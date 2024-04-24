@@ -26,5 +26,6 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard2');
 
-    Route::get('/pick-up-job/create', [PickUpJobController::class, 'create'])->name('pick-up.create');
+    Route::get('/pick-up/create-job', [PickUpJobController::class, 'create'])
+        ->name('pick-up.create-job');
 });

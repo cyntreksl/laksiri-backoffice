@@ -8,6 +8,6 @@ class PickUpJobController extends Controller
 {
     public function create()
     {
-        return Inertia::render('PickUpJob');
+        return Inertia::render('Pickup/CreateJob');
     }
 }
