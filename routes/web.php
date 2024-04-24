@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PickUpJobController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -13,7 +14,6 @@ Route::get('/', function () {
     ]);
 });
 
-
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -25,4 +25,6 @@ Route::middleware([
     Route::get('/dashboard-2', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard2');
+
+    Route::get('/pick-up-job/create', [PickUpJobController::class, 'create'])->name('pick-up.create');
 });

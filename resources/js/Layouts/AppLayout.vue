@@ -328,10 +328,10 @@ export default {
                     break
                 case 'sample':
                     childMenuList.splice(0, childMenuList.length, {
-                        title: 'Dashboard1x',
-                        route: 'dashboard'
+                        title: 'Add Job',
+                        route: 'pick-up.create'
                     }, {
-                        title: 'Dashboard2y',
+                        title: 'Pending Jobs',
                         route: 'dashboard2'
                     })
                     break
