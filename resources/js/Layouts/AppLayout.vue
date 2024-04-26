@@ -567,11 +567,11 @@ export default {
                         childMenuList.length,
                         {
                             title: "Create Job",
-                            route: "pick-up.create-job",
+                            route: "pickups.create",
                         },
                         {
                             title: "Pending Jobs",
-                            route: "dashboard2",
+                            route: "pickups.index",
                         },
                         {
                             title: "Pickup Ordering",
