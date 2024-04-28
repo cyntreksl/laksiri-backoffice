@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PickupController;
 use App\Http\Controllers\PickUpJobController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -26,5 +27,6 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard2');
 
-    Route::get('/pick-up-job/create', [PickUpJobController::class, 'create'])->name('pick-up.create');
+    // Pick Up
+    Route::resource('pickups', PickupController::class);
 });
