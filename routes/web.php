@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\PickupController;
-use App\Http\Controllers\PickUpJobController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;

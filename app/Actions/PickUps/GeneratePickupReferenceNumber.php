@@ -10,6 +10,6 @@ class GeneratePickupReferenceNumber
 
     public function handle(): string
     {
-        return 'REF' . str_pad(mt_rand(1, 999999), 6, '0', STR_PAD_LEFT);
+        return 'REF'.str_pad(mt_rand(1, 999999), 6, '0', STR_PAD_LEFT);
     }
 }

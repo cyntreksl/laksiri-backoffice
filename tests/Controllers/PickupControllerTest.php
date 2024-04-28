@@ -5,7 +5,6 @@ namespace Tests\Controllers;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Http\Response;
 use Tests\TestCase;
 
 class PickupControllerTest extends TestCase
@@ -46,7 +45,7 @@ class PickupControllerTest extends TestCase
             'notes' => 'This is a test note.',
         ];
 
-        $response = $this->post(route('pickups.store'),  [
+        $response = $this->post(route('pickups.store'), [
             'cargo_type' => 'sea',
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
@@ -57,9 +56,7 @@ class PickupControllerTest extends TestCase
             'note' => 'This is a test note.',
         ]);
 
-
         $response->assertStatus(200); // 302 Found (redirect)
         $this->assertDatabaseHas('pick_ups', $data);
     }
-
 }

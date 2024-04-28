@@ -9,7 +9,6 @@ use Inertia\Inertia;
 
 class PickupController extends Controller
 {
-
     public function __construct(private readonly PickupRepositoryInterface $pickupRepository)
     {
     }
@@ -19,7 +18,7 @@ class PickupController extends Controller
         $pickups = $this->pickupRepository->getPickups();
 
         return Inertia::render('Pickup/PendingJobs', [
-            'pickups' => $pickups
+            'pickups' => $pickups,
         ]);
     }
 

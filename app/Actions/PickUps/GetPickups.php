@@ -11,6 +11,6 @@ class GetPickups
 
     public function handle()
     {
-        return  PickUp::latest()->get();
+        return PickUp::latest()->get();
     }
 }

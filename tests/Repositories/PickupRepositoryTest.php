@@ -10,6 +10,7 @@ use App\Repositories\PickupRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;
+
 class PickupRepositoryTest extends TestCase
 {
     use RefreshDatabase;
@@ -21,7 +22,6 @@ class PickupRepositoryTest extends TestCase
 
         $pickup1 = PickUp::factory()->create(['name' => 'John Doe']);
         $pickup2 = PickUp::factory()->create(['name' => 'Jane Doe']);
-
 
         $getPickupsActionMock = Mockery::mock(GetPickups::class);
         $getPickupsActionMock
@@ -35,7 +35,6 @@ class PickupRepositoryTest extends TestCase
         $this->assertEquals($pickup1->name, $pickups[0]->name);
         $this->assertEquals($pickup2->name, $pickups[1]->name);
     }
-
 
     public function test_store_pickup_method_in_repository()
     {
@@ -78,7 +77,4 @@ class PickupRepositoryTest extends TestCase
             'created_by' => 1,
         ]);
     }
-
-
-
 }
