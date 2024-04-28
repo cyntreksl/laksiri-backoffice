@@ -3,12 +3,16 @@
 namespace App\Repositories;
 
 use App\Actions\PickUps\CreatePickUp;
-use App\Enum\CargoType;
+use App\Actions\PickUps\GetPickups;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Models\PickUp;
 
 class PickupRepository implements PickupRepositoryInterface
 {
+    public function getPickups()
+    {
+        return GetPickups::run();
+    }
 
     public function storePickup(array $data)
     {

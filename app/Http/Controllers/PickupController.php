@@ -16,7 +16,7 @@ class PickupController extends Controller
 
     public function index()
     {
-        $pickups = PickUp::latest()->get();
+        $pickups = $this->pickupRepository->getPickups();
 
         return Inertia::render('Pickup/PendingJobs', [
             'pickups' => $pickups

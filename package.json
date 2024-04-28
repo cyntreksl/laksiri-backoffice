@@ -34,7 +34,8 @@
         "filepond": "^4.30.6",
         "filepond-plugin-image-preview": "^4.6.12",
         "flatpickr": "^4.6.13",
-        "gridjs": "^6.1.1",
+        "gridjs": "^6.2.0",
+        "gridjs-vue": "^5.0.4",
         "highlight.js": "^11.9.0",
         "pinia": "^2.1.7",
         "quill": "^1.3.7",
@@ -43,6 +44,7 @@
         "swiper": "^11.0.7",
         "tippy.js": "^6.3.7",
         "toastify-js": "^1.12.0",
-        "tom-select": "^2.3.1"
+        "tom-select": "^2.3.1",
+        "vue3-popper": "^1.5.0"
     }
 }

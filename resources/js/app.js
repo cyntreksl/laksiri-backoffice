@@ -76,12 +76,15 @@ import { createPinia } from 'pinia'
 const pinia = createPinia()
 
 
+import Popper from "vue3-popper";
+
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
         return createApp({ render: () => h(App, props) })
             .use(plugin)
+            .use(Popper)
             .use(ZiggyVue)
             .use(pinia)
             .mount(el);
