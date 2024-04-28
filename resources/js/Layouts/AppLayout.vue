@@ -61,10 +61,10 @@
                         </a>
                         <!-- Pickup -->
                         <a
-                            @click="setMenu('pick-up')"
+                            @click="setMenu('pickups')"
                             x-tooltip.placement.right="'Pickup'"
                             :class="[
-                                activeMenu === 'pick-up'
+                                activeMenu === 'pickups'
                                     ? 'bg-primary/10 text-primary'
                                     : '',
                             ]"
@@ -490,7 +490,7 @@
     </div>
 </template>
 <script>
-import { reactive, ref } from "vue";
+import {customRef, reactive, ref} from "vue";
 import { useMonochromeSelector } from "../composable/monochromeMode.js";
 import { useDarkModeSelector } from "../composable/darkMode.js";
 import { Head, router } from "@inertiajs/vue3";
@@ -542,8 +542,11 @@ export default {
 
         setSidebarState();
 
+        const current = route().current();
+        const mainRoute = current.split('.')[0];
+        const activeMenu = ref(mainRoute);
+
         const childMenuList = reactive([]);
-        const activeMenu = ref("home");
 
         const setMenu = (menu) => {
             switch (menu) {
@@ -561,7 +564,7 @@ export default {
                         },
                     );
                     break;
-                case "pick-up":
+                case "pickups":
                     childMenuList.splice(
                         0,
                         childMenuList.length,
@@ -588,11 +591,10 @@ export default {
                     );
                     break;
             }
-
             activeMenu.value = menu;
         };
 
-        setMenu("home");
+        setMenu(mainRoute);
 
         return {
             toggleSideBar,

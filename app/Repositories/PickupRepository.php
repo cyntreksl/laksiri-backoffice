@@ -8,11 +8,9 @@ use App\Models\PickUp;
 
 class PickupRepository implements PickupRepositoryInterface
 {
-
     public function storePickup(array $data)
     {
-        // generate reference number using REF111111 pattern.
-        $reference_number = 'REF' . str_pad(mt_rand(1, 999999), 6, '0', STR_PAD_LEFT);
+        $reference_number = $this->generatePickupReferenceNumber();
         // assign agent
 
         // assign location longitude, latitude and name
@@ -31,5 +29,11 @@ class PickupRepository implements PickupRepositoryInterface
             'notes' => $data['note'],
             'created_by' => auth()->id(),
         ]);
+    }
+
+    // generate reference number using REF111111 pattern.
+    private function generatePickupReferenceNumber(): string
+    {
+        return 'REF' . str_pad(mt_rand(1, 999999), 6, '0', STR_PAD_LEFT);
     }
 }

@@ -9,11 +9,9 @@ use Inertia\Inertia;
 
 class PickupController extends Controller
 {
-    private PickupRepositoryInterface $pickupRepository;
 
-    public function __construct(PickupRepositoryInterface $pickupRepository)
+    public function __construct(private readonly PickupRepositoryInterface $pickupRepository)
     {
-        $this->pickupRepository = $pickupRepository;
     }
 
     public function index()
