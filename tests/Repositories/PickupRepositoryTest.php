@@ -10,13 +10,15 @@ use App\Repositories\PickupRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;
-use Mockery\MockInterface;
 class PickupRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
     public function test_get_pickups_method_in_repository()
     {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
         $pickup1 = PickUp::factory()->create(['name' => 'John Doe']);
         $pickup2 = PickUp::factory()->create(['name' => 'Jane Doe']);
 
@@ -37,8 +39,8 @@ class PickupRepositoryTest extends TestCase
 
     public function test_store_pickup_method_in_repository()
     {
-
-        $this->actingAs(User::factory()->create());
+        $user = User::factory()->create();
+        $this->actingAs($user);
 
         $data = [
             'cargo_type' => 'sea',
@@ -52,12 +54,13 @@ class PickupRepositoryTest extends TestCase
         ];
 
         $pickup = PickUp::factory()->create($data);
+
         $createPickUpMock = Mockery::mock(CreatePickUp::class);
         $createPickUpMock
             ->expects('handle')
-            ->once()
             ->with($data)
             ->andReturns($pickup);
+
         $this->app->instance(CreatePickUp::class, $createPickUpMock);
 
         $pickupRepository = new PickupRepository();
@@ -72,9 +75,10 @@ class PickupRepositoryTest extends TestCase
             'location_name' => 'New York',
             'zone_id' => 1,
             'notes' => 'This is a test note.',
-            'created_by' => auth()->id(),
+            'created_by' => 1,
         ]);
     }
+
 
 
 }
