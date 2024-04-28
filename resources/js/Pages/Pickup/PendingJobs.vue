@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
+import {ref} from "vue";
 
 defineProps({
     pickups: {
@@ -7,6 +8,8 @@ defineProps({
         default: () => {},
     },
 });
+
+const isFilterExpanded = ref(true);
 </script>
 
 <template>
@@ -104,7 +107,7 @@ defineProps({
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                             />
                         </svg>
-                        <span>Create</span>
+                        <span>List</span>
                     </div>
                 </li>
             </ul>
@@ -113,31 +116,21 @@ defineProps({
         <div class="py-10">
             <div x-data="{isFilterExpanded:false}">
                 <div class="flex items-center justify-between">
-                    <h2
-                        class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
+                    <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
                         Pending Pickups
                     </h2>
+
                     <div class="flex">
-                        <div
-                            class="flex items-center"
-                            x-data="{isInputActive:false}"
-                        >
+                        <div class="flex items-center" x-data="{isInputActive:false}">
                             <label class="block">
                                 <input
-                                    x-effect="isInputActive === true && $nextTick(() => { $el.focus()});"
-                                    :class="
-                                        isInputActive ? 'w-32 lg:w-48' : 'w-0'
-                                    "
-                                    class="form-input bg-transparent px-1 text-right transition-all duration-100 placeholder:text-slate-500 dark:placeholder:text-navy-200"
+                                    class="form-input h-8 w-full rounded-full border border-slate-300 bg-transparent px-4 py-2 text-xs+ placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     placeholder="Search here..."
                                     type="text"
                                 />
                             </label>
                             <button
-                                @click="isInputActive = !isInputActive"
-                                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            >
+                                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     class="size-4.5"
