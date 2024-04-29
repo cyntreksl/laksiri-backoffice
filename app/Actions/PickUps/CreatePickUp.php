@@ -2,7 +2,6 @@
 
 namespace App\Actions\PickUps;
 
-use App\Enum\CargoType;
 use App\Models\PickUp;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -15,7 +14,7 @@ class CreatePickUp
         return PickUp::create([
             'reference' => GeneratePickupReferenceNumber::run(),
             'agent_id' => 1,
-            'cargo_type' => $data['cargo_type'] === 'sea' ? CargoType::SEA_CARGO : CargoType::AIR_CARGO,
+            'cargo_type' => $data['cargo_type'],
             'name' => $data['name'],
             'email' => $data['email'],
             'contact_number' => $data['contact_number'],
