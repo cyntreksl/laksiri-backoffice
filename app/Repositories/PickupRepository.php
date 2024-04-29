@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Actions\NoteType\GetNoteTypes;
 use App\Actions\PickUps\CreatePickUp;
 use App\Actions\PickUps\GetPickups;
 use App\Interfaces\PickupRepositoryInterface;
@@ -22,5 +23,10 @@ class PickupRepository implements PickupRepositoryInterface
 
         // store pickup
         return CreatePickUp::run($data);
+    }
+
+    public function getNoteTypes()
+    {
+        return GetNoteTypes::run();
     }
 }

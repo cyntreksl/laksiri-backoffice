@@ -25,7 +25,9 @@ class PickupController extends Controller
 
     public function create()
     {
-        return Inertia::render('Pickup/CreateJob');
+        return Inertia::render('Pickup/CreateJob', [
+            'noteTypes' => $this->pickupRepository->getNoteTypes(),
+        ]);
     }
 
     public function store(StorePickupRequest $request)

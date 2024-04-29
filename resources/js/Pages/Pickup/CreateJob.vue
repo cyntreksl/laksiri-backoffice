@@ -2,6 +2,14 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm} from "@inertiajs/vue3";
 
+defineProps({
+    noteTypes: {
+        type: Object,
+        default: () => {
+        }
+    }
+})
+
 const form = useForm({
     name: "",
     email: "",
@@ -273,9 +281,9 @@ const handlePickupCreate = () => {
                                         <option selected disabled>
                                             Select One
                                         </option>
-                                        <option>Wedding</option>
-                                        <option>Birthday</option>
-                                        <option>Other</option>
+                                        <option v-for="noteType in noteTypes" :key="noteType"
+                                                :value="noteType.note_type">{{ noteType.note_type }}
+                                        </option>
                                     </select>
                                 </label>
                                 <span
@@ -411,9 +419,9 @@ const handlePickupCreate = () => {
                                         <option selected disabled>
                                             Select Zone
                                         </option>
-                                        <option value="1">Wedding</option>
-                                        <option value="2">Birthday</option>
-                                        <option value="3">Other</option>
+                                        <option value="1">Zone 1</option>
+                                        <option value="2">Zone 2</option>
+                                        <option value="3">Zone 3</option>
                                     </select>
                                 </label>
                                 <div
