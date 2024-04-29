@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePickupRequest;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Models\PickUp;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class PickupController extends Controller
         return Inertia::render('Pickup/CreateJob');
     }
 
-    public function store(Request $request)
+    public function store(StorePickupRequest $request)
     {
         $this->pickupRepository->storePickup($request->all());
     }

@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { router, useForm } from "@inertiajs/vue3";
+import {router, useForm} from "@inertiajs/vue3";
 
 const form = useForm({
     name: "",
@@ -172,6 +172,10 @@ const handlePickupCreate = () => {
                                         </svg>
                                     </div>
                                 </label>
+                                <span
+                                    v-if="form.errors.name"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.name }}</span>
                             </div>
 
                             <div>
@@ -202,6 +206,10 @@ const handlePickupCreate = () => {
                                         </svg>
                                     </div>
                                 </label>
+                                <span
+                                    v-if="form.errors.email"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.email }}</span>
                             </div>
 
                             <div>
@@ -222,6 +230,10 @@ const handlePickupCreate = () => {
                                         type="text"
                                     />
                                 </div>
+                                <span
+                                    v-if="form.errors.contact_number"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.contact_number }}</span>
                             </div>
 
                             <div class="col-span-2">
@@ -234,6 +246,10 @@ const handlePickupCreate = () => {
                                         class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     ></textarea>
                                 </label>
+                                <span
+                                    v-if="form.errors.address"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.address }}</span>
                             </div>
                         </div>
                     </div>
@@ -262,6 +278,10 @@ const handlePickupCreate = () => {
                                         <option>Other</option>
                                     </select>
                                 </label>
+                                <span
+                                    v-if="form.errors.note_type"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.name }}</span>
                             </div>
 
                             <div class="col-span-2">
@@ -274,6 +294,10 @@ const handlePickupCreate = () => {
                                         class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     ></textarea>
                                 </label>
+                                <span
+                                    v-if="form.errors.note"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.note }}</span>
                             </div>
                         </div>
                     </div>
@@ -314,6 +338,10 @@ const handlePickupCreate = () => {
                                     <p>Sea Cargo</p>
                                 </label>
                             </div>
+                            <span
+                                v-if="form.errors.cargo_type"
+                                class="text-tiny+ text-error"
+                            >{{ form.errors.cargo_type }}</span>
                         </div>
                     </div>
 
@@ -339,6 +367,11 @@ const handlePickupCreate = () => {
                                             type="text"
                                         />
                                     </label>
+                                    <div
+                                        v-if="form.errors.location"
+                                        class="text-tiny+ text-error"
+                                    >{{ form.errors.location }}
+                                    </div>
                                 </div>
 
                                 <div>
@@ -383,6 +416,11 @@ const handlePickupCreate = () => {
                                         <option value="3">Other</option>
                                     </select>
                                 </label>
+                                <div
+                                    v-if="form.errors.zone_id"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.zone_id }}
+                                </div>
                             </div>
 
                             <div>
@@ -414,6 +452,11 @@ const handlePickupCreate = () => {
                                         </svg>
                                     </span>
                                 </label>
+                                <div
+                                    v-if="form.errors.pickup_date"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.pickup_date }}
+                                </div>
                             </div>
                         </div>
                     </div>
