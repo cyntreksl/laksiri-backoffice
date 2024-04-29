@@ -1,5 +1,5 @@
 <template>
-    <Head :title="title" />
+    <Head :title="title"/>
     <div class="flex grow bg-slate-50 dark:bg-navy-900">
         <!-- Sidebar -->
         <div class="sidebar print:hidden">
@@ -25,6 +25,7 @@
                     >
                         <!-- Dashboard -->
                         <a
+                            :href="route('dashboard')"
                             @click="setMenu('home')"
                             x-tooltip.placement.right="'Dashboard'"
                             :class="[
@@ -34,33 +35,18 @@
                             ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-navy-600 dark:text-accent-light dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                         >
-                            <svg
-                                class="size-7"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    fill="currentColor"
-                                    fill-opacity=".3"
-                                    d="M5 14.059c0-1.01 0-1.514.222-1.945.221-.43.632-.724 1.453-1.31l4.163-2.974c.56-.4.842-.601 1.162-.601.32 0 .601.2 1.162.601l4.163 2.974c.821.586 1.232.88 1.453 1.31.222.43.222.935.222 1.945V19c0 .943 0 1.414-.293 1.707C18.414 21 17.943 21 17 21H7c-.943 0-1.414 0-1.707-.293C5 20.414 5 19.943 5 19v-4.94Z"
-                                ></path>
-                                <path
-                                    fill="currentColor"
-                                    d="M3 12.387c0 .267 0 .4.084.441.084.041.19-.04.4-.204l7.288-5.669c.59-.459.885-.688 1.228-.688.343 0 .638.23 1.228.688l7.288 5.669c.21.163.316.245.4.204.084-.04.084-.174.084-.441v-.409c0-.48 0-.72-.102-.928-.101-.208-.291-.355-.67-.65l-7-5.445c-.59-.459-.885-.688-1.228-.688-.343 0-.638.23-1.228.688l-7 5.445c-.379.295-.569.442-.67.65-.102.208-.102.448-.102.928v.409Z"
-                                ></path>
-                                <path
-                                    fill="currentColor"
-                                    d="M11.5 15.5h1A1.5 1.5 0 0 1 14 17v3.5h-4V17a1.5 1.5 0 0 1 1.5-1.5Z"
-                                ></path>
-                                <path
-                                    fill="currentColor"
-                                    d="M17.5 5h-1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5Z"
-                                ></path>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-home">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M5 12l-2 0l9 -9l9 9l-2 0"/>
+                                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/>
+                                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
                             </svg>
                         </a>
                         <!-- Pickup -->
                         <a
+                            :href="route('pickups.index')"
                             @click="setMenu('pickups')"
                             x-tooltip.placement.right="'Pickup'"
                             :class="[
@@ -70,40 +56,37 @@
                             ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                         >
-                            <svg
-                                class="size-7"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="icon icon-tabler icons-tabler-outline icon-tabler-truck">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                <path d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/>
+                            </svg>
+                        </a>
+                        <!-- HBL -->
+                        <a
+                            :href="route('hbls.index')"
+                            @click="setMenu('hbls')"
+                            x-tooltip.placement.right="'HBL'"
+                            :class="[
+                                activeMenu === 'hbls'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="icon icon-tabler icons-tabler-outline icon-tabler-app-window">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                 <path
-                                    d="M5 8H19V16C19 17.8856 19 18.8284 18.4142 19.4142C17.8284 20 16.8856 20 15 20H9C7.11438 20 6.17157 20 5.58579 19.4142C5 18.8284 5 17.8856 5 16V8Z"
-                                    fill="currentColor"
-                                    fill-opacity="0.3"
-                                ></path>
-                                <path
-                                    d="M12 8L11.7608 5.84709C11.6123 4.51089 10.4672 3.5 9.12282 3.5V3.5C7.68381 3.5 6.5 4.66655 6.5 6.10555V6.10555C6.5 6.97673 6.93539 7.79026 7.66025 8.2735L9.5 9.5"
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                ></path>
-                                <path
-                                    d="M12 8L12.2392 5.84709C12.3877 4.51089 13.5328 3.5 14.8772 3.5V3.5C16.3162 3.5 17.5 4.66655 17.5 6.10555V6.10555C17.5 6.97673 17.0646 7.79026 16.3397 8.2735L14.5 9.5"
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                ></path>
-                                <rect
-                                    x="4"
-                                    y="8"
-                                    width="16"
-                                    height="3"
-                                    rx="1"
-                                    fill="currentColor"
-                                ></rect>
-                                <path
-                                    d="M12 11V15"
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                ></path>
+                                    d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/>
+                                <path d="M6 8h.01"/>
+                                <path d="M9 8h.01"/>
                             </svg>
                         </a>
                     </div>
@@ -276,7 +259,7 @@
                         <p
                             class="text-base tracking-wider text-slate-800 dark:text-navy-100"
                         >
-                            <slot name="header" />
+                            <slot name="header"/>
                         </p>
                         <button
                             class="btn size-7 rounded-full p-0 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent-light/80 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 xl:hidden"
@@ -485,19 +468,19 @@
 
         <!-- Main Content Wrapper -->
         <main class="main-content w-full h-screen pb-8 p-4">
-            <slot />
+            <slot/>
         </main>
     </div>
 </template>
 <script>
 import {customRef, reactive, ref} from "vue";
-import { useMonochromeSelector } from "../composable/monochromeMode.js";
-import { useDarkModeSelector } from "../composable/darkMode.js";
-import { Head, router } from "@inertiajs/vue3";
+import {useMonochromeSelector} from "../composable/monochromeMode.js";
+import {useDarkModeSelector} from "../composable/darkMode.js";
+import {Head, router} from "@inertiajs/vue3";
 import logo from "../../images/app-logo.svg";
 
 export default {
-    components: { Head },
+    components: {Head},
     props: {
         title: "",
     },
@@ -587,6 +570,20 @@ export default {
                         {
                             title: "All Jobs",
                             route: "dashboard2",
+                        },
+                    );
+                    break;
+                case "hbls":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Create HBL",
+                            route: "hbls.create",
+                        },
+                        {
+                            title: "All HBL",
+                            route: "hbls.index",
                         },
                     );
                     break;

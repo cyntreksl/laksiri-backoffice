@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -28,4 +29,6 @@ Route::middleware([
 
     // Pick Up
     Route::resource('pickups', PickupController::class);
+    // HBL
+    Route::resource('hbls', HBLController::class);
 });
