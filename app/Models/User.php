@@ -34,6 +34,7 @@ class User extends Authenticatable
         'name',
         'email',
         'username',
+        'password',
         'primary_branch_id',
         'status',
         'is_ban',
@@ -87,6 +88,6 @@ class User extends Authenticatable
 
     public function branches(): BelongsToMany
     {
-        return $this->belongsToMany(Branch::class, 'user_branches');
+        return $this->belongsToMany(Branch::class, 'branch_user', 'user_id', 'branch_id');
     }
 }

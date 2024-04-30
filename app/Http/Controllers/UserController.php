@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUserRequest;
+use App\Interfaces\BranchRepositoryInterface;
+use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -9,7 +12,11 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function __construct(private readonly UserRepositoryInterface $userRepository)
+    public function __construct(
+        private readonly UserRepositoryInterface   $userRepository,
+        private readonly RoleRepositoryInterface   $roleRepository,
+        private readonly BranchRepositoryInterface $branchRepository,
+    )
     {
     }
 
@@ -20,23 +27,17 @@ class UserController extends Controller
     {
         return Inertia::render('User/UserList', [
             'users' => $this->userRepository->getUsers(),
+            'roles' => $this->roleRepository->getRoles(),
+            'branches' => $this->branchRepository->getBranches(),
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        //
+        $this->userRepository->storeUser($request->all());
     }
 
     /**

@@ -33,5 +33,6 @@ Route::middleware([
     // HBL
     Route::resource('hbls', HBLController::class);
     // User
-    Route::resource('users', UserController::class);
+    Route::resource('users', UserController::class)
+        ->except(['create']);
 });
