@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -31,7 +33,12 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
+        'username',
+        'primary_branch_id',
+        'status',
+        'is_ban',
+        'last_login_at',
+        'last_logout_at',
     ];
 
     /**
@@ -71,5 +78,15 @@ class User extends Authenticatable
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->logOnlyDirty();
+    }
+
+    public function primaryBranch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'primary_branch_id');
+    }
+
+    public function branches(): BelongsToMany
+    {
+        return $this->belongsToMany(Branch::class, 'user_branches');
     }
 }

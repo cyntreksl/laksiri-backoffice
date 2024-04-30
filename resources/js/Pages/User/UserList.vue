@@ -1,12 +1,12 @@
 <script setup>
+import Breadcrumb from "@/Components/Breadcrumb.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
 import {Grid} from "gridjs";
-import AppLayout from "@/Layouts/AppLayout.vue";
-import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Popper from "vue3-popper";
 
 const props = defineProps({
-    hbls: {
+    users: {
         type: Object,
         default: () => {
         }
@@ -17,14 +17,14 @@ const wrapperRef = ref(null);
 let grid = null;
 
 const data = reactive({
-    HBLData: props.hbls,
+    UserData: props.users,
     columnVisibility: {
-        reference: true,
-        hbl_name: true,
-        consignee_name: true,
+        username: true,
+        primary_branch_id: true,
+        created_at: true,
         status: true,
-        address: true,
-        consignee_address: true,
+        last_login_at: true,
+        last_logout_at: true,
     }
 });
 
@@ -44,22 +44,22 @@ const initializeGrid = () => {
 };
 
 const createColumns = () => [
-    {name: 'HBL', hidden: !data.columnVisibility.reference},
-    {name: 'Name', hidden: !data.columnVisibility.hbl_name},
-    {name: 'Name Consignee', hidden: !data.columnVisibility.consignee_name},
+    {name: 'Username', hidden: !data.columnVisibility.username},
+    {name: 'Primary Branch', hidden: !data.columnVisibility.primary_branch_id},
+    {name: 'Created At', hidden: !data.columnVisibility.created_at},
     {name: 'Status', hidden: !data.columnVisibility.status},
-    {name: 'Address', hidden: !data.columnVisibility.address},
-    {name: 'Address Consignee', hidden: !data.columnVisibility.consignee_address},
+    {name: 'Last Login', hidden: !data.columnVisibility.last_login_at},
+    {name: 'Last Logout', hidden: !data.columnVisibility.last_logout_at},
 ];
 
 const createData = () =>
-    data.HBLData.map(pickup => [
-        pickup.reference,
-        pickup.hbl_name,
-        pickup.consignee_name,
+    data.UserData.map(pickup => [
+        pickup.username,
+        pickup.primary_branch_id,
+        pickup.created_at,
         pickup.status,
-        pickup.address,
-        pickup.consignee_address,
+        pickup.last_login_at,
+        pickup.last_logout_at,
     ]);
 
 const updateGridConfig = () => {
@@ -82,8 +82,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <AppLayout title="HBL List">
-        <template #header>HBL List</template>
+    <AppLayout title="User Management">
+        <template #header>User Management</template>
 
         <Breadcrumb/>
 
@@ -91,7 +91,7 @@ onMounted(() => {
             <div>
                 <div class="flex items-center justify-between p-2">
                     <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                        HBL List
+                        User Management
                     </h2>
 
                     <div class="flex">
@@ -113,8 +113,8 @@ onMounted(() => {
                                             <div class="mt-4 flex flex-col space-y-4 text-slate-600 dark:text-navy-100">
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
-                                                        :checked="data.columnVisibility.reference"
-                                                        @change="toggleColumnVisibility('reference', $event)"
+                                                        :checked="data.columnVisibility.username"
+                                                        @change="toggleColumnVisibility('username', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
@@ -123,52 +123,12 @@ onMounted(() => {
 
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
-                                                        :checked="data.columnVisibility.name"
-                                                        @change="toggleColumnVisibility('name', $event)"
+                                                        :checked="data.columnVisibility.primary_branch_id"
+                                                        @change="toggleColumnVisibility('primary_branch_id', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
                                                     <p>Name</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.address"
-                                                        @change="toggleColumnVisibility('consignee_name', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Name Consignee</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.contact"
-                                                        @change="toggleColumnVisibility('status', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Status</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.cargoMode"
-                                                        @change="toggleColumnVisibility('address', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Address</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.notes"
-                                                        @change="toggleColumnVisibility('consignee_address', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Address Consignee</p>
                                                 </label>
                                             </div>
                                         </div>
@@ -189,7 +149,7 @@ onMounted(() => {
                         <button
                             class="btn bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                         >
-                            New HBL
+                            New User
                         </button>
                     </a>
                 </div>
