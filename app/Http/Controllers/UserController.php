@@ -13,8 +13,8 @@ use Inertia\Inertia;
 class UserController extends Controller
 {
     public function __construct(
-        private readonly UserRepositoryInterface   $userRepository,
-        private readonly RoleRepositoryInterface   $roleRepository,
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly RoleRepositoryInterface $roleRepository,
         private readonly BranchRepositoryInterface $branchRepository,
     )
     {
