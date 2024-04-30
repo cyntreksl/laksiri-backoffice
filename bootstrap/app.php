@@ -12,7 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withEvents([
-        __DIR__ . '/../app/Events',
+        __DIR__.'/../app/Events',
     ])
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
