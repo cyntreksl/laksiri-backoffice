@@ -30,7 +30,7 @@ const props = defineProps({
 const wrapperRef = ref(null);
 let grid = null;
 const confirmingUserCreation = ref(false);
-
+console.log(props.users)
 const data = reactive({
     UserData: props.users,
     columnVisibility: {
@@ -47,8 +47,7 @@ const initializeGrid = () => {
     grid = new Grid({
         search: true,
         pagination: {
-            enabled: true,
-            limit: 10,
+            limit: 20
         },
         sort: true,
         columns: createColumns(),
