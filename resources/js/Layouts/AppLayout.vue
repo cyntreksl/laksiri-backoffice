@@ -93,7 +93,7 @@
                         <a
                             :href="route('users.index')"
                             @click="setMenu('users')"
-                            x-tooltip.placement.right="'Admin'"
+                            x-tooltip.placement.right="'User Management'"
                             :class="[
                                 activeMenu === 'users'
                                     ? 'bg-primary/10 text-primary'

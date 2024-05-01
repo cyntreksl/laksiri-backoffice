@@ -1,5 +1,4 @@
 <script setup>
-import Breadcrumb from "@/Components/Breadcrumb.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
 import {Grid} from "gridjs";
@@ -126,7 +125,6 @@ const createUser = () => {
     <AppLayout title="User Management">
         <template #header>User Management</template>
 
-        <Breadcrumb/>
 
         <div class="card mt-4">
             <div>
