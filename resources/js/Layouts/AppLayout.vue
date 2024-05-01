@@ -25,7 +25,6 @@
                     >
                         <!-- Dashboard -->
                         <a
-                            :href="route('dashboard')"
                             @click="setMenu('home')"
                             x-tooltip.placement.right="'Dashboard'"
                             :class="[
@@ -46,7 +45,6 @@
                         </a>
                         <!-- Pickup -->
                         <a
-                            :href="route('pickups.index')"
                             @click="setMenu('pickups')"
                             x-tooltip.placement.right="'Pickup'"
                             :class="[
@@ -68,7 +66,6 @@
                         </a>
                         <!-- HBL -->
                         <a
-                            :href="route('hbls.index')"
                             @click="setMenu('hbls')"
                             x-tooltip.placement.right="'HBL'"
                             :class="[
@@ -91,7 +88,6 @@
                         </a>
                         <!-- Admin -->
                         <a
-                            :href="route('users.index')"
                             @click="setMenu('users')"
                             x-tooltip.placement.right="'User Management'"
                             :class="[
@@ -305,90 +301,39 @@
                     </div>
 
                     <!-- Sidebar Panel Body -->
-                    <div
-                        class="h-[calc(100%-4.5rem)] overflow-x-hidden pb-6 simplebar-scrollable-y"
-                        data-simplebar="init"
-                    >
-                        <div
-                            class="simplebar-wrapper"
-                            style="margin: 0px 0px -24px"
-                        >
+                    <div class="h-[calc(100%-4.5rem)] overflow-x-hidden pb-6 simplebar-scrollable-y"
+                         data-simplebar="init">
+                        <div class="simplebar-wrapper" style="margin: 0px 0px -24px">
                             <div class="simplebar-height-auto-observer-wrapper">
-                                <div
-                                    class="simplebar-height-auto-observer"
-                                ></div>
+                                <div class="simplebar-height-auto-observer"></div>
                             </div>
                             <div class="simplebar-mask">
-                                <div
-                                    class="simplebar-offset"
-                                    style="right: 0px; bottom: 0px"
-                                >
-                                    <div
-                                        class="simplebar-content-wrapper"
-                                        tabindex="0"
-                                        role="region"
-                                        aria-label="scrollable content"
-                                        style="
-                                            height: 100%;
-                                            overflow: hidden scroll;
-                                        "
-                                    >
-                                        <div
-                                            class="simplebar-content"
-                                            style="padding: 0px 0px 24px"
-                                        >
-                                            <ul
-                                                class="flex flex-1 flex-col px-4 font-inter"
-                                            >
-                                                <li
-                                                    v-for="item in childMenuList"
-                                                >
-                                                    <a
-                                                        :href="
-                                                            route(item.route)
-                                                        "
-                                                        :class="
-                                                            route().current() ===
-                                                            item.route
-                                                                ? 'font-medium text-primary dark:text-accent-light'
-                                                                : 'text-slate-600 hover:text-slate-900 dark:text-navy-200 dark:hover:text-navy-50'
-                                                        "
-                                                        class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
-                                                    >
+                                <div class="simplebar-offset" style="right: 0px; bottom: 0px">
+                                    <div class="simplebar-content-wrapper" tabindex="0" role="region"
+                                         aria-label="scrollable content"
+                                         style=" height: 100%;overflow: hidden scroll; ">
+                                        <div class="simplebar-content" style="padding: 0px 0px 24px">
+                                            <ul class="flex flex-1 flex-col px-4 font-inter">
+                                                <li v-for="item in childMenuList">
+                                                    <Link :href="route(item.route)"
+                                                          :class="route().current() ===item.route? 'font-medium text-primary dark:text-accent-light': 'text-slate-600 hover:text-slate-900 dark:text-navy-200 dark:hover:text-navy-50'"
+                                                          class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light">
                                                         {{ item.title }}
-                                                    </a>
+                                                    </Link>
                                                 </li>
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div
-                                class="simplebar-placeholder"
-                                style="width: 240px; height: 686px"
-                            ></div>
+                            <div class="simplebar-placeholder" style="width: 240px; height: 686px"></div>
                         </div>
-                        <div
-                            class="simplebar-track simplebar-horizontal"
-                            style="visibility: hidden"
-                        >
-                            <div
-                                class="simplebar-scrollbar"
-                                style="width: 0px; display: none"
-                            ></div>
+                        <div class="simplebar-track simplebar-horizontal" style="visibility: hidden">
+                            <div class="simplebar-scrollbar" style="width: 0px; display: none"></div>
                         </div>
-                        <div
-                            class="simplebar-track simplebar-vertical"
-                            style="visibility: visible"
-                        >
-                            <div
-                                class="simplebar-scrollbar"
-                                style="
-                                    height: 126px;
-                                    display: block;
-                                    transform: translate3d(0px, 0px, 0px);
-                                "
-                            ></div>
+                        <div class="simplebar-track simplebar-vertical" style="visibility: visible">
+                            <div class="simplebar-scrollbar"
+                                 style="height: 126px;display: block;transform: translate3d(0px, 0px, 0px);"></div>
                         </div>
                     </div>
                 </div>
@@ -501,9 +446,10 @@ import {useMonochromeSelector} from "../composable/monochromeMode.js";
 import {useDarkModeSelector} from "../composable/darkMode.js";
 import {Head, router} from "@inertiajs/vue3";
 import logo from "../../images/app-logo.svg";
+import {Link} from '@inertiajs/vue3'
 
 export default {
-    components: {Head},
+    components: {Head, Link},
     props: {
         title: "",
     },

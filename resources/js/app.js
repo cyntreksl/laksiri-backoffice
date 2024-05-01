@@ -84,7 +84,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         return createApp({ render: () => h(App, props) })
             .use(plugin)
-            .use(Popper)
+            // .use(Popper)
             .use(ZiggyVue)
             .use(pinia)
             .mount(el);
