@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,4 +32,7 @@ Route::middleware([
     Route::resource('pickups', PickupController::class);
     // HBL
     Route::resource('hbls', HBLController::class);
+    // User
+    Route::resource('users', UserController::class)
+        ->except(['create']);
 });

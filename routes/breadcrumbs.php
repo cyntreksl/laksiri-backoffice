@@ -31,3 +31,9 @@ Breadcrumbs::for('hbls.create', function (BreadcrumbTrail $trail) {
     $trail->parent('hbls.index');
     $trail->push('Create HBL', route('hbls.create'));
 });
+
+// Users
+Breadcrumbs::for('users.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('User Management', route('users.index'));
+});

@@ -16,7 +16,7 @@ defineProps({
 });
 
 const form = useForm({
-    email: '',
+    username: '',
     password: '',
     remember: false,
 });
@@ -123,23 +123,24 @@ const submit = () => {
                 <form @submit.prevent="submit" class="mt-16">
                     <label class="relative flex">
                         <input
-                            id="email"
-                            v-model="form.email"
+                            id="username"
+                            v-model="form.username"
                             required
                             autofocus
                             autocomplete="username"
                             class="form-input peer w-full rounded-lg bg-slate-150 px-3 py-2 pl-9 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
-                            placeholder="Email" type="email"/>
+                            placeholder="Username" type="text"/>
                         <span
                             class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="size-5 transition-colors duration-200"
-                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                 stroke="currentColor" class="size-5 transition-colors duration-200">
+  <path stroke-linecap="round" stroke-linejoin="round"
+        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+</svg>
+
                     </span>
                     </label>
-                    <InputError class="mt-2" :message="form.errors.email"/>
+                    <InputError class="mt-2" :message="form.errors.username"/>
                     <label class="relative mt-4 flex">
                         <input
                             id="password"
@@ -178,16 +179,6 @@ const submit = () => {
                         class="btn mt-10 h-10 w-full bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
                         Sign In
                     </button>
-                    <div class="mt-4 text-center text-xs+">
-                        <p class="line-clamp-1">
-                            <span>Dont have Account?</span>
-
-                            <Link :href="route('register')"
-                                  class="text-primary transition-colors hover:text-primary-focus dark:text-accent-light dark:hover:text-accent"
-                            >Create account
-                            </Link>
-                        </p>
-                    </div>
                 </form>
             </div>
             <div class="my-5 flex justify-center text-xs text-slate-400 dark:text-navy-300">

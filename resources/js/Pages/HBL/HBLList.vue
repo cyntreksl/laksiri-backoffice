@@ -3,6 +3,7 @@ import {onMounted, reactive, ref} from "vue";
 import {Grid} from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import Popper from "vue3-popper";
 
 const props = defineProps({
     hbls: {

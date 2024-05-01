@@ -89,6 +89,29 @@
                                 <path d="M9 8h.01"/>
                             </svg>
                         </a>
+                        <!-- Admin -->
+                        <a
+                            :href="route('users.index')"
+                            @click="setMenu('users')"
+                            x-tooltip.placement.right="'Admin'"
+                            :class="[
+                                activeMenu === 'users'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="icon icon-tabler icons-tabler-outline icon-tabler-users">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+                                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
+                            </svg>
+                        </a>
                     </div>
 
                     <!-- Bottom Links -->
@@ -584,6 +607,16 @@ export default {
                         {
                             title: "All HBL",
                             route: "hbls.index",
+                        },
+                    );
+                    break;
+                case "users":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Users",
+                            route: "users.index",
                         },
                     );
                     break;
