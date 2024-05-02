@@ -35,4 +35,6 @@ Route::middleware([
     // User
     Route::resource('users', UserController::class)
         ->except(['create']);
+
+    Route::get('user-list', [UserController::class, 'list']);
 });

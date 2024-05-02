@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {className, Grid, h, html} from "gridjs";
+import {Grid, h} from "gridjs";
 import Popper from "vue3-popper";
 import CreateUserForm from "@/Pages/User/Partials/CreateUserForm.vue";
 import {router} from "@inertiajs/vue3";
@@ -27,34 +27,64 @@ const wrapperRef = ref(null);
 let grid = null;
 
 const data = reactive({
-    UserData: props.users,
+    UserData: {},
     columnVisibility: {
         id: false,
         username: true,
-        primary_branch_id: true,
+        primary_branch_name: true,
         created_at: true,
         status: true,
         last_login_at: true,
         last_logout_at: true,
-        branches: true,
+        secondary_branch_names: true,
         actions: true,
     }
 });
 
 const initializeGrid = () => {
     grid = new Grid({
-        search: true,
-        pagination: {
-            limit: 20
-        },
-        sort: true,
         columns: createColumns(),
-        data: () => {
-            return new Promise(resolve => {
-                setTimeout(() =>
-                    resolve(createData()), 2000);
-            });
+        search: {
+            debounceTimeout:1000,
+            server: {
+                url: (prev, keyword) => `${prev}?search=${keyword}`
+            }
         },
+        sort: {
+            multiColumn: false,
+            server: {
+                url: (prev, columns) => {
+                    if (!columns.length) return prev;
+
+                    const col = columns[0];
+                    const dir = col.direction === 1 ? 'asc' : 'desc';
+                    let colName = ['id', 'username','primary_branch_name', 'created_at','status', 'last_login_at','last_logout_at', 'secondary_branch_names'][col.index];
+
+                    return `${prev}&order=${colName}&dir=${dir}`;
+                }
+            }
+        },
+        pagination: {
+            limit: 10,
+            server: {
+                url: (prev, page, limit) => `${prev}&limit=${limit}&offset=${page * limit}`
+            }
+        },
+        server: {
+            url: '/user-list?',
+            then: data => data.data.map(pokemon => [
+                pokemon.id,
+                pokemon.username,
+                pokemon.primary_branch_name,
+                pokemon.created_at,
+                pokemon.status,
+                pokemon.last_login_at,
+                pokemon.last_logout_at,
+                pokemon.secondary_branch_names,
+            ]),
+            total: data => data.meta.total
+        }
+
     });
 
     grid.render(wrapperRef.value);
@@ -74,14 +104,15 @@ const deleteItem = (row) => {
 const createColumns = () => [
     {name: 'ID', hidden: !data.columnVisibility.id},
     {name: 'Username', hidden: !data.columnVisibility.username},
-    {name: 'Primary Branch', hidden: !data.columnVisibility.primary_branch_id},
+    {name: 'Primary Branch Name', hidden: !data.columnVisibility.primary_branch_name,sort: false},
     {name: 'Created At', hidden: !data.columnVisibility.created_at},
     {name: 'Status', hidden: !data.columnVisibility.status},
     {name: 'Last Login', hidden: !data.columnVisibility.last_login_at},
     {name: 'Last Logout', hidden: !data.columnVisibility.last_logout_at},
-    {name: 'Secondary Branches', hidden: !data.columnVisibility.branches},
+    {name: 'Secondary Branches', hidden: !data.columnVisibility.secondary_branch_names,sort: false},
     {
         name: 'Actions',
+        sort:false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h('div', {}, [
@@ -122,18 +153,6 @@ const createColumns = () => [
     },
 ];
 
-
-const createData = () =>
-    data.UserData.map(user => [
-        user.id,
-        user.username,
-        user.primary_branch.name,
-        user.created_at,
-        user.status,
-        user.last_login_at,
-        user.last_logout_at,
-        user.branches.map(branch => branch.name + " "),
-    ]);
 
 const updateGridConfig = () => {
     grid.updateConfig({
@@ -204,8 +223,8 @@ const handleDeleteUser = (userId) => {
 
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
-                                                        :checked="data.columnVisibility.primary_branch_id"
-                                                        @change="toggleColumnVisibility('primary_branch_id', $event)"
+                                                        :checked="data.columnVisibility.primary_branch_name"
+                                                        @change="toggleColumnVisibility('primary_branch_name', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />

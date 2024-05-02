@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Resources\UserCollection;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
@@ -13,8 +14,8 @@ use Inertia\Inertia;
 class UserController extends Controller
 {
     public function __construct(
-        private readonly UserRepositoryInterface $userRepository,
-        private readonly RoleRepositoryInterface $roleRepository,
+        private readonly UserRepositoryInterface   $userRepository,
+        private readonly RoleRepositoryInterface   $roleRepository,
         private readonly BranchRepositoryInterface $branchRepository,
     )
     {
@@ -29,6 +30,38 @@ class UserController extends Controller
             'users' => $this->userRepository->getUsers(),
             'roles' => $this->roleRepository->getRoles(),
             'branches' => $this->branchRepository->getBranches(),
+        ]);
+    }
+
+    public function list(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+        $search = $request->input('search', null);
+
+        $query = User::with('branches');
+
+        if (!empty($search)) {
+            $query->where('username', 'like', '%' . $search . '%');
+        }
+
+        $users = $query->orderBy($order, $dir)
+            ->skip($page)
+            ->take($limit)
+            ->get();
+
+        $totalUsers = User::count();
+
+        return response()->json([
+            'data' => UserCollection::collection($users),
+            'meta' => [
+                'total' => $totalUsers,
+                'page' => $page,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalUsers / $limit)
+            ]
         ]);
     }
 
