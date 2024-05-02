@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {Grid, h} from "gridjs";
+import {Grid, h, html} from "gridjs";
 import Popper from "vue3-popper";
 import CreateUserForm from "@/Pages/User/Partials/CreateUserForm.vue";
 import {router} from "@inertiajs/vue3";
@@ -60,6 +60,17 @@ const initializeGrid = () => {
     grid.render(wrapperRef.value);
 };
 
+
+const editItem = (row) => {
+    console.log('Edit item:', row);
+    // Add your edit logic here
+};
+
+const deleteItem = (row) => {
+    console.log('Delete item:', row);
+    // Add your delete logic here
+};
+
 const createColumns = () => [
     {name: 'ID', hidden: !data.columnVisibility.id},
     {name: 'Username', hidden: !data.columnVisibility.username},
@@ -71,19 +82,25 @@ const createColumns = () => [
     {name: 'Secondary Branches', hidden: !data.columnVisibility.branches},
     {
         name: 'Actions',
-        hidden: !data.columnVisibility.actions,
-        formatter: (cell, row) => {
-            return h('div', (
+        formatter: (_, row) => {
+            return h('div', {}, [
                 h('button', {
-                    onClick: () => alert(`Editing "${row.cells[0].data}" "${row.cells[1].data}"`)
-                }, 'Edit'),
-                    h('button', {
-                        onClick: () => alert(`Deleting "${row.cells[0].data}" "${row.cells[1].data}"`)
-                    }, 'Delete')
-            ))
+                    className: 'btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2',
+                    onClick: () => editItem(row.cells[0].data)
+                }, [
+                    h('i', { className: 'fas fa-edit' })
+                ]),
+                h('button', {
+                    className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
+                    onClick: () => handleDeleteUser(row.cells[0].data)
+                }, [
+                    h('i', { className: 'fas fa-trash-alt' })
+                ])
+            ]);
         },
     },
 ];
+
 
 const createData = () =>
     data.UserData.map(user => [
@@ -122,13 +139,6 @@ const handleDeleteUser = (userId) => {
     })
 }
 
-function deleteItem() {
-    console.log('h')
-}
-
-function editItem() {
-    console.log('h')
-}
 </script>
 
 <template>

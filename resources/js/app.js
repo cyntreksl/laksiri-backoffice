@@ -94,4 +94,4 @@ createInertiaApp({
     },
 });
 
-Alpine.start()
+// Alpine.start()

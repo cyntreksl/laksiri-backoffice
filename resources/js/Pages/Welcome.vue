@@ -34,7 +34,7 @@ function handleImageError() {
                 Welcome to
             </p>
             <p class="pt-4 text-7xl font-bold text-primary dark:text-accent">
-                Sri Lanka Laksiri Portal
+                Laksiri Portal
             </p>
             <div v-if="canLogin" class="py-5 space-x-5">
                 <Link
