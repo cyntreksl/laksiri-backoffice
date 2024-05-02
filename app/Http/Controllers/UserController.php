@@ -69,6 +69,6 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $this->userRepository->deleteUser($user);
     }
 }

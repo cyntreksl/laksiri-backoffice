@@ -1,9 +1,10 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {Grid} from "gridjs";
+import {Grid, h} from "gridjs";
 import Popper from "vue3-popper";
 import CreateUserForm from "@/Pages/User/Partials/CreateUserForm.vue";
+import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
     users: {
@@ -28,6 +29,7 @@ let grid = null;
 const data = reactive({
     UserData: props.users,
     columnVisibility: {
+        id: false,
         username: true,
         primary_branch_id: true,
         created_at: true,
@@ -35,6 +37,7 @@ const data = reactive({
         last_login_at: true,
         last_logout_at: true,
         branches: true,
+        actions: true,
     }
 });
 
@@ -46,13 +49,19 @@ const initializeGrid = () => {
         },
         sort: true,
         columns: createColumns(),
-        data: createData(),
+        data: () => {
+            return new Promise(resolve => {
+                setTimeout(() =>
+                    resolve(createData()), 2000);
+            });
+        },
     });
 
     grid.render(wrapperRef.value);
 };
 
 const createColumns = () => [
+    {name: 'ID', hidden: !data.columnVisibility.id},
     {name: 'Username', hidden: !data.columnVisibility.username},
     {name: 'Primary Branch', hidden: !data.columnVisibility.primary_branch_id},
     {name: 'Created At', hidden: !data.columnVisibility.created_at},
@@ -60,10 +69,25 @@ const createColumns = () => [
     {name: 'Last Login', hidden: !data.columnVisibility.last_login_at},
     {name: 'Last Logout', hidden: !data.columnVisibility.last_logout_at},
     {name: 'Secondary Branches', hidden: !data.columnVisibility.branches},
+    {
+        name: 'Actions',
+        hidden: !data.columnVisibility.actions,
+        formatter: (cell, row) => {
+            return h('div', (
+                h('button', {
+                    onClick: () => alert(`Editing "${row.cells[0].data}" "${row.cells[1].data}"`)
+                }, 'Edit'),
+                    h('button', {
+                        onClick: () => alert(`Deleting "${row.cells[0].data}" "${row.cells[1].data}"`)
+                    }, 'Delete')
+            ))
+        },
+    },
 ];
 
 const createData = () =>
     data.UserData.map(user => [
+        user.id,
         user.username,
         user.primary_branch.name,
         user.created_at,
@@ -85,11 +109,26 @@ const toggleColumnVisibility = columnName => {
     grid.forceRender();
 };
 
-const showColumn = ref(false);
-
 onMounted(() => {
     initializeGrid();
 })
+
+const handleDeleteUser = (userId) => {
+    router.delete(route("users.destroy", userId), {
+        preserveScroll: true,
+        onSuccess: () => {
+            return route.push('users.index')
+        },
+    })
+}
+
+function deleteItem() {
+    console.log('h')
+}
+
+function editItem() {
+    console.log('h')
+}
 </script>
 
 <template>
