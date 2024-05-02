@@ -561,7 +561,11 @@ export default {
                         0,
                         childMenuList.length,
                         {
-                            title: "Users",
+                            title: "System Users",
+                            route: "users.index",
+                        },
+                        {
+                            title: "Drivers",
                             route: "users.index",
                         },
                     );

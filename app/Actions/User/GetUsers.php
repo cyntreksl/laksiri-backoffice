@@ -12,6 +12,8 @@ class GetUsers
 
     public function handle(): Collection|array
     {
-        return User::latest()->get();
+        return User::with(['branches', 'primaryBranch'])
+            ->latest()
+            ->get();
     }
 }
