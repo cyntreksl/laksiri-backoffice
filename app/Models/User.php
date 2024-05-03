@@ -26,15 +26,6 @@ class User extends Authenticatable
     use TwoFactorAuthenticatable;
 
     /**
-     * The storage format of the model's date columns.
-     *
-     * @var string
-     */
-    protected $dateFormat = 'U';
-
-    public $timestamps = false;
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>

@@ -6,6 +6,7 @@ import {router, useForm} from "@inertiajs/vue3";
 import {ref} from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
+import notification from "@/magics/notification.js";
 
 const props = defineProps({
     roles: {
@@ -27,6 +28,7 @@ const closeModal = () => {
 };
 
 const form = useForm({
+    name: '',
     username: '',
     email: '',
     password: '',
@@ -41,9 +43,11 @@ const createUser = () => {
         onSuccess: () => {
             router.visit(route("users.index"));
             form.reset();
+            notification({
+                text: 'User Created Successfully!',
+                variant: 'success',
+            })
         },
-        onError: () => console.log("error"),
-        onFinish: () => console.log("finish"),
         preserveScroll: true,
         preserveState: true,
     });
@@ -66,6 +70,28 @@ const createUser = () => {
 
         <template #content>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <InputLabel value="Name"/>
+                    <label class="relative flex">
+                        <input
+                            v-model="form.name"
+                            class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                            placeholder="Name"
+                            type="text"
+                        />
+                        <div
+                            class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                 stroke="currentColor" class="size-4.5 transition-colors duration-200">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+                            </svg>
+                        </div>
+                    </label>
+                    <InputError :message="form.errors.name"/>
+                </div>
+
                 <div>
                     <InputLabel value="Username"/>
                     <label class="relative flex">
@@ -196,7 +222,7 @@ const createUser = () => {
                     <InputError :message="form.errors.secondary_branches"/>
                 </div>
 
-                <div class="col-span-2">
+                <div>
                     <InputLabel value="Select Role"/>
                     <div class="space-x-5 mt-1">
                         <label
@@ -218,26 +244,26 @@ const createUser = () => {
             </div>
 
             <div class="mt-4">
-                <ul class="space-y-4">
-                    <li>
+                <div class="space-y-3">
+                    <div class="badge bg-navy-700 text-white dark:bg-navy-900">
                         EMPTY
-                    </li>
-                    <li>
+                    </div>
+                    <div>
                         User can`t login to this branch. But can view details from other branches
-                    </li>
-                    <li>
+                    </div>
+                    <div class="badge bg-navy-700 text-white dark:bg-navy-900">
                         VIEWER
-                    </li>
-                    <li>
+                    </div>
+                    <div>
                         User can view, create, edit. Based on permissions
-                    </li>
-                    <li>
+                    </div>
+                    <div class="badge bg-navy-700 text-white dark:bg-navy-900">
                         ADMIN
-                    </li>
-                    <li>
+                    </div>
+                    <div>
                         All privileges. User can view, create, edit and delete
-                    </li>
-                </ul>
+                    </div>
+                </div>
             </div>
         </template>
 
@@ -256,7 +282,3 @@ const createUser = () => {
         </template>
     </DialogModal>
 </template>
-
-<style scoped>
-
-</style>
