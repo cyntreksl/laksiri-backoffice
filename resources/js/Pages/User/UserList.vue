@@ -142,16 +142,12 @@ const createColumns = () => [
     },
 ];
 
-const resolveStatus = status => {
-    if (status === 'ACTIVE')
-        return 'badge bg-success/10 text-success dark:bg-success/15'
-    if (status === 'DEACTIVATE')
-        return 'badge bg-error/10 text-error dark:bg-error/15'
-    if (status === 'INACTIVE')
-        return 'badge bg-warning/10 text-warning dark:bg-warning/15'
-    if (status === 'INVITED')
-        return 'badge bg-info/10 text-info dark:bg-info/15'
-}
+const resolveStatus = status => ({
+    'ACTIVE': 'badge bg-success/10 text-success dark:bg-success/15',
+    'DEACTIVATE': 'badge bg-error/10 text-error dark:bg-error/15',
+    'INACTIVE': 'badge bg-warning/10 text-warning dark:bg-warning/15',
+    'INVITED': 'badge bg-info/10 text-info dark:bg-info/15'
+}[status]);
 
 const updateGridConfig = () => {
     grid.updateConfig({
