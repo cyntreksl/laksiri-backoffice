@@ -7,11 +7,6 @@ import CreateUserForm from "@/Pages/User/Partials/CreateUserForm.vue";
 import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
-    users: {
-        type: Object,
-        default: () => {
-        }
-    },
     roles: {
         type: Object,
         default: () => {
@@ -72,15 +67,15 @@ const initializeGrid = () => {
         },
         server: {
             url: '/user-list?',
-            then: data => data.data.map(pokemon => [
-                pokemon.id,
-                pokemon.username,
-                pokemon.primary_branch_name,
-                pokemon.created_at,
-                pokemon.status,
-                pokemon.last_login_at,
-                pokemon.last_logout_at,
-                pokemon.secondary_branch_names,
+            then: data => data.data.map(item => [
+                item.id,
+                item.username,
+                item.primary_branch_name,
+                item.created_at,
+                item.status,
+                item.last_login_at,
+                item.last_logout_at,
+                item.secondary_branch_names,
             ]),
             total: data => data.meta.total
         }
@@ -93,12 +88,10 @@ const initializeGrid = () => {
 
 const editItem = (row) => {
     console.log('Edit item:', row);
-    // Add your edit logic here
 };
 
 const deleteItem = (row) => {
     console.log('Delete item:', row);
-    // Add your delete logic here
 };
 
 const createColumns = () => [
@@ -213,22 +206,52 @@ const handleDeleteUser = (userId) => {
                                             <div class="mt-4 flex flex-col space-y-4 text-slate-600 dark:text-navy-100">
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
-                                                        :checked="data.columnVisibility.username"
-                                                        @change="toggleColumnVisibility('username', $event)"
+                                                        :checked="data.columnVisibility.id"
+                                                        @change="toggleColumnVisibility('ID', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
-                                                    <p>Reference</p>
+                                                    <p>ID</p>
                                                 </label>
 
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
-                                                        :checked="data.columnVisibility.primary_branch_name"
-                                                        @change="toggleColumnVisibility('primary_branch_name', $event)"
+                                                        :checked="data.columnVisibility.secondary_branch_names"
+                                                        @change="toggleColumnVisibility('Secondary Branches', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
-                                                    <p>Name</p>
+                                                    <p>Secondary Branches</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.created_at"
+                                                        @change="toggleColumnVisibility('Created At', $event)"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                    />
+                                                    <p>Created At</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.last_login_at"
+                                                        @change="toggleColumnVisibility('Last Login', $event)"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                    />
+                                                    <p>Last Login</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.last_logout_at"
+                                                        @change="toggleColumnVisibility('Last Logout', $event)"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                    />
+                                                    <p>Last Logout</p>
                                                 </label>
                                             </div>
                                         </div>
