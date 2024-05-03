@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserBranchRequest;
+use App\Http\Requests\UpdateUserPasswordRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserCollection;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
@@ -14,8 +17,8 @@ use Inertia\Inertia;
 class UserController extends Controller
 {
     public function __construct(
-        private readonly UserRepositoryInterface   $userRepository,
-        private readonly RoleRepositoryInterface   $roleRepository,
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly RoleRepositoryInterface $roleRepository,
         private readonly BranchRepositoryInterface $branchRepository,
     )
     {
@@ -59,8 +62,8 @@ class UserController extends Controller
                 'total' => $totalUsers,
                 'page' => $page,
                 'perPage' => $limit,
-                'lastPage' => ceil($totalUsers / $limit)
-            ]
+                'lastPage' => ceil($totalUsers / $limit),
+            ],
         ]);
     }
 
@@ -85,15 +88,19 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        return Inertia::render('User/UserEdit', [
+            'user' => $user->load('roles', 'branches'),
+            'roles' => $this->roleRepository->getRoles(),
+            'branches' => $this->branchRepository->getBranches(),
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $this->userRepository->updateUser($request->all(), $user);
     }
 
     /**
@@ -102,5 +109,15 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $this->userRepository->deleteUser($user);
+    }
+
+    public function changePassword(UpdateUserPasswordRequest $request, User $user)
+    {
+        $this->userRepository->updatePassword($request->all(), $user);
+    }
+
+    public function changeBranch(UpdateUserBranchRequest $request, User $user)
+    {
+        $this->userRepository->updateBranch($request->all(), $user);
     }
 }

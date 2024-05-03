@@ -105,9 +105,9 @@ const createColumns = () => [
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h('div', {}, [
-                h('button', {
+                h('a', {
                     className: 'btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2',
-                    onClick: () => editItem(row)
+                    href: route('users.edit', row.cells[0].data)
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
