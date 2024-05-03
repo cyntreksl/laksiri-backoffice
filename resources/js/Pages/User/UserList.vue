@@ -1,10 +1,11 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {Grid, h} from "gridjs";
+import {Grid, h, html} from "gridjs";
 import Popper from "vue3-popper";
 import CreateUserForm from "@/Pages/User/Partials/CreateUserForm.vue";
 import {router} from "@inertiajs/vue3";
+import notification from "@/magics/notification.js";
 
 const props = defineProps({
     roles: {
@@ -30,8 +31,8 @@ const data = reactive({
         created_at: true,
         status: true,
         last_login_at: true,
-        last_logout_at: true,
-        secondary_branch_names: true,
+        last_logout_at: false,
+        secondary_branch_names: false,
         actions: true,
     }
 });
@@ -85,21 +86,16 @@ const initializeGrid = () => {
     grid.render(wrapperRef.value);
 };
 
-
-const editItem = (row) => {
-    console.log('Edit item:', row);
-};
-
-const deleteItem = (row) => {
-    console.log('Delete item:', row);
-};
-
 const createColumns = () => [
     {name: 'ID', hidden: !data.columnVisibility.id},
     {name: 'Username', hidden: !data.columnVisibility.username},
     {name: 'Primary Branch Name', hidden: !data.columnVisibility.primary_branch_name,sort: false},
     {name: 'Created At', hidden: !data.columnVisibility.created_at},
-    {name: 'Status', hidden: !data.columnVisibility.status},
+    {
+        name: 'Status',
+        hidden: !data.columnVisibility.status,
+        formatter: (cell) => html(`<div class="${resolveStatus(cell)}">${cell}</div>`)
+    },
     {name: 'Last Login', hidden: !data.columnVisibility.last_login_at},
     {name: 'Last Logout', hidden: !data.columnVisibility.last_logout_at},
     {name: 'Secondary Branches', hidden: !data.columnVisibility.secondary_branch_names,sort: false},
@@ -109,9 +105,9 @@ const createColumns = () => [
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h('div', {}, [
-                h('button', {
+                h('a', {
                     className: 'btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2',
-                    onClick: () => editItem(row)
+                    href: route('users.edit', row.cells[0].data)
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
@@ -127,7 +123,7 @@ const createColumns = () => [
                 ]),
                 h('button', {
                     className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
-                    onClick: () => handleDeleteUser(row)
+                    onClick: () => handleDeleteUser(row.cells[0].data)
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
@@ -146,6 +142,12 @@ const createColumns = () => [
     },
 ];
 
+const resolveStatus = status => ({
+    'ACTIVE': 'badge bg-success/10 text-success dark:bg-success/15',
+    'DEACTIVATE': 'badge bg-error/10 text-error dark:bg-error/15',
+    'INACTIVE': 'badge bg-warning/10 text-warning dark:bg-warning/15',
+    'INVITED': 'badge bg-info/10 text-info dark:bg-info/15'
+}[status]);
 
 const updateGridConfig = () => {
     grid.updateConfig({
@@ -167,11 +169,14 @@ const handleDeleteUser = (userId) => {
     router.delete(route("users.destroy", userId), {
         preserveScroll: true,
         onSuccess: () => {
-            return route.push('users.index')
+            notification({
+                text: 'User Deleted Successfully!',
+                variant: 'success',
+            });
+            router.visit(route('users.index'), {only: ['users']})
         },
     })
 }
-
 </script>
 
 <template>

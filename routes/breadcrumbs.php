@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
@@ -36,4 +37,10 @@ Breadcrumbs::for('hbls.create', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('users.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('User Management', route('users.index'));
+});
+
+// Users > Edit
+Breadcrumbs::for('users.edit', function (BreadcrumbTrail $trail, User $user) {
+    $trail->parent('users.index');
+    $trail->push('User Edit', route('users.edit', $user->id));
 });

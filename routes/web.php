@@ -36,5 +36,11 @@ Route::middleware([
     Route::resource('users', UserController::class)
         ->except(['create']);
 
+    Route::put('users/{user}/password/change', [UserController::class, 'changePassword'])
+        ->name('users.password.change');
+
+    Route::put('users/{user}/branch/change', [UserController::class, 'changeBranch'])
+        ->name('users.branch.update');
+
     Route::get('user-list', [UserController::class, 'list']);
 });
