@@ -59,7 +59,7 @@ const createUser = () => {
         <PrimaryButton
             @click="confirmingUserCreation = !confirmingUserCreation"
         >
-            New User
+            Create New User
         </PrimaryButton>
     </div>
 
