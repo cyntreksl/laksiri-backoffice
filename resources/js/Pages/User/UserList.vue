@@ -91,7 +91,17 @@ const createColumns = () => [
     {name: 'Username', hidden: !data.columnVisibility.username},
     {name: 'Primary Branch Name', hidden: !data.columnVisibility.primary_branch_name,sort: false},
     {name: 'Created At', hidden: !data.columnVisibility.created_at},
-    {name: 'Status', hidden: !data.columnVisibility.status},
+    {
+        name: 'Status',
+        hidden: !data.columnVisibility.status,
+        attributes: (cell) => {
+            if (cell) {
+                return {
+                    'class': resolveStatus(cell),
+                };
+            }
+        }
+    },
     {name: 'Last Login', hidden: !data.columnVisibility.last_login_at},
     {name: 'Last Logout', hidden: !data.columnVisibility.last_logout_at},
     {name: 'Secondary Branches', hidden: !data.columnVisibility.secondary_branch_names,sort: false},
@@ -138,6 +148,16 @@ const createColumns = () => [
     },
 ];
 
+const resolveStatus = status => {
+    if (status === 'ACTIVE')
+        return 'badge bg-success/10 text-success dark:bg-success/15 mt-4'
+    if (status === 'DEACTIVATE')
+        return 'badge bg-error/10 text-error dark:bg-error/15 mt-4'
+    if (status === 'INACTIVE')
+        return 'badge bg-warning/10 text-warning dark:bg-warning/15 mt-4'
+    if (status === 'INVITED')
+        return 'badge bg-info/10 text-info dark:bg-info/15 mt-4'
+}
 
 const updateGridConfig = () => {
     grid.updateConfig({
