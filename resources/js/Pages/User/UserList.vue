@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {Grid, h} from "gridjs";
+import {Grid, h, html} from "gridjs";
 import Popper from "vue3-popper";
 import CreateUserForm from "@/Pages/User/Partials/CreateUserForm.vue";
 import {router} from "@inertiajs/vue3";
@@ -94,13 +94,7 @@ const createColumns = () => [
     {
         name: 'Status',
         hidden: !data.columnVisibility.status,
-        attributes: (cell) => {
-            if (cell) {
-                return {
-                    'class': resolveStatus(cell),
-                };
-            }
-        }
+        formatter: (cell) => html(`<div class="${resolveStatus(cell)}">${cell}</div>`)
     },
     {name: 'Last Login', hidden: !data.columnVisibility.last_login_at},
     {name: 'Last Logout', hidden: !data.columnVisibility.last_logout_at},
@@ -150,13 +144,13 @@ const createColumns = () => [
 
 const resolveStatus = status => {
     if (status === 'ACTIVE')
-        return 'badge bg-success/10 text-success dark:bg-success/15 mt-4'
+        return 'badge bg-success/10 text-success dark:bg-success/15'
     if (status === 'DEACTIVATE')
-        return 'badge bg-error/10 text-error dark:bg-error/15 mt-4'
+        return 'badge bg-error/10 text-error dark:bg-error/15'
     if (status === 'INACTIVE')
-        return 'badge bg-warning/10 text-warning dark:bg-warning/15 mt-4'
+        return 'badge bg-warning/10 text-warning dark:bg-warning/15'
     if (status === 'INVITED')
-        return 'badge bg-info/10 text-info dark:bg-info/15 mt-4'
+        return 'badge bg-info/10 text-info dark:bg-info/15'
 }
 
 const updateGridConfig = () => {
