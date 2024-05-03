@@ -31,8 +31,8 @@ const data = reactive({
         created_at: true,
         status: true,
         last_login_at: true,
-        last_logout_at: true,
-        secondary_branch_names: true,
+        last_logout_at: false,
+        secondary_branch_names: false,
         actions: true,
     }
 });
@@ -84,11 +84,6 @@ const initializeGrid = () => {
     });
 
     grid.render(wrapperRef.value);
-};
-
-
-const editItem = (row) => {
-    console.log('Edit item:', row);
 };
 
 const createColumns = () => [
@@ -172,7 +167,6 @@ const handleDeleteUser = (userId) => {
         },
     })
 }
-
 </script>
 
 <template>
