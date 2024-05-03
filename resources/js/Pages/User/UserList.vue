@@ -5,6 +5,7 @@ import {Grid, h} from "gridjs";
 import Popper from "vue3-popper";
 import CreateUserForm from "@/Pages/User/Partials/CreateUserForm.vue";
 import {router} from "@inertiajs/vue3";
+import notification from "@/magics/notification.js";
 
 const props = defineProps({
     roles: {
@@ -90,10 +91,6 @@ const editItem = (row) => {
     console.log('Edit item:', row);
 };
 
-const deleteItem = (row) => {
-    console.log('Delete item:', row);
-};
-
 const createColumns = () => [
     {name: 'ID', hidden: !data.columnVisibility.id},
     {name: 'Username', hidden: !data.columnVisibility.username},
@@ -127,7 +124,7 @@ const createColumns = () => [
                 ]),
                 h('button', {
                     className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
-                    onClick: () => handleDeleteUser(row)
+                    onClick: () => handleDeleteUser(row.cells[0].data)
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
@@ -167,7 +164,11 @@ const handleDeleteUser = (userId) => {
     router.delete(route("users.destroy", userId), {
         preserveScroll: true,
         onSuccess: () => {
-            return route.push('users.index')
+            notification({
+                text: 'User Deleted Successfully!',
+                variant: 'success',
+            });
+            router.visit(route('users.index'), {only: ['users']})
         },
     })
 }
