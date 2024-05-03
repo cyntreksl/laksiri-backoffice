@@ -14,6 +14,7 @@ class CreateUser
     public function handle(array $data): User
     {
         $user = User::create([
+            'name' => $data['name'],
             'username' => $data['username'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),

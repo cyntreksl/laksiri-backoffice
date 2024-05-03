@@ -1,7 +1,7 @@
 import Toastify from "toastify-js";
 
 export default (userOptions) => {
-  let [position = "right", gravity = "bottom"] = userOptions.position
+    let [position = "right", gravity = "top"] = userOptions.position
     ? userOptions.position.split("-")
     : "";
 
