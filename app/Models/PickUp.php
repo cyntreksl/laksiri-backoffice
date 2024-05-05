@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\BranchScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+#[ScopedBy(BranchScope::class)]
 class PickUp extends Model
 {
     use HasFactory;
@@ -14,7 +17,7 @@ class PickUp extends Model
 
     protected $fillable = [
         'reference',
-        'agent_id',
+        'branch_id',
         'cargo_type',
         'name',
         'email',
