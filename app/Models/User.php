@@ -71,8 +71,8 @@ class User extends Authenticatable
     {
         $currentBranch = GetUserCurrentBranch::run();
         $builder->whereHas('branches', function (Builder $builder) use ($currentBranch) {
-            $builder->where('branches.id', $currentBranch['branchId'])->orWhere('primary_branch_id', $currentBranch['branchId']);
-        });
+            $builder->where('branches.id', $currentBranch['branchId']);
+        })->orWhere('users.primary_branch_id', $currentBranch['branchId']);
     }
 
     public function getPrimaryBranchNameAttribute()
