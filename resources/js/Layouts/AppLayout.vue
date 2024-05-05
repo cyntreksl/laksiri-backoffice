@@ -25,10 +25,10 @@
                     >
                         <!-- Dashboard -->
                         <a
-                            @click="setMenu('home')"
+                            @click="setMenu('dashboard')"
                             x-tooltip.placement.right="'Dashboard'"
                             :class="[
-                                activeMenu === 'home'
+                                activeMenu === 'dashboard'
                                     ? 'bg-primary/10 text-primary'
                                     : '',
                             ]"
@@ -502,17 +502,13 @@ export default {
 
         const setMenu = (menu) => {
             switch (menu) {
-                case "home":
+                case "dashboard":
                     childMenuList.splice(
                         0,
                         childMenuList.length,
                         {
-                            title: "Dashboard1",
+                            title: "Dashboard",
                             route: "dashboard",
-                        },
-                        {
-                            title: "Dashboard2",
-                            route: "dashboard2",
                         },
                     );
                     break;
