@@ -17,4 +17,6 @@ interface UserRepositoryInterface
     public function updatePassword(array $data, User $user);
 
     public function updateBranch(array $data, User $user);
+
+    public function switchBranch(string $branchName);
 }

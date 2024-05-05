@@ -43,4 +43,6 @@ Route::middleware([
         ->name('users.branch.update');
 
     Route::get('user-list', [UserController::class, 'list']);
+
+    Route::post('switch-branch', [UserController::class, 'switchBranch']);
 });

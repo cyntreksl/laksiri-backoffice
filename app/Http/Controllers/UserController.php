@@ -11,7 +11,13 @@ use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
+use Exception;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -43,7 +49,7 @@ class UserController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        $query = User::with('branches');
+        $query = User::currentBranch()->with('branches');
 
         if (!empty($search)) {
             $query->where('username', 'like', '%' . $search . '%');
@@ -54,7 +60,7 @@ class UserController extends Controller
             ->take($limit)
             ->get();
 
-        $totalUsers = User::count();
+        $totalUsers = User::currentBranch()->count();
 
         return response()->json([
             'data' => UserCollection::collection($users),
@@ -119,5 +125,21 @@ class UserController extends Controller
     public function changeBranch(UpdateUserBranchRequest $request, User $user)
     {
         $this->userRepository->updateBranch($request->all(), $user);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function switchBranch(Request $request): JsonResponse
+    {
+        $branchName = $request->input('branch_name');
+        try {
+            $response = $this->userRepository->switchBranch($branchName);
+            return response()->json($response);
+        }catch (Exception $exception){
+            Log::error("User branch switch failed: " . $exception->getMessage());
+            return response()->json([]);
+        }
     }
 }

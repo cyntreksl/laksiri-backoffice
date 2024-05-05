@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Events\UpdateLastLogin;
 use App\Events\UpdateLastLogout;
+use App\Listeners\SetUserCurrentBranch;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,5 +28,7 @@ class AppServiceProvider extends ServiceProvider
             UpdateLastLogin::class,
             UpdateLastLogout::class,
         );
+
+        Event::listen(Login::class,SetUserCurrentBranch::class);
     }
 }

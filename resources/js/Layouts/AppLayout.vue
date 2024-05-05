@@ -25,10 +25,10 @@
                     >
                         <!-- Dashboard -->
                         <a
-                            @click="setMenu('home')"
+                            @click="setMenu('dashboard')"
                             x-tooltip.placement.right="'Dashboard'"
                             :class="[
-                                activeMenu === 'home'
+                                activeMenu === 'dashboard'
                                     ? 'bg-primary/10 text-primary'
                                     : '',
                             ]"
@@ -198,6 +198,7 @@
                                     </div>
 
                                     <div class="flex flex-col pt-2 pb-5">
+
                                         <a
                                             :href="route('profile.show')"
                                             class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
@@ -429,6 +430,41 @@
                                 </svg>
                             </button>
                         </div>
+
+                        <!-- Branch-->
+                        <Popper class="">
+                            <button @click="showBranchPopper=!showBranchPopper"
+                                class="btn space-x-1  ml-3 bg-slate-150 font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
+                                <span class="text-xs">{{$page.props.auth.user.active_branch_name}} </span>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="size-4 transition-transform duration-200"
+                                    :class="showBranchPopper && 'rotate-180'"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M19 9l-7 7-7-7"
+                                    />
+                                </svg>
+                            </button>
+                            <template #content >
+                                <div  class="popper-root" :class="showBranchPopper?'show':''">
+                                    <div class="popper-box cursor-pointer rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700">
+                                        <ul>
+                                            <li v-for="branch in userBranches">
+                                                <a @click="setBranch(branch)"
+                                                    class="flex  items-center px-3 h-8 pr-12 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">{{branch}}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </template>
+                        </Popper>
                     </div>
                 </div>
             </div>
@@ -441,15 +477,16 @@
     </div>
 </template>
 <script>
-import {customRef, reactive, ref} from "vue";
+import {computed, customRef, reactive, ref} from "vue";
 import {useMonochromeSelector} from "../composable/monochromeMode.js";
 import {useDarkModeSelector} from "../composable/darkMode.js";
-import {Head, router} from "@inertiajs/vue3";
+import {Head, router, usePage} from "@inertiajs/vue3";
 import logo from "../../images/app-logo.svg";
 import {Link} from '@inertiajs/vue3'
+import Popper from "vue3-popper";
 
 export default {
-    components: {Head, Link},
+    components: {Head, Link,Popper},
     props: {
         title: "",
     },
@@ -502,17 +539,13 @@ export default {
 
         const setMenu = (menu) => {
             switch (menu) {
-                case "home":
+                case "dashboard":
                     childMenuList.splice(
                         0,
                         childMenuList.length,
                         {
-                            title: "Dashboard1",
+                            title: "Dashboard",
                             route: "dashboard",
-                        },
-                        {
-                            title: "Dashboard2",
-                            route: "dashboard2",
                         },
                     );
                     break;
@@ -575,6 +608,35 @@ export default {
         };
 
         setMenu(mainRoute);
+        const page = usePage()
+        const userBranches = page.props.userBranch;
+
+        const showBranchPopper = ref(false)
+        const setBranch = (branch) =>{
+            showBranchPopper.value = false;
+
+            fetch('/switch-branch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ branch_name: branch })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to switch branch');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data.message);
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
 
         return {
             toggleSideBar,
@@ -587,6 +649,9 @@ export default {
             setMenu,
             childMenuList,
             activeMenu,
+            userBranches,
+            setBranch,
+            showBranchPopper,
         };
     },
 };
