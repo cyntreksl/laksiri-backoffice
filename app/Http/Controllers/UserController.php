@@ -45,7 +45,9 @@ class UserController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        $query = User::currentBranch()->with('branches');
+        $query = User::withoutRole('driver')
+            ->currentBranch()
+            ->with('branches');
 
         if (! empty($search)) {
             $query->where('username', 'like', '%'.$search.'%');
