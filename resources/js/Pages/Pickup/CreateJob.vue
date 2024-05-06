@@ -264,52 +264,52 @@ const handlePickupCreate = () => {
                             </h2>
                         </div>
                         <div class="my-5 space-y-5">
-                            <div
-                                class="flex justify-between items-center space-y-5 space-x-5"
-                            >
-                                <div class="w-full">
-                                    <label class="block">
-                                        <span>Location</span>
-                                        <input
-                                            v-model="form.location"
-                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            placeholder="Location"
-                                            type="text"
-                                        />
-                                    </label>
-                                    <div
-                                        v-if="form.errors.location"
-                                        class="text-tiny+ text-error"
-                                    >{{ form.errors.location }}
-                                    </div>
-                                </div>
+                            <!--                            <div-->
+                            <!--                                class="flex justify-between items-center space-y-5 space-x-5"-->
+                            <!--                            >-->
+                            <!--                                <div class="w-full">-->
+                            <!--                                    <label class="block">-->
+                            <!--                                        <span>Location</span>-->
+                            <!--                                        <input-->
+                            <!--                                            v-model="form.location"-->
+                            <!--                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
+                            <!--                                            placeholder="Location"-->
+                            <!--                                            type="text"-->
+                            <!--                                        />-->
+                            <!--                                    </label>-->
+                            <!--                                    <div-->
+                            <!--                                        v-if="form.errors.location"-->
+                            <!--                                        class="text-tiny+ text-error"-->
+                            <!--                                    >{{ form.errors.location }}-->
+                            <!--                                    </div>-->
+                            <!--                                </div>-->
 
-                                <div>
-                                    <button
-                                        class="btn size-9 rounded-full bg-success p-0 font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="size-5"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                            />
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-                                            />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
+                            <!--                                <div>-->
+                            <!--                                    <button-->
+                            <!--                                        class="btn size-9 rounded-full bg-success p-0 font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90"-->
+                            <!--                                    >-->
+                            <!--                                        <svg-->
+                            <!--                                            xmlns="http://www.w3.org/2000/svg"-->
+                            <!--                                            fill="none"-->
+                            <!--                                            viewBox="0 0 24 24"-->
+                            <!--                                            stroke-width="1.5"-->
+                            <!--                                            stroke="currentColor"-->
+                            <!--                                            class="size-5"-->
+                            <!--                                        >-->
+                            <!--                                            <path-->
+                            <!--                                                stroke-linecap="round"-->
+                            <!--                                                stroke-linejoin="round"-->
+                            <!--                                                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"-->
+                            <!--                                            />-->
+                            <!--                                            <path-->
+                            <!--                                                stroke-linecap="round"-->
+                            <!--                                                stroke-linejoin="round"-->
+                            <!--                                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"-->
+                            <!--                                            />-->
+                            <!--                                        </svg>-->
+                            <!--                                    </button>-->
+                            <!--                                </div>-->
+                            <!--                            </div>-->
 
                             <div>
                                 <label class="block">
