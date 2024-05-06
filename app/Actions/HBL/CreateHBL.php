@@ -2,6 +2,8 @@
 
 namespace App\Actions\HBL;
 
+use App\Actions\User\GetUserCurrentBranch;
+use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -13,7 +15,7 @@ class CreateHBL
     {
         return HBL::create([
             'reference' => GenerateHBLReferenceNumber::run(),
-            'agent_id' => 1,
+            'branch_id' => GetUserCurrentBranchID::run(),
             'cargo_type' => $data['cargo_type'],
             'hbl_type' => $data['hbl_type'],
             'hbl' => $data['hbl'],
