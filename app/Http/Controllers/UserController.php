@@ -12,11 +12,8 @@ use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
 use Exception;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -26,8 +23,7 @@ class UserController extends Controller
         private readonly UserRepositoryInterface $userRepository,
         private readonly RoleRepositoryInterface $roleRepository,
         private readonly BranchRepositoryInterface $branchRepository,
-    )
-    {
+    ) {
     }
 
     /**
@@ -51,8 +47,8 @@ class UserController extends Controller
 
         $query = User::currentBranch()->with('branches');
 
-        if (!empty($search)) {
-            $query->where('username', 'like', '%' . $search . '%');
+        if (! empty($search)) {
+            $query->where('username', 'like', '%'.$search.'%');
         }
 
         $users = $query->orderBy($order, $dir)
@@ -79,14 +75,6 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $this->userRepository->storeUser($request->all());
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
-    {
-        //
     }
 
     /**
@@ -127,18 +115,16 @@ class UserController extends Controller
         $this->userRepository->updateBranch($request->all(), $user);
     }
 
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function switchBranch(Request $request): JsonResponse
     {
         $branchName = $request->input('branch_name');
         try {
             $response = $this->userRepository->switchBranch($branchName);
+
             return response()->json($response);
-        }catch (Exception $exception){
-            Log::error("User branch switch failed: " . $exception->getMessage());
+        } catch (Exception $exception) {
+            Log::error('User branch switch failed: '.$exception->getMessage());
+
             return response()->json([]);
         }
     }

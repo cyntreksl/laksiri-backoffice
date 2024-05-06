@@ -35,7 +35,7 @@ Route::middleware([
     Route::resource('hbls', HBLController::class);
     // User
     Route::resource('users', UserController::class)
-        ->except(['create']);
+        ->except(['create', 'show']);
 
     Route::put('users/{user}/password/change', [UserController::class, 'changePassword'])
         ->name('users.password.change');
@@ -48,5 +48,8 @@ Route::middleware([
     Route::post('switch-branch', [UserController::class, 'switchBranch']);
 
     // Driver
-    Route::resource('drivers', DriverController::class);
+    Route::resource('drivers', DriverController::class)
+        ->except(['create', 'show']);
+
+    Route::get('driver-list', [DriverController::class, 'list']);
 });
