@@ -55,7 +55,7 @@ const createUser = () => {
 </script>
 
 <template>
-    <div class="flex justify-end mx-5">
+    <div class="flex justify-end mx-5 mt-4">
         <PrimaryButton
             @click="confirmingUserCreation = !confirmingUserCreation"
         >
@@ -114,7 +114,7 @@ const createUser = () => {
                     <InputError :message="form.errors.username"/>
                 </div>
 
-                <div>
+                <div class="col-span-1 sm:col-span-2">
                     <InputLabel value="Email"/>
                     <label class="relative flex">
                         <input
@@ -210,7 +210,10 @@ const createUser = () => {
                         <InputLabel value="Select Secondary Branch"/>
                         <select
                             v-model="form.secondary_branches"
-                            x-init="$el._tom = new Tom($el)"
+                            x-init="$el._tom = new Tom($el,{
+            plugins: ['remove_button'],
+            create: true,
+          })"
                             multiple
                             class="w-full"
                             placeholder="Select a secondary branch..."

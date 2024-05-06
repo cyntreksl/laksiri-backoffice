@@ -6,6 +6,8 @@ import Popper from "vue3-popper";
 import CreateUserForm from "@/Pages/User/Partials/CreateUserForm.vue";
 import {router} from "@inertiajs/vue3";
 import notification from "@/magics/notification.js";
+import DeleteUserConfirmationModal from "@/Pages/User/Partials/DeleteUserConfirmationModal.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 
 const props = defineProps({
     roles: {
@@ -41,7 +43,7 @@ const initializeGrid = () => {
     grid = new Grid({
         columns: createColumns(),
         search: {
-            debounceTimeout:1000,
+            debounceTimeout: 1000,
             server: {
                 url: (prev, keyword) => `${prev}?search=${keyword}`
             }
@@ -54,7 +56,7 @@ const initializeGrid = () => {
 
                     const col = columns[0];
                     const dir = col.direction === 1 ? 'asc' : 'desc';
-                    let colName = ['id', 'username','primary_branch_name', 'created_at','status', 'last_login_at','last_logout_at', 'secondary_branch_names'][col.index];
+                    let colName = ['id', 'username', 'primary_branch_name', 'created_at', 'status', 'last_login_at', 'last_logout_at', 'secondary_branch_names'][col.index];
 
                     return `${prev}&order=${colName}&dir=${dir}`;
                 }
@@ -89,7 +91,7 @@ const initializeGrid = () => {
 const createColumns = () => [
     {name: 'ID', hidden: !data.columnVisibility.id},
     {name: 'Username', hidden: !data.columnVisibility.username},
-    {name: 'Primary Branch Name', hidden: !data.columnVisibility.primary_branch_name,sort: false},
+    {name: 'Primary Branch Name', hidden: !data.columnVisibility.primary_branch_name, sort: false},
     {name: 'Created At', hidden: !data.columnVisibility.created_at},
     {
         name: 'Status',
@@ -98,10 +100,10 @@ const createColumns = () => [
     },
     {name: 'Last Login', hidden: !data.columnVisibility.last_login_at},
     {name: 'Last Logout', hidden: !data.columnVisibility.last_logout_at},
-    {name: 'Secondary Branches', hidden: !data.columnVisibility.secondary_branch_names,sort: false},
+    {name: 'Secondary Branches', hidden: !data.columnVisibility.secondary_branch_names, sort: false},
     {
         name: 'Actions',
-        sort:false,
+        sort: false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h('div', {}, [
@@ -123,7 +125,7 @@ const createColumns = () => [
                 ]),
                 h('button', {
                     className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
-                    onClick: () => handleDeleteUser(row.cells[0].data)
+                    onClick: () => confirmDeleteUser(row.cells[0].data)
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
@@ -165,14 +167,28 @@ onMounted(() => {
     initializeGrid();
 })
 
-const handleDeleteUser = (userId) => {
-    router.delete(route("users.destroy", userId), {
+const showConfirmDeleteUserModal = ref(false);
+const userId = ref(null);
+
+const confirmDeleteUser = (id) => {
+    userId.value = id;
+    showConfirmDeleteUserModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmDeleteUserModal.value = false;
+}
+
+const handleDeleteUser = () => {
+    router.delete(route("users.destroy", userId.value), {
         preserveScroll: true,
         onSuccess: () => {
+            closeModal();
             notification({
                 text: 'User Deleted Successfully!',
                 variant: 'success',
             });
+            userId.value = null;
             router.visit(route('users.index'), {only: ['users']})
         },
     })
@@ -182,6 +198,8 @@ const handleDeleteUser = (userId) => {
 <template>
     <AppLayout title="User Management">
         <template #header>User Management</template>
+
+        <Breadcrumb/>
 
         <CreateUserForm :branches="branches" :roles="roles"/>
 
@@ -212,7 +230,7 @@ const handleDeleteUser = (userId) => {
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
                                                         :checked="data.columnVisibility.id"
-                                                        @change="toggleColumnVisibility('ID', $event)"
+                                                        @change="toggleColumnVisibility('id', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
@@ -222,7 +240,7 @@ const handleDeleteUser = (userId) => {
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
                                                         :checked="data.columnVisibility.secondary_branch_names"
-                                                        @change="toggleColumnVisibility('Secondary Branches', $event)"
+                                                        @change="toggleColumnVisibility('secondary_branch_names', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
@@ -232,7 +250,7 @@ const handleDeleteUser = (userId) => {
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
                                                         :checked="data.columnVisibility.created_at"
-                                                        @change="toggleColumnVisibility('Created At', $event)"
+                                                        @change="toggleColumnVisibility('created_at', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
@@ -242,7 +260,7 @@ const handleDeleteUser = (userId) => {
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
                                                         :checked="data.columnVisibility.last_login_at"
-                                                        @change="toggleColumnVisibility('Last Login', $event)"
+                                                        @change="toggleColumnVisibility('last_login_at', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
@@ -252,7 +270,7 @@ const handleDeleteUser = (userId) => {
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
                                                         :checked="data.columnVisibility.last_logout_at"
-                                                        @change="toggleColumnVisibility('Last Logout', $event)"
+                                                        @change="toggleColumnVisibility('last_logout_at', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
@@ -279,5 +297,8 @@ const handleDeleteUser = (userId) => {
                 </div>
             </div>
         </div>
+
+        <DeleteUserConfirmationModal :show="showConfirmDeleteUserModal" @close="closeModal"
+                                     @delete-user="handleDeleteUser"/>
     </AppLayout>
 </template>
