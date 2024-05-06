@@ -149,7 +149,7 @@ watch(
     ],
     ([newOtherCharge, newDiscount,newFreightCharge]) => {
         // Convert dimensions from cm to meters
-        hblTotal.value = (form.bill_charge + form.freight_charge + form.other_charge) - form.discount;
+        hblTotal.value = (parseFloat(form.bill_charge) + parseFloat(form.freight_charge) + parseFloat(form.other_charge)) - form.discount;
         form.grand_total = hblTotal.value;
     }
 );
