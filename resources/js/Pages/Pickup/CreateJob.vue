@@ -2,8 +2,9 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import {watch} from "vue";
 
-defineProps({
+const props = defineProps({
     noteTypes: {
         type: Object,
         default: () => {
@@ -41,6 +42,10 @@ const handlePickupCreate = () => {
         preserveState: true,
     });
 };
+
+watch(() => form.note_type, (newValue) => {
+    form.note += newValue;
+});
 </script>
 
 <template>
