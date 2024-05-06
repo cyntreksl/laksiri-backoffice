@@ -48,5 +48,7 @@ Route::middleware([
     Route::post('switch-branch', [UserController::class, 'switchBranch']);
 
     // Driver
-    Route::resource('drivers', DriverController::class);
+    Route::name('users.')->group(function () {
+        Route::resource('drivers', DriverController::class);
+    });
 });
