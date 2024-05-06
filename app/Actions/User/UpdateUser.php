@@ -24,6 +24,11 @@ class UpdateUser
 
             // assign a new role to the user
             $user->assignRole($data['role_id']);
+
+            activity()->performedOn($user)
+                ->withProperties(['role_id' => $data['role_id']])
+                ->event('updated')
+                ->log('updated');
         }
 
         return $user;
