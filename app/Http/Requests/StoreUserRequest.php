@@ -20,6 +20,19 @@ class StoreUserRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'primary_branch_id.required' => 'The primary branch is required.',
+            'role_id.required' => 'The role is required.',
+        ];
+    }
+
     public function authorize(): bool
     {
         return true;
