@@ -2,6 +2,8 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import {reactive, ref, watch} from "vue";
+import notification from "@/magics/notification.js";
 
 defineProps({
     hblTypes: {
@@ -42,6 +44,8 @@ const form = useForm({
     other_charge: 0,
     discount: 0,
     paid_amount: 0,
+    grand_total: 0,
+    packages:{}
 });
 
 const handleHBLCreate = () => {
@@ -56,10 +60,139 @@ const handleHBLCreate = () => {
         preserveState: true,
     });
 };
+
+const showAddNewPackageDialog = ref(false);
+
+const showPackageDialog = () => {
+    showAddNewPackageDialog.value = true;
+}
+
+const packageList = ref([]);
+
+const packageItem = reactive({
+    type: '',
+    length: 0,
+    width: 0,
+    height: 0,
+    quantity: 0,
+    volume: 0,
+    totalWeight: 0,
+    remarks: ''
+});
+
+const grandTotalWeight = ref(0);
+const grandTotalVolume = ref(0);
+
+const addPackageData = () => {
+    if (!packageItem.type || packageItem.length <= 0 || packageItem.width <= 0 || packageItem.height <= 0 || packageItem.quantity <= 0 || packageItem.volume <= 0 || packageItem.totalWeight <= 0) {
+        notification({
+            text: 'Please fill all required data',
+            variant: 'error',
+        });
+        return;
+    }
+
+
+    const newItem = { ...packageItem }; // Create a copy of packageItem
+    packageList.value.push(newItem); // Add the new item to packageList
+    form.packages = packageList.value;
+
+    grandTotalWeight.value += newItem.totalWeight;
+    grandTotalVolume.value += newItem.volume;
+
+    // Reset packageItem values for the next entry
+    packageItem.type = '';
+    packageItem.length = 0;
+    packageItem.width = 0;
+    packageItem.height = 0;
+    packageItem.quantity = 0;
+    packageItem.volume = 0;
+    packageItem.totalWeight = 0;
+    packageItem.remarks = '';
+
+    showAddNewPackageDialog.value=false;
+};
+
+// Watch for changes in length, width, height, or quantity to update volume and totalWeight
+watch(
+    [
+        () => packageItem.length,
+        () => packageItem.width,
+        () => packageItem.height,
+        () => packageItem.quantity
+    ],
+    ([newLength, newWidth, newHeight, newQuantity]) => {
+        // Convert dimensions from cm to meters
+        const lengthMeters = newLength / 100; // 1 cm = 0.01 meters
+        const widthMeters = newWidth / 100;
+        const heightMeters = newHeight / 100;
+
+        // Calculate volume in cubic meters (m³)
+        const volumeCubicMeters = lengthMeters * widthMeters * heightMeters * newQuantity;
+
+        // Assuming weight is directly proportional to volume
+        // Convert weight from grams to kilograms
+        const totalWeightKg = volumeCubicMeters * newQuantity / 1000; // 1 gram = 0.001 kilograms
+
+        // Update reactive properties
+        packageItem.volume = volumeCubicMeters;
+        packageItem.totalWeight = totalWeightKg;
+    }
+);
+
+
+watch(
+    [
+        () => form.other_charge,
+        () => form.discount,
+        () => form.freight_charge,
+    ],
+    ([newOtherCharge, newDiscount,newFreightCharge]) => {
+        // Convert dimensions from cm to meters
+        hblTotal.value = (parseFloat(form.bill_charge) + parseFloat(form.freight_charge) + parseFloat(form.other_charge)) - form.discount;
+        form.grand_total = hblTotal.value;
+    }
+);
+
+
+const packageTypes = [
+    'WOODEN BOX', 'CARTON', 'FRIDGE', 'TV CARTON', 'COOKER', 'W/MACHINE',
+    'MATT/BED BDL', 'TRUNK STEEL BOX', 'TRAVELING BOX', 'IRON TABLE/LADDER',
+    'SOFA SET/BNDL', 'BNDL', 'BICYCLE'
+];
+
+const selectedType = ref('');
+
+const updateTypeDescription = () => {
+    packageItem.type += (packageItem.type ? ' ' : '') + selectedType.value;
+};
+
+const hblTotal = ref(0);
+const currency = ref("SAR");
+
+const calculatePayment = () =>{
+    const cargoType =  form.cargo_type;
+    const freightCharge = ref(0);
+    const billCharge = ref(0);
+    if (cargoType==='Sea Cargo'){
+        freightCharge.value = grandTotalVolume.value * 300;
+        billCharge.value = 50;
+    }else if(cargoType==='Air Cargo'){
+        freightCharge.value = grandTotalWeight.value * 8;
+        billCharge.value = 40;
+    }
+
+    form.freight_charge = freightCharge.value.toFixed(2);
+    form.bill_charge=billCharge.value;
+}
+
+
+
 </script>
 
 <template>
     <AppLayout title="HBL Create">
+
         <template #header>HBL - Create</template>
 
         <!-- Breadcrumb -->
@@ -78,41 +211,41 @@ const handleHBLCreate = () => {
                             </h2>
                         </div>
                         <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-1">
-                                <span>HBL</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.hbl"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="HBL"
-                                        type="text"
-                                    />
-                                    <div
-                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="size-4.5 transition-colors duration-200"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                                            />
-                                        </svg>
-                                    </div>
-                                </label>
-                                <span
-                                    v-if="form.errors.hbl"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.hbl }}</span>
-                            </div>
+                            <!--                            <div class="col-span-1">-->
+                            <!--                                <span>HBL</span>-->
+                            <!--                                <label class="relative flex">-->
+                            <!--                                    <input-->
+                            <!--                                        v-model="form.hbl"-->
+                            <!--                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
+                            <!--                                        placeholder="HBL"-->
+                            <!--                                        type="text"-->
+                            <!--                                    />-->
+                            <!--                                    <div-->
+                            <!--                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"-->
+                            <!--                                    >-->
+                            <!--                                        <svg-->
+                            <!--                                            xmlns="http://www.w3.org/2000/svg"-->
+                            <!--                                            fill="none"-->
+                            <!--                                            viewBox="0 0 24 24"-->
+                            <!--                                            stroke-width="1.5"-->
+                            <!--                                            stroke="currentColor"-->
+                            <!--                                            class="size-4.5 transition-colors duration-200"-->
+                            <!--                                        >-->
+                            <!--                                            <path-->
+                            <!--                                                stroke-linecap="round"-->
+                            <!--                                                stroke-linejoin="round"-->
+                            <!--                                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"-->
+                            <!--                                            />-->
+                            <!--                                        </svg>-->
+                            <!--                                    </div>-->
+                            <!--                                </label>-->
+                            <!--                                <span-->
+                            <!--                                    v-if="form.errors.hbl"-->
+                            <!--                                    class="text-tiny+ text-error"-->
+                            <!--                                >{{ form.errors.hbl }}</span>-->
+                            <!--                            </div>-->
 
-                            <div class="col-span-2">
+                            <div class="col-span-3">
                                 <span>Name</span>
                                 <label class="relative flex">
                                     <input
@@ -557,14 +690,12 @@ const handleHBLCreate = () => {
                     <!-- Price & Payment -->
                     <div class="card px-4 py-4 sm:px-5">
                         <div class="flex justify-between items-center">
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
+                            <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
                                 Price and Payment
                             </h2>
-                            <button
-                                class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
-                            >
+                            <button type="button"
+                                    @click="calculatePayment"
+                                class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90">
                                 Calculate Payment
                             </button>
                         </div>
@@ -653,19 +784,19 @@ const handleHBLCreate = () => {
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Packages</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        2
+                                        {{packageList.length}}
                                     </p>
                                 </div>
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Weight</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        1
+                                        {{grandTotalWeight}}
                                     </p>
                                 </div>
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Volume</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        0.01
+                                        {{grandTotalVolume}}
                                     </p>
                                 </div>
                             </div>
@@ -674,7 +805,7 @@ const handleHBLCreate = () => {
                                 <div class="flex justify-between text-2xl text-success font-bold">
                                     <p class="line-clamp-1">Grand Total</p>
                                     <p>
-                                        48 SAR
+                                        {{hblTotal}} {{currency}}
                                     </p>
                                 </div>
                             </div>
@@ -682,7 +813,265 @@ const handleHBLCreate = () => {
                     </div>
                 </div>
             </div>
+
+            <div class="card col-span-5 px-4 py-4 sm:px-5 mb-10">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
+                        Package Details
+                    </h2>
+                    <button type="button" @click="showPackageDialog"
+                            class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90">
+                        New Package <i class="fas fa-plus fa-fw fa-fw"></i>
+                    </button>
+                </div>
+
+                <div class="mt-5">
+                    <div v-if="packageList.length > 0" class="is-scrollbar-hidden min-w-full overflow-x-auto">
+                        <table class="is-zebra w-full text-left">
+                            <thead>
+                            <tr>
+                                <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
+                                    Type
+                                </th>
+                                <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
+                                    Length (CM)
+                                </th>
+                                <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
+                                    Width
+                                </th>
+                                <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
+                                    Height
+                                </th>
+                                <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
+                                    Quantity
+                                </th>
+                                <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
+                                    Weight
+                                </th>
+                                <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
+                                    Volume (M.CU)
+                                </th>
+                                <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
+                                    Remark
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="item in packageList">
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.type}}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.length}}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.width}}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.height}}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.quantity}}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.volume}}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.totalWeight}}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.remarks}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div v-else class="text-center">
+                        <div class="text-center mb-8">
+                            <svg
+                                class="w-24 h-24 mx-auto mb-4 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 9l-2 2-2-2m4 2h4a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2h4m4-2l2 2 2-2"
+                                ></path>
+                            </svg>
+                            <p class="text-gray-600">No packages. Please add packages to view data.</p>
+                        </div>
+                        <button
+                            type="button"
+                            @click="showPackageDialog"
+                            class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
+                        >
+                            New Package <i class="fas fa-plus fa-fw"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </form>
+
+        <div v-if="showAddNewPackageDialog"
+             class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden "
+             role="dialog">
+            <div class="absolute inset-0 bg-slate-900/60 transition-opacity duration-300" @click="false"
+                 x-show="true"></div>
+
+            <div class="relative w-1/3 rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700">
+                <div class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5">
+                    <h3 class="text-base font-medium text-slate-700 dark:text-navy-100">
+                        Add New Package
+                    </h3>
+                    <button
+                        @click="showAddNewPackageDialog = !showAddNewPackageDialog"
+                        class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="size-4.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                            ></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="px-4 py-4 sm:px-5">
+                    <p class="text-base">
+                        Add new package to HBL
+                    </p>
+
+                    <div class="mt-4 space-y-4">
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="col-span-2">
+                                <label class="block">
+                                    <span>Type </span>
+                                    <select
+                                        v-model="selectedType"
+                                        @change="updateTypeDescription"
+                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent">
+                                        <option v-for="type in packageTypes" :key="type">{{ type }}</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block">
+                                    <span>Type Description <span class="text-red-500 text-sm">*</span></span>
+                                    <input
+                                        v-model="packageItem.type"
+                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="Sofa set"
+                                        type="text"
+                                    />
+                                </label>
+                            </div>
+
+                            <div>
+                                <label class="block">
+                                    <span>Length (cm) <span class="text-red-500 text-sm">*</span></span>
+                                    <input
+                                        v-model="packageItem.length"
+                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="1.00"
+                                        step="0.01"
+                                        type="number"
+                                    />
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block">
+                                    <span>Width  <span class="text-red-500 text-sm">*</span></span>
+                                    <input
+                                        v-model="packageItem.width"
+                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="1.00"
+                                        step="0.01"
+                                        type="number"
+                                    />
+                                </label>
+                            </div>
+
+                            <div>
+                                <label class="block">
+                                    <span>Height <span class="text-red-500 text-sm">*</span></span>
+                                    <input
+                                        v-model="packageItem.height"
+                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="1.00"
+                                        step="0.01"
+                                        type="number"
+                                    />
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block">
+                                    <span>Quantity <span class="text-red-500 text-sm">*</span></span>
+                                    <input
+                                        v-model="packageItem.quantity"
+                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="1"
+                                        step="1"
+                                        type="number"
+                                    />
+                                </label>
+                            </div>
+
+
+                            <div class="col-span-2">
+                                <label class="block">
+                                    <span>Volume (M.CU) <span class="text-red-500 text-sm">*</span></span>
+                                    <input
+                                        v-model="packageItem.volume"
+                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="1.00"
+                                        step="0.01"
+                                        type="number"
+                                    />
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block">
+                                    <span>Total Weight  <span class="text-red-500 text-sm">*</span></span>
+                                    <input
+                                        v-model="packageItem.totalWeight"
+                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="1"
+                                        step="1"
+                                        type="number"
+                                    />
+                                </label>
+                            </div>
+
+
+
+
+                            <div class="col-span-4">
+                                <label class="block">
+                                    <span>Remarks</span>
+                                    <textarea
+                                        v-model="packageItem.remarks"
+                                        rows="4"
+                                        placeholder="Enter Text"
+                                        class="form-textarea mt-1.5 w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    ></textarea>
+                                </label>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="space-x-2 text-right">
+                            <button
+                                @click="showAddNewPackageDialog = false"
+                                class="btn min-w-[7rem]  border border-slate-300 font-medium text-slate-800 hover:bg-slate-150 focus:bg-slate-150 active:bg-slate-150/80 dark:border-navy-450 dark:text-navy-50 dark:hover:bg-navy-500 dark:focus:bg-navy-500 dark:active:bg-navy-500/90">
+                                Cancel
+                            </button>
+                            <button @click="addPackageData"
+                                class="btn min-w-[7rem]  bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </AppLayout>
 </template>
 

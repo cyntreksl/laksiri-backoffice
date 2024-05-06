@@ -599,7 +599,7 @@ export default {
                         },
                         {
                             title: "Drivers",
-                            route: "drivers.index",
+                            route: "users.drivers.index",
                         },
                     );
                     break;

@@ -25,9 +25,9 @@ const form = useForm({
 });
 
 const createDriver = () => {
-    form.post(route("drivers.store"), {
+    form.post(route("users.drivers.store"), {
         onSuccess: () => {
-            router.visit(route("drivers.index"));
+            router.visit(route("users.drivers.index"));
             form.reset();
             notification({
                 text: 'Driver Created Successfully!',

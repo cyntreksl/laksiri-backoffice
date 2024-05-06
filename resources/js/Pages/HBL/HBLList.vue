@@ -86,7 +86,15 @@ onMounted(() => {
         <template #header>HBL List</template>
 
         <Breadcrumb/>
-
+        <div class="flex justify-end mt-5">
+            <a :href="route('hbls.create')">
+                <button
+                    class="btn bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                >
+                    Create New HBL
+                </button>
+            </a>
+        </div>
         <div class="card mt-4">
             <div>
                 <div class="flex items-center justify-between p-2">
@@ -184,15 +192,7 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="flex justify-end mx-5">
-                    <a :href="route('hbls.create')">
-                        <button
-                            class="btn bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                        >
-                            New HBL
-                        </button>
-                    </a>
-                </div>
+
 
                 <div class=" mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">

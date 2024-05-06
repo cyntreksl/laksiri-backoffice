@@ -25,7 +25,7 @@ class StoreHBLRequest extends FormRequest
         return [
             'cargo_type' => ['required'],
             'hbl_type' => ['required'],
-            'hbl' => ['required'],
+//            'hbl' => ['required'],
             'hbl_name' => ['required'],
             'email' => ['required', 'email', 'max:254'],
             'contact_number' => ['nullable'],

@@ -48,8 +48,7 @@ Route::middleware([
     Route::post('switch-branch', [UserController::class, 'switchBranch']);
 
     // Driver
-    Route::resource('drivers', DriverController::class)
-        ->except(['create', 'show', 'destroy']);
-
-    Route::get('driver-list', [DriverController::class, 'list']);
+    Route::name('users.')->group(function () {
+        Route::resource('drivers', DriverController::class);
+    });
 });
