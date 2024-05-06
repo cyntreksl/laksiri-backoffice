@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
 use App\Http\Controllers\UserController;
@@ -45,4 +46,9 @@ Route::middleware([
     Route::get('user-list', [UserController::class, 'list']);
 
     Route::post('switch-branch', [UserController::class, 'switchBranch']);
+
+    // Driver
+    Route::name('users.')->group(function () {
+        Route::resource('drivers', DriverController::class);
+    });
 });
