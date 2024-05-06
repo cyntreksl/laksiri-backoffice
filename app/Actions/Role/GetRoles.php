@@ -12,6 +12,7 @@ class GetRoles
 
     public function handle(): Collection|array
     {
-        return Role::all();
+        return Role::whereNot('name', 'driver')
+            ->get();
     }
 }
