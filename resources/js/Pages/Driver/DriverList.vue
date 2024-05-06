@@ -222,12 +222,12 @@ const handleDeleteDriver = () => {
 
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
-                                                        :checked="data.columnVisibility.secondary_branch_names"
+                                                        :checked="data.columnVisibility.name"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
-                                                        @change="toggleColumnVisibility('secondary_branch_names', $event)"
+                                                        @change="toggleColumnVisibility('name', $event)"
                                                     />
-                                                    <p>Secondary Branches</p>
+                                                    <p>Name</p>
                                                 </label>
 
                                                 <label class="inline-flex items-center space-x-2">
