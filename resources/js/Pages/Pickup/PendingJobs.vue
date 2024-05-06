@@ -1,14 +1,19 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {Grid} from "gridjs";
+import {Grid, h} from "gridjs";
 import {onMounted, reactive, ref} from "vue";
 import Popper from "vue3-popper";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
+import DeleteUserConfirmationModal from "@/Pages/User/Partials/DeleteUserConfirmationModal.vue";
+import {router} from "@inertiajs/vue3";
+import notification from "@/magics/notification.js";
 
 export default {
-    components: {Breadcrumb, AppLayout, Popper},
+    components: {DeleteUserConfirmationModal, AssignDriverModal, Breadcrumb, AppLayout, Popper},
     props: {
         pickups: {},
+        drivers: {},
     },
     setup(props) {
         const wrapperRef = ref(null);
@@ -17,12 +22,18 @@ export default {
         const data = reactive({
             pickupsData: props.pickups,
             columnVisibility: {
+                id: false,
                 reference: true,
                 name: true,
+                email: false,
                 address: true,
                 contact: true,
                 cargoMode: true,
-                notes: true,
+                notes: false,
+                pickupDate: true,
+                pickupTimeStart: false,
+                pickupTimeEnd: false,
+                actions: true,
             },
         });
 
@@ -46,21 +57,72 @@ export default {
         };
 
         const createColumns = () => [
+            {name: 'ID', hidden: !data.columnVisibility.id},
             {name: 'Reference', hidden: !data.columnVisibility.reference},
             {name: 'Name', hidden: !data.columnVisibility.name},
             {name: 'Address', hidden: !data.columnVisibility.address},
             {name: 'Contact', hidden: !data.columnVisibility.contact},
             {name: 'Cargo Mode', hidden: !data.columnVisibility.cargoMode},
+            {name: 'Pickup Date', hidden: !data.columnVisibility.pickupDate},
+            {name: 'Start Pickup Time', hidden: !data.columnVisibility.pickupTimeStart},
+            {name: 'End Pickup Time', hidden: !data.columnVisibility.pickupTimeEnd},
+            {name: 'Email', hidden: !data.columnVisibility.email},
             {name: 'Note', hidden: !data.columnVisibility.notes},
+            {
+                name: 'Actions',
+                sort: false,
+                hidden: !data.columnVisibility.actions,
+                formatter: (_, row) => {
+                    return h('div', {}, [
+                        h('button', {
+                            className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
+                            onClick: () => confirmAssignDriver(row.cells[0].data)
+                        }, [
+                            h('svg', {
+                                xmlns: 'http://www.w3.org/2000/svg',
+                                viewBox: '0 0 24 24',
+                                width: 24,
+                                height: 24,
+                                class: 'size-4.5 icon icon-tabler icons-tabler-outline icon-tabler-truck',
+                                fill: 'none',
+                                stroke: "currentColor",
+                                strokeWidth: 2,
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                            }, [
+                                h('path', {
+                                    stroke: "none",
+                                    d: 'M0 0h24v24H0z',
+                                    fill: 'none',
+                                }),
+                                h('path', {
+                                    d: 'M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
+                                }),
+                                h('path', {
+                                    d: 'M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
+                                }),
+                                h('path', {
+                                    d: 'M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5',
+                                }),
+                            ])
+                        ]),
+                    ]);
+                },
+            },
         ];
 
         const createData = () =>
             data.pickupsData.map(pickup => [
+                pickup.id,
                 pickup.reference,
                 pickup.name,
                 pickup.address,
                 pickup.contact_number,
                 pickup.cargo_type,
+                pickup.pickup_date,
+                pickup.pickup_time_start,
+                pickup.pickup_time_end,
+                pickup.email,
                 pickup.notes,
             ]);
 
@@ -78,12 +140,28 @@ export default {
 
         const showColumn = ref(false);
 
+        const showConfirmAssignDriverModal = ref(false);
+        const jobId = ref(null);
+
+        const confirmAssignDriver = (id) => {
+            jobId.value = id;
+            showConfirmAssignDriverModal.value = true;
+        };
+
+        const closeModal = () => {
+            showConfirmAssignDriverModal.value = false;
+            jobId.value = null;
+        }
+
         return {
             grid,
             wrapperRef,
             data,
             showColumn,
             toggleColumnVisibility,
+            showConfirmAssignDriverModal,
+            closeModal,
+            jobId
         };
     },
 }
@@ -176,6 +254,46 @@ export default {
                                                     />
                                                     <p>Note</p>
                                                 </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.pickupDate"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('pickupDate', $event)"
+                                                    />
+                                                    <p>Pickup Date</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.pickupTimeStart"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('pickupTimeStart', $event)"
+                                                    />
+                                                    <p>Start Pickup Date</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.pickupTimeEnd"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('pickupTimeEnd', $event)"
+                                                    />
+                                                    <p>End Pickup Date</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.email"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('email', $event)"
+                                                    />
+                                                    <p>Email</p>
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -199,5 +317,7 @@ export default {
                 </div>
             </div>
         </div>
+
+        <AssignDriverModal :drivers="drivers" :job-id="jobId" :show="showConfirmAssignDriverModal" @close="closeModal"/>
     </AppLayout>
 </template>

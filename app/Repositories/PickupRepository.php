@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Actions\NoteType\GetNoteTypes;
+use App\Actions\PickUps\AssignDriver;
 use App\Actions\PickUps\CreatePickUp;
 use App\Actions\PickUps\GetPickups;
 use App\Interfaces\PickupRepositoryInterface;
@@ -17,8 +18,6 @@ class PickupRepository implements PickupRepositoryInterface
 
     public function storePickup(array $data)
     {
-        // assign agent
-
         // assign location longitude, latitude and name
 
         // store pickup
@@ -28,5 +27,10 @@ class PickupRepository implements PickupRepositoryInterface
     public function getNoteTypes()
     {
         return GetNoteTypes::run();
+    }
+
+    public function assignDriver(array $data, PickUp $pickUp)
+    {
+        return AssignDriver::run($data, $pickUp);
     }
 }

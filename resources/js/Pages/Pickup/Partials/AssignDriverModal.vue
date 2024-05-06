@@ -1,0 +1,87 @@
+<script setup>
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import DialogModal from "@/Components/DialogModal.vue";
+import {router, useForm} from "@inertiajs/vue3";
+import InputLabel from "@/Components/InputLabel.vue";
+import InputError from "@/Components/InputError.vue";
+import notification from "@/magics/notification.js";
+
+const props = defineProps({
+    show: {
+        type: Boolean,
+        default: false,
+    },
+    drivers: {
+        type: Object,
+        default: () => {
+        },
+    },
+    jobId: {
+        type: Number,
+    }
+});
+
+const emit = defineEmits(['close']);
+
+const form = useForm({
+    driver_id: '',
+});
+
+const handleAssignDriver = () => {
+    form.put(route("pickups.driver.update", props.jobId), {
+        preserveScroll: true,
+        onSuccess: () => {
+            emit('close');
+            notification({
+                text: 'Driver Assigned!',
+                variant: 'success',
+            });
+            router.visit(route('pickups.index'))
+        },
+    })
+}
+</script>
+
+<template>
+    <DialogModal :maxWidth="'xl'" :show="show" @close="$emit('close')">
+        <template #title>
+            Assign Driver
+        </template>
+
+        <template #content>
+            <div class="grid grid-cols-1 gap-5">
+                <div>
+                    <InputLabel value="Select Driver"/>
+                    <div class="space-x-5 mt-1">
+                        <label class="block">
+                            <select
+                                v-model="form.driver_id"
+                                class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                            >
+                                <option v-for="driver in drivers" :key="driver.id"
+                                        :value="driver.id">{{ driver.name }}
+                                </option>
+                            </select>
+                        </label>
+                        <InputError :message="form.errors.driver_id"/>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template #footer>
+            <SecondaryButton @click="$emit('close')">
+                Cancel
+            </SecondaryButton>
+            <PrimaryButton
+                :class="{ 'opacity-25': form.processing }"
+                :disabled="form.processing"
+                class="ms-3"
+                @click="handleAssignDriver"
+            >
+                Assign Driver
+            </PrimaryButton>
+        </template>
+    </DialogModal>
+</template>
