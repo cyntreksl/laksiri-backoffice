@@ -16,7 +16,6 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
-
 class User extends Authenticatable
 {
     use HasApiTokens;
@@ -42,6 +41,10 @@ class User extends Authenticatable
         'is_ban',
         'last_login_at',
         'last_logout_at',
+        'contact',
+        'working_hours_end',
+        'working_hours_start',
+        'preferred_zone',
     ];
 
     /**
@@ -77,15 +80,15 @@ class User extends Authenticatable
 
     public function getPrimaryBranchNameAttribute()
     {
-           return $this->primaryBranch ? $this->primaryBranch->name : null;
+        return $this->primaryBranch ? $this->primaryBranch->name : null;
     }
 
     public function getActiveBranchNameAttribute()
     {
         $data = GetUserCurrentBranch::run();
+
         return $data['branchName'];
     }
-
 
     /**
      * Get the attributes that should be cast.

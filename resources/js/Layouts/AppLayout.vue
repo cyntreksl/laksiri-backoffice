@@ -86,7 +86,7 @@
                                 <path d="M9 8h.01"/>
                             </svg>
                         </a>
-                        <!-- Admin -->
+                        <!-- User Management -->
                         <a
                             @click="setMenu('users')"
                             x-tooltip.placement.right="'User Management'"
@@ -599,7 +599,7 @@ export default {
                         },
                         {
                             title: "Drivers",
-                            route: "users.index",
+                            route: "drivers.index",
                         },
                     );
                     break;
