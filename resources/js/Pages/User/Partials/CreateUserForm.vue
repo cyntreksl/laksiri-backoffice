@@ -55,7 +55,7 @@ const createUser = () => {
 </script>
 
 <template>
-    <div class="flex justify-end mx-5">
+    <div class="flex justify-end mx-5 mt-4">
         <PrimaryButton
             @click="confirmingUserCreation = !confirmingUserCreation"
         >

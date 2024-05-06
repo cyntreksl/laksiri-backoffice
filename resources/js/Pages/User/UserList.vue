@@ -7,6 +7,7 @@ import CreateUserForm from "@/Pages/User/Partials/CreateUserForm.vue";
 import {router} from "@inertiajs/vue3";
 import notification from "@/magics/notification.js";
 import DeleteUserConfirmationModal from "@/Pages/User/Partials/DeleteUserConfirmationModal.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 
 const props = defineProps({
     roles: {
@@ -198,6 +199,8 @@ const handleDeleteUser = () => {
     <AppLayout title="User Management">
         <template #header>User Management</template>
 
+        <Breadcrumb/>
+
         <CreateUserForm :branches="branches" :roles="roles"/>
 
         <div class="card mt-4">
@@ -227,7 +230,7 @@ const handleDeleteUser = () => {
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
                                                         :checked="data.columnVisibility.id"
-                                                        @change="toggleColumnVisibility('ID', $event)"
+                                                        @change="toggleColumnVisibility('id', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
@@ -237,7 +240,7 @@ const handleDeleteUser = () => {
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
                                                         :checked="data.columnVisibility.secondary_branch_names"
-                                                        @change="toggleColumnVisibility('Secondary Branches', $event)"
+                                                        @change="toggleColumnVisibility('secondary_branch_names', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
@@ -247,7 +250,7 @@ const handleDeleteUser = () => {
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
                                                         :checked="data.columnVisibility.created_at"
-                                                        @change="toggleColumnVisibility('Created At', $event)"
+                                                        @change="toggleColumnVisibility('created_at', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
@@ -257,7 +260,7 @@ const handleDeleteUser = () => {
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
                                                         :checked="data.columnVisibility.last_login_at"
-                                                        @change="toggleColumnVisibility('Last Login', $event)"
+                                                        @change="toggleColumnVisibility('last_login_at', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
@@ -267,7 +270,7 @@ const handleDeleteUser = () => {
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
                                                         :checked="data.columnVisibility.last_logout_at"
-                                                        @change="toggleColumnVisibility('Last Logout', $event)"
+                                                        @change="toggleColumnVisibility('last_logout_at', $event)"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                     />
