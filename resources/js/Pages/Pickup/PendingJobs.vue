@@ -19,10 +19,14 @@ export default {
             columnVisibility: {
                 reference: true,
                 name: true,
+                email: false,
                 address: true,
                 contact: true,
                 cargoMode: true,
-                notes: true,
+                notes: false,
+                pickupDate: true,
+                pickupTimeStart: false,
+                pickupTimeEnd: false,
             },
         });
 
@@ -51,6 +55,10 @@ export default {
             {name: 'Address', hidden: !data.columnVisibility.address},
             {name: 'Contact', hidden: !data.columnVisibility.contact},
             {name: 'Cargo Mode', hidden: !data.columnVisibility.cargoMode},
+            {name: 'Pickup Date', hidden: !data.columnVisibility.pickupDate},
+            {name: 'Start Pickup Time', hidden: !data.columnVisibility.pickupTimeStart},
+            {name: 'End Pickup Time', hidden: !data.columnVisibility.pickupTimeEnd},
+            {name: 'Email', hidden: !data.columnVisibility.email},
             {name: 'Note', hidden: !data.columnVisibility.notes},
         ];
 
@@ -61,6 +69,10 @@ export default {
                 pickup.address,
                 pickup.contact_number,
                 pickup.cargo_type,
+                pickup.pickup_date,
+                pickup.pickup_time_start,
+                pickup.pickup_time_end,
+                pickup.email,
                 pickup.notes,
             ]);
 
@@ -175,6 +187,46 @@ export default {
                                                         type="checkbox"
                                                     />
                                                     <p>Note</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.pickupDate"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('pickupDate', $event)"
+                                                    />
+                                                    <p>Pickup Date</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.pickupTimeStart"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('pickupTimeStart', $event)"
+                                                    />
+                                                    <p>Start Pickup Date</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.pickupTimeEnd"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('pickupTimeEnd', $event)"
+                                                    />
+                                                    <p>End Pickup Date</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.email"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('email', $event)"
+                                                    />
+                                                    <p>Email</p>
                                                 </label>
                                             </div>
                                         </div>
