@@ -26,7 +26,6 @@ const form = useForm({
 const updateUserBranch = () => {
     form.put(route("users.branch.update", props.user.id), {
         onSuccess: () => {
-            form.reset();
             notification({
                 text: 'User Branches Updated Successfully!',
                 variant: 'success',
@@ -69,7 +68,10 @@ const updateUserBranch = () => {
                     <InputLabel value="Select Secondary Branch"/>
                     <select
                         v-model="form.secondary_branches"
-                        x-init="$el._tom = new Tom($el)"
+                        x-init="$el._tom = new Tom($el,{
+            plugins: ['remove_button'],
+            create: true,
+          })"
                         multiple
                         class="w-full"
                         placeholder="Select a secondary branch..."
