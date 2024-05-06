@@ -30,10 +30,19 @@ class StorePickupRequest extends FormRequest
             'address' => ['required'],
             'location' => ['nullable'],
             'zone_id' => ['nullable', 'integer'],
-            'notes' => ['nullable'],
+            'notes' => ['required'],
             'pickup_date' => ['required', 'date'],
-            'pickup_time_start' => ['required', 'date_format:H:i'],
-            'pickup_time_end' => ['required', 'date_format:H:i'],
+            'pickup_time_start' => ['nullable', 'date_format:H:i a'],
+            'pickup_time_end' => ['nullable', 'date_format:H:i a'],
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'pickup_time_start.date_format' => "Invalid date format for entered value.Please enter time like 10:00 am",
+            'pickup_time_end.date_format' => "Invalid date format for entered value.Please enter time like 11:00 am",
+        ];
+    }
+
 }

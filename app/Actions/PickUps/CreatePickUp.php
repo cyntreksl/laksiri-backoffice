@@ -22,10 +22,12 @@ class CreatePickUp
             'address' => $data['address'],
             'location_name' => $data['location'],
             'zone_id' => $data['zone_id'],
-            'notes' => $data['note'],
+            'notes' => $data['notes'],
             'pickup_date' => $data['pickup_date'],
             'pickup_time_start' => $data['pickup_time_start'],
             'pickup_time_end' => $data['pickup_time_end'],
+            'is_from_important_customer' => $data['is_from_important_customer'],
+            'is_urgent_pickup'=> $data['is_urgent_pickup'],
             'created_by' => auth()->id(),
         ]);
     }

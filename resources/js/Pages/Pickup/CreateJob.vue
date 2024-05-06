@@ -2,7 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {watch} from "vue";
+import {ref, watch} from "vue";
 import notification from "@/magics/notification.js";
 
 const props = defineProps({
@@ -24,13 +24,15 @@ const form = useForm({
     contact_number: "",
     address: "",
     note_type: "",
-    note: "",
+    notes: "",
     cargo_type: "",
     location: "",
     zone_id: "",
     pickup_date: "",
     pickup_time_start: "",
     pickup_time_end: "",
+    is_from_important_customer:false,
+    is_urgent_pickup:false,
 });
 
 const handlePickupCreate = () => {
@@ -51,7 +53,18 @@ const handlePickupCreate = () => {
 };
 
 watch(() => form.note_type, (newValue) => {
-    form.note += newValue;
+    form.notes += newValue;
+});
+
+const isImportant = ref(false);
+const isUrgentPickup = ref(false);
+
+watch(isImportant, (newValue) => {
+    form.is_from_important_customer = newValue;
+});
+
+watch(isUrgentPickup, (newValue) => {
+    form.is_urgent_pickup = newValue;
 });
 </script>
 
@@ -67,12 +80,28 @@ watch(() => form.note_type, (newValue) => {
             <div class="grid grid-cols-1 sm:grid-cols-5 mt-4 gap-4">
                 <div class="sm:col-span-3 space-y-5">
                     <div class="card px-4 py-4 sm:px-5">
-                        <div>
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
+                        <div class="grid grid-cols-2">
+                            <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
                                 Basic Details
                             </h2>
+                            <div class="flex justify-end">
+                                <button type="button" x-data="{ isImportant: true }"
+                                        x-tooltip.placement.left-start.success="'This pickup is from important customer'"
+                                        @click.stop="isImportant = !isImportant"
+                                        class="btn size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 flex items-center space-x-2">
+                                    <svg v-if="isImportant" xmlns="http://www.w3.org/2000/svg"
+                                         class="size-5.5 text-success dark:text-accent" viewBox="0 0 20 20"
+                                         fill="currentColor">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="size-4.5" fill="none"
+                                         viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                              d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <div class="grid grid-cols-2 gap-5 mt-3">
                             <div class="col-span-2">
@@ -85,8 +114,7 @@ watch(() => form.note_type, (newValue) => {
                                         type="text"
                                     />
                                     <div
-                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                    >
+                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             fill="none"
@@ -219,28 +247,46 @@ watch(() => form.note_type, (newValue) => {
                                 <span>Note</span>
                                 <label class="block">
                                     <textarea
-                                        v-model="form.note"
+                                        v-model="form.notes"
                                         rows="4"
                                         placeholder="Type note here..."
                                         class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     ></textarea>
                                 </label>
                                 <span
-                                    v-if="form.errors.note"
+                                    v-if="form.errors.notes"
                                     class="text-tiny+ text-error"
-                                >{{ form.errors.note }}</span>
+                                >{{ form.errors.notes }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="sm:col-span-2 space-y-5">
                     <div class="card px-4 py-4 sm:px-5">
-                        <div>
+                        <div class="grid grid-cols-2">
                             <h2
                                 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
                                 Cargo Type
                             </h2>
+                            <div class="flex justify-end">
+                                <button type="button" x-data="{ isImportant: true }"
+                                        x-tooltip.placement.left-start.secondary="'This is need to pickup within today'"
+                                        @click.stop="isUrgentPickup = !isUrgentPickup"
+                                        class="btn size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 flex items-center space-x-2">
+                                    <svg v-if="isUrgentPickup" xmlns="http://www.w3.org/2000/svg"
+                                         class="size-5.5 text-secondary dark:text-accent" viewBox="0 0 20 20"
+                                         fill="currentColor">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="size-4.5" fill="none"
+                                         viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                              d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <div class="my-5">
                             <div class="my-5">
@@ -353,7 +399,7 @@ watch(() => form.note_type, (newValue) => {
                                         x-init="$el._x_flatpickr = flatpickr($el)"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         placeholder="Choose date..."
-                                        type="text"
+                                        type="date"
                                     />
                                     <span
                                         class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
@@ -381,19 +427,19 @@ watch(() => form.note_type, (newValue) => {
                                 </div>
                             </div>
 
-                            <div>
-                                <span class="">Start Pickup Time</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.pickup_time_start"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Choose time..."
-                                        type="text"
-                                        x-init="$el._x_flatpickr = flatpickr($el,{enableTime: true,noCalendar: true,dateFormat: 'H:i',time_24hr:true})"
-                                    />
-                                    <span
-                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                    >
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <span class="">Start Pickup Time</span>
+                                    <label class="relative flex">
+                                        <input
+                                            v-model="form.pickup_time_start"
+                                            class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                            placeholder="09:00AM"
+                                            type="text"
+                                        />
+                                        <span
+                                            class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                                        >
                                       <svg
                                           class="size-5"
                                           fill="none"
@@ -409,27 +455,26 @@ watch(() => form.note_type, (newValue) => {
                                         />
                                       </svg>
                                     </span>
-                                </label>
-                                <div
-                                    v-if="form.errors.pickup_time_start"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.pickup_time_start }}
+                                    </label>
+                                    <div
+                                        v-if="form.errors.pickup_time_start"
+                                        class="text-tiny+ text-error"
+                                    >{{ form.errors.pickup_time_start }}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div>
-                                <span class="">End Pickup Time</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.pickup_time_end"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Choose time..."
-                                        type="text"
-                                        x-init="$el._x_flatpickr = flatpickr($el,{enableTime: true,noCalendar: true,dateFormat: 'H:i',time_24hr:true})"
-                                    />
-                                    <span
-                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                    >
+                                <div>
+                                    <span class="">End Pickup Time</span>
+                                    <label class="relative flex">
+                                        <input
+                                            v-model="form.pickup_time_end"
+                                            class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                            placeholder="11:00AM"
+                                            type="text"
+                                        />
+                                        <span
+                                            class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                                        >
                                       <svg
                                           class="size-5"
                                           fill="none"
@@ -445,47 +490,50 @@ watch(() => form.note_type, (newValue) => {
                                         />
                                       </svg>
                                     </span>
-                                </label>
-                                <div
-                                    v-if="form.errors.pickup_time_end"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.pickup_time_end }}
+                                    </label>
+                                    <div
+                                        v-if="form.errors.pickup_time_end"
+                                        class="text-tiny+ text-error"
+                                    >{{ form.errors.pickup_time_end }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="flex justify-end bottom-0 space-x-5">
+                        <button
+                            class="btn border border-error font-medium text-error hover:bg-error hover:text-white focus:bg-error focus:text-white active:bg-error/90"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            :disabled="form.processing"
+                            :class="{ 'opacity-50': form.processing }"
+                            class="btn space-x-2 border border-warning/30 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                        >
+                            <span>Create a Job</span>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="size-5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                                />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex justify-end py-10 space-x-5">
-                <button
-                    class="btn border border-error font-medium text-error hover:bg-error hover:text-white focus:bg-error focus:text-white active:bg-error/90"
-                >
-                    Cancel
-                </button>
-                <button
-                    type="submit"
-                    :disabled="form.processing"
-                    :class="{ 'opacity-50': form.processing }"
-                    class="btn space-x-2 border border-warning/30 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                >
-                    <span>Create a Job</span>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="size-5"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                        />
-                    </svg>
-                </button>
-            </div>
+
         </form>
     </AppLayout>
 </template>
