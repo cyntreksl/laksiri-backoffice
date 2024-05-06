@@ -569,10 +569,6 @@ export default {
                             title: "Job Exception",
                             route: "dashboard2",
                         },
-                        {
-                            title: "All Jobs",
-                            route: "dashboard2",
-                        },
                     );
                     break;
                 case "hbls":
