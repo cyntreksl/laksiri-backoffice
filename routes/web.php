@@ -35,7 +35,7 @@ Route::middleware([
     Route::resource('hbls', HBLController::class);
     // User
     Route::resource('users', UserController::class)
-        ->except(['create']);
+        ->except(['create', 'show']);
 
     Route::put('users/{user}/password/change', [UserController::class, 'changePassword'])
         ->name('users.password.change');
