@@ -20,6 +20,11 @@ class UpdateUserBranch
             $user->branches()->detach();
 
             $user->branches()->attach($data['secondary_branches']);
+
+            activity()->performedOn($user)
+                ->withProperties(['secondary_branches' => $data['secondary_branches']])
+                ->event('updated')
+                ->log('updated');
         }
     }
 }

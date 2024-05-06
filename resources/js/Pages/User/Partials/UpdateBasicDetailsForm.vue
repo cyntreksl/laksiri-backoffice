@@ -1,7 +1,7 @@
 <script setup>
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
-import {useForm} from "@inertiajs/vue3";
+import {router, useForm} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import notification from "@/magics/notification.js";
 
@@ -32,15 +32,18 @@ const form = useForm({
 
 const handleUpdateUser = () => {
     form.put(route("users.update", props.user.id), {
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: () => {
-            form.reset();
             notification({
                 text: 'Basic Details Updated Successfully!',
                 variant: 'success',
-            })
+            });
+            router.visit(route('users.edit', props.user.id));
         },
-        preserveScroll: true,
-        preserveState: true,
+        onError: () => {
+            form.reset();
+        }
     });
 }
 </script>
