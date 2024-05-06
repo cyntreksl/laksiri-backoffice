@@ -2,13 +2,20 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import {watch} from "vue";
+import notification from "@/magics/notification.js";
 
-defineProps({
+const props = defineProps({
     noteTypes: {
         type: Object,
         default: () => {
         }
-    }
+    },
+    cargoTypes: {
+        type: Object,
+        default: () => {
+        }
+    },
 })
 
 const form = useForm({
@@ -22,13 +29,19 @@ const form = useForm({
     location: "",
     zone_id: "",
     pickup_date: "",
+    pickup_time_start: "",
+    pickup_time_end: "",
 });
 
 const handlePickupCreate = () => {
     form.post(route("pickups.store"), {
         onSuccess: () => {
-            router.visit(route("pickups.index"));
             form.reset();
+            router.visit(route("pickups.index"));
+            notification({
+                text: 'Pickup added successfully!',
+                variant: 'success',
+            })
         },
         onError: () => console.log("error"),
         onFinish: () => console.log("finish"),
@@ -36,6 +49,10 @@ const handlePickupCreate = () => {
         preserveState: true,
     });
 };
+
+watch(() => form.note_type, (newValue) => {
+    form.note += newValue;
+});
 </script>
 
 <template>
@@ -226,36 +243,27 @@ const handlePickupCreate = () => {
                             </h2>
                         </div>
                         <div class="my-5">
-                            <div class="space-x-5">
-                                <label
-                                    class="inline-flex items-center space-x-2"
-                                >
-                                    <input
-                                        v-model="form.cargo_type"
-                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        name="cargo_type"
-                                        value="air"
-                                        type="radio"
-                                    />
-                                    <p>Air Cargo</p>
-                                </label>
-                                <label
-                                    class="inline-flex items-center space-x-2"
-                                >
-                                    <input
-                                        v-model="form.cargo_type"
-                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        name="cargo_type"
-                                        value="sea"
-                                        type="radio"
-                                    />
-                                    <p>Sea Cargo</p>
-                                </label>
+                            <div class="my-5">
+                                <div class="space-x-5">
+                                    <label
+                                        v-for="cargoType in cargoTypes"
+                                        class="inline-flex items-center space-x-2"
+                                    >
+                                        <input
+                                            v-model="form.cargo_type"
+                                            :value="cargoType"
+                                            class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                                            name="cargo_type"
+                                            type="radio"
+                                        />
+                                        <p>{{ cargoType }}</p>
+                                    </label>
+                                </div>
+                                <span
+                                    v-if="form.errors.cargo_type"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.cargo_type }}</span>
                             </div>
-                            <span
-                                v-if="form.errors.cargo_type"
-                                class="text-tiny+ text-error"
-                            >{{ form.errors.cargo_type }}</span>
                         </div>
                     </div>
 
@@ -268,52 +276,52 @@ const handlePickupCreate = () => {
                             </h2>
                         </div>
                         <div class="my-5 space-y-5">
-                            <div
-                                class="flex justify-between items-center space-y-5 space-x-5"
-                            >
-                                <div class="w-full">
-                                    <label class="block">
-                                        <span>Location</span>
-                                        <input
-                                            v-model="form.location"
-                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            placeholder="Location"
-                                            type="text"
-                                        />
-                                    </label>
-                                    <div
-                                        v-if="form.errors.location"
-                                        class="text-tiny+ text-error"
-                                    >{{ form.errors.location }}
-                                    </div>
-                                </div>
+                            <!--                            <div-->
+                            <!--                                class="flex justify-between items-center space-y-5 space-x-5"-->
+                            <!--                            >-->
+                            <!--                                <div class="w-full">-->
+                            <!--                                    <label class="block">-->
+                            <!--                                        <span>Location</span>-->
+                            <!--                                        <input-->
+                            <!--                                            v-model="form.location"-->
+                            <!--                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
+                            <!--                                            placeholder="Location"-->
+                            <!--                                            type="text"-->
+                            <!--                                        />-->
+                            <!--                                    </label>-->
+                            <!--                                    <div-->
+                            <!--                                        v-if="form.errors.location"-->
+                            <!--                                        class="text-tiny+ text-error"-->
+                            <!--                                    >{{ form.errors.location }}-->
+                            <!--                                    </div>-->
+                            <!--                                </div>-->
 
-                                <div>
-                                    <button
-                                        class="btn size-9 rounded-full bg-success p-0 font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="size-5"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                            />
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-                                            />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
+                            <!--                                <div>-->
+                            <!--                                    <button-->
+                            <!--                                        class="btn size-9 rounded-full bg-success p-0 font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90"-->
+                            <!--                                    >-->
+                            <!--                                        <svg-->
+                            <!--                                            xmlns="http://www.w3.org/2000/svg"-->
+                            <!--                                            fill="none"-->
+                            <!--                                            viewBox="0 0 24 24"-->
+                            <!--                                            stroke-width="1.5"-->
+                            <!--                                            stroke="currentColor"-->
+                            <!--                                            class="size-5"-->
+                            <!--                                        >-->
+                            <!--                                            <path-->
+                            <!--                                                stroke-linecap="round"-->
+                            <!--                                                stroke-linejoin="round"-->
+                            <!--                                                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"-->
+                            <!--                                            />-->
+                            <!--                                            <path-->
+                            <!--                                                stroke-linecap="round"-->
+                            <!--                                                stroke-linejoin="round"-->
+                            <!--                                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"-->
+                            <!--                                            />-->
+                            <!--                                        </svg>-->
+                            <!--                                    </button>-->
+                            <!--                                </div>-->
+                            <!--                            </div>-->
 
                             <div>
                                 <label class="block">
@@ -370,6 +378,78 @@ const handlePickupCreate = () => {
                                     v-if="form.errors.pickup_date"
                                     class="text-tiny+ text-error"
                                 >{{ form.errors.pickup_date }}
+                                </div>
+                            </div>
+
+                            <div>
+                                <span class="">Start Pickup Time</span>
+                                <label class="relative flex">
+                                    <input
+                                        v-model="form.pickup_time_start"
+                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="Choose time..."
+                                        type="text"
+                                        x-init="$el._x_flatpickr = flatpickr($el,{enableTime: true,noCalendar: true,dateFormat: 'H:i',time_24hr:true})"
+                                    />
+                                    <span
+                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                                    >
+                                      <svg
+                                          class="size-5"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          stroke-width="1.5"
+                                          viewBox="0 0 24 24"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                      </svg>
+                                    </span>
+                                </label>
+                                <div
+                                    v-if="form.errors.pickup_time_start"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.pickup_time_start }}
+                                </div>
+                            </div>
+
+                            <div>
+                                <span class="">End Pickup Time</span>
+                                <label class="relative flex">
+                                    <input
+                                        v-model="form.pickup_time_end"
+                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="Choose time..."
+                                        type="text"
+                                        x-init="$el._x_flatpickr = flatpickr($el,{enableTime: true,noCalendar: true,dateFormat: 'H:i',time_24hr:true})"
+                                    />
+                                    <span
+                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                                    >
+                                      <svg
+                                          class="size-5"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          stroke-width="1.5"
+                                          viewBox="0 0 24 24"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                      </svg>
+                                    </span>
+                                </label>
+                                <div
+                                    v-if="form.errors.pickup_time_end"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.pickup_time_end }}
                                 </div>
                             </div>
                         </div>

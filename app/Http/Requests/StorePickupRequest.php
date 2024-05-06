@@ -25,12 +25,15 @@ class StorePickupRequest extends FormRequest
         return [
             'cargo_type' => ['required'],
             'name' => ['required'],
-            'email' => ['required', 'email', 'max:254'],
+            'email' => ['nullable', 'email', 'max:254'],
             'contact_number' => ['required'],
             'address' => ['required'],
             'location' => ['nullable'],
-            'zone_id' => ['required', 'integer'],
+            'zone_id' => ['nullable', 'integer'],
             'notes' => ['nullable'],
+            'pickup_date' => ['required', 'date'],
+            'pickup_time_start' => ['required', 'date_format:H:i'],
+            'pickup_time_end' => ['required', 'date_format:H:i'],
         ];
     }
 }

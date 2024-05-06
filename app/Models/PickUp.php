@@ -32,6 +32,9 @@ class PickUp extends Model
         'driver_assigned_at',
         'hbl_id',
         'created_by',
+        'pickup_date',
+        'pickup_time_start',
+        'pickup_time_end',
     ];
 
     public function getActivitylogOptions(): LogOptions

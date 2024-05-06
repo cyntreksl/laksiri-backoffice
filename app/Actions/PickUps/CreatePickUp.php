@@ -2,6 +2,7 @@
 
 namespace App\Actions\PickUps;
 
+use App\Actions\User\GetUserCurrentBranch;
 use App\Models\PickUp;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -13,7 +14,7 @@ class CreatePickUp
     {
         return PickUp::create([
             'reference' => GeneratePickupReferenceNumber::run(),
-            'agent_id' => 1,
+            'branch_id' => GetUserCurrentBranch::run()['branchId'],
             'cargo_type' => $data['cargo_type'],
             'name' => $data['name'],
             'email' => $data['email'],
@@ -22,6 +23,9 @@ class CreatePickUp
             'location_name' => $data['location'],
             'zone_id' => $data['zone_id'],
             'notes' => $data['note'],
+            'pickup_date' => $data['pickup_date'],
+            'pickup_time_start' => $data['pickup_time_start'],
+            'pickup_time_end' => $data['pickup_time_end'],
             'created_by' => auth()->id(),
         ]);
     }
