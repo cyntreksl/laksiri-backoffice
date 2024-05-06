@@ -26,7 +26,7 @@ class UpdateLastLogout
         try {
             $user = $event->user;
             $user->last_logout_at = Carbon::now();
-            $user->status = UserStatus::DEACTIVATE->value;
+            $user->status = UserStatus::INACTIVE->value;
             $user->save();
         } catch (\Throwable $throwable) {
             report($throwable);

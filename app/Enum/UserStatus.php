@@ -8,4 +8,5 @@ enum UserStatus: string
     case DEACTIVATE = 'DEACTIVATE';
     case DELETED = 'DELETED';
     case INVITED = 'INVITED';
+    case INACTIVE = 'INACTIVE';
 }
