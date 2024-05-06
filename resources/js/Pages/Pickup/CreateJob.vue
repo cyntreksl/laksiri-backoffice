@@ -8,7 +8,12 @@ defineProps({
         type: Object,
         default: () => {
         }
-    }
+    },
+    cargoTypes: {
+        type: Object,
+        default: () => {
+        }
+    },
 })
 
 const form = useForm({
@@ -226,36 +231,27 @@ const handlePickupCreate = () => {
                             </h2>
                         </div>
                         <div class="my-5">
-                            <div class="space-x-5">
-                                <label
-                                    class="inline-flex items-center space-x-2"
-                                >
-                                    <input
-                                        v-model="form.cargo_type"
-                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        name="cargo_type"
-                                        value="air"
-                                        type="radio"
-                                    />
-                                    <p>Air Cargo</p>
-                                </label>
-                                <label
-                                    class="inline-flex items-center space-x-2"
-                                >
-                                    <input
-                                        v-model="form.cargo_type"
-                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        name="cargo_type"
-                                        value="sea"
-                                        type="radio"
-                                    />
-                                    <p>Sea Cargo</p>
-                                </label>
+                            <div class="my-5">
+                                <div class="space-x-5">
+                                    <label
+                                        v-for="cargoType in cargoTypes"
+                                        class="inline-flex items-center space-x-2"
+                                    >
+                                        <input
+                                            v-model="form.cargo_type"
+                                            :value="cargoType"
+                                            class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                                            name="cargo_type"
+                                            type="radio"
+                                        />
+                                        <p>{{ cargoType }}</p>
+                                    </label>
+                                </div>
+                                <span
+                                    v-if="form.errors.cargo_type"
+                                    class="text-tiny+ text-error"
+                                >{{ form.errors.cargo_type }}</span>
                             </div>
-                            <span
-                                v-if="form.errors.cargo_type"
-                                class="text-tiny+ text-error"
-                            >{{ form.errors.cargo_type }}</span>
                         </div>
                     </div>
 

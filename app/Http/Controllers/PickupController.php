@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\CargoType;
 use App\Http\Requests\StorePickupRequest;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Models\PickUp;
@@ -26,6 +27,7 @@ class PickupController extends Controller
     public function create()
     {
         return Inertia::render('Pickup/CreateJob', [
+            'cargoTypes' => CargoType::cases(),
             'noteTypes' => $this->pickupRepository->getNoteTypes(),
         ]);
     }
