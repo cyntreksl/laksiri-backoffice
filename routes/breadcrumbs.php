@@ -46,7 +46,7 @@ Breadcrumbs::for('users.edit', function (BreadcrumbTrail $trail, User $user) {
 });
 
 // Drivers
-Breadcrumbs::for('drivers.index', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('users.drivers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Driver Management', route('drivers.index'));
+    $trail->push('Driver Management', route('users.drivers.index'));
 });
