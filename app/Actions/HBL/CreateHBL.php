@@ -13,12 +13,13 @@ class CreateHBL
 
     public function handle(array $data): HBL
     {
+        $reference = GenerateHBLReferenceNumber::run();
         return HBL::create([
-            'reference' => GenerateHBLReferenceNumber::run(),
+            'reference' => $reference,
             'branch_id' => GetUserCurrentBranchID::run(),
             'cargo_type' => $data['cargo_type'],
             'hbl_type' => $data['hbl_type'],
-            'hbl' => $data['hbl'],
+            'hbl' =>$reference,
             'hbl_name' => $data['hbl_name'],
             'email' => $data['email'],
             'contact_number' => $data['contact_number'],
@@ -35,8 +36,8 @@ class CreateHBL
             'bill_charge' => $data['bill_charge'],
             'other_charge' => $data['other_charge'],
             'discount' => $data['discount'],
-            'paid_amount' => $data['discount'],
-            'grand_total' => 1000,
+            'paid_amount' => $data['paid_amount'],
+            'grand_total' => $data['grand_total'],
             'created_by' => auth()->id(),
         ]);
     }

@@ -44,6 +44,8 @@ const form = useForm({
     other_charge: 0,
     discount: 0,
     paid_amount: 0,
+    grand_total: 0,
+    packages:{}
 });
 
 const handleHBLCreate = () => {
@@ -62,7 +64,6 @@ const handleHBLCreate = () => {
 const showAddNewPackageDialog = ref(false);
 
 const showPackageDialog = () => {
-    console.log('clock');
     showAddNewPackageDialog.value = true;
 }
 
@@ -79,6 +80,9 @@ const packageItem = reactive({
     remarks: ''
 });
 
+const grandTotalWeight = ref(0);
+const grandTotalVolume = ref(0);
+
 const addPackageData = () => {
     if (!packageItem.type || packageItem.length <= 0 || packageItem.width <= 0 || packageItem.height <= 0 || packageItem.quantity <= 0 || packageItem.volume <= 0 || packageItem.totalWeight <= 0) {
         notification({
@@ -91,6 +95,11 @@ const addPackageData = () => {
 
     const newItem = { ...packageItem }; // Create a copy of packageItem
     packageList.value.push(newItem); // Add the new item to packageList
+    form.packages = packageList.value;
+
+    grandTotalWeight.value += newItem.totalWeight;
+    grandTotalVolume.value += newItem.volume;
+
     // Reset packageItem values for the next entry
     packageItem.type = '';
     packageItem.length = 0;
@@ -130,6 +139,22 @@ watch(
         packageItem.totalWeight = totalWeightKg;
     }
 );
+
+
+watch(
+    [
+        () => form.other_charge,
+        () => form.discount,
+        () => form.freight_charge,
+    ],
+    ([newOtherCharge, newDiscount,newFreightCharge]) => {
+        // Convert dimensions from cm to meters
+        hblTotal.value = (form.bill_charge + form.freight_charge + form.other_charge) - form.discount;
+        form.grand_total = hblTotal.value;
+    }
+);
+
+
 const packageTypes = [
     'WOODEN BOX', 'CARTON', 'FRIDGE', 'TV CARTON', 'COOKER', 'W/MACHINE',
     'MATT/BED BDL', 'TRUNK STEEL BOX', 'TRAVELING BOX', 'IRON TABLE/LADDER',
@@ -141,6 +166,27 @@ const selectedType = ref('');
 const updateTypeDescription = () => {
     packageItem.type += (packageItem.type ? ' ' : '') + selectedType.value;
 };
+
+const hblTotal = ref(0);
+const currency = ref("SAR");
+
+const calculatePayment = () =>{
+    const cargoType =  form.cargo_type;
+    const freightCharge = ref(0);
+    const billCharge = ref(0);
+    if (cargoType==='Sea Cargo'){
+        freightCharge.value = grandTotalVolume.value * 300;
+        billCharge.value = 50;
+    }else if(cargoType==='Air Cargo'){
+        freightCharge.value = grandTotalWeight.value * 8;
+        billCharge.value = 40;
+    }
+
+    form.freight_charge = freightCharge.value.toFixed(2);
+    form.bill_charge=billCharge.value;
+}
+
+
 
 </script>
 
@@ -644,14 +690,12 @@ const updateTypeDescription = () => {
                     <!-- Price & Payment -->
                     <div class="card px-4 py-4 sm:px-5">
                         <div class="flex justify-between items-center">
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
+                            <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
                                 Price and Payment
                             </h2>
-                            <button
-                                class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
-                            >
+                            <button type="button"
+                                    @click="calculatePayment"
+                                class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90">
                                 Calculate Payment
                             </button>
                         </div>
@@ -740,19 +784,19 @@ const updateTypeDescription = () => {
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Packages</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        2
+                                        {{packageList.length}}
                                     </p>
                                 </div>
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Weight</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        1
+                                        {{grandTotalWeight}}
                                     </p>
                                 </div>
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Volume</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        0.01
+                                        {{grandTotalVolume}}
                                     </p>
                                 </div>
                             </div>
@@ -761,7 +805,7 @@ const updateTypeDescription = () => {
                                 <div class="flex justify-between text-2xl text-success font-bold">
                                     <p class="line-clamp-1">Grand Total</p>
                                     <p>
-                                        48 SAR
+                                        {{hblTotal}} {{currency}}
                                     </p>
                                 </div>
                             </div>
