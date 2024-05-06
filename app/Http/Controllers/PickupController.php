@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enum\CargoType;
 use App\Http\Requests\StorePickupRequest;
+use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Models\PickUp;
 use Illuminate\Http\Request;
@@ -11,7 +12,10 @@ use Inertia\Inertia;
 
 class PickupController extends Controller
 {
-    public function __construct(private readonly PickupRepositoryInterface $pickupRepository)
+    public function __construct(
+        private readonly PickupRepositoryInterface $pickupRepository,
+        private readonly DriverRepositoryInterface $driverRepository
+    )
     {
     }
 
@@ -21,6 +25,7 @@ class PickupController extends Controller
 
         return Inertia::render('Pickup/PendingJobs', [
             'pickups' => $pickups,
+            'drivers' => $this->driverRepository->getAllDrivers(),
         ]);
     }
 
@@ -51,5 +56,11 @@ class PickupController extends Controller
 
     public function destroy(PickUp $pickUp)
     {
+    }
+
+    public function updateDriver(Request $request, $pickUp)
+    {
+        $pickUp = PickUp::find($pickUp);
+        $this->pickupRepository->assignDriver($request->all(), $pickUp);
     }
 }

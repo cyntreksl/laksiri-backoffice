@@ -31,6 +31,8 @@ Route::middleware([
 
     // Pick Up
     Route::resource('pickups', PickupController::class);
+    Route::put('pickups/{pickup}/driver/update', [PickupController::class, 'updateDriver'])
+        ->name('pickups.driver.update');
     // HBL
     Route::resource('hbls', HBLController::class);
     // User
