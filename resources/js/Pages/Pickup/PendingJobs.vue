@@ -6,8 +6,6 @@ import Popper from "vue3-popper";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
 import DeleteUserConfirmationModal from "@/Pages/User/Partials/DeleteUserConfirmationModal.vue";
-import {router} from "@inertiajs/vue3";
-import notification from "@/magics/notification.js";
 
 export default {
     components: {DeleteUserConfirmationModal, AssignDriverModal, Breadcrumb, AppLayout, Popper},
@@ -153,6 +151,7 @@ export default {
             jobId.value = null;
         }
 
+        const showFilters = ref(false);
         return {
             grid,
             wrapperRef,
@@ -161,7 +160,8 @@ export default {
             toggleColumnVisibility,
             showConfirmAssignDriverModal,
             closeModal,
-            jobId
+            jobId,
+            showFilters
         };
     },
 }
@@ -301,7 +301,7 @@ export default {
                             </template>
                         </Popper>
 
-                        <button
+                        <button @click="showFilters=true"
                             class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                             <i class="fa-solid fa-filter"></i>
                         </button>
@@ -319,5 +319,16 @@ export default {
         </div>
 
         <AssignDriverModal :drivers="drivers" :job-id="jobId" :show="showConfirmAssignDriverModal" @close="closeModal"/>
+
+        <div class="block" v-show="showFilters">
+            <div class="fixed inset-0 z-[100] bg-slate-900/60 transition-opacity duration-200 show block" x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+            <div class="fixed right-0 top-0 z-[101] h-full w-72">
+                <div class="flex h-full w-full transform-gpu flex-col bg-white transition-transform duration-200 dark:bg-navy-700 show block" x-transition:enter="ease-out" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="ease-in" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
+<!--                 TODO close button-->
+<!--                 TODO Filters-->
+<!--                 TODO Filter Now Action Button-->
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>

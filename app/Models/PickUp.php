@@ -35,6 +35,8 @@ class PickUp extends Model
         'pickup_date',
         'pickup_time_start',
         'pickup_time_end',
+        'is_urgent_pickup',
+        'is_from_important_customer',
     ];
 
     public function getActivitylogOptions(): LogOptions
