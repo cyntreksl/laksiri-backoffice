@@ -65,8 +65,4 @@ class DriverController extends Controller
     public function update(Request $request, User $user)
     {
     }
-
-    public function destroy(User $user)
-    {
-    }
 }

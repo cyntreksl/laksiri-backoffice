@@ -49,7 +49,7 @@ Route::middleware([
 
     // Driver
     Route::resource('drivers', DriverController::class)
-        ->except(['create', 'show']);
+        ->except(['create', 'show', 'destroy']);
 
     Route::get('driver-list', [DriverController::class, 'list']);
 });

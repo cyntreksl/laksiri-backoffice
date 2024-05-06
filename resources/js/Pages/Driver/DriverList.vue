@@ -162,7 +162,7 @@ const closeModal = () => {
 }
 
 const handleDeleteDriver = () => {
-    router.delete(route("drivers.destroy", driverId.value), {
+    router.delete(route("users.destroy", driverId.value), {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
@@ -171,9 +171,10 @@ const handleDeleteDriver = () => {
                 variant: 'success',
             });
             driverId.value = null;
-            router.visit(route('drivers.index'), {only: ['drivers']})
+            router.visit(route('drivers.index'), {only: ['users']})
         },
     })
+
 }
 </script>
 
