@@ -13,9 +13,9 @@ class StoreDriverRequest extends FormRequest
             'name' => ['required', 'min:5', 'max:20'],
             'password' => ['required', 'string', Password::default(), 'confirmed'],
             'contact' => ['required'],
-            'working_hours_start' => ['required'],
-            'working_hours_end' => ['required'],
-            'preferred_zone' => ['required'],
+            'working_hours_start' => ['nullable'],
+            'working_hours_end' => ['nullable'],
+            'preferred_zone' => ['nullable'],
         ];
     }
 
