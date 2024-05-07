@@ -53,4 +53,17 @@ Route::middleware([
     Route::name('users.')->group(function () {
         Route::resource('drivers', DriverController::class);
     });
+
+    // Back Office
+    Route::name('back-office.')->group(function () {
+        // Cash Settlements
+        Route::get('cash-settlements', function () {
+            return Inertia::render('CashSettlement/CashSettlementList');
+        })->name('cash-settlements.index');
+
+        // Warehouse
+        Route::get('warehouses', function () {
+            return Inertia::render('Warehouse/WarehouseList');
+        })->name('warehouses.index');
+    });
 });

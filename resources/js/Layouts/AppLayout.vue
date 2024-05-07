@@ -86,6 +86,29 @@
                                 <path d="M9 8h.01"/>
                             </svg>
                         </a>
+                        <!-- Back Office -->
+                        <a
+                            @click="setMenu('back-office')"
+                            x-tooltip.placement.right="'Back Office'"
+                            :class="[
+                                activeMenu === 'back-office'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-building" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M3 21l18 0" />
+                                <path d="M9 8l1 0" />
+                                <path d="M9 12l1 0" />
+                                <path d="M9 16l1 0" />
+                                <path d="M14 8l1 0" />
+                                <path d="M14 12l1 0" />
+                                <path d="M14 16l1 0" />
+                                <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16" />
+                            </svg>
+                        </a>
                         <!-- User Management -->
                         <a
                             @click="setMenu('users')"
@@ -582,6 +605,20 @@ export default {
                         {
                             title: "All HBL",
                             route: "hbls.index",
+                        },
+                    );
+                    break;
+                case "back-office":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Cash Settlements",
+                            route: "back-office.cash-settlements.index",
+                        },
+                        {
+                            title: "Warehouse",
+                            route: "back-office.warehouses.index",
                         },
                     );
                     break;
