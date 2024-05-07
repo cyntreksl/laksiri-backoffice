@@ -109,6 +109,27 @@
                                 <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16" />
                             </svg>
                         </a>
+                        <!-- Loading -->
+                        <a
+                            @click="setMenu('loading')"
+                            x-tooltip.placement.right="'Loading'"
+                            :class="[
+                                activeMenu === 'loading'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-truck-loading" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15" />
+                                <path d="M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z" />
+                                <path d="M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                            </svg>
+
+
+                        </a>
                         <!-- User Management -->
                         <a
                             @click="setMenu('users')"
@@ -619,6 +640,24 @@ export default {
                         {
                             title: "Warehouse",
                             route: "back-office.warehouses.index",
+                        },
+                    );
+                    break;
+                case "loading":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Loading Point",
+                            route: "loading.loading-points.index",
+                        },
+                        {
+                            title: "Manual Loading",
+                            route: "loading.manual-loadings.index",
+                        },
+                        {
+                            title: "Loaded Shipment",
+                            route: "loading.loaded-shipments.index",
                         },
                     );
                     break;

@@ -66,4 +66,24 @@ Route::middleware([
             return Inertia::render('Warehouse/WarehouseList');
         })->name('warehouses.index');
     });
+
+    //Loading
+    Route::name('loading.')->group(function () {
+        // Loading Point
+        Route::get('loading-points', function () {
+            return Inertia::render('Loading/LoadingPoint');
+        })->name('loading-points.index');
+
+        // Warehouse
+        Route::get('manual-loadings', function () {
+            return Inertia::render('Loading/ManualLoading');
+        })->name('manual-loadings.index');
+
+        //Loaded Shipments
+        Route::get('loaded-shipments', function () {
+            return Inertia::render('Loading/LoadedShipmentList');
+        })->name('loaded-shipments.index');
+    });
+
+
 });
