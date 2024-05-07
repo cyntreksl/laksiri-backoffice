@@ -121,6 +121,15 @@ Route::middleware([
         })->name('dispatched-loads.index');
     });
 
+    //Reports
+    Route::name('reports.')->group(function () {
+        //Delivery Warehouse
+        Route::get('payment-summaries', function () {
+            return Inertia::render('Report/PaymentSummeryList');
+        })->name('payment-summaries.index');
+
+    });
+
 
 
 });
