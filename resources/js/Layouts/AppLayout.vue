@@ -148,6 +148,28 @@
                             </svg>
 
                         </a>
+                        <!-- Delivery -->
+                        <a
+                            @click="setMenu('delivery')"
+                            x-tooltip.placement.right="'Delivery'"
+                            :class="[
+                                activeMenu === 'delivery'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trolley" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M11 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                <path d="M6 16l3 2" />
+                                <path d="M12 17l8 -12" />
+                                <path d="M17 10l2 1" />
+                                <path d="M9.592 4.695l3.306 2.104a1.3 1.3 0 0 1 .396 1.8l-3.094 4.811a1.3 1.3 0 0 1 -1.792 .394l-3.306 -2.104a1.3 1.3 0 0 1 -.396 -1.8l3.094 -4.81a1.3 1.3 0 0 1 1.792 -.394z" />
+                            </svg>
+
+
+                        </a>
                         <!-- User Management -->
                         <a
                             @click="setMenu('users')"
@@ -694,6 +716,24 @@ export default {
                         {
                             title: "Unloading Issues",
                             route: "arrival.unloading-issues.index",
+                        },
+                    );
+                    break;
+                case "delivery":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Delivery Warehouse",
+                            route: "delivery.delivery-warehouses.index",
+                        },
+                        {
+                            title: "Dispatch Point",
+                            route: "delivery.dispatch-points.index",
+                        },
+                        {
+                            title: "Dispatched Loads",
+                            route: "delivery.dispatched-loads.index",
                         },
                     );
                     break;
