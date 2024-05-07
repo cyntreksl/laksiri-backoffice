@@ -122,11 +122,32 @@ Route::middleware([
     });
 
     //Reports
-    Route::name('reports.')->group(function () {
-        //Delivery Warehouse
+    Route::name('report.')->group(function () {
+        //Payment Summery
         Route::get('payment-summaries', function () {
             return Inertia::render('Report/PaymentSummeryList');
         })->name('payment-summaries.index');
+
+    });
+
+    //Setting
+    Route::name('setting.')->group(function () {
+        //Driver Zones
+        Route::get('driver-zones', function () {
+            return Inertia::render('Setting/DriverZoneList');
+        })->name('driver-zones.index');
+        //Driver Areas
+        Route::get('driver-areas', function () {
+            return Inertia::render('Setting/DriverAreaList');
+        })->name('driver-areas.index');
+        //Warehouse Zones
+        Route::get('warehouse-zones', function () {
+            return Inertia::render('Setting/WarehouseZoneList');
+        })->name('warehouse-zones.index');
+        //Pricing
+        Route::get('prices', function () {
+            return Inertia::render('Setting/PricingList');
+        })->name('prices.index');
 
     });
 

@@ -213,13 +213,22 @@
                                 <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
                             </svg>
                         </a>
+
+
                     </div>
 
                     <!-- Bottom Links -->
                     <div class="flex flex-col items-center space-y-3 py-3">
                         <!-- Settings -->
+
                         <a
-                            href="#"
+                            @click="setMenu('setting')"
+                            x-tooltip.placement.right="'Setting'"
+                            :class="[
+                                activeMenu === 'setting'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                         >
                             <svg
@@ -238,6 +247,7 @@
                                     d="M11.995 15.332c1.794 0 3.248-1.464 3.248-3.27 0-1.807-1.454-3.272-3.248-3.272-1.794 0-3.248 1.465-3.248 3.271 0 1.807 1.454 3.271 3.248 3.271Z"
                                 ></path>
                             </svg>
+
                         </a>
 
                         <!-- Profile -->
@@ -764,7 +774,7 @@ export default {
                         childMenuList.length,
                         {
                             title: "Payment Summery",
-                            route: "reports.payment-summaries.index",
+                            route: "report.payment-summaries.index",
                         },
 
                     );
@@ -781,6 +791,29 @@ export default {
                             title: "Drivers",
                             route: "users.drivers.index",
                         },
+                    );
+                    break;
+                case "setting":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Driver Zones",
+                            route: "setting.driver-zones.index",
+                        },
+                        {
+                            title: "Driver Areas",
+                            route: "setting.driver-areas.index",
+                        },
+                        {
+                            title: "Warehouse Zones",
+                            route: "setting.warehouse-zones.index",
+                        },
+                        {
+                            title: "Pricing",
+                            route: "setting.prices.index",
+                        },
+
                     );
                     break;
             }
