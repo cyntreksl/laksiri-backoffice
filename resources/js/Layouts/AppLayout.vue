@@ -130,6 +130,24 @@
 
 
                         </a>
+                        <!-- Arrivals -->
+                        <a
+                            @click="setMenu('arrival')"
+                            x-tooltip.placement.right="'Arrivals'"
+                            :class="[
+                                activeMenu === 'arrival'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-inbox" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
+                                <path d="M4 13h3l3 3h4l3 -3h3" />
+                            </svg>
+
+                        </a>
                         <!-- User Management -->
                         <a
                             @click="setMenu('users')"
@@ -658,6 +676,24 @@ export default {
                         {
                             title: "Loaded Shipment",
                             route: "loading.loaded-shipments.index",
+                        },
+                    );
+                    break;
+                case "arrival":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Shipments Arrivals",
+                            route: "arrival.shipments-arrivals.index",
+                        },
+                        {
+                            title: "Bonded Warehouse",
+                            route: "arrival.bonded-warehouses.index",
+                        },
+                        {
+                            title: "Unloading Issues",
+                            route: "arrival.unloading-issues.index",
                         },
                     );
                     break;

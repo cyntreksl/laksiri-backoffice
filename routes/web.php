@@ -85,5 +85,23 @@ Route::middleware([
         })->name('loaded-shipments.index');
     });
 
+    //Arrivals
+    Route::name('arrival.')->group(function () {
+        // Shipments Arrivals
+        Route::get('shipments-arrivals', function () {
+            return Inertia::render('Arrival/ShipmentsArrivalsList');
+        })->name('shipments-arrivals.index');
+
+        // Bonded Warehouse
+        Route::get('bonded-warehouses', function () {
+            return Inertia::render('Arrival/BondedWarehouseList');
+        })->name('bonded-warehouses.index');
+
+        //Unloading Issues
+        Route::get('unloading-issues', function () {
+            return Inertia::render('Arrival/UnloadingIssueList');
+        })->name('unloading-issues.index');
+    });
+
 
 });
