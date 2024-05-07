@@ -791,6 +791,10 @@ export default {
                             title: "Drivers",
                             route: "users.drivers.index",
                         },
+                        {
+                            title: "Driver Tracking",
+                            route: "users.driver-tracings.index",
+                        },
                     );
                     break;
                 case "setting":

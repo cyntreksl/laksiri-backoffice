@@ -52,6 +52,10 @@ Route::middleware([
     // Driver
     Route::name('users.')->group(function () {
         Route::resource('drivers', DriverController::class);
+        //Driver Tracking
+        Route::get('driver-tracings', function () {
+            return Inertia::render('User/DriverTracking');
+        })->name('driver-tracings.index');
     });
 
     // Back Office
