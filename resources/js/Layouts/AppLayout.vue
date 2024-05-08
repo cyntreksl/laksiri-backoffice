@@ -86,6 +86,111 @@
                                 <path d="M9 8h.01"/>
                             </svg>
                         </a>
+                        <!-- Back Office -->
+                        <a
+                            @click="setMenu('back-office')"
+                            x-tooltip.placement.right="'Back Office'"
+                            :class="[
+                                activeMenu === 'back-office'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-building" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M3 21l18 0" />
+                                <path d="M9 8l1 0" />
+                                <path d="M9 12l1 0" />
+                                <path d="M9 16l1 0" />
+                                <path d="M14 8l1 0" />
+                                <path d="M14 12l1 0" />
+                                <path d="M14 16l1 0" />
+                                <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16" />
+                            </svg>
+                        </a>
+                        <!-- Loading -->
+                        <a
+                            @click="setMenu('loading')"
+                            x-tooltip.placement.right="'Loading'"
+                            :class="[
+                                activeMenu === 'loading'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-truck-loading" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15" />
+                                <path d="M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z" />
+                                <path d="M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                            </svg>
+
+
+                        </a>
+                        <!-- Arrivals -->
+                        <a
+                            @click="setMenu('arrival')"
+                            x-tooltip.placement.right="'Arrivals'"
+                            :class="[
+                                activeMenu === 'arrival'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-inbox" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
+                                <path d="M4 13h3l3 3h4l3 -3h3" />
+                            </svg>
+
+                        </a>
+                        <!-- Delivery -->
+                        <a
+                            @click="setMenu('delivery')"
+                            x-tooltip.placement.right="'Delivery'"
+                            :class="[
+                                activeMenu === 'delivery'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trolley" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M11 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                <path d="M6 16l3 2" />
+                                <path d="M12 17l8 -12" />
+                                <path d="M17 10l2 1" />
+                                <path d="M9.592 4.695l3.306 2.104a1.3 1.3 0 0 1 .396 1.8l-3.094 4.811a1.3 1.3 0 0 1 -1.792 .394l-3.306 -2.104a1.3 1.3 0 0 1 -.396 -1.8l3.094 -4.81a1.3 1.3 0 0 1 1.792 -.394z" />
+                            </svg>
+
+
+                        </a>
+                        <!-- Reports -->
+                        <a
+                            @click="setMenu('report')"
+                            x-tooltip.placement.right="'Report'"
+                            :class="[
+                                activeMenu === 'report'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-text" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+                                <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+                                <path d="M9 12h6" />
+                                <path d="M9 16h6" />
+                            </svg>
+
+                        </a>
+
                         <!-- User Management -->
                         <a
                             @click="setMenu('users')"
@@ -108,13 +213,22 @@
                                 <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
                             </svg>
                         </a>
+
+
                     </div>
 
                     <!-- Bottom Links -->
                     <div class="flex flex-col items-center space-y-3 py-3">
                         <!-- Settings -->
+
                         <a
-                            href="#"
+                            @click="setMenu('setting')"
+                            x-tooltip.placement.right="'Setting'"
+                            :class="[
+                                activeMenu === 'setting'
+                                    ? 'bg-primary/10 text-primary'
+                                    : '',
+                            ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                         >
                             <svg
@@ -133,6 +247,7 @@
                                     d="M11.995 15.332c1.794 0 3.248-1.464 3.248-3.27 0-1.807-1.454-3.272-3.248-3.272-1.794 0-3.248 1.465-3.248 3.271 0 1.807 1.454 3.271 3.248 3.271Z"
                                 ></path>
                             </svg>
+
                         </a>
 
                         <!-- Profile -->
@@ -585,6 +700,85 @@ export default {
                         },
                     );
                     break;
+                case "back-office":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Cash Settlements",
+                            route: "back-office.cash-settlements.index",
+                        },
+                        {
+                            title: "Warehouse",
+                            route: "back-office.warehouses.index",
+                        },
+                    );
+                    break;
+                case "loading":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Loading Point",
+                            route: "loading.loading-points.index",
+                        },
+                        {
+                            title: "Manual Loading",
+                            route: "loading.manual-loadings.index",
+                        },
+                        {
+                            title: "Loaded Shipment",
+                            route: "loading.loaded-shipments.index",
+                        },
+                    );
+                    break;
+                case "arrival":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Shipments Arrivals",
+                            route: "arrival.shipments-arrivals.index",
+                        },
+                        {
+                            title: "Bonded Warehouse",
+                            route: "arrival.bonded-warehouses.index",
+                        },
+                        {
+                            title: "Unloading Issues",
+                            route: "arrival.unloading-issues.index",
+                        },
+                    );
+                    break;
+                case "delivery":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Delivery Warehouse",
+                            route: "delivery.delivery-warehouses.index",
+                        },
+                        {
+                            title: "Dispatch Point",
+                            route: "delivery.dispatch-points.index",
+                        },
+                        {
+                            title: "Dispatched Loads",
+                            route: "delivery.dispatched-loads.index",
+                        },
+                    );
+                    break;
+                case "report":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Payment Summery",
+                            route: "report.payment-summaries.index",
+                        },
+
+                    );
+                    break;
                 case "users":
                     childMenuList.splice(
                         0,
@@ -597,6 +791,33 @@ export default {
                             title: "Drivers",
                             route: "users.drivers.index",
                         },
+                        {
+                            title: "Driver Tracking",
+                            route: "users.driver-tracings.index",
+                        },
+                    );
+                    break;
+                case "setting":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Driver Zones",
+                            route: "setting.driver-zones.index",
+                        },
+                        {
+                            title: "Driver Areas",
+                            route: "setting.driver-areas.index",
+                        },
+                        {
+                            title: "Warehouse Zones",
+                            route: "setting.warehouse-zones.index",
+                        },
+                        {
+                            title: "Pricing",
+                            route: "setting.prices.index",
+                        },
+
                     );
                     break;
             }
