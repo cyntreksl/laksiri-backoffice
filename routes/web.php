@@ -4,6 +4,7 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ZoneController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -52,5 +53,17 @@ Route::middleware([
     // Driver
     Route::name('users.')->group(function () {
         Route::resource('drivers', DriverController::class);
+    });
+
+    // Settings
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('Settings/index');
+        })->name('index');
+        // Zones
+        Route::prefix('zones')->name('zones.')->group(function () {
+            Route::post('store', [ZoneController::class, 'store'])->name('store');
+            Route::get('list', [ZoneController::class, 'list'])->name('list');
+        });
     });
 });
