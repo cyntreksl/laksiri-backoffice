@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CashSettlementController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
@@ -61,9 +62,7 @@ Route::middleware([
     // Back Office
     Route::name('back-office.')->group(function () {
         // Cash Settlements
-        Route::get('cash-settlements', function () {
-            return Inertia::render('CashSettlement/CashSettlementList');
-        })->name('cash-settlements.index');
+        Route::get('cash-settlements',[CashSettlementController::class,'index'])->name('cash-settlements.index');
 
         // Warehouse
         Route::get('warehouses', function () {
