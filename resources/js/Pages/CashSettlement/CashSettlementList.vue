@@ -2,19 +2,22 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Popper from "vue3-popper";
-import {reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
+import {Grid, h, html} from "gridjs";
 
 export default {
     components: {AppLayout, Breadcrumb, Popper},
     props: {
-        drivers:{},
-        officers:{},
+        drivers: {},
+        officers: {},
     },
     setup(props) {
         const showFilters = ref(false);
         const currentDate = new Date();
         const fromDate = new Date(currentDate.setDate(currentDate.getDate() - 30)).toISOString().split('T')[0];
         const toDate = new Date().toISOString().split('T')[0];
+        const wrapperRef = ref(null);
+        let grid = null;
 
         const filters = reactive({
             fromDate: fromDate,
@@ -24,9 +27,110 @@ export default {
             upb: false,
             d2d: false,
             gift: false,
-            drivers:{},
-            officers:{},
+            drivers: {},
+            officers: {},
         })
+
+        onMounted(() => {
+            initializeGrid();
+        })
+
+        const data = reactive({
+            columnVisibility: {
+                hbl: true,
+                hbl_name: true,
+                address: true,
+                picked_date: true,
+                weight: true,
+                volume: true,
+                grand_total: true,
+                paid_amount: true,
+                cargo_type: true,
+                hbl_type: true,
+                officer: true,
+                actions: true,
+            }
+        });
+
+        const createColumns = () => [
+            {name: 'HBL', hidden: !data.columnVisibility.hbl},
+            {name: 'Name', hidden: !data.columnVisibility.hbl_name},
+            {name: 'Address', hidden: !data.columnVisibility.address},
+            {name: 'Picked Date', hidden: !data.columnVisibility.picked_date},
+            {name: 'Weight', hidden: !data.columnVisibility.weight},
+            {name: 'Volume', hidden: !data.columnVisibility.volume},
+            {name: 'Amount', hidden: !data.columnVisibility.grand_total},
+            {name: 'Paid', hidden: !data.columnVisibility.paid_amount},
+            {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
+            {name: 'Delivery Type', hidden: !data.columnVisibility.hbl_type},
+            {name: 'Officer', hidden: !data.columnVisibility.officer},
+            {name: 'Actions', hidden: !data.columnVisibility.actions, sort: false},
+        ];
+
+
+        const baseUrl = ref('/cash-settlement-list')
+
+        const constructUrl = () => {
+            const params = new URLSearchParams();
+            for (const key in filters) {
+                if (filters.hasOwnProperty(key)) {
+                    params.append(key, filters[key].toString());
+                }
+            }
+            return baseUrl.value + '?' + params.toString();
+        }
+
+        const initializeGrid = () => {
+            grid = new Grid({
+                columns: createColumns(),
+                search: {
+                    debounceTimeout: 1000,
+                    server: {
+                        url: (prev, keyword) => `${prev}?search=${keyword}`
+                    }
+                },
+                sort: {
+                    multiColumn: false,
+                    server: {
+                        url: (prev, columns) => {
+                            if (!columns.length) return prev;
+                            const col = columns[0];
+                            const dir = col.direction === 1 ? 'asc' : 'desc';
+                            let colName = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key])[col.index];
+
+                            return `${prev}&order=${colName}&dir=${dir}`;
+                        }
+                    }
+                },
+                pagination: {
+                    limit: 10,
+                    server: {
+                        url: (prev, page, limit) => `${prev}&limit=${limit}&offset=${page * limit}`
+                    }
+                },
+                server: {
+                    url: constructUrl(),
+                    then: data => data.data.map(item => [
+                        item.reference,
+                        item.name,
+                        item.address,
+                        item.picked_date,
+                        item.weight,
+                        item.volume,
+                        item.grand_total,
+                        item.paid_amount,
+                        item.cargo_type,
+                        item.hbl_type,
+                        item.officer,
+                    ]),
+                    total: data => data.meta.total
+                }
+
+            });
+
+            grid.render(wrapperRef.value);
+        };
+
         const applyFilters = () => {
             showFilters.value = false;
             console.log(filters)
@@ -35,7 +139,8 @@ export default {
         return {
             showFilters,
             applyFilters,
-            filters
+            filters,
+            wrapperRef
         }
     }
 }
@@ -51,9 +156,42 @@ export default {
         <div class="card mt-4">
             <div>
                 <div class="flex items-center justify-between p-2">
-                    <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                        Cash Settlement List
-                    </h2>
+                    <div class="">
+                        <div class="flex">
+                            <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
+                                Cash Settlement List
+                            </h2>
+                        </div>
+
+                        <div class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300">
+                            <div class="mr-4 cursor-pointer"  x-tooltip.info.placement.bottom="'Applied Filters'"  >
+                                Filter Options:
+                            </div>
+                            <div class="flex -space-x-px">
+                                <div>
+                                    <div
+                                        class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
+                                        From Date
+                                    </div>
+                                    <div
+                                        class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+                                        {{ filters.fromDate }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div
+                                        class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
+                                        To Date
+                                    </div>
+                                    <div
+                                        class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+                                        {{ filters.toDate }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div class="flex">
                         <Popper>
@@ -84,6 +222,11 @@ export default {
                                 class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                             <i class="fa-solid fa-filter"></i>
                         </button>
+                    </div>
+                </div>
+                <div class=" mt-3">
+                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
+                        <div ref="wrapperRef"></div>
                     </div>
                 </div>
             </div>
@@ -183,15 +326,15 @@ export default {
                     </div>
                     <label class="inline-flex items-center space-x-2 mt-2">
                         <input v-model="filters.airCargo"
-                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                            type="checkbox"/>
+                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                               type="checkbox"/>
                         <span>Air Cargo</span>
                     </label>
 
                     <label class="inline-flex items-center space-x-2 mt-2">
                         <input v-model="filters.seaCargo"
-                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                            type="checkbox"/>
+                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                               type="checkbox"/>
                         <span>Sea Cargo</span>
                     </label>
                     <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
@@ -200,21 +343,21 @@ export default {
                     </div>
                     <label class="inline-flex items-center space-x-2 mt-2">
                         <input v-model="filters.upb"
-                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                            type="checkbox"/>
+                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                               type="checkbox"/>
                         <span>UPB</span>
                     </label>
 
                     <label class="inline-flex items-center space-x-2 mt-2">
                         <input v-model="filters.d2d"
-                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                            type="checkbox"/>
+                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                               type="checkbox"/>
                         <span>Door to Door</span>
                     </label>
                     <label class="inline-flex items-center space-x-2 mt-2">
                         <input v-model="filters.gift"
-                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                            type="checkbox"/>
+                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                               type="checkbox"/>
                         <span>Gift</span>
                     </label>
                     <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
@@ -228,7 +371,8 @@ export default {
                             placeholder="Select drivers..."
                             autocomplete="off">
                             <option value="">Select drivers...</option>
-                            <option v-for="(driver,id) in drivers" :key="id" :value="driver.id">{{driver.name}}</option>
+                            <option v-for="(driver,id) in drivers" :key="id" :value="driver.id">{{ driver.name }}
+                            </option>
                         </select>
                     </label>
                     <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
@@ -242,7 +386,8 @@ export default {
                             placeholder="Select officers..."
                             autocomplete="off">
                             <option value="">Select officers...</option>
-                            <option v-for="(officer,id) in officers" :key="id" :value="officer.id">{{officer.name}}</option>
+                            <option v-for="(officer,id) in officers" :key="id" :value="officer.id">{{ officer.name }}
+                            </option>
                         </select>
                     </label>
 

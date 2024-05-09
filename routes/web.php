@@ -63,6 +63,7 @@ Route::middleware([
     Route::name('back-office.')->group(function () {
         // Cash Settlements
         Route::get('cash-settlements',[CashSettlementController::class,'index'])->name('cash-settlements.index');
+        Route::get('cash-settlement-list',[CashSettlementController::class,'list'])->name('cash-settlements.list');
 
         // Warehouse
         Route::get('warehouses', function () {

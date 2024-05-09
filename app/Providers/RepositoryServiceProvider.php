@@ -3,12 +3,14 @@
 namespace App\Providers;
 
 use App\Interfaces\BranchRepositoryInterface;
+use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Repositories\BranchRepository;
+use App\Repositories\CashSettlementRepository;
 use App\Repositories\DriverRepository;
 use App\Repositories\HBLRepository;
 use App\Repositories\PickupRepository;
@@ -26,6 +28,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(RoleRepositoryInterface::class, RoleRepository::class);
         $this->app->bind(BranchRepositoryInterface::class, BranchRepository::class);
         $this->app->bind(DriverRepositoryInterface::class, DriverRepository::class);
+        $this->app->bind(CashSettlementInterface::class, CashSettlementRepository::class);
     }
 
     public function boot(): void
