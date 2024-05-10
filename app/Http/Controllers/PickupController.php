@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
 use App\Http\Requests\StorePickupRequest;
 use App\Interfaces\DriverRepositoryInterface;
@@ -15,8 +16,7 @@ class PickupController extends Controller
     public function __construct(
         private readonly PickupRepositoryInterface $pickupRepository,
         private readonly DriverRepositoryInterface $driverRepository
-    )
-    {
+    ) {
     }
 
     public function index()
@@ -34,6 +34,7 @@ class PickupController extends Controller
         return Inertia::render('Pickup/CreateJob', [
             'cargoTypes' => CargoType::cases(),
             'noteTypes' => $this->pickupRepository->getNoteTypes(),
+            'zones' => GetZones::run(),
         ]);
     }
 
