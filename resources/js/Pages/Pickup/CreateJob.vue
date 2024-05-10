@@ -2,13 +2,14 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {computed, ref, watch} from "vue";
+import {computed, ref, watch, watchEffect} from "vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import {push} from "notivue";
+import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
     noteTypes: {
@@ -68,13 +69,14 @@ const form = useForm({
     location: "",
     zone_id: null,
     pickup_date: formattedToday,
-    pickup_time_start: "",
-    pickup_time_end: "",
+    pickup_time_start: '',
+    pickup_time_end: '',
     is_from_important_customer: false,
     is_urgent_pickup: false,
 });
 
 const handlePickupCreate = () => {
+    console.log(form.pickup_time_end, form.pickup_time_start);
     form.post(route("pickups.store"), {
         onSuccess: () => {
             form.reset();
@@ -414,63 +416,15 @@ watch(isUrgentPickup, (newValue) => {
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <InputLabel value="Start Pickup Time"/>
-                                    <label class="relative flex">
-                                        <input
-                                            v-model="form.pickup_time_start"
-                                            class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            placeholder="09:00AM"
-                                            type="text"
-                                        />
-                                        <span
-                                            class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                        >
-                                      <svg
-                                          class="size-5"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          stroke-width="1.5"
-                                          viewBox="0 0 24 24"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        />
-                                      </svg>
-                                    </span>
-                                    </label>
+                                    <TextInput v-model="form.pickup_time_start" class="w-full" placeholder="Choose Time"
+                                               type="time"/>
                                     <InputError :message="form.errors.pickup_time_start"/>
                                 </div>
 
                                 <div>
                                     <InputLabel value="End Pickup Time"/>
-                                    <label class="relative flex">
-                                        <input
-                                            v-model="form.pickup_time_end"
-                                            class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            placeholder="11:00AM"
-                                            type="text"
-                                        />
-                                        <span
-                                            class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                        >
-                                      <svg
-                                          class="size-5"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          stroke-width="1.5"
-                                          viewBox="0 0 24 24"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        />
-                                      </svg>
-                                    </span>
-                                    </label>
+                                    <TextInput v-model="form.pickup_time_end" class="w-full" placeholder="Choose Time"
+                                               type="time"/>
                                     <InputError :message="form.errors.pickup_time_end"/>
                                 </div>
                             </div>
