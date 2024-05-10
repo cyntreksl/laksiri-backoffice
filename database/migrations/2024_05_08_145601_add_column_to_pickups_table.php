@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('pick_ups', function (Blueprint $table) {
-            $table->string('pickup_order')
+            $table->float('pickup_order')
                 ->nullable()
                 ->after('is_from_important_customer');
         });
