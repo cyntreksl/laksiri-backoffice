@@ -8,6 +8,6 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::middleware(['auth:sanctum'])->prefix('/v1/')->group(function () {
+Route::middleware(['auth:api'])->prefix('/v1/')->group(function () {
     Route::get('/pending-pickup-list', [PickupController::class, 'index']);
 });
