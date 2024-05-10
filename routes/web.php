@@ -57,13 +57,13 @@ Route::middleware([
 
     // Settings
     Route::prefix('settings')->name('settings.')->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('Settings/index');
-        })->name('index');
+//        Route::get('/', function () {
+//            return Inertia::render('Settings/index');
+//        })->name('index');
         // Zones
-        Route::prefix('zones')->name('zones.')->group(function () {
-            Route::post('store', [ZoneController::class, 'store'])->name('store');
-            Route::get('list', [ZoneController::class, 'list'])->name('list');
-        });
+        Route::get('zones/list', [ZoneController::class, 'list'])->name('zones.list');
+        Route::resource('zones', ZoneController::class)
+            ->except(['create', 'show']);
+
     });
 });

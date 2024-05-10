@@ -598,6 +598,15 @@ export default {
                             route: "users.drivers.index",
                         },
                     );
+                case "settings":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Zones",
+                            route: "settings.zones.index",
+                        },
+                    );
                     break;
             }
             activeMenu.value = menu;

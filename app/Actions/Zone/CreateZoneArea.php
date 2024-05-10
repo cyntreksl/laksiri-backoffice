@@ -12,11 +12,17 @@ class CreateZoneArea
 {
     use AsAction;
 
-    public function handle(array $data, Zone $zone)
+    public function handle(string $data, Zone $zone)
     {
+
+
         try {
             DB::beginTransaction();
-            foreach ($data as $areaData) {
+            $areas = array_map(function ($item) {
+                return ['name' => $item];
+            }, explode(',', $data));
+
+            foreach ($areas as $areaData) {
                 $area = $this->createZoneArea($areaData);
                 $zone->areas()->syncWithoutDetaching($area->id);
             }

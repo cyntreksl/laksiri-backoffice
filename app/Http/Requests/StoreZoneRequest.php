@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\CommaSeparatedRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
 
@@ -24,9 +25,7 @@ class StoreZoneRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'pickup_areas'=> ['nullable', 'array'],
-            'areas' => ['required', 'array'],
-            'areas.*.name' => ['required', 'string', 'max:255'],
+            'areas' => ['required', 'string', new CommaSeparatedRule],
         ];
     }
 }
