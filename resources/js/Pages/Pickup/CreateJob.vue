@@ -72,8 +72,9 @@ const handlePickupCreate = () => {
             router.visit(route("pickups.index"));
             push.success('Pickup added successfully!');
         },
-        onError: () => console.log("error"),
-        onFinish: () => console.log("finish"),
+        onError: () => {
+            push.error('Something went to wrong!');
+        },
         preserveScroll: true,
         preserveState: true,
     });
