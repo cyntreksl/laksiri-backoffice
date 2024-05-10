@@ -26,7 +26,6 @@ class PickupController extends Controller
         return Inertia::render('Pickup/PendingJobs', [
             'pickups' => $pickups,
             'drivers' => $this->driverRepository->getAllDrivers(),
-            'zones' => GetZones::run(),
         ]);
     }
 
@@ -35,6 +34,7 @@ class PickupController extends Controller
         return Inertia::render('Pickup/CreateJob', [
             'cargoTypes' => CargoType::cases(),
             'noteTypes' => $this->pickupRepository->getNoteTypes(),
+            'zones' => GetZones::run(),
         ]);
     }
 
