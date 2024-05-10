@@ -432,7 +432,7 @@ watch(isUrgentPickup, (newValue) => {
                     </div>
 
                     <div class="flex justify-end bottom-0 space-x-5">
-                        <DangerOutlineButton>Cancel</DangerOutlineButton>
+                        <DangerOutlineButton @click="router.visit(route('pickups.index'))">Cancel</DangerOutlineButton>
                         <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
                                        class="space-x-2"
                                        type="submit"
