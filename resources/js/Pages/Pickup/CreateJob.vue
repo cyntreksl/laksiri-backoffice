@@ -3,12 +3,12 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {computed, ref, watch} from "vue";
-import notification from "@/magics/notification.js";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import DatePicker from "@/Components/DatePicker.vue";
+import {push} from "notivue";
 
 const props = defineProps({
     noteTypes: {
@@ -70,10 +70,7 @@ const handlePickupCreate = () => {
         onSuccess: () => {
             form.reset();
             router.visit(route("pickups.index"));
-            notification({
-                text: 'Pickup added successfully!',
-                variant: 'success',
-            })
+            push.success('Pickup added successfully!');
         },
         onError: () => console.log("error"),
         onFinish: () => console.log("finish"),
