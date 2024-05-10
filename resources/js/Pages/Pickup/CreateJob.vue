@@ -21,6 +21,11 @@ const props = defineProps({
         default: () => {
         }
     },
+    zones: {
+        type: Object,
+        default: () => {
+        }
+    }
 })
 
 const currentBranch = usePage().props?.auth.user.primary_branch.slug;
@@ -48,17 +53,21 @@ const countryCodes = [
 const countryCode = ref(findCountryCodeByBranch.value);
 const contactNumber = ref('');
 
+// Get today's date in yyyy-mm-dd format
+const today = new Date();
+const formattedToday = today.toISOString().split('T')[0];
+
 const form = useForm({
     name: "",
     email: "",
     contact_number: computed(() => countryCode.value + contactNumber.value),
     address: "",
-    note_type: "",
+    note_type: null,
     notes: "",
     cargo_type: "",
     location: "",
-    zone_id: "",
-    pickup_date: "",
+    zone_id: null,
+    pickup_date: formattedToday,
     pickup_time_start: "",
     pickup_time_end: "",
     is_from_important_customer: false,
@@ -247,7 +256,7 @@ watch(isUrgentPickup, (newValue) => {
                                         v-model="form.note_type"
                                         class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
-                                        <option selected disabled>
+                                        <option :value="null" disabled>
                                             Select One
                                         </option>
                                         <option v-for="noteType in noteTypes" :key="noteType"
@@ -385,12 +394,12 @@ watch(isUrgentPickup, (newValue) => {
                                         v-model="form.zone_id"
                                         class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
-                                        <option selected disabled>
+                                        <option :value="null" disabled>
                                             Select Zone
                                         </option>
-                                        <option value="1">Zone 1</option>
-                                        <option value="2">Zone 2</option>
-                                        <option value="3">Zone 3</option>
+                                        <option v-for="zone in zones" :key="zone.id" :value="zone.name">
+                                            {{ zone.name }}
+                                        </option>
                                     </select>
                                 </label>
                                 <InputError :message="form.errors.zone_id"/>

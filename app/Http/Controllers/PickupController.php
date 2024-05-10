@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
 use App\Http\Requests\StorePickupRequest;
 use App\Interfaces\DriverRepositoryInterface;
@@ -25,6 +26,7 @@ class PickupController extends Controller
         return Inertia::render('Pickup/PendingJobs', [
             'pickups' => $pickups,
             'drivers' => $this->driverRepository->getAllDrivers(),
+            'zones' => GetZones::run(),
         ]);
     }
 
