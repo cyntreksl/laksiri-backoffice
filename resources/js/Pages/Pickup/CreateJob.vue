@@ -1,8 +1,8 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import notification from "@/magics/notification.js";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -23,10 +23,35 @@ const props = defineProps({
     },
 })
 
+const currentBranch = usePage().props?.auth.user.primary_branch.slug;
+
+const findCountryCodeByBranch = computed(() => {
+    switch (currentBranch) {
+        case 'riyadh':
+            return '+966';
+        case 'sri-lanka':
+            return '+94';
+        case 'dubai':
+            return '+971';
+        case 'kuwait':
+            return '+965';
+    }
+})
+
+const countryCodes = [
+    '+94',
+    '+966',
+    '+971',
+    '+965',
+]
+
+const countryCode = ref(findCountryCodeByBranch.value);
+const contactNumber = ref('');
+
 const form = useForm({
     name: "",
     email: "",
-    contact_number: "",
+    contact_number: computed(() => countryCode.value + contactNumber.value),
     address: "",
     note_type: "",
     notes: "",
@@ -174,15 +199,17 @@ watch(isUrgentPickup, (newValue) => {
                                 <InputLabel value="Mobile Number"/>
                                 <div class="flex -space-x-px">
                                     <select
+                                        v-model="countryCode"
                                         class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
-                                        <option>+94</option>
-                                        <option>+95</option>
-                                        <option>+96</option>
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index">{{
+                                                countryCode
+                                            }}
+                                        </option>
                                     </select>
 
                                     <input
-                                        v-model="form.contact_number"
+                                        v-model="contactNumber"
                                         class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
                                         type="text"
