@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Factory\CashSettlement\FilterFactory;
 use App\Http\Resources\CashSettlementCollection;
 use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\GridJsInterface;
@@ -22,6 +23,10 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         if (! empty($search)) {
             $query->where('hbl','like',"%$search%");
         }
+
+
+        //apply filters
+        FilterFactory::apply($query,$filters);
 
         $records = $query->orderBy($order, $direction)
             ->skip($offset)

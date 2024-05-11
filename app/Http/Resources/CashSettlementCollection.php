@@ -16,8 +16,8 @@ class CashSettlementCollection extends JsonResource
     {
         return [
           'id'=>$this->id,
-          'reference'=>$this->reference,
-          'name'=>$this->hbl_name,
+          'hbl'=>$this->reference,
+          'hbl_name'=>$this->hbl_name,
           'address'=>$this->address,
           'picked_date'=>$this->picked_date,
           'weight'=>$this->weight,

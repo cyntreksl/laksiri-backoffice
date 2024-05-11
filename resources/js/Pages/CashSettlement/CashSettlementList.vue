@@ -39,18 +39,30 @@ export default {
             columnVisibility: {
                 hbl: true,
                 hbl_name: true,
-                address: true,
+                address: false,
                 picked_date: true,
                 weight: true,
                 volume: true,
                 grand_total: true,
                 paid_amount: true,
                 cargo_type: true,
-                hbl_type: true,
-                officer: true,
+                hbl_type: false,
+                officer: false,
                 actions: true,
             }
         });
+
+        const toggleColumnVisibility = columnName => {
+            data.columnVisibility[columnName] = !data.columnVisibility[columnName];
+            updateGridConfig();
+            grid.forceRender();
+        };
+
+        const updateGridConfig = () => {
+            grid.updateConfig({
+                columns: createColumns(),
+            });
+        };
 
         const createColumns = () => [
             {name: 'HBL', hidden: !data.columnVisibility.hbl},
@@ -77,10 +89,13 @@ export default {
                     params.append(key, filters[key].toString());
                 }
             }
+            console.log(params.toString())
             return baseUrl.value + '?' + params.toString();
         }
 
         const initializeGrid = () => {
+            const visibleColumns = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key]);
+
             grid = new Grid({
                 columns: createColumns(),
                 search: {
@@ -110,37 +125,52 @@ export default {
                 },
                 server: {
                     url: constructUrl(),
-                    then: data => data.data.map(item => [
-                        item.reference,
-                        item.name,
-                        item.address,
-                        item.picked_date,
-                        item.weight,
-                        item.volume,
-                        item.grand_total,
-                        item.paid_amount,
-                        item.cargo_type,
-                        item.hbl_type,
-                        item.officer,
-                    ]),
-                    total: data => data.meta.total
+                    then: data => data.data.map(item => {
+                        const row = [];
+                        visibleColumns.forEach(column => {
+                            row.push(item[column]);
+                        });
+                        return row;
+                    }),
+                    total: response => {
+                        if (response && response.meta && response.meta.total) {
+                            return response.meta.total;
+                        } else {
+                            throw new Error('Invalid total count in server response');
+                        }
+                    }
                 }
-
             });
-
             grid.render(wrapperRef.value);
         };
 
         const applyFilters = () => {
             showFilters.value = false;
-            console.log(filters)
+            const newUrl = constructUrl();
+            const visibleColumns = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key]);
+            grid.updateConfig({
+                server: {
+                    url: newUrl,
+                    then: data => data.data.map(item => {
+                        const row = [];
+                        visibleColumns.forEach(column => {
+                            row.push(item[column]);
+                        });
+                        return row;
+                    }),
+                }
+            });
+            grid.forceRender();
         }
+
 
         return {
             showFilters,
             applyFilters,
             filters,
-            wrapperRef
+            wrapperRef,
+            toggleColumnVisibility,
+            data
         }
     }
 }
@@ -188,6 +218,13 @@ export default {
                                         {{ filters.toDate }}
                                     </div>
                                 </div>
+                                <div>
+                                    <div v-if="filters.seaCargo" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">Sea Cargo</div>
+                                    <div v-if="filters.airCargo" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">Air Cargo</div>
+                                    <div v-if="filters.gift" class="badge bg-success text-white ml-2">Gift</div>
+                                    <div v-if="filters.upb" class="badge bg-success text-white ml-2">UPB</div>
+                                    <div v-if="filters.d2d" class="badge bg-success text-white ml-2">Door to Door</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -210,7 +247,42 @@ export default {
                                             </h3>
                                             <p class="mt-1 text-xs+">Choose which columns you want to see </p>
                                             <div class="mt-4 flex flex-col space-y-4 text-slate-600 dark:text-navy-100">
-
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.address"
+                                                        @change="toggleColumnVisibility('address', $event)"
+                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                                                        type="checkbox"
+                                                    />
+                                                    Address
+                                                </label>
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.cargo_type"
+                                                        @change="toggleColumnVisibility('cargo_type', $event)"
+                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                                                        type="checkbox"
+                                                    />
+                                                    Cargo Mode
+                                                </label>
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.hbl_type"
+                                                        @change="toggleColumnVisibility('hbl_type', $event)"
+                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                                                        type="checkbox"
+                                                    />
+                                                    Delivery Type
+                                                </label>
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.officer"
+                                                        @change="toggleColumnVisibility('officer', $event)"
+                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                                                        type="checkbox"
+                                                    />
+                                                    Officer
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -403,12 +475,20 @@ export default {
         </div>
     </AppLayout>
 </template>
-<style scoped>
+<style >
 [type='checkbox']:checked {
     background-image: none !important;
 }
 
 [type='checkbox']:focus, [type='radio']:focus {
     --tw-ring-offset-width: 0 !important;
+}
+
+.popper{
+    inset: 0 auto auto -15px !important;
+}
+
+:root {
+    --popper-theme-box-shadow: 0 6px 30px -6px rgba(0, 0, 0, 0.25);
 }
 </style>
