@@ -2,6 +2,9 @@
 
 namespace App\Repositories;
 
+use App\Actions\HBL\CashSettlement\GetCashSettlementByIds;
+use App\Actions\HBL\CashSettlement\GetTotalCashSettlementCount;
+use App\Actions\HBL\UpdateHBLSystemStatus;
 use App\Factory\CashSettlement\FilterFactory;
 use App\Http\Resources\CashSettlementCollection;
 use App\Interfaces\CashSettlementInterface;
@@ -23,12 +26,11 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', string $search = null, array $filters = [])
     {
         $query = HBL::query();
-        $query->where('system_status',3.1);
+        $query->cashSettlement();
 
         if (!empty($search)) {
             $query->where('hbl','like',"%$search%");
         }
-
 
         //apply filters
         FilterFactory::apply($query,$filters);
@@ -38,7 +40,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
             ->take($limit)
             ->get();
 
-        $totalRecords = HBL::where('system_status',3.1)->count();
+        $totalRecords = GetTotalCashSettlementCount::run();
 
         return response()->json([
             'data' => CashSettlementCollection::collection($records),
@@ -54,7 +56,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
     public function getSummery(array $filters = [])
     {
         $query = HBL::query();
-        $query->where('system_status',3.1);
+        $query->cashSettlement();
 
         //apply filters
         FilterFactory::apply($query,$filters);
@@ -74,18 +76,10 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
 
     public function cashReceived(array $hblIds)
     {
-       $hbls = HBL::whereIn('id',$hblIds)->where('system_status',3.1)->get();
+       $hblList = GetCashSettlementByIds::run($hblIds);
 
-       foreach ($hbls as $hbl) {
-           $hbl->system_status = 4;
-           $hbl->save();
-
-           $status = new HBLStatusChange();
-           $status->hbl_id = $hbl->id;
-           $status->title = "Cash Collected";
-           $status->message = sprintf("HBL #%s cash collected",$hbl->hbl);
-           $status->created_by = Auth::id();
-           $status->save();
+       foreach ($hblList as $hbl) {
+           UpdateHBLSystemStatus::run($hbl,4);
        }
 
        return $this->success("Cash Received",[]);
