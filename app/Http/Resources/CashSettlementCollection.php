@@ -15,7 +15,7 @@ class CashSettlementCollection extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-//          'id'=>$this->id??'-',
+          'id'=>$this->id??'-',
           'hbl'=>$this->reference??'-',
           'hbl_name'=>$this->hbl_name??'-',
           'address'=>$this->address??'-',

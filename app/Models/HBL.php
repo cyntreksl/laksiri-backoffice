@@ -17,6 +17,12 @@ class HBL extends Model
 
     protected $table = 'hbl';
 
+    protected $SYSTEM_STATUS = [
+        3.0 => 'HBL created',
+        3.1 => 'HBL created - Job Converted to HBL',
+        4.0 => 'Cash Collected',
+    ];
+
     protected $fillable = [
         'reference', 'branch_id', 'cargo_type', 'hbl_type', 'hbl', 'hbl_name', 'email', 'contact_number', 'nic', 'iq_number', 'address', 'consignee_name', 'consignee_nic', 'consignee_contact', 'consignee_address', 'consignee_note', 'warehouse', 'freight_charge', 'bill_charge', 'other_charge', 'discount', 'paid_amount', 'grand_total', 'created_by', 'deleted_at',
     ];

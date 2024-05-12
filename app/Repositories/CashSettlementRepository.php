@@ -19,8 +19,9 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', string $search = null, array $filters = [])
     {
         $query = HBL::query();
+        $query->where('system_status',3.1);
 
-        if (! empty($search)) {
+        if (!empty($search)) {
             $query->where('hbl','like',"%$search%");
         }
 
@@ -33,7 +34,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
             ->take($limit)
             ->get();
 
-        $totalRecords = HBL::count();
+        $totalRecords = HBL::where('system_status',3.1)->count();
 
         return response()->json([
             'data' => CashSettlementCollection::collection($records),
