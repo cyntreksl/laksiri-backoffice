@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Scopes\BranchScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
@@ -42,5 +43,10 @@ class PickUp extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->logOnlyDirty();
+    }
+
+    public function scopeAssignedToDriver(Builder $query): void
+    {
+        $query->where('driver_id', auth()->id());
     }
 }

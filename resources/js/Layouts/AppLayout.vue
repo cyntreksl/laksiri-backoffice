@@ -587,6 +587,9 @@
 
         <!-- Main Content Wrapper -->
         <main class="main-content w-full h-screen pb-8 p-4">
+            <Notivue v-slot="item">
+                <Notification :item="item"/>
+            </Notivue>
             <slot/>
         </main>
     </div>
@@ -599,9 +602,11 @@ import {Head, router, usePage} from "@inertiajs/vue3";
 import logo from "../../images/app-logo.svg";
 import {Link} from '@inertiajs/vue3'
 import Popper from "vue3-popper";
+import {Notification, Notivue} from "notivue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
 
 export default {
-    components: {Head, Link,Popper},
+    components: {Notification, Breadcrumb, Notivue, Head, Link, Popper},
     props: {
         title: "",
     },
@@ -818,6 +823,15 @@ export default {
                             route: "setting.prices.index",
                         },
 
+                    );
+                case "settings":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Zones",
+                            route: "settings.zones.index",
+                        },
                     );
                     break;
             }

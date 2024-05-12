@@ -13,7 +13,7 @@ class CreatePickUp
     public function handle(array $data): PickUp
     {
         return PickUp::create([
-            'reference' => GeneratePickupReferenceNumber::run(),
+            'reference' => GeneratePickupReferenceNumber::run(GetUserCurrentBranch::run()['branchName']),
             'branch_id' => GetUserCurrentBranch::run()['branchId'],
             'cargo_type' => $data['cargo_type'],
             'name' => $data['name'],
@@ -27,7 +27,7 @@ class CreatePickUp
             'pickup_time_start' => $data['pickup_time_start'],
             'pickup_time_end' => $data['pickup_time_end'],
             'is_from_important_customer' => $data['is_from_important_customer'],
-            'is_urgent_pickup'=> $data['is_urgent_pickup'],
+            'is_urgent_pickup' => $data['is_urgent_pickup'],
             'created_by' => auth()->id(),
         ]);
     }

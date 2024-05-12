@@ -1,9 +1,15 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {ref, watch} from "vue";
-import notification from "@/magics/notification.js";
+import {computed, ref, watch, watchEffect} from "vue";
+import InputError from "@/Components/InputError.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import DatePicker from "@/Components/DatePicker.vue";
+import {push} from "notivue";
+import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
     noteTypes: {
@@ -16,37 +22,70 @@ const props = defineProps({
         default: () => {
         }
     },
+    zones: {
+        type: Object,
+        default: () => {
+        }
+    }
 })
+
+const currentBranch = usePage().props?.auth.user.primary_branch.slug;
+
+const findCountryCodeByBranch = computed(() => {
+    switch (currentBranch) {
+        case 'riyadh':
+            return '+966';
+        case 'sri-lanka':
+            return '+94';
+        case 'dubai':
+            return '+971';
+        case 'kuwait':
+            return '+965';
+    }
+})
+
+const countryCodes = [
+    '+94',
+    '+966',
+    '+971',
+    '+965',
+]
+
+const countryCode = ref(findCountryCodeByBranch.value);
+const contactNumber = ref('');
+
+// Get today's date in yyyy-mm-dd format
+const today = new Date();
+const formattedToday = today.toISOString().split('T')[0];
 
 const form = useForm({
     name: "",
     email: "",
-    contact_number: "",
+    contact_number: computed(() => countryCode.value + contactNumber.value),
     address: "",
-    note_type: "",
+    note_type: null,
     notes: "",
     cargo_type: "",
     location: "",
-    zone_id: "",
-    pickup_date: "",
-    pickup_time_start: "",
-    pickup_time_end: "",
-    is_from_important_customer:false,
-    is_urgent_pickup:false,
+    zone_id: null,
+    pickup_date: formattedToday,
+    pickup_time_start: '',
+    pickup_time_end: '',
+    is_from_important_customer: false,
+    is_urgent_pickup: false,
 });
 
 const handlePickupCreate = () => {
+    console.log(form.pickup_time_end, form.pickup_time_start);
     form.post(route("pickups.store"), {
         onSuccess: () => {
             form.reset();
             router.visit(route("pickups.index"));
-            notification({
-                text: 'Pickup added successfully!',
-                variant: 'success',
-            })
+            push.success('Pickup added successfully!');
         },
-        onError: () => console.log("error"),
-        onFinish: () => console.log("finish"),
+        onError: () => {
+            push.error('Something went to wrong!');
+        },
         preserveScroll: true,
         preserveState: true,
     });
@@ -105,7 +144,7 @@ watch(isUrgentPickup, (newValue) => {
                         </div>
                         <div class="grid grid-cols-2 gap-5 mt-3">
                             <div class="col-span-2">
-                                <span>Name</span>
+                                <InputLabel value="Name"/>
                                 <label class="relative flex">
                                     <input
                                         v-model="form.name"
@@ -131,14 +170,11 @@ watch(isUrgentPickup, (newValue) => {
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.name"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.name }}</span>
+                                <InputError :message="form.errors.name"/>
                             </div>
 
                             <div>
-                                <span>Email</span>
+                                <InputLabel value="Email"/>
                                 <label class="relative flex">
                                     <input
                                         v-model="form.email"
@@ -165,38 +201,34 @@ watch(isUrgentPickup, (newValue) => {
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.email"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.email }}</span>
+                                <InputError :message="form.errors.email"/>
                             </div>
 
                             <div>
-                                <span>Mobile Number</span>
+                                <InputLabel value="Mobile Number"/>
                                 <div class="flex -space-x-px">
                                     <select
+                                        v-model="countryCode"
                                         class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
-                                        <option>+94</option>
-                                        <option>+95</option>
-                                        <option>+96</option>
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index">{{
+                                                countryCode
+                                            }}
+                                        </option>
                                     </select>
 
                                     <input
-                                        v-model="form.contact_number"
+                                        v-model="contactNumber"
                                         class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
                                         type="text"
                                     />
                                 </div>
-                                <span
-                                    v-if="form.errors.contact_number"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.contact_number }}</span>
+                                <InputError :message="form.errors.contact_number"/>
                             </div>
 
                             <div class="col-span-2">
-                                <span>Address</span>
+                                <InputLabel value="Address"/>
                                 <label class="block">
                                     <textarea
                                         v-model="form.address"
@@ -205,10 +237,7 @@ watch(isUrgentPickup, (newValue) => {
                                         class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     ></textarea>
                                 </label>
-                                <span
-                                    v-if="form.errors.address"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.address }}</span>
+                                <InputError :message="form.errors.address"/>
                             </div>
                         </div>
                     </div>
@@ -224,12 +253,12 @@ watch(isUrgentPickup, (newValue) => {
                         <div class="grid grid-cols-2 gap-5 mt-3">
                             <div class="col-span-2">
                                 <label class="block">
-                                    <span>Note Type</span>
+                                    <InputLabel value="Note Type"/>
                                     <select
                                         v-model="form.note_type"
                                         class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
-                                        <option selected disabled>
+                                        <option :value="null" disabled>
                                             Select One
                                         </option>
                                         <option v-for="noteType in noteTypes" :key="noteType"
@@ -237,14 +266,11 @@ watch(isUrgentPickup, (newValue) => {
                                         </option>
                                     </select>
                                 </label>
-                                <span
-                                    v-if="form.errors.note_type"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.name }}</span>
+                                <InputError :message="form.errors.note_type"/>
                             </div>
 
                             <div class="col-span-2">
-                                <span>Note</span>
+                                <InputLabel value="Note"/>
                                 <label class="block">
                                     <textarea
                                         v-model="form.notes"
@@ -253,10 +279,7 @@ watch(isUrgentPickup, (newValue) => {
                                         class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     ></textarea>
                                 </label>
-                                <span
-                                    v-if="form.errors.notes"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.notes }}</span>
+                                <InputError :message="form.errors.notes"/>
                             </div>
                         </div>
                     </div>
@@ -305,10 +328,7 @@ watch(isUrgentPickup, (newValue) => {
                                         <p>{{ cargoType }}</p>
                                     </label>
                                 </div>
-                                <span
-                                    v-if="form.errors.cargo_type"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.cargo_type }}</span>
+                                <InputError :message="form.errors.cargo_type"/>
                             </div>
                         </div>
                     </div>
@@ -371,147 +391,51 @@ watch(isUrgentPickup, (newValue) => {
 
                             <div>
                                 <label class="block">
-                                    <span>Zone</span>
+                                    <InputLabel value="Zone"/>
                                     <select
                                         v-model="form.zone_id"
                                         class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
-                                        <option selected disabled>
+                                        <option :value="null" disabled>
                                             Select Zone
                                         </option>
-                                        <option value="1">Zone 1</option>
-                                        <option value="2">Zone 2</option>
-                                        <option value="3">Zone 3</option>
+                                        <option v-for="zone in zones" :key="zone.id" :value="zone.name">
+                                            {{ zone.name }}
+                                        </option>
                                     </select>
                                 </label>
-                                <div
-                                    v-if="form.errors.zone_id"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.zone_id }}
-                                </div>
+                                <InputError :message="form.errors.zone_id"/>
                             </div>
 
                             <div>
-                                <span class="">Pickup Date</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.pickup_date"
-                                        x-init="$el._x_flatpickr = flatpickr($el)"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Choose date..."
-                                        type="date"
-                                    />
-                                    <span
-                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="size-5 transition-colors duration-200"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                            />
-                                        </svg>
-                                    </span>
-                                </label>
-                                <div
-                                    v-if="form.errors.pickup_date"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.pickup_date }}
-                                </div>
+                                <InputLabel value="Pickup Date"/>
+                                <DatePicker v-model="form.pickup_date"/>
+                                <InputError :message="form.errors.pickup_date"/>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <span class="">Start Pickup Time</span>
-                                    <label class="relative flex">
-                                        <input
-                                            v-model="form.pickup_time_start"
-                                            class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            placeholder="09:00AM"
-                                            type="text"
-                                        />
-                                        <span
-                                            class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                        >
-                                      <svg
-                                          class="size-5"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          stroke-width="1.5"
-                                          viewBox="0 0 24 24"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        />
-                                      </svg>
-                                    </span>
-                                    </label>
-                                    <div
-                                        v-if="form.errors.pickup_time_start"
-                                        class="text-tiny+ text-error"
-                                    >{{ form.errors.pickup_time_start }}
-                                    </div>
+                                    <InputLabel value="Start Pickup Time"/>
+                                    <TextInput v-model="form.pickup_time_start" class="w-full" placeholder="Choose Time"
+                                               type="time"/>
+                                    <InputError :message="form.errors.pickup_time_start"/>
                                 </div>
 
                                 <div>
-                                    <span class="">End Pickup Time</span>
-                                    <label class="relative flex">
-                                        <input
-                                            v-model="form.pickup_time_end"
-                                            class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            placeholder="11:00AM"
-                                            type="text"
-                                        />
-                                        <span
-                                            class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                        >
-                                      <svg
-                                          class="size-5"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          stroke-width="1.5"
-                                          viewBox="0 0 24 24"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        />
-                                      </svg>
-                                    </span>
-                                    </label>
-                                    <div
-                                        v-if="form.errors.pickup_time_end"
-                                        class="text-tiny+ text-error"
-                                    >{{ form.errors.pickup_time_end }}
-                                    </div>
+                                    <InputLabel value="End Pickup Time"/>
+                                    <TextInput v-model="form.pickup_time_end" class="w-full" placeholder="Choose Time"
+                                               type="time"/>
+                                    <InputError :message="form.errors.pickup_time_end"/>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="flex justify-end bottom-0 space-x-5">
-                        <button
-                            class="btn border border-error font-medium text-error hover:bg-error hover:text-white focus:bg-error focus:text-white active:bg-error/90"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            :disabled="form.processing"
-                            :class="{ 'opacity-50': form.processing }"
-                            class="btn space-x-2 border border-warning/30 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                        <DangerOutlineButton @click="router.visit(route('pickups.index'))">Cancel</DangerOutlineButton>
+                        <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
+                                       class="space-x-2"
+                                       type="submit"
                         >
                             <span>Create a Job</span>
                             <svg
@@ -528,12 +452,10 @@ watch(isUrgentPickup, (newValue) => {
                                     d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
                                 />
                             </svg>
-                        </button>
+                        </PrimaryButton>
                     </div>
                 </div>
             </div>
-
-
         </form>
     </AppLayout>
 </template>

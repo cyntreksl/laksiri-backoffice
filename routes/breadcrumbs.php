@@ -57,3 +57,9 @@ Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail
     $trail->push('Cash Settlements');
     $trail->push('Settlement List', route('back-office.cash-settlements.index'));
 });
+
+// Settings > Zones
+Breadcrumbs::for('settings.zones.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard'); // replace with 'settings.index'
+    $trail->push('Zones', route('settings.zones.index'));
+});
