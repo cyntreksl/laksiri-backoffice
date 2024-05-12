@@ -399,7 +399,7 @@ watch(isUrgentPickup, (newValue) => {
                                         <option :value="null" disabled>
                                             Select Zone
                                         </option>
-                                        <option v-for="zone in zones" :key="zone.id" :value="zone.name">
+                                        <option v-for="zone in zones" :key="zone.id" :value="zone.id">
                                             {{ zone.name }}
                                         </option>
                                     </select>
