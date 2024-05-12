@@ -46,4 +46,25 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
             ],
         ]);
     }
+
+    public function getSummery(array $filters = [])
+    {
+        $query = HBL::query();
+        $query->where('system_status',3.1);
+
+        //apply filters
+        FilterFactory::apply($query,$filters);
+
+        $records = $query->get();
+
+        $sumAmount = $records->sum('grand_total');
+        $sumPaidAmount = $records->sum('paid_amount');
+        $countRecords = $records->count();
+
+        return [
+            'totalRecords' => $countRecords,
+            'sumAmount' => $sumAmount,
+            'sumPaidAmount' => $sumPaidAmount,
+        ];
+    }
 }

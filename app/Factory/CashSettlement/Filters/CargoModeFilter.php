@@ -10,6 +10,7 @@ class CargoModeFilter implements FilterInterface
 
     public function apply(Builder $query, $value)
     {
-        return $query->whereIn('cargo_type', explode(',', $value));
+        $value = !is_array($value) ?explode(',', $value) : $value;
+        return $query->whereIn('cargo_type',$value );
     }
 }

@@ -2,11 +2,12 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Popper from "vue3-popper";
-import {onMounted, reactive, ref} from "vue";
-import {Grid, h, html} from "gridjs";
+import {computed, onMounted, reactive, ref} from "vue";
+import {Grid, h} from "gridjs";
+import {RowSelection} from "gridjs/plugins/selection";
 
 export default {
-    components: {AppLayout, Breadcrumb, Popper},
+    components: {AppLayout, Breadcrumb, Popper, RowSelection},
     props: {
         drivers: {},
         officers: {},
@@ -24,8 +25,8 @@ export default {
             toDate: toDate,
             drivers: {},
             officers: {},
-            deliveryType:['UBP',"Door to Door","Gift"],
-            cargoMode:["Air Cargo","Sea Cargo"],
+            deliveryType: ['UBP', "Door to Door", "Gift"],
+            cargoMode: ["Air Cargo", "Sea Cargo"],
         })
 
         onMounted(() => {
@@ -46,7 +47,8 @@ export default {
                 hbl_type: false,
                 officer: false,
                 actions: true,
-            }
+            },
+            selectedData: {},
         });
 
         const toggleColumnVisibility = columnName => {
@@ -61,7 +63,36 @@ export default {
             });
         };
 
+        const selectedData = ref([]);
+
+
         const createColumns = () => [
+            {
+                name: '#',
+                formatter: (_, row) => {
+                    return h('input',
+                        {
+                            type: 'checkbox',
+                            className: 'form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent',
+                            onChange: (event) => {
+                                const isChecked = event.target.checked;
+                                if (isChecked) {
+                                    const rowData = row.cells.map(cell => cell.data); // Extract data from cells array
+                                    selectedData.value.push(rowData); // Push extracted data into selectedData
+                                } else {
+                                    // Remove the specific row from selectedData (assuming uniqueness of rows)
+                                    const index = selectedData.value.findIndex(selectedRow => {
+                                        const rowData = row.cells.map(cell => cell.data);
+                                        return JSON.stringify(selectedRow) === JSON.stringify(rowData);
+                                    });
+                                    if (index !== -1) {
+                                        selectedData.value.splice(index, 1);
+                                    }
+                                }
+                            }
+                        });
+                }
+            },
             {name: 'HBL', hidden: !data.columnVisibility.hbl},
             {name: 'Name', hidden: !data.columnVisibility.hbl_name},
             {name: 'Address', hidden: !data.columnVisibility.address},
@@ -86,7 +117,6 @@ export default {
                     params.append(key, filters[key].toString());
                 }
             }
-            console.log(params.toString())
             return baseUrl.value + '?' + params.toString();
         }
 
@@ -124,6 +154,7 @@ export default {
                     url: constructUrl(),
                     then: data => data.data.map(item => {
                         const row = [];
+                        row.push({id: item.id})
                         visibleColumns.forEach(column => {
                             row.push(item[column]);
                         });
@@ -160,14 +191,71 @@ export default {
             grid.forceRender();
         }
 
+        const totalRecord = ref(0);
+        const totalGrandAmount = ref(0);
+        const totalPaidAmount = ref(0);
 
+        const getCashSettlementSummary = async (filters) => {
+            try {
+                const response = await fetch("/cash-settlement-summery", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                    },
+                    body: JSON.stringify(filters)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+
+                const data = await response.json();
+                totalRecord.value = data.totalRecords;
+                totalGrandAmount.value = data.sumAmount;
+                totalPaidAmount.value = data.sumPaidAmount;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        const cashReceived = () => {
+            console.log(selectedData)
+        }
+
+        const isDataEmpty = computed(() => selectedData.value.length === 0);
+        const countOfSelectedData = computed(() => selectedData.value.length);
+        const valueOfSelectedData = computed(() => {
+            return selectedData.value.reduce((total, item) => {
+                const grandTotal = parseFloat(item[7] || 0);
+                return total + grandTotal;
+            }, 0);
+        });
+        const paidValueOfSelectedData = computed(() => {
+            return selectedData.value.reduce((total, item) => {
+                const grandTotal = parseFloat(item[8] || 0);
+                return total + grandTotal;
+            }, 0);
+        });
+
+        getCashSettlementSummary();
         return {
             showFilters,
             applyFilters,
             filters,
             wrapperRef,
             toggleColumnVisibility,
-            data
+            data,
+            selectedData,
+            cashReceived,
+            isDataEmpty,
+            countOfSelectedData,
+            valueOfSelectedData,
+            paidValueOfSelectedData,
+            totalRecord,
+            totalGrandAmount,
+            totalPaidAmount,
+
         }
     }
 }
@@ -180,6 +268,65 @@ export default {
 
         <Breadcrumb/>
 
+        <div class="grid grid-cols-6 gap-4 mt-4">
+            <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
+                <div class="flex justify-between space-x-1">
+                    <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
+                        {{ totalRecord }}
+                    </p>
+                </div>
+                <p class="mt-1 text-xs+">HBL Count</p>
+            </div>
+
+            <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
+                <div class="flex justify-between space-x-1">
+                    <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
+                        {{ totalGrandAmount.toLocaleString() }}
+                    </p>
+                </div>
+                <p class="mt-1 text-xs+">HBL Amount</p>
+            </div>
+
+            <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
+                <div class="flex justify-between space-x-1">
+                    <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
+                        {{ totalPaidAmount.toLocaleString() }}
+                    </p>
+                </div>
+                <p class="mt-1 text-xs+">HBL Paid Amount</p>
+            </div>
+
+            <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
+                <div class="flex justify-between space-x-1">
+                    <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
+                        {{ countOfSelectedData }}
+                    </p>
+                </div>
+                <p class="mt-1 text-xs+">Selected HBL Count</p>
+            </div>
+
+            <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
+                <div class="flex justify-between space-x-1">
+                    <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
+                        {{ valueOfSelectedData.toLocaleString() }}
+                    </p>
+                </div>
+                <p class="mt-1 text-xs+">Selected HBL Amount</p>
+            </div>
+
+            <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
+                <div class="flex justify-between space-x-1">
+                    <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
+                        {{ paidValueOfSelectedData.toLocaleString() }}
+                    </p>
+                </div>
+                <p class="mt-1 text-xs+">Selected HBL Paid Amount</p>
+            </div>
+        </div>
+        <div class="flex justify-end mt-5">
+
+        </div>
+
         <div class="card mt-4">
             <div>
                 <div class="flex items-center justify-between p-2">
@@ -191,7 +338,7 @@ export default {
                         </div>
 
                         <div class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300">
-                            <div class="mr-4 cursor-pointer"  x-tooltip.info.placement.bottom="'Applied Filters'"  >
+                            <div class="mr-4 cursor-pointer" x-tooltip.info.placement.bottom="'Applied Filters'">
                                 Filter Options:
                             </div>
                             <div class="flex -space-x-px">
@@ -216,8 +363,14 @@ export default {
                                     </div>
                                 </div>
                                 <div>
-                                    <div v-if="filters.cargoMode" v-for="(mode, index) in filters.cargoMode" :key="index" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">{{ mode }}</div>
-                                    <div v-if="filters.deliveryType"  v-for="(type, index) in filters.deliveryType" :key="index" class="badge bg-success text-white ml-2">{{type}}</div>
+                                    <div v-if="filters.cargoMode" v-for="(mode, index) in filters.cargoMode"
+                                         :key="index" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">{{
+                                            mode
+                                        }}
+                                    </div>
+                                    <div v-if="filters.deliveryType" v-for="(type, index) in filters.deliveryType"
+                                         :key="index" class="badge bg-success text-white ml-2">{{ type }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -225,6 +378,7 @@ export default {
 
 
                     <div class="flex">
+
                         <Popper>
                             <button x-tooltip.placement.top="'View columns'"
                                     class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
@@ -287,6 +441,16 @@ export default {
                         <button x-tooltip.placement.top="'Filter result'" @click="showFilters=true"
                                 class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                             <i class="fa-solid fa-filter"></i>
+                        </button>
+
+                        <button
+                            :disabled="isDataEmpty"
+                            class="btn font-medium text-white ml-2"
+                            :class="{
+            'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90': !isDataEmpty,
+            'bg-gray-300 cursor-not-allowed': isDataEmpty
+        }">
+                            Cash Received
                         </button>
                     </div>
                 </div>
@@ -391,7 +555,7 @@ export default {
                         <span class="font-medium">Cargo Mode</span>
                     </div>
                     <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.cargoMode"  value="Air Cargo"
+                        <input v-model="filters.cargoMode" value="Air Cargo"
                                class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                type="checkbox"/>
                         <span>Air Cargo</span>
@@ -467,7 +631,7 @@ export default {
         </div>
     </AppLayout>
 </template>
-<style >
+<style>
 [type='checkbox']:checked {
     background-image: none !important;
 }
@@ -476,7 +640,7 @@ export default {
     --tw-ring-offset-width: 0 !important;
 }
 
-.popper{
+.popper {
     inset: 0 auto auto -15px !important;
 }
 
