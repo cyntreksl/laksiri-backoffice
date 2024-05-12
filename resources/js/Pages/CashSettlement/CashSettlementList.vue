@@ -6,6 +6,7 @@ import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h} from "gridjs";
 import {RowSelection} from "gridjs/plugins/selection";
 import {push} from "notivue";
+
 export default {
     components: {AppLayout, Breadcrumb, Popper, RowSelection},
     props: {
@@ -228,12 +229,12 @@ export default {
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
                     },
-                    body:JSON.stringify({'hbl_ids':idList})
+                    body: JSON.stringify({'hbl_ids': idList})
                 });
 
                 if (!response.ok) {
                     throw new Error('Network response was not ok.');
-                }else {
+                } else {
                     window.location.reload();
                     push.success('Cash collected successfully!')
                 }
@@ -258,15 +259,16 @@ export default {
             }, 0);
         });
 
-        const pageReady = () =>{
-            if (totalRecord.value > 0){
+        const pageReady = async () => {
+            await getCashSettlementSummary();
+            if (totalRecord.value > 0) {
                 initializeGrid();
-            }else {
+            } else {
                 console.log("no data");
             }
         }
 
-        getCashSettlementSummary();
+
         pageReady();
 
 
@@ -485,8 +487,15 @@ export default {
                     </div>
                 </div>
                 <div class=" mt-3">
-                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
+                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto p-3">
+                        <div v-if="totalRecord > 0" ref="wrapperRef"></div>
+                        <div v-else class="flex items-center text-center justify-center h-48 rounded border border-2 border-dashed">
+                            <div class="text-gray-600 ">
+                                <h3 class="text-lg font-semibold mt-2">No records found</h3>
+                                <p class="text-sm text-gray-500">Sorry, we couldn't find any records matching your criteria.</p>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
