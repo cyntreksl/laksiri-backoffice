@@ -50,3 +50,9 @@ Breadcrumbs::for('users.drivers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Driver Management', route('users.drivers.index'));
 });
+
+// Settings > Zones
+Breadcrumbs::for('settings.zones.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard'); // replace with 'settings.index'
+    $trail->push('Zones', route('settings.zones.index'));
+});
