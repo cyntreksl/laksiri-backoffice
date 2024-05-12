@@ -10,12 +10,12 @@ trait ResponseAPI
      * Core of response
      *
      * @param string $message
-     * @param object|array $data
+     * @param object|array|null $data
      * @param int $statusCode
      * @param bool $isSuccess
      * @return JsonResponse
      */
-    public function coreResponse(string $message, object|array $data, int $statusCode, bool $isSuccess = true): JsonResponse
+    public function coreResponse(string $message, object|array|null $data, int $statusCode, bool $isSuccess = true): JsonResponse
     {
         // Check the params
         if (! $message) {
