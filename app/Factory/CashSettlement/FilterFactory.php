@@ -4,7 +4,6 @@ namespace App\Factory\CashSettlement;
 
 use App\Interfaces\FilterInterface;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class FilterFactory

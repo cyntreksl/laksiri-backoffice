@@ -22,13 +22,10 @@ export default {
         const filters = reactive({
             fromDate: fromDate,
             toDate: toDate,
-            airCargo: false,
-            seaCargo: false,
-            upb: false,
-            d2d: false,
-            gift: false,
             drivers: {},
             officers: {},
+            deliveryType:['UBP',"Door to Door","Gift"],
+            cargoMode:["Air Cargo","Sea Cargo"],
         })
 
         onMounted(() => {
@@ -94,7 +91,7 @@ export default {
         }
 
         const initializeGrid = () => {
-            const visibleColumns = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key]);
+            const visibleColumns = Object.keys(data.columnVisibility);
 
             grid = new Grid({
                 columns: createColumns(),
@@ -147,7 +144,7 @@ export default {
         const applyFilters = () => {
             showFilters.value = false;
             const newUrl = constructUrl();
-            const visibleColumns = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key]);
+            const visibleColumns = Object.keys(data.columnVisibility);
             grid.updateConfig({
                 server: {
                     url: newUrl,
@@ -219,11 +216,8 @@ export default {
                                     </div>
                                 </div>
                                 <div>
-                                    <div v-if="filters.seaCargo" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">Sea Cargo</div>
-                                    <div v-if="filters.airCargo" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">Air Cargo</div>
-                                    <div v-if="filters.gift" class="badge bg-success text-white ml-2">Gift</div>
-                                    <div v-if="filters.upb" class="badge bg-success text-white ml-2">UPB</div>
-                                    <div v-if="filters.d2d" class="badge bg-success text-white ml-2">Door to Door</div>
+                                    <div v-if="filters.cargoMode" v-for="(mode, index) in filters.cargoMode" :key="index" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">{{ mode }}</div>
+                                    <div v-if="filters.deliveryType"  v-for="(type, index) in filters.deliveryType" :key="index" class="badge bg-success text-white ml-2">{{type}}</div>
                                 </div>
                             </div>
                         </div>
@@ -397,14 +391,14 @@ export default {
                         <span class="font-medium">Cargo Mode</span>
                     </div>
                     <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.airCargo"
+                        <input v-model="filters.cargoMode"  value="Air Cargo"
                                class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                type="checkbox"/>
                         <span>Air Cargo</span>
                     </label>
 
                     <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.seaCargo"
+                        <input v-model="filters.cargoMode" value="Sea Cargo"
                                class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                type="checkbox"/>
                         <span>Sea Cargo</span>
@@ -414,20 +408,20 @@ export default {
                         <span class="font-medium">Delivery Mode</span>
                     </div>
                     <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.upb"
+                        <input v-model="filters.deliveryType" value="UBP"
                                class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                type="checkbox"/>
                         <span>UPB</span>
                     </label>
 
                     <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.d2d"
+                        <input v-model="filters.deliveryType" value="Door to Door"
                                class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                type="checkbox"/>
                         <span>Door to Door</span>
                     </label>
                     <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.gift"
+                        <input v-model="filters.deliveryType" value="Gift"
                                class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                type="checkbox"/>
                         <span>Gift</span>
@@ -439,7 +433,6 @@ export default {
                             v-model="filters.drivers"
                             x-init="$el._tom = new Tom($el,{   plugins: ['remove_button']})"
                             class="mt-1.5 w-full"
-                            multiple
                             placeholder="Select drivers..."
                             autocomplete="off">
                             <option value="">Select drivers...</option>
@@ -454,7 +447,6 @@ export default {
                             v-model="filters.officers"
                             x-init="$el._tom = new Tom($el,{   plugins: ['remove_button']})"
                             class="mt-1.5 w-full"
-                            multiple
                             placeholder="Select officers..."
                             autocomplete="off">
                             <option value="">Select officers...</option>
