@@ -4,7 +4,6 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ZoneController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -53,17 +52,109 @@ Route::middleware([
     // Driver
     Route::name('users.')->group(function () {
         Route::resource('drivers', DriverController::class);
+        //Driver Tracking
+        Route::get('driver-tracings', function () {
+            return Inertia::render('User/DriverTracking');
+        })->name('driver-tracings.index');
     });
 
-    // Settings
-    Route::prefix('settings')->name('settings.')->group(function () {
-//        Route::get('/', function () {
-//            return Inertia::render('Settings/index');
-//        })->name('index');
-        // Zones
-        Route::get('zones/list', [ZoneController::class, 'list'])->name('zones.list');
-        Route::resource('zones', ZoneController::class)
-            ->except(['create', 'show']);
+    // Back Office
+    Route::name('back-office.')->group(function () {
+        // Cash Settlements
+        Route::get('cash-settlements', function () {
+            return Inertia::render('CashSettlement/CashSettlementList');
+        })->name('cash-settlements.index');
+
+        // Warehouse
+        Route::get('warehouses', function () {
+            return Inertia::render('Warehouse/WarehouseList');
+        })->name('warehouses.index');
+    });
+
+    //Loading
+    Route::name('loading.')->group(function () {
+        // Loading Point
+        Route::get('loading-points', function () {
+            return Inertia::render('Loading/LoadingPoint');
+        })->name('loading-points.index');
+
+        // Warehouse
+        Route::get('manual-loadings', function () {
+            return Inertia::render('Loading/ManualLoading');
+        })->name('manual-loadings.index');
+
+        //Loaded Shipments
+        Route::get('loaded-shipments', function () {
+            return Inertia::render('Loading/LoadedShipmentList');
+        })->name('loaded-shipments.index');
+    });
+
+    //Arrivals
+    Route::name('arrival.')->group(function () {
+        // Shipments Arrivals
+        Route::get('shipments-arrivals', function () {
+            return Inertia::render('Arrival/ShipmentsArrivalsList');
+        })->name('shipments-arrivals.index');
+
+        // Bonded Warehouse
+        Route::get('bonded-warehouses', function () {
+            return Inertia::render('Arrival/BondedWarehouseList');
+        })->name('bonded-warehouses.index');
+
+        //Unloading Issues
+        Route::get('unloading-issues', function () {
+            return Inertia::render('Arrival/UnloadingIssueList');
+        })->name('unloading-issues.index');
+    });
+
+    //Delivery
+    Route::name('delivery.')->group(function () {
+        //Delivery Warehouse
+        Route::get('delivery-warehouses', function () {
+            return Inertia::render('Delivery/DeliveryWarehouseList');
+        })->name('delivery-warehouses.index');
+
+        // Dispatch Point
+        Route::get('dispatch-points', function () {
+            return Inertia::render('Delivery/DispatchPointList');
+        })->name('dispatch-points.index');
+
+        //Dispatched Loads
+        Route::get('dispatched-loads', function () {
+            return Inertia::render('Delivery/DispatchedLoadList');
+        })->name('dispatched-loads.index');
+    });
+
+    //Reports
+    Route::name('report.')->group(function () {
+        //Payment Summery
+        Route::get('payment-summaries', function () {
+            return Inertia::render('Report/PaymentSummeryList');
+        })->name('payment-summaries.index');
 
     });
+
+    //Setting
+    Route::name('setting.')->group(function () {
+        //Driver Zones
+        Route::get('driver-zones', function () {
+            return Inertia::render('Setting/DriverZoneList');
+        })->name('driver-zones.index');
+        //Driver Areas
+        Route::get('driver-areas', function () {
+            return Inertia::render('Setting/DriverAreaList');
+        })->name('driver-areas.index');
+        //Warehouse Zones
+        Route::get('warehouse-zones', function () {
+            return Inertia::render('Setting/WarehouseZoneList');
+        })->name('warehouse-zones.index');
+        //Pricing
+        Route::get('prices', function () {
+            return Inertia::render('Setting/PricingList');
+        })->name('prices.index');
+
+    });
+
+
+
 });
