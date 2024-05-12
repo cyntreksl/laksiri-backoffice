@@ -1,4 +1,4 @@
-<template>
+<template xmlns="http://www.w3.org/1999/html">
     <Head :title="title"/>
     <div class="flex grow bg-slate-50 dark:bg-navy-900">
         <!-- Sidebar -->
@@ -396,7 +396,7 @@
                         >
                             <slot name="header"/>
                         </p>
-                        <button
+                        <button @click="toggleSideBar"
                             class="btn size-7 rounded-full p-0 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent-light/80 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 xl:hidden"
                         >
                             <svg
@@ -468,7 +468,7 @@
                 <div class="flex w-full items-center justify-between">
                     <!-- Left: Sidebar Toggle Button -->
                     <div class="size-7">
-                        <button
+                        <button v-if="!isSidebarExpanded"
                             @click="toggleSideBar"
                             class="menu-toggle ml-0.5 flex size-7 flex-col justify-center space-y-1.5 text-primary outline-none focus:outline-none dark:text-accent-light/80"
                         >
@@ -476,6 +476,24 @@
                             <span></span>
                             <span></span>
                         </button>
+                        <button v-else
+                            @click="toggleSideBar">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="size-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M15 19l-7-7 7-7"
+                            ></path>
+                        </svg>
+                        </button>
+
                     </div>
 
                     <!-- Right: Header buttons -->
@@ -883,6 +901,7 @@ export default {
             userBranches,
             setBranch,
             showBranchPopper,
+            isSidebarExpanded
         };
     },
 };
