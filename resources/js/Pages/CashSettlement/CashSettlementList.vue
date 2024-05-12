@@ -5,7 +5,7 @@ import Popper from "vue3-popper";
 import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h} from "gridjs";
 import {RowSelection} from "gridjs/plugins/selection";
-
+import {push} from "notivue";
 export default {
     components: {AppLayout, Breadcrumb, Popper, RowSelection},
     props: {
@@ -29,9 +29,9 @@ export default {
             cargoMode: ["Air Cargo", "Sea Cargo"],
         })
 
-        onMounted(() => {
-            initializeGrid();
-        })
+        // onMounted(() => {
+        //     initializeGrid();
+        // })
 
         const data = reactive({
             columnVisibility: {
@@ -219,8 +219,28 @@ export default {
             }
         }
 
-        const cashReceived = () => {
-            console.log(selectedData)
+        const cashReceived = async () => {
+            const idList = selectedData.value.map(item => item[0]);
+            try {
+                const response = await fetch("/cash-received", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                    },
+                    body:JSON.stringify({'hbl_ids':idList})
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }else {
+                    window.location.reload();
+                    push.success('Cash collected successfully!')
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
 
         const isDataEmpty = computed(() => selectedData.value.length === 0);
@@ -238,7 +258,18 @@ export default {
             }, 0);
         });
 
+        const pageReady = () =>{
+            if (totalRecord.value > 0){
+                initializeGrid();
+            }else {
+                console.log("no data");
+            }
+        }
+
         getCashSettlementSummary();
+        pageReady();
+
+
         return {
             showFilters,
             applyFilters,
@@ -323,9 +354,7 @@ export default {
                 <p class="mt-1 text-xs+">Selected HBL Paid Amount</p>
             </div>
         </div>
-        <div class="flex justify-end mt-5">
 
-        </div>
 
         <div class="card mt-4">
             <div>
@@ -444,6 +473,7 @@ export default {
                         </button>
 
                         <button
+                            @click="cashReceived"
                             :disabled="isDataEmpty"
                             class="btn font-medium text-white ml-2"
                             :class="{

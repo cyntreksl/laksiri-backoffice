@@ -7,9 +7,13 @@ use App\Http\Resources\CashSettlementCollection;
 use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\HBL;
+use App\Models\HBLStatusChange;
+use App\Traits\ResponseAPI;
+use Illuminate\Support\Facades\Auth;
 
 class CashSettlementRepository implements CashSettlementInterface, GridJsInterface
 {
+    use ResponseAPI;
 
     public function getPendingSettlementList(): HBL
     {
@@ -66,5 +70,24 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
             'sumAmount' => $sumAmount,
             'sumPaidAmount' => $sumPaidAmount,
         ];
+    }
+
+    public function cashReceived(array $hblIds)
+    {
+       $hbls = HBL::whereIn('id',$hblIds)->where('system_status',3.1)->get();
+
+       foreach ($hbls as $hbl) {
+           $hbl->system_status = 4;
+           $hbl->save();
+
+           $status = new HBLStatusChange();
+           $status->hbl_id = $hbl->id;
+           $status->title = "Cash Collected";
+           $status->message = sprintf("HBL #%s cash collected",$hbl->hbl);
+           $status->created_by = Auth::id();
+           $status->save();
+       }
+
+       return $this->success("Cash Received",[]);
     }
 }

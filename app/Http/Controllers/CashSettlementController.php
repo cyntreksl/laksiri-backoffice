@@ -43,4 +43,10 @@ class CashSettlementController extends Controller
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode','deliveryType','upb', 'd2d', 'gift', 'drivers', 'officers']);
         return $this->cashSettlementRepository->getSummery($filters);
     }
+
+    public function cashReceived(Request $request)
+    {
+        $hblIds = $request->hbl_ids;
+        return $this->cashSettlementRepository->cashReceived($hblIds);
+    }
 }

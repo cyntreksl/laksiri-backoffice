@@ -65,6 +65,7 @@ Route::middleware([
         Route::get('cash-settlements',[CashSettlementController::class,'index'])->name('cash-settlements.index');
         Route::get('cash-settlement-list',[CashSettlementController::class,'list'])->name('cash-settlements.list');
         Route::post('cash-settlement-summery',[CashSettlementController::class,'getSummery'])->name('cash-settlements.summery');
+        Route::post('cash-received',[CashSettlementController::class,'cashReceived'])->name('cash-settlements.cashReceived');
 
         // Warehouse
         Route::get('warehouses', function () {
