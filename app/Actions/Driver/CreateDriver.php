@@ -16,7 +16,7 @@ class CreateDriver
     {
         $user = User::create([
             'name' => $data['name'],
-            'username' => $data['name'],
+            'username' => $data['username'],
             'password' => Hash::make($data['password']),
             'working_hours_start' => $data['working_hours_start'],
             'working_hours_end' => $data['working_hours_end'],
@@ -24,6 +24,7 @@ class CreateDriver
             'contact' => $data['contact'],
             'status' => UserStatus::INVITED->value,
             'primary_branch_id' => auth()->user()->primary_branch_id,
+            'created_by' => auth()->id(),
         ]);
 
         $driver_role = Role::where('name', 'driver')->first();
