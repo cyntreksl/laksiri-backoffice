@@ -4,6 +4,7 @@ use App\Http\Controllers\CashSettlementController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
+use App\Http\Controllers\ZoneController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -82,6 +83,7 @@ Route::middleware([
         Route::get('zones/list', [ZoneController::class, 'list'])->name('zones.list');
         Route::resource('zones', ZoneController::class)
             ->except(['create', 'show']);
+    });
     //Loading
     Route::name('loading.')->group(function () {
         // Loading Point
@@ -165,5 +167,5 @@ Route::middleware([
         })->name('prices.index');
 
     });
-
 });
+
