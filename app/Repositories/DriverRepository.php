@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Actions\Driver\CreateDriver;
 use App\Actions\Driver\GetDrivers;
 use App\Actions\Driver\GetTotalDriversCountInCurrentBranch;
 use App\Factory\User\FilterFactory;
 use App\Http\Resources\DriverCollection;
+use App\Actions\User\CreateUser;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\User;
@@ -20,7 +20,7 @@ class DriverRepository implements DriverRepositoryInterface, GridJsInterface
 
     public function storeDriver(array $data)
     {
-        return CreateDriver::run($data);
+        return CreateUser::run($data);
     }
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])

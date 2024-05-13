@@ -45,6 +45,7 @@ class User extends Authenticatable
         'working_hours_end',
         'working_hours_start',
         'preferred_zone',
+        'created_by',
     ];
 
     /**

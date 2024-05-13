@@ -6,7 +6,7 @@ import {router, useForm} from "@inertiajs/vue3";
 import {ref} from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
-import notification from "@/magics/notification.js";
+import {push} from "notivue";
 
 const confirmingDriverCreation = ref(false);
 
@@ -16,23 +16,26 @@ const closeModal = () => {
 
 const form = useForm({
     name: '',
+    username: '',
     password: '',
     password_confirmation: '',
     working_hours_start: '',
     working_hours_end: '',
     preferred_zone: [],
     contact: '',
+    role: 'driver',
 });
 
 const createDriver = () => {
     form.post(route("users.drivers.store"), {
         onSuccess: () => {
+            closeModal();
             router.visit(route("users.drivers.index"));
             form.reset();
-            notification({
-                text: 'Driver Created Successfully!',
-                variant: 'success',
-            })
+            push.success('Driver Created Successfully!');
+        },
+        onError: () => {
+            push.error('Something went to wrong!');
         },
         preserveScroll: true,
         preserveState: true,
@@ -103,6 +106,31 @@ const createDriver = () => {
                     <InputError :message="form.errors.contact"/>
                 </div>
 
+                <div class="col-span-1 sm:col-span-2">
+                    <InputLabel value="Username"/>
+                    <label class="relative flex">
+                        <input
+                            v-model="form.username"
+                            class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                            placeholder="Username"
+                            type="text"
+                        />
+                        <div
+                            class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                        >
+                            <svg class="size-4.5 transition-colors duration-200" fill="none" stroke="currentColor"
+                                 stroke-width="1.5"
+                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </label>
+                    <InputError :message="form.errors.username"/>
+                </div>
+
                 <div>
                     <InputLabel value="Password"/>
                     <label class="relative flex">
@@ -148,12 +176,12 @@ const createDriver = () => {
                 </div>
 
                 <div>
-                    <InputLabel value="Working Hour Start"/>
+                    <InputLabel value="Working Hours Start"/>
                     <label class="relative flex">
                         <input
                             v-model="form.working_hours_start"
                             class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                            placeholder="Working Hour Start"
+                            placeholder="Working Hours Start"
                             type="text"
                         />
                     </label>
@@ -163,12 +191,12 @@ const createDriver = () => {
                 </div>
 
                 <div>
-                    <InputLabel value="Working Hour End"/>
+                    <InputLabel value="Working Hours End"/>
                     <label class="relative flex">
                         <input
                             v-model="form.working_hours_end"
                             class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                            placeholder="Working Hour End"
+                            placeholder="Working Hours End"
                             type="text"
                         />
                     </label>
