@@ -57,9 +57,6 @@ Route::middleware([
 
     // Settings
     Route::prefix('settings')->name('settings.')->group(function () {
-//        Route::get('/', function () {
-//            return Inertia::render('Settings/index');
-//        })->name('index');
         // Zones
         Route::get('zones/list', [ZoneController::class, 'list'])->name('zones.list');
         Route::resource('zones', ZoneController::class)

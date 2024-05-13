@@ -598,6 +598,7 @@ export default {
                             route: "users.drivers.index",
                         },
                     );
+                    break;
                 case "settings":
                     childMenuList.splice(
                         0,

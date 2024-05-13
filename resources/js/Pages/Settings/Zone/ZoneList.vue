@@ -29,6 +29,7 @@ const data = reactive({
     columnVisibility: {
         id: false,
         name: true,
+        areas: true,
         actions: true,
     }
 });
@@ -50,7 +51,7 @@ const initializeGrid = () => {
 
                     const col = columns[0];
                     const dir = col.direction === 1 ? 'asc' : 'desc';
-                    let colName = ['id', 'name',][col.index];
+                    let colName = ['id', 'name','areas'][col.index];
 
                     return `${prev}&order=${colName}&dir=${dir}`;
                 }
@@ -67,6 +68,7 @@ const initializeGrid = () => {
             then: data => data.data.map(item => [
                 item.id,
                 item.name,
+                item.areas.map(area => area.name).join('/')
             ]),
             total: data => data.meta.total
         }
@@ -79,6 +81,20 @@ const initializeGrid = () => {
 const createColumns = () => [
     {name: 'ID', hidden: !data.columnVisibility.id},
     {name: 'Name', hidden: !data.columnVisibility.name},
+    {
+        name: 'Areas',
+        hidden: !data.columnVisibility.areas,
+
+        formatter: (_, row) => {
+            return h('div', {
+                class: 'inline-space mt-3 flex grow flex-wrap items-start'
+            }, [
+                row.cells[2].data.split('/').map(area => h('span', {
+                    class: 'tag rounded-full bg-success/10 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25'
+                }, area.toUpperCase()))
+            ]);
+        }
+    },
 
     {
         name: 'Actions',

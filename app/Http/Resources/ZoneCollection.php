@@ -18,7 +18,12 @@ class ZoneCollection extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'areas' => $this->areas->toArray()
-            ];
+            'areas' => $this->areas->map(function ($area) {
+                return [
+                        'id' => $area->id,
+                        'name' => $area->name,
+                    ];
+            })->toArray(),
+        ];
     }
 }
