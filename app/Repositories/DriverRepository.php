@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Actions\Driver\CreateDriver;
 use App\Actions\Driver\GetDrivers;
+use App\Actions\User\CreateUser;
 use App\Interfaces\DriverRepositoryInterface;
 
 class DriverRepository implements DriverRepositoryInterface
@@ -15,6 +15,6 @@ class DriverRepository implements DriverRepositoryInterface
 
     public function storeDriver(array $data)
     {
-        return CreateDriver::run($data);
+        return CreateUser::run($data);
     }
 }

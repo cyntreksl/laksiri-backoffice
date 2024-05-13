@@ -23,6 +23,7 @@ const form = useForm({
     working_hours_end: '',
     preferred_zone: [],
     contact: '',
+    role: 'driver',
 });
 
 const createDriver = () => {

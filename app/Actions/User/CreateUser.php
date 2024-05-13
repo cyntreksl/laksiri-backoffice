@@ -2,9 +2,7 @@
 
 namespace App\Actions\User;
 
-use App\Enum\UserStatus;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CreateUser
@@ -13,18 +11,16 @@ class CreateUser
 
     public function handle(array $data): User
     {
-        $user = User::create([
-            'name' => $data['name'],
-            'username' => $data['username'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'primary_branch_id' => $data['primary_branch_id'],
-            'status' => UserStatus::INVITED->value,
-        ]);
+        if ($data['role'] === 'driver') {
+            $data['primary_branch_id'] = auth()->user()->primary_branch_id;
+            $data['created_by'] = auth()->id();
+        }
 
-        if (isset($data['role_id'])) {
-            // assign role
-            $user->assignRole($data['role_id']);
+        $user = User::create($data);
+
+        // assign role
+        if (isset($data['role'])) {
+            $user->assignRole($data['role']);
         }
 
         if (isset($data['secondary_branches'])) {
