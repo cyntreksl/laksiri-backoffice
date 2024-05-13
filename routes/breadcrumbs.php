@@ -51,6 +51,13 @@ Breadcrumbs::for('users.drivers.index', function (BreadcrumbTrail $trail) {
     $trail->push('Driver Management', route('users.drivers.index'));
 });
 
+//Cash settlement
+Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Cash Settlements');
+    $trail->push('Settlement List', route('back-office.cash-settlements.index'));
+});
+
 // Settings > Zones
 Breadcrumbs::for('settings.zones.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard'); // replace with 'settings.index'

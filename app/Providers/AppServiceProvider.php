@@ -8,6 +8,7 @@ use App\Listeners\SetUserCurrentBranch;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Passport::enablePasswordGrant();
         Event::listen(
             UpdateLastLogin::class,
             UpdateLastLogout::class,

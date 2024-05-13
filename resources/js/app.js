@@ -1,5 +1,7 @@
 import './bootstrap';
 import '../css/app.css';
+import 'notivue/notification.css' // Only needed if using built-in notifications
+import 'notivue/animations.css' // Only needed if using built-in animations
 
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
@@ -74,9 +76,12 @@ Alpine.data("accordionItem", accordionItem);
 
 import { createPinia } from 'pinia'
 const pinia = createPinia()
-
+const notivue = createNotivue({
+    position: "top-right",
+})
 
 import Popper from "vue3-popper";
+import {createNotivue} from "notivue";
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -87,6 +92,7 @@ createInertiaApp({
             // .use(Popper)
             .use(ZiggyVue)
             .use(pinia)
+            .use(notivue)
             .mount(el);
     },
     progress: {

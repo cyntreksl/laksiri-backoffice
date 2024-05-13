@@ -16,7 +16,7 @@ class StoreUserRequest extends FormRequest
             'password' => ['required', 'string', Password::default(), 'confirmed'],
             'primary_branch_id' => ['required', 'exists:branches,id'],
             'secondary_branches' => ['nullable'],
-            'role_id' => ['required', 'exists:roles,id'],
+            'role' => ['required', 'exists:roles,name'],
         ];
     }
 
@@ -29,7 +29,6 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'primary_branch_id.required' => 'The primary branch is required.',
-            'role_id.required' => 'The role is required.',
         ];
     }
 
