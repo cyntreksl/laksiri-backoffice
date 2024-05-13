@@ -20,6 +20,7 @@ return new class extends Migration
             $table->timestamp('time')->nullable();
             $table->double('longitude', 11, 8)->nullable();
             $table->double('latitude', 11, 8)->nullable();
+            $table->json('meta_data')->nullable();
             $table->enum('status', ['success', 'failed']);
             $table->timestamps();
         });

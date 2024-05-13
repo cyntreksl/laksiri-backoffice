@@ -18,10 +18,6 @@ class LoginController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $credentials = $request->only('username', 'password');
-
-        $ip = $request->ip();
-
-        return $this->authRepository->login($credentials, $ip);
+        return $this->authRepository->login($request->all());
     }
 }
