@@ -6,7 +6,7 @@ import {router, useForm} from "@inertiajs/vue3";
 import {ref} from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
-import notification from "@/magics/notification.js";
+import {push} from "notivue";
 
 const props = defineProps({
     roles: {
@@ -35,18 +35,19 @@ const form = useForm({
     password_confirmation: '',
     primary_branch_id: '',
     secondary_branches: [],
-    role_id: '',
+    role: '',
 });
 
 const createUser = () => {
     form.post(route("users.store"), {
         onSuccess: () => {
+            closeModal();
             router.visit(route("users.index"));
             form.reset();
-            notification({
-                text: 'User Created Successfully!',
-                variant: 'success',
-            })
+            push.success('User Created Successfully!');
+        },
+        onError: () => {
+            push.error('Something went to wrong!');
         },
         preserveScroll: true,
         preserveState: true,
@@ -233,10 +234,10 @@ const createUser = () => {
                             class="inline-flex items-center space-x-2"
                         >
                             <input
-                                v-model="form.role_id"
+                                v-model="form.role"
                                 class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                                 name="role"
-                                :value="role.id"
+                                :value="role.name"
                                 type="radio"
                             />
                             <p class="capitalize">{{ role.name }}</p>
