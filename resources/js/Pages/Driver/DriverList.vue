@@ -91,7 +91,7 @@ const createColumns = () => [
             return h('div', {}, [
                 h('a', {
                     className: 'btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2',
-                    href: route('drivers.edit', row.cells[0].data)
+                    href: route('users.drivers.edit', row.cells[0].data)
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
@@ -171,7 +171,7 @@ const handleDeleteDriver = () => {
                 variant: 'success',
             });
             driverId.value = null;
-            router.visit(route('drivers.index'), {only: ['users']})
+            router.visit(route('users.drivers.index'), {only: ['users']})
         },
     })
 

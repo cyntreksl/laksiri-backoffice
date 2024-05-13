@@ -53,6 +53,9 @@ Route::middleware([
     // Driver
     Route::name('users.')->group(function () {
         Route::resource('drivers', DriverController::class);
+
+        Route::get('driver-list', [DriverController::class, 'list']);
+
         //Driver Tracking
         Route::get('driver-tracings', function () {
             return Inertia::render('User/DriverTracking');
@@ -62,10 +65,10 @@ Route::middleware([
     // Back Office
     Route::name('back-office.')->group(function () {
         // Cash Settlements
-        Route::get('cash-settlements',[CashSettlementController::class,'index'])->name('cash-settlements.index');
-        Route::get('cash-settlement-list',[CashSettlementController::class,'list'])->name('cash-settlements.list');
-        Route::post('cash-settlement-summery',[CashSettlementController::class,'getSummery'])->name('cash-settlements.summery');
-        Route::post('cash-received',[CashSettlementController::class,'cashReceived'])->name('cash-settlements.cashReceived');
+        Route::get('cash-settlements', [CashSettlementController::class, 'index'])->name('cash-settlements.index');
+        Route::get('cash-settlement-list', [CashSettlementController::class, 'list'])->name('cash-settlements.list');
+        Route::post('cash-settlement-summery', [CashSettlementController::class, 'getSummery'])->name('cash-settlements.summery');
+        Route::post('cash-received', [CashSettlementController::class, 'cashReceived'])->name('cash-settlements.cashReceived');
 
         // Warehouse
         Route::get('warehouses', function () {
@@ -156,7 +159,5 @@ Route::middleware([
         })->name('prices.index');
 
     });
-
-
 
 });
