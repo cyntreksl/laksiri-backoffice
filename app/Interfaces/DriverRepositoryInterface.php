@@ -3,10 +3,11 @@
 namespace App\Interfaces;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 interface DriverRepositoryInterface
 {
-    public function getAllDrivers(): User;
+    public function getAllDrivers(): Collection;
 
     public function storeDriver(array $data);
 }
