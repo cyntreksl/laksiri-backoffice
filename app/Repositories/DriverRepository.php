@@ -10,10 +10,11 @@ use App\Actions\User\CreateUser;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 class DriverRepository implements DriverRepositoryInterface, GridJsInterface
 {
-    public function getAllDrivers(): User
+    public function getAllDrivers(): Collection
     {
         return GetDrivers::run();
     }
