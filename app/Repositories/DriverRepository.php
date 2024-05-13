@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\Driver\CreateDriver;
 use App\Actions\Driver\GetDrivers;
 use App\Actions\Driver\GetTotalDriversCountInCurrentBranch;
+use App\Factory\User\FilterFactory;
 use App\Http\Resources\DriverCollection;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\GridJsInterface;
@@ -29,6 +30,9 @@ class DriverRepository implements DriverRepositoryInterface, GridJsInterface
         if (!empty($search)) {
             $query->where('username', 'like', '%' . $search . '%');
         }
+
+        //apply filters
+        FilterFactory::apply($query, $filters);
 
         $users = $query->orderBy($order, $direction)
             ->skip($offset)

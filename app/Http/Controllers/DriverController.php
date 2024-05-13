@@ -28,7 +28,9 @@ class DriverController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        return $this->driverRepository->dataset($limit, $page, $order, $dir, $search);
+        $filters = $request->only(['fromDate', 'toDate']);
+
+        return $this->driverRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 
     public function store(StoreDriverRequest $request)
