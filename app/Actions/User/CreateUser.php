@@ -12,7 +12,7 @@ class CreateUser
     public function handle(array $data): User
     {
         if ($data['role'] === 'driver') {
-            $data['primary_branch_id'] = auth()->user()->primary_branch_id;
+            $data['primary_branch_id'] = GetUserCurrentBranchID::run();
             $data['created_by'] = auth()->id();
         }
 
