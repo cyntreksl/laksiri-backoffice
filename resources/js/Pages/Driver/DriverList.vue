@@ -8,12 +8,23 @@ import notification from "@/magics/notification.js";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import CreateDriverForm from "@/Pages/Driver/Partials/CreateDriverForm.vue";
 import DeleteDriverConfirmationModal from "@/Pages/Driver/Partials/DeleteDriverConfirmationModal.vue";
+import DatePicker from "@/Components/DatePicker.vue";
+import InputLabel from "@/Components/InputLabel.vue";
 
 const wrapperRef = ref(null);
 let grid = null;
 
+const showFilters = ref(false);
+const currentDate = new Date();
+const fromDate = new Date(currentDate.setDate(currentDate.getDate() - 30)).toISOString().split('T')[0];
+const toDate = new Date().toISOString().split('T')[0];
+
+const filters = reactive({
+    fromDate: fromDate,
+    toDate: toDate,
+})
+
 const data = reactive({
-    DriverData: {},
     columnVisibility: {
         id: false,
         username: true,
@@ -25,52 +36,7 @@ const data = reactive({
     }
 });
 
-const initializeGrid = () => {
-    grid = new Grid({
-        columns: createColumns(),
-        search: {
-            debounceTimeout: 1000,
-            server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`
-            }
-        },
-        sort: {
-            multiColumn: false,
-            server: {
-                url: (prev, columns) => {
-                    if (!columns.length) return prev;
-
-                    const col = columns[0];
-                    const dir = col.direction === 1 ? 'asc' : 'desc';
-                    let colName = ['id', 'username', 'primary_branch_name', 'created_at', 'status'][col.index];
-
-                    return `${prev}&order=${colName}&dir=${dir}`;
-                }
-            }
-        },
-        pagination: {
-            limit: 10,
-            server: {
-                url: (prev, page, limit) => `${prev}&limit=${limit}&offset=${page * limit}`
-            }
-        },
-        server: {
-            url: '/driver-list?',
-            then: data => data.data.map(item => [
-                item.id,
-                item.username,
-                item.name,
-                item.primary_branch_name,
-                item.created_at,
-                item.status,
-            ]),
-            total: data => data.meta.total
-        }
-
-    });
-
-    grid.render(wrapperRef.value);
-};
+const baseUrl = ref('/driver-list')
 
 const createColumns = () => [
     {name: 'ID', hidden: !data.columnVisibility.id},
@@ -91,7 +57,7 @@ const createColumns = () => [
             return h('div', {}, [
                 h('a', {
                     className: 'btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2',
-                    href: route('drivers.edit', row.cells[0].data)
+                    href: route('users.drivers.edit', row.cells[0].data)
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
@@ -145,6 +111,59 @@ const toggleColumnVisibility = columnName => {
     grid.forceRender();
 };
 
+const initializeGrid = () => {
+    const visibleColumns = Object.keys(data.columnVisibility);
+
+    grid = new Grid({
+        columns: createColumns(),
+        search: {
+            debounceTimeout: 1000,
+            server: {
+                url: (prev, keyword) => `${prev}?search=${keyword}`
+            }
+        },
+        sort: {
+            multiColumn: false,
+            server: {
+                url: (prev, columns) => {
+                    if (!columns.length) return prev;
+                    const col = columns[0];
+                    const dir = col.direction === 1 ? 'asc' : 'desc';
+                    let colName = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key])[col.index];
+
+                    return `${prev}&order=${colName}&dir=${dir}`;
+                }
+            }
+        },
+        pagination: {
+            limit: 10,
+            server: {
+                url: (prev, page, limit) => `${prev}&limit=${limit}&offset=${page * limit}`
+            }
+        },
+        server: {
+            url: constructUrl(),
+            then: data => data.data.map(item => {
+                const row = [];
+                row.push({id: item.id})
+                visibleColumns.forEach(column => {
+                    row.push(item[column]);
+                });
+                return row;
+            }),
+            total: response => {
+                if (response && response.meta && response.meta.total) {
+                    return response.meta.total;
+                } else {
+                    throw new Error('Invalid total count in server response');
+                }
+            }
+        }
+    });
+
+    grid.render(wrapperRef.value);
+};
+
 onMounted(() => {
     initializeGrid();
 })
@@ -171,10 +190,38 @@ const handleDeleteDriver = () => {
                 variant: 'success',
             });
             driverId.value = null;
-            router.visit(route('drivers.index'), {only: ['users']})
+            router.visit(route('users.drivers.index'), {only: ['users']})
         },
     })
+}
 
+const constructUrl = () => {
+    const params = new URLSearchParams();
+    for (const key in filters) {
+        if (filters.hasOwnProperty(key)) {
+            params.append(key, filters[key].toString());
+        }
+    }
+    return baseUrl.value + '?' + params.toString();
+}
+
+const applyFilters = () => {
+    showFilters.value = false;
+    const newUrl = constructUrl();
+    const visibleColumns = Object.keys(data.columnVisibility);
+    grid.updateConfig({
+        server: {
+            url: newUrl,
+            then: data => data.data.map(item => {
+                const row = [];
+                visibleColumns.forEach(column => {
+                    row.push(item[column]);
+                });
+                return row;
+            }),
+        }
+    });
+    grid.forceRender();
 }
 </script>
 
@@ -222,12 +269,32 @@ const handleDeleteDriver = () => {
 
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
+                                                        :checked="data.columnVisibility.username"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('username', $event)"
+                                                    />
+                                                    <p>Username</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
                                                         :checked="data.columnVisibility.name"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                         @change="toggleColumnVisibility('name', $event)"
                                                     />
                                                     <p>Name</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.primary_branch_name"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('primary_branch_name', $event)"
+                                                    />
+                                                    <p>Primary Branch</p>
                                                 </label>
 
                                                 <label class="inline-flex items-center space-x-2">
@@ -242,22 +309,12 @@ const handleDeleteDriver = () => {
 
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
-                                                        :checked="data.columnVisibility.last_login_at"
+                                                        :checked="data.columnVisibility.status"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
-                                                        @change="toggleColumnVisibility('last_login_at', $event)"
+                                                        @change="toggleColumnVisibility('status', $event)"
                                                     />
-                                                    <p>Last Login</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.last_logout_at"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="toggleColumnVisibility('last_logout_at', $event)"
-                                                    />
-                                                    <p>Last Logout</p>
+                                                    <p>Status</p>
                                                 </label>
                                             </div>
                                         </div>
@@ -267,6 +324,7 @@ const handleDeleteDriver = () => {
                         </Popper>
 
                         <button
+                            x-tooltip.placement.top="'Filter result'" @click="showFilters=true"
                             class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                             <i class="fa-solid fa-filter"></i>
                         </button>
@@ -283,5 +341,52 @@ const handleDeleteDriver = () => {
 
         <DeleteDriverConfirmationModal :show="showConfirmDeleteDriverModal" @close="closeModal"
                                        @delete-driver="handleDeleteDriver"/>
+
+        <div v-show="showFilters" class="block">
+            <div class="fixed inset-0 z-[100] bg-slate-900/60 transition-opacity duration-200 show block"
+                 x-transition:enter="ease-out" x-transition:enter-end="opacity-100" x-transition:enter-start="opacity-0"
+                 x-transition:leave="ease-in" x-transition:leave-end="opacity-0"
+                 x-transition:leave-start="opacity-100"></div>
+            <div class="fixed right-0 top-0 z-[101] h-full w-72">
+                <div
+                    class="flex h-full p-5 w-full transform-gpu flex-col bg-white transition-transform duration-200 dark:bg-navy-700 show space-y-4"
+                    x-transition:enter="ease-out" x-transition:enter-end="translate-x-0"
+                    x-transition:enter-start="translate-x-full" x-transition:leave="ease-in"
+                    x-transition:leave-end="translate-x-full" x-transition:leave-start="translate-x-0">
+                    <div class="my-3 flex h-5 items-center justify-between">
+                        <h2 class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 lg:text-base">
+                            Filter Drivers
+                        </h2>
+
+                        <button class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-red-500/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25" x-tooltip.placement.bottom.error="'Close filter drawer'"
+                                @click="showFilters = false">
+                            <svg class="size-4.5" fill="none" stroke="currentColor" stroke-width="2"
+                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
+
+                    <!--Filters-->
+                    <div>
+                        <InputLabel value="From"/>
+                        <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
+                    </div>
+
+                    <div>
+                        <InputLabel value="To"/>
+                        <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
+                    </div>
+                    <!--Filter Now Action Button-->
+                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
+                    <button class="btn w-full space-x-2 bg-primary/10 font-medium text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25"
+                            @click="applyFilters">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Apply Filters</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>
