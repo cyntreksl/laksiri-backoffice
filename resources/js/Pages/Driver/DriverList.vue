@@ -222,12 +222,32 @@ const handleDeleteDriver = () => {
 
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
+                                                        :checked="data.columnVisibility.username"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('username', $event)"
+                                                    />
+                                                    <p>Username</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
                                                         :checked="data.columnVisibility.name"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
                                                         @change="toggleColumnVisibility('name', $event)"
                                                     />
                                                     <p>Name</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.primary_branch_name"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('primary_branch_name', $event)"
+                                                    />
+                                                    <p>Primary Branch</p>
                                                 </label>
 
                                                 <label class="inline-flex items-center space-x-2">
@@ -242,22 +262,12 @@ const handleDeleteDriver = () => {
 
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
-                                                        :checked="data.columnVisibility.last_login_at"
+                                                        :checked="data.columnVisibility.status"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
-                                                        @change="toggleColumnVisibility('last_login_at', $event)"
+                                                        @change="toggleColumnVisibility('status', $event)"
                                                     />
-                                                    <p>Last Login</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.last_logout_at"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="toggleColumnVisibility('last_logout_at', $event)"
-                                                    />
-                                                    <p>Last Logout</p>
+                                                    <p>Status</p>
                                                 </label>
                                             </div>
                                         </div>
