@@ -118,4 +118,12 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Branch::class, 'branch_user', 'user_id', 'branch_id');
     }
+
+    /**
+     * Find the user instance for the given username.
+     */
+    public function findForPassport(string $username): User
+    {
+        return $this->where('username', $username)->first();
+    }
 }
