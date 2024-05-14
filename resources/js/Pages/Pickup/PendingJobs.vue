@@ -41,11 +41,11 @@ const toDate = moment(new Date()).format('YYYY-MM-DD');
 const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
-    cargoMode: ["Air Cargo", "Sea Cargo"],
-    isUrgent: true,
-    isImportant: true,
-    createdBy: {},
-    zoneBy: {},
+    cargoMode: ["Air Cargo", "Sea Cargo", "Door to Door"],
+    isUrgent: '',
+    isImportant: '',
+    createdBy: '',
+    zoneBy: '',
 })
 
 const data = reactive({
@@ -402,6 +402,14 @@ const closeModal = () => {
                            type="checkbox"
                            value="Sea Cargo"/>
                     <span>Sea Cargo</span>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <input v-model="filters.cargoMode"
+                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                           type="checkbox"
+                           value="Door to Door"/>
+                    <span>Door to Door</span>
                 </label>
 
                 <FilterBorder/>

@@ -9,8 +9,10 @@ class IsImportantFilter implements FilterInterface
 {
     public function apply(Builder $query, $value)
     {
-        $value = (bool)$value;
+        if ($value) {
+            $value = (bool)$value;
 
-        return $query->where('is_from_important_customer', $value);
+            return $query->where('is_from_important_customer', $value);
+        }
     }
 }

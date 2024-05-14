@@ -9,8 +9,10 @@ class ZoneByFilter implements FilterInterface
 {
     public function apply(Builder $query, $value)
     {
-        $value = is_array($value) ? array_values($value) : $value;
+        if ($value) {
+            $value = !is_array($value) ? explode(',', $value) : $value;
 
-        return $query->orWhereIn('zone_id', [$value]);
+            return $query->whereIn('zone_id', $value);
+        }
     }
 }

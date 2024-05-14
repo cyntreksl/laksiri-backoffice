@@ -9,8 +9,10 @@ class CreatedByFilter implements FilterInterface
 {
     public function apply(Builder $query, $value)
     {
-        $value = is_array($value) ? array_values($value) : $value;
+        if ($value) {
+            $value = !is_array($value) ? explode(',', $value) : $value;
 
-        return $query->orWhereIn('created_by', [$value]);
+            return $query->whereIn('created_by', $value);
+        }
     }
 }
