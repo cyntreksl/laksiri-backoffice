@@ -1,169 +1,234 @@
-<script>
+<script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {Grid, h} from "gridjs";
 import {onMounted, reactive, ref} from "vue";
-import Popper from "vue3-popper";
+import {Grid, h} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
-import DeleteUserConfirmationModal from "@/Pages/User/Partials/DeleteUserConfirmationModal.vue";
+import moment from "moment";
+import FilterDrawer from "@/Components/FilterDrawer.vue";
+import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import DatePicker from "@/Components/DatePicker.vue";
+import FilterBorder from "@/Components/FilterBorder.vue";
+import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
+import Checkbox from "@/Components/Checkbox.vue";
 
-export default {
-    components: {DeleteUserConfirmationModal, AssignDriverModal, Breadcrumb, AppLayout, Popper},
-    props: {
-        pickups: {},
-        drivers: {},
+defineProps({
+    drivers: {
+        type: Object,
+        default: () => {
+        },
     },
-    setup(props) {
-        const wrapperRef = ref(null);
-        let grid = null;
+    users: {
+        type: Object,
+        default: () => {
+        },
+    },
+    zones: {
+        type: Object,
+        default: () => {
+        },
+    }
+})
 
-        const data = reactive({
-            pickupsData: props.pickups,
-            columnVisibility: {
-                id: false,
-                reference: true,
-                name: true,
-                email: false,
-                address: true,
-                contact: true,
-                cargoMode: true,
-                notes: false,
-                pickupDate: true,
-                pickupTimeStart: false,
-                pickupTimeEnd: false,
-                actions: true,
-            },
-        });
+const wrapperRef = ref(null);
+let grid = null;
 
-        onMounted(() => {
-            initializeGrid();
-        });
+const showFilters = ref(false);
+const fromDate = moment(new Date()).subtract(7, 'days').format('YYYY-MM-DD');
+const toDate = moment(new Date()).format('YYYY-MM-DD');
 
-        const initializeGrid = () => {
-            grid = new Grid({
-                search: true,
-                pagination: {
-                    enabled: true,
-                    limit: 10,
-                },
-                sort: true,
-                columns: createColumns(),
-                data: createData(),
-            });
+const filters = reactive({
+    fromDate: fromDate,
+    toDate: toDate,
+    cargoMode: ["Air Cargo", "Sea Cargo", "Door to Door"],
+    isUrgent: '',
+    isImportant: '',
+    createdBy: '',
+    zoneBy: '',
+})
 
-            grid.render(wrapperRef.value);
-        };
+const data = reactive({
+    columnVisibility: {
+        id: false,
+        reference: true,
+        name: true,
+        email: false,
+        address: true,
+        contact_number: true,
+        cargo_type: true,
+        pickup_date: true,
+        pickup_time_start: false,
+        pickup_time_end: false,
+        actions: true,
+    },
+});
 
-        const createColumns = () => [
-            {name: 'ID', hidden: !data.columnVisibility.id},
-            {name: 'Reference', hidden: !data.columnVisibility.reference},
-            {name: 'Name', hidden: !data.columnVisibility.name},
-            {name: 'Address', hidden: !data.columnVisibility.address},
-            {name: 'Contact', hidden: !data.columnVisibility.contact},
-            {name: 'Cargo Mode', hidden: !data.columnVisibility.cargoMode},
-            {name: 'Pickup Date', hidden: !data.columnVisibility.pickupDate},
-            {name: 'Start Pickup Time', hidden: !data.columnVisibility.pickupTimeStart},
-            {name: 'End Pickup Time', hidden: !data.columnVisibility.pickupTimeEnd},
-            {name: 'Email', hidden: !data.columnVisibility.email},
-            {name: 'Note', hidden: !data.columnVisibility.notes},
-            {
-                name: 'Actions',
-                sort: false,
-                hidden: !data.columnVisibility.actions,
-                formatter: (_, row) => {
-                    return h('div', {}, [
-                        h('button', {
-                            className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
-                            onClick: () => confirmAssignDriver(row.cells[0].data)
-                        }, [
-                            h('svg', {
-                                xmlns: 'http://www.w3.org/2000/svg',
-                                viewBox: '0 0 24 24',
-                                width: 24,
-                                height: 24,
-                                class: 'size-4.5 icon icon-tabler icons-tabler-outline icon-tabler-truck',
-                                fill: 'none',
-                                stroke: "currentColor",
-                                strokeWidth: 2,
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            }, [
-                                h('path', {
-                                    stroke: "none",
-                                    d: 'M0 0h24v24H0z',
-                                    fill: 'none',
-                                }),
-                                h('path', {
-                                    d: 'M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
-                                }),
-                                h('path', {
-                                    d: 'M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
-                                }),
-                                h('path', {
-                                    d: 'M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5',
-                                }),
-                            ])
-                        ]),
-                    ]);
-                },
-            },
-        ];
+const baseUrl = ref('/pickup-list')
 
-        const createData = () =>
-            data.pickupsData.map(pickup => [
-                pickup.id,
-                pickup.reference,
-                pickup.name,
-                pickup.address,
-                pickup.contact_number,
-                pickup.cargo_type,
-                pickup.pickup_date,
-                pickup.pickup_time_start,
-                pickup.pickup_time_end,
-                pickup.email,
-                pickup.notes,
-            ]);
+const toggleColumnVisibility = columnName => {
+    data.columnVisibility[columnName] = !data.columnVisibility[columnName];
+    updateGridConfig();
+    grid.forceRender();
+};
 
-        const toggleColumnVisibility = columnName => {
-            data.columnVisibility[columnName] = !data.columnVisibility[columnName];
-            updateGridConfig();
-            grid.forceRender();
-        };
+const initializeGrid = () => {
+    const visibleColumns = Object.keys(data.columnVisibility);
 
-        const updateGridConfig = () => {
-            grid.updateConfig({
-                columns: createColumns(),
-            });
-        };
+    grid = new Grid({
+        columns: createColumns(),
+        search: {
+            debounceTimeout: 1000,
+            server: {
+                url: (prev, keyword) => `${prev}?search=${keyword}`
+            }
+        },
+        sort: {
+            multiColumn: false,
+            server: {
+                url: (prev, columns) => {
+                    if (!columns.length) return prev;
+                    const col = columns[0];
+                    const dir = col.direction === 1 ? 'asc' : 'desc';
+                    let colName = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key])[col.index];
 
-        const showColumn = ref(false);
-
-        const showConfirmAssignDriverModal = ref(false);
-        const jobId = ref(null);
-
-        const confirmAssignDriver = (id) => {
-            jobId.value = id;
-            showConfirmAssignDriverModal.value = true;
-        };
-
-        const closeModal = () => {
-            showConfirmAssignDriverModal.value = false;
-            jobId.value = null;
+                    return `${prev}&order=${colName}&dir=${dir}`;
+                }
+            }
+        },
+        pagination: {
+            limit: 10,
+            server: {
+                url: (prev, page, limit) => `${prev}&limit=${limit}&offset=${page * limit}`
+            }
+        },
+        server: {
+            url: constructUrl(),
+            then: data => data.data.map(item => {
+                const row = [];
+                // row.push({id: item.id})
+                visibleColumns.forEach(column => {
+                    row.push(item[column]);
+                });
+                return row;
+            }),
+            total: response => {
+                if (response && response.meta && response.meta.total) {
+                    return response.meta.total;
+                } else {
+                    throw new Error('Invalid total count in server response');
+                }
+            }
         }
+    });
 
-        const showFilters = ref(false);
-        return {
-            grid,
-            wrapperRef,
-            data,
-            showColumn,
-            toggleColumnVisibility,
-            showConfirmAssignDriverModal,
-            closeModal,
-            jobId,
-            showFilters
-        };
+    grid.render(wrapperRef.value);
+};
+
+const createColumns = () => [
+    {name: 'ID', hidden: !data.columnVisibility.id},
+    {name: 'Reference', hidden: !data.columnVisibility.reference},
+    {name: 'Name', hidden: !data.columnVisibility.name},
+    {name: 'Email', hidden: !data.columnVisibility.email},
+    {name: 'Address', hidden: !data.columnVisibility.address},
+    {name: 'Contact', hidden: !data.columnVisibility.contact_number},
+    {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
+    {name: 'Pickup Date', hidden: !data.columnVisibility.pickup_date},
+    {name: 'Pickup Time Start', hidden: !data.columnVisibility.pickup_time_start},
+    {name: 'Pickup Time End', hidden: !data.columnVisibility.pickup_time_end},
+    {
+        name: 'Actions',
+        sort: false,
+        hidden: !data.columnVisibility.actions,
+        formatter: (_, row) => {
+            return h('div', {}, [
+                h('button', {
+                    className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
+                    onClick: () => confirmAssignDriver(row.cells[0].data)
+                }, [
+                    h('svg', {
+                        xmlns: 'http://www.w3.org/2000/svg',
+                        viewBox: '0 0 24 24',
+                        width: 24,
+                        height: 24,
+                        class: 'size-4.5 icon icon-tabler icons-tabler-outline icon-tabler-truck',
+                        fill: 'none',
+                        stroke: "currentColor",
+                        strokeWidth: 2,
+                        strokeLinecap: "round",
+                        strokeLinejoin: "round",
+                    }, [
+                        h('path', {
+                            stroke: "none",
+                            d: 'M0 0h24v24H0z',
+                            fill: 'none',
+                        }),
+                        h('path', {
+                            d: 'M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
+                        }),
+                        h('path', {
+                            d: 'M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
+                        }),
+                        h('path', {
+                            d: 'M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5',
+                        }),
+                    ])
+                ]),
+            ]);
+        },
     },
+];
+
+const updateGridConfig = () => {
+    grid.updateConfig({
+        columns: createColumns(),
+    });
+};
+
+onMounted(() => {
+    initializeGrid();
+})
+
+const constructUrl = () => {
+    const params = new URLSearchParams();
+    for (const key in filters) {
+        if (filters.hasOwnProperty(key)) {
+            params.append(key, filters[key].toString());
+        }
+    }
+    return baseUrl.value + '?' + params.toString();
+}
+
+const applyFilters = () => {
+    showFilters.value = false;
+    const newUrl = constructUrl();
+    const visibleColumns = Object.keys(data.columnVisibility);
+    grid.updateConfig({
+        server: {
+            url: newUrl,
+            then: data => data.data.map(item => {
+                const row = [];
+                visibleColumns.forEach(column => {
+                    row.push(item[column]);
+                });
+                return row;
+            }),
+        }
+    });
+    grid.forceRender();
+}
+
+const showConfirmAssignDriverModal = ref(false);
+const jobId = ref(null);
+
+const confirmAssignDriver = (id) => {
+    jobId.value = id;
+    showConfirmAssignDriverModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmAssignDriverModal.value = false;
+    jobId.value = null;
 }
 </script>
 <template>
@@ -175,140 +240,121 @@ export default {
         <div class="card mt-4">
             <div>
                 <div class="flex items-center justify-between p-2">
-                    <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                        Pending Pickups
-                    </h2>
+                    <div class="">
+                        <div class="flex">
+                            <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
+                                Pending Pickups
+                            </h2>
+                        </div>
 
-                    <div class="flex">
-                        <Popper >
-                            <button
-                                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
-                                <i class="fa-solid fa-grip"></i>
-                            </button>
-                            <template #content>
-                                <div class="max-w-[16rem]">
-                                    <div class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700">
-                                        <div
-                                            class="rounded-md border border-slate-150 bg-white p-4 dark:border-navy-600 dark:bg-navy-700">
-                                            <h3 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                                                Select Columns
-                                            </h3>
-                                            <p class="mt-1 text-xs+">Choose which columns you want to see </p>
-                                            <div class="mt-4 flex flex-col space-y-4 text-slate-600 dark:text-navy-100">
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.reference"
-                                                        @change="toggleColumnVisibility('reference', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Reference</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.name"
-                                                        @change="toggleColumnVisibility('name', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Name</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.address"
-                                                        @change="toggleColumnVisibility('address', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Address</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.contact"
-                                                        @change="toggleColumnVisibility('contact', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Contact</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.cargoMode"
-                                                        @change="toggleColumnVisibility('cargoMode', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Cargo Mode</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.notes"
-                                                        @change="toggleColumnVisibility('notes', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Note</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.pickupDate"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="toggleColumnVisibility('pickupDate', $event)"
-                                                    />
-                                                    <p>Pickup Date</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.pickupTimeStart"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="toggleColumnVisibility('pickupTimeStart', $event)"
-                                                    />
-                                                    <p>Start Pickup Date</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.pickupTimeEnd"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="toggleColumnVisibility('pickupTimeEnd', $event)"
-                                                    />
-                                                    <p>End Pickup Date</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.email"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="toggleColumnVisibility('email', $event)"
-                                                    />
-                                                    <p>Email</p>
-                                                </label>
-                                            </div>
-                                        </div>
+                        <div class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300">
+                            <div class="mr-4 cursor-pointer" x-tooltip.info.placement.bottom="'Applied Filters'">
+                                Filter Options:
+                            </div>
+                            <div class="flex -space-x-px">
+                                <div>
+                                    <div
+                                        class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
+                                        From Date
+                                    </div>
+                                    <div
+                                        class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+                                        {{ filters.fromDate }}
                                     </div>
                                 </div>
-                            </template>
-                        </Popper>
+                                <div>
+                                    <div
+                                        class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
+                                        To Date
+                                    </div>
+                                    <div
+                                        class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+                                        {{ filters.toDate }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div v-for="(mode, index) in filters.cargoMode" v-if="filters.cargoMode"
+                                         :key="index" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">{{
+                                            mode
+                                        }}
+                                    </div>
 
-                        <button @click="showFilters=true"
-                            class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
+                                    <div v-if="filters.isUrgent" class="badge bg-success text-white ml-2">
+                                        Is Urgent
+                                    </div>
+
+                                    <div v-if="filters.isImportant" class="badge bg-cyan-500 text-white ml-2">
+                                        Is Important to Customer
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="flex">
+                        <ColumnVisibilityPopover>
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.reference"
+                                          @change="toggleColumnVisibility('reference', $event)"/>
+                                <span class="hover:cursor-pointer">Reference</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.name"
+                                          @change="toggleColumnVisibility('name', $event)"/>
+                                <span class="hover:cursor-pointer">Name</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.email"
+                                          @change="toggleColumnVisibility('email', $event)"/>
+                                <span class="hover:cursor-pointer">Email</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.address"
+                                          @change="toggleColumnVisibility('address', $event)"/>
+                                <span class="hover:cursor-pointer">Address</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.contact_number"
+                                          @change="toggleColumnVisibility('contact_number', $event)"/>
+                                <span class="hover:cursor-pointer">Contact</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.cargo_type"
+                                          @change="toggleColumnVisibility('cargo_type', $event)"/>
+                                <span class="hover:cursor-pointer">Cargo Mode</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.pickup_date"
+                                          @change="toggleColumnVisibility('pickup_date', $event)"/>
+                                <span class="hover:cursor-pointer">Pickup Date</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.pickup_time_start"
+                                          @change="toggleColumnVisibility('pickup_time_start', $event)"/>
+                                <span class="hover:cursor-pointer">Pickup Time Start</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.pickup_time_end"
+                                          @change="toggleColumnVisibility('pickup_time_end', $event)"/>
+                                <span class="hover:cursor-pointer">Pickup Time End</span>
+                            </label>
+                        </ColumnVisibilityPopover>
+
+                        <button x-tooltip.placement.top="'Filters'" @click="showFilters=true"
+                                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                             <i class="fa-solid fa-filter"></i>
                         </button>
                     </div>
                 </div>
-
-
 
                 <div class=" mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
@@ -320,15 +366,136 @@ export default {
 
         <AssignDriverModal :drivers="drivers" :job-id="jobId" :show="showConfirmAssignDriverModal" @close="closeModal"/>
 
-        <div class="block" v-show="showFilters">
-            <div class="fixed inset-0 z-[100] bg-slate-900/60 transition-opacity duration-200 show block" x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
-            <div class="fixed right-0 top-0 z-[101] h-full w-72">
-                <div class="flex h-full w-full transform-gpu flex-col bg-white transition-transform duration-200 dark:bg-navy-700 show block" x-transition:enter="ease-out" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="ease-in" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
-<!--                 TODO close button-->
-<!--                 TODO Filters-->
-<!--                 TODO Filter Now Action Button-->
+        <FilterDrawer :show="showFilters" @close="showFilters = false">
+            <template #title>
+                Filter Pending Jobs
+            </template>
+
+            <template #content>
+                <div>
+                    <InputLabel value="From"/>
+                    <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
                 </div>
-            </div>
-        </div>
+
+                <div>
+                    <InputLabel value="To"/>
+                    <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
+                </div>
+
+                <FilterBorder/>
+
+                <div>
+                    <span class="font-medium">Cargo Mode</span>
+                </div>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <input v-model="filters.cargoMode"
+                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                           type="checkbox"
+                           value="Air Cargo"/>
+                    <span>Air Cargo</span>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <input v-model="filters.cargoMode"
+                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                           type="checkbox"
+                           value="Sea Cargo"/>
+                    <span>Sea Cargo</span>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <input v-model="filters.cargoMode"
+                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                           type="checkbox"
+                           value="Door to Door"/>
+                    <span>Door to Door</span>
+                </label>
+
+                <FilterBorder/>
+
+                <div>
+                    <span class="font-medium">Is Urgent</span>
+                </div>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <input v-model="filters.isUrgent"
+                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                           type="checkbox"
+                           value="true"/>
+                    <span>Is Urgent</span>
+                </label>
+
+                <FilterBorder/>
+
+                <div>
+                    <span class="font-medium">Is Important to Customer</span>
+                </div>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <input v-model="filters.isImportant"
+                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                           type="checkbox"
+                           value="true"/>
+                    <span>Is Important</span>
+                </label>
+
+                <FilterBorder/>
+
+                <div>
+                    <span class="font-medium">Created By</span>
+                </div>
+
+                <select
+                    v-model="filters.createdBy"
+                    autocomplete="off"
+                    class="w-full"
+                    multiple
+                    placeholder="Select a User..."
+                    x-init="$el._tom = new Tom($el,{
+            plugins: ['remove_button'],
+            create: true,
+          })"
+                >
+                    <option v-for="user in users" :value="user.id">{{ user.name }}</option>
+                </select>
+
+                <FilterBorder/>
+
+                <div>
+                    <span class="font-medium">Zone</span>
+                </div>
+
+                <select
+                    v-model="filters.zoneBy"
+                    autocomplete="off"
+                    class="w-full"
+                    multiple
+                    placeholder="Select a Zone..."
+                    x-init="$el._tom = new Tom($el,{
+            plugins: ['remove_button'],
+            create: true,
+          })"
+                >
+                    <option v-for="zone in zones" :value="zone.id">{{ zone.zone_name }}</option>
+                </select>
+
+
+                <!--Filter Now Action Button-->
+                <SoftPrimaryButton class="space-x-2" @click="applyFilters">
+                    <i class="fa-solid fa-filter"></i>
+                    <span>Apply Filters</span>
+                </SoftPrimaryButton>
+            </template>
+        </FilterDrawer>
     </AppLayout>
 </template>
+<style scoped>
+[type='checkbox']:checked {
+    background-image: none !important;
+}
+
+[type='checkbox']:focus, [type='radio']:focus {
+    --tw-ring-offset-width: 0 !important;
+}
+</style>

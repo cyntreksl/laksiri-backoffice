@@ -59,7 +59,7 @@ const breadcrumbs = computed(() => insertBetween(usePage().props.breadcrumbs || 
                         <Link
                             v-else
                             class="flex items-center text-primary space-x-1.5 transition-colors hover:text-primary-focus dark:text-accent-light dark:hover:text-accent"
-                            :href="page.url"
+                            :href="page.url ? page.url : ''"
                         >
                             <span>{{ page.title }}</span>
                         </Link>

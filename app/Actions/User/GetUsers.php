@@ -12,7 +12,8 @@ class GetUsers
 
     public function handle(): Collection|array
     {
-        return User::with(['branches', 'primaryBranch'])
+        return User::withoutRole('driver')
+            ->with(['branches', 'primaryBranch'])
             ->latest()
             ->get();
     }
