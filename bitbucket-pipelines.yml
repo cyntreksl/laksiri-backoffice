@@ -1,0 +1,178 @@
+image: atlassian/default-image:2
+
+definitions:
+  services:
+    mysql:
+      image: mysql:5.7
+      environment:
+        MYSQL_DATABASE: 'testing'
+        MYSQL_ROOT_PASSWORD: 'let_me_in'
+        MYSQL_USER: 'homestead'
+        MYSQL_PASSWORD: 'secret'
+    redis:
+      image: redis:3.2
+      memory: 512
+
+  steps:
+    - step: &composer
+        name: Composer & Migrations
+        image: php:8.2-fpm
+        services:
+          - mysql
+          - redis
+          - docker
+        caches:
+          - composer
+        script:
+          - php -v
+          - apt-get update
+          # Installing first the libraries necessary to configure and install gd
+          - apt-get install -y unzip libzip-dev libpng-dev zip git mariadb-client
+          # Now we can configure and install the extension
+          - docker-php-ext-configure zip
+          - docker-php-ext-install -j$(nproc) gd
+          - docker-php-ext-install pcntl
+          - docker-php-ext-install zip
+          - docker-php-ext-install pdo_mysql
+          - docker-php-ext-install exif
+          - docker-php-ext-install bcmath
+          - php -i | grep 'pcntl'
+          - php -i | grep 'zip'
+          - php -i | grep 'pdo_mysql'
+          - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+          - composer -V
+          - php -r "file_exists('.env') || copy('.env.example', '.env');"
+          - composer install
+          # library to check code security
+          - composer outdated
+          - php artisan key:generate
+          - ln -f -s .env.pipelines .env
+          - php artisan migrate --force
+        artifacts:
+          - .env
+          - vendor/**
+
+    - step: &test
+        name: Testing Application
+        image: php:8.2-fpm
+        script:
+          #- sed -i 's/DB_HOST=127.0.0.1/DB_HOST=mysql/g' .env
+          - cat .env
+          - docker-php-ext-install pdo_mysql
+          - vendor/bin/pint
+        services:
+          - mysql
+          - redis
+          - docker
+
+
+    - step: &unit-tests
+        name: Laravel Unit Tests
+        image: php:8.2-fpm
+        script:
+          - cat .env
+          - docker-php-ext-install pdo_mysql
+          - php artisan test
+        services:
+          - mysql
+          - redis
+          - docker
+
+
+    - step: &standards
+        name: Checking Code Standards - PSR2
+        image: php:8.2-fpm
+        script:
+          - vendor/bin/pint
+        services:
+          - mysql
+          - redis
+          - docker
+
+    - step: &build
+        name: Building Application
+        image: atlassian/default-image:2
+        script:
+          - zip -r application.zip -r * .[^.]* -x "vendor/*"
+        artifacts:
+          - application.zip
+        services:
+          - docker
+
+    - step: &frontend
+        name: Build Frontend Assets
+        image: node:16.18.1
+        script:
+          - npm ci
+          - npm run build
+        artifacts:
+          - public/build/assets/*
+          - public/build/*
+        services:
+          - docker
+
+
+    - step: &deploy
+        name: Deploy to Elastic beanstalk
+        script:
+          - pipe: atlassian/aws-elasticbeanstalk-deploy:0.5.5
+            variables:
+              ENVIRONMENT_NAME: ${ENVIRONMENT_NAME}
+              AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+              AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+              AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+              APPLICATION_NAME: ${APPLICATION_NAME}
+              ZIP_FILE: "application.zip"
+              S3_BUCKET: ${AWS_S3_BUCKET}
+              VERSION_LABEL: "$BITBUCKET_COMMIT-$BITBUCKET_BUILD_NUMBER"
+        artifacts:
+          - .env
+        services:
+          - docker
+
+
+    - step: &short-commit
+        name: Short Commit
+        script:
+          - echo $(echo $BITBUCKET_COMMIT | cut -c1-7) > .short-commit
+        artifacts:
+          - .short-commit
+
+
+push-staging: &push-test
+  step:
+    <<: *deploy
+    deployment: Test
+
+
+
+pipelines:
+  pull-requests:
+    '**':
+      - step:
+          <<: *composer
+      - step:
+          <<: *frontend
+      - parallel:
+          - step:
+              <<: *standards
+          - step:
+              <<: *unit-tests
+
+  branches:
+    master:
+      - parallel:
+          - step:
+              <<: *short-commit
+          - step:
+              <<: *composer
+      - step:
+          <<: *frontend
+      - step:
+          <<: *test
+      - step:
+          <<: *build
+      - <<: *push-test
+
+
+
