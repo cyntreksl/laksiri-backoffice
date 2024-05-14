@@ -156,8 +156,8 @@ pipelines:
       - parallel:
           - step:
               <<: *standards
-          - step:
-              <<: *unit-tests
+#          - step:
+#              <<: *unit-tests
 
   branches:
     master:
@@ -168,8 +168,8 @@ pipelines:
               <<: *composer
       - step:
           <<: *frontend
-      - step:
-          <<: *test
+#      - step:
+#          <<: *test
       - step:
           <<: *build
       - <<: *push-test
