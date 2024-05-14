@@ -13,14 +13,14 @@ import InputLabel from "@/Components/InputLabel.vue";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import FilterBorder from "@/Components/FilterBorder.vue";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
+import moment from "moment";
 
 const wrapperRef = ref(null);
 let grid = null;
 
 const showFilters = ref(false);
-const currentDate = new Date();
-const fromDate = new Date(currentDate.setDate(currentDate.getDate() - 30)).toISOString().split('T')[0];
-const toDate = new Date().toISOString().split('T')[0];
+const fromDate = moment(new Date()).subtract(1, 'months').format('YYYY-MM-DD');
+const toDate = moment(new Date()).format('YYYY-MM-DD');
 
 const filters = reactive({
     fromDate: fromDate,
@@ -105,7 +105,11 @@ const createColumns = () => [
     {name: 'Username', hidden: !data.columnVisibility.username},
     {name: 'Name', hidden: !data.columnVisibility.name},
     {name: 'Primary Branch Name', hidden: !data.columnVisibility.primary_branch_name, sort: false},
-    {name: 'Created At', hidden: !data.columnVisibility.created_at},
+    {
+        name: 'Created At',
+        hidden: !data.columnVisibility.created_at,
+        formatter: (cell) => moment(cell).format('MMMM Do YYYY, h:mm:ss A')
+    },
     {
         name: 'Status',
         hidden: !data.columnVisibility.status,

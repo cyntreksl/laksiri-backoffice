@@ -6,6 +6,7 @@ import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h} from "gridjs";
 import {RowSelection} from "gridjs/plugins/selection";
 import {push} from "notivue";
+import moment from "moment";
 
 export default {
     components: {AppLayout, Breadcrumb, Popper, RowSelection},
@@ -15,9 +16,8 @@ export default {
     },
     setup(props) {
         const showFilters = ref(false);
-        const currentDate = new Date();
-        const fromDate = new Date(currentDate.setDate(currentDate.getDate() - 30)).toISOString().split('T')[0];
-        const toDate = new Date().toISOString().split('T')[0];
+        const fromDate = moment(new Date()).subtract(1, 'months').format('YYYY-MM-DD');
+        const toDate = moment(new Date()).format('YYYY-MM-DD');
         const wrapperRef = ref(null);
         let grid = null;
 
