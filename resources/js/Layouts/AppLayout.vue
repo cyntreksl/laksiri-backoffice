@@ -842,6 +842,7 @@ export default {
                         },
 
                     );
+                    break;
                 case "settings":
                     childMenuList.splice(
                         0,
