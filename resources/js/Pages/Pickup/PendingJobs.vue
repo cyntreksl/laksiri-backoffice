@@ -18,6 +18,16 @@ defineProps({
         type: Object,
         default: () => {
         },
+    },
+    users: {
+        type: Object,
+        default: () => {
+        },
+    },
+    zones: {
+        type: Object,
+        default: () => {
+        },
     }
 })
 
@@ -34,6 +44,8 @@ const filters = reactive({
     cargoMode: ["Air Cargo", "Sea Cargo"],
     isUrgent: true,
     isImportant: true,
+    createdBy: {},
+    zoneBy: {},
 })
 
 const data = reactive({
@@ -338,7 +350,7 @@ const closeModal = () => {
                         </ColumnVisibilityPopover>
 
                         <button x-tooltip.placement.top="'Filters'" @click="showFilters=true"
-                            class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
+                                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                             <i class="fa-solid fa-filter"></i>
                         </button>
                     </div>
@@ -377,14 +389,16 @@ const closeModal = () => {
                 </div>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.cargoMode" class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                    <input v-model="filters.cargoMode"
+                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                            type="checkbox"
                            value="Air Cargo"/>
                     <span>Air Cargo</span>
                 </label>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.cargoMode" class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                    <input v-model="filters.cargoMode"
+                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                            type="checkbox"
                            value="Sea Cargo"/>
                     <span>Sea Cargo</span>
@@ -397,7 +411,8 @@ const closeModal = () => {
                 </div>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.isUrgent" class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                    <input v-model="filters.isUrgent"
+                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                            type="checkbox"
                            value="true"/>
                     <span>Is Urgent</span>
@@ -410,11 +425,53 @@ const closeModal = () => {
                 </div>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.isImportant" class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                    <input v-model="filters.isImportant"
+                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                            type="checkbox"
                            value="true"/>
                     <span>Is Important</span>
                 </label>
+
+                <FilterBorder/>
+
+                <div>
+                    <span class="font-medium">Created By</span>
+                </div>
+
+                <select
+                    v-model="filters.createdBy"
+                    autocomplete="off"
+                    class="w-full"
+                    multiple
+                    placeholder="Select a User..."
+                    x-init="$el._tom = new Tom($el,{
+            plugins: ['remove_button'],
+            create: true,
+          })"
+                >
+                    <option v-for="user in users" :value="user.id">{{ user.name }}</option>
+                </select>
+
+                <FilterBorder/>
+
+                <div>
+                    <span class="font-medium">Zone</span>
+                </div>
+
+                <select
+                    v-model="filters.zoneBy"
+                    autocomplete="off"
+                    class="w-full"
+                    multiple
+                    placeholder="Select a Zone..."
+                    x-init="$el._tom = new Tom($el,{
+            plugins: ['remove_button'],
+            create: true,
+          })"
+                >
+                    <option v-for="zone in zones" :value="zone.id">{{ zone.zone_name }}</option>
+                </select>
+
 
                 <!--Filter Now Action Button-->
                 <SoftPrimaryButton class="space-x-2" @click="applyFilters">
