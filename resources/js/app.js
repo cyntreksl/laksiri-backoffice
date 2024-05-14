@@ -82,6 +82,15 @@ const notivue = createNotivue({
 
 import Popper from "vue3-popper";
 import {createNotivue} from "notivue";
+import moment from "moment";
+
+const momentPlugin = {
+    install(app) {
+        // Attach moment to Vue 3 global properties, to make it globally available.
+        // https://vuejs.org/guide/reusability/plugins.html#writing-a-plugin
+        app.config.globalProperties.$moment = moment
+    }
+}
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -91,6 +100,7 @@ createInertiaApp({
             .use(plugin)
             // .use(Popper)
             .use(ZiggyVue)
+            .use(momentPlugin)
             .use(pinia)
             .use(notivue)
             .mount(el);
