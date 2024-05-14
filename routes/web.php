@@ -32,10 +32,15 @@ Route::middleware([
 
     // Pick Up
     Route::resource('pickups', PickupController::class);
+
+    Route::get('pickup-list', [PickupController::class, 'list']);
+
     Route::put('pickups/{pickup}/driver/update', [PickupController::class, 'updateDriver'])
         ->name('pickups.driver.update');
+
     // HBL
     Route::resource('hbls', HBLController::class);
+
     // User
     Route::resource('users', UserController::class)
         ->except(['create', 'show']);
