@@ -228,9 +228,57 @@ const closeModal = () => {
         <div class="card mt-4">
             <div>
                 <div class="flex items-center justify-between p-2">
-                    <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                        Pending Pickups
-                    </h2>
+                    <div class="">
+                        <div class="flex">
+                            <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
+                                Pending Pickups
+                            </h2>
+                        </div>
+
+                        <div class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300">
+                            <div class="mr-4 cursor-pointer" x-tooltip.info.placement.bottom="'Applied Filters'">
+                                Filter Options:
+                            </div>
+                            <div class="flex -space-x-px">
+                                <div>
+                                    <div
+                                        class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
+                                        From Date
+                                    </div>
+                                    <div
+                                        class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+                                        {{ filters.fromDate }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div
+                                        class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
+                                        To Date
+                                    </div>
+                                    <div
+                                        class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+                                        {{ filters.toDate }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div v-for="(mode, index) in filters.cargoMode" v-if="filters.cargoMode"
+                                         :key="index" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">{{
+                                            mode
+                                        }}
+                                    </div>
+
+                                    <div v-if="filters.isUrgent" class="badge bg-success text-white ml-2">
+                                        Is Urgent
+                                    </div>
+
+                                    <div v-if="filters.isImportant" class="badge bg-cyan-500 text-white ml-2">
+                                        Is Important to Customer
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div class="flex">
                         <ColumnVisibilityPopover>
