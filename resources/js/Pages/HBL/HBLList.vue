@@ -35,6 +35,8 @@ const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo", "Door to Door"],
+    hblType: ["UBP", "Gift", "Door to Door"],
+    warehouse: ["COLOMBO", "NINTAVUR"],
     createdBy: '',
 })
 
@@ -52,6 +54,7 @@ const data = reactive({
         contact_number: true,
         cargo_type: true,
         hbl_type: true,
+        warehouse: true,
         status: false,
         actions: true,
     }
@@ -131,6 +134,7 @@ const createColumns = () => [
     {name: 'Contact', hidden: !data.columnVisibility.contact_number},
     {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
     {name: 'HBL Type', hidden: !data.columnVisibility.hbl_type},
+    {name: 'Warehouse', hidden: !data.columnVisibility.warehouse},
     {name: 'Status', hidden: !data.columnVisibility.status},
     {
         name: 'Actions',
@@ -268,6 +272,19 @@ const applyFilters = () => {
                                             mode
                                         }}
                                     </div>
+
+                                    <div v-for="(type, index) in filters.hblType" v-if="filters.hblType"
+                                         :key="index" class="badge bg-fuchsia-600 text-white dark:bg-fuchsia-600 ml-2">
+                                        {{
+                                            type
+                                        }}
+                                    </div>
+
+                                    <div v-for="(item, index) in filters.warehouse" v-if="filters.warehouse"
+                                         :key="index" class="badge bg-pink-600 text-white dark:bg-pink-600 ml-2">{{
+                                            item
+                                        }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -342,6 +359,12 @@ const applyFilters = () => {
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.warehouse"
+                                          @change="toggleColumnVisibility('warehouse', $event)"/>
+                                <span class="hover:cursor-pointer">Warehouse</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
                                 <Checkbox :checked="data.columnVisibility.status"
                                           @change="toggleColumnVisibility('status', $event)"/>
                                 <span class="hover:cursor-pointer">Status</span>
@@ -393,6 +416,34 @@ const applyFilters = () => {
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch v-model="filters.cargoMode" label="Door to Door" value="Door to Door"/>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="HBL Type"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.hblType" label="UBP" value="UBP"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.hblType" label="Gift" value="Gift"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.hblType" label="Door to Door" value="Door to Door"/>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Warehouse"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.warehouse" label="COLOMBO" value="COLOMBO"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.warehouse" label="NINTAVUR" value="NINTAVUR"/>
                 </label>
 
                 <FilterBorder/>

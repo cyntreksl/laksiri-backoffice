@@ -40,7 +40,7 @@ class HBLController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse']);
 
         return $this->HBLRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
