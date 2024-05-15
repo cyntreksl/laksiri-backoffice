@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\CurrentBranchZonesScope;
+use App\Models\Scopes\BranchScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-#[ScopedBy(CurrentBranchZonesScope::class)]
+#[ScopedBy(BranchScope::class)]
 class Zone extends Model
 {
     use HasFactory;
