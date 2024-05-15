@@ -13,6 +13,7 @@ import FilterBorder from "@/Components/FilterBorder.vue";
 import moment from "moment";
 import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
+import Switch from "@/Components/Switch.vue";
 
 defineProps({
     users: {
@@ -345,27 +346,15 @@ const applyFilters = () => {
                 </div>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.cargoMode"
-                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                           type="checkbox"
-                           value="Air Cargo"/>
-                    <span>Air Cargo</span>
+                    <Switch v-model="filters.cargoMode" label="Air Cargo" value="Air Cargo"/>
                 </label>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.cargoMode"
-                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                           type="checkbox"
-                           value="Sea Cargo"/>
-                    <span>Sea Cargo</span>
+                    <Switch v-model="filters.cargoMode" label="Sea Cargo" value="Sea Cargo"/>
                 </label>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.cargoMode"
-                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                           type="checkbox"
-                           value="Door to Door"/>
-                    <span>Door to Door</span>
+                    <Switch v-model="filters.cargoMode" label="Door to Door" value="Door to Door"/>
                 </label>
 
                 <FilterBorder/>

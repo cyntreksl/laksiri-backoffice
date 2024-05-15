@@ -12,6 +12,7 @@ import DatePicker from "@/Components/DatePicker.vue";
 import FilterBorder from "@/Components/FilterBorder.vue";
 import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
+import Switch from "@/Components/Switch.vue";
 
 defineProps({
     drivers: {
@@ -389,27 +390,15 @@ const closeModal = () => {
                 </div>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.cargoMode"
-                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                           type="checkbox"
-                           value="Air Cargo"/>
-                    <span>Air Cargo</span>
+                    <Switch v-model="filters.cargoMode" label="Air Cargo" value="Air Cargo"/>
                 </label>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.cargoMode"
-                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                           type="checkbox"
-                           value="Sea Cargo"/>
-                    <span>Sea Cargo</span>
+                    <Switch v-model="filters.cargoMode" label="Sea Cargo" value="Sea Cargo"/>
                 </label>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.cargoMode"
-                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                           type="checkbox"
-                           value="Door to Door"/>
-                    <span>Door to Door</span>
+                    <Switch v-model="filters.cargoMode" label="Door to Door" value="Door to Door"/>
                 </label>
 
                 <FilterBorder/>
@@ -419,11 +408,7 @@ const closeModal = () => {
                 </div>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.isUrgent"
-                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                           type="checkbox"
-                           value="true"/>
-                    <span>Is Urgent</span>
+                    <Switch v-model="filters.isUrgent" label="Is Urgent" value="true"/>
                 </label>
 
                 <FilterBorder/>
@@ -433,11 +418,7 @@ const closeModal = () => {
                 </div>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <input v-model="filters.isImportant"
-                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                           type="checkbox"
-                           value="true"/>
-                    <span>Is Important</span>
+                    <Switch v-model="filters.isImportant" label="Is Important" value="true"/>
                 </label>
 
                 <FilterBorder/>
@@ -490,12 +471,3 @@ const closeModal = () => {
         </FilterDrawer>
     </AppLayout>
 </template>
-<style scoped>
-[type='checkbox']:checked {
-    background-image: none !important;
-}
-
-[type='checkbox']:focus, [type='radio']:focus {
-    --tw-ring-offset-width: 0 !important;
-}
-</style>
