@@ -16,6 +16,10 @@ class CreateUser
             $data['created_by'] = auth()->id();
         }
 
+        if (empty($data['preferred_zone'])) {
+            $data['preferred_zone'] = null;
+        }
+
         $user = User::create($data);
 
         // assign role
