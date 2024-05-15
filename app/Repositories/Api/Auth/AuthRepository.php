@@ -35,7 +35,7 @@ class AuthRepository implements AuthRepositoryInterface
 
         if (Auth::attempt($credentials)) {
             if (Auth::user()->hasRole('driver')) {
-                $token = Auth::user()->createToken('DriverAuthToken')->plainTextToken;
+                $token = Auth::user()->createToken('DriverAuthToken')->accessToken;
 
                 activity()
                     ->causedBy(Auth::user())
