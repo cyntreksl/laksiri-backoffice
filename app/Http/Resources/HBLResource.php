@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Http\Resources;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class HBLResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'reference' => $this->reference,
+            'cargo_type' => $this->cargo_type,
+            'hbl_type' => $this->hbl_type,
+            'hbl' => $this->hbl,
+            'hbl_name' => $this->hbl_name,
+            'email' => $this->email,
+            'contact_number' => $this->contact_number,
+            'nic' => $this->nic,
+            'iq_number' => $this->iq_number,
+            'address' => $this->address,
+            'consignee_name' => $this->consignee_name,
+            'consignee_nic' => $this->consignee_nic,
+            'consignee_contact' => $this->consignee_contact,
+            'consignee_address' => $this->consignee_address,
+            'consignee_note' => $this->consignee_note,
+            'warehouse' => $this->warehouse,
+            'freight_charge' => $this->freight_charge,
+            'bill_charge' => $this->bill_charge,
+            'other_charge' => $this->other_charge,
+            'discount' => $this->discount,
+            'paid_amount' => $this->paid_amount,
+            'grand_total' => $this->grand_total,
+            'status' => $this->status,
+            'created_by' => User::find($this->created_by)->name,
+        ];
+    }
+}

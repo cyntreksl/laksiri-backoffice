@@ -8,12 +8,17 @@ use App\Enum\WarehouseType;
 use App\Http\Requests\StoreHBLRequest;
 use App\Http\Requests\UpdateHBLRequest;
 use App\Interfaces\HBLRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class HBLController extends Controller
 {
-    public function __construct(private readonly HBLRepositoryInterface $HBLRepository)
+    public function __construct(
+        private readonly HBLRepositoryInterface  $HBLRepository,
+        private readonly UserRepositoryInterface $userRepository
+    )
     {
     }
 
@@ -22,11 +27,22 @@ class HBLController extends Controller
      */
     public function index()
     {
-        $hbls = $this->HBLRepository->getHBLs();
-
         return Inertia::render('HBL/HBLList', [
-            'hbls' => $hbls,
+            'users' => $this->userRepository->getUsers(),
         ]);
+    }
+
+    public function list(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy']);
+
+        return $this->HBLRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 
     /**
