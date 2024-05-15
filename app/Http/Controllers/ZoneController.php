@@ -30,16 +30,14 @@ class ZoneController extends Controller
 
         $query = Zone::query()->with('areas');
 
-        if (! empty($search)) {
-            $query->where('name', 'like', '%'.$search.'%');
+        if (!empty($search)) {
+            $query->searchByZoneOrArea($search);
         }
 
         $zones = $query->orderBy($order, $dir)
             ->skip($page)
             ->take($limit)
             ->get();
-
-//        $zones = $this->zoneRepository->getZones();
 
         $totalZones = Zone::count();
 
