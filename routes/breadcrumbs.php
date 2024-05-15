@@ -25,6 +25,7 @@ Breadcrumbs::for('pickups.create', function (BreadcrumbTrail $trail) {
 // HBLs
 Breadcrumbs::for('hbls.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
+    $trail->push('HBL List');
     $trail->push('HBL List', route('hbls.index'));
 });
 
