@@ -4,6 +4,9 @@ import {router, useForm} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {reactive, ref, watch} from "vue";
 import notification from "@/magics/notification.js";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
+import InputError from "@/Components/InputError.vue";
 
 defineProps({
     hblTypes: {
@@ -211,40 +214,6 @@ const calculatePayment = () =>{
                             </h2>
                         </div>
                         <div class="grid grid-cols-3 gap-5 mt-3">
-                            <!--                            <div class="col-span-1">-->
-                            <!--                                <span>HBL</span>-->
-                            <!--                                <label class="relative flex">-->
-                            <!--                                    <input-->
-                            <!--                                        v-model="form.hbl"-->
-                            <!--                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
-                            <!--                                        placeholder="HBL"-->
-                            <!--                                        type="text"-->
-                            <!--                                    />-->
-                            <!--                                    <div-->
-                            <!--                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"-->
-                            <!--                                    >-->
-                            <!--                                        <svg-->
-                            <!--                                            xmlns="http://www.w3.org/2000/svg"-->
-                            <!--                                            fill="none"-->
-                            <!--                                            viewBox="0 0 24 24"-->
-                            <!--                                            stroke-width="1.5"-->
-                            <!--                                            stroke="currentColor"-->
-                            <!--                                            class="size-4.5 transition-colors duration-200"-->
-                            <!--                                        >-->
-                            <!--                                            <path-->
-                            <!--                                                stroke-linecap="round"-->
-                            <!--                                                stroke-linejoin="round"-->
-                            <!--                                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"-->
-                            <!--                                            />-->
-                            <!--                                        </svg>-->
-                            <!--                                    </div>-->
-                            <!--                                </label>-->
-                            <!--                                <span-->
-                            <!--                                    v-if="form.errors.hbl"-->
-                            <!--                                    class="text-tiny+ text-error"-->
-                            <!--                                >{{ form.errors.hbl }}</span>-->
-                            <!--                            </div>-->
-
                             <div class="col-span-3">
                                 <span>Name</span>
                                 <label class="relative flex">
@@ -273,10 +242,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.hbl_name"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.hbl_name }}</span>
+                                <InputError :message="form.errors.hbl_name"/>
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-5 mt-3">
@@ -308,10 +274,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.email"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.email }}</span>
+                                <InputError :message="form.errors.email"/>
                             </div>
 
                             <div>
@@ -332,10 +295,7 @@ const calculatePayment = () =>{
                                         type="text"
                                     />
                                 </div>
-                                <span
-                                    v-if="form.errors.contact_number"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.contact_number }}</span>
+                                <InputError :message="form.errors.contact_number"/>
                             </div>
 
                             <div>
@@ -366,10 +326,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.nic"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.nic }}</span>
+                                <InputError :message="form.errors.nic"/>
                             </div>
 
                             <div>
@@ -400,10 +357,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.iq_number"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.iq_number }}</span>
+                                <InputError :message="form.errors.iq_number"/>
                             </div>
 
                             <div class="col-span-2">
@@ -416,10 +370,7 @@ const calculatePayment = () =>{
                                         class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     ></textarea>
                                 </label>
-                                <span
-                                    v-if="form.errors.address"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.address }}</span>
+                                <InputError :message="form.errors.address"/>
                             </div>
                         </div>
                     </div>
@@ -461,10 +412,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.consignee_name"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.consignee_name }}</span>
+                                <InputError :message="form.errors.consignee_name"/>
                             </div>
 
                             <div>
@@ -495,10 +443,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.consignee_nic"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.consignee_nic }}</span>
+                                <InputError :message="form.errors.consignee_nic"/>
                             </div>
 
                             <div>
@@ -519,10 +464,7 @@ const calculatePayment = () =>{
                                         type="text"
                                     />
                                 </div>
-                                <span
-                                    v-if="form.errors.consignee_contact"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.consignee_contact }}</span>
+                                <InputError :message="form.errors.consignee_contact"/>
                             </div>
 
                             <div class="col-span-2">
@@ -535,10 +477,7 @@ const calculatePayment = () =>{
                                         class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     ></textarea>
                                 </label>
-                                <span
-                                    v-if="form.errors.consignee_address"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.consignee_address }}</span>
+                                <InputError :message="form.errors.consignee_address"/>
                             </div>
 
                             <div class="col-span-2">
@@ -551,10 +490,7 @@ const calculatePayment = () =>{
                                         class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     ></textarea>
                                 </label>
-                                <span
-                                    v-if="form.errors.consignee_name"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.consignee_name }}</span>
+                                <InputError :message="form.errors.consignee_name"/>
                             </div>
                         </div>
                     </div>
@@ -562,16 +498,10 @@ const calculatePayment = () =>{
                 <div class="sm:col-span-2 space-y-5">
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-5">
-                        <button
-                            class="btn border border-error font-medium text-error hover:bg-error hover:text-white focus:bg-error focus:text-white active:bg-error/90"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            :disabled="form.processing"
-                            :class="{ 'opacity-50': form.processing }"
-                            class="btn space-x-2 border border-warning/30 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                        <DangerOutlineButton @click="router.visit(route('hbls.index'))">Cancel</DangerOutlineButton>
+                        <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
+                                       class="space-x-2"
+                                       type="submit"
                         >
                             <span>Create a HBL</span>
                             <svg
@@ -588,7 +518,7 @@ const calculatePayment = () =>{
                                     d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
                                 />
                             </svg>
-                        </button>
+                        </PrimaryButton>
                     </div>
 
                     <!-- Cargo Type -->
@@ -616,10 +546,7 @@ const calculatePayment = () =>{
                                     <p>{{ cargoType }}</p>
                                 </label>
                             </div>
-                            <span
-                                v-if="form.errors.cargo_type"
-                                class="text-tiny+ text-error"
-                            >{{ form.errors.cargo_type }}</span>
+                            <InputError :message="form.errors.cargo_type"/>
                         </div>
                     </div>
 
@@ -648,10 +575,7 @@ const calculatePayment = () =>{
                                     <p>{{ hblType }}</p>
                                 </label>
                             </div>
-                            <span
-                                v-if="form.errors.hbl_type"
-                                class="text-tiny+ text-error"
-                            >{{ form.errors.hbl_type }}</span>
+                            <InputError :message="form.errors.hbl_type"/>
                         </div>
                     </div>
 
@@ -680,10 +604,7 @@ const calculatePayment = () =>{
                                     <p>{{ warehouse }}</p>
                                 </label>
                             </div>
-                            <span
-                                v-if="form.errors.warehouse"
-                                class="text-tiny+ text-error"
-                            >{{ form.errors.warehouse }}</span>
+                            <InputError :message="form.errors.warehouse"/>
                         </div>
                     </div>
 
@@ -710,10 +631,7 @@ const calculatePayment = () =>{
                                         min="0"
                                     />
                                 </label>
-                                <span
-                                    v-if="form.errors.freight_charge"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.freight_charge }}</span>
+                                <InputError :message="form.errors.freight_charge"/>
                             </div>
 
                             <div>
@@ -726,10 +644,7 @@ const calculatePayment = () =>{
                                         min="0"
                                     />
                                 </label>
-                                <span
-                                    v-if="form.errors.bill_charge"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.bill_charge }}</span>
+                                <InputError :message="form.errors.bill_charge"/>
                             </div>
 
                             <div>
@@ -742,10 +657,7 @@ const calculatePayment = () =>{
                                         min="0"
                                     />
                                 </label>
-                                <span
-                                    v-if="form.errors.other_charge"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.other_charge }}</span>
+                                <InputError :message="form.errors.other_charge"/>
                             </div>
 
                             <div>
@@ -758,10 +670,7 @@ const calculatePayment = () =>{
                                         type="number"
                                     />
                                 </label>
-                                <span
-                                    v-if="form.errors.discount"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.discount }}</span>
+                                <InputError :message="form.errors.discount"/>
                             </div>
 
                             <div class="col-span-2">
@@ -774,10 +683,7 @@ const calculatePayment = () =>{
                                         min="0"
                                     />
                                 </label>
-                                <span
-                                    v-if="form.errors.paid_amount"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.paid_amount }}</span>
+                                <InputError :message="form.errors.paid_amount"/>
                             </div>
 
                             <div class="col-start-2 mt-2 space-y-2.5 font-bold">
