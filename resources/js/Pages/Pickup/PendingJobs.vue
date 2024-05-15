@@ -13,6 +13,7 @@ import FilterBorder from "@/Components/FilterBorder.vue";
 import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
+import FilterHeader from "@/Components/FilterHeader.vue";
 
 defineProps({
     drivers: {
@@ -385,9 +386,7 @@ const closeModal = () => {
 
                 <FilterBorder/>
 
-                <div>
-                    <span class="font-medium">Cargo Mode</span>
-                </div>
+                <FilterHeader value="Cargo Mode"/>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch v-model="filters.cargoMode" label="Air Cargo" value="Air Cargo"/>
@@ -403,9 +402,7 @@ const closeModal = () => {
 
                 <FilterBorder/>
 
-                <div>
-                    <span class="font-medium">Is Urgent</span>
-                </div>
+                <FilterHeader value="Is Urgent"/>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch v-model="filters.isUrgent" label="Is Urgent" value="true"/>
@@ -413,9 +410,7 @@ const closeModal = () => {
 
                 <FilterBorder/>
 
-                <div>
-                    <span class="font-medium">Is Important to Customer</span>
-                </div>
+                <FilterHeader value="Is Important to Customer"/>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch v-model="filters.isImportant" label="Is Important" value="true"/>
@@ -423,9 +418,7 @@ const closeModal = () => {
 
                 <FilterBorder/>
 
-                <div>
-                    <span class="font-medium">Created By</span>
-                </div>
+                <FilterHeader value="Created By"/>
 
                 <select
                     v-model="filters.createdBy"
@@ -443,9 +436,7 @@ const closeModal = () => {
 
                 <FilterBorder/>
 
-                <div>
-                    <span class="font-medium">Zone</span>
-                </div>
+                <FilterHeader value="Zone"/>
 
                 <select
                     v-model="filters.zoneBy"

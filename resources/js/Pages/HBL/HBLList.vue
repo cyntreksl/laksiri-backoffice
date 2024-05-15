@@ -14,6 +14,7 @@ import moment from "moment";
 import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
+import FilterHeader from "@/Components/FilterHeader.vue";
 
 defineProps({
     users: {
@@ -341,9 +342,7 @@ const applyFilters = () => {
 
                 <FilterBorder/>
 
-                <div>
-                    <span class="font-medium">Cargo Mode</span>
-                </div>
+                <FilterHeader value="Cargo Mode"/>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch v-model="filters.cargoMode" label="Air Cargo" value="Air Cargo"/>
@@ -359,9 +358,7 @@ const applyFilters = () => {
 
                 <FilterBorder/>
 
-                <div>
-                    <span class="font-medium">Created By</span>
-                </div>
+                <FilterHeader value="Created By"/>
 
                 <select
                     v-model="filters.createdBy"
