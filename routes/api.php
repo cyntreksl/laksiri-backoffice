@@ -11,6 +11,7 @@ Route::get('/user', function (Request $request) {
 
 Route::middleware(['auth:sanctum',])->prefix('/v1/')->group(function () {
     Route::get('/pending-pickup-list', [PickupController::class, 'index']);
+    Route::post('/pickup-to-hbl/{pickUp}', [PickupController::class, 'pickupToHbl']);
 });
 
 Route::post('/login', [LoginController::class, 'login']);

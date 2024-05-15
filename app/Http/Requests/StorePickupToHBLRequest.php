@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+
+class StorePickupToHBLRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'hbl_type' => ['required'],
+            'nic' => ['nullable'],
+            'iq_number' => ['nullable'],
+            'consignee_name' => ['required'],
+            'consignee_nic' => ['required'],
+            'consignee_contact' => ['required'],
+            'consignee_address' => ['required'],
+            'consignee_note' => ['nullable'],
+            'warehouse' => ['required'],
+            'freight_charge' => ['required', 'numeric'],
+            'bill_charge' => ['required', 'numeric'],
+            'other_charge' => ['required', 'numeric'],
+            'discount' => ['required', 'numeric'],
+            'paid_amount' => ['required', 'numeric'],
+        ];
+    }
+}
