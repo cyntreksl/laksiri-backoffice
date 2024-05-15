@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
+use App\Actions\HBL\DeleteHBL;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetTotalHBLCount;
 use App\Factory\HBL\FilterFactory;
@@ -55,5 +56,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function deleteHBL(HBL $hbl)
+    {
+        return DeleteHBL::run($hbl);
     }
 }

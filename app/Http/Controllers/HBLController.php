@@ -16,7 +16,7 @@ use Inertia\Inertia;
 class HBLController extends Controller
 {
     public function __construct(
-        private readonly HBLRepositoryInterface  $HBLRepository,
+        private readonly HBLRepositoryInterface $HBLRepository,
         private readonly UserRepositoryInterface $userRepository
     )
     {
@@ -92,8 +92,8 @@ class HBLController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(HBL $hBL)
+    public function destroy(HBL $hbl)
     {
-        //
+        $this->HBLRepository->deleteHBL($hbl);
     }
 }
