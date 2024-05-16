@@ -4,8 +4,8 @@ use App\Http\Controllers\CashSettlementController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
-use App\Http\Controllers\ZoneController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ZoneController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -41,6 +41,8 @@ Route::middleware([
 
     // HBL
     Route::resource('hbls', HBLController::class);
+
+    Route::get('hbl-list', [HBLController::class, 'list']);
 
     // User
     Route::resource('users', UserController::class)
@@ -173,4 +175,3 @@ Route::middleware([
 
     });
 });
-

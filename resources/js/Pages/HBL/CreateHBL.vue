@@ -4,6 +4,13 @@ import {router, useForm} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {reactive, ref, watch} from "vue";
 import notification from "@/magics/notification.js";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
+import InputError from "@/Components/InputError.vue";
+import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import {push} from "notivue";
+import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 
 defineProps({
     hblTypes: {
@@ -45,7 +52,7 @@ const form = useForm({
     discount: 0,
     paid_amount: 0,
     grand_total: 0,
-    packages:{}
+    packages: {}
 });
 
 const handleHBLCreate = () => {
@@ -92,25 +99,27 @@ const addPackageData = () => {
         return;
     }
 
+    if (editMode.value) {
+        packageList.value.splice(editIndex.value, 1, {...packageItem})
+    } else {
+        const newItem = {...packageItem}; // Create a copy of packageItem
+        packageList.value.push(newItem); // Add the new item to packageList
+        form.packages = packageList.value;
 
-    const newItem = { ...packageItem }; // Create a copy of packageItem
-    packageList.value.push(newItem); // Add the new item to packageList
-    form.packages = packageList.value;
+        grandTotalWeight.value += newItem.totalWeight;
+        grandTotalVolume.value += newItem.volume;
 
-    grandTotalWeight.value += newItem.totalWeight;
-    grandTotalVolume.value += newItem.volume;
-
-    // Reset packageItem values for the next entry
-    packageItem.type = '';
-    packageItem.length = 0;
-    packageItem.width = 0;
-    packageItem.height = 0;
-    packageItem.quantity = 0;
-    packageItem.volume = 0;
-    packageItem.totalWeight = 0;
-    packageItem.remarks = '';
-
-    showAddNewPackageDialog.value=false;
+        // Reset packageItem values for the next entry
+        packageItem.type = '';
+        packageItem.length = 0;
+        packageItem.width = 0;
+        packageItem.height = 0;
+        packageItem.quantity = 0;
+        packageItem.volume = 0;
+        packageItem.totalWeight = 0;
+        packageItem.remarks = '';
+    }
+    closeAddPackageModal();
 };
 
 // Watch for changes in length, width, height, or quantity to update volume and totalWeight
@@ -147,7 +156,7 @@ watch(
         () => form.discount,
         () => form.freight_charge,
     ],
-    ([newOtherCharge, newDiscount,newFreightCharge]) => {
+    ([newOtherCharge, newDiscount, newFreightCharge]) => {
         // Convert dimensions from cm to meters
         hblTotal.value = (parseFloat(form.bill_charge) + parseFloat(form.freight_charge) + parseFloat(form.other_charge)) - form.discount;
         form.grand_total = hblTotal.value;
@@ -170,24 +179,58 @@ const updateTypeDescription = () => {
 const hblTotal = ref(0);
 const currency = ref("SAR");
 
-const calculatePayment = () =>{
-    const cargoType =  form.cargo_type;
+const calculatePayment = () => {
+    const cargoType = form.cargo_type;
     const freightCharge = ref(0);
     const billCharge = ref(0);
-    if (cargoType==='Sea Cargo'){
+    if (cargoType === 'Sea Cargo') {
         freightCharge.value = grandTotalVolume.value * 300;
         billCharge.value = 50;
-    }else if(cargoType==='Air Cargo'){
+    } else if (cargoType === 'Air Cargo') {
         freightCharge.value = grandTotalWeight.value * 8;
         billCharge.value = 40;
     }
 
     form.freight_charge = freightCharge.value.toFixed(2);
-    form.bill_charge=billCharge.value;
+    form.bill_charge = billCharge.value;
+}
+const showConfirmRemovePackageModal = ref(false);
+const packageIndex = ref(null);
+
+// remove package
+const confirmRemovePackage = (index) => {
+    packageIndex.value = index;
+    showConfirmRemovePackageModal.value = true;
 }
 
+const closeModal = () => {
+    showConfirmRemovePackageModal.value = false;
+}
 
+const handleRemovePackage = () => {
+    if (packageIndex.value !== null) {
+        packageList.value.splice(packageIndex.value, 1);
+        closeModal();
+    }
+}
 
+// edit package
+const closeAddPackageModal = () => {
+    showAddNewPackageDialog.value = false;
+    editIndex.value = null;
+    editMode.value = false;
+}
+
+const editMode = ref(false);
+const editIndex = ref(null);
+
+const openEditModal = (index) => {
+    editMode.value = true;
+    editIndex.value = index;
+    showAddNewPackageDialog.value = true;
+    // populate packageItem with existing data for editing
+    Object.assign(packageItem, packageList.value[index])
+}
 </script>
 
 <template>
@@ -211,40 +254,6 @@ const calculatePayment = () =>{
                             </h2>
                         </div>
                         <div class="grid grid-cols-3 gap-5 mt-3">
-                            <!--                            <div class="col-span-1">-->
-                            <!--                                <span>HBL</span>-->
-                            <!--                                <label class="relative flex">-->
-                            <!--                                    <input-->
-                            <!--                                        v-model="form.hbl"-->
-                            <!--                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
-                            <!--                                        placeholder="HBL"-->
-                            <!--                                        type="text"-->
-                            <!--                                    />-->
-                            <!--                                    <div-->
-                            <!--                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"-->
-                            <!--                                    >-->
-                            <!--                                        <svg-->
-                            <!--                                            xmlns="http://www.w3.org/2000/svg"-->
-                            <!--                                            fill="none"-->
-                            <!--                                            viewBox="0 0 24 24"-->
-                            <!--                                            stroke-width="1.5"-->
-                            <!--                                            stroke="currentColor"-->
-                            <!--                                            class="size-4.5 transition-colors duration-200"-->
-                            <!--                                        >-->
-                            <!--                                            <path-->
-                            <!--                                                stroke-linecap="round"-->
-                            <!--                                                stroke-linejoin="round"-->
-                            <!--                                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"-->
-                            <!--                                            />-->
-                            <!--                                        </svg>-->
-                            <!--                                    </div>-->
-                            <!--                                </label>-->
-                            <!--                                <span-->
-                            <!--                                    v-if="form.errors.hbl"-->
-                            <!--                                    class="text-tiny+ text-error"-->
-                            <!--                                >{{ form.errors.hbl }}</span>-->
-                            <!--                            </div>-->
-
                             <div class="col-span-3">
                                 <span>Name</span>
                                 <label class="relative flex">
@@ -273,10 +282,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.hbl_name"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.hbl_name }}</span>
+                                <InputError :message="form.errors.hbl_name"/>
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-5 mt-3">
@@ -308,10 +314,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.email"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.email }}</span>
+                                <InputError :message="form.errors.email"/>
                             </div>
 
                             <div>
@@ -332,10 +335,7 @@ const calculatePayment = () =>{
                                         type="text"
                                     />
                                 </div>
-                                <span
-                                    v-if="form.errors.contact_number"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.contact_number }}</span>
+                                <InputError :message="form.errors.contact_number"/>
                             </div>
 
                             <div>
@@ -366,10 +366,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.nic"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.nic }}</span>
+                                <InputError :message="form.errors.nic"/>
                             </div>
 
                             <div>
@@ -400,10 +397,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.iq_number"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.iq_number }}</span>
+                                <InputError :message="form.errors.iq_number"/>
                             </div>
 
                             <div class="col-span-2">
@@ -416,10 +410,7 @@ const calculatePayment = () =>{
                                         class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     ></textarea>
                                 </label>
-                                <span
-                                    v-if="form.errors.address"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.address }}</span>
+                                <InputError :message="form.errors.address"/>
                             </div>
                         </div>
                     </div>
@@ -461,10 +452,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.consignee_name"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.consignee_name }}</span>
+                                <InputError :message="form.errors.consignee_name"/>
                             </div>
 
                             <div>
@@ -495,10 +483,7 @@ const calculatePayment = () =>{
                                         </svg>
                                     </div>
                                 </label>
-                                <span
-                                    v-if="form.errors.consignee_nic"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.consignee_nic }}</span>
+                                <InputError :message="form.errors.consignee_nic"/>
                             </div>
 
                             <div>
@@ -519,10 +504,7 @@ const calculatePayment = () =>{
                                         type="text"
                                     />
                                 </div>
-                                <span
-                                    v-if="form.errors.consignee_contact"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.consignee_contact }}</span>
+                                <InputError :message="form.errors.consignee_contact"/>
                             </div>
 
                             <div class="col-span-2">
@@ -535,10 +517,7 @@ const calculatePayment = () =>{
                                         class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     ></textarea>
                                 </label>
-                                <span
-                                    v-if="form.errors.consignee_address"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.consignee_address }}</span>
+                                <InputError :message="form.errors.consignee_address"/>
                             </div>
 
                             <div class="col-span-2">
@@ -551,10 +530,7 @@ const calculatePayment = () =>{
                                         class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     ></textarea>
                                 </label>
-                                <span
-                                    v-if="form.errors.consignee_name"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.consignee_name }}</span>
+                                <InputError :message="form.errors.consignee_note"/>
                             </div>
                         </div>
                     </div>
@@ -562,16 +538,10 @@ const calculatePayment = () =>{
                 <div class="sm:col-span-2 space-y-5">
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-5">
-                        <button
-                            class="btn border border-error font-medium text-error hover:bg-error hover:text-white focus:bg-error focus:text-white active:bg-error/90"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            :disabled="form.processing"
-                            :class="{ 'opacity-50': form.processing }"
-                            class="btn space-x-2 border border-warning/30 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                        <DangerOutlineButton @click="router.visit(route('hbls.index'))">Cancel</DangerOutlineButton>
+                        <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
+                                       class="space-x-2"
+                                       type="submit"
                         >
                             <span>Create a HBL</span>
                             <svg
@@ -588,7 +558,7 @@ const calculatePayment = () =>{
                                     d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
                                 />
                             </svg>
-                        </button>
+                        </PrimaryButton>
                     </div>
 
                     <!-- Cargo Type -->
@@ -616,10 +586,7 @@ const calculatePayment = () =>{
                                     <p>{{ cargoType }}</p>
                                 </label>
                             </div>
-                            <span
-                                v-if="form.errors.cargo_type"
-                                class="text-tiny+ text-error"
-                            >{{ form.errors.cargo_type }}</span>
+                            <InputError :message="form.errors.cargo_type"/>
                         </div>
                     </div>
 
@@ -648,10 +615,7 @@ const calculatePayment = () =>{
                                     <p>{{ hblType }}</p>
                                 </label>
                             </div>
-                            <span
-                                v-if="form.errors.hbl_type"
-                                class="text-tiny+ text-error"
-                            >{{ form.errors.hbl_type }}</span>
+                            <InputError :message="form.errors.hbl_type"/>
                         </div>
                     </div>
 
@@ -680,10 +644,7 @@ const calculatePayment = () =>{
                                     <p>{{ warehouse }}</p>
                                 </label>
                             </div>
-                            <span
-                                v-if="form.errors.warehouse"
-                                class="text-tiny+ text-error"
-                            >{{ form.errors.warehouse }}</span>
+                            <InputError :message="form.errors.warehouse"/>
                         </div>
                     </div>
 
@@ -695,7 +656,7 @@ const calculatePayment = () =>{
                             </h2>
                             <button type="button"
                                     @click="calculatePayment"
-                                class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90">
+                                    class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90">
                                 Calculate Payment
                             </button>
                         </div>
@@ -710,10 +671,7 @@ const calculatePayment = () =>{
                                         min="0"
                                     />
                                 </label>
-                                <span
-                                    v-if="form.errors.freight_charge"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.freight_charge }}</span>
+                                <InputError :message="form.errors.freight_charge"/>
                             </div>
 
                             <div>
@@ -726,10 +684,7 @@ const calculatePayment = () =>{
                                         min="0"
                                     />
                                 </label>
-                                <span
-                                    v-if="form.errors.bill_charge"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.bill_charge }}</span>
+                                <InputError :message="form.errors.bill_charge"/>
                             </div>
 
                             <div>
@@ -742,10 +697,7 @@ const calculatePayment = () =>{
                                         min="0"
                                     />
                                 </label>
-                                <span
-                                    v-if="form.errors.other_charge"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.other_charge }}</span>
+                                <InputError :message="form.errors.other_charge"/>
                             </div>
 
                             <div>
@@ -758,10 +710,7 @@ const calculatePayment = () =>{
                                         type="number"
                                     />
                                 </label>
-                                <span
-                                    v-if="form.errors.discount"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.discount }}</span>
+                                <InputError :message="form.errors.discount"/>
                             </div>
 
                             <div class="col-span-2">
@@ -774,29 +723,26 @@ const calculatePayment = () =>{
                                         min="0"
                                     />
                                 </label>
-                                <span
-                                    v-if="form.errors.paid_amount"
-                                    class="text-tiny+ text-error"
-                                >{{ form.errors.paid_amount }}</span>
+                                <InputError :message="form.errors.paid_amount"/>
                             </div>
 
                             <div class="col-start-2 mt-2 space-y-2.5 font-bold">
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Packages</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        {{packageList.length}}
+                                        {{ packageList.length }}
                                     </p>
                                 </div>
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Weight</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        {{grandTotalWeight}}
+                                        {{ grandTotalWeight }}
                                     </p>
                                 </div>
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Volume</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        {{grandTotalVolume}}
+                                        {{ grandTotalVolume }}
                                     </p>
                                 </div>
                             </div>
@@ -805,7 +751,7 @@ const calculatePayment = () =>{
                                 <div class="flex justify-between text-2xl text-success font-bold">
                                     <p class="line-clamp-1">Grand Total</p>
                                     <p>
-                                        {{hblTotal}} {{currency}}
+                                        {{ hblTotal }} {{ currency }}
                                     </p>
                                 </div>
                             </div>
@@ -819,10 +765,9 @@ const calculatePayment = () =>{
                     <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
                         Package Details
                     </h2>
-                    <button type="button" @click="showPackageDialog"
-                            class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90">
+                    <PrimaryOutlineButton type="button" @click="showPackageDialog">
                         New Package <i class="fas fa-plus fa-fw fa-fw"></i>
-                    </button>
+                    </PrimaryOutlineButton>
                 </div>
 
                 <div class="mt-5">
@@ -830,6 +775,9 @@ const calculatePayment = () =>{
                         <table class="is-zebra w-full text-left">
                             <thead>
                             <tr>
+                                <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 text-center">
+                                    <span class="hidden">Actions</span>
+                                </th>
                                 <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
                                     Type
                                 </th>
@@ -857,15 +805,30 @@ const calculatePayment = () =>{
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="item in packageList">
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.type}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.length}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.width}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.height}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.quantity}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.volume}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.totalWeight}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.remarks}}</td>
+                            <tr v-for="(item, index) in packageList">
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
+                                    <button
+                                        class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
+                                        @click.prevent="confirmRemovePackage(index)"
+                                    >
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+
+                                    <button
+                                        @click.prevent="openEditModal(index)"
+                                        class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
+                                    >
+                                        <i class="fa-solid fa-edit"></i>
+                                    </button>
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.type }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.length }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.width }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.height }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.quantity }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.totalWeight }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.remarks }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -888,13 +851,9 @@ const calculatePayment = () =>{
                             </svg>
                             <p class="text-gray-600">No packages. Please add packages to view data.</p>
                         </div>
-                        <button
-                            type="button"
-                            @click="showPackageDialog"
-                            class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
-                        >
-                            New Package <i class="fas fa-plus fa-fw"></i>
-                        </button>
+                        <PrimaryOutlineButton type="button" @click="showPackageDialog">
+                            New Package <i class="fas fa-plus fa-fw fa-fw"></i>
+                        </PrimaryOutlineButton>
                     </div>
                 </div>
             </div>
@@ -909,10 +868,10 @@ const calculatePayment = () =>{
             <div class="relative w-1/3 rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700">
                 <div class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5">
                     <h3 class="text-base font-medium text-slate-700 dark:text-navy-100">
-                        Add New Package
+                        {{ editMode ? 'Edit Package' : 'Add New Package' }}
                     </h3>
                     <button
-                        @click="showAddNewPackageDialog = !showAddNewPackageDialog"
+                        @click="closeAddPackageModal"
                         class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                     >
                         <svg
@@ -933,7 +892,7 @@ const calculatePayment = () =>{
                 </div>
                 <div class="px-4 py-4 sm:px-5">
                     <p class="text-base">
-                        Add new package to HBL
+                        {{ !editMode ? 'Add new package to HBL' : '' }}
                     </p>
 
                     <div class="mt-4 space-y-4">
@@ -1037,9 +996,6 @@ const calculatePayment = () =>{
                                 </label>
                             </div>
 
-
-
-
                             <div class="col-span-4">
                                 <label class="block">
                                     <span>Remarks</span>
@@ -1053,26 +1009,20 @@ const calculatePayment = () =>{
                             </div>
                         </div>
 
-
-
-
                         <div class="space-x-2 text-right">
-                            <button
-                                @click="showAddNewPackageDialog = false"
-                                class="btn min-w-[7rem]  border border-slate-300 font-medium text-slate-800 hover:bg-slate-150 focus:bg-slate-150 active:bg-slate-150/80 dark:border-navy-450 dark:text-navy-50 dark:hover:bg-navy-500 dark:focus:bg-navy-500 dark:active:bg-navy-500/90">
+                            <SecondaryButton class="min-w-[7rem]" @click="closeAddPackageModal">
                                 Cancel
-                            </button>
-                            <button @click="addPackageData"
-                                class="btn min-w-[7rem]  bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
-                                Add
-                            </button>
+                            </SecondaryButton>
+                            <PrimaryButton class="min-w-[7rem]" type="button" @click="addPackageData">
+                                {{ editMode ? 'Edit' : 'Add' }}
+                            </PrimaryButton>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <RemovePackageConfirmationModal :show="showConfirmRemovePackageModal" @close="closeModal"
+                                        @remove-package="handleRemovePackage"/>
     </AppLayout>
 </template>
-
-<style scoped></style>
