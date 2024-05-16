@@ -44,7 +44,7 @@ class HBL extends Model
 
     public function packages()
     {
-        return $this->hasMany(HBLPackage::class, 'hbl_id', 'id');
+        return $this->hasMany(HBLPackage::class, 'hnl_id', 'id');
     }
 
     public function status(): HasMany
