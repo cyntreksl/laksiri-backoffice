@@ -37,6 +37,11 @@ class HBL extends Model
         $query->where('system_status',3.1);
     }
 
+    public function status(): HasMany
+    {
+        return $this->hasMany(HBLStatusChange::class, 'hbl_id', 'id');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->logOnlyDirty();
@@ -44,11 +49,6 @@ class HBL extends Model
 
     public function packages()
     {
-        return $this->hasMany(HBLPackage::class, 'hnl_id', 'id');
-    }
-
-    public function status(): HasMany
-    {
-        return $this->hasMany(HBLStatusChange::class, 'hbl_id', 'id');
+        return $this->hasMany(HBLPackage::class, 'hbl_id', 'id');
     }
 }
