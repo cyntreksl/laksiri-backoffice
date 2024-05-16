@@ -99,25 +99,27 @@ const addPackageData = () => {
         return;
     }
 
+    if (editMode.value) {
+        packageList.value.splice(editIndex.value, 1, {...packageItem})
+    } else {
+        const newItem = {...packageItem}; // Create a copy of packageItem
+        packageList.value.push(newItem); // Add the new item to packageList
+        form.packages = packageList.value;
 
-    const newItem = {...packageItem}; // Create a copy of packageItem
-    packageList.value.push(newItem); // Add the new item to packageList
-    form.packages = packageList.value;
+        grandTotalWeight.value += newItem.totalWeight;
+        grandTotalVolume.value += newItem.volume;
 
-    grandTotalWeight.value += newItem.totalWeight;
-    grandTotalVolume.value += newItem.volume;
-
-    // Reset packageItem values for the next entry
-    packageItem.type = '';
-    packageItem.length = 0;
-    packageItem.width = 0;
-    packageItem.height = 0;
-    packageItem.quantity = 0;
-    packageItem.volume = 0;
-    packageItem.totalWeight = 0;
-    packageItem.remarks = '';
-
-    showAddNewPackageDialog.value = false;
+        // Reset packageItem values for the next entry
+        packageItem.type = '';
+        packageItem.length = 0;
+        packageItem.width = 0;
+        packageItem.height = 0;
+        packageItem.quantity = 0;
+        packageItem.volume = 0;
+        packageItem.totalWeight = 0;
+        packageItem.remarks = '';
+    }
+    closeAddPackageModal();
 };
 
 // Watch for changes in length, width, height, or quantity to update volume and totalWeight
@@ -195,6 +197,7 @@ const calculatePayment = () => {
 const showConfirmRemovePackageModal = ref(false);
 const packageIndex = ref(null);
 
+// remove package
 const confirmRemovePackage = (index) => {
     packageIndex.value = index;
     showConfirmRemovePackageModal.value = true;
@@ -209,6 +212,24 @@ const handleRemovePackage = () => {
         packageList.value.splice(packageIndex.value, 1);
         closeModal();
     }
+}
+
+// edit package
+const closeAddPackageModal = () => {
+    showAddNewPackageDialog.value = false;
+    editIndex.value = null;
+    editMode.value = false;
+}
+
+const editMode = ref(false);
+const editIndex = ref(null);
+
+const openEditModal = (index) => {
+    editMode.value = true;
+    editIndex.value = index;
+    showAddNewPackageDialog.value = true;
+    // populate packageItem with existing data for editing
+    Object.assign(packageItem, packageList.value[index])
 }
 </script>
 
@@ -786,13 +807,15 @@ const handleRemovePackage = () => {
                             <tbody>
                             <tr v-for="(item, index) in packageList">
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
-                                    <button class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
-                                            @click.prevent="confirmRemovePackage(index)"
+                                    <button
+                                        class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
+                                        @click.prevent="confirmRemovePackage(index)"
                                     >
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
 
                                     <button
+                                        @click.prevent="openEditModal(index)"
                                         class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
                                     >
                                         <i class="fa-solid fa-edit"></i>
@@ -845,10 +868,10 @@ const handleRemovePackage = () => {
             <div class="relative w-1/3 rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700">
                 <div class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5">
                     <h3 class="text-base font-medium text-slate-700 dark:text-navy-100">
-                        Add New Package
+                        {{ editMode ? 'Edit Package' : 'Add New Package' }}
                     </h3>
                     <button
-                        @click="showAddNewPackageDialog = !showAddNewPackageDialog"
+                        @click="closeAddPackageModal"
                         class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                     >
                         <svg
@@ -869,7 +892,7 @@ const handleRemovePackage = () => {
                 </div>
                 <div class="px-4 py-4 sm:px-5">
                     <p class="text-base">
-                        Add new package to HBL
+                        {{ !editMode ? 'Add new package to HBL' : '' }}
                     </p>
 
                     <div class="mt-4 space-y-4">
@@ -987,11 +1010,11 @@ const handleRemovePackage = () => {
                         </div>
 
                         <div class="space-x-2 text-right">
-                            <SecondaryButton class="min-w-[7rem]" @click="showAddNewPackageDialog = false">
+                            <SecondaryButton class="min-w-[7rem]" @click="closeAddPackageModal">
                                 Cancel
                             </SecondaryButton>
                             <PrimaryButton class="min-w-[7rem]" type="button" @click="addPackageData">
-                                Add
+                                {{ editMode ? 'Edit' : 'Add' }}
                             </PrimaryButton>
                         </div>
                     </div>
