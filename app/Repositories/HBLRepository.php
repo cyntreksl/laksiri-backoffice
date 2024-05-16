@@ -5,9 +5,14 @@ namespace App\Repositories;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\GetHBLs;
+use App\Actions\HBL\GetTotalHBLCount;
+use App\Factory\HBL\FilterFactory;
+use App\Http\Resources\HBLResource;
+use App\Interfaces\GridJsInterface;
 use App\Interfaces\HBLRepositoryInterface;
+use App\Models\HBL;
 
-class HBLRepository implements HBLRepositoryInterface
+class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 {
     public function getHBLs()
     {
@@ -18,7 +23,37 @@ class HBLRepository implements HBLRepositoryInterface
     {
         $hbl = CreateHBL::run($data);
         $packagesData = $data['packages'];
-        CreateHBLPackages::run($hbl,$packagesData);
+        CreateHBLPackages::run($hbl, $packagesData);
+
         return $hbl;
+    }
+
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        $query = HBL::query();
+
+        if (!empty($search)) {
+            $query->whereAny(['reference', 'name', 'contact_number'], 'like', '%' . $search . '%');
+        }
+
+        //apply filters
+        FilterFactory::apply($query, $filters);
+
+        $hbls = $query->orderBy($order, $direction)
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        $totalRecords = GetTotalHBLCount::run();
+
+        return response()->json([
+            'data' => HBLResource::collection($hbls),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
     }
 }

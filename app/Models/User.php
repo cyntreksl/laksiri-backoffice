@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -125,5 +126,13 @@ class User extends Authenticatable
     public function findForPassport(string $username): User
     {
         return $this->where('username', $username)->first();
+    }
+
+    /**
+     * Get the HBLs associated with the user.
+     */
+    public function hbls(): HasMany
+    {
+        return $this->hasMany(Hbl::class);
     }
 }
