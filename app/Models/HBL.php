@@ -47,7 +47,7 @@ class HBL extends Model
         return LogOptions::defaults()->logAll()->logOnlyDirty();
     }
 
-    public function packages()
+    public function packages(): HasMany
     {
         return $this->hasMany(HBLPackage::class, 'hbl_id', 'id');
     }
