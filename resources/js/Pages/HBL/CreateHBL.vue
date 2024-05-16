@@ -9,6 +9,8 @@ import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import {push} from "notivue";
+import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 
 defineProps({
     hblTypes: {
@@ -50,7 +52,7 @@ const form = useForm({
     discount: 0,
     paid_amount: 0,
     grand_total: 0,
-    packages:{}
+    packages: {}
 });
 
 const handleHBLCreate = () => {
@@ -98,7 +100,7 @@ const addPackageData = () => {
     }
 
 
-    const newItem = { ...packageItem }; // Create a copy of packageItem
+    const newItem = {...packageItem}; // Create a copy of packageItem
     packageList.value.push(newItem); // Add the new item to packageList
     form.packages = packageList.value;
 
@@ -115,7 +117,7 @@ const addPackageData = () => {
     packageItem.totalWeight = 0;
     packageItem.remarks = '';
 
-    showAddNewPackageDialog.value=false;
+    showAddNewPackageDialog.value = false;
 };
 
 // Watch for changes in length, width, height, or quantity to update volume and totalWeight
@@ -152,7 +154,7 @@ watch(
         () => form.discount,
         () => form.freight_charge,
     ],
-    ([newOtherCharge, newDiscount,newFreightCharge]) => {
+    ([newOtherCharge, newDiscount, newFreightCharge]) => {
         // Convert dimensions from cm to meters
         hblTotal.value = (parseFloat(form.bill_charge) + parseFloat(form.freight_charge) + parseFloat(form.other_charge)) - form.discount;
         form.grand_total = hblTotal.value;
@@ -175,24 +177,39 @@ const updateTypeDescription = () => {
 const hblTotal = ref(0);
 const currency = ref("SAR");
 
-const calculatePayment = () =>{
-    const cargoType =  form.cargo_type;
+const calculatePayment = () => {
+    const cargoType = form.cargo_type;
     const freightCharge = ref(0);
     const billCharge = ref(0);
-    if (cargoType==='Sea Cargo'){
+    if (cargoType === 'Sea Cargo') {
         freightCharge.value = grandTotalVolume.value * 300;
         billCharge.value = 50;
-    }else if(cargoType==='Air Cargo'){
+    } else if (cargoType === 'Air Cargo') {
         freightCharge.value = grandTotalWeight.value * 8;
         billCharge.value = 40;
     }
 
     form.freight_charge = freightCharge.value.toFixed(2);
-    form.bill_charge=billCharge.value;
+    form.bill_charge = billCharge.value;
+}
+const showConfirmRemovePackageModal = ref(false);
+const packageIndex = ref(null);
+
+const confirmRemovePackage = (index) => {
+    packageIndex.value = index;
+    showConfirmRemovePackageModal.value = true;
 }
 
+const closeModal = () => {
+    showConfirmRemovePackageModal.value = false;
+}
 
-
+const handleRemovePackage = () => {
+    if (packageIndex.value !== null) {
+        packageList.value.splice(packageIndex.value, 1);
+        closeModal();
+    }
+}
 </script>
 
 <template>
@@ -618,7 +635,7 @@ const calculatePayment = () =>{
                             </h2>
                             <button type="button"
                                     @click="calculatePayment"
-                                class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90">
+                                    class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90">
                                 Calculate Payment
                             </button>
                         </div>
@@ -692,19 +709,19 @@ const calculatePayment = () =>{
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Packages</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        {{packageList.length}}
+                                        {{ packageList.length }}
                                     </p>
                                 </div>
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Weight</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        {{grandTotalWeight}}
+                                        {{ grandTotalWeight }}
                                     </p>
                                 </div>
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Volume</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        {{grandTotalVolume}}
+                                        {{ grandTotalVolume }}
                                     </p>
                                 </div>
                             </div>
@@ -713,7 +730,7 @@ const calculatePayment = () =>{
                                 <div class="flex justify-between text-2xl text-success font-bold">
                                     <p class="line-clamp-1">Grand Total</p>
                                     <p>
-                                        {{hblTotal}} {{currency}}
+                                        {{ hblTotal }} {{ currency }}
                                     </p>
                                 </div>
                             </div>
@@ -737,6 +754,9 @@ const calculatePayment = () =>{
                         <table class="is-zebra w-full text-left">
                             <thead>
                             <tr>
+                                <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 text-center">
+                                    <span class="hidden">Actions</span>
+                                </th>
                                 <th class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
                                     Type
                                 </th>
@@ -764,15 +784,28 @@ const calculatePayment = () =>{
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="item in packageList">
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.type}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.length}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.width}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.height}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.quantity}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.volume}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.totalWeight}}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{item.remarks}}</td>
+                            <tr v-for="(item, index) in packageList">
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
+                                    <button class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
+                                            @click.prevent="confirmRemovePackage(index)"
+                                    >
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+
+                                    <button
+                                        class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
+                                    >
+                                        <i class="fa-solid fa-edit"></i>
+                                    </button>
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.type }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.length }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.width }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.height }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.quantity }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.totalWeight }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.remarks }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -966,7 +999,7 @@ const calculatePayment = () =>{
             </div>
         </div>
 
+        <RemovePackageConfirmationModal :show="showConfirmRemovePackageModal" @close="closeModal"
+                                        @remove-package="handleRemovePackage"/>
     </AppLayout>
 </template>
-
-<style scoped></style>
