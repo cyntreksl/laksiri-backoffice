@@ -7,6 +7,8 @@ import notification from "@/magics/notification.js";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
+import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 defineProps({
     hblTypes: {
@@ -725,10 +727,9 @@ const calculatePayment = () =>{
                     <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
                         Package Details
                     </h2>
-                    <button type="button" @click="showPackageDialog"
-                            class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90">
+                    <PrimaryOutlineButton type="button" @click="showPackageDialog">
                         New Package <i class="fas fa-plus fa-fw fa-fw"></i>
-                    </button>
+                    </PrimaryOutlineButton>
                 </div>
 
                 <div class="mt-5">
@@ -794,13 +795,9 @@ const calculatePayment = () =>{
                             </svg>
                             <p class="text-gray-600">No packages. Please add packages to view data.</p>
                         </div>
-                        <button
-                            type="button"
-                            @click="showPackageDialog"
-                            class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
-                        >
-                            New Package <i class="fas fa-plus fa-fw"></i>
-                        </button>
+                        <PrimaryOutlineButton type="button" @click="showPackageDialog">
+                            New Package <i class="fas fa-plus fa-fw fa-fw"></i>
+                        </PrimaryOutlineButton>
                     </div>
                 </div>
             </div>
@@ -943,9 +940,6 @@ const calculatePayment = () =>{
                                 </label>
                             </div>
 
-
-
-
                             <div class="col-span-4">
                                 <label class="block">
                                     <span>Remarks</span>
@@ -959,19 +953,13 @@ const calculatePayment = () =>{
                             </div>
                         </div>
 
-
-
-
                         <div class="space-x-2 text-right">
-                            <button
-                                @click="showAddNewPackageDialog = false"
-                                class="btn min-w-[7rem]  border border-slate-300 font-medium text-slate-800 hover:bg-slate-150 focus:bg-slate-150 active:bg-slate-150/80 dark:border-navy-450 dark:text-navy-50 dark:hover:bg-navy-500 dark:focus:bg-navy-500 dark:active:bg-navy-500/90">
+                            <SecondaryButton class="min-w-[7rem]" @click="showAddNewPackageDialog = false">
                                 Cancel
-                            </button>
-                            <button @click="addPackageData"
-                                class="btn min-w-[7rem]  bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+                            </SecondaryButton>
+                            <PrimaryButton class="min-w-[7rem]" type="button" @click="addPackageData">
                                 Add
-                            </button>
+                            </PrimaryButton>
                         </div>
                     </div>
                 </div>
