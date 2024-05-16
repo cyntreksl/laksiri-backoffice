@@ -33,7 +33,7 @@ class HBL extends Model
 
     public function scopeCashSettlement(Builder $query)
     {
-        $query->where('system_status', 3.1);
+        $query->where('system_status',3.1);
     }
 
     public function getActivitylogOptions(): LogOptions
