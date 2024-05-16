@@ -1,6 +1,6 @@
 <script setup>
 import {onMounted, reactive, ref} from "vue";
-import {Link} from '@inertiajs/vue3'
+import {Link, router} from '@inertiajs/vue3'
 import {Grid, h} from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
@@ -15,6 +15,8 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
+import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
+import {push} from "notivue";
 
 defineProps({
     users: {
@@ -109,7 +111,7 @@ const initializeGrid = () => {
                 return row;
             }),
             total: response => {
-                if (response && response.meta && response.meta.total) {
+                if (response && response.meta) {
                     return response.meta.total;
                 } else {
                     throw new Error('Invalid total count in server response');
@@ -144,34 +146,18 @@ const createColumns = () => [
             return h('div', {}, [
                 h('button', {
                     className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
-                    onClick: () => alert(row.cells[0].data)
+                    onClick: () => confirmDeleteHBL(row.cells[0].data)
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
-                        viewBox: '0 0 24 24',
-                        width: 24,
-                        height: 24,
-                        class: 'size-4.5 icon icon-tabler icons-tabler-outline icon-tabler-truck',
+                        viewBox: '0 0 448 512',
+                        class: 'size-4.5',
                         fill: 'none',
-                        stroke: "currentColor",
-                        strokeWidth: 2,
-                        strokeLinecap: "round",
-                        strokeLinejoin: "round",
                     }, [
                         h('path', {
-                            stroke: "none",
-                            d: 'M0 0h24v24H0z',
-                            fill: 'none',
-                        }),
-                        h('path', {
-                            d: 'M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
-                        }),
-                        h('path', {
-                            d: 'M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
-                        }),
-                        h('path', {
-                            d: 'M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5',
-                        }),
+                            d: 'M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z',
+                            fill: 'currentColor',
+                        })
                     ])
                 ]),
             ]);
@@ -216,6 +202,34 @@ const applyFilters = () => {
         }
     });
     grid.forceRender();
+}
+
+const showConfirmDeleteHBLModal = ref(false);
+const hblId = ref(null);
+
+const confirmDeleteHBL = (id) => {
+    hblId.value = id;
+    showConfirmDeleteHBLModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmDeleteHBLModal.value = false;
+}
+
+const handleDeleteHBL = () => {
+    router.delete(route("hbls.destroy", hblId.value), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeModal();
+            push.success('HBL record Deleted Successfully!');
+            hblId.value = null;
+            router.visit(route('hbls.index'), {only: ['hbls']})
+        },
+        onError: () => {
+            closeModal();
+            push.error('Something went to wrong!');
+        }
+    })
 }
 </script>
 
@@ -471,5 +485,8 @@ const applyFilters = () => {
                 </SoftPrimaryButton>
             </template>
         </FilterDrawer>
+
+        <DeleteHBLConfirmationModal :show="showConfirmDeleteHBLModal" @close="closeModal"
+                                    @delete-hbl="handleDeleteHBL"/>
     </AppLayout>
 </template>

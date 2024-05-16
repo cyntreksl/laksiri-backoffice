@@ -10,12 +10,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ScopedBy(BranchScope::class)]
 class HBL extends Model
 {
     use HasFactory;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $table = 'hbl';
 
@@ -34,14 +37,19 @@ class HBL extends Model
         $query->where('system_status', 3.1);
     }
 
+    public function status(): HasMany
+    {
+        return $this->hasMany(HBLStatusChange::class, 'hbl_id', 'id');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->logOnlyDirty();
     }
 
-    public function packages()
+    public function packages(): HasMany
     {
-        return $this->hasMany(HBLPackage::class, 'hnl_id', 'id');
+        return $this->hasMany(HBLPackage::class, 'hbl_id', 'id');
     }
 
     /**

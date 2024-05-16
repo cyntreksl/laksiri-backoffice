@@ -115,7 +115,7 @@ const initializeGrid = () => {
                 return row;
             }),
             total: response => {
-                if (response && response.meta && response.meta.total) {
+                if (response && response.meta) {
                     return response.meta.total;
                 } else {
                     throw new Error('Invalid total count in server response');
