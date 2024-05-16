@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -40,7 +39,7 @@ class HBLResource extends JsonResource
             'paid_amount' => $this->paid_amount,
             'grand_total' => $this->grand_total,
             'status' => $this->status,
-            'created_by' => User::find($this->created_by)->name,
+            'created_by' => $this->user?->name,
         ];
     }
 }
