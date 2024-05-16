@@ -11,6 +11,14 @@ class DeleteHBL
 
     public function handle(HBL $hbl)
     {
+        if ($hbl->packages()) {
+            $hbl->packages()->delete();
+        }
+
+        if ($hbl->status()) {
+            $hbl->status()->delete();
+        }
+
         $hbl->delete();
     }
 }

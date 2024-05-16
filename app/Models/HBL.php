@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -15,6 +17,7 @@ class HBL extends Model
 {
     use HasFactory;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $table = 'hbl';
 
@@ -28,10 +31,9 @@ class HBL extends Model
         'reference', 'branch_id', 'cargo_type', 'hbl_type', 'hbl', 'hbl_name', 'email', 'contact_number', 'nic', 'iq_number', 'address', 'consignee_name', 'consignee_nic', 'consignee_contact', 'consignee_address', 'consignee_note', 'warehouse', 'freight_charge', 'bill_charge', 'other_charge', 'discount', 'paid_amount', 'grand_total', 'created_by', 'deleted_at',
     ];
 
-
     public function scopeCashSettlement(Builder $query)
     {
-        $query->where('system_status',3.1);
+        $query->where('system_status', 3.1);
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -39,8 +41,13 @@ class HBL extends Model
         return LogOptions::defaults()->logAll()->logOnlyDirty();
     }
 
-    public function packages()
+    public function packages(): HasMany
     {
-        return $this->hasMany(HBLPackage::class, 'hnl_id', 'id');
+        return $this->hasMany(HBLPackage::class, 'hbl_id', 'id');
+    }
+
+    public function status(): HasMany
+    {
+        return $this->hasMany(HBLStatusChange::class, 'hbl_id', 'id');
     }
 }
