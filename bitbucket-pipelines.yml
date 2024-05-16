@@ -147,6 +147,21 @@ push-staging: &push-test
 
 
 pipelines:
+  custom:
+    '**':
+      - parallel:
+          - step:
+              <<: *short-commit
+          - step:
+              <<: *composer
+          - step:
+              <<: *frontend
+          #      - step:
+          #          <<: *test
+          - step:
+              <<: *build
+          - <<: *push-test
+
   pull-requests:
     '**':
       - step:
