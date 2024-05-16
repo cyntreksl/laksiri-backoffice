@@ -10,4 +10,4 @@ Route::domain('api.' . config('app.url'))
     Route::get('/pending-pickup-list', [PickupController::class, 'index']);
 });
 
-Route::domain('api.' .  config('app.url'))->post('/login', [LoginController::class, 'login']);
+Route::domain('api.' .  config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
