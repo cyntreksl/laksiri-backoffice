@@ -30,6 +30,7 @@ const data = reactive({
         id: false,
         name: true,
         areas: true,
+        created_at: false,
         actions: true,
     }
 });
@@ -40,7 +41,7 @@ const initializeGrid = () => {
         search: {
             debounceTimeout: 1000,
             server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`
+                url: (prev, keyword) => `${prev}search=${keyword}`
             }
         },
         sort: {
@@ -68,7 +69,8 @@ const initializeGrid = () => {
             then: data => data.data.map(item => [
                 item.id,
                 item.name,
-                item.areas.map(area => area.name).join('/')
+                item.areas.map(area => area.name).join('/'),
+                item.created_at,
             ]),
             total: data => data.meta.total
         }
@@ -95,6 +97,7 @@ const createColumns = () => [
             ]);
         }
     },
+    {name: 'Created At', hidden: !data.columnVisibility.created_at},
 
     {
         name: 'Actions',
@@ -217,26 +220,6 @@ const handleDeleteZone = () => {
                                                         type="checkbox"
                                                     />
                                                     <p>Created At</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.last_login_at"
-                                                        @change="toggleColumnVisibility('last_login_at', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Last Login</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.last_logout_at"
-                                                        @change="toggleColumnVisibility('last_logout_at', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Last Logout</p>
                                                 </label>
                                             </div>
                                         </div>
