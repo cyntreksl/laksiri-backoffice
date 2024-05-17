@@ -39,10 +39,8 @@ const handleSearch = () => {
 
 const handleMoveUp = (index) => {
     if (index > 0) {
-        // Swap the current item with the previous item
         const newPickups = [...props.pickups];
         [newPickups[index - 1], newPickups[index]] = [newPickups[index], newPickups[index - 1]];
-        console.log(newPickups)
     } else {
         console.log("This item is already at the top.");
     }
@@ -50,7 +48,8 @@ const handleMoveUp = (index) => {
 
 const handleMoveDown = (index) => {
     if (index < props.pickups.length - 1) {
-        console.log(props.pickups[index + 1]);
+        const newPickups = [...props.pickups];
+        [newPickups[index + 1], newPickups[index]] = [newPickups[index], newPickups[index + 1]];
     } else {
         console.log("This item is already at the bottom.");
     }
