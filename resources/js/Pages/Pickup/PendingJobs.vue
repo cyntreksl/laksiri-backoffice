@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {Grid, h} from "gridjs";
+import {Grid, h, html} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
 import moment from "moment";
@@ -44,21 +44,22 @@ const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo", "Door to Door"],
-    isUrgent: '',
-    isImportant: '',
+    isUrgent: false,
+    isImportant: false,
     createdBy: '',
     zoneBy: '',
 })
 
 const data = reactive({
     columnVisibility: {
-        id: false,
         reference: true,
         name: true,
         email: false,
         address: true,
         contact_number: true,
         cargo_type: true,
+        is_urgent_pickup: true,
+        is_from_important_customer: true,
         pickup_date: true,
         pickup_time_start: false,
         pickup_time_end: false,
@@ -82,7 +83,7 @@ const initializeGrid = () => {
         search: {
             debounceTimeout: 1000,
             server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`
+                url: (prev, keyword) => `${prev}&search=${keyword}`
             }
         },
         sort: {
@@ -92,8 +93,7 @@ const initializeGrid = () => {
                     if (!columns.length) return prev;
                     const col = columns[0];
                     const dir = col.direction === 1 ? 'asc' : 'desc';
-                    let colName = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key])[col.index];
-
+                    let colName = visibleColumns[col.index];
                     return `${prev}&order=${colName}&dir=${dir}`;
                 }
             }
@@ -128,13 +128,27 @@ const initializeGrid = () => {
 };
 
 const createColumns = () => [
-    {name: 'ID', hidden: !data.columnVisibility.id},
+    // {name: 'ID', hidden: !data.columnVisibility.id},
     {name: 'Reference', hidden: !data.columnVisibility.reference},
     {name: 'Name', hidden: !data.columnVisibility.name},
     {name: 'Email', hidden: !data.columnVisibility.email},
-    {name: 'Address', hidden: !data.columnVisibility.address},
-    {name: 'Contact', hidden: !data.columnVisibility.contact_number},
+    {name: 'Address', hidden: !data.columnVisibility.address, sort: false},
+    {name: 'Contact', hidden: !data.columnVisibility.contact_number, sort: false},
     {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
+    {
+        name: 'VIP Customer',
+        hidden: !data.columnVisibility.is_from_important_customer,
+        formatter: (cell) => {
+            return cell? html(`<div class="badge bg-info text-white dark:bg-navy-900 ml-2"><i class="text-white mr-2 fa-solid fa-crown"></i> VIP</div>`) :null
+        }
+    },
+    {
+        name: 'Urgent Pickup',
+        hidden: !data.columnVisibility.is_urgent_pickup,
+        formatter: (cell) => {
+            return cell? html(`<div class="badge bg-success text-white dark:bg-navy-900 ml-2"><i class="text-white mr-2 fa-solid fa-star"></i> Urgent Pickup</div>`) :null
+        }
+    },
     {name: 'Pickup Date', hidden: !data.columnVisibility.pickup_date},
     {name: 'Pickup Time Start', hidden: !data.columnVisibility.pickup_time_start},
     {name: 'Pickup Time End', hidden: !data.columnVisibility.pickup_time_end},
@@ -286,7 +300,7 @@ const closeModal = () => {
                                     </div>
 
                                     <div v-if="filters.isImportant" class="badge bg-cyan-500 text-white ml-2">
-                                        Is Important to Customer
+                                        VIP Customer
                                     </div>
                                 </div>
                             </div>
@@ -336,6 +350,18 @@ const closeModal = () => {
                                 <Checkbox :checked="data.columnVisibility.pickup_date"
                                           @change="toggleColumnVisibility('pickup_date', $event)"/>
                                 <span class="hover:cursor-pointer">Pickup Date</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.is_urgent_pickup"
+                                          @change="toggleColumnVisibility('is_urgent_pickup', $event)"/>
+                                <span class="hover:cursor-pointer">Urgent Pickup</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.is_from_important_customer"
+                                          @change="toggleColumnVisibility('is_from_important_customer', $event)"/>
+                                <span class="hover:cursor-pointer">VIP Customer</span>
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
