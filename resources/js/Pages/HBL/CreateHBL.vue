@@ -100,6 +100,8 @@ const addPackageData = () => {
     }
 
     if (editMode.value) {
+        grandTotalVolume.value -= packageItem.volume;
+        grandTotalWeight.value -= packageItem.totalWeight;
         packageList.value.splice(editIndex.value, 1, {...packageItem})
     } else {
         const newItem = {...packageItem}; // Create a copy of packageItem
@@ -209,6 +211,8 @@ const closeModal = () => {
 
 const handleRemovePackage = () => {
     if (packageIndex.value !== null) {
+        grandTotalVolume.value -= packageList.value[packageIndex.value].volume;
+        grandTotalWeight.value -= packageList.value[packageIndex.value].totalWeight;
         packageList.value.splice(packageIndex.value, 1);
         closeModal();
     }
