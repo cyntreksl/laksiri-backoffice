@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePickupToHBLRequest;
 use App\Interfaces\Api\PickupRepositoryInterface;
+use App\Models\PickUp;
 
 class PickupController extends Controller
 {
@@ -15,5 +17,10 @@ class PickupController extends Controller
     public function index()
     {
         return $this->pickupRepository->getPendingPickupsForDriver();
+    }
+
+    public function pickupToHbl(PickUp $pickUp, StorePickupToHBLRequest $request)
+    {
+        return $this->pickupRepository->pickupToHbl($pickUp,$request);
     }
 }
