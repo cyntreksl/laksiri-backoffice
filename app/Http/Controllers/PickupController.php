@@ -10,6 +10,7 @@ use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Models\PickUp;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -18,8 +19,8 @@ class PickupController extends Controller
     public function __construct(
         private readonly PickupRepositoryInterface $pickupRepository,
         private readonly DriverRepositoryInterface $driverRepository,
-        private readonly UserRepositoryInterface   $userRepository,
-        private readonly ZoneRepositoryInterface   $zoneRepository,
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly ZoneRepositoryInterface $zoneRepository,
     ) {
     }
 
@@ -79,5 +80,41 @@ class PickupController extends Controller
     {
         $pickUp = PickUp::find($pickUp);
         $this->pickupRepository->assignDriver($request->all(), $pickUp);
+    }
+
+    public function showPickupOrder(Request $request)
+    {
+//        $pickups = PickUp::when($request->filled('fromDate'), function (Builder $query) use ($request) {
+//            $query->whereDate('created_at', '>=', $request->input('fromDate'));
+//            $query->whereDate('created_at', '<=', $request->input('toDate'));
+//            $query->where('driver_id', $request->input('driverId'));
+//        })->get();
+
+        $query = Pickup::query();
+
+        if ($request->filled('fromDate') || $request->filled('toDate') || $request->filled('driverId')) {
+            if ($request->filled('fromDate')) {
+                $query->whereDate('created_at', '>=', $request->input('fromDate'));
+            }
+
+            if ($request->filled('toDate')) {
+                $query->whereDate('created_at', '<=', $request->input('toDate'));
+            }
+
+            if ($request->filled('driverId')) {
+                $query->where('driver_id', $request->input('driverId'));
+            }
+        } else {
+            // If no filters are provided, return an empty collection
+            $query->whereRaw('1 = 0');
+        }
+
+        $pickups = $query->get();
+
+        return Inertia::render('Pickup/PickupOrder', [
+            'filters' => $request->only('fromDate', 'toDate', 'driverId'),
+            'drivers' => $this->driverRepository->getAllDrivers(),
+            'pickups' => $pickups,
+        ]);
     }
 }
