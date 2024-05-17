@@ -82,7 +82,7 @@ const initializeGrid = () => {
         search: {
             debounceTimeout: 1000,
             server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`
+                url: (prev, keyword) => `${prev}&search=${keyword}`
             }
         },
         sort: {
