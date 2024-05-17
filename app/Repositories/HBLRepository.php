@@ -34,18 +34,20 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         $query = HBL::query();
 
         if (!empty($search)) {
-            $query->whereAny(['reference', 'name', 'contact_number'], 'like', '%' . $search . '%');
+            $query->whereAny(['reference', 'hbl_name', 'contact_number'], 'like', '%' . $search . '%');
         }
 
         //apply filters
         FilterFactory::apply($query, $filters);
+
+        $countQuery = $query;
 
         $hbls = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
 
-        $totalRecords = GetTotalHBLCount::run();
+        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => HBLResource::collection($hbls),

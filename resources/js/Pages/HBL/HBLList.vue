@@ -78,7 +78,7 @@ const initializeGrid = () => {
         search: {
             debounceTimeout: 1000,
             server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`
+                url: (prev, keyword) => `${prev}&search=${keyword}`
             }
         },
         sort: {
@@ -88,7 +88,7 @@ const initializeGrid = () => {
                     if (!columns.length) return prev;
                     const col = columns[0];
                     const dir = col.direction === 1 ? 'asc' : 'desc';
-                    let colName = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key])[col.index];
+                    let colName = visibleColumns[col.index];
 
                     return `${prev}&order=${colName}&dir=${dir}`;
                 }
@@ -129,11 +129,11 @@ const createColumns = () => [
     {name: 'HBL', hidden: !data.columnVisibility.hbl},
     {name: 'HBL Name', hidden: !data.columnVisibility.hbl_name},
     {name: 'Consignee Name', hidden: !data.columnVisibility.consignee_name},
-    {name: 'Consignee Address', hidden: !data.columnVisibility.consignee_address},
-    {name: 'Consignee Contact', hidden: !data.columnVisibility.consignee_contact},
-    {name: 'Email', hidden: !data.columnVisibility.email},
-    {name: 'Address', hidden: !data.columnVisibility.address},
-    {name: 'Contact', hidden: !data.columnVisibility.contact_number},
+    {name: 'Consignee Address', hidden: !data.columnVisibility.consignee_address,sort: false},
+    {name: 'Consignee Contact', hidden: !data.columnVisibility.consignee_contact,sort: false},
+    {name: 'Email', hidden: !data.columnVisibility.email,sort: false},
+    {name: 'Address', hidden: !data.columnVisibility.address,sort: false},
+    {name: 'Contact', hidden: !data.columnVisibility.contact_number,sort: false},
     {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
     {name: 'HBL Type', hidden: !data.columnVisibility.hbl_type},
     {name: 'Warehouse', hidden: !data.columnVisibility.warehouse},
