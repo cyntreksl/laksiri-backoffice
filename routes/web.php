@@ -39,6 +39,9 @@ Route::middleware([
     Route::put('pickups/{pickup}/driver/update', [PickupController::class, 'updateDriver'])
         ->name('pickups.driver.update');
 
+    Route::get('pickups/priority/ordering', [PickupController::class, 'showPickupOrder'])
+        ->name('pickups.ordering');
+
     // HBL
     Route::resource('hbls', HBLController::class);
 
@@ -91,6 +94,7 @@ Route::middleware([
         Route::resource('zones', ZoneController::class)
             ->except(['create', 'show']);
     });
+
     //Loading
     Route::name('loading.')->group(function () {
         // Loading Point

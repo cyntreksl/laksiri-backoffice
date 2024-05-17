@@ -701,7 +701,7 @@ export default {
                         },
                         {
                             title: "Pickup Ordering",
-                            route: "dashboard2",
+                            route: "pickups.ordering",
                         },
                         {
                             title: "Job Exception",
