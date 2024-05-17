@@ -6,6 +6,7 @@ use App\Actions\PickUps\ConvertPickupToHBL;
 use App\Actions\PickUps\GetPickupsByDriver;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\Api\PickupRepositoryInterface;
+use App\Models\PickUp;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 
@@ -34,6 +35,16 @@ class PickupRepository implements PickupRepositoryInterface
 
             return $this->success('Pickup converted to HBL successfully!',[]);
 
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), $e->getCode());
+        }
+    }
+
+    public function showPickup(PickUp $pickup): JsonResponse
+    {
+        try {
+            $pickupResource = new PickupResource($pickup);
+            return $this->success('Success', $pickupResource);
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());
         }

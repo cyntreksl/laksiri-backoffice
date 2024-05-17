@@ -19,6 +19,11 @@ class PickupController extends Controller
         return $this->pickupRepository->getPendingPickupsForDriver();
     }
 
+    public function show(PickUp $pickup)
+    {
+        return $this->pickupRepository->showPickup($pickup);
+    }
+
     public function pickupToHbl(PickUp $pickUp, StorePickupToHBLRequest $request)
     {
         return $this->pickupRepository->pickupToHbl($pickUp,$request);
