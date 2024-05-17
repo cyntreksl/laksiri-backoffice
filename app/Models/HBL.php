@@ -7,14 +7,18 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ScopedBy(BranchScope::class)]
 class HBL extends Model
 {
     use HasFactory;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $table = 'hbl';
 
@@ -25,13 +29,17 @@ class HBL extends Model
     ];
 
     protected $fillable = [
-        'reference', 'branch_id', 'cargo_type', 'hbl_type', 'hbl', 'hbl_name', 'email', 'contact_number', 'nic', 'iq_number', 'address', 'consignee_name', 'consignee_nic', 'consignee_contact', 'consignee_address', 'consignee_note', 'warehouse', 'freight_charge', 'bill_charge', 'other_charge', 'discount', 'paid_amount', 'grand_total', 'created_by', 'deleted_at',
+        'reference', 'branch_id', 'pickup_id', 'cargo_type', 'hbl_type', 'hbl', 'hbl_name', 'email', 'contact_number', 'nic', 'iq_number', 'address', 'consignee_name', 'consignee_nic', 'consignee_contact', 'consignee_address', 'consignee_note', 'warehouse', 'freight_charge', 'bill_charge', 'other_charge', 'discount', 'paid_amount', 'grand_total', 'created_by', 'deleted_at',
     ];
-
 
     public function scopeCashSettlement(Builder $query)
     {
-        $query->where('system_status',3.1);
+        $query->where('system_status', 3.1);
+    }
+
+    public function status(): HasMany
+    {
+        return $this->hasMany(HBLStatusChange::class, 'hbl_id', 'id');
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -39,8 +47,16 @@ class HBL extends Model
         return LogOptions::defaults()->logAll()->logOnlyDirty();
     }
 
-    public function packages()
+    public function packages(): HasMany
     {
-        return $this->hasMany(HBLPackage::class, 'hnl_id', 'id');
+        return $this->hasMany(HBLPackage::class, 'hbl_id', 'id');
+    }
+
+    /**
+     * Get the user who created this HBL.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

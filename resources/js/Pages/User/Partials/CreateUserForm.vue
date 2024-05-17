@@ -243,7 +243,7 @@ const createUser = () => {
                             <p class="capitalize">{{ role.name }}</p>
                         </label>
                     </div>
-                    <InputError :message="form.errors.role_id"/>
+                    <InputError :message="form.errors.role"/>
                 </div>
             </div>
 

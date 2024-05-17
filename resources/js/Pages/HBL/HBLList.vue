@@ -1,72 +1,68 @@
 <script setup>
 import {onMounted, reactive, ref} from "vue";
-import {Grid} from "gridjs";
+import {Link, router} from '@inertiajs/vue3'
+import {Grid, h} from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import Popper from "vue3-popper";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
+import FilterDrawer from "@/Components/FilterDrawer.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import DatePicker from "@/Components/DatePicker.vue";
+import FilterBorder from "@/Components/FilterBorder.vue";
+import moment from "moment";
+import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
+import Checkbox from "@/Components/Checkbox.vue";
+import Switch from "@/Components/Switch.vue";
+import FilterHeader from "@/Components/FilterHeader.vue";
+import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
+import {push} from "notivue";
 
-const props = defineProps({
-    hbls: {
+defineProps({
+    users: {
         type: Object,
         default: () => {
-        }
-    }
+        },
+    },
 })
 
 const wrapperRef = ref(null);
 let grid = null;
 
+const showFilters = ref(false);
+const fromDate = moment(new Date()).subtract(7, 'days').format('YYYY-MM-DD');
+const toDate = moment(new Date()).format('YYYY-MM-DD');
+
+const filters = reactive({
+    fromDate: fromDate,
+    toDate: toDate,
+    cargoMode: ["Air Cargo", "Sea Cargo", "Door to Door"],
+    hblType: ["UBP", "Gift", "Door to Door"],
+    warehouse: ["COLOMBO", "NINTAVUR"],
+    createdBy: '',
+})
+
 const data = reactive({
-    HBLData: props.hbls,
     columnVisibility: {
+        id: false,
         reference: true,
+        hbl: true,
         hbl_name: true,
         consignee_name: true,
-        status: true,
-        address: true,
         consignee_address: true,
+        consignee_contact: true,
+        email: false,
+        address: false,
+        contact_number: true,
+        cargo_type: true,
+        hbl_type: true,
+        warehouse: true,
+        status: false,
+        actions: true,
     }
 });
 
-const initializeGrid = () => {
-    grid = new Grid({
-        search: true,
-        pagination: {
-            enabled: true,
-            limit: 10,
-        },
-        sort: true,
-        columns: createColumns(),
-        data: createData(),
-    });
-
-    grid.render(wrapperRef.value);
-};
-
-const createColumns = () => [
-    {name: 'HBL', hidden: !data.columnVisibility.reference},
-    {name: 'Name', hidden: !data.columnVisibility.hbl_name},
-    {name: 'Name Consignee', hidden: !data.columnVisibility.consignee_name},
-    {name: 'Status', hidden: !data.columnVisibility.status},
-    {name: 'Address', hidden: !data.columnVisibility.address},
-    {name: 'Address Consignee', hidden: !data.columnVisibility.consignee_address},
-];
-
-const createData = () =>
-    data.HBLData.map(pickup => [
-        pickup.reference,
-        pickup.hbl_name,
-        pickup.consignee_name,
-        pickup.status,
-        pickup.address,
-        pickup.consignee_address,
-    ]);
-
-const updateGridConfig = () => {
-    grid.updateConfig({
-        columns: createColumns(),
-    });
-};
+const baseUrl = ref('/hbl-list')
 
 const toggleColumnVisibility = columnName => {
     data.columnVisibility[columnName] = !data.columnVisibility[columnName];
@@ -74,11 +70,167 @@ const toggleColumnVisibility = columnName => {
     grid.forceRender();
 };
 
-const showColumn = ref(false);
+const initializeGrid = () => {
+    const visibleColumns = Object.keys(data.columnVisibility);
+
+    grid = new Grid({
+        columns: createColumns(),
+        search: {
+            debounceTimeout: 1000,
+            server: {
+                url: (prev, keyword) => `${prev}?search=${keyword}`
+            }
+        },
+        sort: {
+            multiColumn: false,
+            server: {
+                url: (prev, columns) => {
+                    if (!columns.length) return prev;
+                    const col = columns[0];
+                    const dir = col.direction === 1 ? 'asc' : 'desc';
+                    let colName = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key])[col.index];
+
+                    return `${prev}&order=${colName}&dir=${dir}`;
+                }
+            }
+        },
+        pagination: {
+            limit: 10,
+            server: {
+                url: (prev, page, limit) => `${prev}&limit=${limit}&offset=${page * limit}`
+            }
+        },
+        server: {
+            url: constructUrl(),
+            then: data => data.data.map(item => {
+                const row = [];
+                // row.push({id: item.id})
+                visibleColumns.forEach(column => {
+                    row.push(item[column]);
+                });
+                return row;
+            }),
+            total: response => {
+                if (response && response.meta) {
+                    return response.meta.total;
+                } else {
+                    throw new Error('Invalid total count in server response');
+                }
+            }
+        }
+    });
+
+    grid.render(wrapperRef.value);
+};
+
+const createColumns = () => [
+    {name: 'ID', hidden: !data.columnVisibility.id},
+    {name: 'Reference', hidden: !data.columnVisibility.reference},
+    {name: 'HBL', hidden: !data.columnVisibility.hbl},
+    {name: 'HBL Name', hidden: !data.columnVisibility.hbl_name},
+    {name: 'Consignee Name', hidden: !data.columnVisibility.consignee_name},
+    {name: 'Consignee Address', hidden: !data.columnVisibility.consignee_address},
+    {name: 'Consignee Contact', hidden: !data.columnVisibility.consignee_contact},
+    {name: 'Email', hidden: !data.columnVisibility.email},
+    {name: 'Address', hidden: !data.columnVisibility.address},
+    {name: 'Contact', hidden: !data.columnVisibility.contact_number},
+    {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
+    {name: 'HBL Type', hidden: !data.columnVisibility.hbl_type},
+    {name: 'Warehouse', hidden: !data.columnVisibility.warehouse},
+    {name: 'Status', hidden: !data.columnVisibility.status},
+    {
+        name: 'Actions',
+        sort: false,
+        hidden: !data.columnVisibility.actions,
+        formatter: (_, row) => {
+            return h('div', {}, [
+                h('button', {
+                    className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
+                    onClick: () => confirmDeleteHBL(row.cells[0].data)
+                }, [
+                    h('svg', {
+                        xmlns: 'http://www.w3.org/2000/svg',
+                        viewBox: '0 0 448 512',
+                        class: 'size-4.5',
+                        fill: 'none',
+                    }, [
+                        h('path', {
+                            d: 'M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z',
+                            fill: 'currentColor',
+                        })
+                    ])
+                ]),
+            ]);
+        },
+    },
+];
+
+const updateGridConfig = () => {
+    grid.updateConfig({
+        columns: createColumns(),
+    });
+};
 
 onMounted(() => {
     initializeGrid();
 })
+
+const constructUrl = () => {
+    const params = new URLSearchParams();
+    for (const key in filters) {
+        if (filters.hasOwnProperty(key)) {
+            params.append(key, filters[key].toString());
+        }
+    }
+    return baseUrl.value + '?' + params.toString();
+}
+
+const applyFilters = () => {
+    showFilters.value = false;
+    const newUrl = constructUrl();
+    const visibleColumns = Object.keys(data.columnVisibility);
+    grid.updateConfig({
+        server: {
+            url: newUrl,
+            then: data => data.data.map(item => {
+                const row = [];
+                visibleColumns.forEach(column => {
+                    row.push(item[column]);
+                });
+                return row;
+            }),
+        }
+    });
+    grid.forceRender();
+}
+
+const showConfirmDeleteHBLModal = ref(false);
+const hblId = ref(null);
+
+const confirmDeleteHBL = (id) => {
+    hblId.value = id;
+    showConfirmDeleteHBLModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmDeleteHBLModal.value = false;
+}
+
+const handleDeleteHBL = () => {
+    router.delete(route("hbls.destroy", hblId.value), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeModal();
+            push.success('HBL record Deleted Successfully!');
+            hblId.value = null;
+            router.visit(route('hbls.index'), {only: ['hbls']})
+        },
+        onError: () => {
+            closeModal();
+            push.error('Something went to wrong!');
+        }
+    })
+}
 </script>
 
 <template>
@@ -87,112 +239,158 @@ onMounted(() => {
 
         <Breadcrumb/>
         <div class="flex justify-end mt-5">
-            <a :href="route('hbls.create')">
-                <button
-                    class="btn bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                >
+            <Link :href="route('hbls.create')">
+                <PrimaryButton>
                     Create New HBL
-                </button>
-            </a>
+                </PrimaryButton>
+            </Link>
         </div>
         <div class="card mt-4">
             <div>
                 <div class="flex items-center justify-between p-2">
-                    <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                        HBL List
-                    </h2>
+                    <div class="">
+                        <div class="flex">
+                            <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
+                                HBL List
+                            </h2>
+                        </div>
 
-                    <div class="flex">
-                        <Popper>
-                            <button
-                                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
-                                <i class="fa-solid fa-grip"></i>
-                            </button>
-                            <template #content>
-                                <div class="max-w-[16rem]">
+                        <div class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300">
+                            <div class="mr-4 cursor-pointer" x-tooltip.info.placement.bottom="'Applied Filters'">
+                                Filter Options:
+                            </div>
+                            <div class="flex -space-x-px">
+                                <div>
                                     <div
-                                        class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700">
-                                        <div
-                                            class="rounded-md border border-slate-150 bg-white p-4 dark:border-navy-600 dark:bg-navy-700">
-                                            <h3 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                                                Select Columns
-                                            </h3>
-                                            <p class="mt-1 text-xs+">Choose which columns you want to see </p>
-                                            <div class="mt-4 flex flex-col space-y-4 text-slate-600 dark:text-navy-100">
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.reference"
-                                                        @change="toggleColumnVisibility('reference', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Reference</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.name"
-                                                        @change="toggleColumnVisibility('name', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Name</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.address"
-                                                        @change="toggleColumnVisibility('consignee_name', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Name Consignee</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.contact"
-                                                        @change="toggleColumnVisibility('status', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Status</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.cargoMode"
-                                                        @change="toggleColumnVisibility('address', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Address</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.notes"
-                                                        @change="toggleColumnVisibility('consignee_address', $event)"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                    />
-                                                    <p>Address Consignee</p>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
+                                        From Date
+                                    </div>
+                                    <div
+                                        class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+                                        {{ filters.fromDate }}
                                     </div>
                                 </div>
-                            </template>
-                        </Popper>
+                                <div>
+                                    <div
+                                        class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
+                                        To Date
+                                    </div>
+                                    <div
+                                        class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+                                        {{ filters.toDate }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div v-for="(mode, index) in filters.cargoMode" v-if="filters.cargoMode"
+                                         :key="index" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">{{
+                                            mode
+                                        }}
+                                    </div>
 
+                                    <div v-for="(type, index) in filters.hblType" v-if="filters.hblType"
+                                         :key="index" class="badge bg-fuchsia-600 text-white dark:bg-fuchsia-600 ml-2">
+                                        {{
+                                            type
+                                        }}
+                                    </div>
+
+                                    <div v-for="(item, index) in filters.warehouse" v-if="filters.warehouse"
+                                         :key="index" class="badge bg-pink-600 text-white dark:bg-pink-600 ml-2">{{
+                                            item
+                                        }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <ColumnVisibilityPopover>
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.reference"
+                                          @change="toggleColumnVisibility('reference', $event)"/>
+                                <span class="hover:cursor-pointer">Reference</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.hbl"
+                                          @change="toggleColumnVisibility('hbl', $event)"/>
+                                <span class="hover:cursor-pointer">HBL</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.hbl_name"
+                                          @change="toggleColumnVisibility('hbl_name', $event)"/>
+                                <span class="hover:cursor-pointer">HBL Name</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.consignee_name"
+                                          @change="toggleColumnVisibility('consignee_name', $event)"/>
+                                <span class="hover:cursor-pointer">Consignee Name</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.consignee_address"
+                                          @change="toggleColumnVisibility('consignee_address', $event)"/>
+                                <span class="hover:cursor-pointer">Consignee Address</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.consignee_contact"
+                                          @change="toggleColumnVisibility('consignee_contact', $event)"/>
+                                <span class="hover:cursor-pointer">Consignee Contact</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.email"
+                                          @change="toggleColumnVisibility('email', $event)"/>
+                                <span class="hover:cursor-pointer">Email</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.address"
+                                          @change="toggleColumnVisibility('address', $event)"/>
+                                <span class="hover:cursor-pointer">Address</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.contact_number"
+                                          @change="toggleColumnVisibility('contact_number', $event)"/>
+                                <span class="hover:cursor-pointer">Contact</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.cargo_type"
+                                          @change="toggleColumnVisibility('cargo_type', $event)"/>
+                                <span class="hover:cursor-pointer">Cargo Mode</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.hbl_type"
+                                          @change="toggleColumnVisibility('hbl_type', $event)"/>
+                                <span class="hover:cursor-pointer">HBL Type</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.warehouse"
+                                          @change="toggleColumnVisibility('warehouse', $event)"/>
+                                <span class="hover:cursor-pointer">Warehouse</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.status"
+                                          @change="toggleColumnVisibility('status', $event)"/>
+                                <span class="hover:cursor-pointer">Status</span>
+                            </label>
+                        </ColumnVisibilityPopover>
                         <button
+                            x-tooltip.placement.top="'Filters'" @click="showFilters=true"
                             class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                             <i class="fa-solid fa-filter"></i>
                         </button>
                     </div>
                 </div>
-
-
 
                 <div class=" mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
@@ -201,5 +399,94 @@ onMounted(() => {
                 </div>
             </div>
         </div>
+
+        <FilterDrawer :show="showFilters" @close="showFilters = false">
+            <template #title>
+                Filter HBL
+            </template>
+
+            <template #content>
+                <div>
+                    <InputLabel value="From"/>
+                    <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
+                </div>
+
+                <div>
+                    <InputLabel value="To"/>
+                    <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
+                </div>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Cargo Mode"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.cargoMode" label="Air Cargo" value="Air Cargo"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.cargoMode" label="Sea Cargo" value="Sea Cargo"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.cargoMode" label="Door to Door" value="Door to Door"/>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="HBL Type"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.hblType" label="UBP" value="UBP"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.hblType" label="Gift" value="Gift"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.hblType" label="Door to Door" value="Door to Door"/>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Warehouse"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.warehouse" label="COLOMBO" value="COLOMBO"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.warehouse" label="NINTAVUR" value="NINTAVUR"/>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Created By"/>
+
+                <select
+                    v-model="filters.createdBy"
+                    autocomplete="off"
+                    class="w-full"
+                    multiple
+                    placeholder="Select a User..."
+                    x-init="$el._tom = new Tom($el,{
+            plugins: ['remove_button'],
+            create: true,
+          })"
+                >
+                    <option v-for="user in users" :value="user.id">{{ user.name }}</option>
+                </select>
+
+                <!--Filter Now Action Button-->
+                <SoftPrimaryButton class="space-x-2" @click="applyFilters">
+                    <i class="fa-solid fa-filter"></i>
+                    <span>Apply Filters</span>
+                </SoftPrimaryButton>
+            </template>
+        </FilterDrawer>
+
+        <DeleteHBLConfirmationModal :show="showConfirmDeleteHBLModal" @close="closeModal"
+                                    @delete-hbl="handleDeleteHBL"/>
     </AppLayout>
 </template>

@@ -26,4 +26,11 @@ interface PickupRepositoryInterface
      * @return JsonResponse
      */
     public function showPickup(PickUp $pickup): JsonResponse;
+
+    /**
+     * Convert a pickup to HBL.
+     *
+     * @method  POST api/v1/pickup-to-hbl/{pickUp}
+     */
+    public function pickupToHbl($pickUp, $request);
 }

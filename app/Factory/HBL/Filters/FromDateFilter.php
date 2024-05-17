@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Factory\Pickup\Filters;
+namespace App\Factory\HBL\Filters;
 
 use App\Interfaces\FilterInterface;
 use Illuminate\Database\Eloquent\Builder;
 
-class ToDateFilter implements FilterInterface
+class FromDateFilter implements FilterInterface
 {
     public function apply(Builder $query, $value)
     {
-        return $query->whereDate('created_at', '<=', $value);
+        return $query->whereDate('created_at', '>=', $value);
     }
 }

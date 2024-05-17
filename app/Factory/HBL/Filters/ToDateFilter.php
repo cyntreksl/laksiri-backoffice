@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Factory\Pickup\Filters;
+namespace App\Factory\HBL\Filters;
 
 use App\Interfaces\FilterInterface;
 use Illuminate\Database\Eloquent\Builder;

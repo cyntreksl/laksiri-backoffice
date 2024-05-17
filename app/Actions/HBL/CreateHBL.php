@@ -2,7 +2,6 @@
 
 namespace App\Actions\HBL;
 
-use App\Actions\User\GetUserCurrentBranch;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -19,7 +18,7 @@ class CreateHBL
             'branch_id' => GetUserCurrentBranchID::run(),
             'cargo_type' => $data['cargo_type'],
             'hbl_type' => $data['hbl_type'],
-            'hbl' =>$reference,
+            'hbl' => $reference,
             'hbl_name' => $data['hbl_name'],
             'email' => $data['email'],
             'contact_number' => $data['contact_number'],
@@ -39,6 +38,7 @@ class CreateHBL
             'paid_amount' => $data['paid_amount'],
             'grand_total' => $data['grand_total'],
             'created_by' => auth()->id(),
+            'pickup_id' => $data['pickup_id'] ?? null,
         ]);
     }
 }
