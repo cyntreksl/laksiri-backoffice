@@ -52,7 +52,6 @@ const filters = reactive({
 
 const data = reactive({
     columnVisibility: {
-        id: false,
         reference: true,
         name: true,
         email: false,
@@ -92,8 +91,7 @@ const initializeGrid = () => {
                     if (!columns.length) return prev;
                     const col = columns[0];
                     const dir = col.direction === 1 ? 'asc' : 'desc';
-                    let colName = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key])[col.index];
-
+                    let colName = visibleColumns[col.index];
                     return `${prev}&order=${colName}&dir=${dir}`;
                 }
             }
@@ -128,12 +126,12 @@ const initializeGrid = () => {
 };
 
 const createColumns = () => [
-    {name: 'ID', hidden: !data.columnVisibility.id},
+    // {name: 'ID', hidden: !data.columnVisibility.id},
     {name: 'Reference', hidden: !data.columnVisibility.reference},
     {name: 'Name', hidden: !data.columnVisibility.name},
     {name: 'Email', hidden: !data.columnVisibility.email},
-    {name: 'Address', hidden: !data.columnVisibility.address},
-    {name: 'Contact', hidden: !data.columnVisibility.contact_number},
+    {name: 'Address', hidden: !data.columnVisibility.address,sort: false},
+    {name: 'Contact', hidden: !data.columnVisibility.contact_number,sort: false},
     {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
     {name: 'Pickup Date', hidden: !data.columnVisibility.pickup_date},
     {name: 'Pickup Time Start', hidden: !data.columnVisibility.pickup_time_start},
