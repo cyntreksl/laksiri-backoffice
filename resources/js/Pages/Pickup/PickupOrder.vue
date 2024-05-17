@@ -37,12 +37,23 @@ const handleSearch = () => {
     });
 }
 
-const handleMoveUp = () => {
-
+const handleMoveUp = (index) => {
+    if (index > 0) {
+        // Swap the current item with the previous item
+        const newPickups = [...props.pickups];
+        [newPickups[index - 1], newPickups[index]] = [newPickups[index], newPickups[index - 1]];
+        console.log(newPickups)
+    } else {
+        console.log("This item is already at the top.");
+    }
 }
 
-const handleMoveDown = () => {
-
+const handleMoveDown = (index) => {
+    if (index < props.pickups.length - 1) {
+        console.log(props.pickups[index + 1]);
+    } else {
+        console.log("This item is already at the bottom.");
+    }
 }
 </script>
 
@@ -169,7 +180,7 @@ const handleMoveDown = () => {
                                     <button
                                         :disabled="index === 0"
                                         class="btn size-9 rounded-full p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25 disabled:pointer-events-none disabled:select-none disabled:opacity-60 disabled:text-gray-500"
-                                        @click.prevent="handleMoveUp"
+                                        @click.prevent="handleMoveUp(index)"
                                     >
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" stroke-linecap="round" stroke-linejoin="round" />
@@ -180,7 +191,7 @@ const handleMoveDown = () => {
                                     <button
                                         :disabled="index === pickups.length - 1"
                                         class="btn size-9 rounded-full p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25 disabled:pointer-events-none disabled:select-none disabled:opacity-60 disabled:text-gray-500"
-                                        @click.prevent="handleMoveDown"
+                                        @click.prevent="handleMoveDown(index)"
                                     >
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" stroke-linecap="round" stroke-linejoin="round" />
