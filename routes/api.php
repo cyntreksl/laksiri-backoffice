@@ -8,7 +8,6 @@ Route::domain('api.'.config('app.url'))
     ->middleware(['auth:sanctum'])
     ->prefix('/v1/')->group(function () {
         Route::get('/pending-pickup-list', [PickupController::class, 'index']);
-        Route::get('/pickups/{pickup}', [PickupController::class, 'show']);
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
