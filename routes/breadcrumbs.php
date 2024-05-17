@@ -16,6 +16,13 @@ Breadcrumbs::for('pickups.index', function (BreadcrumbTrail $trail) {
     $trail->push('Pending Jobs', route('pickups.index'));
 });
 
+// pickups > pickup ordering
+Breadcrumbs::for('pickups.ordering', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Pickup Ordering');
+    $trail->push('Pickup Ordering', route('pickups.ordering'));
+});
+
 // pickups > create
 Breadcrumbs::for('pickups.create', function (BreadcrumbTrail $trail) {
     $trail->parent('pickups.index');
