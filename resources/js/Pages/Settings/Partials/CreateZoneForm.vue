@@ -20,9 +20,9 @@ const form = useForm({
 });
 
 const createZone = () => {
-    form.post(route("settings.zones.store"), {
+    form.post(route("setting.zones.store"), {
         onSuccess: () => {
-            router.visit(route("settings.zones.index"));
+            router.visit(route("setting.driver-zones.index"));
             form.reset();
             notification({
                 text: 'Zone Created Successfully!',

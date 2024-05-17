@@ -65,7 +65,7 @@ const initializeGrid = () => {
             }
         },
         server: {
-            url: '/settings/zones/list?',
+            url: '/zones/list?',
             then: data => data.data.map(item => [
                 item.id,
                 item.name,
@@ -155,7 +155,7 @@ const closeModal = () => {
 }
 
 const handleDeleteZone = () => {
-    router.delete(route("settings.zones.destroy", zoneId.value), {
+    router.delete(route("setting.zones.destroy", zoneId.value), {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
@@ -164,7 +164,7 @@ const handleDeleteZone = () => {
                 variant: 'success',
             });
             zoneId.value = null;
-            router.visit(route('settings.zones.index'), {only: ['users']})
+            router.visit(route('setting.driver-zones.index'), {only: ['users']})
         },
     })
 }

@@ -84,13 +84,7 @@ Route::middleware([
         })->name('warehouses.index');
     });
 
-    // Settings
-    Route::prefix('settings')->name('settings.')->group(function () {
-        // Zones
-        Route::get('zones/list', [ZoneController::class, 'list'])->name('zones.list');
-        Route::resource('zones', ZoneController::class)
-            ->except(['create', 'show']);
-    });
+
     //Loading
     Route::name('loading.')->group(function () {
         // Loading Point
@@ -156,10 +150,10 @@ Route::middleware([
 
     //Setting
     Route::name('setting.')->group(function () {
-        //Driver Zones
-        Route::get('driver-zones', function () {
-            return Inertia::render('Setting/DriverZoneList');
-        })->name('driver-zones.index');
+        // Zones
+        Route::get('zones/list', [ZoneController::class, 'list'])->name('driver-zones.list');
+        Route::resource('zones', ZoneController::class)
+            ->except(['create', 'show'])->name('index','driver-zones.index');
         //Driver Areas
         Route::get('driver-areas', function () {
             return Inertia::render('Setting/DriverAreaList');
