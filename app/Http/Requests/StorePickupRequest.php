@@ -2,11 +2,15 @@
 
 namespace App\Http\Requests;
 
+use App\Traits\ResponseAPI;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Validator;
 
 class StorePickupRequest extends FormRequest
 {
+    use ResponseAPI;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -55,5 +59,16 @@ class StorePickupRequest extends FormRequest
             'pickup_time_start.date_format' => 'Invalid date format for entered value.Please enter time like 18:00',
             'pickup_time_end.date_format' => 'Invalid date format for entered value.Please enter time like 13:00',
         ];
+    }
+
+    public function failedValidation(Validator|\Illuminate\Contracts\Validation\Validator $validator): void
+    {
+        if (request()->is('v1/*')) {
+            throw new HttpResponseException(
+                $this->error('Validation Errors', $validator->errors())
+            );
+        }
+
+        parent::failedValidation($validator);
     }
 }

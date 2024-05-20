@@ -22,8 +22,6 @@ interface PickupRepositoryInterface
      * @param  PickUp  $pickup  The pending pickup to retrieve details for.
      *
      * @method GET api/v1/pickups/{id}
-     *
-     * @return JsonResponse
      */
     public function showPickup(PickUp $pickup): JsonResponse;
 
@@ -33,4 +31,16 @@ interface PickupRepositoryInterface
      * @method  POST api/v1/pickup-to-hbl/{pickUp}
      */
     public function pickupToHbl($pickUp, $request);
+
+    /**
+     * Store pickup details.
+     *
+     * This method accepts an array of data related to the pickup and processes it to
+     * store the necessary information.
+     *
+     * @param  array  $data  The data related to the pickup to be stored.
+     *
+     * @method POST api.laksiri.world/v1/pickups
+     */
+    public function storePickup(array $data): JsonResponse;
 }
