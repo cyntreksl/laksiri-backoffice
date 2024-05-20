@@ -13,7 +13,7 @@ class StoreDriverRequest extends FormRequest
             'name' => ['required', 'min:5', 'max:20'],
             'username' => ['required', 'unique:users,username', 'min:5', 'max:20'],
             'password' => ['required', 'string', Password::default(), 'confirmed'],
-            'contact' => ['required'],
+            'contact' => ['required', 'phone:INTERNATIONAL'],
             'working_hours_start' => ['nullable'],
             'working_hours_end' => ['nullable'],
             'preferred_zone' => ['nullable'],
