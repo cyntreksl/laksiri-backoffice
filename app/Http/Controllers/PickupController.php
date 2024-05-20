@@ -89,4 +89,11 @@ class PickupController extends Controller
             'pickups' => $this->pickupRepository->getFilteredPickups($request),
         ]);
     }
+
+    public function updatePickupOrder(Request $request)
+    {
+        if ($request->pickups) {
+            $this->pickupRepository->savePickupOrder($request->pickups);
+        }
+    }
 }

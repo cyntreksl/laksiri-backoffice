@@ -7,6 +7,7 @@ use App\Actions\PickUps\AssignDriver;
 use App\Actions\PickUps\CreatePickUp;
 use App\Actions\PickUps\GetPickups;
 use App\Actions\PickUps\GetTotalPickupCount;
+use App\Actions\PickUps\SavePickUpOrder;
 use App\Factory\Pickup\FilterFactory;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\GridJsInterface;
@@ -43,10 +44,10 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     {
         $query = PickUp::query();
 
-        if (!empty($search)) {
-            $query->where('reference', 'like', '%' . $search . '%');
-            $query->where('name', 'like', '%' . $search . '%');
-            $query->where('contact_number', 'like', '%' . $search . '%');
+        if (! empty($search)) {
+            $query->where('reference', 'like', '%'.$search.'%');
+            $query->where('name', 'like', '%'.$search.'%');
+            $query->where('contact_number', 'like', '%'.$search.'%');
         }
 
         //apply filters
@@ -73,12 +74,24 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     public function getFilteredPickups(Request $request)
     {
         $query = Pickup::query();
+
         if ($request->filled('fromDate') || $request->filled('toDate') || $request->filled('driverId')) {
             FilterFactory::apply($query, ['fromDate' => $request->fromDate, 'toDate' => $request->toDate, 'driverId' => $request->driverId]);
         } else {
             // If no filters are provided, return an empty collection
             $query->whereRaw('1 = 0');
         }
-        return $query->orderBy('pickup_order')->get();
+
+        return $query
+            ->with('zone')
+            ->orderBy('pickup_order')
+            ->get();
+    }
+
+    public function savePickupOrder(array $pickups): void
+    {
+        foreach ($pickups as $item) {
+            SavePickUpOrder::run($item);
+        }
     }
 }

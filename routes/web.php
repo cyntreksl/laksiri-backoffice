@@ -42,6 +42,9 @@ Route::middleware([
     Route::get('pickups/priority/ordering', [PickupController::class, 'showPickupOrder'])
         ->name('pickups.ordering');
 
+    Route::put('/pickups/update/order', [PickupController::class, 'updatePickupOrder'])
+        ->name('pickups.update-order');
+
     // HBL
     Route::resource('hbls', HBLController::class);
 

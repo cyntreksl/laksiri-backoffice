@@ -16,4 +16,6 @@ interface PickupRepositoryInterface
     public function assignDriver(array $data, PickUp $pickUp);
 
     public function getFilteredPickups(Request $request);
+
+    public function savePickupOrder(array $pickups);
 }
