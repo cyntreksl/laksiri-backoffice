@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\v1\Auth\LoginController;
 use App\Http\Controllers\Api\v1\HBLController;
 use App\Http\Controllers\Api\v1\PickupController;
-use App\Http\Controllers\Api\v1\HBLController;
 use Illuminate\Support\Facades\Route;
 
 Route::domain('api.'.config('app.url'))
@@ -13,8 +12,7 @@ Route::domain('api.'.config('app.url'))
         Route::get('/pickups/{pickup}', [PickupController::class, 'show']);
         Route::post('/pickup-to-hbl/{pickUp}', [PickupController::class, 'pickupToHbl']);
         Route::post('/pickups', [PickupController::class, 'store']);
-        Route::get('/hbls/{hbl}', [HBLController::class, 'show']);
-        Route::apiResource('hbl', HBLController::class)->only(['store']);
+        Route::apiResource('hbls', HBLController::class)->only(['store','show']);
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);

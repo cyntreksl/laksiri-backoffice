@@ -9,9 +9,6 @@ use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
-use App\Interfaces\Api\HBLRepositoryInterface;
-use App\Traits\ResponseAPI;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
 class HBLRepository implements HBLRepositoryInterface
@@ -23,6 +20,10 @@ class HBLRepository implements HBLRepositoryInterface
         try {
             $hblResource = new HBLResource($hbl);
             return $this->success('Success', $hblResource);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), $e->getCode());
+        }
+    }
     public function storeHBL(array $data): JsonResponse
     {
         try {
