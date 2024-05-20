@@ -1,12 +1,9 @@
 <script setup>
-import {ref} from 'vue';
-
 const props = defineProps({
     title: {type: String, required: true},
     subTitle: {type: String, required: false},
+    showPanel: {type: Boolean, default: false},
 });
-
-const showPanel = ref(false);
 </script>
 
 <template>

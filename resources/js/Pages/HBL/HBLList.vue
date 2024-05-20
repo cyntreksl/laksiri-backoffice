@@ -19,12 +19,16 @@ import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmati
 import {push} from "notivue";
 import HBLDetailModal from "@/Pages/HBL/Partials/HBLDetailModal.vue";
 
-defineProps({
+const props = defineProps({
     users: {
         type: Object,
         default: () => {
         },
     },
+    hbls: {
+        type: Object,
+        default: () => {},
+    }
 })
 
 const wrapperRef = ref(null);
@@ -152,8 +156,9 @@ const createColumns = () => [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
                         viewBox: '0 0 24 24',
-                        class: 'size-4.5',
+                        class: 'size-5',
                         fill: 'none',
+                        strokeWidth: 2.5,
                         stroke: 'currentColor',
                     }, [
                         h('path', {
@@ -239,6 +244,7 @@ const applyFilters = () => {
 
 const showConfirmDeleteHBLModal = ref(false);
 const hblId = ref(null);
+const selectedHBL = ref({});
 
 const confirmDeleteHBL = (id) => {
     hblId.value = id;
@@ -249,6 +255,7 @@ const closeModal = () => {
     showConfirmDeleteHBLModal.value = false;
     showConfirmViewHBLModal.value = false;
     hblId.value = null;
+    selectedHBL.value = null;
 }
 
 const handleDeleteHBL = () => {
@@ -270,7 +277,7 @@ const handleDeleteHBL = () => {
 const showConfirmViewHBLModal = ref(false);
 
 const confirmViewHBL = (id) => {
-    hblId.value = id;
+    selectedHBL.value = props.hbls.find(hbl => hbl.id === id);
     showConfirmViewHBLModal.value = true;
 };
 </script>
@@ -531,6 +538,6 @@ const confirmViewHBL = (id) => {
         <DeleteHBLConfirmationModal :show="showConfirmDeleteHBLModal" @close="closeModal"
                                     @delete-hbl="handleDeleteHBL"/>
 
-        <HBLDetailModal :show="showConfirmViewHBLModal" @close="closeModal"/>
+        <HBLDetailModal :hbl="selectedHBL" :show="showConfirmViewHBLModal" @close="closeModal"/>
     </AppLayout>
 </template>
