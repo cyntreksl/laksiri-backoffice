@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\v1\Auth\LoginController;
+use App\Http\Controllers\Api\v1\HBLController;
 use App\Http\Controllers\Api\v1\PickupController;
 use App\Http\Controllers\Api\v1\HBLController;
 use Illuminate\Support\Facades\Route;
-
 
 Route::domain('api.'.config('app.url'))
     ->middleware(['auth:sanctum'])
@@ -12,6 +12,8 @@ Route::domain('api.'.config('app.url'))
         Route::get('/pending-pickup-list', [PickupController::class, 'index']);
         Route::get('/pickups/{pickup}', [PickupController::class, 'show']);
         Route::post('/pickup-to-hbl/{pickUp}', [PickupController::class, 'pickupToHbl']);
+        Route::post('/pickups', [PickupController::class, 'store']);
+        Route::get('/hbls/{hbl}', [HBLController::class, 'show']);
         Route::apiResource('hbl', HBLController::class)->only(['store']);
     });
 

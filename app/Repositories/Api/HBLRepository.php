@@ -2,6 +2,11 @@
 
 namespace App\Repositories\Api;
 
+use App\Http\Resources\HBLResource;
+use App\Interfaces\Api\HBLRepositoryInterface;
+use App\Models\HBL;
+use App\Traits\ResponseAPI;
+use Illuminate\Http\JsonResponse;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Interfaces\Api\HBLRepositoryInterface;
@@ -12,6 +17,12 @@ use Illuminate\Support\Facades\DB;
 class HBLRepository implements HBLRepositoryInterface
 {
     use ResponseAPI;
+
+    public function showHBL(HBL $hbl): JsonResponse
+    {
+        try {
+            $hblResource = new HBLResource($hbl);
+            return $this->success('Success', $hblResource);
     public function storeHBL(array $data): JsonResponse
     {
         try {

@@ -26,8 +26,8 @@ class CreatePickUp
             'pickup_date' => $data['pickup_date'],
             'pickup_time_start' => $data['pickup_time_start'],
             'pickup_time_end' => $data['pickup_time_end'],
-            'is_from_important_customer' => $data['is_from_important_customer'],
-            'is_urgent_pickup' => $data['is_urgent_pickup'],
+            'is_from_important_customer' => (bool) $data['is_from_important_customer'],
+            'is_urgent_pickup' => (bool) $data['is_urgent_pickup'],
             'created_by' => auth()->id(),
         ]);
     }
