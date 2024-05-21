@@ -830,8 +830,8 @@ const openEditModal = (index) => {
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.width }}</td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.height }}</td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.quantity }}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume }}</td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.totalWeight }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume }}</td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.remarks }}</td>
                             </tr>
                             </tbody>
