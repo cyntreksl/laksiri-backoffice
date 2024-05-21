@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {Grid, h} from "gridjs";
+import {Grid, h, html} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
@@ -124,7 +124,13 @@ const createColumns = () => [
     {name: 'Reference', hidden: !data.columnVisibility.reference},
     {name: 'Name', hidden: !data.columnVisibility.name},
     {name: 'Zone', hidden: !data.columnVisibility.zone},
-    {name: 'Picker Note', hidden: !data.columnVisibility.picker_note},
+    {
+        name: 'Picker Note',
+        hidden: !data.columnVisibility.picker_note,
+        formatter: (cell) => {
+            return cell? html(`<div class="badge space-x-2.5 rounded-full bg-red-100 text-red-500 dark:bg-red-100"> ${cell}</div>`) :null
+        }
+    },
     {name: 'Address', hidden: !data.columnVisibility.address, sort: false},
     {name: 'Pickup Date', hidden: !data.columnVisibility.pickup_date},
     {name: 'Created Date', hidden: !data.columnVisibility.created_date},
@@ -265,6 +271,22 @@ const applyFilters = () => {
                                         {{ filters.toDate }}
                                     </div>
                                 </div>
+                                <div>
+                                    <div v-for="(id, index) in filters.createdBy" v-if="filters.createdBy"
+                                         :key="index" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">
+                                        {{
+                                            users.find(user => user.id === id)?.name
+                                        }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div v-for="(id, index) in filters.zoneBy" v-if="filters.zoneBy"
+                                         :key="index" class="badge bg-success text-white dark:bg-success ml-2">
+                                        {{
+                                            zones.find(zone => zone.id === id)?.name
+                                        }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -391,7 +413,7 @@ const applyFilters = () => {
             create: true,
           })"
                 >
-                    <option v-for="zone in zones" :value="zone.id">{{ zone.zone_name }}</option>
+                    <option v-for="zone in zones" :value="zone.id">{{ zone.name }}</option>
                 </select>
 
 
