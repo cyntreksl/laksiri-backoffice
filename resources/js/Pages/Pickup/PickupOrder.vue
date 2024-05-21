@@ -29,8 +29,8 @@ const props = defineProps({
 })
 
 const form = reactive({
-    fromDate: props.filters.fromDate || "",
-    toDate: props.filters.toDate || "",
+    fromDate: props.filters.fromDate || moment(new Date()).format('YYYY-MM-DD'),
+    toDate: props.filters.toDate || moment(new Date()).format('YYYY-MM-DD'),
     driverId: props.filters.driverId || null,
 })
 
