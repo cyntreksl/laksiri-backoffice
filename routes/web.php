@@ -4,6 +4,7 @@ use App\Http\Controllers\CashSettlementController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
+use App\Http\Controllers\PickupExceptionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Foundation\Application;
@@ -39,8 +40,10 @@ Route::middleware([
     Route::put('pickups/{pickup}/driver/update', [PickupController::class, 'updateDriver'])
         ->name('pickups.driver.update');
 
-    Route::get('pickups/exceptions/list', [PickupController::class, 'exceptions'])
+    Route::get('pickups/exceptions/list', [PickupExceptionController::class, 'index'])
         ->name('pickups.exceptions');
+
+    Route::get('pickup-exception-list', [PickupExceptionController::class, 'list']);
 
     // HBL
     Route::resource('hbls', HBLController::class);

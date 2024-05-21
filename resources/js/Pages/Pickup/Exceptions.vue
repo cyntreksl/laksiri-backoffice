@@ -60,7 +60,7 @@ const data = reactive({
     },
 });
 
-const baseUrl = ref('/pickup-list')
+const baseUrl = ref('/pickup-exception-list')
 
 const toggleColumnVisibility = columnName => {
     data.columnVisibility[columnName] = !data.columnVisibility[columnName];
