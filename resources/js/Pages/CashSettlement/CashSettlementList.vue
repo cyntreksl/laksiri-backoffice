@@ -1,7 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import Popper from "vue3-popper";
 import {computed, reactive, ref} from "vue";
 import {Grid, h} from "gridjs";
 import {push} from "notivue";
@@ -14,6 +13,8 @@ import DatePicker from "@/Components/DatePicker.vue";
 import FilterBorder from "@/Components/FilterBorder.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
+import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
+import Checkbox from "@/Components/Checkbox.vue";
 
 defineProps({
     drivers: {
@@ -389,64 +390,31 @@ pageReady();
 
                     <div class="flex space-x-2">
 
-                        <Popper>
-                            <button x-tooltip.placement.top="'View columns'"
-                                    class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
-                                <i class="fa-solid fa-grip"></i>
-                            </button>
-                            <template #content>
-                                <div class="max-w-[16rem]">
-                                    <div
-                                        class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700">
-                                        <div
-                                            class="rounded-md border border-slate-150 bg-white p-4 dark:border-navy-600 dark:bg-navy-700">
-                                            <h3 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                                                Select Columns
-                                            </h3>
-                                            <p class="mt-1 text-xs+">Choose which columns you want to see </p>
-                                            <div class="mt-4 flex flex-col space-y-4 text-slate-600 dark:text-navy-100">
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.address"
-                                                        @change="toggleColumnVisibility('address', $event)"
-                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                                                        type="checkbox"
-                                                    />
-                                                    Address
-                                                </label>
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.cargo_type"
-                                                        @change="toggleColumnVisibility('cargo_type', $event)"
-                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                                                        type="checkbox"
-                                                    />
-                                                    Cargo Mode
-                                                </label>
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.hbl_type"
-                                                        @change="toggleColumnVisibility('hbl_type', $event)"
-                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                                                        type="checkbox"
-                                                    />
-                                                    Delivery Type
-                                                </label>
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.officer"
-                                                        @change="toggleColumnVisibility('officer', $event)"
-                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                                                        type="checkbox"
-                                                    />
-                                                    Officer
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </Popper>
+                        <ColumnVisibilityPopover>
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.address"
+                                          @change="toggleColumnVisibility('address', $event)"/>
+                                <span class="hover:cursor-pointer">Address</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.cargo_type"
+                                          @change="toggleColumnVisibility('cargo_type', $event)"/>
+                                <span class="hover:cursor-pointer">Cargo Mode</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.hbl_type"
+                                          @change="toggleColumnVisibility('hbl_type', $event)"/>
+                                <span class="hover:cursor-pointer">Delivery Type</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.officer"
+                                          @change="toggleColumnVisibility('officer', $event)"/>
+                                <span class="hover:cursor-pointer">Officer</span>
+                            </label>
+                        </ColumnVisibilityPopover>
 
                         <button x-tooltip.placement.top="'Filter result'" @click="showFilters=true"
                                 class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
@@ -481,7 +449,6 @@ pageReady();
                                 <p class="text-sm text-gray-500">Sorry, we couldn't find any records matching your criteria.</p>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
