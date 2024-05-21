@@ -18,8 +18,8 @@ class PickupController extends Controller
     public function __construct(
         private readonly PickupRepositoryInterface $pickupRepository,
         private readonly DriverRepositoryInterface $driverRepository,
-        private readonly UserRepositoryInterface   $userRepository,
-        private readonly ZoneRepositoryInterface   $zoneRepository,
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly ZoneRepositoryInterface $zoneRepository,
     ) {
     }
 
@@ -79,5 +79,14 @@ class PickupController extends Controller
     {
         $pickUp = PickUp::find($pickUp);
         $this->pickupRepository->assignDriver($request->all(), $pickUp);
+    }
+
+    public function exceptions()
+    {
+        return Inertia::render('Pickup/Exceptions', [
+            'drivers' => $this->driverRepository->getAllDrivers(),
+            'users' => $this->userRepository->getUsers(),
+            'zones' => $this->zoneRepository->getZones(),
+        ]);
     }
 }
