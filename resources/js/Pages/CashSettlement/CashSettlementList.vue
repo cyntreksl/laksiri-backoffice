@@ -1,300 +1,273 @@
-<script>
+<script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Popper from "vue3-popper";
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, reactive, ref} from "vue";
 import {Grid, h} from "gridjs";
-import {RowSelection} from "gridjs/plugins/selection";
 import {push} from "notivue";
 import moment from "moment";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
-export default {
-    components: {AppLayout, Breadcrumb, Popper, RowSelection},
-    props: {
-        drivers: {},
-        officers: {},
+defineProps({
+    drivers: {
+        type: Object,
+        default: () => {},
     },
-    setup(props) {
-        const showFilters = ref(false);
-        const fromDate = moment(new Date()).subtract(1, 'months').format('YYYY-MM-DD');
-        const toDate = moment(new Date()).format('YYYY-MM-DD');
-        const wrapperRef = ref(null);
-        let grid = null;
+    officers: {
+        type: Object,
+        default: () => {},
+    },
+})
 
-        const filters = reactive({
-            fromDate: fromDate,
-            toDate: toDate,
-            drivers: {},
-            officers: {},
-            deliveryType: ['UBP', "Door to Door", "Gift"],
-            cargoMode: ["Air Cargo", "Sea Cargo"],
-        })
+const showFilters = ref(false);
+const fromDate = moment(new Date()).subtract(1, 'months').format('YYYY-MM-DD');
+const toDate = moment(new Date()).format('YYYY-MM-DD');
+const wrapperRef = ref(null);
+let grid = null;
 
-        // onMounted(() => {
-        //     initializeGrid();
-        // })
+const filters = reactive({
+    fromDate: fromDate,
+    toDate: toDate,
+    drivers: {},
+    officers: {},
+    deliveryType: ['UBP', "Door to Door", "Gift"],
+    cargoMode: ["Air Cargo", "Sea Cargo"],
+})
 
-        const data = reactive({
-            columnVisibility: {
-                hbl: true,
-                hbl_name: true,
-                address: false,
-                picked_date: true,
-                weight: true,
-                volume: true,
-                grand_total: true,
-                paid_amount: true,
-                cargo_type: true,
-                hbl_type: false,
-                officer: false,
-                actions: true,
-            },
-            selectedData: {},
-        });
+const data = reactive({
+    columnVisibility: {
+        hbl: true,
+        hbl_name: true,
+        address: false,
+        picked_date: true,
+        weight: true,
+        volume: true,
+        grand_total: true,
+        paid_amount: true,
+        cargo_type: true,
+        hbl_type: false,
+        officer: false,
+        actions: true,
+    },
+    selectedData: {},
+});
 
-        const toggleColumnVisibility = columnName => {
-            data.columnVisibility[columnName] = !data.columnVisibility[columnName];
-            updateGridConfig();
-            grid.forceRender();
-        };
+const toggleColumnVisibility = columnName => {
+    data.columnVisibility[columnName] = !data.columnVisibility[columnName];
+    updateGridConfig();
+    grid.forceRender();
+};
 
-        const updateGridConfig = () => {
-            grid.updateConfig({
-                columns: createColumns(),
-            });
-        };
+const updateGridConfig = () => {
+    grid.updateConfig({
+        columns: createColumns(),
+    });
+};
 
-        const selectedData = ref([]);
+const selectedData = ref([]);
 
-
-        const createColumns = () => [
-            {
-                name: '#',
-                formatter: (_, row) => {
-                    return h('input',
-                        {
-                            type: 'checkbox',
-                            className: 'form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent',
-                            onChange: (event) => {
-                                const isChecked = event.target.checked;
-                                if (isChecked) {
-                                    const rowData = row.cells.map(cell => cell.data); // Extract data from cells array
-                                    selectedData.value.push(rowData); // Push extracted data into selectedData
-                                } else {
-                                    // Remove the specific row from selectedData (assuming uniqueness of rows)
-                                    const index = selectedData.value.findIndex(selectedRow => {
-                                        const rowData = row.cells.map(cell => cell.data);
-                                        return JSON.stringify(selectedRow) === JSON.stringify(rowData);
-                                    });
-                                    if (index !== -1) {
-                                        selectedData.value.splice(index, 1);
-                                    }
-                                }
-                            }
-                        });
-                }
-            },
-            {name: 'HBL', hidden: !data.columnVisibility.hbl},
-            {name: 'Name', hidden: !data.columnVisibility.hbl_name},
-            {name: 'Address', hidden: !data.columnVisibility.address},
-            {name: 'Picked Date', hidden: !data.columnVisibility.picked_date},
-            {name: 'Weight', hidden: !data.columnVisibility.weight},
-            {name: 'Volume', hidden: !data.columnVisibility.volume},
-            {name: 'Amount', hidden: !data.columnVisibility.grand_total},
-            {name: 'Paid', hidden: !data.columnVisibility.paid_amount},
-            {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
-            {name: 'Delivery Type', hidden: !data.columnVisibility.hbl_type},
-            {name: 'Officer', hidden: !data.columnVisibility.officer},
-            {name: 'Actions', hidden: !data.columnVisibility.actions, sort: false},
-        ];
-
-
-        const baseUrl = ref('/cash-settlement-list')
-
-        const constructUrl = () => {
-            const params = new URLSearchParams();
-            for (const key in filters) {
-                if (filters.hasOwnProperty(key)) {
-                    params.append(key, filters[key].toString());
-                }
-            }
-            return baseUrl.value + '?' + params.toString();
-        }
-
-        const initializeGrid = () => {
-            const visibleColumns = Object.keys(data.columnVisibility);
-
-            grid = new Grid({
-                columns: createColumns(),
-                search: {
-                    debounceTimeout: 1000,
-                    server: {
-                        url: (prev, keyword) => `${prev}?search=${keyword}`
-                    }
-                },
-                sort: {
-                    multiColumn: false,
-                    server: {
-                        url: (prev, columns) => {
-                            if (!columns.length) return prev;
-                            const col = columns[0];
-                            const dir = col.direction === 1 ? 'asc' : 'desc';
-                            let colName = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key])[col.index];
-
-                            return `${prev}&order=${colName}&dir=${dir}`;
-                        }
-                    }
-                },
-                pagination: {
-                    limit: 10,
-                    server: {
-                        url: (prev, page, limit) => `${prev}&limit=${limit}&offset=${page * limit}`
-                    }
-                },
-                server: {
-                    url: constructUrl(),
-                    then: data => data.data.map(item => {
-                        const row = [];
-                        row.push({id: item.id})
-                        visibleColumns.forEach(column => {
-                            row.push(item[column]);
-                        });
-                        return row;
-                    }),
-                    total: response => {
-                        if (response && response.meta) {
-                            return response.meta.total;
+const createColumns = () => [
+    {
+        name: '#',
+        formatter: (_, row) => {
+            return h('input',
+                {
+                    type: 'checkbox',
+                    className: 'form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent',
+                    onChange: (event) => {
+                        const isChecked = event.target.checked;
+                        if (isChecked) {
+                            const rowData = row.cells.map(cell => cell.data); // Extract data from cells array
+                            selectedData.value.push(rowData); // Push extracted data into selectedData
                         } else {
-                            throw new Error('Invalid total count in server response');
+                            // Remove the specific row from selectedData (assuming uniqueness of rows)
+                            const index = selectedData.value.findIndex(selectedRow => {
+                                const rowData = row.cells.map(cell => cell.data);
+                                return JSON.stringify(selectedRow) === JSON.stringify(rowData);
+                            });
+                            if (index !== -1) {
+                                selectedData.value.splice(index, 1);
+                            }
                         }
                     }
-                }
-            });
-            grid.render(wrapperRef.value);
-        };
-
-        const applyFilters = () => {
-            showFilters.value = false;
-            const newUrl = constructUrl();
-            const visibleColumns = Object.keys(data.columnVisibility);
-            grid.updateConfig({
-                server: {
-                    url: newUrl,
-                    then: data => data.data.map(item => {
-                        const row = [];
-                        visibleColumns.forEach(column => {
-                            row.push(item[column]);
-                        });
-                        return row;
-                    }),
-                }
-            });
-            grid.forceRender();
-        }
-
-        const totalRecord = ref(0);
-        const totalGrandAmount = ref(0);
-        const totalPaidAmount = ref(0);
-
-        const getCashSettlementSummary = async (filters) => {
-            try {
-                const response = await fetch("/cash-settlement-summery", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                    },
-                    body: JSON.stringify(filters)
                 });
+        }
+    },
+    {name: 'HBL', hidden: !data.columnVisibility.hbl},
+    {name: 'Name', hidden: !data.columnVisibility.hbl_name},
+    {name: 'Address', hidden: !data.columnVisibility.address},
+    {name: 'Picked Date', hidden: !data.columnVisibility.picked_date},
+    {name: 'Weight', hidden: !data.columnVisibility.weight},
+    {name: 'Volume', hidden: !data.columnVisibility.volume},
+    {name: 'Amount', hidden: !data.columnVisibility.grand_total},
+    {name: 'Paid', hidden: !data.columnVisibility.paid_amount},
+    {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
+    {name: 'Delivery Type', hidden: !data.columnVisibility.hbl_type},
+    {name: 'Officer', hidden: !data.columnVisibility.officer},
+    {name: 'Actions', hidden: !data.columnVisibility.actions, sort: false},
+];
 
-                if (!response.ok) {
-                    throw new Error('Network response was not ok.');
-                }
+const baseUrl = ref('/cash-settlement-list')
 
-                const data = await response.json();
-                totalRecord.value = data.totalRecords;
-                totalGrandAmount.value = data.sumAmount;
-                totalPaidAmount.value = data.sumPaidAmount;
-            } catch (error) {
-                console.error('Error:', error);
+const constructUrl = () => {
+    const params = new URLSearchParams();
+    for (const key in filters) {
+        if (filters.hasOwnProperty(key)) {
+            params.append(key, filters[key].toString());
+        }
+    }
+    return baseUrl.value + '?' + params.toString();
+}
+
+const initializeGrid = () => {
+    const visibleColumns = Object.keys(data.columnVisibility);
+
+    grid = new Grid({
+        columns: createColumns(),
+        search: {
+            debounceTimeout: 1000,
+            server: {
+                url: (prev, keyword) => `${prev}?search=${keyword}`
             }
-        }
+        },
+        sort: {
+            multiColumn: false,
+            server: {
+                url: (prev, columns) => {
+                    if (!columns.length) return prev;
+                    const col = columns[0];
+                    const dir = col.direction === 1 ? 'asc' : 'desc';
+                    let colName = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key])[col.index];
 
-        const cashReceived = async () => {
-            const idList = selectedData.value.map(item => item[0]);
-            try {
-                const response = await fetch("/cash-received", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                    },
-                    body: JSON.stringify({'hbl_ids': idList})
+                    return `${prev}&order=${colName}&dir=${dir}`;
+                }
+            }
+        },
+        pagination: {
+            limit: 10,
+            server: {
+                url: (prev, page, limit) => `${prev}&limit=${limit}&offset=${page * limit}`
+            }
+        },
+        server: {
+            url: constructUrl(),
+            then: data => data.data.map(item => {
+                const row = [];
+                row.push({id: item.id})
+                visibleColumns.forEach(column => {
+                    row.push(item[column]);
                 });
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok.');
+                return row;
+            }),
+            total: response => {
+                if (response && response.meta) {
+                    return response.meta.total;
                 } else {
-                    window.location.reload();
-                    push.success('Cash collected successfully!')
+                    throw new Error('Invalid total count in server response');
                 }
-
-            } catch (error) {
-                console.error('Error:', error);
             }
         }
+    });
+    grid.render(wrapperRef.value);
+};
 
-        const isDataEmpty = computed(() => selectedData.value.length === 0);
-        const countOfSelectedData = computed(() => selectedData.value.length);
-        const valueOfSelectedData = computed(() => {
-            return selectedData.value.reduce((total, item) => {
-                const grandTotal = parseFloat(item[7] || 0);
-                return total + grandTotal;
-            }, 0);
-        });
-        const paidValueOfSelectedData = computed(() => {
-            return selectedData.value.reduce((total, item) => {
-                const grandTotal = parseFloat(item[8] || 0);
-                return total + grandTotal;
-            }, 0);
+const applyFilters = () => {
+    showFilters.value = false;
+    const newUrl = constructUrl();
+    const visibleColumns = Object.keys(data.columnVisibility);
+    grid.updateConfig({
+        server: {
+            url: newUrl,
+            then: data => data.data.map(item => {
+                const row = [];
+                visibleColumns.forEach(column => {
+                    row.push(item[column]);
+                });
+                return row;
+            }),
+        }
+    });
+    grid.forceRender();
+}
+
+const totalRecord = ref(0);
+const totalGrandAmount = ref(0);
+const totalPaidAmount = ref(0);
+
+const getCashSettlementSummary = async (filters) => {
+    try {
+        const response = await fetch("/cash-settlement-summery", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify(filters)
         });
 
-        const pageReady = async () => {
-            await getCashSettlementSummary();
-            if (totalRecord.value > 0) {
-                initializeGrid();
-            } else {
-                console.log("no data");
-            }
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
         }
 
-
-        pageReady();
-
-
-        return {
-            showFilters,
-            applyFilters,
-            filters,
-            wrapperRef,
-            toggleColumnVisibility,
-            data,
-            selectedData,
-            cashReceived,
-            isDataEmpty,
-            countOfSelectedData,
-            valueOfSelectedData,
-            paidValueOfSelectedData,
-            totalRecord,
-            totalGrandAmount,
-            totalPaidAmount,
-
-        }
+        const data = await response.json();
+        totalRecord.value = data.totalRecords;
+        totalGrandAmount.value = data.sumAmount;
+        totalPaidAmount.value = data.sumPaidAmount;
+    } catch (error) {
+        console.error('Error:', error);
     }
 }
 
-</script>
+const cashReceived = async () => {
+    const idList = selectedData.value.map(item => item[0]);
+    try {
+        const response = await fetch("/cash-received", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify({'hbl_ids': idList})
+        });
 
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            window.location.reload();
+            push.success('Cash collected successfully!')
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+const isDataEmpty = computed(() => selectedData.value.length === 0);
+const countOfSelectedData = computed(() => selectedData.value.length);
+const valueOfSelectedData = computed(() => {
+    return selectedData.value.reduce((total, item) => {
+        const grandTotal = parseFloat(item[7] || 0);
+        return total + grandTotal;
+    }, 0);
+});
+const paidValueOfSelectedData = computed(() => {
+    return selectedData.value.reduce((total, item) => {
+        const grandTotal = parseFloat(item[8] || 0);
+        return total + grandTotal;
+    }, 0);
+});
+
+const pageReady = async () => {
+    await getCashSettlementSummary();
+    if (totalRecord.value > 0) {
+        initializeGrid();
+    } else {
+        console.log("no data");
+    }
+}
+
+pageReady();
+</script>
 <template>
     <AppLayout title="Cash Settlements">
         <template #header>Cash Settlements</template>
@@ -408,7 +381,7 @@ export default {
                     </div>
 
 
-                    <div class="flex">
+                    <div class="flex space-x-2">
 
                         <Popper>
                             <button x-tooltip.placement.top="'View columns'"
@@ -477,13 +450,20 @@ export default {
                         <button
                             @click="cashReceived"
                             :disabled="isDataEmpty"
-                            class="btn font-medium text-white ml-2"
+                            class="btn font-medium text-white"
                             :class="{
             'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90': !isDataEmpty,
             'bg-gray-300 cursor-not-allowed': isDataEmpty
         }">
                             Cash Received
                         </button>
+
+                        <PrimaryButton>
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            Payment
+                        </PrimaryButton>
                     </div>
                 </div>
                 <div class=" mt-3">
