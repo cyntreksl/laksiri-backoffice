@@ -39,6 +39,9 @@ Route::middleware([
     Route::put('pickups/{pickup}/driver/update', [PickupController::class, 'updateDriver'])
         ->name('pickups.driver.update');
 
+    Route::get('pickups/exceptions/list', [PickupController::class, 'exceptions'])
+        ->name('pickups.exceptions');
+
     // HBL
     Route::resource('hbls', HBLController::class);
 
@@ -83,7 +86,6 @@ Route::middleware([
             return Inertia::render('Warehouse/WarehouseList');
         })->name('warehouses.index');
     });
-
 
     //Loading
     Route::name('loading.')->group(function () {
@@ -153,7 +155,7 @@ Route::middleware([
         // Zones
         Route::get('zones/list', [ZoneController::class, 'list'])->name('driver-zones.list');
         Route::resource('zones', ZoneController::class)
-            ->except(['create', 'show'])->name('index','driver-zones.index');
+            ->except(['create', 'show'])->name('index', 'driver-zones.index');
         //Driver Areas
         Route::get('driver-areas', function () {
             return Inertia::render('Setting/DriverAreaList');
