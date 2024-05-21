@@ -7,6 +7,13 @@ import {Grid, h} from "gridjs";
 import {push} from "notivue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
+import FilterDrawer from "@/Components/FilterDrawer.vue";
+import Switch from "@/Components/Switch.vue";
+import DatePicker from "@/Components/DatePicker.vue";
+import FilterBorder from "@/Components/FilterBorder.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import FilterHeader from "@/Components/FilterHeader.vue";
 
 defineProps({
     drivers: {
@@ -330,7 +337,6 @@ pageReady();
             </div>
         </div>
 
-
         <div class="card mt-4">
             <div>
                 <div class="flex items-center justify-between p-2">
@@ -481,189 +487,75 @@ pageReady();
             </div>
         </div>
 
-        <div class="block" v-show="showFilters">
-            <div class="fixed inset-0 z-[100] bg-slate-900/60 transition-opacity duration-200 show block"
-                 x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                 x-transition:leave="ease-in" x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"></div>
-            <div class="fixed right-0 top-0 z-[101] h-full w-72">
-                <div
-                    class="flex h-full p-5 w-full transform-gpu flex-col bg-white transition-transform duration-200 dark:bg-navy-700 show block"
-                    x-transition:enter="ease-out" x-transition:enter-start="translate-x-full"
-                    x-transition:enter-end="translate-x-0" x-transition:leave="ease-in"
-                    x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
-                    <div class="my-3 flex h-5 items-center justify-between">
-                        <h2 class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 lg:text-base">
-                            Filter Cash Settlement
-                        </h2>
+        <FilterDrawer :show="showFilters" @close="showFilters = false">
+            <template #title>
+                Filter Cash Settlement
+            </template>
 
-                        <button x-tooltip.placement.bottom.error="'Close filter drawer'" @click="showFilters = false"
-                                class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-red-500/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="size-4.5" fill="none" viewBox="0 0 24 24"
-                                 stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-
-                    <!--Filters-->
-                    <div>
-                        <span class="">From</span>
-                        <label class="relative flex">
-                            <input
-                                v-model="filters.fromDate"
-                                x-init="$el._x_flatpickr = flatpickr($el)"
-                                class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                placeholder="Choose date..."
-                                type="date"
-                            />
-                            <span
-                                class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="size-5 transition-colors duration-200"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                            />
-                                        </svg>
-                                    </span>
-                        </label>
-                    </div>
-
-                    <div>
-                        <span class="">to</span>
-                        <label class="relative flex">
-                            <input
-                                v-model="filters.toDate"
-                                x-init="$el._x_flatpickr = flatpickr($el)"
-                                class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                placeholder="Choose date..."
-                                type="date"
-                            />
-                            <span
-                                class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                            >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="size-5 transition-colors duration-200"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                            />
-                                        </svg>
-                                    </span>
-                        </label>
-                    </div>
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-
-                    <div>
-                        <span class="font-medium">Cargo Mode</span>
-                    </div>
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.cargoMode" value="Air Cargo"
-                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                               type="checkbox"/>
-                        <span>Air Cargo</span>
-                    </label>
-
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.cargoMode" value="Sea Cargo"
-                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                               type="checkbox"/>
-                        <span>Sea Cargo</span>
-                    </label>
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-                    <div>
-                        <span class="font-medium">Delivery Mode</span>
-                    </div>
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.deliveryType" value="UBP"
-                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                               type="checkbox"/>
-                        <span>UPB</span>
-                    </label>
-
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.deliveryType" value="Door to Door"
-                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                               type="checkbox"/>
-                        <span>Door to Door</span>
-                    </label>
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.deliveryType" value="Gift"
-                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                               type="checkbox"/>
-                        <span>Gift</span>
-                    </label>
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-                    <label class="block">
-                        <span class="font-medium">Select Drivers</span>
-                        <select
-                            v-model="filters.drivers"
-                            x-init="$el._tom = new Tom($el,{   plugins: ['remove_button']})"
-                            class="mt-1.5 w-full"
-                            placeholder="Select drivers..."
-                            autocomplete="off">
-                            <option value="">Select drivers...</option>
-                            <option v-for="(driver,id) in drivers" :key="id" :value="driver.id">{{ driver.name }}
-                            </option>
-                        </select>
-                    </label>
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-                    <label class="block">
-                        <span class="font-medium">Select Officers</span>
-                        <select
-                            v-model="filters.officers"
-                            x-init="$el._tom = new Tom($el,{   plugins: ['remove_button']})"
-                            class="mt-1.5 w-full"
-                            placeholder="Select officers..."
-                            autocomplete="off">
-                            <option value="">Select officers...</option>
-                            <option v-for="(officer,id) in officers" :key="id" :value="officer.id">{{ officer.name }}
-                            </option>
-                        </select>
-                    </label>
-
-                    <!--Filter Now Action Button-->
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-                    <button @click="applyFilters"
-                            class="btn w-full space-x-2 bg-primary/10 font-medium text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25">
-                        <i class="fa-solid fa-filter"></i>
-                        <span>Apply Filters</span>
-                    </button>
+            <template #content>
+                <div>
+                    <InputLabel value="From"/>
+                    <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
                 </div>
-            </div>
-        </div>
+
+                <div>
+                    <InputLabel value="To"/>
+                    <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
+                </div>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Cargo Mode"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.cargoMode" label="Air Cargo" value="Air Cargo"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.cargoMode" label="Sea Cargo" value="Sea Cargo"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.cargoMode" label="Door to Door" value="Door to Door"/>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Select Drivers"/>
+
+                <select
+                    v-model="filters.drivers"
+                    autocomplete="off"
+                    class="mt-1.5 w-full"
+                    placeholder="Select drivers..."
+                    x-init="$el._tom = new Tom($el,{   plugins: ['remove_button']})">
+                    <option value="">Select drivers...</option>
+                    <option v-for="(driver,id) in drivers" :key="id" :value="driver.id">{{ driver.name }}
+                    </option>
+                </select>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Select Officers"/>
+
+                <select
+                    v-model="filters.officers"
+                    autocomplete="off"
+                    class="mt-1.5 w-full"
+                    placeholder="Select officers..."
+                    x-init="$el._tom = new Tom($el,{   plugins: ['remove_button']})">
+                    <option value="">Select officers...</option>
+                    <option v-for="(officer,id) in officers" :key="id" :value="officer.id">{{ officer.name }}
+                    </option>
+                </select>
+
+
+                <!--Filter Now Action Button-->
+                <SoftPrimaryButton class="space-x-2" @click="applyFilters">
+                    <i class="fa-solid fa-filter"></i>
+                    <span>Apply Filters</span>
+                </SoftPrimaryButton>
+            </template>
+        </FilterDrawer>
     </AppLayout>
 </template>
-<style>
-[type='checkbox']:checked {
-    background-image: none !important;
-}
-
-[type='checkbox']:focus, [type='radio']:focus {
-    --tw-ring-offset-width: 0 !important;
-}
-
-.popper {
-    inset: 0 auto auto -15px !important;
-}
-
-:root {
-    --popper-theme-box-shadow: 0 6px 30px -6px rgba(0, 0, 0, 0.25);
-}
-</style>
