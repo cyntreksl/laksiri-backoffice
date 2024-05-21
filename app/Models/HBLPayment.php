@@ -16,6 +16,10 @@ class HBLPayment extends Model
 
     protected $table = 'hbl_payments';
 
+    protected $fillable = [
+        'branch_id', 'hbl_id', 'grand_total', 'paid_amount', 'status', 'created_by',
+    ];
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->logOnlyDirty();

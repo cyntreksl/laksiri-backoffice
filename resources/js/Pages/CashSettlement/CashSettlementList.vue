@@ -5,7 +5,6 @@ import {computed, reactive, ref} from "vue";
 import {Grid, h} from "gridjs";
 import {push} from "notivue";
 import moment from "moment";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
 import Switch from "@/Components/Switch.vue";
@@ -15,15 +14,19 @@ import InputLabel from "@/Components/InputLabel.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
+import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 defineProps({
     drivers: {
         type: Object,
-        default: () => {},
+        default: () => {
+        },
     },
     officers: {
         type: Object,
-        default: () => {},
+        default: () => {
+        },
     },
 })
 
@@ -112,7 +115,34 @@ const createColumns = () => [
     {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
     {name: 'Delivery Type', hidden: !data.columnVisibility.hbl_type},
     {name: 'Officer', hidden: !data.columnVisibility.officer},
-    {name: 'Actions', hidden: !data.columnVisibility.actions, sort: false},
+    {
+        name: 'Actions',
+        hidden: !data.columnVisibility.actions,
+        sort: false,
+        formatter: (_, row) => {
+            return h('div', {}, [
+                h('button', {
+                    className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
+                    onClick: () => confirmPayment(row.cells)
+                }, [
+                    h('svg', {
+                        xmlns: 'http://www.w3.org/2000/svg',
+                        viewBox: '0 0 24 24',
+                        class: 'size-4.5',
+                        fill: 'none',
+                        stroke: "currentColor",
+                        strokeWidth: 1.5,
+                    }, [
+                        h('path', {
+                            strokeLinecap: "round",
+                            strokeLinejoin: 'round',
+                            d: 'M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z',
+                        }),
+                    ])
+                ]),
+            ]);
+        },
+    },
 ];
 
 const baseUrl = ref('/cash-settlement-list')
@@ -275,6 +305,19 @@ const pageReady = async () => {
 }
 
 pageReady();
+
+const showConfirmPaymentModal = ref(false);
+const hblData = ref({});
+
+const confirmPayment = (row) => {
+    hblData.value = row;
+    showConfirmPaymentModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmPaymentModal.value = false;
+    hblData.value = null;
+}
 </script>
 <template>
     <AppLayout title="Cash Settlements">
@@ -431,24 +474,12 @@ pageReady();
         }">
                             Cash Received
                         </button>
-
-                        <PrimaryButton>
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            Payment
-                        </PrimaryButton>
                     </div>
                 </div>
-                <div class=" mt-3">
+                <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto p-3">
                         <div v-if="totalRecord > 0" ref="wrapperRef"></div>
-                        <div v-else class="flex items-center text-center justify-center h-48 rounded border border-2 border-dashed">
-                            <div class="text-gray-600 ">
-                                <h3 class="text-lg font-semibold mt-2">No records found</h3>
-                                <p class="text-sm text-gray-500">Sorry, we couldn't find any records matching your criteria.</p>
-                            </div>
-                        </div>
+                        <NoRecordsFound v-else/>
                     </div>
                 </div>
             </div>
@@ -524,5 +555,7 @@ pageReady();
                 </SoftPrimaryButton>
             </template>
         </FilterDrawer>
+
+        <PaymentModal :hbl-data="hblData" :show="showConfirmPaymentModal" @close="closeModal"/>
     </AppLayout>
 </template>
