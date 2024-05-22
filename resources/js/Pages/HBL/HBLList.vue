@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import {Link, router} from '@inertiajs/vue3'
 import {Grid, h} from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
@@ -17,13 +17,18 @@ import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
 import {push} from "notivue";
+import HBLDetailModal from "@/Pages/HBL/Partials/HBLDetailModal.vue";
 
-defineProps({
+const props = defineProps({
     users: {
         type: Object,
         default: () => {
         },
     },
+    hbls: {
+        type: Object,
+        default: () => {},
+    }
 })
 
 const wrapperRef = ref(null);
@@ -144,22 +149,55 @@ const createColumns = () => [
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h('div', {}, [
-                h('button', {
-                    className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
-                    onClick: () => confirmDeleteHBL(row.cells[0].data)
+                h('a', {
+                    className: 'btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2',
+                    onClick: () => confirmViewHBL(row.cells[0].data),
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
-                        viewBox: '0 0 448 512',
-                        class: 'size-4.5',
+                        viewBox: '0 0 24 24',
+                        class: 'size-5',
                         fill: 'none',
+                        strokeWidth: 2.5,
+                        stroke: 'currentColor',
                     }, [
                         h('path', {
-                            d: 'M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z',
-                            fill: 'currentColor',
-                        })
+                            d: 'M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z',
+                            strokeLinecap: 'round',
+                            strokeLinejoin: 'round',
+                        }),
+                        h('path', {
+                            d: 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
+                            strokeLinecap: 'round',
+                            strokeLinejoin: 'round',
+                        }),
                     ])
                 ]),
+                h(
+                    "button",
+                    {
+                        className:
+                            "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
+                        onClick: () => confirmDeleteHBL(row.cells[0].data),
+                    },
+                    [
+                        h(
+                            "svg",
+                            {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                viewBox: "0 0 448 512",
+                                class: "size-4.5",
+                                fill: "none",
+                            },
+                            [
+                                h("path", {
+                                    d: "M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z",
+                                    fill: "currentColor",
+                                }),
+                            ]
+                        ),
+                    ]
+                ),
             ]);
         },
     },
@@ -206,6 +244,7 @@ const applyFilters = () => {
 
 const showConfirmDeleteHBLModal = ref(false);
 const hblId = ref(null);
+const selectedHBL = ref({});
 
 const confirmDeleteHBL = (id) => {
     hblId.value = id;
@@ -214,6 +253,9 @@ const confirmDeleteHBL = (id) => {
 
 const closeModal = () => {
     showConfirmDeleteHBLModal.value = false;
+    showConfirmViewHBLModal.value = false;
+    hblId.value = null;
+    selectedHBL.value = null;
 }
 
 const handleDeleteHBL = () => {
@@ -231,6 +273,13 @@ const handleDeleteHBL = () => {
         }
     })
 }
+
+const showConfirmViewHBLModal = ref(false);
+
+const confirmViewHBL = (id) => {
+    selectedHBL.value = props.hbls.find(hbl => hbl.id === id);
+    showConfirmViewHBLModal.value = true;
+};
 </script>
 
 <template>
@@ -488,5 +537,7 @@ const handleDeleteHBL = () => {
 
         <DeleteHBLConfirmationModal :show="showConfirmDeleteHBLModal" @close="closeModal"
                                     @delete-hbl="handleDeleteHBL"/>
+
+        <HBLDetailModal :hbl="selectedHBL" :show="showConfirmViewHBLModal" @close="closeModal"/>
     </AppLayout>
 </template>
