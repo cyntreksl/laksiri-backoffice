@@ -4,6 +4,7 @@ use App\Http\Controllers\CashSettlementController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
+use App\Http\Controllers\PickupExceptionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Foundation\Application;
@@ -38,6 +39,11 @@ Route::middleware([
 
     Route::put('pickups/{pickup}/driver/update', [PickupController::class, 'updateDriver'])
         ->name('pickups.driver.update');
+
+    Route::get('pickups/exceptions/list', [PickupExceptionController::class, 'index'])
+        ->name('pickups.exceptions');
+
+    Route::get('pickup-exception-list', [PickupExceptionController::class, 'list']);
 
     Route::get('pickups/priority/ordering', [PickupController::class, 'showPickupOrder'])
         ->name('pickups.ordering');
@@ -83,19 +89,12 @@ Route::middleware([
         Route::get('cash-settlement-list', [CashSettlementController::class, 'list'])->name('cash-settlements.list');
         Route::post('cash-settlement-summery', [CashSettlementController::class, 'getSummery'])->name('cash-settlements.summery');
         Route::post('cash-received', [CashSettlementController::class, 'cashReceived'])->name('cash-settlements.cashReceived');
+        Route::put('update/payments/{hbl}', [CashSettlementController::class, 'paymentUpdate'])->name('cash-settlements.payment.update');
 
         // Warehouse
         Route::get('warehouses', function () {
             return Inertia::render('Warehouse/WarehouseList');
         })->name('warehouses.index');
-    });
-
-    // Settings
-    Route::prefix('settings')->name('settings.')->group(function () {
-        // Zones
-        Route::get('zones/list', [ZoneController::class, 'list'])->name('zones.list');
-        Route::resource('zones', ZoneController::class)
-            ->except(['create', 'show']);
     });
 
     //Loading
@@ -163,10 +162,10 @@ Route::middleware([
 
     //Setting
     Route::name('setting.')->group(function () {
-        //Driver Zones
-        Route::get('driver-zones', function () {
-            return Inertia::render('Setting/DriverZoneList');
-        })->name('driver-zones.index');
+        // Zones
+        Route::get('zones/list', [ZoneController::class, 'list'])->name('driver-zones.list');
+        Route::resource('zones', ZoneController::class)
+            ->except(['create', 'show'])->name('index', 'driver-zones.index');
         //Driver Areas
         Route::get('driver-areas', function () {
             return Inertia::render('Setting/DriverAreaList');
