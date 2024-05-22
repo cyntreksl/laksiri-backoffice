@@ -6,7 +6,7 @@ use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\DeleteHBL;
 use App\Actions\HBL\GetHBLs;
-use App\Actions\HBL\GetTotalHBLCount;
+use App\Actions\HBL\SwitchHoldStatus;
 use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\GridJsInterface;
@@ -33,8 +33,8 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         $query = HBL::query();
 
-        if (!empty($search)) {
-            $query->whereAny(['reference', 'hbl_name', 'contact_number'], 'like', '%' . $search . '%');
+        if (! empty($search)) {
+            $query->whereAny(['reference', 'hbl_name', 'contact_number'], 'like', '%'.$search.'%');
         }
 
         //apply filters
@@ -63,5 +63,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function deleteHBL(HBL $hbl)
     {
         return DeleteHBL::run($hbl);
+    }
+
+    public function toggleHold(HBL $hbl)
+    {
+        return SwitchHoldStatus::run($hbl);
     }
 }

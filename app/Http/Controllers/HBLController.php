@@ -18,8 +18,7 @@ class HBLController extends Controller
     public function __construct(
         private readonly HBLRepositoryInterface $HBLRepository,
         private readonly UserRepositoryInterface $userRepository
-    )
-    {
+    ) {
     }
 
     /**
@@ -95,5 +94,10 @@ class HBLController extends Controller
     public function destroy(HBL $hbl)
     {
         $this->HBLRepository->deleteHBL($hbl);
+    }
+
+    public function toggleHold(HBL $hbl)
+    {
+        $this->HBLRepository->toggleHold($hbl);
     }
 }

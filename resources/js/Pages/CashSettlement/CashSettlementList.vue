@@ -16,6 +16,8 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
+import HoldConfirmationModal from "@/Pages/CashSettlement/Partials/HoldConfirmationModal.vue";
+import {router} from "@inertiajs/vue3";
 
 defineProps({
     drivers: {
@@ -57,6 +59,7 @@ const data = reactive({
         paid_amount: true,
         cargo_type: true,
         hbl_type: false,
+        is_hold: true,
         status: true,
         officer: false,
         actions: true,
@@ -116,6 +119,16 @@ const createColumns = () => [
     {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
     {name: 'Delivery Type', hidden: !data.columnVisibility.hbl_type},
     {
+        name: 'Is Hold',
+        hidden: !data.columnVisibility.is_hold,
+        formatter: (cell) => {
+            return cell ? html(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-success">
+  <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
+</svg>`) : null
+        },
+        sort: false
+    },
+    {
         name: 'Status',
         hidden: !data.columnVisibility.status,
         formatter: (cell) => {
@@ -164,6 +177,45 @@ const createColumns = () => [
                             d: 'M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z',
                         }),
                     ])
+                ]),
+
+                h('button', {
+                    className: 'btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25',
+                    onClick: () => confirmIsHold(row.cells)
+                }, [
+                    row.cells[11].data ? h('svg', {
+                            xmlns: 'http://www.w3.org/2000/svg',
+                            viewBox: '0 0 24 24',
+                            class: 'size-4.5',
+                            fill: 'none',
+                            stroke: "currentColor",
+                            strokeWidth: 1.5,
+                        }, [
+                            h('path', {
+                                strokeLinecap: "round",
+                                strokeLinejoin: 'round',
+                                d: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+                            }),
+                            h('path', {
+                                strokeLinecap: "round",
+                                strokeLinejoin: 'round',
+                                d: 'M15.91 11.672a.375.375 0 0 1 0 .656l-5.603 3.113a.375.375 0 0 1-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112Z',
+                            }),
+                        ]) :
+                        h('svg', {
+                            xmlns: 'http://www.w3.org/2000/svg',
+                            viewBox: '0 0 24 24',
+                            class: 'size-4.5',
+                            fill: 'none',
+                            stroke: "currentColor",
+                            strokeWidth: 1.5,
+                        }, [
+                            h('path', {
+                                strokeLinecap: "round",
+                                strokeLinejoin: 'round',
+                                d: 'M14.25 9v6m-4.5 0V9M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+                            }),
+                        ])
                 ]),
             ]);
         },
@@ -342,6 +394,32 @@ const confirmPayment = (row) => {
 const closeModal = () => {
     showConfirmPaymentModal.value = false;
     hblData.value = null;
+}
+
+const showConfirmHoldModal = ref(false);
+
+const confirmIsHold = (row) => {
+    hblData.value = row;
+    showConfirmHoldModal.value = true;
+};
+
+const closeHoldModal = () => {
+    showConfirmHoldModal.value = false;
+}
+
+const toggleHold = () => {
+    router.put(route('hbls.toggle-hold', hblData.value[0].data.id), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeHoldModal()
+            push.success(hblData.value[11].data ? 'Released ' + hblData.value[1].data : 'Hold ' + hblData.value[1].data)
+            router.visit(route('back-office.cash-settlements.index'))
+            hblData.value = {}
+        },
+        onError: () => {
+            push.error('Something went to wrong!');
+        }
+    })
 }
 </script>
 <template>
@@ -582,5 +660,8 @@ const closeModal = () => {
         </FilterDrawer>
 
         <PaymentModal :hbl-data="hblData" :show="showConfirmPaymentModal" @close="closeModal"/>
+
+        <HoldConfirmationModal :hbl-data="hblData" :show="showConfirmHoldModal" @close="closeHoldModal"
+                               @toggle-hold="toggleHold"/>
     </AppLayout>
 </template>
