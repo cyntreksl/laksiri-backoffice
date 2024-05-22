@@ -41,9 +41,9 @@ let grid = null;
 const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
+    isHold: false,
     drivers: {},
     officers: {},
-    deliveryType: ['UBP', "Door to Door", "Gift"],
     cargoMode: ["Air Cargo", "Sea Cargo"],
 })
 
@@ -59,9 +59,9 @@ const data = reactive({
         paid_amount: true,
         cargo_type: true,
         hbl_type: false,
+        officer: false,
         is_hold: true,
         status: true,
-        officer: false,
         actions: true,
     },
     selectedData: {},
@@ -118,13 +118,19 @@ const createColumns = () => [
     {name: 'Paid', hidden: !data.columnVisibility.paid_amount},
     {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
     {name: 'Delivery Type', hidden: !data.columnVisibility.hbl_type},
+    {name: 'Officer', hidden: !data.columnVisibility.officer},
     {
         name: 'Is Hold',
         hidden: !data.columnVisibility.is_hold,
         formatter: (cell) => {
-            return cell ? html(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-success">
-  <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
-</svg>`) : null
+            if (cell) {
+                const svgMarkup = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-success">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
+                </svg>`;
+                return html(svgMarkup);
+            }
+            return null;
         },
         sort: false
     },
@@ -618,6 +624,14 @@ const toggleHold = () => {
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch v-model="filters.cargoMode" label="Door to Door" value="Door to Door"/>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Is Hold"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.isHold" label="Is Hold" value="true"/>
                 </label>
 
                 <FilterBorder/>
