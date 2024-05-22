@@ -39,6 +39,7 @@ class HBLResource extends JsonResource
             'paid_amount' => $this->paid_amount,
             'grand_total' => $this->grand_total,
             'status' => $this->status,
+            'is_hold' => $this->is_hold,
             'created_by' => $this->user?->name,
         ];
     }
