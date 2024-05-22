@@ -704,8 +704,8 @@ export default {
                             route: "dashboard2",
                         },
                         {
-                            title: "Job Exception",
-                            route: "dashboard2",
+                            title: "Pickup Exceptions",
+                            route: "pickups.exceptions",
                         },
                     );
                     break;

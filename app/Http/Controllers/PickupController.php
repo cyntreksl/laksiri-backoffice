@@ -18,8 +18,8 @@ class PickupController extends Controller
     public function __construct(
         private readonly PickupRepositoryInterface $pickupRepository,
         private readonly DriverRepositoryInterface $driverRepository,
-        private readonly UserRepositoryInterface   $userRepository,
-        private readonly ZoneRepositoryInterface   $zoneRepository,
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly ZoneRepositoryInterface $zoneRepository,
     ) {
     }
 
