@@ -42,8 +42,10 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     {
         $query = PickUp::query();
 
-        if (!empty($search)) {
-            $query->whereAny(['reference', 'name', 'contact_number'], 'like', '%' . $search . '%');
+        if (! empty($search)) {
+            $query->where('reference', 'like', '%'.$search.'%');
+            $query->where('name', 'like', '%'.$search.'%');
+            $query->where('contact_number', 'like', '%'.$search.'%');
         }
 
         //apply filters
