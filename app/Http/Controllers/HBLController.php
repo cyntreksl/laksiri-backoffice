@@ -18,8 +18,7 @@ class HBLController extends Controller
     public function __construct(
         private readonly HBLRepositoryInterface $HBLRepository,
         private readonly UserRepositoryInterface $userRepository
-    )
-    {
+    ) {
     }
 
     /**
@@ -29,6 +28,7 @@ class HBLController extends Controller
     {
         return Inertia::render('HBL/HBLList', [
             'users' => $this->userRepository->getUsers(),
+            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
         ]);
     }
 

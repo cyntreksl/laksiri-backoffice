@@ -4,11 +4,14 @@ namespace App\Factory\Pickup\Filters;
 
 use App\Interfaces\FilterInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 class FromDateFilter implements FilterInterface
 {
     public function apply(Builder $query, $value)
     {
-        return $query->whereDate('created_at', '>=', $value);
+        $dateValue = Carbon::parse($value); // Ensure $value is parsed into a date
+
+        return $query->whereDate('created_at', '>=', $dateValue);
     }
 }

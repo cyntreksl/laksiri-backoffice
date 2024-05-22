@@ -76,7 +76,6 @@ const form = useForm({
 });
 
 const handlePickupCreate = () => {
-    console.log(form.pickup_time_end, form.pickup_time_start);
     form.post(route("pickups.store"), {
         onSuccess: () => {
             form.reset();
