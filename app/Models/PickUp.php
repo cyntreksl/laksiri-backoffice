@@ -53,6 +53,7 @@ class PickUp extends Model
         $query->where('driver_id', auth()->id());
     }
 
+
     /**
      * Get the zone that owns the pickup.
      */
