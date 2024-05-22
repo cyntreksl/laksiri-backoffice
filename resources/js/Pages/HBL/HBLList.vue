@@ -38,6 +38,7 @@ const filters = reactive({
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo", "Door to Door"],
     hblType: ["UBP", "Gift", "Door to Door"],
+    isHold: false,
     warehouse: ["COLOMBO", "NINTAVUR"],
     createdBy: '',
 })
@@ -525,6 +526,14 @@ const toggleHold = () => {
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch v-model="filters.hblType" label="Door to Door" value="Door to Door"/>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Is Hold"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.isHold" label="Is Hold" value="true"/>
                 </label>
 
                 <FilterBorder/>
