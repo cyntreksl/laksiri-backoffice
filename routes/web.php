@@ -40,16 +40,16 @@ Route::middleware([
     Route::put('pickups/{pickup}/driver/update', [PickupController::class, 'updateDriver'])
         ->name('pickups.driver.update');
 
-    Route::get('pickups/exceptions/list', [PickupExceptionController::class, 'index'])
-        ->name('pickups.exceptions');
-
-    Route::get('pickup-exception-list', [PickupExceptionController::class, 'list']);
-
     Route::get('pickups/priority/ordering', [PickupController::class, 'showPickupOrder'])
         ->name('pickups.ordering');
 
     Route::put('/pickups/update/order', [PickupController::class, 'updatePickupOrder'])
         ->name('pickups.update-order');
+
+    Route::get('pickups/exceptions/list', [PickupExceptionController::class, 'index'])
+        ->name('pickups.exceptions');
+
+    Route::get('pickup-exception-list', [PickupExceptionController::class, 'list']);
 
     // HBL
     Route::resource('hbls', HBLController::class);
