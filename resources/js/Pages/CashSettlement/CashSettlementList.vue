@@ -1,300 +1,349 @@
-<script>
+<script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import Popper from "vue3-popper";
-import {computed, onMounted, reactive, ref} from "vue";
-import {Grid, h} from "gridjs";
-import {RowSelection} from "gridjs/plugins/selection";
+import {computed, reactive, ref} from "vue";
+import {Grid, h, html} from "gridjs";
 import {push} from "notivue";
 import moment from "moment";
+import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
+import FilterDrawer from "@/Components/FilterDrawer.vue";
+import Switch from "@/Components/Switch.vue";
+import DatePicker from "@/Components/DatePicker.vue";
+import FilterBorder from "@/Components/FilterBorder.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import FilterHeader from "@/Components/FilterHeader.vue";
+import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
+import Checkbox from "@/Components/Checkbox.vue";
+import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
-export default {
-    components: {AppLayout, Breadcrumb, Popper, RowSelection},
-    props: {
-        drivers: {},
-        officers: {},
+defineProps({
+    drivers: {
+        type: Object,
+        default: () => {
+        },
     },
-    setup(props) {
-        const showFilters = ref(false);
-        const fromDate = moment(new Date()).subtract(1, 'months').format('YYYY-MM-DD');
-        const toDate = moment(new Date()).format('YYYY-MM-DD');
-        const wrapperRef = ref(null);
-        let grid = null;
+    officers: {
+        type: Object,
+        default: () => {
+        },
+    },
+})
 
-        const filters = reactive({
-            fromDate: fromDate,
-            toDate: toDate,
-            drivers: {},
-            officers: {},
-            deliveryType: ['UBP', "Door to Door", "Gift"],
-            cargoMode: ["Air Cargo", "Sea Cargo"],
-        })
+const showFilters = ref(false);
+const fromDate = moment(new Date()).subtract(1, 'months').format('YYYY-MM-DD');
+const toDate = moment(new Date()).format('YYYY-MM-DD');
+const wrapperRef = ref(null);
+let grid = null;
 
-        // onMounted(() => {
-        //     initializeGrid();
-        // })
+const filters = reactive({
+    fromDate: fromDate,
+    toDate: toDate,
+    drivers: {},
+    officers: {},
+    deliveryType: ['UBP', "Door to Door", "Gift"],
+    cargoMode: ["Air Cargo", "Sea Cargo"],
+})
 
-        const data = reactive({
-            columnVisibility: {
-                hbl: true,
-                hbl_name: true,
-                address: false,
-                picked_date: true,
-                weight: true,
-                volume: true,
-                grand_total: true,
-                paid_amount: true,
-                cargo_type: true,
-                hbl_type: false,
-                officer: false,
-                actions: true,
-            },
-            selectedData: {},
-        });
+const data = reactive({
+    columnVisibility: {
+        hbl: true,
+        hbl_name: true,
+        address: false,
+        picked_date: true,
+        weight: true,
+        volume: true,
+        grand_total: true,
+        paid_amount: true,
+        cargo_type: true,
+        hbl_type: false,
+        status: true,
+        officer: false,
+        actions: true,
+    },
+    selectedData: {},
+});
 
-        const toggleColumnVisibility = columnName => {
-            data.columnVisibility[columnName] = !data.columnVisibility[columnName];
-            updateGridConfig();
-            grid.forceRender();
-        };
+const toggleColumnVisibility = columnName => {
+    data.columnVisibility[columnName] = !data.columnVisibility[columnName];
+    updateGridConfig();
+    grid.forceRender();
+};
 
-        const updateGridConfig = () => {
-            grid.updateConfig({
-                columns: createColumns(),
-            });
-        };
+const updateGridConfig = () => {
+    grid.updateConfig({
+        columns: createColumns(),
+    });
+};
 
-        const selectedData = ref([]);
+const selectedData = ref([]);
 
-
-        const createColumns = () => [
-            {
-                name: '#',
-                formatter: (_, row) => {
-                    return h('input',
-                        {
-                            type: 'checkbox',
-                            className: 'form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent',
-                            onChange: (event) => {
-                                const isChecked = event.target.checked;
-                                if (isChecked) {
-                                    const rowData = row.cells.map(cell => cell.data); // Extract data from cells array
-                                    selectedData.value.push(rowData); // Push extracted data into selectedData
-                                } else {
-                                    // Remove the specific row from selectedData (assuming uniqueness of rows)
-                                    const index = selectedData.value.findIndex(selectedRow => {
-                                        const rowData = row.cells.map(cell => cell.data);
-                                        return JSON.stringify(selectedRow) === JSON.stringify(rowData);
-                                    });
-                                    if (index !== -1) {
-                                        selectedData.value.splice(index, 1);
-                                    }
-                                }
-                            }
-                        });
-                }
-            },
-            {name: 'HBL', hidden: !data.columnVisibility.hbl},
-            {name: 'Name', hidden: !data.columnVisibility.hbl_name},
-            {name: 'Address', hidden: !data.columnVisibility.address},
-            {name: 'Picked Date', hidden: !data.columnVisibility.picked_date},
-            {name: 'Weight', hidden: !data.columnVisibility.weight},
-            {name: 'Volume', hidden: !data.columnVisibility.volume},
-            {name: 'Amount', hidden: !data.columnVisibility.grand_total},
-            {name: 'Paid', hidden: !data.columnVisibility.paid_amount},
-            {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
-            {name: 'Delivery Type', hidden: !data.columnVisibility.hbl_type},
-            {name: 'Officer', hidden: !data.columnVisibility.officer},
-            {name: 'Actions', hidden: !data.columnVisibility.actions, sort: false},
-        ];
-
-
-        const baseUrl = ref('/cash-settlement-list')
-
-        const constructUrl = () => {
-            const params = new URLSearchParams();
-            for (const key in filters) {
-                if (filters.hasOwnProperty(key)) {
-                    params.append(key, filters[key].toString());
-                }
-            }
-            return baseUrl.value + '?' + params.toString();
-        }
-
-        const initializeGrid = () => {
-            const visibleColumns = Object.keys(data.columnVisibility);
-
-            grid = new Grid({
-                columns: createColumns(),
-                search: {
-                    debounceTimeout: 1000,
-                    server: {
-                        url: (prev, keyword) => `${prev}?search=${keyword}`
-                    }
-                },
-                sort: {
-                    multiColumn: false,
-                    server: {
-                        url: (prev, columns) => {
-                            if (!columns.length) return prev;
-                            const col = columns[0];
-                            const dir = col.direction === 1 ? 'asc' : 'desc';
-                            let colName = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key])[col.index];
-
-                            return `${prev}&order=${colName}&dir=${dir}`;
-                        }
-                    }
-                },
-                pagination: {
-                    limit: 10,
-                    server: {
-                        url: (prev, page, limit) => `${prev}&limit=${limit}&offset=${page * limit}`
-                    }
-                },
-                server: {
-                    url: constructUrl(),
-                    then: data => data.data.map(item => {
-                        const row = [];
-                        row.push({id: item.id})
-                        visibleColumns.forEach(column => {
-                            row.push(item[column]);
-                        });
-                        return row;
-                    }),
-                    total: response => {
-                        if (response && response.meta) {
-                            return response.meta.total;
+const createColumns = () => [
+    {
+        name: '#',
+        formatter: (_, row) => {
+            return h('input',
+                {
+                    type: 'checkbox',
+                    className: 'form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent',
+                    onChange: (event) => {
+                        const isChecked = event.target.checked;
+                        if (isChecked) {
+                            const rowData = row.cells.map(cell => cell.data); // Extract data from cells array
+                            selectedData.value.push(rowData); // Push extracted data into selectedData
                         } else {
-                            throw new Error('Invalid total count in server response');
+                            // Remove the specific row from selectedData (assuming uniqueness of rows)
+                            const index = selectedData.value.findIndex(selectedRow => {
+                                const rowData = row.cells.map(cell => cell.data);
+                                return JSON.stringify(selectedRow) === JSON.stringify(rowData);
+                            });
+                            if (index !== -1) {
+                                selectedData.value.splice(index, 1);
+                            }
                         }
                     }
-                }
-            });
-            grid.render(wrapperRef.value);
-        };
-
-        const applyFilters = () => {
-            showFilters.value = false;
-            const newUrl = constructUrl();
-            const visibleColumns = Object.keys(data.columnVisibility);
-            grid.updateConfig({
-                server: {
-                    url: newUrl,
-                    then: data => data.data.map(item => {
-                        const row = [];
-                        visibleColumns.forEach(column => {
-                            row.push(item[column]);
-                        });
-                        return row;
-                    }),
-                }
-            });
-            grid.forceRender();
-        }
-
-        const totalRecord = ref(0);
-        const totalGrandAmount = ref(0);
-        const totalPaidAmount = ref(0);
-
-        const getCashSettlementSummary = async (filters) => {
-            try {
-                const response = await fetch("/cash-settlement-summery", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                    },
-                    body: JSON.stringify(filters)
                 });
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok.');
-                }
-
-                const data = await response.json();
-                totalRecord.value = data.totalRecords;
-                totalGrandAmount.value = data.sumAmount;
-                totalPaidAmount.value = data.sumPaidAmount;
-            } catch (error) {
-                console.error('Error:', error);
-            }
         }
-
-        const cashReceived = async () => {
-            const idList = selectedData.value.map(item => item[0]);
-            try {
-                const response = await fetch("/cash-received", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                    },
-                    body: JSON.stringify({'hbl_ids': idList})
-                });
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok.');
-                } else {
-                    window.location.reload();
-                    push.success('Cash collected successfully!')
-                }
-
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        const isDataEmpty = computed(() => selectedData.value.length === 0);
-        const countOfSelectedData = computed(() => selectedData.value.length);
-        const valueOfSelectedData = computed(() => {
-            return selectedData.value.reduce((total, item) => {
-                const grandTotal = parseFloat(item[7] || 0);
-                return total + grandTotal;
-            }, 0);
-        });
-        const paidValueOfSelectedData = computed(() => {
-            return selectedData.value.reduce((total, item) => {
-                const grandTotal = parseFloat(item[8] || 0);
-                return total + grandTotal;
-            }, 0);
-        });
-
-        const pageReady = async () => {
-            await getCashSettlementSummary();
-            if (totalRecord.value > 0) {
-                initializeGrid();
+    },
+    {name: 'HBL', hidden: !data.columnVisibility.hbl},
+    {name: 'Name', hidden: !data.columnVisibility.hbl_name},
+    {name: 'Address', hidden: !data.columnVisibility.address},
+    {name: 'Picked Date', hidden: !data.columnVisibility.picked_date},
+    {name: 'Weight', hidden: !data.columnVisibility.weight},
+    {name: 'Volume', hidden: !data.columnVisibility.volume},
+    {name: 'Amount', hidden: !data.columnVisibility.grand_total},
+    {name: 'Paid', hidden: !data.columnVisibility.paid_amount},
+    {name: 'Cargo Mode', hidden: !data.columnVisibility.cargo_type},
+    {name: 'Delivery Type', hidden: !data.columnVisibility.hbl_type},
+    {
+        name: 'Status',
+        hidden: !data.columnVisibility.status,
+        formatter: (cell) => {
+            if (cell === 'Full Paid') {
+                return html(`<div class="badge space-x-2.5 text-success">
+    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+    <span>${cell}</span>
+  </div>`);
+            } else if (cell === 'Partial Paid') {
+                return html(`<div class="badge space-x-2.5 text-warning">
+    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-question-mark"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 8a3.5 3 0 0 1 3.5 -3h1a3.5 3 0 0 1 3.5 3a3 3 0 0 1 -2 3a3 4 0 0 0 -2 4" /><path d="M12 19l0 .01" /></svg>
+    <span>${cell}</span>
+  </div>`);
+            } else if (cell === 'Unpaid') {
+                return html(`<div class="badge space-x-2.5 text-error">
+    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+    <span>${cell}</span>
+  </div>`);
             } else {
-                console.log("no data");
+                return cell;
             }
         }
+    },
+    {name: 'Officer', hidden: !data.columnVisibility.officer},
+    {
+        name: 'Actions',
+        hidden: !data.columnVisibility.actions,
+        sort: false,
+        formatter: (_, row) => {
+            return h('div', {}, [
+                h('button', {
+                    className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
+                    onClick: () => confirmPayment(row.cells)
+                }, [
+                    h('svg', {
+                        xmlns: 'http://www.w3.org/2000/svg',
+                        viewBox: '0 0 24 24',
+                        class: 'size-4.5',
+                        fill: 'none',
+                        stroke: "currentColor",
+                        strokeWidth: 1.5,
+                    }, [
+                        h('path', {
+                            strokeLinecap: "round",
+                            strokeLinejoin: 'round',
+                            d: 'M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z',
+                        }),
+                    ])
+                ]),
+            ]);
+        },
+    },
+];
 
+const baseUrl = ref('/cash-settlement-list')
 
-        pageReady();
-
-
-        return {
-            showFilters,
-            applyFilters,
-            filters,
-            wrapperRef,
-            toggleColumnVisibility,
-            data,
-            selectedData,
-            cashReceived,
-            isDataEmpty,
-            countOfSelectedData,
-            valueOfSelectedData,
-            paidValueOfSelectedData,
-            totalRecord,
-            totalGrandAmount,
-            totalPaidAmount,
-
+const constructUrl = () => {
+    const params = new URLSearchParams();
+    for (const key in filters) {
+        if (filters.hasOwnProperty(key)) {
+            params.append(key, filters[key].toString());
         }
+    }
+    return baseUrl.value + '?' + params.toString();
+}
+
+const initializeGrid = () => {
+    const visibleColumns = Object.keys(data.columnVisibility);
+
+    grid = new Grid({
+        columns: createColumns(),
+        search: {
+            debounceTimeout: 1000,
+            server: {
+                url: (prev, keyword) => `${prev}?search=${keyword}`
+            }
+        },
+        sort: {
+            multiColumn: false,
+            server: {
+                url: (prev, columns) => {
+                    if (!columns.length) return prev;
+                    const col = columns[0];
+                    const dir = col.direction === 1 ? 'asc' : 'desc';
+                    let colName = Object.keys(data.columnVisibility).filter(key => data.columnVisibility[key])[col.index];
+
+                    return `${prev}&order=${colName}&dir=${dir}`;
+                }
+            }
+        },
+        pagination: {
+            limit: 10,
+            server: {
+                url: (prev, page, limit) => `${prev}&limit=${limit}&offset=${page * limit}`
+            }
+        },
+        server: {
+            url: constructUrl(),
+            then: data => data.data.map(item => {
+                const row = [];
+                row.push({id: item.id})
+                visibleColumns.forEach(column => {
+                    row.push(item[column]);
+                });
+                return row;
+            }),
+            total: response => {
+                if (response && response.meta) {
+                    return response.meta.total;
+                } else {
+                    throw new Error('Invalid total count in server response');
+                }
+            }
+        }
+    });
+    grid.render(wrapperRef.value);
+};
+
+const applyFilters = () => {
+    showFilters.value = false;
+    const newUrl = constructUrl();
+    const visibleColumns = Object.keys(data.columnVisibility);
+    grid.updateConfig({
+        server: {
+            url: newUrl,
+            then: data => data.data.map(item => {
+                const row = [];
+                visibleColumns.forEach(column => {
+                    row.push(item[column]);
+                });
+                return row;
+            }),
+        }
+    });
+    grid.forceRender();
+}
+
+const totalRecord = ref(0);
+const totalGrandAmount = ref(0);
+const totalPaidAmount = ref(0);
+
+const getCashSettlementSummary = async (filters) => {
+    try {
+        const response = await fetch("/cash-settlement-summery", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify(filters)
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        }
+
+        const data = await response.json();
+        totalRecord.value = data.totalRecords;
+        totalGrandAmount.value = data.sumAmount;
+        totalPaidAmount.value = data.sumPaidAmount;
+    } catch (error) {
+        console.error('Error:', error);
     }
 }
 
-</script>
+const cashReceived = async () => {
+    const idList = selectedData.value.map(item => item[0]);
+    try {
+        const response = await fetch("/cash-received", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify({'hbl_ids': idList})
+        });
 
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            window.location.reload();
+            push.success('Cash collected successfully!')
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+const isDataEmpty = computed(() => selectedData.value.length === 0);
+const countOfSelectedData = computed(() => selectedData.value.length);
+const valueOfSelectedData = computed(() => {
+    return selectedData.value.reduce((total, item) => {
+        const grandTotal = parseFloat(item[7] || 0);
+        return total + grandTotal;
+    }, 0);
+});
+const paidValueOfSelectedData = computed(() => {
+    return selectedData.value.reduce((total, item) => {
+        const grandTotal = parseFloat(item[8] || 0);
+        return total + grandTotal;
+    }, 0);
+});
+
+const pageReady = async () => {
+    await getCashSettlementSummary();
+    if (totalRecord.value > 0) {
+        initializeGrid();
+    } else {
+        console.log("no data");
+    }
+}
+
+pageReady();
+
+const showConfirmPaymentModal = ref(false);
+const hblData = ref({});
+
+const confirmPayment = (row) => {
+    hblData.value = row;
+    showConfirmPaymentModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmPaymentModal.value = false;
+    hblData.value = null;
+}
+</script>
 <template>
     <AppLayout title="Cash Settlements">
         <template #header>Cash Settlements</template>
@@ -357,7 +406,6 @@ export default {
             </div>
         </div>
 
-
         <div class="card mt-4">
             <div>
                 <div class="flex items-center justify-between p-2">
@@ -408,66 +456,33 @@ export default {
                     </div>
 
 
-                    <div class="flex">
+                    <div class="flex space-x-2">
 
-                        <Popper>
-                            <button x-tooltip.placement.top="'View columns'"
-                                    class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
-                                <i class="fa-solid fa-grip"></i>
-                            </button>
-                            <template #content>
-                                <div class="max-w-[16rem]">
-                                    <div
-                                        class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700">
-                                        <div
-                                            class="rounded-md border border-slate-150 bg-white p-4 dark:border-navy-600 dark:bg-navy-700">
-                                            <h3 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                                                Select Columns
-                                            </h3>
-                                            <p class="mt-1 text-xs+">Choose which columns you want to see </p>
-                                            <div class="mt-4 flex flex-col space-y-4 text-slate-600 dark:text-navy-100">
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.address"
-                                                        @change="toggleColumnVisibility('address', $event)"
-                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                                                        type="checkbox"
-                                                    />
-                                                    Address
-                                                </label>
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.cargo_type"
-                                                        @change="toggleColumnVisibility('cargo_type', $event)"
-                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                                                        type="checkbox"
-                                                    />
-                                                    Cargo Mode
-                                                </label>
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.hbl_type"
-                                                        @change="toggleColumnVisibility('hbl_type', $event)"
-                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                                                        type="checkbox"
-                                                    />
-                                                    Delivery Type
-                                                </label>
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.officer"
-                                                        @change="toggleColumnVisibility('officer', $event)"
-                                                        class="form-switch mr-2 h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                                                        type="checkbox"
-                                                    />
-                                                    Officer
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </Popper>
+                        <ColumnVisibilityPopover>
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.address"
+                                          @change="toggleColumnVisibility('address', $event)"/>
+                                <span class="hover:cursor-pointer">Address</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.cargo_type"
+                                          @change="toggleColumnVisibility('cargo_type', $event)"/>
+                                <span class="hover:cursor-pointer">Cargo Mode</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.hbl_type"
+                                          @change="toggleColumnVisibility('hbl_type', $event)"/>
+                                <span class="hover:cursor-pointer">Delivery Type</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.officer"
+                                          @change="toggleColumnVisibility('officer', $event)"/>
+                                <span class="hover:cursor-pointer">Officer</span>
+                            </label>
+                        </ColumnVisibilityPopover>
 
                         <button x-tooltip.placement.top="'Filter result'" @click="showFilters=true"
                                 class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
@@ -477,7 +492,7 @@ export default {
                         <button
                             @click="cashReceived"
                             :disabled="isDataEmpty"
-                            class="btn font-medium text-white ml-2"
+                            class="btn font-medium text-white"
                             :class="{
             'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90': !isDataEmpty,
             'bg-gray-300 cursor-not-allowed': isDataEmpty
@@ -486,204 +501,86 @@ export default {
                         </button>
                     </div>
                 </div>
-                <div class=" mt-3">
+                <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto p-3">
                         <div v-if="totalRecord > 0" ref="wrapperRef"></div>
-                        <div v-else class="flex items-center text-center justify-center h-48 rounded border border-2 border-dashed">
-                            <div class="text-gray-600 ">
-                                <h3 class="text-lg font-semibold mt-2">No records found</h3>
-                                <p class="text-sm text-gray-500">Sorry, we couldn't find any records matching your criteria.</p>
-                            </div>
-                        </div>
-
+                        <NoRecordsFound v-else/>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="block" v-show="showFilters">
-            <div class="fixed inset-0 z-[100] bg-slate-900/60 transition-opacity duration-200 show block"
-                 x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                 x-transition:leave="ease-in" x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"></div>
-            <div class="fixed right-0 top-0 z-[101] h-full w-72">
-                <div
-                    class="flex h-full p-5 w-full transform-gpu flex-col bg-white transition-transform duration-200 dark:bg-navy-700 show block"
-                    x-transition:enter="ease-out" x-transition:enter-start="translate-x-full"
-                    x-transition:enter-end="translate-x-0" x-transition:leave="ease-in"
-                    x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
-                    <div class="my-3 flex h-5 items-center justify-between">
-                        <h2 class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 lg:text-base">
-                            Filter Cash Settlement
-                        </h2>
+        <FilterDrawer :show="showFilters" @close="showFilters = false">
+            <template #title>
+                Filter Cash Settlement
+            </template>
 
-                        <button x-tooltip.placement.bottom.error="'Close filter drawer'" @click="showFilters = false"
-                                class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-red-500/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="size-4.5" fill="none" viewBox="0 0 24 24"
-                                 stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-
-                    <!--Filters-->
-                    <div>
-                        <span class="">From</span>
-                        <label class="relative flex">
-                            <input
-                                v-model="filters.fromDate"
-                                x-init="$el._x_flatpickr = flatpickr($el)"
-                                class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                placeholder="Choose date..."
-                                type="date"
-                            />
-                            <span
-                                class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="size-5 transition-colors duration-200"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                            />
-                                        </svg>
-                                    </span>
-                        </label>
-                    </div>
-
-                    <div>
-                        <span class="">to</span>
-                        <label class="relative flex">
-                            <input
-                                v-model="filters.toDate"
-                                x-init="$el._x_flatpickr = flatpickr($el)"
-                                class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                placeholder="Choose date..."
-                                type="date"
-                            />
-                            <span
-                                class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                            >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="size-5 transition-colors duration-200"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                            />
-                                        </svg>
-                                    </span>
-                        </label>
-                    </div>
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-
-                    <div>
-                        <span class="font-medium">Cargo Mode</span>
-                    </div>
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.cargoMode" value="Air Cargo"
-                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                               type="checkbox"/>
-                        <span>Air Cargo</span>
-                    </label>
-
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.cargoMode" value="Sea Cargo"
-                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                               type="checkbox"/>
-                        <span>Sea Cargo</span>
-                    </label>
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-                    <div>
-                        <span class="font-medium">Delivery Mode</span>
-                    </div>
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.deliveryType" value="UBP"
-                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                               type="checkbox"/>
-                        <span>UPB</span>
-                    </label>
-
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.deliveryType" value="Door to Door"
-                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                               type="checkbox"/>
-                        <span>Door to Door</span>
-                    </label>
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <input v-model="filters.deliveryType" value="Gift"
-                               class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                               type="checkbox"/>
-                        <span>Gift</span>
-                    </label>
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-                    <label class="block">
-                        <span class="font-medium">Select Drivers</span>
-                        <select
-                            v-model="filters.drivers"
-                            x-init="$el._tom = new Tom($el,{   plugins: ['remove_button']})"
-                            class="mt-1.5 w-full"
-                            placeholder="Select drivers..."
-                            autocomplete="off">
-                            <option value="">Select drivers...</option>
-                            <option v-for="(driver,id) in drivers" :key="id" :value="driver.id">{{ driver.name }}
-                            </option>
-                        </select>
-                    </label>
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-                    <label class="block">
-                        <span class="font-medium">Select Officers</span>
-                        <select
-                            v-model="filters.officers"
-                            x-init="$el._tom = new Tom($el,{   plugins: ['remove_button']})"
-                            class="mt-1.5 w-full"
-                            placeholder="Select officers..."
-                            autocomplete="off">
-                            <option value="">Select officers...</option>
-                            <option v-for="(officer,id) in officers" :key="id" :value="officer.id">{{ officer.name }}
-                            </option>
-                        </select>
-                    </label>
-
-                    <!--Filter Now Action Button-->
-                    <div class="my-4 mx-5 h-px bg-slate-200 dark:bg-navy-500"></div>
-                    <button @click="applyFilters"
-                            class="btn w-full space-x-2 bg-primary/10 font-medium text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25">
-                        <i class="fa-solid fa-filter"></i>
-                        <span>Apply Filters</span>
-                    </button>
+            <template #content>
+                <div>
+                    <InputLabel value="From"/>
+                    <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
                 </div>
-            </div>
-        </div>
+
+                <div>
+                    <InputLabel value="To"/>
+                    <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
+                </div>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Cargo Mode"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.cargoMode" label="Air Cargo" value="Air Cargo"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.cargoMode" label="Sea Cargo" value="Sea Cargo"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.cargoMode" label="Door to Door" value="Door to Door"/>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Select Drivers"/>
+
+                <select
+                    v-model="filters.drivers"
+                    autocomplete="off"
+                    class="mt-1.5 w-full"
+                    placeholder="Select drivers..."
+                    x-init="$el._tom = new Tom($el,{   plugins: ['remove_button']})">
+                    <option value="">Select drivers...</option>
+                    <option v-for="(driver,id) in drivers" :key="id" :value="driver.id">{{ driver.name }}
+                    </option>
+                </select>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Select Officers"/>
+
+                <select
+                    v-model="filters.officers"
+                    autocomplete="off"
+                    class="mt-1.5 w-full"
+                    placeholder="Select officers..."
+                    x-init="$el._tom = new Tom($el,{   plugins: ['remove_button']})">
+                    <option value="">Select officers...</option>
+                    <option v-for="(officer,id) in officers" :key="id" :value="officer.id">{{ officer.name }}
+                    </option>
+                </select>
+
+
+                <!--Filter Now Action Button-->
+                <SoftPrimaryButton class="space-x-2" @click="applyFilters">
+                    <i class="fa-solid fa-filter"></i>
+                    <span>Apply Filters</span>
+                </SoftPrimaryButton>
+            </template>
+        </FilterDrawer>
+
+        <PaymentModal :hbl-data="hblData" :show="showConfirmPaymentModal" @close="closeModal"/>
     </AppLayout>
 </template>
-<style>
-[type='checkbox']:checked {
-    background-image: none !important;
-}
-
-[type='checkbox']:focus, [type='radio']:focus {
-    --tw-ring-offset-width: 0 !important;
-}
-
-.popper {
-    inset: 0 auto auto -15px !important;
-}
-
-:root {
-    --popper-theme-box-shadow: 0 6px 30px -6px rgba(0, 0, 0, 0.25);
-}
-</style>

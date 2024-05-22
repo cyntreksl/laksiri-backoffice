@@ -4,15 +4,14 @@ namespace App\Repositories;
 
 use App\Actions\HBL\CashSettlement\GetCashSettlementByIds;
 use App\Actions\HBL\CashSettlement\GetTotalCashSettlementCount;
+use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\UpdateHBLSystemStatus;
 use App\Factory\CashSettlement\FilterFactory;
 use App\Http\Resources\CashSettlementCollection;
 use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\HBL;
-use App\Models\HBLStatusChange;
 use App\Traits\ResponseAPI;
-use Illuminate\Support\Facades\Auth;
 
 class CashSettlementRepository implements CashSettlementInterface, GridJsInterface
 {
@@ -23,17 +22,17 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         // TODO: Implement getPendingSettlementList() method.
     }
 
-    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', string $search = null, array $filters = [])
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
         $query = HBL::query();
         $query->cashSettlement();
 
-        if (!empty($search)) {
-            $query->where('hbl','like',"%$search%");
+        if (! empty($search)) {
+            $query->where('hbl', 'like', "%$search%");
         }
 
         //apply filters
-        FilterFactory::apply($query,$filters);
+        FilterFactory::apply($query, $filters);
 
         $records = $query->orderBy($order, $direction)
             ->skip($offset)
@@ -59,7 +58,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         $query->cashSettlement();
 
         //apply filters
-        FilterFactory::apply($query,$filters);
+        FilterFactory::apply($query, $filters);
 
         $records = $query->get();
 
@@ -76,12 +75,21 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
 
     public function cashReceived(array $hblIds)
     {
-       $hblList = GetCashSettlementByIds::run($hblIds);
+        $hblList = GetCashSettlementByIds::run($hblIds);
 
-       foreach ($hblList as $hbl) {
-           UpdateHBLSystemStatus::run($hbl,4);
-       }
+        foreach ($hblList as $hbl) {
+            UpdateHBLSystemStatus::run($hbl, 4);
+        }
 
-       return $this->success("Cash Received",[]);
+        return $this->success('Cash Received', []);
+    }
+
+    public function updatePayment(array $data, HBL $hbl)
+    {
+        $new_paid_amount = $data['paid_amount'];
+        $old_paid_amount = $hbl->paid_amount;
+        $total_paid_amount = $old_paid_amount + $new_paid_amount;
+
+        UpdateHBLPayments::run($total_paid_amount, $hbl);
     }
 }
