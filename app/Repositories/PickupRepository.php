@@ -45,9 +45,7 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
         $query = PickUp::query();
 
         if (! empty($search)) {
-            $query->where('reference', 'like', '%'.$search.'%');
-            $query->where('name', 'like', '%'.$search.'%');
-            $query->where('contact_number', 'like', '%'.$search.'%');
+            $query->whereAny(['reference', 'name', 'contact_number'], 'like', '%' . $search . '%');
         }
 
         //apply filters
@@ -74,7 +72,6 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     public function getFilteredPickups(Request $request)
     {
         $query = Pickup::query();
-
         if ($request->filled('fromDate') || $request->filled('toDate') || $request->filled('driverId')) {
             FilterFactory::apply($query, ['fromDate' => $request->fromDate, 'toDate' => $request->toDate, 'driverId' => $request->driverId]);
         } else {
