@@ -13,4 +13,6 @@ interface HBLRepositoryInterface
     public function updateHBL(array $data, HBL $HBL);
 
     public function deleteHBL(HBL $HBL);
+
+    public function getHBLsWithPackages();
 }

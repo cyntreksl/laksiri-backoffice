@@ -701,11 +701,11 @@ export default {
                         },
                         {
                             title: "Pickup Ordering",
-                            route: "dashboard2",
+                            route: "pickups.ordering",
                         },
                         {
-                            title: "Job Exception",
-                            route: "dashboard2",
+                            title: "Pickup Exceptions",
+                            route: "pickups.exceptions",
                         },
                     );
                     break;

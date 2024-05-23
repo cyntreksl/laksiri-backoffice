@@ -8,6 +8,8 @@ use App\Actions\HBL\DeleteHBL;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\UpdateHBL;
 use App\Actions\HBL\UpdateHBLPackages;
+use App\Actions\HBL\GetHBLsWithPackages;
+use App\Actions\HBL\GetTotalHBLCount;
 use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\GridJsInterface;
@@ -73,5 +75,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function deleteHBL(HBL $hbl)
     {
         return DeleteHBL::run($hbl);
+    }
+
+    public function getHBLsWithPackages()
+    {
+        return GetHBLsWithPackages::run();
     }
 }

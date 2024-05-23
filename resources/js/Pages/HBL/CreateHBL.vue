@@ -2,7 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {reactive, ref, watch} from "vue";
+import {computed, reactive, ref, watch} from "vue";
 import notification from "@/magics/notification.js";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
@@ -100,9 +100,9 @@ const addPackageData = () => {
     }
 
     if (editMode.value) {
-        grandTotalVolume.value -= packageItem.volume;
-        grandTotalWeight.value -= packageItem.totalWeight;
         packageList.value.splice(editIndex.value, 1, {...packageItem})
+        grandTotalWeight.value = packageList.value.reduce((accumulator, currentValue) => accumulator + currentValue.totalWeight, 0);
+        grandTotalVolume.value = packageList.value.reduce((accumulator, currentValue) => accumulator + currentValue.volume, 0);
     } else {
         const newItem = {...packageItem}; // Create a copy of packageItem
         packageList.value.push(newItem); // Add the new item to packageList
@@ -830,8 +830,8 @@ const openEditModal = (index) => {
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.width }}</td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.height }}</td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.quantity }}</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume }}</td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.totalWeight }}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume }}</td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.remarks }}</td>
                             </tr>
                             </tbody>

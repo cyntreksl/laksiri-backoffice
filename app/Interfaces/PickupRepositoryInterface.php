@@ -3,6 +3,7 @@
 namespace App\Interfaces;
 
 use App\Models\PickUp;
+use Illuminate\Http\Request;
 
 interface PickupRepositoryInterface
 {
@@ -13,4 +14,8 @@ interface PickupRepositoryInterface
     public function getNoteTypes();
 
     public function assignDriver(array $data, PickUp $pickUp);
+
+    public function getFilteredPickups(Request $request);
+
+    public function savePickupOrder(array $pickups);
 }

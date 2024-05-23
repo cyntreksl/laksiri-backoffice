@@ -16,11 +16,24 @@ Breadcrumbs::for('pickups.index', function (BreadcrumbTrail $trail) {
     $trail->push('Pending Jobs', route('pickups.index'));
 });
 
+// pickups > pickup ordering
+Breadcrumbs::for('pickups.ordering', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Pickup Ordering');
+    $trail->push('Pickup Ordering', route('pickups.ordering'));
+});
+
 // pickups > create
 Breadcrumbs::for('pickups.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Pickup');
     $trail->push('Create Pickup', route('pickups.create'));
+});
+
+Breadcrumbs::for('pickups.exceptions', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Pickups Exceptions');
+    $trail->push('Exceptions', route('pickups.exceptions'));
 });
 
 // HBLs

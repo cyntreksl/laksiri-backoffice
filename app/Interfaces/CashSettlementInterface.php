@@ -6,8 +6,11 @@ use App\Models\HBL;
 
 interface CashSettlementInterface
 {
-    public function getPendingSettlementList() : HBL;
+    public function getPendingSettlementList(): HBL;
 
-    public function getSummery(array $filters = []) ;
+    public function getSummery(array $filters = []);
+
     public function cashReceived(array $hblIds);
+
+    public function updatePayment(array $data, HBL $hbl);
 }

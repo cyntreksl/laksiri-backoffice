@@ -21,9 +21,9 @@ const close = () => {
              x-transition:enter="ease-out" x-transition:enter-end="opacity-100" x-transition:enter-start="opacity-0"
              x-transition:leave="ease-in" x-transition:leave-end="opacity-0"
              x-transition:leave-start="opacity-100"></div>
-        <div class="fixed right-0 top-0 z-[101] h-full w-72">
+        <div class="fixed right-0 top-0 z-[101] w-72">
             <div
-                class="flex h-full p-5 w-full transform-gpu flex-col bg-white transition-transform duration-200 dark:bg-navy-700 show space-y-4"
+                class="flex h-screen p-5 w-full transform-gpu flex-col bg-white transition-transform duration-200 dark:bg-navy-700 show space-y-4 overflow-y-auto"
                 x-transition:enter="ease-out" x-transition:enter-end="translate-x-0"
                 x-transition:enter-start="translate-x-full" x-transition:leave="ease-in"
                 x-transition:leave-end="translate-x-full" x-transition:leave-start="translate-x-0">
@@ -38,7 +38,6 @@ const close = () => {
                 <FilterBorder/>
 
                 <slot name="content"/>
-
             </div>
         </div>
     </div>

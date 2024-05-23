@@ -2,44 +2,33 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\BranchScope;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-#[ScopedBy(BranchScope::class)]
-class PickUp extends Model
+class PickupException extends Model
 {
     use HasFactory;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
-        'reference',
+        'pickup_id',
         'branch_id',
-        'cargo_type',
-        'name',
-        'email',
-        'contact_number',
-        'address',
-        'location_name',
-        'location_longitude',
-        'location_latitude',
-        'zone_id',
-        'notes',
         'driver_id',
-        'driver_assigned_at',
-        'hbl_id',
-        'created_by',
+        'zone_id',
+        'reference',
+        'name',
+        'picker_note',
+        'address',
         'pickup_date',
-        'pickup_time_start',
-        'pickup_time_end',
-        'is_urgent_pickup',
-        'is_from_important_customer',
-        'status',
+        'auth',
+        'system_status',
+        'driver_assigned_at',
+        'created_by',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -47,17 +36,16 @@ class PickUp extends Model
         return LogOptions::defaults()->logAll()->logOnlyDirty();
     }
 
-    public function scopeAssignedToDriver(Builder $query): void
-    {
-        $query->where('driver_id', auth()->id());
-    }
-
-
     /**
      * Get the zone that owns the pickup.
      */
     public function zone(): BelongsTo
     {
         return $this->belongsTo(Zone::class, 'zone_id');
+    }
+
+    public function driver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'driver_id');
     }
 }
