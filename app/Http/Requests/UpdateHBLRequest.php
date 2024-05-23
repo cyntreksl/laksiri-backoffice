@@ -11,7 +11,7 @@ class UpdateHBLRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,26 @@ class UpdateHBLRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'cargo_type' => ['required'],
+            'hbl_type' => ['required'],
+            'hbl_name' => ['required'],
+            'email' => ['required', 'email', 'max:254'],
+            'contact_number' => ['nullable'],
+            'nic' => ['nullable'],
+            'iq_number' => ['nullable'],
+            'address' => ['nullable'],
+            'consignee_name' => ['required'],
+            'consignee_nic' => ['required'],
+            'consignee_contact' => ['required'],
+            'consignee_address' => ['required'],
+            'consignee_note' => ['nullable'],
+            'warehouse' => ['required'],
+            'freight_charge' => ['required', 'numeric'],
+            'bill_charge' => ['required', 'numeric'],
+            'other_charge' => ['required', 'numeric'],
+            'discount' => ['required', 'numeric'],
+            'paid_amount' => ['required', 'numeric'],
+            'packages' => ['sometimes','required', 'array'],
         ];
     }
 }

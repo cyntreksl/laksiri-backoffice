@@ -6,7 +6,8 @@ use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\DeleteHBL;
 use App\Actions\HBL\GetHBLs;
-use App\Actions\HBL\GetTotalHBLCount;
+use App\Actions\HBL\UpdateHBL;
+use App\Actions\HBL\UpdateHBLPackages;
 use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\GridJsInterface;
@@ -25,6 +26,15 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         $hbl = CreateHBL::run($data);
         $packagesData = $data['packages'];
         CreateHBLPackages::run($hbl, $packagesData);
+
+        return $hbl;
+    }
+
+    public function updateHBL(array $data, HBL $hbl)
+    {
+        $hbl = UpdateHBL::run($hbl, $data);
+        $packagesData = $data['packages'];
+        UpdateHBLPackages::run($hbl, $packagesData);
 
         return $hbl;
     }

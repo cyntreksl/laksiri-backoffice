@@ -10,5 +10,7 @@ interface HBLRepositoryInterface
 
     public function storeHBL(array $data);
 
+    public function updateHBL(array $data, HBL $HBL);
+
     public function deleteHBL(HBL $HBL);
 }
