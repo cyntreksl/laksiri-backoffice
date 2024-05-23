@@ -165,9 +165,6 @@ const createColumns = () => [
                         })
                     ])
                 ]),
-                h('button', {
-                    className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
-                    onClick: () => confirmDeleteHBL(row.cells[0].data)
                 h('a', {
                     className: 'btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2',
                     onClick: () => confirmViewHBL(row.cells[0].data),
