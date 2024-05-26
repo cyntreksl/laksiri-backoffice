@@ -77,7 +77,7 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     {
         $query = Pickup::query();
         if ($request->filled('fromDate') || $request->filled('toDate') || $request->filled('driverId')) {
-            FilterFactory::apply($query, ['fromDate' => $request->fromDate, 'toDate' => $request->toDate, 'driverId' => $request->driverId]);
+            FilterFactory::apply($query, ['FromPickupDate' => $request->fromDate, 'toPickupDate' => $request->toDate, 'driverBy' => $request->driverId]);
         } else {
             // If no filters are provided, return an empty collection
             $query->whereRaw('1 = 0');
