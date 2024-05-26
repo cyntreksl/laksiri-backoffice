@@ -3,7 +3,6 @@
 namespace App\Actions\User;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class DeleteUser

@@ -12,6 +12,6 @@ class GetCashSettlementByIds
 
     public function handle(array $value): Collection
     {
-       return HBL::cashSettlement()->whereIn('id',$value)->get();
+        return HBL::cashSettlement()->whereIn('id', $value)->get();
     }
 }

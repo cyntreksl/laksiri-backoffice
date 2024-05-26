@@ -16,7 +16,7 @@ enum ContainerType: string
 
     public function dimensions(): array
     {
-        return match($this) {
+        return match ($this) {
             // Sea Cargo Dimensions
             self::TwentyFTGeneral => ['L' => 5.89, 'W' => 2.35, 'H' => 2.36],
             self::TwentyFTHighCube => ['L' => 5.89, 'W' => 2.35, 'H' => 2.69],
@@ -31,7 +31,7 @@ enum ContainerType: string
 
     public function cubicCapacity(): float
     {
-        return match($this) {
+        return match ($this) {
             // Sea Cargo Capacities
             self::TwentyFTGeneral => 33.0,
             self::TwentyFTHighCube => 37.0,
@@ -46,7 +46,7 @@ enum ContainerType: string
 
     public function cargoWeight(): float
     {
-        return match($this) {
+        return match ($this) {
             // Sea Cargo Weights
             self::TwentyFTGeneral, self::TwentyFTHighCube => 21700.0,
             self::FortyFTGeneral, self::FortyFTHighCube => 26500.0,
@@ -61,17 +61,18 @@ enum ContainerType: string
     {
         $dimensions = $this->dimensions();
         $volume = $dimensions['L'] * $dimensions['W'] * $dimensions['H'];
+
         return $volume * 1000 / $divisor; // Convert volume in cubic meters to kilograms
     }
 
     public static function getDropdownOptions(): array
     {
-        return array_map(fn($case) => $case->value, self::cases());
+        return array_map(fn ($case) => $case->value, self::cases());
     }
 
     public static function getSeaCargoOptions(): array
     {
-        return array_filter(self::cases(), fn($case) => in_array($case, [
+        return array_filter(self::cases(), fn ($case) => in_array($case, [
             self::TwentyFTGeneral,
             self::TwentyFTHighCube,
             self::FortyFTGeneral,
@@ -81,7 +82,7 @@ enum ContainerType: string
 
     public static function getAirCargoOptions(): array
     {
-        return array_filter(self::cases(), fn($case) => in_array($case, [
+        return array_filter(self::cases(), fn ($case) => in_array($case, [
             self::AirCargoULD1,
             self::AirCargoULD2,
         ]));

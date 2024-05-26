@@ -9,6 +9,7 @@ use Lorisleiva\Actions\Concerns\AsAction;
 class CreateZone
 {
     use AsAction;
+
     public function handle(array $data): Zone
     {
         return Zone::firstOrCreate(
@@ -21,5 +22,4 @@ class CreateZone
             ]
         );
     }
-
 }

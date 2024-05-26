@@ -52,6 +52,7 @@ class UserRepository implements UserRepositoryInterface
     {
         try {
             $branchName = GetBranchByName::run($branchName);
+
             return SwitchUserBranch::run($branchName);
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());

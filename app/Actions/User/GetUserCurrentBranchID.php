@@ -10,7 +10,7 @@ class GetUserCurrentBranchID
 {
     use AsAction;
 
-    public function handle() :int
+    public function handle(): int
     {
         $branchId = session('current_branch_id');
 

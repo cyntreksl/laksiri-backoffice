@@ -7,7 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ZoneCollection extends JsonResource
 {
-
     /**
      * Transform the resource collection into an array.
      *
@@ -21,9 +20,9 @@ class ZoneCollection extends JsonResource
             'created_at' => $this->created_at,
             'areas' => $this->areas->map(function ($area) {
                 return [
-                        'id' => $area->id,
-                        'name' => $area->name,
-                    ];
+                    'id' => $area->id,
+                    'name' => $area->name,
+                ];
             })->toArray(),
         ];
     }

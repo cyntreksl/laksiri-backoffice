@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Rules\CommaSeparatedRule;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreZoneRequest extends FormRequest
 {

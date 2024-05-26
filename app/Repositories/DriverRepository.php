@@ -4,9 +4,9 @@ namespace App\Repositories;
 
 use App\Actions\Driver\GetDrivers;
 use App\Actions\Driver\GetTotalDriversCountInCurrentBranch;
+use App\Actions\User\CreateUser;
 use App\Factory\User\FilterFactory;
 use App\Http\Resources\DriverCollection;
-use App\Actions\User\CreateUser;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\User;
@@ -28,8 +28,8 @@ class DriverRepository implements DriverRepositoryInterface, GridJsInterface
     {
         $query = User::role('driver')->currentBranch();
 
-        if (!empty($search)) {
-            $query->where('username', 'like', '%' . $search . '%');
+        if (! empty($search)) {
+            $query->where('username', 'like', '%'.$search.'%');
         }
 
         //apply filters

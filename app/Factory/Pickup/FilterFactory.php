@@ -20,7 +20,7 @@ class FilterFactory
 
     public static function create(string $filterName): ?FilterInterface
     {
-        $className = 'App\\Factory\\Pickup\\Filters\\' . ucfirst(Str::camel($filterName)) . 'Filter';
+        $className = 'App\\Factory\\Pickup\\Filters\\'.ucfirst(Str::camel($filterName)).'Filter';
         if (class_exists($className)) {
             return new $className();
         }

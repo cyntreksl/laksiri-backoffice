@@ -34,7 +34,7 @@ class PickupRepository implements PickupRepositoryInterface
         try {
             $hbl = ConvertPickupToHBL::run($pickUp, $request);
 
-            return $this->success('Pickup converted to HBL successfully!',[]);
+            return $this->success('Pickup converted to HBL successfully!', []);
 
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());
@@ -45,6 +45,7 @@ class PickupRepository implements PickupRepositoryInterface
     {
         try {
             $pickupResource = new PickupResource($pickup);
+
             return $this->success('Success', $pickupResource);
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());
@@ -55,6 +56,7 @@ class PickupRepository implements PickupRepositoryInterface
     {
         try {
             $pickup = CreatePickUp::run($data);
+
             return $this->success('Pickup created successfully!', $pickup);
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('branch_id');
             $table->enum('cargo_type', [CargoType::SEA_CARGO->value, CargoType::AIR_CARGO->value])->nullable();
-            $table->enum('container_type', [ContainerType::TwentyFTGeneral->value,ContainerType::TwentyFTHighCube->value,ContainerType::FortyFTGeneral->value,ContainerType::FortyFTHighCube->value ])->nullable();
+            $table->enum('container_type', [ContainerType::TwentyFTGeneral->value, ContainerType::TwentyFTHighCube->value, ContainerType::FortyFTGeneral->value, ContainerType::FortyFTHighCube->value])->nullable();
             $table->string('reference')->nullable();
             $table->string('bl_number')->nullable(); // For Sea Cargo
             $table->string('awb_number')->nullable(); // For Air Cargo

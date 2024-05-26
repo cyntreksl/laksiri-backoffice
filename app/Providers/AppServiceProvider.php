@@ -6,11 +6,11 @@ use App\Events\UpdateLastLogin;
 use App\Events\UpdateLastLogout;
 use App\Listeners\SetUserCurrentBranch;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
-use Illuminate\Support\Facades\App;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (App::environment() == "production") {
+        if (App::environment() == 'production') {
             URL::forceScheme('https');
         }
 
@@ -37,6 +37,6 @@ class AppServiceProvider extends ServiceProvider
             UpdateLastLogout::class,
         );
 
-        Event::listen(Login::class,SetUserCurrentBranch::class);
+        Event::listen(Login::class, SetUserCurrentBranch::class);
     }
 }

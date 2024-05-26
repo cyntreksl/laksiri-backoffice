@@ -10,7 +10,7 @@ enum CargoType: string
 
     public static function getCargoTypeOptions(): array
     {
-        return array_filter(self::cases(), fn($case) => in_array($case, [
+        return array_filter(self::cases(), fn ($case) => in_array($case, [
             self::SEA_CARGO,
             self::AIR_CARGO,
         ]));

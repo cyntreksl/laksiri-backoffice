@@ -15,7 +15,7 @@ class Container extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $fillable=[
+    protected $fillable = [
         'branch_id',
         'cargo_type',
         'reference',

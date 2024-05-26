@@ -33,7 +33,7 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            'userBranch'=> Auth::check() ? Auth::user()->branches()->pluck('name')->toArray() : [],
+            'userBranch' => Auth::check() ? Auth::user()->branches()->pluck('name')->toArray() : [],
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

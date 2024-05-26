@@ -31,9 +31,9 @@ class Zone extends Model
     public function scopeSearchByZoneOrArea($query, $searchTerm)
     {
         return $query->where(function ($query) use ($searchTerm) {
-            $query->where('name', 'like', '%' . $searchTerm . '%')
+            $query->where('name', 'like', '%'.$searchTerm.'%')
                 ->orWhereHas('areas', function ($query) use ($searchTerm) {
-                    $query->where('name', 'like', '%' . $searchTerm . '%');
+                    $query->where('name', 'like', '%'.$searchTerm.'%');
                 });
         });
     }
@@ -47,5 +47,4 @@ class Zone extends Model
     {
         return $this->belongsToMany(Area::class)->withTimestamps();
     }
-
 }
