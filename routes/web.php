@@ -51,6 +51,9 @@ Route::middleware([
 
     Route::get('hbl-list', [HBLController::class, 'list']);
 
+    Route::put('hbls/toggle-hold/{hbl}', [HBLController::class, 'toggleHold'])
+        ->name('hbls.toggle-hold');
+
     // User
     Route::resource('users', UserController::class)
         ->except(['create', 'show']);

@@ -13,4 +13,6 @@ interface HBLRepositoryInterface
     public function deleteHBL(HBL $HBL);
 
     public function getHBLsWithPackages();
+
+    public function toggleHold(HBL $hbl);
 }
