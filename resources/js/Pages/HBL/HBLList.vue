@@ -1,7 +1,7 @@
 <script setup>
 import {computed, onMounted, reactive, ref} from "vue";
 import {Link, router} from '@inertiajs/vue3'
-import {Grid, h} from "gridjs";
+import {Grid, h, html} from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -18,6 +18,7 @@ import FilterHeader from "@/Components/FilterHeader.vue";
 import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
 import {push} from "notivue";
 import HBLDetailModal from "@/Pages/HBL/Partials/HBLDetailModal.vue";
+import HoldConfirmationModal from "@/Pages/HBL/Partials/HoldConfirmationModal.vue";
 
 const props = defineProps({
     users: {
@@ -43,6 +44,7 @@ const filters = reactive({
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo", "Door to Door"],
     hblType: ["UBP", "Gift", "Door to Door"],
+    isHold: false,
     warehouse: ["COLOMBO", "NINTAVUR"],
     createdBy: '',
 })
@@ -63,6 +65,7 @@ const data = reactive({
         hbl_type: true,
         warehouse: true,
         status: false,
+        is_hold: true,
         actions: true,
     }
 });
@@ -144,6 +147,16 @@ const createColumns = () => [
     {name: 'Warehouse', hidden: !data.columnVisibility.warehouse},
     {name: 'Status', hidden: !data.columnVisibility.status},
     {
+        name: 'Is Hold',
+        hidden: !data.columnVisibility.is_hold,
+        formatter: (cell) => {
+            return cell ? html(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-success">
+  <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
+</svg>`) : null
+        },
+        sort: false
+    },
+    {
         name: 'Actions',
         sort: false,
         hidden: !data.columnVisibility.actions,
@@ -172,6 +185,44 @@ const createColumns = () => [
                             strokeLinejoin: 'round',
                         }),
                     ])
+                ]),
+                h('button', {
+                    className: 'btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25',
+                    onClick: () => confirmIsHold(row.cells)
+                }, [
+                    row.cells[14].data ? h('svg', {
+                            xmlns: 'http://www.w3.org/2000/svg',
+                            viewBox: '0 0 24 24',
+                            class: 'size-4.5',
+                            fill: 'none',
+                            stroke: "currentColor",
+                            strokeWidth: 1.5,
+                        }, [
+                            h('path', {
+                                strokeLinecap: "round",
+                                strokeLinejoin: 'round',
+                                d: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+                            }),
+                            h('path', {
+                                strokeLinecap: "round",
+                                strokeLinejoin: 'round',
+                                d: 'M15.91 11.672a.375.375 0 0 1 0 .656l-5.603 3.113a.375.375 0 0 1-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112Z',
+                            }),
+                        ]) :
+                        h('svg', {
+                            xmlns: 'http://www.w3.org/2000/svg',
+                            viewBox: '0 0 24 24',
+                            class: 'size-4.5',
+                            fill: 'none',
+                            stroke: "currentColor",
+                            strokeWidth: 1.5,
+                        }, [
+                            h('path', {
+                                strokeLinecap: "round",
+                                strokeLinejoin: 'round',
+                                d: 'M14.25 9v6m-4.5 0V9M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+                            }),
+                        ])
                 ]),
                 h(
                     "button",
@@ -280,6 +331,34 @@ const confirmViewHBL = (id) => {
     selectedHBL.value = props.hbls.find(hbl => hbl.id === id);
     showConfirmViewHBLModal.value = true;
 };
+
+const hblData = ref({});
+
+const showConfirmHoldModal = ref(false);
+
+const confirmIsHold = (row) => {
+    hblData.value = row;
+    showConfirmHoldModal.value = true;
+};
+
+const closeHoldModal = () => {
+    showConfirmHoldModal.value = false;
+}
+
+const toggleHold = () => {
+    router.put(route('hbls.toggle-hold', hblData.value[0].data), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeHoldModal()
+            push.success(hblData.value[14].data ? 'Released ' + hblData.value[1].data : 'Hold ' + hblData.value[1].data)
+            router.visit(route('hbls.index'))
+            hblData.value = {}
+        },
+        onError: () => {
+            push.error('Something went to wrong!');
+        }
+    })
+}
 </script>
 
 <template>
@@ -499,6 +578,14 @@ const confirmViewHBL = (id) => {
 
                 <FilterBorder/>
 
+                <FilterHeader value="Is Hold"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.isHold" label="Is Hold" value="true"/>
+                </label>
+
+                <FilterBorder/>
+
                 <FilterHeader value="Warehouse"/>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
@@ -539,5 +626,8 @@ const confirmViewHBL = (id) => {
                                     @delete-hbl="handleDeleteHBL"/>
 
         <HBLDetailModal :hbl="selectedHBL" :show="showConfirmViewHBLModal" @close="closeModal"/>
+
+        <HoldConfirmationModal :hbl-data="hblData" :show="showConfirmHoldModal" @close="closeHoldModal"
+                               @toggle-hold="toggleHold"/>
     </AppLayout>
 </template>
