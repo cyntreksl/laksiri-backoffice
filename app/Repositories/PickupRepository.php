@@ -44,12 +44,11 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     {
         $query = PickUp::query();
 
-
-        if (!empty($search)) {
-            $query->where(function($query) use ($search) {
-                $query->where('reference', 'like', '%' . $search . '%')
-                    ->orWhere('name', 'like', '%' . $search . '%')
-                    ->orWhere('contact_number', 'like', '%' . $search . '%');
+        if (! empty($search)) {
+            $query->where(function ($query) use ($search) {
+                $query->where('reference', 'like', '%'.$search.'%')
+                    ->orWhere('name', 'like', '%'.$search.'%')
+                    ->orWhere('contact_number', 'like', '%'.$search.'%');
             });
         }
 

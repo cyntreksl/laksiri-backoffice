@@ -46,6 +46,7 @@ class ConvertPickupToHBL
                 'hbl_id' => $hbl->id,
             ]);
             DB::commit();
+
             return $hbl;
         } catch (\Exception $e) {
             DB::rollBack();

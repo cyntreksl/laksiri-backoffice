@@ -742,6 +742,10 @@ export default {
                         0,
                         childMenuList.length,
                         {
+                            title: "Containers",
+                            route: "loading.loading-containers.index",
+                        },
+                        {
                             title: "Loading Point",
                             route: "loading.loading-points.index",
                         },

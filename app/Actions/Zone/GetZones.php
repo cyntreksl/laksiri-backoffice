@@ -12,6 +12,6 @@ class GetZones
 
     public function handle()
     {
-        return Zone::where('branch_id',GetUserCurrentBranchID::run())->latest()->with(['areas'])->get();
+        return Zone::where('branch_id', GetUserCurrentBranchID::run())->latest()->with(['areas'])->get();
     }
 }

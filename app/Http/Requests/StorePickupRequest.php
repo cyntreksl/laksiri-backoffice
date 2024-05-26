@@ -11,6 +11,7 @@ use Illuminate\Validation\Validator;
 class StorePickupRequest extends FormRequest
 {
     use ResponseAPI;
+
     /**
      * Determine if the user is authorized to make this request.
      */

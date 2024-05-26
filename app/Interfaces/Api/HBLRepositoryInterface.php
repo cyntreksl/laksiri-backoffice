@@ -8,5 +8,6 @@ use Illuminate\Http\JsonResponse;
 interface HBLRepositoryInterface
 {
     public function showHBL(HBL $hbl): JsonResponse;
+
     public function storeHBL(array $data);
 }

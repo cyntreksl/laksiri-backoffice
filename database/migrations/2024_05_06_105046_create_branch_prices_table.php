@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('branch_id')->comment('origin_branch_id');
             $table->integer('destination_branch_id');
             $table->string('cargo_mode');
-            $table->enum('price_mode',['weight','volume']);
+            $table->enum('price_mode', ['weight', 'volume']);
             $table->string('condition')->comment('> 0');
             $table->string('true_action')->comment('if condition true');
             $table->string('false_action')->comment('if condition false');

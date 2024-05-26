@@ -2,9 +2,6 @@
 
 namespace App\Actions\HBL;
 
-use App\Actions\HBL\GenerateHBLReferenceNumber;
-use App\Actions\User\GetUserCurrentBranch;
-use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\HBL;
 use App\Models\HBLStatusChange;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +16,7 @@ class HBLSystemStatusLog
         $HBLStatus = new HBLStatusChange();
         $HBLStatus->hbl_id = $HBL->id;
         $HBLStatus->title = $this->title($status);
-        $HBLStatus->message = sprintf($this->message($status),$HBL->hbl);
+        $HBLStatus->message = sprintf($this->message($status), $HBL->hbl);
         $HBLStatus->created_by = Auth::id();
         $HBLStatus->save();
 
@@ -28,16 +25,16 @@ class HBLSystemStatusLog
 
     private function title(float $status): string
     {
-        $title = "HBL created";
-        switch ($status){
+        $title = 'HBL created';
+        switch ($status) {
             case 3.0:
-                $title = "HBL created";
+                $title = 'HBL created';
                 break;
             case 3.1:
-                $title = "HBL created - Job Converted to HBL";
+                $title = 'HBL created - Job Converted to HBL';
                 break;
             case 4.0:
-                $title = "Cash Collected";
+                $title = 'Cash Collected';
                 break;
         }
 
@@ -46,16 +43,16 @@ class HBLSystemStatusLog
 
     private function message(float $status): string
     {
-        $title = "HBL #%s created";
-        switch ($status){
+        $title = 'HBL #%s created';
+        switch ($status) {
             case 3.0:
-                $title = "HBL #%s created";
+                $title = 'HBL #%s created';
                 break;
             case 3.1:
-                $title = "HBL #%s created - Job Converted to HBL";
+                $title = 'HBL #%s created - Job Converted to HBL';
                 break;
             case 4.0:
-                $title = "HBL #%s cash collected";
+                $title = 'HBL #%s cash collected';
                 break;
         }
 

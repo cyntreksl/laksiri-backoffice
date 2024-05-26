@@ -30,7 +30,7 @@ class ZoneController extends Controller
 
         $query = Zone::query()->with('areas');
 
-        if (!empty($search)) {
+        if (! empty($search)) {
             $query->searchByZoneOrArea($search);
         }
 
@@ -51,6 +51,7 @@ class ZoneController extends Controller
             ],
         ]);
     }
+
     public function store(StoreZoneRequest $request)
     {
         $this->zoneRepository->store($request->all());

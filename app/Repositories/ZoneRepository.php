@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Actions\HBL\GetHBLs;
 use App\Actions\Zone\CreateZone;
 use App\Actions\Zone\CreateZoneArea;
 use App\Actions\Zone\DeleteZone;
@@ -12,11 +11,11 @@ use App\Models\Zone;
 
 class ZoneRepository implements ZoneRepositoryInterface
 {
-
     public function getZones()
     {
         return GetZones::run();
     }
+
     public function store(array $data)
     {
         $zone = CreateZone::run($data);
@@ -25,9 +24,9 @@ class ZoneRepository implements ZoneRepositoryInterface
 
         return $zone;
     }
+
     public function destroy(Zone $user): void
     {
         DeleteZone::run($user);
     }
 }
-

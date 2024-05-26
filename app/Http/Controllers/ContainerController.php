@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Enum\CargoType;
+use App\Enum\ContainerType;
+use App\Http\Requests\StoreContainerRequest;
+use App\Interfaces\ContainerRepositoryInterface;
+use Inertia\Inertia;
+
+class ContainerController extends Controller
+{
+    public function __construct(private readonly ContainerRepositoryInterface $containerRepository)
+    {
+    }
+
+    public function index()
+    {
+        return Inertia::render('Container/ContainerList');
+    }
+
+    public function create()
+    {
+        $containerTypes = ContainerType::getDropdownOptions();
+        $seaContainerOptions = ContainerType::getSeaCargoOptions();
+        $airContainerOptions = ContainerType::getAirCargoOptions();
+        $cargoTypes = CargoType::getCargoTypeOptions();
+
+        return Inertia::render('Container/ContainerCreate', [
+            'containerTypes' => $containerTypes,
+            'seaContainerOptions' => $seaContainerOptions,
+            'airContainerOptions' => $airContainerOptions,
+            'cargoTypes' => $cargoTypes,
+        ]);
+    }
+
+    public function store(StoreContainerRequest $request)
+    {
+        try {
+            $container = $this->containerRepository->store($request->validated());
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+}

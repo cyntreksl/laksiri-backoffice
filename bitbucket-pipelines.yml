@@ -83,7 +83,7 @@ definitions:
         name: Checking Code Standards - PSR2
         image: php:8.2-fpm
         script:
-          - vendor/bin/pint
+          - vendor/bin/pint --test
         services:
           - mysql
           - redis
@@ -156,8 +156,8 @@ pipelines:
               <<: *composer
           - step:
               <<: *frontend
-          #      - step:
-          #          <<: *test
+          - step:
+              <<: *standards
           - step:
               <<: *build
           - <<: *push-test
@@ -183,6 +183,8 @@ pipelines:
               <<: *composer
       - step:
           <<: *frontend
+      - step:
+          <<: *standards
 #      - step:
 #          <<: *test
       - step:

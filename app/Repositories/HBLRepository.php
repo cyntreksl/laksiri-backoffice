@@ -7,7 +7,6 @@ use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\DeleteHBL;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLsWithPackages;
-use App\Actions\HBL\GetTotalHBLCount;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\HBLResource;

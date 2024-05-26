@@ -15,7 +15,6 @@ class CreateZoneArea
     public function handle(string $data, Zone $zone)
     {
 
-
         try {
             DB::beginTransaction();
             $areas = array_map(function ($item) {

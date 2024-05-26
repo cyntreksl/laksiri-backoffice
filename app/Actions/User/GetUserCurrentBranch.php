@@ -2,23 +2,20 @@
 
 namespace App\Actions\User;
 
-use App\Enum\UserStatus;
 use App\Models\Branch;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class GetUserCurrentBranch
 {
     use AsAction;
 
-    public function handle() :array
+    public function handle(): array
     {
         $branchName = session('current_branch_name');
-        $branchId =session('current_branch_id');
+        $branchId = session('current_branch_id');
 
-//      For API
+        //      For API
         if (empty($branchId)) {
             $primaryBranch = Branch::find(Auth::user()->primary_branch_id);
             $branchId = $primaryBranch->id;
@@ -26,8 +23,8 @@ class GetUserCurrentBranch
         }
 
         return [
-          'branchName' => $branchName,
-          'branchId' => $branchId,
+            'branchName' => $branchName,
+            'branchId' => $branchId,
         ];
     }
 }

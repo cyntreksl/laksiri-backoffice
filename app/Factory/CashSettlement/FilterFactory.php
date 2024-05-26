@@ -10,10 +10,11 @@ class FilterFactory
 {
     public static function create(string $filterName): ?FilterInterface
     {
-        $className = "App\\Factory\\CashSettlement\\Filters\\" . ucfirst(Str::camel($filterName)) . 'Filter';
+        $className = 'App\\Factory\\CashSettlement\\Filters\\'.ucfirst(Str::camel($filterName)).'Filter';
         if (class_exists($className)) {
             return new $className();
         }
+
         return null;
     }
 
@@ -22,7 +23,7 @@ class FilterFactory
 
         foreach ($filters as $key => $value) {
             $filter = self::create($key);
-            if ($filter instanceof FilterInterface && $value != "false" ) {
+            if ($filter instanceof FilterInterface && $value != 'false') {
                 $filter->apply($query, $value);
             }
         }
