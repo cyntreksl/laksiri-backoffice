@@ -79,3 +79,18 @@ Breadcrumbs::for('settings.zones.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard'); // replace with 'settings.index'
     $trail->push('Zones', route('settings.zones.index'));
 });
+
+
+// Loading > Container Index
+Breadcrumbs::for('loading.loading-containers.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard'); // replace with 'settings.index'
+    $trail->push('Containers');
+    $trail->push('Containers List', route('loading.loading-containers.index'));
+});
+
+// Loading > Container Create
+Breadcrumbs::for('loading.loading-containers.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard'); // replace with 'settings.index'
+    $trail->push('Containers',route('loading.loading-containers.index'));
+    $trail->push('Containers Create', route('loading.loading-containers.create'));
+});

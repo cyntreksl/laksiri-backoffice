@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CashSettlementController;
+use App\Http\Controllers\ContainerController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
@@ -93,6 +94,16 @@ Route::middleware([
 
     //Loading
     Route::name('loading.')->group(function () {
+        // Containers
+        Route::resource('containers', ContainerController::class)->names([
+            'index' => 'loading-containers.index',
+            'create' => 'loading-containers.create',
+            'store' => 'loading-containers.store',
+            'edit' => 'loading-containers.edit',
+            'update' => 'loading-containers.update',
+            'destroy' => 'loading-containers.destroy',
+        ]);
+
         // Loading Point
         Route::get('loading-points', function () {
             return Inertia::render('Loading/LoadingPoint');

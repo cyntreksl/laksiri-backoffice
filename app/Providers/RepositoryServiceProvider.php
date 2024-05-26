@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\CashSettlementInterface;
+use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
@@ -13,6 +14,7 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Repositories\BranchRepository;
 use App\Repositories\CashSettlementRepository;
+use App\Repositories\ContainerRepositories;
 use App\Repositories\DriverRepository;
 use App\Repositories\HBLRepository;
 use App\Repositories\PickupExceptionRepository;
@@ -35,6 +37,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ZoneRepositoryInterface::class, ZoneRepository::class);
         $this->app->bind(CashSettlementInterface::class, CashSettlementRepository::class);
         $this->app->bind(PickupExceptionRepositoryInterface::class, PickupExceptionRepository::class);
+        $this->app->bind(ContainerRepositoryInterface::class, ContainerRepositories::class);
     }
 
     public function boot(): void
