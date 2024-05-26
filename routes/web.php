@@ -37,6 +37,8 @@ Route::middleware([
     Route::resource('pickups', PickupController::class);
 
     Route::get('pickup-list', [PickupController::class, 'list']);
+    Route::get('pickup-list-order', [PickupController::class, 'showPickupOrder'])->name('pickups.ordering');
+    Route::put('pickup-list-update-order', [PickupController::class, 'updatePickupOrder'])->name('pickups.update-order');
 
     Route::put('pickups/{pickup}/driver/update', [PickupController::class, 'updateDriver'])
         ->name('pickups.driver.update');

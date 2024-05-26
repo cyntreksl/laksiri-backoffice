@@ -24,7 +24,19 @@ const activeTab = ref('tabHome')
 </script>
 
 <template>
-    <DialogModal :maxWidth="'7xl'" :show="show" @close="close">
+    <DialogModal :maxWidth="'7xl'" :show="show" @close="close" :closeable="true">
+        <template #title>
+            <div class="flex justify-between items-center">
+                <div></div>
+                <button
+                    class="text-gray-500 jus text-right hover:text-red-500 focus:outline-none"
+                    @click="$emit('close')"
+                >
+                    ✖
+                </button>
+            </div>
+
+        </template>
         <template #content>
             <div class="tabs flex flex-col">
                 <div

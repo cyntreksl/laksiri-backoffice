@@ -59,7 +59,7 @@ class PickupRepository implements PickupRepositoryInterface
 
             return $this->success('Pickup created successfully!', $pickup);
         } catch (\Exception $e) {
-            return $this->error($e->getMessage(), $e->getCode());
+            return $this->error($e->getMessage(), null, $e->getCode());
         }
     }
 }

@@ -77,7 +77,7 @@ class PickupController extends Controller
 
     public function updateDriver(Request $request, $pickUp)
     {
-        $pickUp = PickUp::find($pickUp);
+        $pickUp = PickUp::whereReference($pickUp)->first();
         $this->pickupRepository->assignDriver($request->all(), $pickUp);
     }
 
