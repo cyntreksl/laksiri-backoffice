@@ -40,7 +40,7 @@ class HBLController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold']);
 
         return $this->HBLRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
@@ -95,5 +95,10 @@ class HBLController extends Controller
     public function destroy(HBL $hbl)
     {
         $this->HBLRepository->deleteHBL($hbl);
+    }
+
+    public function toggleHold(HBL $hbl)
+    {
+        $this->HBLRepository->toggleHold($hbl);
     }
 }
