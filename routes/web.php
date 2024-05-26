@@ -48,7 +48,6 @@ Route::middleware([
 
     Route::get('pickup-exception-list', [PickupExceptionController::class, 'list']);
 
-
     // HBL
     Route::resource('hbls', HBLController::class);
 
