@@ -121,3 +121,23 @@ Breadcrumbs::for('branches.edit', function (BreadcrumbTrail $trail, Branch $bran
     $trail->push('Branch');
     $trail->push('Edit', route('branches.edit', $branch->id));
 });
+
+// Pricing
+Breadcrumbs::for('setting.prices.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Price Rule List', route('setting.prices.index'));
+});
+
+// Branches > Create
+Breadcrumbs::for('setting.prices.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('branches.index');
+    $trail->push('Create', route('setting.prices.create'));
+});
+
+// Branches > Edit
+Breadcrumbs::for('setting.prices.edit', function (BreadcrumbTrail $trail, $id) {
+    $trail->parent('dashboard');
+    $trail->push('Branch');
+    $trail->push('Edit', route('setting.prices.edit', $id));
+});
