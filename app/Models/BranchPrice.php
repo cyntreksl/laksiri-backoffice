@@ -18,7 +18,7 @@ class BranchPrice extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'branch_id', 'destination_branch_id', 'cargo_mode', 'price_mode', 'condition', 'true_action', 'false_action', 'is_editable',
+        'branch_id', 'destination_branch_id', 'cargo_mode', 'price_mode', 'condition', 'true_action', 'false_action', 'is_editable', 'bill_price', 'bill_vat', 'destination_charges',
     ];
 
     public function getActivitylogOptions(): LogOptions

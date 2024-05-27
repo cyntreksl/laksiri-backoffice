@@ -12,6 +12,8 @@ class GetPriceRules
 
     public function handle(): Collection|array
     {
-        return BranchPrice::all();
+        return BranchPrice::join('branches', 'branch_prices.destination_branch_id', '=', 'branches.id')
+            ->select('branch_prices.*', 'branches.name as destination_branch_name')
+            ->get();
     }
 }

@@ -28,6 +28,9 @@ const form = useForm({
     condition: '',
     true_action: '',
     false_action: '',
+    bill_price: null,
+    bill_vat: null,
+    destination_charges: '',
     is_editable: true,
 });
 
@@ -164,6 +167,24 @@ const handlePriceRuleCreate = () => {
                                 <InputLabel value="False Action"/>
                                 <TextInput v-model="form.false_action" class="w-full" placeholder="Set False Action"/>
                                 <InputError :message="form.errors.false_action"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Bill Price"/>
+                                <TextInput v-model="form.bill_price" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <InputError :message="form.errors.bill_price"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Bill VAT (%)"/>
+                                <TextInput v-model="form.bill_vat" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <InputError :message="form.errors.bill_vat"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Destination Charges"/>
+                                <TextInput v-model="form.destination_charges" class="w-full" placeholder="Set Destination Charges"/>
+                                <InputError :message="form.errors.destination_charges"/>
                             </div>
 
                             <div>

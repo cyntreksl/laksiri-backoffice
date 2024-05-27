@@ -29,7 +29,22 @@ class StoreBranchPriceRequest extends FormRequest
             'condition' => ['required', 'string'],
             'true_action' => ['required', 'string'],
             'false_action' => ['required', 'string'],
+            'bill_price' => ['required', 'numeric'],
+            'bill_vat' => ['required', 'numeric'],
+            'destination_charges' => ['required', 'string'],
             'is_editable' => ['boolean'],
+        ];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'destination_branch_id' => 'destination branch',
         ];
     }
 }
