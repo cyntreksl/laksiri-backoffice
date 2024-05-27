@@ -22,7 +22,9 @@ class LoginController extends Controller
      * Authenticate user and return token
      *
      * @unauthenticated
+     *
      * @group Authentication
+     *
      * @response 200 {
      * "message": "Login successful",
      * "error": false,

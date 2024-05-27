@@ -43,3 +43,13 @@ Add `docblocks` to your routes or controllers:
 - `@bodyParam`: This tag describes the request body parameters. You can specify the parameter type, indicate if it's required, and provide an example. It's automatically detected from the request validation rules.
 - `@response`: This tag describes the response. You can specify the response status code and provide an example response. It's automatically detected from the controller method's return type. You can also add custom response examples using this tag.
 - After adding or editing the docblocks in your routes or controllers, remember to run `php artisan scribe:generate` to update the documentation.
+
+
+## Code Linting and Formatting
+
+We're using [Laravel Pint](https://laravel.com/docs/11.x/pint) to lint and format our code. To lint and format your code, run the following command before committing your changes:
+
+```bash
+./vendor/bin/pint
+```
+
