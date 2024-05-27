@@ -93,3 +93,15 @@ Breadcrumbs::for('loading.loading-containers.create', function (BreadcrumbTrail 
     $trail->push('Containers', route('loading.loading-containers.index'));
     $trail->push('Containers Create', route('loading.loading-containers.create'));
 });
+
+// Settings > Branches
+Breadcrumbs::for('setting.branches.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Branches', route('setting.branches.index'));
+});
+
+Breadcrumbs::for('setting.branches.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('setting.branches.index');
+    $trail->push('Create', route('setting.branches.create'));
+});

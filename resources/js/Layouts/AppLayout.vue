@@ -844,6 +844,10 @@ export default {
                             title: "Pricing",
                             route: "setting.prices.index",
                         },
+                        {
+                            title: "Branches",
+                            route: "setting.branches.index",
+                        },
 
                     );
                     break;
