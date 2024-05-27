@@ -8,7 +8,6 @@ import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import {push} from "notivue";
-import {ref} from "vue";
 
 const props = defineProps({
     cargoModes: {
