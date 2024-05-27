@@ -50,24 +50,34 @@ class PriceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(BranchPrice $branchPrice)
+    public function edit($branchPrice)
     {
-        //
+        $branchPrice = BranchPrice::find($branchPrice);
+
+        return Inertia::render('Setting/Pricing/EditPriceRule', [
+            'cargoModes' => CargoType::cases(),
+            'branches' => $this->branchRepository->getBranches(),
+            'priceRule' => $branchPrice,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBranchPriceRequest $request, BranchPrice $branchPrice)
+    public function update(UpdateBranchPriceRequest $request, $branchPrice)
     {
-        //
+        $branchPrice = BranchPrice::find($branchPrice);
+
+        $this->priceRepository->updatePriceRule($request->all(), $branchPrice);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(BranchPrice $branchPrice)
+    public function destroy($branchPrice)
     {
-        //
+        $branchPrice = BranchPrice::find($branchPrice);
+
+        $this->priceRepository->deletePriceRule($branchPrice);
     }
 }
