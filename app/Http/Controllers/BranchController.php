@@ -55,7 +55,13 @@ class BranchController extends Controller
      */
     public function edit(Branch $branch)
     {
-        //
+        return Inertia::render('Branch/EditBranch', [
+            'cargoModes' => CargoType::cases(),
+            'deliveryTypes' => HBLType::cases(),
+            'packageTypes' => PackageType::cases(),
+            'branchTypes' => BranchType::cases(),
+            'branch' => $branch,
+        ]);
     }
 
     /**
@@ -63,7 +69,7 @@ class BranchController extends Controller
      */
     public function update(UpdateBranchRequest $request, Branch $branch)
     {
-        //
+        $this->branchRepository->updateBranch($request->all(), $branch);
     }
 
     /**

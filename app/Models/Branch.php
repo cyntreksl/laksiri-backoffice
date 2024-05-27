@@ -45,10 +45,4 @@ class Branch extends Model
     {
         return $this->hasMany(Area::class);
     }
-
-    protected $casts = [
-        'cargo_modes' => 'array',
-        'delivery_types' => 'array',
-        'package_types' => 'array',
-    ];
 }

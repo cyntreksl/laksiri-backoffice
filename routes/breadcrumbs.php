@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Branch;
 use App\Models\User;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
@@ -105,4 +106,11 @@ Breadcrumbs::for('branches.index', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('branches.create', function (BreadcrumbTrail $trail) {
     $trail->parent('branches.index');
     $trail->push('Create', route('branches.create'));
+});
+
+// Branches > Edit
+Breadcrumbs::for('branches.edit', function (BreadcrumbTrail $trail, Branch $branch) {
+    $trail->parent('dashboard');
+    $trail->push('Branch');
+    $trail->push('Edit', route('branches.edit', $branch->id));
 });

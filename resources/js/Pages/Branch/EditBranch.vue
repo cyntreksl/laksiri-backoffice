@@ -8,8 +8,9 @@ import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import {push} from "notivue";
+import {ref} from "vue";
 
-defineProps({
+const props = defineProps({
     cargoModes: {
         type: Array,
         default: () => []
@@ -26,24 +27,29 @@ defineProps({
         type: Array,
         default: () => []
     },
+    branch: {
+        type: Object,
+        default: () => {}
+    }
 })
 
 const form = useForm({
-    name: '',
-    type: null,
-    currency_name: '',
-    currency_symbol: '',
-    cargo_modes: [],
-    delivery_types: [],
-    package_types: [],
+    name: props.branch.name,
+    type: props.branch.type || null,
+    currency_name: props.branch.currency_name || '',
+    currency_symbol: props.branch.currency_symbol || '',
+    cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
+    delivery_types: JSON.parse(props.branch.delivery_types) || [],
+    package_types: JSON.parse(props.branch.package_types) || [],
 });
 
-const handleBranchCreate = () => {
-    form.post(route("branches.store"), {
+console.log(props.branch)
+
+const handleBranchUpdate = () => {
+    form.put(route("branches.update", props.branch.id), {
         onSuccess: () => {
-            form.reset();
-            router.visit(route("branches.index"));
-            push.success('Branch added successfully!');
+            router.visit(route("branches.edit", props.branch.id));
+            push.success('Branch updated successfully!');
         },
         onError: () => {
             push.error('Something went to wrong!');
@@ -56,15 +62,16 @@ const handleBranchCreate = () => {
 </script>
 
 <template>
-    <AppLayout title="Create Branch">
+    <AppLayout title="Edit Branch">
         <template #header>Branches</template>
 
-        <Breadcrumb/>
-        <form @submit.prevent="handleBranchCreate">
+        <Breadcrumb :branch="branch"/>
+
+        <form @submit.prevent="handleBranchUpdate">
 
             <div class="flex items-center justify-between p-2 my-5">
                 <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                    Create New Branch
+                    Edit  Branch
                 </h2>
 
                 <div class="flex justify-end bottom-0 space-x-5">
@@ -73,7 +80,7 @@ const handleBranchCreate = () => {
                                    class="space-x-2"
                                    type="submit"
                     >
-                        <span>Create a Branch</span>
+                        <span>Update Branch</span>
                         <svg
                             class="size-5"
                             fill="none"
@@ -153,11 +160,11 @@ const handleBranchCreate = () => {
                                 <label class="block">
                                     <span>Select Cargo Modes</span>
                                     <select
+                                        v-model="form.cargo_modes"
                                         autocomplete="off"
                                         class="mt-1.5 w-full"
                                         multiple
                                         placeholder="Select a Cargo Mode..."
-                                        v-model="form.cargo_modes"
                                         x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
                                     >
                                         <option value="">Select a Cargo Mode...</option>
@@ -182,11 +189,11 @@ const handleBranchCreate = () => {
                                 <label class="block">
                                     <span>Select Delivery Types</span>
                                     <select
+                                        v-model="form.delivery_types"
                                         autocomplete="off"
                                         class="mt-1.5 w-full"
                                         multiple
                                         placeholder="Select a Delivery Type..."
-                                        v-model="form.delivery_types"
                                         x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
                                     >
                                         <option value="">Select a Delivery Type...</option>
@@ -211,11 +218,11 @@ const handleBranchCreate = () => {
                                 <label class="block">
                                     <span>Select Package Types</span>
                                     <select
+                                        v-model="form.package_types"
                                         autocomplete="off"
                                         class="mt-1.5 w-full"
                                         multiple
                                         placeholder="Select a Package Type..."
-                                        v-model="form.package_types"
                                         x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
                                     >
                                         <option value="">Select a Package Type...</option>

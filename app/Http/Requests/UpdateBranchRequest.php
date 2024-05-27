@@ -11,7 +11,7 @@ class UpdateBranchRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,13 @@ class UpdateBranchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required'],
+            'type' => ['required'],
+            'currency_name' => ['required'],
+            'currency_symbol' => ['required', 'max:3'],
+            'cargo_modes' => ['required'],
+            'delivery_types' => ['required'],
+            'package_types' => ['required'],
         ];
     }
 }

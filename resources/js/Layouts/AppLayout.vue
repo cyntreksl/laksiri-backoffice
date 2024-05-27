@@ -315,7 +315,7 @@
                                     <div class="flex flex-col pt-2 pb-5">
 
                                         <a
-                                            :href="route('branches.index')"
+                                            :href="route('branches.edit', $page.props.auth.user.primary_branch_id)"
                                             class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
                                         >
                                             <div
@@ -331,7 +331,7 @@
                                                 <h2
                                                     class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
                                                 >
-                                                    Branches
+                                                    Business Profile
                                                 </h2>
                                                 <div
                                                     class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
