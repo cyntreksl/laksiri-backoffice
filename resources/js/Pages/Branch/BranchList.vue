@@ -24,7 +24,7 @@ defineProps({
                 Branches
             </h2>
 
-            <Link :href="route('setting.branches.create')">
+            <Link :href="route('branches.create')">
                 <PrimaryButton>
                     Create New Branch
                 </PrimaryButton>

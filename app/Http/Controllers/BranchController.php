@@ -24,7 +24,7 @@ class BranchController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Setting/Branch/BranchList', [
+        return Inertia::render('Branch/BranchList', [
             'branches' => $this->branchRepository->getBranches(),
         ]);
     }
@@ -34,7 +34,7 @@ class BranchController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Setting/Branch/CreateBranch', [
+        return Inertia::render('Branch/CreateBranch', [
             'cargoModes' => CargoType::cases(),
             'deliveryTypes' => HBLType::cases(),
             'packageTypes' => PackageType::cases(),

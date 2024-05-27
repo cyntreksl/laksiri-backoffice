@@ -189,7 +189,8 @@ Route::middleware([
         Route::get('prices', function () {
             return Inertia::render('Setting/PricingList');
         })->name('prices.index');
-        // Branches
-        Route::resource('branches', BranchController::class);
     });
+
+    // Branches
+    Route::resource('branches', BranchController::class)->except('show');
 });

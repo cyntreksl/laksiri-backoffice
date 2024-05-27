@@ -41,10 +41,10 @@ const form = useForm({
 });
 
 const handleBranchCreate = () => {
-    form.post(route("setting.branches.store"), {
+    form.post(route("branches.store"), {
         onSuccess: () => {
             form.reset();
-            router.visit(route("setting.branches.index"));
+            router.visit(route("branches.index"));
             push.success('Branch added successfully!');
         },
         onError: () => {
@@ -70,7 +70,7 @@ const handleBranchCreate = () => {
                 </h2>
 
                 <div class="flex justify-end bottom-0 space-x-5">
-                    <DangerOutlineButton @click="router.visit(route('setting.branches.index'))">Cancel</DangerOutlineButton>
+                    <DangerOutlineButton @click="router.visit(route('branches.index'))">Cancel</DangerOutlineButton>
                     <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
                                    class="space-x-2"
                                    type="submit"
