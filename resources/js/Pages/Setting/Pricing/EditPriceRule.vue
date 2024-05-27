@@ -35,7 +35,7 @@ const form = useForm({
     bill_price: props.priceRule.bill_price || null,
     bill_vat: props.priceRule.bill_vat || null,
     destination_charges: props.priceRule.destination_charges || '',
-    is_editable: props.priceRule.is_editable || true,
+    is_editable: Boolean(props.priceRule.is_editable),
 });
 
 const handlePriceRuleUpdate = () => {
@@ -194,7 +194,7 @@ const handlePriceRuleUpdate = () => {
 
                             <div>
                                 <InputLabel value="Is Editable"/>
-                                <Checkbox v-model="form.is_editable" :checked="form.is_editable" value="Edit"/>
+                                <Checkbox v-model="form.is_editable" :checked="form.is_editable"/>
                                 <InputError :message="form.errors.is_editable"/>
                             </div>
                         </div>
