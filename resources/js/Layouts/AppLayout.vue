@@ -315,6 +315,33 @@
                                     <div class="flex flex-col pt-2 pb-5">
 
                                         <a
+                                            :href="route('branches.edit', $page.props.auth.user.primary_branch_id)"
+                                            class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
+                                        >
+                                            <div
+                                                class="flex size-8 items-center justify-center rounded-lg bg-pink-500 text-white"
+                                            >
+                                                <svg class="size-4.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+
+                                            </div>
+
+                                            <div>
+                                                <h2
+                                                    class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
+                                                >
+                                                    Business Profile
+                                                </h2>
+                                                <div
+                                                    class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
+                                                >
+                                                    Branch Configurations
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        <a
                                             :href="route('profile.show')"
                                             class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
                                         >

@@ -2,9 +2,8 @@
 
 namespace App\Enum;
 
-enum AgentType: string
+enum PackageType: string
 {
     case DEPARTURE = 'Departure';
     case DESTINATION = 'Destination';
-
 }

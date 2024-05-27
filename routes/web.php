@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CashSettlementController;
 use App\Http\Controllers\ContainerController;
 use App\Http\Controllers\DriverController;
@@ -188,6 +189,8 @@ Route::middleware([
         Route::get('prices', function () {
             return Inertia::render('Setting/PricingList');
         })->name('prices.index');
-
     });
+
+    // Branches
+    Route::resource('branches', BranchController::class)->except('show');
 });

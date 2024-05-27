@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Branch;
 use App\Models\User;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
@@ -92,4 +93,24 @@ Breadcrumbs::for('loading.loading-containers.create', function (BreadcrumbTrail 
     $trail->parent('dashboard'); // replace with 'settings.index'
     $trail->push('Containers', route('loading.loading-containers.index'));
     $trail->push('Containers Create', route('loading.loading-containers.create'));
+});
+
+// Branches
+Breadcrumbs::for('branches.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Branches');
+    $trail->push('List', route('branches.index'));
+});
+
+// Branches > Create
+Breadcrumbs::for('branches.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('branches.index');
+    $trail->push('Create', route('branches.create'));
+});
+
+// Branches > Edit
+Breadcrumbs::for('branches.edit', function (BreadcrumbTrail $trail, Branch $branch) {
+    $trail->parent('dashboard');
+    $trail->push('Branch');
+    $trail->push('Edit', route('branches.edit', $branch->id));
 });
