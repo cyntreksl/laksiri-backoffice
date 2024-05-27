@@ -37,5 +37,4 @@ class UpdateHBLPackages
             CreateHBLPackages::run($hbl, $newPackages);
         });
     }
-
 }
