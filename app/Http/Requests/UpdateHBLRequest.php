@@ -41,7 +41,7 @@ class UpdateHBLRequest extends FormRequest
             'other_charge' => ['required', 'numeric'],
             'discount' => ['required', 'numeric'],
             'paid_amount' => ['required', 'numeric'],
-            'packages' => ['sometimes','required', 'array'],
+            'packages' => ['sometimes', 'required', 'array'],
         ];
     }
 }
