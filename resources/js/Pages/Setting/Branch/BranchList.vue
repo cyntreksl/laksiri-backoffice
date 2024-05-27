@@ -106,17 +106,23 @@ defineProps({
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{branch.cargo_modes}}
+                        <span v-for="cmode in branch.cargo_modes" class="badge bg-info/10 text-info dark:bg-info/15 ml-2">
+                            {{cmode}}
+                        </span>
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{branch.delivery_types}}
+                        <span v-for="dtype in branch.delivery_types" class="badge bg-success/10 text-success dark:bg-success/15 ml-2">
+                            {{dtype}}
+                        </span>
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{branch.package_types}}
+                        <span v-for="ptype in branch.package_types" class="badge bg-warning/10 text-warning dark:bg-warning/15 ml-2">
+                            {{ptype}}
+                        </span>
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
 

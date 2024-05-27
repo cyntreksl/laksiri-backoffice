@@ -19,6 +19,11 @@ class Branch extends Model
         'slug',
         'parent_id',
         'type',
+        'currency_name',
+        'currency_symbol',
+        'cargo_modes',
+        'delivery_types',
+        'package_types',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -40,4 +45,10 @@ class Branch extends Model
     {
         return $this->hasMany(Area::class);
     }
+
+    protected $casts = [
+        'cargo_modes' => 'array',
+        'delivery_types' => 'array',
+        'package_types' => 'array',
+    ];
 }

@@ -9,6 +9,7 @@ import DatePicker from "@/Components/DatePicker.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import {ref} from "vue";
+import {push} from "notivue";
 
 defineProps({
     cargoModes: {
@@ -22,12 +23,16 @@ defineProps({
     packageTypes: {
         type: Array,
         default: () => []
-    }
+    },
+    branchTypes: {
+        type: Array,
+        default: () => []
+    },
 })
 
 const form = useForm({
     name: '',
-    type: '',
+    type: null,
     currency_name: '',
     currency_symbol: '',
     cargo_modes: [],
@@ -35,12 +40,19 @@ const form = useForm({
     package_types: [],
 });
 
-const types = ref([
-    {id: 1, name: 'type 1'}
-])
-
 const handleBranchCreate = () => {
-
+    form.post(route("setting.branches.store"), {
+        onSuccess: () => {
+            form.reset();
+            router.visit(route("setting.branches.index"));
+            push.success('Branch added successfully!');
+        },
+        onError: () => {
+            push.error('Something went to wrong!');
+        },
+        preserveScroll: true,
+        preserveState: true,
+    });
 }
 
 </script>
@@ -107,8 +119,8 @@ const handleBranchCreate = () => {
                                         <option :value="null" disabled>
                                             Select Type
                                         </option>
-                                        <option v-for="type in types" :key="type.id" :value="type.id">
-                                            {{ type.name }}
+                                        <option v-for="(branchType, index) in branchTypes" :key="index" :value="branchType">
+                                            {{ branchType }}
                                         </option>
                                     </select>
                                 </label>
@@ -117,13 +129,13 @@ const handleBranchCreate = () => {
 
                             <div class="sm:col-span-3">
                                 <InputLabel value="Currency Name"/>
-                                <TextInput v-model="form.currency_name" class="w-full"/>
+                                <TextInput v-model="form.currency_name" class="w-full" placeholder="Sri Lankan Rupee"/>
                                 <InputError :message="form.errors.currency_name"/>
                             </div>
 
                             <div class="sm:col-span-1">
                                 <InputLabel value="Currency Symbol"/>
-                                <TextInput v-model="form.currency_symbol" class="w-full"/>
+                                <TextInput v-model="form.currency_symbol" class="w-full" placeholder="LKR"/>
                                 <InputError :message="form.errors.currency_symbol"/>
                             </div>
                         </div>
@@ -147,10 +159,11 @@ const handleBranchCreate = () => {
                                         class="mt-1.5 w-full"
                                         multiple
                                         placeholder="Select a Cargo Mode..."
-                                        x-init="$el._tom = new Tom($el)"
+                                        v-model="form.cargo_modes"
+                                        x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
                                     >
                                         <option value="">Select a Cargo Mode...</option>
-                                        <option v-for="cargoMode in cargoModes" :value="cargoMode">{{cargoMode}}</option>
+                                        <option v-for="(cargoMode, index) in cargoModes" :key="index" :value="cargoMode">{{cargoMode}}</option>
                                     </select>
                                 </label>
                             </div>
@@ -175,10 +188,11 @@ const handleBranchCreate = () => {
                                         class="mt-1.5 w-full"
                                         multiple
                                         placeholder="Select a Delivery Type..."
-                                        x-init="$el._tom = new Tom($el)"
+                                        v-model="form.delivery_types"
+                                        x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
                                     >
                                         <option value="">Select a Delivery Type...</option>
-                                        <option v-for="deliveryType in deliveryTypes" :value="deliveryType">{{deliveryType}}</option>
+                                        <option v-for="(deliveryType, index) in deliveryTypes" :key="index" :value="deliveryType">{{deliveryType}}</option>
                                     </select>
                                 </label>
                             </div>
@@ -203,10 +217,11 @@ const handleBranchCreate = () => {
                                         class="mt-1.5 w-full"
                                         multiple
                                         placeholder="Select a Package Type..."
-                                        x-init="$el._tom = new Tom($el)"
+                                        v-model="form.package_types"
+                                        x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
                                     >
                                         <option value="">Select a Package Type...</option>
-                                        <option v-for="packageType in packageTypes" :value="packageType">{{packageType}}</option>
+                                        <option v-for="(packageType, index) in packageTypes" :key="index" :value="packageType">{{packageType}}</option>
                                     </select>
                                 </label>
                             </div>

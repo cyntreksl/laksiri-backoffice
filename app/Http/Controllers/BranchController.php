@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\BranchType;
 use App\Enum\CargoType;
 use App\Enum\HBLType;
+use App\Enum\PackageType;
+use App\Http\Requests\StoreBranchRequest;
+use App\Http\Requests\UpdateBranchRequest;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Models\Branch;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class BranchController extends Controller
@@ -34,24 +37,17 @@ class BranchController extends Controller
         return Inertia::render('Setting/Branch/CreateBranch', [
             'cargoModes' => CargoType::cases(),
             'deliveryTypes' => HBLType::cases(),
-            'packageTypes' => CargoType::cases(),
+            'packageTypes' => PackageType::cases(),
+            'branchTypes' => BranchType::cases(),
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreBranchRequest $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Branch $branch)
-    {
-        //
+        $this->branchRepository->createBranch($request->all());
     }
 
     /**
@@ -65,7 +61,7 @@ class BranchController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Branch $branch)
+    public function update(UpdateBranchRequest $request, Branch $branch)
     {
         //
     }
