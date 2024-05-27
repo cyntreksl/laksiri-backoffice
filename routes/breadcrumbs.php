@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Branch;
+use App\Models\BranchPrice;
 use App\Models\User;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
@@ -113,4 +114,24 @@ Breadcrumbs::for('branches.edit', function (BreadcrumbTrail $trail, Branch $bran
     $trail->parent('dashboard');
     $trail->push('Branch');
     $trail->push('Edit', route('branches.edit', $branch->id));
+});
+
+// Pricing
+Breadcrumbs::for('setting.prices.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Price Rule List', route('setting.prices.index'));
+});
+
+// Branches > Create
+Breadcrumbs::for('setting.prices.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('branches.index');
+    $trail->push('Create', route('setting.prices.create'));
+});
+
+// Branches > Edit
+Breadcrumbs::for('setting.prices.edit', function (BreadcrumbTrail $trail, BranchPrice $branchPrice) {
+    $trail->parent('dashboard');
+    $trail->push('Branch');
+    $trail->push('Edit', route('setting.prices.edit', $branchPrice->id));
 });

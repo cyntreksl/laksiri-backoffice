@@ -7,6 +7,7 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\PickupController;
 use App\Http\Controllers\PickupExceptionController;
+use App\Http\Controllers\PriceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Foundation\Application;
@@ -186,9 +187,7 @@ Route::middleware([
             return Inertia::render('Setting/WarehouseZoneList');
         })->name('warehouse-zones.index');
         //Pricing
-        Route::get('prices', function () {
-            return Inertia::render('Setting/PricingList');
-        })->name('prices.index');
+        Route::resource('prices', PriceController::class)->except('show');
     });
 
     // Branches
