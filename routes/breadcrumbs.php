@@ -50,6 +50,13 @@ Breadcrumbs::for('hbls.create', function (BreadcrumbTrail $trail) {
     $trail->push('Create HBL', route('hbls.create'));
 });
 
+// HBL > edit
+Breadcrumbs::for('hbls.edit', function (BreadcrumbTrail $trail, $hbl) {
+    $trail->parent('dashboard');
+    $trail->push('HBL List', route('hbls.index'));
+    $trail->push('Edit HBL', route('hbls.edit', $hbl->id));
+});
+
 // Users
 Breadcrumbs::for('users.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

@@ -15,4 +15,17 @@ class HBLPackage extends Model
     use SoftDeletes;
 
     protected $table = 'hbl_packages';
+
+    protected $fillable = [
+        'hbl_id',
+        'branch_id',
+        'package_type',
+        'length',
+        'width',
+        'height',
+        'quantity',
+        'volume',
+        'weight',
+        'remarks',
+    ];
 }

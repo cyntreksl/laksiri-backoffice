@@ -76,17 +76,22 @@ class HBLController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(HBL $hBL)
+    public function edit(HBL $hbl)
     {
-        //
+        return Inertia::render('HBL/EditHBL', [
+            'hbl' => $hbl->load('packages'),
+            'cargoTypes' => CargoType::cases(),
+            'hblTypes' => HBLType::cases(),
+            'warehouses' => WarehouseType::cases(),
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateHBLRequest $request, HBL $hBL)
+    public function update(UpdateHBLRequest $request, HBL $hbl)
     {
-        //
+        $this->HBLRepository->updateHBL($request->all(), $hbl);
     }
 
     /**

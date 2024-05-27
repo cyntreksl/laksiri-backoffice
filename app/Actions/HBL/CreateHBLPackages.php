@@ -26,13 +26,13 @@ class CreateHBLPackages
                 $package = new HBLPackage();
                 $package->hbl_id = $hbl->id;
                 $package->branch_id = GetUserCurrentBranchID::run();
-                $package->package_type = $packageData['type'];
+                $package->package_type = $packageData['type'] ?? $packageData['package_type'];
                 $package->length = $packageData['length'];
                 $package->width = $packageData['width'];
                 $package->height = $packageData['height'];
                 $package->quantity = $packageData['quantity'];
                 $package->volume = $packageData['volume'];
-                $package->weight = $packageData['totalWeight'];
+                $package->weight = $packageData['totalWeight'] ?? $packageData['weight'];
                 $package->remarks = $packageData['remarks'];
                 $package->save();
             }
