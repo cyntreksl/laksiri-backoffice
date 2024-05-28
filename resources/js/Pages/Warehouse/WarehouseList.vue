@@ -14,7 +14,6 @@ import InputLabel from "@/Components/InputLabel.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
-import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import HoldConfirmationModal from "@/Pages/CashSettlement/Partials/HoldConfirmationModal.vue";
 import {router} from "@inertiajs/vue3";
@@ -41,7 +40,6 @@ let grid = null;
 const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
-    isHold: false,
     drivers: {},
     officers: {},
     cargoMode: ["Air Cargo", "Sea Cargo"],
@@ -64,7 +62,6 @@ const data = reactive({
         status: true,
         actions: true,
     },
-    selectedData: {},
 });
 
 const toggleColumnVisibility = columnName => {
@@ -137,26 +134,6 @@ const createColumns = () => [
         sort: false,
         formatter: (_, row) => {
             return h('div', {}, [
-                h('button', {
-                    className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
-                    onClick: () => confirmPayment(row.cells)
-                }, [
-                    h('svg', {
-                        xmlns: 'http://www.w3.org/2000/svg',
-                        viewBox: '0 0 24 24',
-                        class: 'size-4.5',
-                        fill: 'none',
-                        stroke: "currentColor",
-                        strokeWidth: 1.5,
-                    }, [
-                        h('path', {
-                            strokeLinecap: "round",
-                            strokeLinejoin: 'round',
-                            d: 'M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z',
-                        }),
-                    ])
-                ]),
-
                 h('button', {
                     className: 'btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25',
                     onClick: () => confirmIsHold(row.cells)
@@ -246,7 +223,7 @@ const initializeGrid = () => {
             url: constructUrl(),
             then: data => data.data.map(item => {
                 const row = [];
-                row.push({id: item.id})
+                // row.push({id: item.id})
                 visibleColumns.forEach(column => {
                     row.push(item[column]);
                 });
@@ -322,18 +299,7 @@ const pageReady = async () => {
 
 pageReady();
 
-const showConfirmPaymentModal = ref(false);
 const hblData = ref({});
-
-const confirmPayment = (row) => {
-    hblData.value = row;
-    showConfirmPaymentModal.value = true;
-};
-
-const closeModal = () => {
-    showConfirmPaymentModal.value = false;
-    hblData.value = null;
-}
 
 const showConfirmHoldModal = ref(false);
 
@@ -523,14 +489,6 @@ const toggleHold = () => {
 
                 <FilterBorder/>
 
-                <FilterHeader value="Is Hold"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.isHold" label="Is Hold" value="true"/>
-                </label>
-
-                <FilterBorder/>
-
                 <FilterHeader value="Select Drivers"/>
 
                 <select
@@ -559,7 +517,6 @@ const toggleHold = () => {
                     </option>
                 </select>
 
-
                 <!--Filter Now Action Button-->
                 <SoftPrimaryButton class="space-x-2" @click="applyFilters">
                     <i class="fa-solid fa-filter"></i>
@@ -567,8 +524,6 @@ const toggleHold = () => {
                 </SoftPrimaryButton>
             </template>
         </FilterDrawer>
-
-        <PaymentModal :hbl-data="hblData" :show="showConfirmPaymentModal" @close="closeModal"/>
 
         <HoldConfirmationModal :hbl-data="hblData" :show="showConfirmHoldModal" @close="closeHoldModal"
                                @toggle-hold="toggleHold"/>

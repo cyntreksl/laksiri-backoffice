@@ -68,6 +68,6 @@ class HBL extends Model
 
     public function scopeWarehouse(Builder $query)
     {
-        $query->where('system_status', '=', 4);
+        $query->where('system_status', 4);
     }
 }

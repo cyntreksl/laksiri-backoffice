@@ -97,7 +97,7 @@ Route::middleware([
         // Warehouse
         Route::get('warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
         Route::get('get-warehouse-list', [WarehouseController::class, 'list'])->name('warehouses.list');
-        Route::post('warehouse-summery', [CashSettlementController::class, 'getSummery'])->name('warehouses.summery');
+        Route::post('warehouse-summery', [WarehouseController::class, 'getSummery'])->name('warehouses.summery');
     });
 
     //Loading
