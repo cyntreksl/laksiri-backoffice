@@ -278,24 +278,25 @@ const applyFilters = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <div v-for="(mode, index) in filters.cargoMode" v-if="filters.cargoMode"
+                                    <div v-for="(mode, index) in filters.cargoType" v-if="filters.cargoType"
                                          :key="index" class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2">{{
                                             mode
                                         }}
                                     </div>
 
-                                    <div v-if="filters.isUrgent" class="badge bg-success text-white ml-2">
-                                        Is Urgent
+                                    <div v-for="(mode, index) in filters.containerType" v-if="filters.containerType"
+                                         :key="index" class="badge bg-cyan-500 text-white dark:bg-cyan-900 ml-2">{{
+                                            mode
+                                        }}
                                     </div>
 
-                                    <div v-if="filters.isImportant" class="badge bg-cyan-500 text-white ml-2">
-                                        VIP Customer
+                                    <div v-if="filters.status" class="badge bg-success text-white ml-2">
+                                        {{filters.status}}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
 
                     <div class="flex">
                         <ColumnVisibilityPopover>
