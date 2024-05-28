@@ -141,3 +141,10 @@ Breadcrumbs::for('setting.prices.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->push('Branch');
     $trail->push('Edit', route('setting.prices.edit', $id));
 });
+
+//Cash settlement
+Breadcrumbs::for('back-office.warehouses.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Warehouse');
+    $trail->push('Warehouse List', route('back-office.warehouses.index'));
+});
