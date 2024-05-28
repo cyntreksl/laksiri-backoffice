@@ -12,6 +12,7 @@ use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
+use App\Interfaces\WarehouseRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Repositories\BranchRepository;
 use App\Repositories\CashSettlementRepository;
@@ -23,6 +24,7 @@ use App\Repositories\PickupRepository;
 use App\Repositories\PriceRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\WarehouseRepository;
 use App\Repositories\ZoneRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -41,6 +43,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PickupExceptionRepositoryInterface::class, PickupExceptionRepository::class);
         $this->app->bind(ContainerRepositoryInterface::class, ContainerRepositories::class);
         $this->app->bind(PriceRepositoryInterface::class, PriceRepository::class);
+        $this->app->bind(WarehouseRepositoryInterface::class, WarehouseRepository::class);
     }
 
     public function boot(): void

@@ -9,6 +9,7 @@ use App\Http\Controllers\PickupController;
 use App\Http\Controllers\PickupExceptionController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -94,9 +95,9 @@ Route::middleware([
         Route::put('update/payments/{hbl}', [CashSettlementController::class, 'paymentUpdate'])->name('cash-settlements.payment.update');
 
         // Warehouse
-        Route::get('warehouses', function () {
-            return Inertia::render('Warehouse/WarehouseList');
-        })->name('warehouses.index');
+        Route::get('warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
+        Route::get('get-warehouse-list', [WarehouseController::class, 'list'])->name('warehouses.list');
+        Route::post('warehouse-summery', [WarehouseController::class, 'getSummery'])->name('warehouses.summery');
     });
 
     //Loading
