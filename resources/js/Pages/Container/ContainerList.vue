@@ -15,6 +15,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import RadioButton from "@/Components/RadioButton.vue";
 
 const props = defineProps({
     cargoTypes: {
@@ -43,12 +44,7 @@ const filters = reactive({
     etdEndDate: '',
     cargoType: Object.values(props.cargoTypes),
     containerType: Object.values(props.containerTypes),
-    isRequested: '',
-    isLoading: '',
-    isDraft: '',
-    isLoaded: '',
-    isUnloaded: '',
-    isReturned: '',
+    status: '',
 })
 
 const data = reactive({
@@ -475,8 +471,28 @@ const applyFilters = () => {
 
                 <FilterHeader value="Status"/>
 
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.isRequested" label="Requested" value="true"/>
+                <label class="inline-flex items-center space-x-2">
+                    <RadioButton v-model="filters.status" label="Requested" name="status" value="requested"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2">
+                    <RadioButton v-model="filters.status" label="Loading" name="status" value="loading"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2">
+                    <RadioButton v-model="filters.status" label="Draft" name="status" value="draft"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2">
+                    <RadioButton v-model="filters.status" label="Loaded" name="status" value="loaded"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2">
+                    <RadioButton v-model="filters.status" label="Unloaded" name="status" value="unloaded"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2">
+                    <RadioButton v-model="filters.status" label="Returned" name="status" value="returned"/>
                 </label>
 
                 <FilterBorder/>
