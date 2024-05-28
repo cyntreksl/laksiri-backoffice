@@ -6,6 +6,7 @@ use App\Enum\CargoType;
 use App\Enum\ContainerType;
 use App\Http\Requests\StoreContainerRequest;
 use App\Interfaces\ContainerRepositoryInterface;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ContainerController extends Controller
@@ -16,7 +17,15 @@ class ContainerController extends Controller
 
     public function index()
     {
-        return Inertia::render('Container/ContainerList');
+        return Inertia::render('Container/ContainerList', [
+            'cargoTypes' => CargoType::cases(),
+            'containerTypes' => ContainerType::cases(),
+        ]);
+    }
+
+    public function list(Request $request)
+    {
+
     }
 
     public function create()

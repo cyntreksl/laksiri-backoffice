@@ -112,6 +112,8 @@ Route::middleware([
             'destroy' => 'loading-containers.destroy',
         ]);
 
+        Route::get('container-list', [ContainerController::class, 'list']);
+
         // Loading Point
         Route::get('loading-points', function () {
             return Inertia::render('Loading/LoadingPoint');
