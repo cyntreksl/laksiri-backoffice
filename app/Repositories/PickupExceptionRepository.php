@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Actions\PickUps\Exception\GetTotalPickupExceptionCount;
 use App\Factory\Pickup\FilterFactory;
 use App\Http\Resources\PickupExceptionResource;
 use App\Interfaces\GridJsInterface;
@@ -25,12 +24,14 @@ class PickupExceptionRepository implements GridJsInterface, PickupExceptionRepos
         //apply filters
         FilterFactory::apply($query, $filters);
 
+        $countQuery = $query;
+
         $exceptions = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
 
-        $totalRecords = GetTotalPickupExceptionCount::run();
+        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => PickupExceptionResource::collection($exceptions),

@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Actions\Driver\GetDrivers;
-use App\Actions\Driver\GetTotalDriversCountInCurrentBranch;
 use App\Actions\User\CreateUser;
 use App\Factory\User\FilterFactory;
 use App\Http\Resources\DriverCollection;
@@ -35,12 +34,14 @@ class DriverRepository implements DriverRepositoryInterface, GridJsInterface
         //apply filters
         FilterFactory::apply($query, $filters);
 
+        $countQuery = $query;
+
         $users = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
 
-        $totalRecords = GetTotalDriversCountInCurrentBranch::run();
+        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => DriverCollection::collection($users),

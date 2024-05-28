@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Actions\HBL\CashSettlement\GetCashSettlementByIds;
-use App\Actions\HBL\CashSettlement\GetTotalCashSettlementCount;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\UpdateHBLSystemStatus;
 use App\Factory\CashSettlement\FilterFactory;
@@ -34,12 +33,14 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         //apply filters
         FilterFactory::apply($query, $filters);
 
+        $countQuery = $query;
+
         $records = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
 
-        $totalRecords = GetTotalCashSettlementCount::run();
+        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => CashSettlementCollection::collection($records),

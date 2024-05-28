@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Actions\Container\CreateContainer;
-use App\Actions\Container\GetTotalContainerCount;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
 use App\Interfaces\ContainerRepositoryInterface;
@@ -40,12 +39,14 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         //apply filters
         FilterFactory::apply($query, $filters);
 
+        $countQuery = $query;
+
         $containers = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
 
-        $totalRecords = GetTotalContainerCount::run();
+        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => ContainerResource::collection($containers),
