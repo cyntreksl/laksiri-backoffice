@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\HBLPaymentStatus;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Models\HBL;
 use App\Repositories\CashSettlementRepository;
@@ -21,7 +22,11 @@ class CashSettlementController extends Controller
         $drivers = $this->driverRepository->getAllDrivers();
         $officers = [];
 
-        return Inertia::render('CashSettlement/CashSettlementList', ['drivers' => $drivers, 'officers' => $officers]);
+        return Inertia::render('CashSettlement/CashSettlementList', [
+            'drivers' => $drivers,
+            'officers' => $officers,
+            'paymentStatus' => HBLPaymentStatus::cases(),
+        ]);
     }
 
     public function list(Request $request)
@@ -32,7 +37,7 @@ class CashSettlementController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus']);
 
         return $this->cashSettlementRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }

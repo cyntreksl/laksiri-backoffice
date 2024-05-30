@@ -29,6 +29,11 @@ defineProps({
         default: () => {
         },
     },
+    paymentStatus: {
+        type: Object,
+        default: () => {
+        },
+    },
 })
 
 const showFilters = ref(false);
@@ -43,6 +48,7 @@ const filters = reactive({
     drivers: {},
     officers: {},
     cargoMode: ["Air Cargo", "Sea Cargo"],
+    paymentStatus: Object.values(props.paymentStatus),
 })
 
 const data = reactive({
@@ -485,6 +491,14 @@ const toggleHold = () => {
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch v-model="filters.cargoMode" label="Door to Door" value="Door to Door"/>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Payment Status"/>
+
+                <label v-for="item in paymentStatus" :key="item" class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.paymentStatus" :label="item" :value="item"/>
                 </label>
 
                 <FilterBorder/>
