@@ -31,6 +31,7 @@ Breadcrumbs::for('pickups.create', function (BreadcrumbTrail $trail) {
     $trail->push('Create Pickup', route('pickups.create'));
 });
 
+// pickups > exceptions
 Breadcrumbs::for('pickups.exceptions', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Pickups Exceptions');
@@ -46,8 +47,9 @@ Breadcrumbs::for('hbls.index', function (BreadcrumbTrail $trail) {
 
 // HBL > create
 Breadcrumbs::for('hbls.create', function (BreadcrumbTrail $trail) {
-    $trail->parent('hbls.index');
-    $trail->push('Create HBL', route('hbls.create'));
+    $trail->parent('dashboard');
+    $trail->push('HBL', route('hbls.index'));
+    $trail->push('HBL Create', route('hbls.create'));
 });
 
 // HBL > edit
