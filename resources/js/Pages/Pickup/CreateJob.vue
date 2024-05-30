@@ -2,7 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {computed, ref, watch, watchEffect} from "vue";
+import {computed, ref, watch} from "vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
@@ -73,6 +73,21 @@ const form = useForm({
     pickup_time_end: '',
     is_from_important_customer: false,
     is_urgent_pickup: false,
+});
+
+// Method to find zone ID based on address
+const findZoneIdByAddress = (address) => {
+    for (const zone of props.zones) {
+        if (address.includes(zone.name)) {
+            return zone.id;
+        }
+    }
+    return null;
+};
+
+// Watcher to update zone_id based on address
+watch(() => form.address, (newAddress) => {
+    form.zone_id = findZoneIdByAddress(newAddress);
 });
 
 const handlePickupCreate = () => {
