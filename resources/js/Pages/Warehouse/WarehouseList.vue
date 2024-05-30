@@ -18,7 +18,7 @@ import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import HoldConfirmationModal from "@/Pages/CashSettlement/Partials/HoldConfirmationModal.vue";
 import {router} from "@inertiajs/vue3";
 
-defineProps({
+const props = defineProps({
     drivers: {
         type: Object,
         default: () => {
