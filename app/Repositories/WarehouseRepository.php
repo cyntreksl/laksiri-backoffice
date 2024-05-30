@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Actions\HBL\Warehouse\GetTotalWarehouseCount;
 use App\Factory\Warehouse\FilterFactory;
 use App\Http\Resources\CashSettlementCollection;
 use App\Interfaces\GridJsInterface;
@@ -27,12 +26,14 @@ class WarehouseRepository implements GridJsInterface, WarehouseRepositoryInterfa
         //apply filters
         FilterFactory::apply($query, $filters);
 
+        $countQuery = $query;
+
         $records = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
 
-        $totalRecords = GetTotalWarehouseCount::run();
+        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => CashSettlementCollection::collection($records),

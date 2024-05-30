@@ -3,10 +3,13 @@
 namespace App\Repositories;
 
 use App\Actions\Container\CreateContainer;
+use App\Factory\Container\FilterFactory;
+use App\Http\Resources\ContainerResource;
 use App\Interfaces\ContainerRepositoryInterface;
+use App\Interfaces\GridJsInterface;
 use App\Models\Container;
 
-class ContainerRepositories implements ContainerRepositoryInterface
+class ContainerRepositories implements ContainerRepositoryInterface, GridJsInterface
 {
     /**
      * @throws \Exception
@@ -18,5 +21,41 @@ class ContainerRepositories implements ContainerRepositoryInterface
         } catch (\Exception $e) {
             throw new \Exception('Failed to create container: '.$e->getMessage());
         }
+    }
+
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        $query = Container::query();
+
+        if (! empty($search)) {
+            $query->where(function ($query) use ($search) {
+                $query->where('reference', 'like', '%'.$search.'%')
+                    ->orWhere('container_number', 'like', '%'.$search.'%')
+                    ->orWhere('bl_number', 'like', '%'.$search.'%')
+                    ->orWhere('awb_number', 'like', '%'.$search.'%');
+            });
+        }
+
+        //apply filters
+        FilterFactory::apply($query, $filters);
+
+        $countQuery = $query;
+
+        $containers = $query->orderBy($order, $direction)
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        $totalRecords = $countQuery->count();
+
+        return response()->json([
+            'data' => ContainerResource::collection($containers),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
     }
 }
