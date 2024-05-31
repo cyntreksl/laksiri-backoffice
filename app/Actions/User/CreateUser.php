@@ -18,6 +18,9 @@ class CreateUser
 
         if (empty($data['preferred_zone'])) {
             $data['preferred_zone'] = null;
+        } else {
+            // Convert preferred_zone array to comma-separated string
+            $data['preferred_zone'] = implode(',', $data['preferred_zone']);
         }
 
         $user = User::create($data);

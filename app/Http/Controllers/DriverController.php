@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDriverRequest;
 use App\Interfaces\DriverRepositoryInterface;
+use App\Interfaces\ZoneRepositoryInterface;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,12 +13,15 @@ class DriverController extends Controller
 {
     public function __construct(
         private readonly DriverRepositoryInterface $driverRepository,
+        private readonly ZoneRepositoryInterface $zoneRepository,
     ) {
     }
 
     public function index()
     {
-        return Inertia::render('Driver/DriverList');
+        return Inertia::render('Driver/DriverList', [
+            'zones' => $this->zoneRepository->getZones(),
+        ]);
     }
 
     public function list(Request $request)

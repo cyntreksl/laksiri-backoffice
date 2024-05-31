@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Actions\Driver\GetDrivers;
 use App\Actions\User\CreateUser;
+use App\Actions\Zone\CreateZone;
 use App\Factory\User\FilterFactory;
 use App\Http\Resources\DriverCollection;
 use App\Interfaces\DriverRepositoryInterface;
@@ -20,6 +21,14 @@ class DriverRepository implements DriverRepositoryInterface, GridJsInterface
 
     public function storeDriver(array $data)
     {
+        // Check and create zones if they don't exist
+        if (! empty($data['preferred_zone'])) {
+            $mappedZones = array_map(fn ($zone) => ['name' => $zone], $data['preferred_zone']);
+            foreach ($mappedZones as $zoneData) {
+                CreateZone::run($zoneData);
+            }
+        }
+
         return CreateUser::run($data);
     }
 
