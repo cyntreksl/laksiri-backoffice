@@ -17,4 +17,6 @@ interface HBLRepositoryInterface
     public function getHBLsWithPackages();
 
     public function toggleHold(HBL $hbl);
+
+    public function getHBLsByCargoType(string $cargoType);
 }

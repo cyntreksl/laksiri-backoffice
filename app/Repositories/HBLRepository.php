@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\DeleteHBL;
+use App\Actions\HBL\GetHBLByCargoTypeWithPackages;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLsWithPackages;
 use App\Actions\HBL\SwitchHoldStatus;
@@ -85,5 +86,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function toggleHold(HBL $hbl)
     {
         return SwitchHoldStatus::run($hbl);
+    }
+
+    public function getHBLsByCargoType(string $cargoType)
+    {
+        return GetHBLByCargoTypeWithPackages::run($cargoType);
     }
 }
