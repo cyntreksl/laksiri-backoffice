@@ -115,9 +115,8 @@ Route::middleware([
         Route::get('container-list', [ContainerController::class, 'list']);
 
         // Loading Point
-        Route::get('loading-points', function () {
-            return Inertia::render('Loading/LoadingPoint');
-        })->name('loading-points.index');
+        Route::get('loading-points/{container}', [ContainerController::class, 'showLoadingPoint'])
+            ->name('loading-points.index');
 
         // Warehouse
         Route::get('manual-loadings', function () {

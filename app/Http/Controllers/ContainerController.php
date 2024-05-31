@@ -6,6 +6,7 @@ use App\Enum\CargoType;
 use App\Enum\ContainerType;
 use App\Http\Requests\StoreContainerRequest;
 use App\Interfaces\ContainerRepositoryInterface;
+use App\Models\Container;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -58,5 +59,10 @@ class ContainerController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
+    }
+
+    public function showLoadingPoint(Container $container)
+    {
+        return Inertia::render('Loading/LoadingPoint');
     }
 }

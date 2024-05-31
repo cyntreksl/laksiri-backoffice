@@ -1,8 +1,8 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {Link} from "@inertiajs/vue3";
-import {Grid} from "gridjs";
+import {Link, router} from "@inertiajs/vue3";
+import {Grid, h} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
@@ -49,6 +49,7 @@ const filters = reactive({
 
 const data = reactive({
     columnVisibility: {
+        id: false,
         cargo_type: true,
         container_type: true,
         reference: true,
@@ -148,6 +149,7 @@ const initializeGrid = () => {
 };
 
 const createColumns = () => [
+    {name: 'ID', hidden: !data.columnVisibility.id},
     {name: 'Cargo Type', hidden: !data.columnVisibility.cargo_type},
     {name: 'Container Type', hidden: !data.columnVisibility.cargo_type},
     {name: 'Reference', hidden: !data.columnVisibility.reference},
@@ -186,6 +188,45 @@ const createColumns = () => [
         name: 'Actions',
         sort: false,
         hidden: !data.columnVisibility.actions,
+        formatter: (_, row) => {
+            return h('div', {}, [
+                h('button', {
+                    className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
+                    onClick: () => router.visit(route('loading.loading-points.index', {
+                        'container': row.cells[0].data,
+                        'cargoType': row.cells[1].data,
+                    }))
+                }, [
+                    h('svg', {
+                        xmlns: 'http://www.w3.org/2000/svg',
+                        viewBox: '0 0 24 24',
+                        width: 24,
+                        height: 24,
+                        class: 'size-4.5 icon icon-tabler icons-tabler-outline icon-tabler-truck',
+                        fill: 'none',
+                        stroke: "currentColor",
+                        strokeWidth: 2,
+                        strokeLinecap: "round",
+                        strokeLinejoin: "round",
+                    }, [
+                        h('path', {
+                            stroke: "none",
+                            d: 'M0 0h24v24H0z',
+                            fill: 'none',
+                        }),
+                        h('path', {
+                            d: 'M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
+                        }),
+                        h('path', {
+                            d: 'M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
+                        }),
+                        h('path', {
+                            d: 'M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5',
+                        }),
+                    ])
+                ]),
+            ]);
+        },
     },
 ];
 
