@@ -3,8 +3,9 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import {ref} from "vue";
 
-defineProps({
+const props = defineProps({
     container: {
         type: Object,
         default: () => {
@@ -17,6 +18,28 @@ defineProps({
     }
 })
 
+const hblPackagesArr = ref(props.hbls.flatMap(hbl => hbl.packages));
+
+const containerArr = ref([]);
+
+const handleLoad = (index) => {
+    if (index !== -1) {
+        containerArr.value.push(hblPackagesArr.value[index]);
+        hblPackagesArr.value.splice(index, 1);
+    }
+}
+
+const handleUnload = (index) => {
+    if (index !== -1) {
+        hblPackagesArr.value.push(containerArr.value[index]);
+        containerArr.value.splice(index, 1)
+    }
+}
+
+// find HBL by packageId
+const findHblByPackageId = (packageId) => {
+    return props.hbls.find(hbl => hbl.packages.some(p => p.id === packageId));
+}
 </script>
 
 <template>
@@ -57,91 +80,89 @@ defineProps({
                             </div>
                         </div>
                         <div class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5">
-                            <template v-for="hbl in hbls" :key="hbl.id">
-                                <div v-for="packageData in hbl.packages" :key="packageData.id"
-                                     class="card cursor-pointer shadow-sm">
-                                    <div class="flex justify-between items-center">
-                                        <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
-                                            <div>
-                                                <div class="flex justify-between">
-                                                    <p class="font-medium tracking-wide text-slate-600 dark:text-navy-100">
-                                                        {{ hbl.hbl }}
-                                                    </p>
-                                                </div>
+                            <div v-for="(packageData, index) in hblPackagesArr" :key="packageData.id"
+                                 class="card cursor-pointer shadow-sm">
+                                <div class="flex justify-between items-center">
+                                    <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
+                                        <div>
+                                            <div class="flex justify-between">
+                                                <p class="font-medium tracking-wide text-slate-600 dark:text-navy-100">
+                                                    {{findHblByPackageId(packageData.id).hbl}}
+                                                </p>
                                             </div>
-                                            <div class="flex flex-wrap gap-1">
-                                                <div
-                                                    class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
-                                                    <svg class="size-3.5" fill="none" stroke="currentColor"
-                                                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path
-                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                            stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"/>
-                                                    </svg>
-                                                    <span>{{ moment(packageData.created_at).format('YYYY-MM-DD') }}</span>
-                                                </div>
-
-                                                <div
-                                                    class="badge space-x-1 bg-warning/10 py-1 px-1.5 text-warning dark:bg-warning/15">
-                                                    <svg
-                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
-                                                        fill="none"
-                                                        stroke="currentColor" stroke-linecap="round"
-                                                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                                        width="24"
-                                                        xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                        <path d="M7 20l10 0"/>
-                                                        <path d="M6 6l6 -1l6 1"/>
-                                                        <path d="M12 3l0 17"/>
-                                                        <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                        <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                    </svg>
-                                                    <span>Volume {{ packageData.volume }}</span>
-                                                </div>
-
-                                                <div
-                                                    class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15">
-                                                    <svg
-                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
-                                                        fill="none" height="24" stroke="currentColor" stroke-linecap="round"
-                                                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                                        width="24"
-                                                        xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                        <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
-                                                        <path
-                                                            d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
-                                                    </svg>
-                                                    <span>Weight {{ packageData.volume }}</span>
-                                                </div>
-
-                                                <div
-                                                    class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15">
-                                                    <svg class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hash" fill="none" stroke="currentColor"
-                                                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                         viewBox="0 0 24 24"
-                                                         xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                        <path d="M5 9l14 0"/>
-                                                        <path d="M5 15l14 0"/>
-                                                        <path d="M11 4l-4 16"/>
-                                                        <path d="M17 4l-4 16"/>
-                                                    </svg>
-                                                    <span>Quantity {{ packageData.quantity }}</span>
-                                                </div>
+                                        </div>
+                                        <div class="flex flex-wrap gap-1">
+                                            <div
+                                                class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
+                                                <svg class="size-3.5" fill="none" stroke="currentColor"
+                                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"/>
+                                                </svg>
+                                                <span>{{ moment(packageData.created_at).format('YYYY-MM-DD') }}</span>
                                             </div>
-                                            <p class="mt-px text-xs text-slate-400 dark:text-navy-300">
-                                                {{ packageData.package_type }}
-                                            </p>
+
+                                            <div
+                                                class="badge space-x-1 bg-warning/10 py-1 px-1.5 text-warning dark:bg-warning/15">
+                                                <svg
+                                                    class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
+                                                    fill="none"
+                                                    stroke="currentColor" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                                    width="24"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                    <path d="M7 20l10 0"/>
+                                                    <path d="M6 6l6 -1l6 1"/>
+                                                    <path d="M12 3l0 17"/>
+                                                    <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
+                                                    <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
+                                                </svg>
+                                                <span>Volume {{ packageData.volume }}</span>
+                                            </div>
+
+                                            <div
+                                                class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15">
+                                                <svg
+                                                    class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
+                                                    fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                                    width="24"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                    <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                                    <path
+                                                        d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
+                                                </svg>
+                                                <span>Weight {{ packageData.volume }}</span>
+                                            </div>
+
+                                            <div
+                                                class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15">
+                                                <svg class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hash" fill="none" stroke="currentColor"
+                                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                     viewBox="0 0 24 24"
+                                                     xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                    <path d="M5 9l14 0"/>
+                                                    <path d="M5 15l14 0"/>
+                                                    <path d="M11 4l-4 16"/>
+                                                    <path d="M17 4l-4 16"/>
+                                                </svg>
+                                                <span>Quantity {{ packageData.quantity }}</span>
+                                            </div>
                                         </div>
-                                        <div class="px-2.5">
-                                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  x-tooltip.placement.top.success="'Click to Load'"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 18v-6a3 3 0 0 1 3 -3h7" /><path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4" /></svg>
-                                        </div>
+                                        <p class="mt-px text-xs text-slate-400 dark:text-navy-300">
+                                            {{ packageData.package_type }}
+                                        </p>
+                                    </div>
+                                    <div class="px-2.5">
+                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success" fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  x-tooltip.placement.top.success="'Click to Load'"  xmlns="http://www.w3.org/2000/svg"  @click.prevent="handleLoad(index)"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 18v-6a3 3 0 0 1 3 -3h7" /><path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4" /></svg>
                                     </div>
                                 </div>
-                            </template>
+                            </div>
                         </div>
                     </div>
 
@@ -163,7 +184,90 @@ defineProps({
                             </div>
                         </div>
                         <div class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5">
-                            <div class="cursor-pointer border-2 rounded-lg border-dashed">
+                            <div v-for="(packageData, index) in containerArr" v-if="containerArr.length > 0" :key="packageData.id"
+                                 class="card cursor-pointer shadow-sm">
+                                <div class="flex justify-between items-center">
+                                    <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
+                                        <div>
+                                            <div class="flex justify-between">
+                                                <p class="font-medium tracking-wide text-slate-600 dark:text-navy-100">
+                                                    {{findHblByPackageId(packageData.id).hbl}}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-wrap gap-1">
+                                            <div
+                                                class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
+                                                <svg class="size-3.5" fill="none" stroke="currentColor"
+                                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"/>
+                                                </svg>
+                                                <span>{{ moment(packageData.created_at).format('YYYY-MM-DD') }}</span>
+                                            </div>
+
+                                            <div
+                                                class="badge space-x-1 bg-warning/10 py-1 px-1.5 text-warning dark:bg-warning/15">
+                                                <svg
+                                                    class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
+                                                    fill="none"
+                                                    stroke="currentColor" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                                    width="24"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                    <path d="M7 20l10 0"/>
+                                                    <path d="M6 6l6 -1l6 1"/>
+                                                    <path d="M12 3l0 17"/>
+                                                    <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
+                                                    <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
+                                                </svg>
+                                                <span>Volume {{ packageData.volume }}</span>
+                                            </div>
+
+                                            <div
+                                                class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15">
+                                                <svg
+                                                    class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
+                                                    fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                                    width="24"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                    <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                                    <path
+                                                        d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
+                                                </svg>
+                                                <span>Weight {{ packageData.volume }}</span>
+                                            </div>
+
+                                            <div
+                                                class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15">
+                                                <svg class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hash" fill="none" stroke="currentColor"
+                                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                     viewBox="0 0 24 24"
+                                                     xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                    <path d="M5 9l14 0"/>
+                                                    <path d="M5 15l14 0"/>
+                                                    <path d="M11 4l-4 16"/>
+                                                    <path d="M17 4l-4 16"/>
+                                                </svg>
+                                                <span>Quantity {{ packageData.quantity }}</span>
+                                            </div>
+                                        </div>
+                                        <p class="mt-px text-xs text-slate-400 dark:text-navy-300">
+                                            {{ packageData.package_type }}
+                                        </p>
+                                    </div>
+                                    <div class="px-2.5">
+                                        <svg class=" hover:text-error icon icon-tabler icons-tabler-outline icon-tabler-corner-up-left-double" fill="none" height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  x-tooltip.placement.top.error="'Click to Unload'"  xmlns="http://www.w3.org/2000/svg"  @click.prevent="handleUnload(index)"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M19 18v-6a3 3 0 0 0 -3 -3h-7" /><path d="M13 13l-4 -4l4 -4m-5 8l-4 -4l4 -4" /></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="cursor-pointer border-2 rounded-lg border-dashed">
                                 <div class="flex justify-center items-center space-x-3 px-2.5 pb-2 pt-1.5 h-24">
                                     <div class="text-center">
                                         <p
