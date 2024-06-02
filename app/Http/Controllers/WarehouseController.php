@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\HBLPaymentStatus;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use Illuminate\Http\Request;
@@ -21,7 +22,9 @@ class WarehouseController extends Controller
         $officers = [];
 
         return Inertia::render('Warehouse/WarehouseList', [
-            'drivers' => $drivers, 'officers' => $officers,
+            'drivers' => $drivers,
+            'officers' => $officers,
+            'paymentStatus' => HBLPaymentStatus::cases(),
         ]);
     }
 
@@ -33,7 +36,7 @@ class WarehouseController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus']);
 
         return $this->warehouseRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }

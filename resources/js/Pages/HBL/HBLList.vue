@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {Link, router} from '@inertiajs/vue3'
 import {Grid, h, html} from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
@@ -29,7 +29,12 @@ const props = defineProps({
     hbls: {
         type: Object,
         default: () => {},
-    }
+    },
+    paymentStatus: {
+        type: Object,
+        default: () => {
+        },
+    },
 })
 
 const wrapperRef = ref(null);
@@ -47,6 +52,7 @@ const filters = reactive({
     isHold: false,
     warehouse: ["COLOMBO", "NINTAVUR"],
     createdBy: '',
+    paymentStatus: Object.values(props.paymentStatus),
 })
 
 const data = reactive({
@@ -590,6 +596,14 @@ const toggleHold = () => {
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch v-model="filters.hblType" label="Door to Door" value="Door to Door"/>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Payment Status"/>
+
+                <label v-for="item in paymentStatus" :key="item" class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.paymentStatus" :label="item" :value="item"/>
                 </label>
 
                 <FilterBorder/>
