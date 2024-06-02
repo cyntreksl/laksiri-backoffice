@@ -15,6 +15,14 @@ import FilterBorder from "@/Components/FilterBorder.vue";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
 import moment from "moment";
 
+defineProps({
+    zones: {
+        type: Object,
+        default: () => {
+        },
+    },
+})
+
 const wrapperRef = ref(null);
 let grid = null;
 
@@ -238,7 +246,7 @@ const applyFilters = () => {
 
         <Breadcrumb/>
 
-        <CreateDriverForm/>
+        <CreateDriverForm :zones="zones"/>
 
         <div class="card mt-4">
             <div>
