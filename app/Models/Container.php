@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ScopedBy(BranchScope::class)]
 class Container extends Model
 {
     use HasFactory;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $fillable = [

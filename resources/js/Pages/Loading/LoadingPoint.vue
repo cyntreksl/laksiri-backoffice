@@ -68,7 +68,7 @@ const findHblByPackageId = (packageId) => {
                     </h3>
                 </div>
                 <div class="flex space-x-2">
-                    <SecondaryButton>
+                    <SecondaryButton :disabled="containerArr.length === 0">
                         <svg class="size-5 mr-2 icon icon-tabler icons-tabler-outline icon-tabler-file-report"
                              fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                              stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -80,7 +80,7 @@ const findHblByPackageId = (packageId) => {
                         </svg>
                         Save Draft
                     </SecondaryButton>
-                    <PrimaryButton>
+                    <PrimaryButton :disabled="containerArr.length === 0">
                         Proceed to Review
                     </PrimaryButton>
                 </div>
@@ -102,7 +102,8 @@ const findHblByPackageId = (packageId) => {
                             <label class="relative hidden w-full max-w-[16rem] sm:flex">
                                 <input
                                     v-model="searchQuery"
-                                    class="form-input peer h-8 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 text-xs+ placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 dark:border-navy-450 dark:hover:border-navy-400 focus:ring-0"
+                                    :disabled="Object.keys(filteredPackages).length === 0"
+                                    class="form-input peer h-8 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 text-xs+ placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 dark:border-navy-450 dark:hover:border-navy-400 focus:ring-0 disabled:pointer-events-none disabled:select-none disabled:border-none disabled:bg-zinc-100"
                                     placeholder="Search on HBL Packages" type="text"/>
                                 <span
                                     class="pointer-events-none absolute flex h-full w-9 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent">

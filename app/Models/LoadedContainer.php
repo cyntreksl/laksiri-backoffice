@@ -11,16 +11,14 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ScopedBy(BranchScope::class)]
-class HBLPayment extends Model
+class LoadedContainer extends Model
 {
     use HasFactory;
     use LogsActivity;
     use SoftDeletes;
 
-    protected $table = 'hbl_payments';
-
     protected $fillable = [
-        'branch_id', 'hbl_id', 'grand_total', 'paid_amount', 'status', 'created_by',
+        'branch_id', 'container_id', 'hbl_id', 'hbl_package_id', 'is_draft', 'reference', 'note', 'cargo_type', 'delivery_type', 'total_packages', 'total_weight', 'total_volume', 'total_hbl', 'status', 'loaded_by',
     ];
 
     public function getActivitylogOptions(): LogOptions
