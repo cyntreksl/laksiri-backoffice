@@ -4,6 +4,7 @@ namespace App\Actions\User;
 
 use App\Models\Branch;
 use Lorisleiva\Actions\Concerns\AsAction;
+use function auth;
 
 class SwitchUserBranch
 {
@@ -11,6 +12,7 @@ class SwitchUserBranch
 
     public function handle(Branch $branch): array
     {
+        auth()->user()->update(['primary_branch_id' => $branch->id]);
         session(['current_branch_id' => $branch->id]);
         session(['current_branch_name' => $branch->name]);
 
