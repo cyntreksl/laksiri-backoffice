@@ -122,6 +122,9 @@ Route::middleware([
         // Loaded Container
         Route::resource('loaded-containers', LoadedContainerController::class);
 
+        Route::delete('/loaded-containers/remove/{hbl_package_id}', [LoadedContainerController::class, 'destroyDraft'])
+            ->name('loaded-containers.remove');
+
         // Warehouse
         Route::get('manual-loadings', function () {
             return Inertia::render('Loading/ManualLoading');

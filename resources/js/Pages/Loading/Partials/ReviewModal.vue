@@ -53,13 +53,12 @@ const form = useForm({
 const handleCreateLoadedContainer = () => {
     form.post(route("loading.loaded-containers.store"), {
         onSuccess: () => {
+            push.success('Container loaded successfully!');
             emit('close');
             router.visit(route("loading.loading-points.index", {
                 'container': route().params.container,
                 'cargoType': route().params.cargoType,
             }));
-            form.reset();
-            push.success('Container loaded successfully!');
         },
         onError: () => {
             push.error('Something went to wrong!');

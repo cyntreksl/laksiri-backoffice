@@ -2,10 +2,11 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import draggable from 'vuedraggable'
 import ReviewModal from "@/Pages/Loading/Partials/ReviewModal.vue";
+import {router} from "@inertiajs/vue3";
+import ActionMessage from "@/Components/ActionMessage.vue";
 
 const props = defineProps({
     container: {
@@ -38,15 +39,15 @@ const containerArr = ref([]);
 
 const handleLoad = (index) => {
     if (index !== -1) {
-        containerArr.value.push(hblPackagesArr.value[index]);
-        hblPackagesArr.value.splice(index, 1);
+        containerArr.value = [...containerArr.value, hblPackagesArr.value[index]];
+        hblPackagesArr.value = hblPackagesArr.value.filter((_, i) => i !== index);
     }
 }
 
 const handleUnload = (index) => {
     if (index !== -1) {
-        hblPackagesArr.value.push(containerArr.value[index]);
-        containerArr.value.splice(index, 1)
+        hblPackagesArr.value = [...hblPackagesArr.value, containerArr.value[index]];
+        containerArr.value = containerArr.value.filter((_, i) => i !== index);
     }
 }
 
@@ -56,6 +57,61 @@ const findHblByPackageId = (packageId) => {
 }
 
 const showReviewModal = ref(false);
+
+const handlePackageChange = () => {
+    containerArr.value = [...containerArr.value];
+    hblPackagesArr.value = [...hblPackagesArr.value];
+}
+
+const draftTextEnabled = ref(false);
+
+const handleCreateDraftLoadedContainer = (packages) => {
+    router.post(route("loading.loaded-containers.store"), {
+            container_id: route().params.container,
+            cargo_type: route().params.cargoType,
+            packages,
+            is_draft: true,
+        },
+        {
+            onSuccess: () => {
+                draftTextEnabled.value = true;
+                setTimeout(() => draftTextEnabled.value = false, 3000);
+            },
+            onError: () => {
+                console.error('Something went to wrong!');
+            },
+            preserveScroll: true,
+            preserveState: true,
+        });
+}
+
+const handleRemoveDraftLoadedContainer = (packages) => {
+    router.delete(route("loading.loaded-containers.remove", packages[0].id),
+        {
+            onSuccess: () => {
+                draftTextEnabled.value = true;
+                setTimeout(() => draftTextEnabled.value = false, 3000);
+            },
+            onError: () => {
+                console.error('Something went to wrong!');
+            },
+            preserveScroll: true,
+            preserveState: true,
+        });
+}
+
+// Watch for changes in the container array
+watch(containerArr, (newValue, oldValue) => {
+    const added = newValue.filter(item => !oldValue.includes(item));
+    const removed = oldValue.filter(item => !newValue.includes(item));
+
+    if (added.length > 0) {
+        handleCreateDraftLoadedContainer(added);
+    }
+    if (removed.length > 0) {
+        handleRemoveDraftLoadedContainer(removed);
+    }
+});
 </script>
 
 <template>
@@ -70,19 +126,33 @@ const showReviewModal = ref(false);
                         Loading Point
                     </h3>
                 </div>
-                <div class="flex space-x-2">
-                    <SecondaryButton :disabled="containerArr.length === 0">
-                        <svg class="size-5 mr-2 icon icon-tabler icons-tabler-outline icon-tabler-file-report"
-                             fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                             stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                            <path d="M17 17m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
-                            <path d="M17 13v4h4"/>
-                            <path d="M12 3v4a1 1 0 0 0 1 1h4"/>
-                            <path d="M11.5 21h-6.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v2m0 3v4"/>
-                        </svg>
-                        Save Draft
-                    </SecondaryButton>
+                <div class="flex space-x-5 items-center">
+<!--                    <SecondaryButton :disabled="containerArr.length === 0">-->
+<!--                        <svg class="size-5 mr-2 icon icon-tabler icons-tabler-outline icon-tabler-file-report"-->
+<!--                             fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"-->
+<!--                             stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">-->
+<!--                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>-->
+<!--                            <path d="M17 17m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>-->
+<!--                            <path d="M17 13v4h4"/>-->
+<!--                            <path d="M12 3v4a1 1 0 0 0 1 1h4"/>-->
+<!--                            <path d="M11.5 21h-6.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v2m0 3v4"/>-->
+<!--                        </svg>-->
+<!--                        Save Draft-->
+<!--                    </SecondaryButton>-->
+                    <ActionMessage :on="draftTextEnabled">
+                        <div class="flex">
+                            <svg class="size-5 mr-2 icon icon-tabler icons-tabler-outline icon-tabler-file-report"
+                                 fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                 stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                <path d="M17 17m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+                                <path d="M17 13v4h4"/>
+                                <path d="M12 3v4a1 1 0 0 0 1 1h4"/>
+                                <path d="M11.5 21h-6.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v2m0 3v4"/>
+                            </svg>
+                            Saved as draft.
+                        </div>
+                    </ActionMessage>
                     <PrimaryButton :disabled="containerArr.length === 0" @click.prevent="showReviewModal = true">
                         Proceed to Review
                     </PrimaryButton>
@@ -105,7 +175,6 @@ const showReviewModal = ref(false);
                             <label class="relative hidden w-full max-w-[16rem] sm:flex">
                                 <input
                                     v-model="searchQuery"
-                                    :disabled="Object.keys(filteredPackages).length === 0"
                                     class="form-input peer h-8 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 text-xs+ placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 dark:border-navy-450 dark:hover:border-navy-400 focus:ring-0 disabled:pointer-events-none disabled:select-none disabled:border-none disabled:bg-zinc-100"
                                     placeholder="Search on HBL Packages" type="text"/>
                                 <span
@@ -119,8 +188,8 @@ const showReviewModal = ref(false);
                             </label>
                         </div>
                         <div>
-                            <draggable v-if="Object.keys(filteredPackages).length > 0"
-                                       :list="filteredPackages"
+                            <draggable v-if="Object.keys(filteredPackages).length > 0" v-model="filteredPackages"
+                                       @change="handlePackageChange"
                                        class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
                                        group="people"
                                        item-key="id">
@@ -264,7 +333,8 @@ const showReviewModal = ref(false);
                         </div>
                         <div class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5">
                             <draggable
-                                :list="containerArr"
+                                v-if="containerArr.length > 0"
+                                v-model="containerArr" @change="handlePackageChange"
                                 class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
                                 group="people"
                                 item-key="id"
@@ -371,7 +441,8 @@ const showReviewModal = ref(false);
                                     </div>
                                 </template>
                             </draggable>
-                            <div v-if="containerArr.length === 0" class="cursor-pointer border-2 rounded-lg border-dashed">
+                            <div v-if="containerArr.length === 0"
+                                 class="cursor-pointer border-2 rounded-lg border-dashed">
                                 <div class="flex justify-center items-center space-x-3 px-2.5 pb-2 pt-1.5 h-24">
                                     <div class="text-center">
                                         <p
@@ -390,6 +461,7 @@ const showReviewModal = ref(false);
                 </div>
             </div>
         </main>
-        <ReviewModal :container-array="containerArr" :find-hbl-by-package-id="findHblByPackageId" :show="showReviewModal" @close="showReviewModal = false"/>
+        <ReviewModal :container-array="containerArr" :find-hbl-by-package-id="findHblByPackageId"
+                     :show="showReviewModal" @close="showReviewModal = false"/>
     </AppLayout>
 </template>
