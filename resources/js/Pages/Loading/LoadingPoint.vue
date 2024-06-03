@@ -5,6 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import {computed, ref} from "vue";
 import draggable from 'vuedraggable'
+import ReviewModal from "@/Pages/Loading/Partials/ReviewModal.vue";
 
 const props = defineProps({
     container: {
@@ -53,6 +54,15 @@ const handleUnload = (index) => {
 const findHblByPackageId = (packageId) => {
     return props.hbls.find(hbl => hbl.packages.some(p => p.id === packageId));
 }
+
+const showReviewModal = ref(false);
+
+const note = ref('');
+
+const handleNoteUpdate = (newNote) => {
+    note.value = newNote;
+};
+
 </script>
 
 <template>
@@ -80,7 +90,7 @@ const findHblByPackageId = (packageId) => {
                         </svg>
                         Save Draft
                     </SecondaryButton>
-                    <PrimaryButton :disabled="containerArr.length === 0">
+                    <PrimaryButton :disabled="containerArr.length === 0" @click.prevent="showReviewModal = true">
                         Proceed to Review
                     </PrimaryButton>
                 </div>
@@ -88,7 +98,7 @@ const findHblByPackageId = (packageId) => {
 
             <div class="flex h-[calc(100vh-8.5rem)] flex-grow flex-col">
                 <div
-                    class="kanban-scrollbar grid grid-cols-1 sm:grid-cols-2 space-x-4 overflow-x-auto overflow-y-hidden px-[var(--margin-x)] transition-all duration-[.25s]">
+                    class="kanban-scrollbar grid grid-cols-1 sm:grid-cols-2 space-x-4 overflow-x-auto overflow-y-auto px-[var(--margin-x)] transition-all duration-[.25s]">
                     <div class="relative flex max-h-full shrink-0 flex-col">
                         <div class="board-draggable-handler flex items-center justify-between px-0.5 pb-3">
                             <div class="flex items-center space-x-2">
@@ -387,5 +397,6 @@ const findHblByPackageId = (packageId) => {
                 </div>
             </div>
         </main>
+        <ReviewModal :container-array="containerArr" :find-hbl-by-package-id="findHblByPackageId" :show="showReviewModal" @close="showReviewModal = false" @update-note="handleNoteUpdate"/>
     </AppLayout>
 </template>
