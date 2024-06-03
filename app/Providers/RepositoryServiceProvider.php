@@ -7,22 +7,26 @@ use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
+use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
+use App\Interfaces\WarehouseRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Repositories\BranchRepository;
 use App\Repositories\CashSettlementRepository;
 use App\Repositories\ContainerRepositories;
 use App\Repositories\DriverRepository;
 use App\Repositories\HBLRepository;
+use App\Repositories\LoadedContainerRepository;
 use App\Repositories\PickupExceptionRepository;
 use App\Repositories\PickupRepository;
 use App\Repositories\PriceRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\WarehouseRepository;
 use App\Repositories\ZoneRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -41,6 +45,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PickupExceptionRepositoryInterface::class, PickupExceptionRepository::class);
         $this->app->bind(ContainerRepositoryInterface::class, ContainerRepositories::class);
         $this->app->bind(PriceRepositoryInterface::class, PriceRepository::class);
+        $this->app->bind(WarehouseRepositoryInterface::class, WarehouseRepository::class);
+        $this->app->bind(LoadedContainerRepositoryInterface::class, LoadedContainerRepository::class);
     }
 
     public function boot(): void

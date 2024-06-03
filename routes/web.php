@@ -5,10 +5,12 @@ use App\Http\Controllers\CashSettlementController;
 use App\Http\Controllers\ContainerController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
+use App\Http\Controllers\LoadedContainerController;
 use App\Http\Controllers\PickupController;
 use App\Http\Controllers\PickupExceptionController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -94,9 +96,9 @@ Route::middleware([
         Route::put('update/payments/{hbl}', [CashSettlementController::class, 'paymentUpdate'])->name('cash-settlements.payment.update');
 
         // Warehouse
-        Route::get('warehouses', function () {
-            return Inertia::render('Warehouse/WarehouseList');
-        })->name('warehouses.index');
+        Route::get('warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
+        Route::get('get-warehouse-list', [WarehouseController::class, 'list'])->name('warehouses.list');
+        Route::post('warehouse-summery', [WarehouseController::class, 'getSummery'])->name('warehouses.summery');
     });
 
     //Loading
@@ -111,10 +113,17 @@ Route::middleware([
             'destroy' => 'loading-containers.destroy',
         ]);
 
+        Route::get('container-list', [ContainerController::class, 'list']);
+
         // Loading Point
-        Route::get('loading-points', function () {
-            return Inertia::render('Loading/LoadingPoint');
-        })->name('loading-points.index');
+        Route::get('loading-points/{container}', [ContainerController::class, 'showLoadingPoint'])
+            ->name('loading-points.index');
+
+        // Loaded Container
+        Route::resource('loaded-containers', LoadedContainerController::class);
+
+        Route::delete('/loaded-containers/remove/{hbl_package_id}', [LoadedContainerController::class, 'destroyDraft'])
+            ->name('loaded-containers.remove');
 
         // Warehouse
         Route::get('manual-loadings', function () {

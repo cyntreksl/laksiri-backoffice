@@ -65,4 +65,9 @@ class HBL extends Model
     {
         return $this->hasOne(HBLPayment::class, 'hbl_id', 'id');
     }
+
+    public function scopeWarehouse(Builder $query)
+    {
+        $query->where('system_status', 4);
+    }
 }

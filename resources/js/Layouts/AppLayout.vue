@@ -773,10 +773,6 @@ export default {
                             route: "loading.loading-containers.index",
                         },
                         {
-                            title: "Loading Point",
-                            route: "loading.loading-points.index",
-                        },
-                        {
                             title: "Manual Loading",
                             route: "loading.manual-loadings.index",
                         },

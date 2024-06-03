@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enum\CargoType;
+use App\Enum\HBLPaymentStatus;
 use App\Enum\HBLType;
 use App\Enum\WarehouseType;
 use App\Http\Requests\StoreHBLRequest;
@@ -29,6 +30,7 @@ class HBLController extends Controller
         return Inertia::render('HBL/HBLList', [
             'users' => $this->userRepository->getUsers(),
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
+            'paymentStatus' => HBLPaymentStatus::cases(),
         ]);
     }
 
@@ -40,7 +42,7 @@ class HBLController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold', 'paymentStatus']);
 
         return $this->HBLRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }

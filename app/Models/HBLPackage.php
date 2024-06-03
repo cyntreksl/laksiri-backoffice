@@ -26,6 +26,7 @@ class HBLPackage extends Model
         'quantity',
         'volume',
         'weight',
+        'is_loaded',
         'remarks',
     ];
 }

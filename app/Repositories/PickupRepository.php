@@ -6,7 +6,6 @@ use App\Actions\NoteType\GetNoteTypes;
 use App\Actions\PickUps\AssignDriver;
 use App\Actions\PickUps\CreatePickUp;
 use App\Actions\PickUps\GetPickups;
-use App\Actions\PickUps\GetTotalPickupCount;
 use App\Actions\PickUps\SavePickUpOrder;
 use App\Factory\Pickup\FilterFactory;
 use App\Http\Resources\PickupResource;
@@ -55,12 +54,14 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
         //apply filters
         FilterFactory::apply($query, $filters);
 
+        $countQuery = $query;
+
         $pickups = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
 
-        $totalRecords = GetTotalPickupCount::run();
+        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => PickupResource::collection($pickups),
