@@ -13,7 +13,9 @@ class GetHBLByCargoTypeWithPackages
     {
         return HBL::where('cargo_type', $cargoType)
             ->latest()
-            ->with('packages')
+            ->with(['packages' => function ($query) {
+                $query->where('is_loaded', false);
+            }])
             ->get();
     }
 }

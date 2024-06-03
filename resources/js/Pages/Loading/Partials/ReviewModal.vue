@@ -4,7 +4,7 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {computed} from "vue";
 import TextInput from "@/Components/TextInput.vue";
-import {useForm} from "@inertiajs/vue3";
+import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
 
 const props = defineProps({
@@ -53,10 +53,13 @@ const form = useForm({
 const handleCreateLoadedContainer = () => {
     form.post(route("loading.loaded-containers.store"), {
         onSuccess: () => {
-            // closeModal();
-            // router.visit(route("users.index"));
+            emit('close');
+            router.visit(route("loading.loading-points.index", {
+                'container': route().params.container,
+                'cargoType': route().params.cargoType,
+            }));
             form.reset();
-            push.success('Container loaded successfully!.');
+            push.success('Container loaded successfully!');
         },
         onError: () => {
             push.error('Something went to wrong!');
