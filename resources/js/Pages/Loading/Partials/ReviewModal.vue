@@ -2,8 +2,10 @@
 import DialogModal from "@/Components/DialogModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {computed, ref} from "vue";
+import {computed} from "vue";
 import TextInput from "@/Components/TextInput.vue";
+import {useForm} from "@inertiajs/vue3";
+import {push} from "notivue";
 
 const props = defineProps({
     show: {
@@ -23,8 +25,6 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
-const note = ref('');
-
 const countPackages = (packageHBlId) => {
     return props.containerArray.filter(item => item.hbl_id === packageHBlId).length;
 }
@@ -41,13 +41,34 @@ const uniqueContainerArray = computed(() => {
     });
 });
 
-const updateNote = () => {
-    emit('update-note', note.value);
+const form = useForm({
+    note: '',
+    container_id: route().params.container,
+    cargo_type: route().params.cargoType,
+    packages: computed(() => {
+        return props.containerArray;
+    }),
+});
+
+const handleCreateLoadedContainer = () => {
+    form.post(route("loading.loaded-containers.store"), {
+        onSuccess: () => {
+            // closeModal();
+            // router.visit(route("users.index"));
+            form.reset();
+            push.success('Container loaded successfully!.');
+        },
+        onError: () => {
+            push.error('Something went to wrong!');
+        },
+        preserveScroll: true,
+        preserveState: true,
+    });
 }
 </script>
 
 <template>
-    <DialogModal :closeable="true" :maxWidth="'4xl'" :show="show" @close="close">
+    <DialogModal :closeable="true" :maxWidth="'4xl'" :show="show" @close="$emit('close')">
         <template #title>
             <div class="flex justify-between items-center">
                 <div>Shipping Summery</div>
@@ -75,7 +96,7 @@ const updateNote = () => {
                     <p>Air Cargo</p>
                 </div>
 
-                <TextInput v-model="note" placeholder="Notes" @input="updateNote" />
+                <TextInput v-model="form.note" placeholder="Notes" />
             </div>
 
             <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
@@ -125,7 +146,7 @@ const updateNote = () => {
                 <SecondaryButton @click="$emit('close')">
                     Cancel
                 </SecondaryButton>
-                <PrimaryButton>
+                <PrimaryButton @click.prevent="handleCreateLoadedContainer">
                     Finish Loading
                 </PrimaryButton>
             </div>

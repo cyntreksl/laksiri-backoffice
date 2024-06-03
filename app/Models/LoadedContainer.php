@@ -18,7 +18,7 @@ class LoadedContainer extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'branch_id', 'container_id', 'hbl_id', 'hbl_package_id', 'is_draft', 'reference', 'note', 'cargo_type', 'delivery_type', 'total_packages', 'total_weight', 'total_volume', 'total_hbl', 'status', 'loaded_by',
+        'branch_id', 'container_id', 'hbl_id', 'hbl_package_id', 'is_draft', 'reference', 'note', 'cargo_type', 'status', 'loaded_by',
     ];
 
     public function getActivitylogOptions(): LogOptions

@@ -5,6 +5,7 @@ use App\Http\Controllers\CashSettlementController;
 use App\Http\Controllers\ContainerController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
+use App\Http\Controllers\LoadedContainerController;
 use App\Http\Controllers\PickupController;
 use App\Http\Controllers\PickupExceptionController;
 use App\Http\Controllers\PriceController;
@@ -117,6 +118,9 @@ Route::middleware([
         // Loading Point
         Route::get('loading-points/{container}', [ContainerController::class, 'showLoadingPoint'])
             ->name('loading-points.index');
+
+        // Loaded Container
+        Route::resource('loaded-containers', LoadedContainerController::class);
 
         // Warehouse
         Route::get('manual-loadings', function () {

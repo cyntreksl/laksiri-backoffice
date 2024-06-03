@@ -56,13 +56,6 @@ const findHblByPackageId = (packageId) => {
 }
 
 const showReviewModal = ref(false);
-
-const note = ref('');
-
-const handleNoteUpdate = (newNote) => {
-    note.value = newNote;
-};
-
 </script>
 
 <template>
@@ -397,6 +390,6 @@ const handleNoteUpdate = (newNote) => {
                 </div>
             </div>
         </main>
-        <ReviewModal :container-array="containerArr" :find-hbl-by-package-id="findHblByPackageId" :show="showReviewModal" @close="showReviewModal = false" @update-note="handleNoteUpdate"/>
+        <ReviewModal :container-array="containerArr" :find-hbl-by-package-id="findHblByPackageId" :show="showReviewModal" @close="showReviewModal = false"/>
     </AppLayout>
 </template>
