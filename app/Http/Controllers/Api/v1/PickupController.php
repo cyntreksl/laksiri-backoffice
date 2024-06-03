@@ -15,21 +15,49 @@ class PickupController extends Controller
     ) {
     }
 
+    /**
+     * Get pending pickups for driver
+     *
+     * Display the pending pickups for the authenticated driver.
+     *
+     * @group Pickups
+     */
     public function index()
     {
         return $this->pickupRepository->getPendingPickupsForDriver();
     }
 
+    /**
+     * Store Pickup
+     *
+     * Store a newly created Pickup in storage.
+     *
+     * @group Pickups
+     */
     public function store(StorePickupRequest $request)
     {
         return $this->pickupRepository->storePickup($request->all());
     }
 
+    /**
+     * Show Pickup
+     *
+     * Display the specified Pickup.
+     *
+     * @group Pickups
+     */
     public function show(PickUp $pickup)
     {
         return $this->pickupRepository->showPickup($pickup);
     }
 
+    /**
+     * Pickup to HBL
+     *
+     * Convert a Pickup to HBL.
+     *
+     * @group Pickups
+     */
     public function pickupToHbl(PickUp $pickUp, StorePickupToHBLRequest $request)
     {
         return $this->pickupRepository->pickupToHbl($pickUp, $request);

@@ -15,11 +15,25 @@ class HBLController extends Controller
     ) {
     }
 
+    /**
+     * Show HBL
+     *
+     * Display the specified HBL.
+     *
+     * @group HBL
+     */
     public function show(HBL $hbl): JsonResponse
     {
         return $this->HBLRepository->showHBL($hbl);
     }
 
+    /**
+     * Store HBL
+     *
+     * Store a newly created HBL in storage.
+     *
+     * @group HBL
+     */
     public function store(StoreHBLRequest $request)
     {
         return $this->HBLRepository->storeHBL($request->all());

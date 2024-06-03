@@ -16,6 +16,30 @@ class LoginController extends Controller
     ) {
     }
 
+    /**
+     * Login
+     *
+     * Authenticate user and return token
+     *
+     * @unauthenticated
+     *
+     * @group Authentication
+     *
+     * @response 200 {
+     * "message": "Login successful",
+     * "error": false,
+     * "code": 200,
+     * "results": {
+     * "token": "{YOUR_AUTH_KEY}",
+     * "user": {
+     * "username": "Driver",
+     * "name": "Driver 1",
+     * "profile_photo_url": "https://ui-avatars.com/api/?name=D+1&color=7F9CF5&background=EBF4FF",
+     * "role": "driver"
+     * }
+     * }
+     * }
+     */
     public function login(LoginRequest $request)
     {
         return $this->authRepository->login($request->all());
