@@ -56,12 +56,12 @@ const data = reactive({
         awb_number: true,
         container_number: true,
         seal_number: true,
-        maximum_volume: true,
-        minimum_volume: true,
-        maximum_weight: true,
-        minimum_weight: true,
-        maximum_volumetric_weight: true,
-        minimum_volumetric_weight: true,
+        maximum_volume: false,
+        minimum_volume: false,
+        maximum_weight: false,
+        minimum_weight: false,
+        maximum_volumetric_weight: false,
+        minimum_volumetric_weight: false,
         estimated_time_of_departure: true,
         estimated_time_of_arrival: true,
         vessel_name: false,
@@ -300,6 +300,42 @@ const applyFilters = () => {
 
                     <div class="flex">
                         <ColumnVisibilityPopover>
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.maximum_volume"
+                                          @change="toggleColumnVisibility('maximum_volume', $event)"/>
+                                <span class="hover:cursor-pointer">Maximum Volume</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.minimum_volume"
+                                          @change="toggleColumnVisibility('minimum_volume', $event)"/>
+                                <span class="hover:cursor-pointer">Minimum Volume</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.maximum_weight"
+                                          @change="toggleColumnVisibility('maximum_weight', $event)"/>
+                                <span class="hover:cursor-pointer">Maximum Weight</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.minimum_weight"
+                                          @change="toggleColumnVisibility('minimum_weight', $event)"/>
+                                <span class="hover:cursor-pointer">Minimum Weight</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.maximum_volumetric_weight"
+                                          @change="toggleColumnVisibility('maximum_volumetric_weight', $event)"/>
+                                <span class="hover:cursor-pointer">Maximum Volumetric Weight</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                                <Checkbox :checked="data.columnVisibility.minimum_volumetric_weight"
+                                          @change="toggleColumnVisibility('minimum_volumetric_weight', $event)"/>
+                                <span class="hover:cursor-pointer">Minimum Volumetric Weight</span>
+                            </label>
+
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox :checked="data.columnVisibility.vessel_name"
                                           @change="toggleColumnVisibility('vessel_name', $event)"/>
