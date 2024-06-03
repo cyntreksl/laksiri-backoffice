@@ -6,13 +6,17 @@ use App\Enum\CargoType;
 use App\Enum\ContainerType;
 use App\Http\Requests\StoreContainerRequest;
 use App\Interfaces\ContainerRepositoryInterface;
+use App\Interfaces\HBLRepositoryInterface;
+use App\Models\Container;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ContainerController extends Controller
 {
-    public function __construct(private readonly ContainerRepositoryInterface $containerRepository)
-    {
+    public function __construct(
+        private readonly ContainerRepositoryInterface $containerRepository,
+        private readonly HBLRepositoryInterface $HBLRepository,
+    ) {
     }
 
     public function index()
@@ -58,5 +62,13 @@ class ContainerController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
+    }
+
+    public function showLoadingPoint(Request $request, Container $container)
+    {
+        return Inertia::render('Loading/LoadingPoint', [
+            'container' => $container,
+            'hbls' => $this->HBLRepository->getHBLsByCargoType($request->cargoType),
+        ]);
     }
 }

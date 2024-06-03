@@ -7,6 +7,7 @@ use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
+use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
@@ -19,6 +20,7 @@ use App\Repositories\CashSettlementRepository;
 use App\Repositories\ContainerRepositories;
 use App\Repositories\DriverRepository;
 use App\Repositories\HBLRepository;
+use App\Repositories\LoadedContainerRepository;
 use App\Repositories\PickupExceptionRepository;
 use App\Repositories\PickupRepository;
 use App\Repositories\PriceRepository;
@@ -44,6 +46,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ContainerRepositoryInterface::class, ContainerRepositories::class);
         $this->app->bind(PriceRepositoryInterface::class, PriceRepository::class);
         $this->app->bind(WarehouseRepositoryInterface::class, WarehouseRepository::class);
+        $this->app->bind(LoadedContainerRepositoryInterface::class, LoadedContainerRepository::class);
     }
 
     public function boot(): void

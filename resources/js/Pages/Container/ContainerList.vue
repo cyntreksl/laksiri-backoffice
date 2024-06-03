@@ -1,8 +1,8 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {Link} from "@inertiajs/vue3";
-import {Grid} from "gridjs";
+import {Link, router} from "@inertiajs/vue3";
+import {Grid, h} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
@@ -49,6 +49,7 @@ const filters = reactive({
 
 const data = reactive({
     columnVisibility: {
+        id: false,
         cargo_type: true,
         container_type: true,
         reference: true,
@@ -148,6 +149,7 @@ const initializeGrid = () => {
 };
 
 const createColumns = () => [
+    {name: 'ID', hidden: !data.columnVisibility.id},
     {name: 'Cargo Type', hidden: !data.columnVisibility.cargo_type},
     {name: 'Container Type', hidden: !data.columnVisibility.cargo_type},
     {name: 'Reference', hidden: !data.columnVisibility.reference},
@@ -186,6 +188,32 @@ const createColumns = () => [
         name: 'Actions',
         sort: false,
         hidden: !data.columnVisibility.actions,
+        formatter: (_, row) => {
+            return h('div', {}, [
+                h('button', {
+                    className: 'btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25',
+                    onClick: () => router.visit(route('loading.loading-points.index', {
+                        'container': row.cells[0].data,
+                        'cargoType': row.cells[1].data,
+                    }))
+                }, [
+                    h('svg', {
+                        xmlns: 'http://www.w3.org/2000/svg',
+                        viewBox: '0 0 24 24',
+                        class: 'size-6',
+                        fill: 'none',
+                        stroke: "currentColor",
+                        strokeWidth: 1.5,
+                    }, [
+                        h('path', {
+                            strokeLinecap: "round",
+                            strokeLinejoin: "round",
+                            d: 'M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3',
+                        }),
+                    ])
+                ]),
+            ]);
+        },
     },
 ];
 
