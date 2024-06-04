@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {computed, reactive, ref, watch} from "vue";
 import notification from "@/magics/notification.js";
@@ -179,7 +179,7 @@ const updateTypeDescription = () => {
 };
 
 const hblTotal = ref(0);
-const currency = ref("SAR");
+const currency = ref(usePage().props.auth?.user?.primary_branch?.currency_symbol || "SAR");
 
 const calculatePayment = () => {
     const cargoType = form.cargo_type;
