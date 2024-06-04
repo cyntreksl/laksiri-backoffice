@@ -78,8 +78,10 @@ const form = useForm({
 // Method to find zone ID based on address
 const findZoneIdByAddress = (address) => {
     for (const zone of props.zones) {
-        if (address.includes(zone.name)) {
-            return zone.id;
+        for (const area of zone.areas) {
+            if (address.includes(area.name)) {
+                return zone.id;
+            }
         }
     }
     return null;
