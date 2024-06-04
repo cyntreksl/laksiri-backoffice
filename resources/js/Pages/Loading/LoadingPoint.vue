@@ -127,18 +127,6 @@ watch(containerArr, (newValue, oldValue) => {
                     </h3>
                 </div>
                 <div class="flex space-x-5 items-center">
-<!--                    <SecondaryButton :disabled="containerArr.length === 0">-->
-<!--                        <svg class="size-5 mr-2 icon icon-tabler icons-tabler-outline icon-tabler-file-report"-->
-<!--                             fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"-->
-<!--                             stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>-->
-<!--                            <path d="M17 17m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>-->
-<!--                            <path d="M17 13v4h4"/>-->
-<!--                            <path d="M12 3v4a1 1 0 0 0 1 1h4"/>-->
-<!--                            <path d="M11.5 21h-6.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v2m0 3v4"/>-->
-<!--                        </svg>-->
-<!--                        Save Draft-->
-<!--                    </SecondaryButton>-->
                     <ActionMessage :on="draftTextEnabled">
                         <div class="flex">
                             <svg class="size-5 mr-2 icon icon-tabler icons-tabler-outline icon-tabler-file-report"
@@ -199,7 +187,7 @@ watch(containerArr, (newValue, oldValue) => {
                                             <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
                                                 <div>
                                                     <div class="flex justify-between">
-                                                        <p class="font-medium tracking-wide text-slate-600 dark:text-navy-100">
+                                                        <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
                                                             {{ findHblByPackageId(element.id).hbl }}
                                                         </p>
                                                     </div>
@@ -273,7 +261,7 @@ watch(containerArr, (newValue, oldValue) => {
                                                         <span>Quantity {{ element.quantity }}</span>
                                                     </div>
                                                 </div>
-                                                <p class="mt-px text-xs text-slate-400 dark:text-navy-300">
+                                                <p class="mt-px font-medium text-slate-400 dark:text-navy-300">
                                                     {{ element.package_type }}
                                                 </p>
                                             </div>
@@ -322,7 +310,7 @@ watch(containerArr, (newValue, oldValue) => {
                                     <i class="fa fa-boxes-alt text-base"></i>
                                 </div>
                                 <h3 class="text-base text-slate-700 dark:text-navy-100">
-                                    {{ container.cargo_type }} Container
+                                    {{ container.cargo_type }} Container ({{container?.reference}})
                                 </h3>
                             </div>
                             <div>
@@ -345,7 +333,7 @@ watch(containerArr, (newValue, oldValue) => {
                                             <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
                                                 <div>
                                                     <div class="flex justify-between">
-                                                        <p class="font-medium tracking-wide text-slate-600 dark:text-navy-100">
+                                                        <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
                                                             {{ findHblByPackageId(element.id).hbl }}
                                                         </p>
                                                     </div>
@@ -419,7 +407,7 @@ watch(containerArr, (newValue, oldValue) => {
                                                         <span>Quantity {{ element.quantity }}</span>
                                                     </div>
                                                 </div>
-                                                <p class="mt-px text-xs text-slate-400 dark:text-navy-300">
+                                                <p class="mt-px font-medium text-slate-400 dark:text-navy-300">
                                                     {{ element.package_type }}
                                                 </p>
                                             </div>
