@@ -2,9 +2,11 @@
 
 namespace App\Actions\Loading\LoadedContainer;
 
+use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\HBL\HBLPackage\MarkAsLoaded;
 use App\Actions\User\GetUserCurrentBranch;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\ContainerStatus;
 use App\Models\LoadedContainer;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -52,6 +54,8 @@ class CreateOrUpdateLoadedContainer
                 // Save the loaded container
                 $loaded_container->save();
             }
+
+            UpdateContainerStatus::run($data['container_id'], ContainerStatus::CONTAINER_LOADED->value);
         } catch (\Exception $e) {
             throw new \Exception('Failed to create loaded container: '.$e->getMessage());
         }
