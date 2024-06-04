@@ -195,20 +195,35 @@ const createColumns = () => [
                     onClick: () => router.visit(route('loading.loading-points.index', {
                         'container': row.cells[0].data,
                         'cargoType': row.cells[1].data,
-                    }))
+                    })),
+                    'x-tooltip..placement.bottom.success': "'Load to Container'"
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
                         viewBox: '0 0 24 24',
-                        class: 'size-6',
+                        class: 'size-6 icon icon-tabler icons-tabler-outline icon-tabler-truck-loading',
                         fill: 'none',
                         stroke: "currentColor",
-                        strokeWidth: 1.5,
+                        strokeWidth: 2,
+                        strokeLinecap: "round",
+                        strokeLinejoin: "round",
                     }, [
                         h('path', {
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                            d: 'M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3',
+                            stroke: "none",
+                            d: 'M0 0h24v24H0z',
+                            fill: 'none',
+                        }),
+                        h('path', {
+                            d: 'M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15',
+                        }),
+                        h('path', {
+                            d: 'M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z',
+                        }),
+                        h('path', {
+                            d: 'M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
+                        }),
+                        h('path', {
+                            d: 'M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
                         }),
                     ])
                 ]),
