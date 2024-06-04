@@ -173,6 +173,15 @@ watch(
     }
 );
 
+watch(
+    [
+        () => form.cargo_type,
+    ],
+    ([newCargoType]) => {
+        calculatePayment();
+    }
+);
+
 
 const packageTypes = [
     'WOODEN BOX', 'CARTON', 'FRIDGE', 'TV CARTON', 'COOKER', 'W/MACHINE',
