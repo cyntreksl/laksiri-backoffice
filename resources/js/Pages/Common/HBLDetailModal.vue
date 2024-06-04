@@ -5,6 +5,7 @@ import AccordionPanel from "@/Components/AccordionPanel.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import Tabs from "@/Components/Tabs.vue";
 import Tab from "@/Components/Tab.vue";
+import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 
 const props = defineProps({
     show: {
@@ -100,103 +101,30 @@ const emit = defineEmits(['close']);
                         </template>
                         <div class="px-4 py-4 sm:px-5">
                             <div class="grid grid-cols-3 gap-x-4 gap-y-8">
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Job Ref
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.reference ?? '-' }}
-                                    </p>
-                                </div>
 
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        HBL
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.hbl ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        CR
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.cr ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Name
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.hbl_name ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Contact
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.contact_number ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Address
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.address ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Passport Number
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.nic ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        IQ Number
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.iq_number ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Location
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.location ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Warehouse Location
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.warehouse ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Delivery Type
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.hbl_type ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Cargo Mode
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.cargo_type ?? '-' }}
-                                    </p>
-                                </div>
+                                <InfoDisplay :value="hbl?.reference" label="Job Ref" />
+
+                                <InfoDisplay :value="hbl?.hbl" label="HBL" />
+
+                                <InfoDisplay :value="hbl?.cr" label="CR" />
+
+                                <InfoDisplay :value="hbl?.hbl_name" label="Name" />
+
+                                <InfoDisplay :value="hbl?.contact_number" label="Contact" />
+
+                                <InfoDisplay :value="hbl?.address" label="Address" />
+
+                                <InfoDisplay :value="hbl?.nic" label="Passport Number" />
+
+                                <InfoDisplay :value="hbl?.iq_number" label="IQ Number" />
+
+                                <InfoDisplay :value="hbl?.location" label="Location" />
+
+                                <InfoDisplay :value="hbl?.warehouse" label="Warehouse Location" />
+
+                                <InfoDisplay :value="hbl?.hbl_type" label="Delivery Type" />
+
+                                <InfoDisplay :value="hbl?.cargo_type" label="Cargo Mode" />
                             </div>
                         </div>
                     </AccordionPanel>
@@ -221,47 +149,17 @@ const emit = defineEmits(['close']);
                         </template>
                         <div class="px-4 py-4 sm:px-5">
                             <div class="grid grid-cols-3 gap-x-4 gap-y-8">
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Name
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.consignee_name ?? '-' }}
-                                    </p>
-                                </div>
 
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Address
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.consignee_address ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Note
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.consignee_note ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Contact
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.consignee_contact ?? '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Nic/PP No
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.consignee_nic ?? '-' }}
-                                    </p>
-                                </div>
+                                <InfoDisplay :value="hbl?.consignee_name" label="Name" />
+
+                                <InfoDisplay :value="hbl?.consignee_address" label="Address" />
+
+                                <InfoDisplay :value="hbl?.consignee_note" label="Note" />
+
+                                <InfoDisplay :value="hbl?.consignee_contact" label="Contact" />
+
+                                <InfoDisplay :value="hbl?.consignee_nic" label="Nic/PP No" />
+
                             </div>
                         </div>
                     </AccordionPanel>
@@ -413,23 +311,11 @@ const emit = defineEmits(['close']);
                         </template>
                         <div class="px-4 py-4 sm:px-5">
                             <div class="grid grid-cols-3 gap-x-4 gap-y-8">
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Grand Total
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.grand_total.toFixed(2) ?? 0.00 }}
-                                    </p>
-                                </div>
 
-                                <div>
-                                    <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                                        Paid Amount
-                                    </p>
-                                    <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100">
-                                        {{ hbl?.paid_amount.toFixed(2) ?? 0.00 }}
-                                    </p>
-                                </div>
+                                <InfoDisplay :value="hbl?.grand_total.toFixed(2) ?? 0.00" label="Grand Total" />
+
+                                <InfoDisplay :value="hbl?.paid_amount.toFixed(2) ?? 0.00" label="Paid Amount" />
+
                             </div>
                         </div>
                     </AccordionPanel>
