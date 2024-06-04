@@ -157,16 +157,18 @@ watch(
     }
 );
 
+const vat = ref(0);
 
 watch(
     [
         () => form.other_charge,
         () => form.discount,
         () => form.freight_charge,
+        () => vat,
     ],
     ([newOtherCharge, newDiscount, newFreightCharge]) => {
         // Convert dimensions from cm to meters
-        hblTotal.value = (parseFloat(form.bill_charge) + parseFloat(form.freight_charge) + parseFloat(form.other_charge)) - form.discount;
+        hblTotal.value = (parseFloat(form.bill_charge) + parseFloat(form.freight_charge) + parseFloat(form.other_charge)) + parseFloat(vat.value) - form.discount;
         form.grand_total = hblTotal.value;
     }
 );
@@ -226,9 +228,10 @@ const calculatePayment = () => {
             }
         }
 
-        billCharge.value = priceRule.value.bill_price || 0;
-        otherCharge.value = parseFloat(priceRule.value.destination_charges) || 0;
+        billCharge.value = priceRule.value.bill_price.toFixed(2) || 0;
+        otherCharge.value = parseFloat(priceRule.value.destination_charges).toFixed(2) || 0;
         isEditable.value = Boolean(priceRule.value.is_editable);
+        vat.value = priceRule.value.bill_vat !== 0 ? parseFloat(priceRule.value.bill_vat) / 100 : 0;
     } else if (cargoType === 'Air Cargo') {
         const priceRule = computed(() => {
             return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Air Cargo');
@@ -262,9 +265,10 @@ const calculatePayment = () => {
             }
         }
 
-        billCharge.value = priceRule.value.bill_price || 0;
-        otherCharge.value = parseFloat(priceRule.value.destination_charges) || 0;
+        billCharge.value = priceRule.value.bill_price.toFixed(2) || 0;
+        otherCharge.value = parseFloat(priceRule.value.destination_charges).toFixed(2) || 0;
         isEditable.value = Boolean(priceRule.value.is_editable);
+        vat.value = priceRule.value.bill_vat !== 0 ? parseFloat(priceRule.value.bill_vat) / 100 : 0;
     }
 
     form.freight_charge = freightCharge.value.toFixed(2);
