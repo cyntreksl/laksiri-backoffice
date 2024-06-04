@@ -14,7 +14,12 @@ const props = defineProps({
         default: () => {
         }
     },
-    hbls: {
+    unloadedHBLs: {
+        type: Object,
+        default: () => {
+        }
+    },
+    loadedHBLs: {
         type: Object,
         default: () => {
         }
@@ -23,7 +28,7 @@ const props = defineProps({
 
 const searchQuery = ref('');
 
-const hblPackagesArr = ref(props.hbls.flatMap(hbl => hbl.packages));
+const hblPackagesArr = ref(props.unloadedHBLs.flatMap(hbl => hbl.packages));
 
 const filteredPackages = computed(() => {
     if (!searchQuery.value) {
@@ -35,7 +40,7 @@ const filteredPackages = computed(() => {
     });
 })
 
-const containerArr = ref([]);
+const containerArr = ref(props.loadedHBLs.flatMap(hbl => hbl.packages));
 
 const handleLoad = (index) => {
     if (index !== -1) {
@@ -53,7 +58,7 @@ const handleUnload = (index) => {
 
 // find HBL by packageId
 const findHblByPackageId = (packageId) => {
-    return props.hbls.find(hbl => hbl.packages.some(p => p.id === packageId));
+    return props.unloadedHBLs.find(hbl => hbl.packages.some(p => p.id === packageId));
 }
 
 const showReviewModal = ref(false);

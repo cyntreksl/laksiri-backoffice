@@ -2,6 +2,7 @@
 
 namespace App\Actions\Loading\LoadedContainer;
 
+use App\Actions\HBL\HBLPackage\MarkAsLoaded;
 use App\Actions\User\GetUserCurrentBranch;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\LoadedContainer;
@@ -31,6 +32,8 @@ class CreateDraftLoadedContainer
                 $loaded_container->loaded_by = auth()->id();
                 $loaded_container->is_draft = true;
                 $loaded_container->save();
+
+                MarkAsLoaded::run($package['id']);
             }
         } catch (\Exception $e) {
             throw new \Exception('Failed to create draft loaded container: '.$e->getMessage());

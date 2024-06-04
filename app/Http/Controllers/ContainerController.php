@@ -68,7 +68,8 @@ class ContainerController extends Controller
     {
         return Inertia::render('Loading/LoadingPoint', [
             'container' => $container,
-            'hbls' => $this->HBLRepository->getHBLsByCargoType($request->cargoType),
+            'unloadedHBLs' => $this->HBLRepository->getUnloadedHBLsByCargoType($request->cargoType),
+            'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
         ]);
     }
 }

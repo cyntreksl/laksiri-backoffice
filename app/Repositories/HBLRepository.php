@@ -5,7 +5,8 @@ namespace App\Repositories;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\DeleteHBL;
-use App\Actions\HBL\GetHBLByCargoTypeWithPackages;
+use App\Actions\HBL\GetHBLByCargoTypeWithLoadedPackages;
+use App\Actions\HBL\GetHBLByCargoTypeWithUnloadedPackages;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLsWithPackages;
 use App\Actions\HBL\SwitchHoldStatus;
@@ -15,6 +16,7 @@ use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\HBLRepositoryInterface;
+use App\Models\Container;
 use App\Models\HBL;
 
 class HBLRepository implements GridJsInterface, HBLRepositoryInterface
@@ -88,8 +90,13 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         return SwitchHoldStatus::run($hbl);
     }
 
-    public function getHBLsByCargoType(string $cargoType)
+    public function getUnloadedHBLsByCargoType(string $cargoType)
     {
-        return GetHBLByCargoTypeWithPackages::run($cargoType);
+        return GetHBLByCargoTypeWithUnloadedPackages::run($cargoType);
+    }
+
+    public function getLoadedHBLsByCargoType(Container $container, string $cargoType)
+    {
+        return GetHBLByCargoTypeWithLoadedPackages::run($container, $cargoType);
     }
 }
