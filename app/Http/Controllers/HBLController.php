@@ -9,6 +9,7 @@ use App\Enum\WarehouseType;
 use App\Http\Requests\StoreHBLRequest;
 use App\Http\Requests\UpdateHBLRequest;
 use App\Interfaces\HBLRepositoryInterface;
+use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
 use Illuminate\Http\Request;
@@ -18,7 +19,8 @@ class HBLController extends Controller
 {
     public function __construct(
         private readonly HBLRepositoryInterface $HBLRepository,
-        private readonly UserRepositoryInterface $userRepository
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly PriceRepositoryInterface $priceRepository,
     ) {
     }
 
@@ -56,6 +58,7 @@ class HBLController extends Controller
             'cargoTypes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
             'warehouses' => WarehouseType::cases(),
+            'priceRules' => $this->priceRepository->getPriceRules(),
         ]);
     }
 

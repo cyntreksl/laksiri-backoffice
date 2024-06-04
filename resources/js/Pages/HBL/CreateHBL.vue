@@ -12,7 +12,7 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import {push} from "notivue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 
-defineProps({
+const props = defineProps({
     hblTypes: {
         type: Object,
         default: () => {
@@ -24,6 +24,11 @@ defineProps({
         }
     },
     warehouses: {
+        type: Object,
+        default: () => {
+        }
+    },
+    priceRules: {
         type: Object,
         default: () => {
         }
@@ -186,11 +191,73 @@ const calculatePayment = () => {
     const freightCharge = ref(0);
     const billCharge = ref(0);
     if (cargoType === 'Sea Cargo') {
-        freightCharge.value = grandTotalVolume.value * 300;
-        billCharge.value = 50;
+        const priceRule = computed(() => {
+            return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Sea Cargo');
+        })
+
+        if (priceRule.value.price_mode === 'volume') {
+            const trueAction = priceRule.value.true_action.trim();
+            const operator = trueAction[0];
+            const value = parseFloat(trueAction.slice(1).trim());
+
+            switch (operator) {
+                case '*':
+                    freightCharge.value = grandTotalVolume.value * value;
+                    break;
+                case '+':
+                    freightCharge.value = grandTotalVolume.value + value;
+                    break;
+                case '-':
+                    freightCharge.value = grandTotalVolume.value - value;
+                    break;
+                case '/':
+                    if (value !== 0) {
+                        freightCharge.value = grandTotalVolume.value / value;
+                    } else {
+                        console.error('Division by zero error');
+                    }
+                    break;
+                default:
+                    console.error('Unsupported operation');
+                    break;
+            }
+        }
+
+        billCharge.value = priceRule.value.bill_price || 0;
     } else if (cargoType === 'Air Cargo') {
-        freightCharge.value = grandTotalWeight.value * 8;
-        billCharge.value = 40;
+        const priceRule = computed(() => {
+            return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Air Cargo');
+        })
+
+        if (priceRule.value.price_mode === 'weight') {
+            const trueAction = priceRule.value.true_action.trim();
+            const operator = trueAction[0];
+            const value = parseFloat(trueAction.slice(1).trim());
+
+            switch (operator) {
+                case '*':
+                    freightCharge.value = grandTotalVolume.value * value;
+                    break;
+                case '+':
+                    freightCharge.value = grandTotalVolume.value + value;
+                    break;
+                case '-':
+                    freightCharge.value = grandTotalVolume.value - value;
+                    break;
+                case '/':
+                    if (value !== 0) {
+                        freightCharge.value = grandTotalVolume.value / value;
+                    } else {
+                        console.error('Division by zero error');
+                    }
+                    break;
+                default:
+                    console.error('Unsupported operation');
+                    break;
+            }
+        }
+
+        billCharge.value = priceRule.value.bill_price || 0;
     }
 
     form.freight_charge = freightCharge.value.toFixed(2);
@@ -638,7 +705,7 @@ const openEditModal = (index) => {
                             </div>
 
                             <div>
-                                <span>Other Charge</span>
+                                <span>Destination Charge</span>
                                 <label class="block">
                                     <input
                                         v-model="form.other_charge"
