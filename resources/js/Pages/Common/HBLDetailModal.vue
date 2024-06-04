@@ -6,6 +6,8 @@ import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue"
 import Tabs from "@/Components/Tabs.vue";
 import Tab from "@/Components/Tab.vue";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
+import TextInput from "@/Components/TextInput.vue";
+import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 
 const props = defineProps({
     show: {
@@ -60,7 +62,7 @@ const emit = defineEmits(['close']);
                             stroke-linejoin="round"/>
                     </svg>
 
-                    <svg v-if="tab.name === 'tabPrint'" class="w-6 h-6" fill="none" stroke="currentColor"
+                    <svg v-if="tab.name === 'tabDocuments'" class="w-6 h-6" fill="none" stroke="currentColor"
                          stroke-width="1.5"
                          viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -69,7 +71,7 @@ const emit = defineEmits(['close']);
                             stroke-linejoin="round"/>
                     </svg>
 
-                    <svg v-if="tab.name === 'tabDocuments'" class="w-6 h-6" fill="none" stroke="currentColor"
+                    <svg v-if="tab.name === 'tabPrint'" class="w-6 h-6" fill="none" stroke="currentColor"
                          stroke-width="1.5"
                          viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -546,31 +548,71 @@ const emit = defineEmits(['close']);
                 </Tab>
 
                 <Tab label="Documents" name="tabDocuments">
-                    <div>
-                        <p>
-                            Pellentesque pulvinar, sapien eget fermentum sodales, felis lacus
-                            viverra magna, id pulvinar odio metus non enim. Ut id augue
-                            interdum, ultrices felis eu, tincidunt libero.
-                        </p>
-                        <div class="flex space-x-2 pt-3">
-                            <a
-                                class="tag rounded-full border border-primary text-primary dark:border-accent-light dark:text-accent-light"
-                                href="#"
-                            >
-                                Tag 1
-                            </a>
-                            <a
-                                class="tag rounded-full border border-primary text-primary dark:border-accent-light dark:text-accent-light"
-                                href="#"
-                            >
-                                Tag 2
-                            </a>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                        <div class="col-span-1 space-y-3">
+                            <div class="filepond fp-bg-filled">
+                                <input multiple type="file" x-init="$el._x_filepond = FilePond.create($el)" />
+                            </div>
+                            <div>
+                                <TextInput class="w-full" placeholder="Notes"/>
+                            </div>
+                            <div>
+                                <PrimaryOutlineButton>
+                                    Upload
+                                </PrimaryOutlineButton>
+                            </div>
                         </div>
-
-                        <p class="pt-3 text-xs text-slate-400 dark:text-navy-300">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempore
-                            dolore non atque?
-                        </p>
+                        <div class="col-span-1 sm:col-span-2">
+                            <h2 class="text-base font-medium tracking-wide text-slate-800 line-clamp-1 dark:text-navy-100">
+                                List of Uploaded Documents
+                            </h2>
+                            <div class="is-scrollbar-hidden min-w-full overflow-x-auto mt-5">
+                                <table class="is-hoverable w-full text-left">
+                                    <thead>
+                                    <tr>
+                                        <th
+                                            class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                        >
+                                            HBL
+                                        </th>
+                                        <th
+                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                        >
+                                            Document Name
+                                        </th>
+                                        <th
+                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                        >
+                                            Uploaded Details
+                                        </th>
+                                        <th
+                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                        >
+                                            Notes
+                                        </th>
+                                        <th
+                                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                        >
+                                            Actions
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                                        <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
+                                            -
+                                        </td>
+                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                            -
+                                        </td>
+                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                                        <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">-</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </Tab>
 
