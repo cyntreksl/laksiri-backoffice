@@ -11,6 +11,7 @@ import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import {push} from "notivue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
+import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
     hblTypes: {
@@ -185,11 +186,13 @@ const updateTypeDescription = () => {
 
 const hblTotal = ref(0);
 const currency = ref(usePage().props.auth?.user?.primary_branch?.currency_symbol || "SAR");
+const isEditable = ref(false);
 
 const calculatePayment = () => {
     const cargoType = form.cargo_type;
     const freightCharge = ref(0);
     const billCharge = ref(0);
+    const otherCharge = ref(0);
     if (cargoType === 'Sea Cargo') {
         const priceRule = computed(() => {
             return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Sea Cargo');
@@ -224,6 +227,8 @@ const calculatePayment = () => {
         }
 
         billCharge.value = priceRule.value.bill_price || 0;
+        otherCharge.value = parseFloat(priceRule.value.destination_charges) || 0;
+        isEditable.value = Boolean(priceRule.value.is_editable);
     } else if (cargoType === 'Air Cargo') {
         const priceRule = computed(() => {
             return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Air Cargo');
@@ -258,10 +263,13 @@ const calculatePayment = () => {
         }
 
         billCharge.value = priceRule.value.bill_price || 0;
+        otherCharge.value = parseFloat(priceRule.value.destination_charges) || 0;
+        isEditable.value = Boolean(priceRule.value.is_editable);
     }
 
     form.freight_charge = freightCharge.value.toFixed(2);
     form.bill_charge = billCharge.value;
+    form.other_charge = otherCharge.value;
 }
 const showConfirmRemovePackageModal = ref(false);
 const packageIndex = ref(null);
@@ -680,66 +688,31 @@ const openEditModal = (index) => {
                         <div class="grid grid-cols-2 gap-5 mt-5">
                             <div>
                                 <span>Freight Charge</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.freight_charge"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="number"
-                                        min="0"
-                                    />
-                                </label>
+                                <TextInput v-model="form.freight_charge" :disabled="isEditable" class="w-full" min="0" type="number" />
                                 <InputError :message="form.errors.freight_charge"/>
                             </div>
 
                             <div>
                                 <span>Bill Charge</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.bill_charge"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="number"
-                                        min="0"
-                                    />
-                                </label>
+                                <TextInput v-model="form.bill_charge" :disabled="isEditable" class="w-full" min="0" type="number" />
                                 <InputError :message="form.errors.bill_charge"/>
                             </div>
 
                             <div>
                                 <span>Destination Charge</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.other_charge"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="number"
-                                        min="0"
-                                    />
-                                </label>
+                                <TextInput v-model="form.other_charge" :disabled="isEditable" class="w-full" min="0" type="number" />
                                 <InputError :message="form.errors.other_charge"/>
                             </div>
 
                             <div>
                                 <span>Discount</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.discount"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="0"
-                                        type="number"
-                                    />
-                                </label>
+                                <TextInput v-model="form.discount" :disabled="isEditable" class="w-full" placeholder="0" type="number" />
                                 <InputError :message="form.errors.discount"/>
                             </div>
 
                             <div class="col-span-2">
                                 <span>Paid Amount</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.paid_amount"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="number"
-                                        min="0"
-                                    />
-                                </label>
+                                <TextInput v-model="form.paid_amount" :disabled="isEditable" class="w-full" min="0" type="number" />
                                 <InputError :message="form.errors.paid_amount"/>
                             </div>
 
