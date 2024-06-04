@@ -58,7 +58,15 @@ const handleUnload = (index) => {
 
 // find HBL by packageId
 const findHblByPackageId = (packageId) => {
-    return props.unloadedHBLs.find(hbl => hbl.packages.some(p => p.id === packageId));
+    // First, check if the package ID exists in any of the unloaded HBLs
+    const packageExists = props.unloadedHBLs.some(hbl => hbl.packages.some(p => p.id === packageId));
+
+    // If the package ID exists, find and return the corresponding HBL
+    if (packageExists) {
+        return props.unloadedHBLs.find(hbl => hbl.packages.some(p => p.id === packageId));
+    } else {
+        return props.loadedHBLs.find(hbl => hbl.packages.some(p => p.id === packageId));
+    }
 }
 
 const showReviewModal = ref(false);

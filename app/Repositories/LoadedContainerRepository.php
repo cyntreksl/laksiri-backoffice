@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Actions\Loading\LoadedContainer\CreateDraftLoadedContainer;
-use App\Actions\Loading\LoadedContainer\CreateLoadedContainer;
+use App\Actions\Loading\LoadedContainer\CreateOrUpdateLoadedContainer;
 use App\Actions\Loading\LoadedContainer\DeleteDraftLoadedContainer;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\LoadedContainer;
@@ -19,7 +19,7 @@ class LoadedContainerRepository implements LoadedContainerRepositoryInterface
             if (isset($data['is_draft'])) {
                 return CreateDraftLoadedContainer::run($data);
             } else {
-                return CreateLoadedContainer::run($data);
+                return CreateOrUpdateLoadedContainer::run($data);
             }
         } catch (\Exception $e) {
             throw new \Exception('Failed to create loaded container: '.$e->getMessage());
