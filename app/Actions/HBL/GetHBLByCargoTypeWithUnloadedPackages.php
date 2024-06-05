@@ -5,7 +5,7 @@ namespace App\Actions\HBL;
 use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class GetHBLByCargoTypeWithPackages
+class GetHBLByCargoTypeWithUnloadedPackages
 {
     use AsAction;
 

@@ -32,10 +32,10 @@ class GenerateLoadingReferenceNumber
 
         $last_loading = LoadedContainer::latest()->first();
 
-        $next_reference = $last_loading ? ((int) substr($last_loading->reference, strlen($branch_code) + 4) + 1) : 1000;
+        // Set the starting reference number
+        $next_reference = $last_loading ? ((int) substr($last_loading->reference, strlen($branch_code) + 1) + 1) : 1000;
 
-        $reference = 'LD'.str_pad($next_reference, 4, '0', STR_PAD_LEFT);
-
-        return $branch_code.'-'.$reference;
+        // Pad the reference number with leading zeros
+        return $branch_code.'-'.'LD-'.str_pad($next_reference, 4, '0', STR_PAD_LEFT);
     }
 }

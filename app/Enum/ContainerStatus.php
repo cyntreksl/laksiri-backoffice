@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Enum;
+
+enum ContainerStatus: string
+{
+    case CONTAINER_ORDERED = 'CONTAINER ORDERED';
+    case CONTAINER_PARTIALLY_LOADED = 'CONTAINER PARTIALLY LOADED';
+    case CONTAINER_LOADED = 'CONTAINER LOADED';
+}

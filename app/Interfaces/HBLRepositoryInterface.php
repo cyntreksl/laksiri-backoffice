@@ -2,6 +2,7 @@
 
 namespace App\Interfaces;
 
+use App\Models\Container;
 use App\Models\HBL;
 
 interface HBLRepositoryInterface
@@ -18,5 +19,7 @@ interface HBLRepositoryInterface
 
     public function toggleHold(HBL $hbl);
 
-    public function getHBLsByCargoType(string $cargoType);
+    public function getUnloadedHBLsByCargoType(string $cargoType);
+
+    public function getLoadedHBLsByCargoType(Container $container, string $cargoType);
 }

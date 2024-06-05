@@ -2,8 +2,11 @@
 
 namespace App\Actions\Loading\LoadedContainer;
 
+use App\Actions\Container\UpdateContainerStatus;
+use App\Actions\HBL\HBLPackage\MarkAsLoaded;
 use App\Actions\User\GetUserCurrentBranch;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\ContainerStatus;
 use App\Models\LoadedContainer;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -31,7 +34,12 @@ class CreateDraftLoadedContainer
                 $loaded_container->loaded_by = auth()->id();
                 $loaded_container->is_draft = true;
                 $loaded_container->save();
+
+                MarkAsLoaded::run($package['id']);
             }
+
+            UpdateContainerStatus::run($data['container_id'], ContainerStatus::CONTAINER_PARTIALLY_LOADED->value);
+
         } catch (\Exception $e) {
             throw new \Exception('Failed to create draft loaded container: '.$e->getMessage());
         }
