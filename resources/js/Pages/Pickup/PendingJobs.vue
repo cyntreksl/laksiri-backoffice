@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h, html} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
@@ -14,6 +14,7 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 defineProps({
     drivers: {
@@ -63,7 +64,6 @@ const data = reactive({
         pickup_date: true,
         pickup_time_start: false,
         pickup_time_end: false,
-        actions: true,
     },
 });
 
@@ -108,7 +108,7 @@ const initializeGrid = () => {
             url: constructUrl(),
             then: data => data.data.map(item => {
                 const row = [];
-                // row.push({id: item.id})
+                row.push({id: item.id})
                 visibleColumns.forEach(column => {
                     row.push(item[column]);
                 });
@@ -127,8 +127,35 @@ const initializeGrid = () => {
     grid.render(wrapperRef.value);
 };
 
+const selectedData = ref([]);
+
 const createColumns = () => [
-    // {name: 'ID', hidden: !data.columnVisibility.id},
+    {
+        name: '#',
+        formatter: (_, row) => {
+            return h('input',
+                {
+                    type: 'checkbox',
+                    className: 'form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent',
+                    onChange: (event) => {
+                        const isChecked = event.target.checked;
+                        if (isChecked) {
+                            const rowData = row.cells.map(cell => cell.data); // Extract data from cells array
+                            selectedData.value.push(rowData); // Push extracted data into selectedData
+                        } else {
+                            // Remove the specific row from selectedData (assuming uniqueness of rows)
+                            const index = selectedData.value.findIndex(selectedRow => {
+                                const rowData = row.cells.map(cell => cell.data);
+                                return JSON.stringify(selectedRow) === JSON.stringify(rowData);
+                            });
+                            if (index !== -1) {
+                                selectedData.value.splice(index, 1);
+                            }
+                        }
+                    }
+                });
+        }
+    },
     {name: 'Reference', hidden: !data.columnVisibility.reference},
     {name: 'Name', hidden: !data.columnVisibility.name},
     {name: 'Email', hidden: !data.columnVisibility.email},
@@ -139,60 +166,19 @@ const createColumns = () => [
         name: 'VIP Customer',
         hidden: !data.columnVisibility.is_from_important_customer,
         formatter: (cell) => {
-            return cell? html(`<div class="badge bg-info text-white dark:bg-navy-900 ml-2"><i class="text-white mr-2 fa-solid fa-crown"></i> VIP</div>`) :null
+            return cell ? html(`<div class="badge bg-info text-white dark:bg-navy-900 ml-2"><i class="text-white mr-2 fa-solid fa-crown"></i> VIP</div>`) : null
         }
     },
     {
         name: 'Urgent Pickup',
         hidden: !data.columnVisibility.is_urgent_pickup,
         formatter: (cell) => {
-            return cell? html(`<div class="badge bg-success text-white dark:bg-navy-900 ml-2"><i class="text-white mr-2 fa-solid fa-star"></i> Urgent Pickup</div>`) :null
+            return cell ? html(`<div class="badge bg-success text-white dark:bg-navy-900 ml-2"><i class="text-white mr-2 fa-solid fa-star"></i> Urgent Pickup</div>`) : null
         }
     },
     {name: 'Pickup Date', hidden: !data.columnVisibility.pickup_date},
     {name: 'Pickup Time Start', hidden: !data.columnVisibility.pickup_time_start},
     {name: 'Pickup Time End', hidden: !data.columnVisibility.pickup_time_end},
-    {
-        name: 'Actions',
-        sort: false,
-        hidden: !data.columnVisibility.actions,
-        formatter: (_, row) => {
-            return h('div', {}, [
-                h('button', {
-                    className: 'btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25',
-                    onClick: () => confirmAssignDriver(row.cells[0].data)
-                }, [
-                    h('svg', {
-                        xmlns: 'http://www.w3.org/2000/svg',
-                        viewBox: '0 0 24 24',
-                        width: 24,
-                        height: 24,
-                        class: 'size-4.5 icon icon-tabler icons-tabler-outline icon-tabler-truck',
-                        fill: 'none',
-                        stroke: "currentColor",
-                        strokeWidth: 2,
-                        strokeLinecap: "round",
-                        strokeLinejoin: "round",
-                    }, [
-                        h('path', {
-                            stroke: "none",
-                            d: 'M0 0h24v24H0z',
-                            fill: 'none',
-                        }),
-                        h('path', {
-                            d: 'M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
-                        }),
-                        h('path', {
-                            d: 'M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
-                        }),
-                        h('path', {
-                            d: 'M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5',
-                        }),
-                    ])
-                ]),
-            ]);
-        },
-    },
 ];
 
 const updateGridConfig = () => {
@@ -235,16 +221,18 @@ const applyFilters = () => {
 }
 
 const showConfirmAssignDriverModal = ref(false);
-const jobId = ref(null);
+const isDataEmpty = computed(() => selectedData.value.length === 0);
+const countOfSelectedData = computed(() => selectedData.value.length);
+const idList = ref([]);
 
-const confirmAssignDriver = (id) => {
-    jobId.value = id;
+const confirmAssignDriver = () => {
+    idList.value = selectedData.value.map(item => item[0]);
     showConfirmAssignDriverModal.value = true;
 };
 
 const closeModal = () => {
     showConfirmAssignDriverModal.value = false;
-    jobId.value = null;
+    idList.value = [];
 }
 </script>
 <template>
@@ -381,6 +369,10 @@ const closeModal = () => {
                                 class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                             <i class="fa-solid fa-filter"></i>
                         </button>
+
+                        <PrimaryButton :disabled="isDataEmpty" @click="confirmAssignDriver">
+                            Assign Driver ({{countOfSelectedData}})
+                        </PrimaryButton>
                     </div>
                 </div>
 
@@ -392,7 +384,7 @@ const closeModal = () => {
             </div>
         </div>
 
-        <AssignDriverModal :drivers="drivers" :job-id="jobId" :show="showConfirmAssignDriverModal" @close="closeModal"/>
+        <AssignDriverModal :drivers="drivers" :id-list="idList" :show="showConfirmAssignDriverModal" @close="closeModal"/>
 
         <FilterDrawer :show="showFilters" @close="showFilters = false">
             <template #title>

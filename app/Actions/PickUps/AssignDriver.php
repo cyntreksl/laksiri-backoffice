@@ -10,13 +10,11 @@ class AssignDriver
 {
     use AsAction;
 
-    public function handle(array $data, PickUp $pickUp): PickUp
+    public function handle(PickUp $pickup, string|int $driver_id)
     {
-        $pickUp->update([
-            'driver_id' => $data['driver_id'],
+        $pickup->update([
+            'driver_id' => $driver_id,
             'driver_assigned_at' => Carbon::now(),
         ]);
-
-        return $pickUp;
     }
 }
