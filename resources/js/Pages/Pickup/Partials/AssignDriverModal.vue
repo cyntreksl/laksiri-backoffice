@@ -5,7 +5,8 @@ import DialogModal from "@/Components/DialogModal.vue";
 import {router, useForm} from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
-import notification from "@/magics/notification.js";
+import {push} from "notivue";
+import {watchEffect} from "vue";
 
 const props = defineProps({
     show: {
@@ -17,26 +18,30 @@ const props = defineProps({
         default: () => {
         },
     },
-    jobId: {
-        type: Number,
+    idList: {
+        type: Array,
+        default: () => [],
     }
 });
 
 const emit = defineEmits(['close']);
 
 const form = useForm({
-    driver_id: '',
+    driver_id: null,
+    job_ids: null,
+});
+
+// Watch for changes in props.idList and update form.job_ids
+watchEffect(() => {
+    form.job_ids = props.idList;
 });
 
 const handleAssignDriver = () => {
-    form.put(route("pickups.driver.update", props.jobId), {
+    form.post(route("pickups.driver.assign"), {
         preserveScroll: true,
         onSuccess: () => {
             emit('close');
-            notification({
-                text: 'Driver Assigned!',
-                variant: 'success',
-            });
+            push.success('Driver Assigned!')
             router.visit(route('pickups.index'))
         },
     })
@@ -59,13 +64,16 @@ const handleAssignDriver = () => {
                                 v-model="form.driver_id"
                                 class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                             >
+                                <option :value="null" disabled>
+                                    Select Driver
+                                </option>
                                 <option v-for="driver in drivers" :key="driver.id"
                                         :value="driver.id">{{ driver.name }}
                                 </option>
                             </select>
                         </label>
-                        <InputError :message="form.errors.driver_id"/>
                     </div>
+                    <InputError :message="form.errors.driver_id"/>
                 </div>
             </div>
         </template>

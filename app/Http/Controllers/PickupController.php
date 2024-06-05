@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
+use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
@@ -75,10 +76,9 @@ class PickupController extends Controller
     {
     }
 
-    public function updateDriver(Request $request, $pickUp)
+    public function assignDriver(AssignDriverRequest $request)
     {
-        $pickUp = PickUp::whereReference($pickUp)->first();
-        $this->pickupRepository->assignDriver($request->all(), $pickUp);
+        return $this->pickupRepository->assignDriverToPickups($request->all());
     }
 
     public function showPickupOrder(Request $request)

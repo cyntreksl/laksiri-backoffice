@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\NoteType\GetNoteTypes;
 use App\Actions\PickUps\AssignDriver;
 use App\Actions\PickUps\CreatePickUp;
+use App\Actions\PickUps\GetPickupByIds;
 use App\Actions\PickUps\GetPickups;
 use App\Actions\PickUps\SavePickUpOrder;
 use App\Factory\Pickup\FilterFactory;
@@ -34,9 +35,13 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
         return GetNoteTypes::run();
     }
 
-    public function assignDriver(array $data, PickUp $pickUp)
+    public function assignDriverToPickups(array $data): void
     {
-        return AssignDriver::run($data, $pickUp);
+        $pickupList = GetPickupByIds::run($data['job_ids']);
+
+        foreach ($pickupList as $pickup) {
+            AssignDriver::run($pickup, $data['driver_id']);
+        }
     }
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
