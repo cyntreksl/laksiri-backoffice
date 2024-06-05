@@ -61,6 +61,7 @@ const data = reactive({
         cargo_type: true,
         is_urgent_pickup: true,
         is_from_important_customer: true,
+        driver: true,
         pickup_date: true,
         pickup_time_start: false,
         pickup_time_end: false,
@@ -174,6 +175,13 @@ const createColumns = () => [
         hidden: !data.columnVisibility.is_urgent_pickup,
         formatter: (cell) => {
             return cell ? html(`<div class="badge bg-success text-white dark:bg-navy-900 ml-2"><i class="text-white mr-2 fa-solid fa-star"></i> Urgent Pickup</div>`) : null
+        }
+    },
+    {
+        name: 'Driver',
+        hidden: !data.columnVisibility.driver,
+        formatter: (cell) => {
+            return cell ? html(`<div class="flex item-center"><svg xmlns="http://www.w3.org/2000/svg"  width="18"  height="18"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg> ${cell} </div>`) : null
         }
     },
     {name: 'Pickup Date', hidden: !data.columnVisibility.pickup_date},
@@ -371,6 +379,7 @@ const closeModal = () => {
                         </button>
 
                         <PrimaryButton :disabled="isDataEmpty" @click="confirmAssignDriver">
+                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"  fill="none"  height="18"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="18"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg>
                             Assign Driver ({{countOfSelectedData}})
                         </PrimaryButton>
                     </div>

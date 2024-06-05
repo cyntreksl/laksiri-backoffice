@@ -59,4 +59,12 @@ class PickUp extends Model
     {
         return $this->belongsTo(Zone::class, 'zone_id');
     }
+
+    /**
+     * Get the driver that owns the pickup.
+     */
+    public function driver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'driver_id');
+    }
 }
