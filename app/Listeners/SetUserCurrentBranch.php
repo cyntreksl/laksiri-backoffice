@@ -22,7 +22,7 @@ class SetUserCurrentBranch
     public function handle(Login $event): void
     {
         $user = $event->user;
-        $branch = GetBranchById::run($user->primary_branch_id);
+        $branch = GetBranchById::run($user->last_logged_branch_id ?? $user->primary_branch_id);
         SwitchUserBranch::run($branch);
     }
 }
