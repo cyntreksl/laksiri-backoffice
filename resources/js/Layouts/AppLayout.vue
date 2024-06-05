@@ -778,7 +778,7 @@ export default {
                         },
                         {
                             title: "Loaded Shipment",
-                            route: "loading.loaded-shipments.index",
+                            route: "loading.loaded-containers.index",
                         },
                     );
                     break;
