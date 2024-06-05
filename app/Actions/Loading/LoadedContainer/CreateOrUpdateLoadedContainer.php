@@ -8,6 +8,7 @@ use App\Actions\User\GetUserCurrentBranch;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Enum\ContainerStatus;
 use App\Models\LoadedContainer;
+use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CreateOrUpdateLoadedContainer
@@ -21,6 +22,8 @@ class CreateOrUpdateLoadedContainer
     {
 
         try {
+            DB::beginTransaction();
+
             $reference = GenerateLoadingReferenceNumber::run(GetUserCurrentBranch::run()['branchName']);
 
             foreach ($data['packages'] as $package) {
@@ -56,7 +59,10 @@ class CreateOrUpdateLoadedContainer
             }
 
             UpdateContainerStatus::run($data['container_id'], ContainerStatus::CONTAINER_LOADED->value);
+
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             throw new \Exception('Failed to create loaded container: '.$e->getMessage());
         }
     }

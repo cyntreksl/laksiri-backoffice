@@ -13,15 +13,12 @@ class GetHBLByCargoTypeWithLoadedPackages
 
     public function handle(Container $container, string $cargoType)
     {
-        $hbl_package_ids = LoadedContainer::where('container_id', $container->id)
+        $loadedContainers = LoadedContainer::where('container_id', $container->id)
             ->where('is_draft', true)
-            ->pluck('hbl_package_id')
-            ->toArray();
+            ->get(['hbl_package_id', 'hbl_id']);
 
-        $hbl_ids = LoadedContainer::where('container_id', $container->id)
-            ->where('is_draft', true)
-            ->pluck('hbl_id')
-            ->toArray();
+        $hbl_package_ids = $loadedContainers->pluck('hbl_package_id')->toArray();
+        $hbl_ids = $loadedContainers->pluck('hbl_id')->toArray();
 
         return HBL::where('cargo_type', $cargoType)
             ->whereIn('id', $hbl_ids)
