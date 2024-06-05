@@ -109,6 +109,8 @@ const addPackageData = () => {
         packageList.value.splice(editIndex.value, 1, {...packageItem})
         grandTotalWeight.value = packageList.value.reduce((accumulator, currentValue) => accumulator + currentValue.totalWeight, 0);
         grandTotalVolume.value = packageList.value.reduce((accumulator, currentValue) => accumulator + currentValue.volume, 0);
+
+        calculatePayment();
     } else {
         const newItem = {...packageItem}; // Create a copy of packageItem
         packageList.value.push(newItem); // Add the new item to packageList
@@ -116,6 +118,8 @@ const addPackageData = () => {
 
         grandTotalWeight.value += newItem.totalWeight;
         grandTotalVolume.value += newItem.volume;
+
+        calculatePayment();
 
         // Reset packageItem values for the next entry
         packageItem.type = '';
@@ -302,6 +306,7 @@ const handleRemovePackage = () => {
         grandTotalVolume.value -= packageList.value[packageIndex.value].volume;
         grandTotalWeight.value -= packageList.value[packageIndex.value].totalWeight;
         packageList.value.splice(packageIndex.value, 1);
+        calculatePayment();
         closeModal();
     }
 }
@@ -695,7 +700,7 @@ const openEditModal = (index) => {
                             <button type="button"
                                     @click="calculatePayment"
                                     class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90">
-                                Calculate Payment
+                                Re Calculate Payment
                             </button>
                         </div>
                         <div class="grid grid-cols-2 gap-5 mt-5">
