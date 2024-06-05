@@ -3,6 +3,7 @@
 namespace App\Actions\User;
 
 use App\Models\Branch;
+use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class SwitchUserBranch
@@ -13,6 +14,11 @@ class SwitchUserBranch
     {
         session(['current_branch_id' => $branch->id]);
         session(['current_branch_name' => $branch->name]);
+
+        $user = Auth::user();
+        if ($user->last_logged_branch_id !== $branch->id) {
+            $user->update(['last_logged_branch_id' => $branch->id]);
+        }
 
         return [
             'branchName' => $branch->name,

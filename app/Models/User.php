@@ -47,6 +47,7 @@ class User extends Authenticatable
         'working_hours_start',
         'preferred_zone',
         'created_by',
+        'last_logged_branch_id',
     ];
 
     /**
