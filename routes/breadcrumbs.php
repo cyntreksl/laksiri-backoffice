@@ -150,3 +150,10 @@ Breadcrumbs::for('back-office.warehouses.index', function (BreadcrumbTrail $trai
     $trail->push('Warehouse');
     $trail->push('Warehouse List', route('back-office.warehouses.index'));
 });
+
+// Loaded Shipments
+Breadcrumbs::for('loading.loaded-containers.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Containers');
+    $trail->push('Loaded Shipments', route('loading.loaded-containers.index'));
+});

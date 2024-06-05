@@ -120,20 +120,18 @@ Route::middleware([
             ->name('loading-points.index');
 
         // Loaded Container
-        Route::resource('loaded-containers', LoadedContainerController::class);
+        Route::resource('loaded-containers', LoadedContainerController::class)
+            ->except(['create']);
 
         Route::delete('/loaded-containers/remove/{hbl_package_id}', [LoadedContainerController::class, 'destroyDraft'])
             ->name('loaded-containers.remove');
 
-        // Warehouse
+        Route::get('loaded-container-list', [LoadedContainerController::class, 'list']);
+
+        // Manual Loadings
         Route::get('manual-loadings', function () {
             return Inertia::render('Loading/ManualLoading');
         })->name('manual-loadings.index');
-
-        //Loaded Shipments
-        Route::get('loaded-shipments', function () {
-            return Inertia::render('Loading/LoadedShipmentList');
-        })->name('loaded-shipments.index');
     });
 
     //Arrivals

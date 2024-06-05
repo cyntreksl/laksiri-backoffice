@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enum\ContainerStatus;
 use App\Models\Scopes\BranchScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -53,5 +55,10 @@ class Container extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->logOnlyDirty();
+    }
+
+    public function scopeLoadedContainers(Builder $query): void
+    {
+        $query->where('status', ContainerStatus::CONTAINER_LOADED->value);
     }
 }
