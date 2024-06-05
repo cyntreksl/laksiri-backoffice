@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {computed, reactive, ref, watch} from "vue";
 import notification from "@/magics/notification.js";
@@ -11,8 +11,9 @@ import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import {push} from "notivue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
+import TextInput from "@/Components/TextInput.vue";
 
-defineProps({
+const props = defineProps({
     hblTypes: {
         type: Object,
         default: () => {
@@ -24,6 +25,11 @@ defineProps({
         }
     },
     warehouses: {
+        type: Object,
+        default: () => {
+        }
+    },
+    priceRules: {
         type: Object,
         default: () => {
         }
@@ -151,17 +157,28 @@ watch(
     }
 );
 
+const vat = ref(0);
 
 watch(
     [
         () => form.other_charge,
         () => form.discount,
         () => form.freight_charge,
+        () => vat,
     ],
     ([newOtherCharge, newDiscount, newFreightCharge]) => {
         // Convert dimensions from cm to meters
-        hblTotal.value = (parseFloat(form.bill_charge) + parseFloat(form.freight_charge) + parseFloat(form.other_charge)) - form.discount;
+        hblTotal.value = (parseFloat(form.bill_charge) + parseFloat(form.freight_charge) + parseFloat(form.other_charge)) + parseFloat(vat.value) - form.discount;
         form.grand_total = hblTotal.value;
+    }
+);
+
+watch(
+    [
+        () => form.cargo_type,
+    ],
+    ([newCargoType]) => {
+        calculatePayment();
     }
 );
 
@@ -179,22 +196,93 @@ const updateTypeDescription = () => {
 };
 
 const hblTotal = ref(0);
-const currency = ref("SAR");
+const currency = ref(usePage().props.auth?.user?.primary_branch?.currency_symbol || "SAR");
+const isEditable = ref(false);
 
 const calculatePayment = () => {
     const cargoType = form.cargo_type;
     const freightCharge = ref(0);
     const billCharge = ref(0);
+    const otherCharge = ref(0);
     if (cargoType === 'Sea Cargo') {
-        freightCharge.value = grandTotalVolume.value * 300;
-        billCharge.value = 50;
+        const priceRule = computed(() => {
+            return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Sea Cargo');
+        })
+
+        if (priceRule.value.price_mode === 'volume') {
+            const trueAction = priceRule.value.true_action.trim();
+            const operator = trueAction[0];
+            const value = parseFloat(trueAction.slice(1).trim());
+
+            switch (operator) {
+                case '*':
+                    freightCharge.value = grandTotalVolume.value * value;
+                    break;
+                case '+':
+                    freightCharge.value = grandTotalVolume.value + value;
+                    break;
+                case '-':
+                    freightCharge.value = grandTotalVolume.value - value;
+                    break;
+                case '/':
+                    if (value !== 0) {
+                        freightCharge.value = grandTotalVolume.value / value;
+                    } else {
+                        console.error('Division by zero error');
+                    }
+                    break;
+                default:
+                    console.error('Unsupported operation');
+                    break;
+            }
+        }
+
+        billCharge.value = priceRule.value.bill_price.toFixed(2) || 0;
+        otherCharge.value = parseFloat(priceRule.value.destination_charges).toFixed(2) || 0;
+        isEditable.value = Boolean(priceRule.value.is_editable);
+        vat.value = priceRule.value.bill_vat !== 0 ? parseFloat(priceRule.value.bill_vat) / 100 : 0;
     } else if (cargoType === 'Air Cargo') {
-        freightCharge.value = grandTotalWeight.value * 8;
-        billCharge.value = 40;
+        const priceRule = computed(() => {
+            return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Air Cargo');
+        })
+
+        if (priceRule.value.price_mode === 'weight') {
+            const trueAction = priceRule.value.true_action.trim();
+            const operator = trueAction[0];
+            const value = parseFloat(trueAction.slice(1).trim());
+
+            switch (operator) {
+                case '*':
+                    freightCharge.value = grandTotalVolume.value * value;
+                    break;
+                case '+':
+                    freightCharge.value = grandTotalVolume.value + value;
+                    break;
+                case '-':
+                    freightCharge.value = grandTotalVolume.value - value;
+                    break;
+                case '/':
+                    if (value !== 0) {
+                        freightCharge.value = grandTotalVolume.value / value;
+                    } else {
+                        console.error('Division by zero error');
+                    }
+                    break;
+                default:
+                    console.error('Unsupported operation');
+                    break;
+            }
+        }
+
+        billCharge.value = priceRule.value.bill_price.toFixed(2) || 0;
+        otherCharge.value = parseFloat(priceRule.value.destination_charges).toFixed(2) || 0;
+        isEditable.value = Boolean(priceRule.value.is_editable);
+        vat.value = priceRule.value.bill_vat !== 0 ? parseFloat(priceRule.value.bill_vat) / 100 : 0;
     }
 
     form.freight_charge = freightCharge.value.toFixed(2);
     form.bill_charge = billCharge.value;
+    form.other_charge = otherCharge.value;
 }
 const showConfirmRemovePackageModal = ref(false);
 const packageIndex = ref(null);
@@ -613,66 +701,31 @@ const openEditModal = (index) => {
                         <div class="grid grid-cols-2 gap-5 mt-5">
                             <div>
                                 <span>Freight Charge</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.freight_charge"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="number"
-                                        min="0"
-                                    />
-                                </label>
+                                <TextInput v-model="form.freight_charge" :disabled="isEditable" class="w-full" min="0" type="number" />
                                 <InputError :message="form.errors.freight_charge"/>
                             </div>
 
                             <div>
                                 <span>Bill Charge</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.bill_charge"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="number"
-                                        min="0"
-                                    />
-                                </label>
+                                <TextInput v-model="form.bill_charge" :disabled="isEditable" class="w-full" min="0" type="number" />
                                 <InputError :message="form.errors.bill_charge"/>
                             </div>
 
                             <div>
-                                <span>Other Charge</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.other_charge"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="number"
-                                        min="0"
-                                    />
-                                </label>
+                                <span>Destination Charge</span>
+                                <TextInput v-model="form.other_charge" :disabled="isEditable" class="w-full" min="0" type="number" />
                                 <InputError :message="form.errors.other_charge"/>
                             </div>
 
                             <div>
                                 <span>Discount</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.discount"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="0"
-                                        type="number"
-                                    />
-                                </label>
+                                <TextInput v-model="form.discount" :disabled="isEditable" class="w-full" placeholder="0" type="number" />
                                 <InputError :message="form.errors.discount"/>
                             </div>
 
                             <div class="col-span-2">
                                 <span>Paid Amount</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.paid_amount"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="number"
-                                        min="0"
-                                    />
-                                </label>
+                                <TextInput v-model="form.paid_amount" :disabled="isEditable" class="w-full" min="0" type="number" />
                                 <InputError :message="form.errors.paid_amount"/>
                             </div>
 
