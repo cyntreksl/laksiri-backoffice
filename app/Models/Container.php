@@ -61,4 +61,9 @@ class Container extends Model
     {
         $query->where('status', ContainerStatus::CONTAINER_LOADED->value);
     }
+
+    public function loadedC()
+    {
+        return $this->hasMany(LoadedContainer::class, 'container_id', 'id');
+    }
 }

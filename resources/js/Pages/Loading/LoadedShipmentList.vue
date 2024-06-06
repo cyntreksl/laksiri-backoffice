@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {router} from "@inertiajs/vue3";
+import {Link} from "@inertiajs/vue3";
 import {Grid, h} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
@@ -187,47 +187,47 @@ const createColumns = () => [
         name: 'Actions',
         sort: false,
         hidden: !data.columnVisibility.actions,
-        // formatter: (_, row) => {
-        //     return h('div', {}, [
-        //         h('button', {
-        //             className: 'btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25',
-        //             onClick: () => router.visit(route('loading.loading-points.index', {
-        //                 'container': row.cells[0].data,
-        //                 'cargoType': row.cells[1].data,
-        //             })),
-        //             'x-tooltip..placement.bottom.success': "'Load to Container'"
-        //         }, [
-        //             h('svg', {
-        //                 xmlns: 'http://www.w3.org/2000/svg',
-        //                 viewBox: '0 0 24 24',
-        //                 class: 'size-6 icon icon-tabler icons-tabler-outline icon-tabler-truck-loading',
-        //                 fill: 'none',
-        //                 stroke: "currentColor",
-        //                 strokeWidth: 2,
-        //                 strokeLinecap: "round",
-        //                 strokeLinejoin: "round",
-        //             }, [
-        //                 h('path', {
-        //                     stroke: "none",
-        //                     d: 'M0 0h24v24H0z',
-        //                     fill: 'none',
-        //                 }),
-        //                 h('path', {
-        //                     d: 'M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15',
-        //                 }),
-        //                 h('path', {
-        //                     d: 'M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z',
-        //                 }),
-        //                 h('path', {
-        //                     d: 'M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
-        //                 }),
-        //                 h('path', {
-        //                     d: 'M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0',
-        //                 }),
-        //             ])
-        //         ]),
-        //     ]);
-        // },
+        formatter: (_, row) => {
+            return h('div', {}, [
+                h('a', {
+                    href: route('loading.loaded-containers.manifest.export', row.cells[0].data)
+                }, [
+                    h('button', {
+                        className: 'btn size-8 p-0 text-warning hover:bg-warning/20 focus:bg-warning/20 active:bg-warning/25',
+                        'x-tooltip..placement.bottom.warning': "'Download Manifest'"
+                    }, [
+                        h('svg', {
+                            xmlns: 'http://www.w3.org/2000/svg',
+                            viewBox: '0 0 24 24',
+                            class: 'size-6 icon icon-tabler icons-tabler-outline icon-tabler-file-download',
+                            fill: 'none',
+                            stroke: "currentColor",
+                            strokeWidth: 2,
+                            strokeLinecap: "round",
+                            strokeLinejoin: "round",
+                        }, [
+                            h('path', {
+                                stroke: "none",
+                                d: 'M0 0h24v24H0z',
+                                fill: 'none',
+                            }),
+                            h('path', {
+                                d: 'M14 3v4a1 1 0 0 0 1 1h4',
+                            }),
+                            h('path', {
+                                d: 'M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z',
+                            }),
+                            h('path', {
+                                d: 'M12 17v-6',
+                            }),
+                            h('path', {
+                                d: 'M9.5 14.5l2.5 2.5l2.5 -2.5',
+                            }),
+                        ])
+                    ]),
+                ])
+            ]);
+        },
     },
 ];
 

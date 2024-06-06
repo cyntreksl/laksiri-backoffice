@@ -6,4 +6,5 @@ return [
     App\Providers\JetstreamServiceProvider::class,
     App\Providers\RepositoryServiceProvider::class,
     App\Providers\ApiRepositoryServiceProvider::class,
+    Maatwebsite\Excel\ExcelServiceProvider::class,
 ];
