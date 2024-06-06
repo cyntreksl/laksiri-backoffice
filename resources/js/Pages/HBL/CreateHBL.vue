@@ -2,7 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {reactive, ref, watch} from "vue";
+import {computed, reactive, ref, watch} from "vue";
 import notification from "@/magics/notification.js";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
