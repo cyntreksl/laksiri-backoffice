@@ -72,22 +72,4 @@ class HBL extends Model
     {
         $query->where('system_status', 4);
     }
-
-    // actions
-    //    public function isFullyLoaded(): bool
-    //    {
-    //        return $this->packages()->whereHas('containers', function ($query) {
-    //            $query->where('status', 'loaded');
-    //        })->count() === $this->packages()->count();
-    //    }
-    //
-    //    public function isPartiallyLoaded(): bool
-    //    {
-    //        $totalPackages = $this->packages()->count();
-    //        $loadedPackages = $this->packages()->whereHas('containers', function ($query) {
-    //            $query->where('status', 'loaded');
-    //        })->count();
-    //
-    //        return $loadedPackages > 0 && $loadedPackages < $totalPackages;
-    //    }
 }

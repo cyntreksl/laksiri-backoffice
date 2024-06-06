@@ -44,24 +44,4 @@ class HBLPackage extends Model
             ->withPivot('status', 'loaded_by')
             ->withTimestamps();
     }
-
-    //    public function scopeIsLoaded(Builder $query): void
-    //    {
-    //        $query->where('is_loaded', true);
-    //    }
-
-    //    public function isLoaded()
-    //    {
-    //        return $this->containers()->wherePivot('status', 'loaded')->exists();
-    //    }
-    //
-    //    public function isDraft()
-    //    {
-    //        return $this->containers()->wherePivot('status', 'draft')->exists();
-    //    }
-    //
-    //    public function loadedBy()
-    //    {
-    //        return $this->containers()->withPivot('loaded_by')->first()->pivot->loaded_by;
-    //    }
 }
