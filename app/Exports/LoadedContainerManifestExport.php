@@ -4,7 +4,6 @@ namespace App\Exports;
 
 use App\Models\Container;
 use App\Models\HBL;
-use App\Models\HBLPackage;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -57,20 +56,14 @@ class LoadedContainerManifestExport implements FromQuery, ShouldAutoSize, WithHe
     {
         $data = [];
 
-        foreach ($container->loadedC->groupBy('hbl_id') as $hblId => $loadedContainer) {
+        foreach ($container->hbl_packages->groupBy('hbl_id') as $hblId => $loadedHBLPackages) {
             $hbl = HBL::find($hblId);
 
             $isFirst = true;
 
-            $totalQuantity = $loadedContainer->sum(function ($loadedContainer) {
-                $hbl_package = HBLPackage::find($loadedContainer->hbl_package_id);
+            $totalQuantity = $loadedHBLPackages->sum('quantity');
 
-                return $hbl_package->quantity;
-            });
-
-            foreach ($loadedContainer as $var) {
-                $hbl_package = HBLPackage::find($var->hbl_package_id);
-
+            foreach ($loadedHBLPackages as $hbl_package) {
                 $data[] = [
                     $isFirst ? $hbl->reference : '',
                     $isFirst ? $hbl->hbl_name : '',

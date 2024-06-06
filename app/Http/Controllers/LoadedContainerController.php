@@ -82,9 +82,9 @@ class LoadedContainerController extends Controller
         //
     }
 
-    public function destroyDraft($hblPackageId)
+    public function destroyDraft(Request $request)
     {
-        return $this->loadedContainerRepository->deleteDraft($hblPackageId);
+        return $this->loadedContainerRepository->deleteDraft($request->all());
     }
 
     public function exportManifest(Container $container)

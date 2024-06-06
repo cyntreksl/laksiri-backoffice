@@ -123,7 +123,7 @@ Route::middleware([
         Route::resource('loaded-containers', LoadedContainerController::class)
             ->except(['create']);
 
-        Route::delete('/loaded-containers/remove/{hbl_package_id}', [LoadedContainerController::class, 'destroyDraft'])
+        Route::post('/loaded-containers/remove', [LoadedContainerController::class, 'destroyDraft'])
             ->name('loaded-containers.remove');
 
         Route::get('loaded-container-list', [LoadedContainerController::class, 'list']);

@@ -5,21 +5,21 @@ namespace App\Actions\Container;
 use App\Models\Container;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class UpdateContainerStatus
+class UpdateReferenceNumber
 {
     use AsAction;
 
     /**
      * @throws \Exception
      */
-    public function handle(Container $container, string $status)
+    public function handle(Container $container, string $reference)
     {
         try {
             $container->update([
-                'status' => $status,
+                'reference' => $reference,
             ]);
         } catch (\Exception $e) {
-            throw new \Exception('Failed to update status of container: '.$e->getMessage());
+            throw new \Exception('Failed to update reference of container: '.$e->getMessage());
         }
     }
 }

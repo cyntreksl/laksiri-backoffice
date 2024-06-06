@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\Loading\LoadedContainer;
+namespace App\Actions\Container\Loading;
 
 use App\Models\Container;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -11,7 +11,7 @@ class GetLoadedContainers
 
     public function handle()
     {
-        return Container::loadedContainers()->with('loadedC')->get();
+        return Container::loadedContainers()->with('hbl_packages')->get();
 
     }
 }

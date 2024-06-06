@@ -4,7 +4,10 @@ namespace App\Enum;
 
 enum ContainerStatus: string
 {
-    case CONTAINER_ORDERED = 'CONTAINER ORDERED';
-    case CONTAINER_PARTIALLY_LOADED = 'CONTAINER PARTIALLY LOADED';
-    case CONTAINER_LOADED = 'CONTAINER LOADED';
+    case REQUESTED = 'REQUESTED';
+    case DRAFT = 'DRAFT';
+    case LOADING = 'LOADING';
+    case UNLOADED = 'UNLOADED';
+    case RETURNED = 'RETURNED';
+    case LOADED = 'LOADED';
 }
