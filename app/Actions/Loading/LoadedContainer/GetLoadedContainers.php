@@ -12,5 +12,6 @@ class GetLoadedContainers
     public function handle()
     {
         return Container::loadedContainers()->with('loadedC')->get();
+
     }
 }

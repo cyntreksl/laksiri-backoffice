@@ -7,6 +7,11 @@ import Tabs from "@/Components/Tabs.vue";
 import Tab from "@/Components/Tab.vue";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
+import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import InputError from "@/Components/InputError.vue";
+import DatePicker from "@/Components/DatePicker.vue";
 
 const props = defineProps({
     show: {
@@ -96,8 +101,10 @@ const emit = defineEmits(['close']);
                             <PrimaryOutlineButton>
                                 <svg class="size-5 mr-2" fill="none" stroke="currentColor"
                                      stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" stroke-linecap="round"
-                                          stroke-linejoin="round"/>
+                                    <path
+                                        d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"/>
                                 </svg>
 
                                 Print All HBL
@@ -105,9 +112,10 @@ const emit = defineEmits(['close']);
                         </div>
                     </div>
 
-                    <div class="flex gap-3">
+                    <div class="flex gap-3 my-3">
                         <SimpleOverviewWidget :count="0" title="HBL">
-                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-app-window text-info" fill="none" height="24" stroke="currentColor"
+                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-app-window text-info"
+                                 fill="none" height="24" stroke="currentColor"
                                  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                  width="24"
                                  xmlns="http://www.w3.org/2000/svg">
@@ -161,20 +169,159 @@ const emit = defineEmits(['close']);
                             </svg>
                         </SimpleOverviewWidget>
                     </div>
+
+                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto my-10">
+                        <table class="is-hoverable w-full text-left">
+                            <thead>
+                            <tr>
+                                <th
+                                    class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    HBL
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Packages
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Name
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    PP No
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Address
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Contact
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Consignee Name
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Consignee Address
+                                </th>
+                                <th
+                                    class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Action
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                                <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
+                                    -
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                    -
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                                <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
+                                    -
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </Tab>
 
                 <Tab label="Shipment Details" name="tabShipment">
 
-                    <div class="flex justify-end">
-                        <div class="badge space-x-2 bg-success text-white shadow-soft shadow-success/50 mb-2">
-                            <i
-                                class="fa-solid fa-person-biking text-sm text-white dark:text-text-white"
-                            ></i>
-                            <span>Driver Picked</span>
+                    <div
+                        class="flex flex-col items-center justify-between space-y-2 text-center sm:flex-row sm:space-y-0 sm:text-left">
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-700 dark:text-navy-100">
+                                Shipment
+                            </h3>
+                            <p class="mt-1 hidden sm:block">{{ container.reference }}</p>
                         </div>
                     </div>
 
-                    <AccordionPanel show-panel title="Cargo Status">
+                    <AccordionPanel show-panel title="Loading Details">
+                        <template #header-image>
+                            <div
+                                class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-truck-loading" fill="none" height="24" stroke="currentColor"
+                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                     width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15"/>
+                                    <path
+                                        d="M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z"/>
+                                    <path d="M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                    <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                </svg>
+                            </div>
+                        </template>
+                        <div class="px-4 py-4 sm:px-5">
+
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-x-4 gap-y-8">
+                                <div>
+                                    <label class="block">
+                                        <InputLabel value="Cargo Mode"/>
+                                        <select
+                                            class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        >
+                                            <option :value="null" disabled>
+                                                Select Cargo Mode
+                                            </option>
+                                            <option>
+                                                Sea Cargo
+                                            </option>
+                                        </select>
+                                    </label>
+                                    <InputError />
+                                </div>
+
+                                <div>
+                                    <InputLabel value="Reference" />
+                                    <TextInput class="w-full" placeholder="Reference"/>
+                                    <InputError />
+                                </div>
+
+                                <div>
+                                    <InputLabel value="AWB No" />
+                                    <TextInput class="w-full" />
+                                    <InputError />
+                                </div>
+
+                                <div>
+                                    <InputLabel value="EDT"/>
+                                    <DatePicker />
+                                    <InputError />
+                                </div>
+
+                                <div>
+                                    <InputLabel value="ETA"/>
+                                    <DatePicker />
+                                    <InputError />
+                                </div>
+                            </div>
+
+                        </div>
+                    </AccordionPanel>
+
+                    <AccordionPanel show-panel title="Loading Status">
                         <template #header-image>
                             <div
                                 class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
@@ -193,202 +340,61 @@ const emit = defineEmits(['close']);
                             </div>
                         </template>
                         <div class="px-4 py-4 sm:px-5">
-
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8">
-
                                 <div>
-                                    <ol class="steps">
-                                        <li class="step before:bg-primary dark:before:bg-accent">
-                                            <div
-                                                class="step-header rounded-full bg-primary text-white dark:bg-accent"
-                                            >
-                                                1
-                                            </div>
-                                            <h3 class="text-slate-600 dark:text-navy-100">Job Added</h3>
-                                            <h3 class="text-slate-600 dark:text-navy-100 font-bold">TESTDRIVER |
-                                                2024-05-12 17:12</h3>
-                                        </li>
-                                        <li class="step before:bg-primary dark:before:bg-accent">
-                                            <div
-                                                class="step-header rounded-full bg-primary text-white dark:bg-accent"
-                                            >
-                                                2
-                                            </div>
-                                            <h3 class="text-slate-600 dark:text-navy-100">Tentative Pickup</h3>
-                                            <h3 class="text-slate-600 dark:text-navy-100 font-bold">TESTDRIVER |
-                                                2024-05-12 17:12</h3>
-                                        </li>
-                                        <li class="step before:bg-primary dark:before:bg-accent">
-                                            <div
-                                                class="step-header rounded-full bg-primary text-white dark:bg-accent"
-                                            >
-                                                3
-                                            </div>
-                                            <h3 class="text-slate-600 dark:text-navy-100">Picked on</h3>
-                                            <h3 class="text-slate-600 dark:text-navy-100 font-bold">2024-05-26 19:26
-                                                N/A</h3>
-                                        </li>
-                                    </ol>
+                                    <label class="block">
+                                        <InputLabel value="Last Status"/>
+                                        <select
+                                            class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        >
+                                            <option :value="null" disabled>
+                                                Select Status
+                                            </option>
+                                            <option>
+                                                Status
+                                            </option>
+                                        </select>
+                                    </label>
+                                    <InputError />
                                 </div>
 
                                 <div>
-                                    <ol class="steps">
-                                        <li class="step before:bg-lime-600 dark:before:bg-accent">
-                                            <div
-                                                class="step-header rounded-full bg-lime-600 text-white dark:bg-accent"
-                                            >
-                                                1
-                                            </div>
-                                            <h3 class="text-slate-600 dark:text-navy-100">HBL Added on</h3>
-                                            <h3 class="text-slate-600 dark:text-navy-100 font-bold">2024-05-26
-                                                19:26</h3>
-                                        </li>
-                                        <li class="step before:bg-lime-600 dark:before:bg-accent">
-                                            <div
-                                                class="step-header rounded-full bg-lime-600 text-white dark:bg-accent"
-                                            >
-                                                2
-                                            </div>
-                                            <h3 class="text-slate-600 dark:text-navy-100">Cash Collected</h3>
-                                            <h3 class="text-slate-600 dark:text-navy-100 font-bold">2024-05-26
-                                                19:26</h3>
-                                        </li>
-                                        <li class="step before:bg-lime-600 dark:before:bg-accent">
-                                            <div
-                                                class="step-header rounded-full bg-lime-600 text-white dark:bg-accent"
-                                            >
-                                                3
-                                            </div>
-                                            <h3 class="text-slate-600 dark:text-navy-100">Warehouse</h3>
-                                            <h3 class="text-slate-600 dark:text-navy-100 font-bold">2024-05-26
-                                                19:26</h3>
-                                        </li>
-                                    </ol>
+                                    <InputLabel value="Note" />
+                                    <TextInput class="w-full" placeholder="Type something..."/>
+                                    <InputError />
                                 </div>
 
+                                <div>
+                                    <InputLabel value="Reached Destination?" />
+                                    <TextInput class="w-full" />
+                                    <InputError />
+                                </div>
+
+                                <div>
+                                    <InputLabel value="Reached Date"/>
+                                    <DatePicker />
+                                    <InputError />
+                                </div>
                             </div>
                         </div>
                     </AccordionPanel>
 
-                    <AccordionPanel show-panel title="Shipment Details">
-                        <template #header-image>
-                            <div
-                                class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
-                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-package-export"
-                                     fill="none" height="24" stroke="currentColor"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                     width="24"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M12 21l-8 -4.5v-9l8 -4.5l8 4.5v4.5"/>
-                                    <path d="M12 12l8 -4.5"/>
-                                    <path d="M12 12v9"/>
-                                    <path d="M12 12l-8 -4.5"/>
-                                    <path d="M15 18h7"/>
-                                    <path d="M19 15l3 3l-3 3"/>
-                                </svg>
-                            </div>
-                        </template>
-                        <div class="px-4 py-4 sm:px-5">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8">
-                                -
-                            </div>
-                        </div>
-                    </AccordionPanel>
+                    <div class="flex space-x-2 items-center justify-end">
+                        <DangerOutlineButton>
+                            <svg class="size-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5"
+                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" stroke-linecap="round"
+                                      stroke-linejoin="round"/>
+                            </svg>
 
-                    <AccordionPanel show-panel title="Complaint Details">
-                        <template #header-image>
-                            <div
-                                class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
-                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-mood-sad-2" fill="none"
-                                     height="24" stroke="currentColor"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                     width="24"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
-                                    <path d="M14.5 16.05a3.5 3.5 0 0 0 -5 0"/>
-                                    <path d="M10 9.25c-.5 1 -2.5 1 -3 0"/>
-                                    <path d="M17 9.25c-.5 1 -2.5 1 -3 0"/>
-                                </svg>
-                            </div>
-                        </template>
-                        <div class="px-4 py-4 sm:px-5">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8">
-                                <p>NO COMPLAINTS FOR THIS HBL</p>
-                            </div>
-                        </div>
-                    </AccordionPanel>
+                            Delete Loading
+                        </DangerOutlineButton>
 
-                    <AccordionPanel show-panel title="Audit Details">
-                        <template #header-image>
-                            <div
-                                class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
-                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-automation" fill="none"
-                                     height="24" stroke="currentColor"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                     width="24"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path
-                                        d="M13 20.693c-.905 .628 -2.36 .292 -2.675 -1.01a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.492 .362 1.716 2.219 .674 3.03"/>
-                                    <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
-                                    <path d="M17 22l5 -3l-5 -3z"/>
-                                </svg>
-                            </div>
-                        </template>
-                        <div class="px-4 py-4 sm:px-5">
-                            <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                                <table class="is-hoverable w-full text-left">
-                                    <thead>
-                                    <tr>
-                                        <th
-                                            class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Detail
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Date
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Time
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Auth
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Branch
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
-                                        <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
-                                            -
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            -
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
-                                        <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">-</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </AccordionPanel>
+                        <PrimaryButton>
+                            <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-device-floppy size-5 mr-2"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" /><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M14 4l0 4l-6 0l0 -4" /></svg>
+                            Save Changes
+                        </PrimaryButton>
+                    </div>
                 </Tab>
 
                 <Tab label="Document for Shipment" name="tabDocuments">
@@ -460,12 +466,6 @@ const emit = defineEmits(['close']);
                     </div>
                 </Tab>
             </Tabs>
-        </template>
-
-        <template #footer>
-            <SecondaryButton @click="$emit('close')">
-                Cancel
-            </SecondaryButton>
         </template>
     </DialogModal>
 </template>
