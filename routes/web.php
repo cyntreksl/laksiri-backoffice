@@ -128,6 +128,9 @@ Route::middleware([
 
         Route::get('loaded-container-list', [LoadedContainerController::class, 'list']);
 
+        Route::get('/loaded-containers/{container}/manifest/export', [LoadedContainerController::class, 'exportManifest'])
+            ->name('loaded-containers.manifest.export');
+
         // Manual Loadings
         Route::get('manual-loadings', function () {
             return Inertia::render('Loading/ManualLoading');

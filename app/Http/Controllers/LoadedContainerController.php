@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enum\CargoType;
 use App\Enum\ContainerType;
 use App\Interfaces\LoadedContainerRepositoryInterface;
+use App\Models\Container;
 use App\Models\LoadedContainer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -83,5 +84,10 @@ class LoadedContainerController extends Controller
     public function destroyDraft($hblPackageId)
     {
         return $this->loadedContainerRepository->deleteDraft($hblPackageId);
+    }
+
+    public function exportManifest(Container $container)
+    {
+        return $this->loadedContainerRepository->downloadManifestFile($container);
     }
 }

@@ -5,12 +5,14 @@ namespace App\Repositories;
 use App\Actions\Loading\LoadedContainer\CreateDraftLoadedContainer;
 use App\Actions\Loading\LoadedContainer\CreateOrUpdateLoadedContainer;
 use App\Actions\Loading\LoadedContainer\DeleteDraftLoadedContainer;
+use App\Exports\LoadedContainerManifestExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
 use App\Models\LoadedContainer;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepositoryInterface
 {
@@ -75,5 +77,10 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function downloadManifestFile(Container $container)
+    {
+        return Excel::download(new LoadedContainerManifestExport($container), 'filensdame.xlsx');
     }
 }
