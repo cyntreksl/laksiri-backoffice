@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\Loading\LoadedContainer\CreateDraftLoadedContainer;
 use App\Actions\Loading\LoadedContainer\CreateOrUpdateLoadedContainer;
 use App\Actions\Loading\LoadedContainer\DeleteDraftLoadedContainer;
+use App\Actions\Loading\LoadedContainer\GetLoadedContainers;
 use App\Exports\LoadedContainerManifestExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
@@ -82,5 +83,10 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
     public function downloadManifestFile(Container $container)
     {
         return Excel::download(new LoadedContainerManifestExport($container), 'manifest.xlsx');
+    }
+
+    public function getLoadedContainers()
+    {
+        return GetLoadedContainers::run();
     }
 }

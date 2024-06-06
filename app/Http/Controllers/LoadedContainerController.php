@@ -24,6 +24,7 @@ class LoadedContainerController extends Controller
     {
         return Inertia::render('Loading/LoadedShipmentList', [
             'cargoTypes' => CargoType::cases(),
+            'containers' => $this->loadedContainerRepository->getLoadedContainers(),
             'containerTypes' => ContainerType::cases(),
         ]);
     }

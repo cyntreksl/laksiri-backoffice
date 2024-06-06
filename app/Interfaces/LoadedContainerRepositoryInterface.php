@@ -11,4 +11,6 @@ interface LoadedContainerRepositoryInterface
     public function deleteDraft(string $hblPackageId);
 
     public function downloadManifestFile(Container $container);
+
+    public function getLoadedContainers();
 }
