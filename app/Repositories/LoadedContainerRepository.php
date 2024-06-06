@@ -81,6 +81,6 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
     public function downloadManifestFile(Container $container)
     {
-        return Excel::download(new LoadedContainerManifestExport($container), 'filensdame.xlsx');
+        return Excel::download(new LoadedContainerManifestExport($container), 'manifest.xlsx');
     }
 }
