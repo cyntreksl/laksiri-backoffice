@@ -518,7 +518,7 @@ const closeModal = () => {
                     </div>
                 </Tab>
             </Tabs>
-            <AddHBLModal :show="showConfirmAddHBLModal" @close="closeModal"/>
+            <AddHBLModal :container="container" :show="showConfirmAddHBLModal" @close="closeModal"/>
         </template>
     </DialogModal>
 </template>
