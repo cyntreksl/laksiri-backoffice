@@ -13,6 +13,8 @@ import InputError from "@/Components/InputError.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import {router} from "@inertiajs/vue3";
 import {push} from "notivue";
+import {ref} from "vue";
+import AddHBLModal from "@/Pages/Loading/Partials/AddHBLModal.vue";
 
 const props = defineProps({
     show: {
@@ -44,6 +46,16 @@ const handleRemoveHBLFromContainer = (hblId) => {
             preserveState: true,
         }
     )
+}
+
+const showConfirmAddHBLModal = ref(false);
+
+const confirmViewLoadedShipment = () => {
+    showConfirmAddHBLModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmAddHBLModal.value = false;
 }
 </script>
 
@@ -105,7 +117,7 @@ const handleRemoveHBLFromContainer = (hblId) => {
                             <p class="mt-1 hidden sm:block">{{ container.reference }}</p>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <PrimaryOutlineButton>
+                            <PrimaryOutlineButton @click="confirmViewLoadedShipment">
                                 <svg class="size-5 mr-2" fill="none" stroke="currentColor"
                                      stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke-linecap="round"
@@ -506,6 +518,7 @@ const handleRemoveHBLFromContainer = (hblId) => {
                     </div>
                 </Tab>
             </Tabs>
+            <AddHBLModal :show="showConfirmAddHBLModal" @close="closeModal"/>
         </template>
     </DialogModal>
 </template>
