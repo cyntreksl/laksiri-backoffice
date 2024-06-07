@@ -302,7 +302,7 @@ const applyFilters = () => {
     });
     grid.forceRender();
 }
-console.log(props.containers)
+
 const selectedContainer = ref({});
 const showConfirmLoadedShipmentModal = ref(false);
 
@@ -313,7 +313,7 @@ const confirmViewLoadedShipment = (id) => {
 
 const closeModal = () => {
     showConfirmLoadedShipmentModal.value = false;
-    selectedContainer.value = null;
+    selectedContainer.value = {};
 }
 </script>
 <template>

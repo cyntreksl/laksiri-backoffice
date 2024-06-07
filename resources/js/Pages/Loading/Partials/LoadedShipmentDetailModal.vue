@@ -1,6 +1,5 @@
 <script setup>
 import DialogModal from "@/Components/DialogModal.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
 import AccordionPanel from "@/Components/AccordionPanel.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import Tabs from "@/Components/Tabs.vue";
@@ -12,6 +11,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import DatePicker from "@/Components/DatePicker.vue";
+import {watch} from "vue";
 
 const props = defineProps({
     show: {
@@ -25,8 +25,10 @@ const props = defineProps({
     }
 });
 
+watch(() => {
+    console.log(props.container)
+})
 
-console.log(props.container)
 const emit = defineEmits(['close']);
 </script>
 
@@ -113,7 +115,7 @@ const emit = defineEmits(['close']);
                     </div>
 
                     <div class="flex gap-3 my-3">
-                        <SimpleOverviewWidget :count="0" title="HBL">
+                        <SimpleOverviewWidget :count="container?.hbl_count || 0" title="HBL">
                             <svg class="icon icon-tabler icons-tabler-outline icon-tabler-app-window text-info"
                                  fill="none" height="24" stroke="currentColor"
                                  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
@@ -127,7 +129,7 @@ const emit = defineEmits(['close']);
                             </svg>
                         </SimpleOverviewWidget>
 
-                        <SimpleOverviewWidget :count="0" title="Package">
+                        <SimpleOverviewWidget :count="container?.hbl_packages_count || 0" title="Package">
                             <svg class="icon icon-tabler icons-tabler-outline icon-tabler-package text-info"
                                  fill="none"
                                  height="24" stroke="currentColor" stroke-linecap="round"
@@ -142,7 +144,7 @@ const emit = defineEmits(['close']);
                             </svg>
                         </SimpleOverviewWidget>
 
-                        <SimpleOverviewWidget :count="0" title="Weight">
+                        <SimpleOverviewWidget :count="container?.hbl_packages_sum_weight || 0.00" title="Weight">
                             <svg class="icon icon-tabler icons-tabler-outline icon-tabler-weight text-info"
                                  fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                                  stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
@@ -154,7 +156,7 @@ const emit = defineEmits(['close']);
                             </svg>
                         </SimpleOverviewWidget>
 
-                        <SimpleOverviewWidget :count="0" title="Volume">
+                        <SimpleOverviewWidget :count="container?.hbl_packages_sum_volume || 0.00" title="Volume">
                             <svg class="icon icon-tabler icons-tabler-outline icon-tabler-scale text-info"
                                  fill="none"
                                  height="24" stroke="currentColor" stroke-linecap="round"
@@ -222,19 +224,19 @@ const emit = defineEmits(['close']);
                             </tr>
                             </thead>
                             <tbody>
-                            <tr class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                            <tr v-for="hbl in container?.hbls" class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                                 <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
-                                    -
+                                    {{hbl.hbl || '-'}}
                                 </td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{hbl.hbl_package_count || '-'}}</td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                    -
+                                    {{hbl.hbl_name || '-'}}
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{hbl.address || '-'}}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{hbl.contact_number || '-'}}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{hbl.consignee_name || '-'}}</td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{hbl.consignee_address || '-'}}</td>
                                 <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
                                     -
                                 </td>

@@ -34,7 +34,7 @@ class HBLPackage extends Model
 
     public function hbl(): BelongsTo
     {
-        return $this->belongsTo(HBL::class);
+        return $this->belongsTo(HBL::class, 'hbl_id');
     }
 
     public function containers(): BelongsToMany
