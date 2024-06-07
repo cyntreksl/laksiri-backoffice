@@ -131,6 +131,9 @@ Route::middleware([
         Route::get('/loaded-containers/{container}/manifest/export', [LoadedContainerController::class, 'exportManifest'])
             ->name('loaded-containers.manifest.export');
 
+        Route::put('containers/{container}/unload/hbl', [ContainerController::class, 'unloadHBLFromContainer'])
+            ->name('containers.unload.hbl');
+
         // Manual Loadings
         Route::get('manual-loadings', function () {
             return Inertia::render('Loading/ManualLoading');

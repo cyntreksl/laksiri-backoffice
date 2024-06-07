@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Actions\Container\CreateContainer;
+use App\Actions\Container\Unloading\UnloadHBL;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
 use App\Interfaces\ContainerRepositoryInterface;
@@ -57,5 +58,10 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function unloadHBLFromContainer(array $data, Container $container)
+    {
+        return UnloadHBL::run($data, $container);
     }
 }
