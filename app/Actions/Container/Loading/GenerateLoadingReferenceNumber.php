@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Actions\Loading\LoadedContainer;
+namespace App\Actions\Container\Loading;
 
-use App\Models\LoadedContainer;
+use App\Models\Container;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class GenerateLoadingReferenceNumber
@@ -30,7 +30,7 @@ class GenerateLoadingReferenceNumber
             }
         }
 
-        $last_loading = LoadedContainer::latest()->first();
+        $last_loading = Container::latest()->first();
 
         // Set the starting reference number
         $next_reference = $last_loading ? ((int) substr($last_loading->reference, strlen($branch_code) + 1) + 1) : 1000;

@@ -99,7 +99,10 @@ const handleCreateDraftLoadedContainer = (packages) => {
 }
 
 const handleRemoveDraftLoadedContainer = (packages) => {
-    router.delete(route("loading.loaded-containers.remove", packages[0].id),
+    router.post(route("loading.loaded-containers.remove"), {
+            container_id: route().params.container,
+            package_id: packages[0].id,
+        },
         {
             onSuccess: () => {
                 draftTextEnabled.value = true;
@@ -323,7 +326,7 @@ watch(containerArr, (newValue, oldValue) => {
                                     <i class="fa fa-boxes-alt text-base"></i>
                                 </div>
                                 <h3 class="text-base text-slate-700 dark:text-navy-100">
-                                    {{ container.cargo_type }} Container ({{container?.reference}})
+                                    {{ container.cargo_type }} Container ({{ container?.reference }})
                                 </h3>
                             </div>
                             <div>

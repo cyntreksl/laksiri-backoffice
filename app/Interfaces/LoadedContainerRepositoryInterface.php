@@ -8,7 +8,9 @@ interface LoadedContainerRepositoryInterface
 {
     public function store(array $data);
 
-    public function deleteDraft(string $hblPackageId);
+    public function deleteDraft(array $data);
 
     public function downloadManifestFile(Container $container);
+
+    public function getLoadedContainers();
 }

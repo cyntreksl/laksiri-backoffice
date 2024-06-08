@@ -2,16 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Actions\Loading\LoadedContainer\CreateDraftLoadedContainer;
-use App\Actions\Loading\LoadedContainer\CreateOrUpdateLoadedContainer;
-use App\Actions\Loading\LoadedContainer\DeleteDraftLoadedContainer;
+use App\Actions\Container\Loading\CreateDraftLoadedContainer;
+use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
+use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
+use App\Actions\Container\Loading\GetLoadedContainers;
 use App\Exports\LoadedContainerManifestExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
-use App\Models\LoadedContainer;
 use Maatwebsite\Excel\Facades\Excel;
 
 class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepositoryInterface
@@ -32,12 +32,10 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         }
     }
 
-    public function deleteDraft(string $hblPackageId)
+    public function deleteDraft(array $data)
     {
         try {
-            $loadedContainer = LoadedContainer::where('hbl_package_id', $hblPackageId)->first();
-
-            return DeleteDraftLoadedContainer::run($loadedContainer);
+            return DeleteDraftLoadedContainer::run($data);
         } catch (\Exception $e) {
             throw new \Exception('Failed to delete draft loaded container: '.$e->getMessage());
         }
@@ -82,5 +80,10 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
     public function downloadManifestFile(Container $container)
     {
         return Excel::download(new LoadedContainerManifestExport($container), 'manifest.xlsx');
+    }
+
+    public function getLoadedContainers()
+    {
+        return GetLoadedContainers::run();
     }
 }

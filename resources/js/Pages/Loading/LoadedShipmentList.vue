@@ -1,7 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {Link} from "@inertiajs/vue3";
 import {Grid, h} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
@@ -15,6 +14,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import RadioButton from "@/Components/RadioButton.vue";
+import LoadedShipmentDetailModal from "@/Pages/Loading/Partials/LoadedShipmentDetailModal.vue";
 
 const props = defineProps({
     cargoTypes: {
@@ -23,6 +23,11 @@ const props = defineProps({
         },
     },
     containerTypes: {
+        type: Object,
+        default: () => {
+        },
+    },
+    containers: {
         type: Object,
         default: () => {
         },
@@ -225,7 +230,35 @@ const createColumns = () => [
                             }),
                         ])
                     ]),
-                ])
+                ]),
+                h('button', {
+                    className: 'btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25',
+                    onClick: () => confirmViewLoadedShipment(row.cells[0].data),
+                    'x-tooltip..placement.bottom.primary': "'View'"
+                }, [
+                    h('svg', {
+                        xmlns: 'http://www.w3.org/2000/svg',
+                        viewBox: '0 0 24 24',
+                        class: 'size-6 icon icon-tabler icons-tabler-outline icon-tabler-eye',
+                        fill: 'none',
+                        stroke: "currentColor",
+                        strokeWidth: 2,
+                        strokeLinecap: "round",
+                        strokeLinejoin: "round",
+                    }, [
+                        h('path', {
+                            stroke: "none",
+                            d: 'M0 0h24v24H0z',
+                            fill: 'none',
+                        }),
+                        h('path', {
+                            d: 'M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0',
+                        }),
+                        h('path', {
+                            d: 'M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6',
+                        }),
+                    ])
+                ]),
             ]);
         },
     },
@@ -268,6 +301,19 @@ const applyFilters = () => {
         }
     });
     grid.forceRender();
+}
+
+const selectedContainer = ref({});
+const showConfirmLoadedShipmentModal = ref(false);
+
+const confirmViewLoadedShipment = (id) => {
+    selectedContainer.value = props.containers.find(container => container.id === id);
+    showConfirmLoadedShipmentModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmLoadedShipmentModal.value = false;
+    selectedContainer.value = {};
 }
 </script>
 <template>
@@ -575,5 +621,7 @@ const applyFilters = () => {
                 </SoftPrimaryButton>
             </template>
         </FilterDrawer>
+
+        <LoadedShipmentDetailModal :container="selectedContainer" :show="showConfirmLoadedShipmentModal" @close="closeModal"/>
     </AppLayout>
 </template>

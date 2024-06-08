@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\DeleteHBL;
-use App\Actions\HBL\GetHBLByCargoTypeWithLoadedPackages;
+use App\Actions\HBL\GetHBLByCargoTypeWithDraftLoadedPackages;
 use App\Actions\HBL\GetHBLByCargoTypeWithUnloadedPackages;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLsWithPackages;
@@ -97,6 +97,6 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function getLoadedHBLsByCargoType(Container $container, string $cargoType)
     {
-        return GetHBLByCargoTypeWithLoadedPackages::run($container, $cargoType);
+        return GetHBLByCargoTypeWithDraftLoadedPackages::run($container, $cargoType);
     }
 }

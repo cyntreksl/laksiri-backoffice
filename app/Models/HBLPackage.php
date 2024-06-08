@@ -6,6 +6,8 @@ use App\Models\Scopes\BranchScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ScopedBy(BranchScope::class)]
@@ -29,4 +31,16 @@ class HBLPackage extends Model
         'is_loaded',
         'remarks',
     ];
+
+    public function hbl(): BelongsTo
+    {
+        return $this->belongsTo(HBL::class, 'hbl_id');
+    }
+
+    public function containers(): BelongsToMany
+    {
+        return $this->belongsToMany(Container::class, 'container_hbl_package', 'hbl_package_id', 'container_id')
+            ->withPivot('status', 'loaded_by')
+            ->withTimestamps();
+    }
 }

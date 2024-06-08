@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -57,13 +58,15 @@ class Container extends Model
         return LogOptions::defaults()->logAll()->logOnlyDirty();
     }
 
-    public function scopeLoadedContainers(Builder $query): void
+    public function hbl_packages(): BelongsToMany
     {
-        $query->where('status', ContainerStatus::CONTAINER_LOADED->value);
+        return $this->belongsToMany(HBLPackage::class, 'container_hbl_package', 'container_id', 'hbl_package_id')
+            ->withPivot('status', 'loaded_by')
+            ->withTimestamps();
     }
 
-    public function loadedC()
+    public function scopeLoadedContainers(Builder $query): void
     {
-        return $this->hasMany(LoadedContainer::class, 'container_id', 'id');
+        $query->where('status', ContainerStatus::LOADED->value);
     }
 }
