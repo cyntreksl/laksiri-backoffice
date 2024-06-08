@@ -13,6 +13,7 @@ Route::domain('api.'.config('app.url'))
         Route::post('/pickup-to-hbl/{pickUp}', [PickupController::class, 'pickupToHbl']);
         Route::post('/pickups', [PickupController::class, 'store']);
         Route::apiResource('hbls', HBLController::class)->only(['store', 'show']);
+        Route::post('/pickups/exceptions/{pickup}', [PickupController::class, 'storePickupException']);
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);

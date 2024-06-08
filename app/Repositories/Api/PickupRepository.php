@@ -5,6 +5,7 @@ namespace App\Repositories\Api;
 use App\Actions\PickUps\ConvertPickupToHBL;
 use App\Actions\PickUps\CreatePickUp;
 use App\Actions\PickUps\GetPickupsByDriver;
+use App\Actions\PickUps\Exception\CreatePickUpException;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\Api\PickupRepositoryInterface;
 use App\Models\PickUp;
@@ -60,6 +61,16 @@ class PickupRepository implements PickupRepositoryInterface
             return $this->success('Pickup created successfully!', $pickup);
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), null, $e->getCode());
+        }
+    }
+
+    public function savePickupException(array $data, PickUp $pickup): JsonResponse
+    {
+        try {
+            $pickupException = CreatePickUpException::run($data, $pickup);
+            return $this->success('Pickup exception created successfully!', $pickupException);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), $e->getCode());
         }
     }
 }

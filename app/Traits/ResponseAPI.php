@@ -45,8 +45,13 @@ trait ResponseAPI
     /**
      * Send any error response
      */
-    public function error(string $message, object|array|null $data = null, int $statusCode = 500): JsonResponse
+    public function error(string $message, object|array|int|null $data = null, int $statusCode = 500): JsonResponse
     {
+        // If $data is an integer, convert it into an array with 'code' key
+        if (is_int($data)) {
+            $data = [];
+        }
+        
         return $this->coreResponse($message, $data, $statusCode, false);
     }
 }
