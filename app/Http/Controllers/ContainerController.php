@@ -72,4 +72,9 @@ class ContainerController extends Controller
             'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
         ]);
     }
+
+    public function unloadHBLFromContainer(Request $request, Container $container)
+    {
+        return $this->containerRepository->unloadHBLFromContainer($request->all(), $container);
+    }
 }
