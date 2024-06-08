@@ -9,6 +9,7 @@ use App\Actions\HBL\GetHBLByCargoTypeWithDraftLoadedPackages;
 use App\Actions\HBL\GetHBLByCargoTypeWithUnloadedPackages;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLsWithPackages;
+use App\Actions\HBL\GetHBLsWithUnloadedPackagesByReference;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
 use App\Actions\HBL\UpdateHBLPackages;
@@ -98,5 +99,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function getLoadedHBLsByCargoType(Container $container, string $cargoType)
     {
         return GetHBLByCargoTypeWithDraftLoadedPackages::run($container, $cargoType);
+    }
+
+    public function getHBLWithUnloadedPackagesByReference(string $reference, string $cargo_type)
+    {
+        return GetHBLsWithUnloadedPackagesByReference::run($reference, $cargo_type);
     }
 }

@@ -77,4 +77,9 @@ class ContainerController extends Controller
     {
         return $this->containerRepository->unloadHBLFromContainer($request->all(), $container);
     }
+
+    public function getHBLWithUnloadedPackages(Request $request)
+    {
+        return $this->HBLRepository->getHBLWithUnloadedPackagesByReference($request->reference, $request->cargo_type);
+    }
 }

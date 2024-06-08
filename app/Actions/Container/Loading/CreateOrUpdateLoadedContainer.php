@@ -27,10 +27,17 @@ class CreateOrUpdateLoadedContainer
             $container = Container::find($data['container_id']);
 
             foreach ($data['packages'] as $package) {
-                $container->hbl_packages()->updateExistingPivot($package['id'], [
+                $result = $container->hbl_packages()->updateExistingPivot($package['id'], [
                     'status' => 'loaded',
                     'loaded_by' => auth()->id(),
                 ]);
+
+                if (! $result) {
+                    $container->hbl_packages()->attach($package['id'], [
+                        'status' => 'loaded',
+                        'loaded_by' => auth()->id(),
+                    ]);
+                }
 
                 // Run the MarkAsLoaded action for the package ID
                 MarkAsLoaded::run($package['id']);
