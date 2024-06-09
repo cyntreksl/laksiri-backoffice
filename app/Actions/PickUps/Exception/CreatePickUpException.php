@@ -1,12 +1,16 @@
 <?php
+
 namespace App\Actions\PickUps\Exception;
+
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\PickUp;
 use App\Models\PickupException;
 use Lorisleiva\Actions\Concerns\AsAction;
+
 class CreatePickUpException
 {
     use AsAction;
+
     public function handle(array $data, PickUp $pickup): PickupException
     {
         return $pickup->pickupException()->create([

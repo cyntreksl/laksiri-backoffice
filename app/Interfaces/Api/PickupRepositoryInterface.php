@@ -44,7 +44,7 @@ interface PickupRepositoryInterface
      */
     public function storePickup(array $data): JsonResponse;
 
-     /**
+    /**
      * Save pickup exception details.
      *
      * This method accepts an array of data related to the pickup exception and a

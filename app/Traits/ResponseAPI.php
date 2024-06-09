@@ -51,7 +51,7 @@ trait ResponseAPI
         if (is_int($data)) {
             $data = [];
         }
-        
+
         return $this->coreResponse($message, $data, $statusCode, false);
     }
 }

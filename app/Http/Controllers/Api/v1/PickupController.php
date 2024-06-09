@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\v1\StorePickupExceptionRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\StorePickupToHBLRequest;
-use App\Http\Requests\Api\v1\StorePickupExceptionRequest;
 use App\Interfaces\Api\PickupRepositoryInterface;
 use App\Models\PickUp;
 
