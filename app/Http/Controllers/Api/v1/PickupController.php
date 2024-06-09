@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\v1\StorePickupExceptionRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\StorePickupToHBLRequest;
 use App\Interfaces\Api\PickupRepositoryInterface;
@@ -61,5 +62,17 @@ class PickupController extends Controller
     public function pickupToHbl(PickUp $pickUp, StorePickupToHBLRequest $request)
     {
         return $this->pickupRepository->pickupToHbl($pickUp, $request);
+    }
+
+    /**
+     * Store Pickup Exception
+     *
+     * Store a newly created Pickup Exception in storage.
+     *
+     * @group Pickups
+     */
+    public function storePickupException(StorePickupExceptionRequest $request, PickUp $pickup)
+    {
+        return $this->pickupRepository->savePickupException($request->all(), $pickup);
     }
 }

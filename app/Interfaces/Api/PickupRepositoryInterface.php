@@ -43,4 +43,17 @@ interface PickupRepositoryInterface
      * @method POST api.laksiri.world/v1/pickups
      */
     public function storePickup(array $data): JsonResponse;
+
+    /**
+     * Save pickup exception details.
+     *
+     * This method accepts an array of data related to the pickup exception and a
+     * PickUp object, processes the information, and stores the necessary details.
+     *
+     * @param  array  $data  The data related to the pickup exception to be stored.
+     * @param  PickUp  $pickup  The pickup object associated with the exception.
+     *
+     * @method POST api.laksiri.world/v1/pickups/exceptions/{pickup_id}
+     */
+    public function savePickupException(array $data, PickUp $pickup): JsonResponse;
 }
