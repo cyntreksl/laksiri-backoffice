@@ -177,7 +177,7 @@ const handlePriceRuleCreate = () => {
 
                             <div>
                                 <InputLabel value="Bill VAT (%)"/>
-                                <TextInput v-model="form.bill_vat" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <TextInput v-model="form.bill_vat" class="w-full" min="0" placeholder="0.00" step="any" type="number"/>
                                 <InputError :message="form.errors.bill_vat"/>
                             </div>
 

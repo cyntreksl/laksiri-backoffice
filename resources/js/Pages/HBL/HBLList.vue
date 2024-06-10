@@ -52,7 +52,7 @@ const filters = reactive({
     isHold: false,
     warehouse: ["COLOMBO", "NINTAVUR"],
     createdBy: '',
-    paymentStatus: Object.values(props.paymentStatus),
+    paymentStatus: [],
 })
 
 const data = reactive({

@@ -48,7 +48,7 @@ const filters = reactive({
     drivers: {},
     officers: {},
     cargoMode: ["Air Cargo", "Sea Cargo"],
-    paymentStatus: Object.values(props.paymentStatus),
+    paymentStatus: [],
 })
 
 const data = reactive({

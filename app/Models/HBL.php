@@ -32,12 +32,12 @@ class HBL extends Model
     ];
 
     protected $fillable = [
-        'reference', 'branch_id', 'pickup_id', 'cargo_type', 'hbl_type', 'hbl', 'hbl_name', 'email', 'contact_number', 'nic', 'iq_number', 'address', 'consignee_name', 'consignee_nic', 'consignee_contact', 'consignee_address', 'consignee_note', 'warehouse', 'freight_charge', 'bill_charge', 'other_charge', 'discount', 'paid_amount', 'grand_total', 'created_by', 'deleted_at',
+        'reference', 'cargo_type', 'hbl_type', 'hbl', 'hbl_name', 'email', 'contact_number', 'nic', 'iq_number', 'address', 'consignee_name', 'consignee_nic', 'consignee_contact', 'consignee_address', 'consignee_note', 'warehouse', 'freight_charge', 'bill_charge', 'other_charge', 'discount', 'paid_amount', 'grand_total', 'status', 'created_by', 'branch_id', 'system_status', 'pickup_id', 'is_hold',
     ];
 
     public function scopeCashSettlement(Builder $query)
     {
-        $query->where('system_status', 3.1);
+        $query->whereIn('system_status', [3, 3.1]);
     }
 
     public function status(): HasMany
@@ -70,6 +70,6 @@ class HBL extends Model
 
     public function scopeWarehouse(Builder $query)
     {
-        $query->where('system_status', 4);
+        $query->whereIn('system_status', [4, 4.1]);
     }
 }

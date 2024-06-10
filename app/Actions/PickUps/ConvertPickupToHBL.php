@@ -36,6 +36,7 @@ class ConvertPickupToHBL
             'paid_amount' => $request->paid_amount,
             'grand_total' => $request->grand_total,
             'pickup_id' => $pickUp->id,
+            'system_status' => 3.1,
         ];
 
         try {
@@ -44,6 +45,7 @@ class ConvertPickupToHBL
             $pickUp->update([
                 'status' => PickupStatus::COLLECTED->value,
                 'hbl_id' => $hbl->id,
+                'system_status' => 3,
             ]);
             DB::commit();
 

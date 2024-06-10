@@ -19,28 +19,13 @@ class PickUp extends Model
     use LogsActivity;
 
     protected $fillable = [
-        'reference',
-        'branch_id',
-        'cargo_type',
-        'name',
-        'email',
-        'contact_number',
-        'address',
-        'location_name',
-        'location_longitude',
-        'location_latitude',
-        'zone_id',
-        'notes',
-        'driver_id',
-        'driver_assigned_at',
-        'hbl_id',
-        'created_by',
-        'pickup_date',
-        'pickup_time_start',
-        'pickup_time_end',
-        'is_urgent_pickup',
-        'is_from_important_customer',
-        'status',
+        'reference', 'cargo_type', 'name', 'email', 'contact_number', 'address', 'location_name', 'location_longitude', 'location_latitude', 'zone_id', 'notes', 'driver_id', 'driver_assigned_at', 'hbl_id', 'created_by', 'deleted_at', 'branch_id', 'pickup_date', 'pickup_time_start', 'pickup_time_end', 'is_urgent_pickup', 'is_from_important_customer', 'pickup_order', 'system_status', 'status',
+    ];
+
+    protected array $SYSTEM_STATUS = [
+        1 => 'Pickup Created',
+        2 => 'Driver Assigned',
+        3 => 'Picked By Driver',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -50,7 +35,8 @@ class PickUp extends Model
 
     public function scopeAssignedToDriver(Builder $query): void
     {
-        $query->where('driver_id', auth()->id());
+        $query->where('system_status', 2)
+            ->where('driver_id', auth()->id());
     }
 
     /**
