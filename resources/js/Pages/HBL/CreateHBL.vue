@@ -705,31 +705,31 @@ const openEditModal = (index) => {
                         <div class="grid grid-cols-2 gap-5 mt-5">
                             <div>
                                 <span>Freight Charge</span>
-                                <TextInput v-model="form.freight_charge" :disabled="!isEditable" class="w-full" min="0" type="number" />
+                                <TextInput v-model="form.freight_charge" :disabled="!isEditable" class="w-full" min="0" step="any" type="number"/>
                                 <InputError :message="form.errors.freight_charge"/>
                             </div>
 
                             <div>
                                 <span>Bill Charge</span>
-                                <TextInput v-model="form.bill_charge" :disabled="!isEditable" class="w-full" min="0" type="number" />
+                                <TextInput v-model="form.bill_charge" :disabled="!isEditable" class="w-full" min="0" step="any" type="number"/>
                                 <InputError :message="form.errors.bill_charge"/>
                             </div>
 
                             <div>
                                 <span>Destination Charge</span>
-                                <TextInput v-model="form.other_charge" :disabled="!isEditable" class="w-full" min="0" type="number" />
+                                <TextInput v-model="form.other_charge" :disabled="!isEditable" class="w-full" min="0" step="any" type="number"/>
                                 <InputError :message="form.errors.other_charge"/>
                             </div>
 
                             <div>
                                 <span>Discount</span>
-                                <TextInput v-model="form.discount" :disabled="!isEditable" class="w-full" placeholder="0" type="number" />
+                                <TextInput v-model="form.discount" :disabled="!isEditable" class="w-full" placeholder="0" step="any" type="number" />
                                 <InputError :message="form.errors.discount"/>
                             </div>
 
                             <div class="col-span-2">
                                 <span>Paid Amount</span>
-                                <TextInput v-model="form.paid_amount" :disabled="!isEditable" class="w-full" min="0" type="number" />
+                                <TextInput v-model="form.paid_amount" :disabled="!isEditable" class="w-full" min="0" step="any" type="number" />
                                 <InputError :message="form.errors.paid_amount"/>
                             </div>
 
