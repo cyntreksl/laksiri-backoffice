@@ -8,6 +8,8 @@ interface BranchRepositoryInterface
 {
     public function getBranches();
 
+    public function getDestinationBranches();
+
     public function createBranch(array $data);
 
     public function updateBranch(array $data, Branch $branch);

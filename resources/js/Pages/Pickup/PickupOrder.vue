@@ -146,7 +146,7 @@ const handleSave = () => {
                                         Select Driver
                                     </option>
                                     <option v-for="driver in drivers" :key="driver.id" :value="driver.id">
-                                        {{ driver.name }} {{ driver.id }}
+                                        {{ driver.name }}
                                     </option>
                                 </select>
                             </div>

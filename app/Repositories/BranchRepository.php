@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Actions\Branch\CreateBranch;
 use App\Actions\Branch\GetBranches;
+use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\Branch\UpdateBranch;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Models\Branch;
@@ -13,6 +14,11 @@ class BranchRepository implements BranchRepositoryInterface
     public function getBranches()
     {
         return GetBranches::run();
+    }
+
+    public function getDestinationBranches()
+    {
+        return GetDestinationBranches::run();
     }
 
     public function createBranch(array $data)

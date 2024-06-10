@@ -85,9 +85,9 @@ Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail
 });
 
 // Settings > Zones
-Breadcrumbs::for('settings.zones.index', function (BreadcrumbTrail $trail) {
-    $trail->parent('dashboard'); // replace with 'settings.index'
-    $trail->push('Zones', route('settings.zones.index'));
+Breadcrumbs::for('setting.driver-zones.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Zones', route('setting.driver-zones.index'));
 });
 
 // Loading > Container Index
@@ -133,7 +133,8 @@ Breadcrumbs::for('setting.prices.index', function (BreadcrumbTrail $trail) {
 
 // Branches > Create
 Breadcrumbs::for('setting.prices.create', function (BreadcrumbTrail $trail) {
-    $trail->parent('branches.index');
+    $trail->parent('dashboard');
+    $trail->push('Price Rule List', route('setting.prices.index'));
     $trail->push('Create', route('setting.prices.create'));
 });
 

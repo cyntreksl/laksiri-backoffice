@@ -52,7 +52,7 @@ const createDriver = () => {
 </script>
 
 <template>
-    <div class="flex justify-end mx-5 mt-4">
+    <div class="flex justify-end  mt-4">
         <PrimaryButton
             @click="confirmingDriverCreation = !confirmingDriverCreation"
         >

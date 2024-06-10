@@ -14,7 +14,7 @@ class CommaSeparatedRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! preg_match('/^[\w\s]+(,\s*[\w\s]+)*$/', $value)) {
+        if (! preg_match('/^[\w\s\-]+(,\s*[\w\s\-]+)*$/', $value)) {
             $fail("The $attribute must be a comma-separated string.");
         }
     }
