@@ -44,6 +44,7 @@ class ConvertPickupToHBL
             $pickUp->update([
                 'status' => PickupStatus::COLLECTED->value,
                 'hbl_id' => $hbl->id,
+                'system_status' => 3,
             ]);
             DB::commit();
 

@@ -15,6 +15,7 @@ class AssignDriver
         $pickup->update([
             'driver_id' => $driver_id,
             'driver_assigned_at' => Carbon::now(),
+            'system_status' => 2,
         ]);
     }
 }

@@ -46,7 +46,7 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = PickUp::query();
+        $query = PickUp::query()->whereIn('system_status', [1, 2]);
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {
