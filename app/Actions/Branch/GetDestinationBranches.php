@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Actions\Driver;
+namespace App\Actions\Branch;
 
-use App\Models\User;
+use App\Enum\BranchType;
+use App\Models\Branch;
 use Illuminate\Database\Eloquent\Collection;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class GetDrivers
+class GetDestinationBranches
 {
     use AsAction;
 
     public function handle(): Collection|array
     {
-        return User::role('driver')
-            ->currentBranch()
-            ->latest()
-            ->get();
+        return Branch::whereType(BranchType::DESTINATION)->get();
     }
 }
