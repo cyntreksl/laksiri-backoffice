@@ -40,6 +40,7 @@ class CreateHBL
             'grand_total' => $data['grand_total'],
             'created_by' => auth()->id(),
             'pickup_id' => $data['pickup_id'] ?? null,
+            'system_status' => $data['system_status'] ?? 3,
         ]);
     }
 }

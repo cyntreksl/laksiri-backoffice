@@ -16,14 +16,10 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
 {
     use ResponseAPI;
 
-    public function getPendingSettlementList(): HBL
-    {
-        // TODO: Implement getPendingSettlementList() method.
-    }
-
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
         $query = HBL::query();
+
         $query->cashSettlement();
 
         if (! empty($search)) {

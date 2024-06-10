@@ -36,6 +36,7 @@ class ConvertPickupToHBL
             'paid_amount' => $request->paid_amount,
             'grand_total' => $request->grand_total,
             'pickup_id' => $pickUp->id,
+            'system_status' => 3.1,
         ];
 
         try {
