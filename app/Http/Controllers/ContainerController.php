@@ -58,7 +58,7 @@ class ContainerController extends Controller
     public function store(StoreContainerRequest $request)
     {
         try {
-            $container = $this->containerRepository->store($request->validated());
+            $this->containerRepository->store($request->all());
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
