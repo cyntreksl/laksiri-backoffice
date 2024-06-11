@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Actions\Container\CreateContainer;
 use App\Actions\Container\Unloading\UnloadHBL;
+use App\Enum\ContainerStatus;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
 use App\Interfaces\ContainerRepositoryInterface;
@@ -26,7 +27,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = Container::query();
+        $query = Container::query()->where('status', '<>', ContainerStatus::LOADED->value);
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {

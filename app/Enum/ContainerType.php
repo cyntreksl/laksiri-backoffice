@@ -13,6 +13,7 @@ enum ContainerType: string
     // Air Cargo Containers
     case AirCargoULD1 = 'Air Cargo ULD 1';
     case AirCargoULD2 = 'Air Cargo ULD 2';
+    case Custom = 'Custom';
 
     public function dimensions(): array
     {
@@ -83,8 +84,9 @@ enum ContainerType: string
     public static function getAirCargoOptions(): array
     {
         return array_filter(self::cases(), fn ($case) => in_array($case, [
-            self::AirCargoULD1,
-            self::AirCargoULD2,
+            //            self::AirCargoULD1,
+            //            self::AirCargoULD2,
+            self::Custom,
         ]));
     }
 }
