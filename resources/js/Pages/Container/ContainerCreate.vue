@@ -42,16 +42,17 @@
                         <div class="my-5">
                             <div class="space-x-5 flex flex-row">
                                 <label
-                                    v-for="cargoType in containerTypes"
+                                    v-for="containerType in containerTypes"
                                     class="inline-flex items-center space-x-2 my-2">
                                     <input
                                         v-model="form.container_type"
                                         class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                                         name="container_type"
-                                        :value="cargoType"
+                                        :checked="containerType === 'Custom'"
+                                        :value="containerType"
                                         type="radio"
                                     />
-                                    <p>{{ cargoType }}</p>
+                                    <p>{{ containerType }}</p>
                                 </label>
                             </div>
                             <InputError :message="form.errors.container_type"/>
@@ -314,10 +315,6 @@
                         </PrimaryButton>
                     </div>
                 </div>
-
-
-
-
             </div>
         </form>
     </AppLayout>
@@ -385,8 +382,6 @@ export default {
                 containerTypes.value = props.airContainerOptions;
             }
         });
-
-
 
         const handleCreate = () => {
             form.post(route("loading.loading-containers.store"), {
