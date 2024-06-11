@@ -87,7 +87,7 @@ Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail
 // Settings > Zones
 Breadcrumbs::for('setting.driver-zones.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Zones', route('setting.driver-zones.index'));
+    $trail->push('Driver Zones', route('setting.driver-zones.index'));
 });
 
 // Loading > Container Index
