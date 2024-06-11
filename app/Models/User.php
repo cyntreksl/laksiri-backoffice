@@ -71,6 +71,7 @@ class User extends Authenticatable
         'profile_photo_url',
         'primary_branch_name',
         'active_branch_name',
+        'active_branch_id',
     ];
 
     public function scopeCurrentBranch(Builder $builder)
@@ -91,6 +92,13 @@ class User extends Authenticatable
         $data = GetUserCurrentBranch::run();
 
         return $data['branchName'];
+    }
+
+    public function getActiveBranchIdAttribute()
+    {
+        $data = GetUserCurrentBranch::run();
+
+        return $data['branchId'];
     }
 
     /**

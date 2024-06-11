@@ -42,8 +42,6 @@ const form = useForm({
     package_types: JSON.parse(props.branch.package_types) || [],
 });
 
-console.log(props.branch)
-
 const handleBranchUpdate = () => {
     form.put(route("branches.update", props.branch.id), {
         onSuccess: () => {
