@@ -88,6 +88,7 @@ class HBLController extends Controller
             'cargoTypes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
             'warehouses' => WarehouseType::cases(),
+            'priceRules' => $this->priceRepository->getPriceRules(),
         ]);
     }
 
