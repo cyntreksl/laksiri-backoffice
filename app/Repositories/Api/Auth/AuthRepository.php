@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Api\Auth;
 
+use App\Actions\BranchPrice\GetPriceRulesByBranchId;
 use App\Interfaces\Api\Auth\AuthRepositoryInterface;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
@@ -52,6 +53,8 @@ class AuthRepository implements AuthRepositoryInterface
                         'name' => Auth::user()->name,
                         'profile_photo_url' => Auth::user()->profile_photo_url,
                         'role' => Auth::user()->roles[0]->name,
+                        'branch_configuration' => Auth::user()->primaryBranch,
+                        'price_rules' => GetPriceRulesByBranchId::run(Auth::user()->primaryBranch->id),
                     ],
                 ]);
             } else {
