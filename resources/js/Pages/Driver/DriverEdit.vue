@@ -29,11 +29,11 @@ defineProps({
     <!-- <Breadcrumb /> -->
 
     <div class="grid grid-cols-1 mt-4 gap-4">
-      <UpdateDriverBasicDetailsForm
+      <!-- <UpdateDriverBasicDetailsForm
         :user="user"
         :roles="roles"
         :branches="branches"
-      />
+      /> -->
     </div>
   </AppLayout>
 </template>

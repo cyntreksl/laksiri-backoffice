@@ -42,14 +42,14 @@ class DriverController extends Controller
         $this->driverRepository->storeDriver($request->all());
     }
 
-    public function edit(User $user)
+    public function edit($id)
     {
+        $user = User::find($id);
 
-dd($user);
+        return Inertia::render('User/UserEdit', [
+            'user' => $user->load('roles', 'branches'),
+        ]);
 
-        // return Inertia::render('Driver/DriverEdit', [
-        //     'user' => $user,
-        // ]);
     }
 
     public function update(Request $request, User $user)

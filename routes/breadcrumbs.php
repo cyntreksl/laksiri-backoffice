@@ -77,7 +77,6 @@ Breadcrumbs::for('users.drivers.index', function (BreadcrumbTrail $trail) {
     $trail->push('Driver Management', route('users.drivers.index'));
 });
 
-
 //Cash settlement
 Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
