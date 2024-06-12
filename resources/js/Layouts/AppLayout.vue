@@ -644,7 +644,7 @@ import {computed, customRef, reactive, ref} from "vue";
 import {useMonochromeSelector} from "../composable/monochromeMode.js";
 import {useDarkModeSelector} from "../composable/darkMode.js";
 import {Head, router, usePage} from "@inertiajs/vue3";
-import logo from "../../images/app-logo.svg";
+import logo from "../../images/logo_main.png";
 import {Link} from '@inertiajs/vue3'
 import Popper from "vue3-popper";
 import {Notification, Notivue} from "notivue";
