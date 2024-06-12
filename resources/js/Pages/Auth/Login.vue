@@ -124,11 +124,7 @@ const submit = () => {
     >
       <div class="flex w-full max-w-sm grow flex-col justify-center p-5">
         <div class="text-center">
-          <img
-            class="mx-auto size-16 lg:hidden"
-            src="{{asset('images/app-logo.svg')}}"
-            alt="logo"
-          />
+          <img class="mx-auto size-16 lg:hidden" :src="logo" alt="logo" />
           <div class="mt-4">
             <h2
               class="text-2xl font-semibold text-slate-600 dark:text-navy-100"
