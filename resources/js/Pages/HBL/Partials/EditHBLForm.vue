@@ -1,14 +1,14 @@
 <script setup>
-import {router, useForm} from "@inertiajs/vue3"
-import {reactive, ref, watch} from "vue";
-import notification from "@/magics/notification.js";
+import {router, useForm, usePage} from "@inertiajs/vue3"
+import {computed, onBeforeMount, reactive, ref, watch} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
-
+import {push} from "notivue";
+import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
     hbl: {
@@ -30,6 +30,11 @@ const props = defineProps({
         type: Object,
         default: () => {
         }
+    },
+    priceRules: {
+        type: Object,
+        default: () => {
+        }
     }
 })
 
@@ -48,22 +53,19 @@ const form = useForm({
     cargo_type: props.hbl.cargo_type,
     hbl_type: props.hbl.hbl_type,
     warehouse: props.hbl.warehouse,
-    freight_charge: props.hbl.freight_charge,
-    bill_charge: props.hbl.bill_charge,
-    other_charge: props.hbl.other_charge,
-    discount: props.hbl.discount,
-    paid_amount: props.hbl.paid_amount,
-    grand_total: props.hbl.grand_total,
+    freight_charge: props.hbl.freight_charge.toFixed(2),
+    bill_charge: props.hbl.bill_charge.toFixed(2),
+    other_charge: props.hbl.other_charge.toFixed(2),
+    discount: props.hbl.discount.toFixed(2),
+    paid_amount: props.hbl.paid_amount.toFixed(2),
+    grand_total: props.hbl.grand_total.toFixed(2),
     packages: props.hbl.packages,
 });
 
 const handleHBLUpdate = () => {
     form.put(route("hbls.update", props.hbl.id), {
         onSuccess: () => {
-            notification({
-                text: 'HBL Updated Successfully!',
-                variant: 'success',
-            });
+            push.success('HBL Updated Successfully!');
             router.visit(route('hbls.index'));
         },
         onError: () => console.log("error"),
@@ -108,17 +110,16 @@ const grandTotalVolume = ref(0);
 
 const addPackageData = () => {
     if (!packageItem.package_type || packageItem.length <= 0 || packageItem.width <= 0 || packageItem.height <= 0 || packageItem.quantity <= 0 || packageItem.volume <= 0 || packageItem.weight <= 0) {
-        notification({
-            text: 'Please fill all required data',
-            variant: 'error',
-        });
+        push.error('Please fill all required data');
         return;
     }
 
     if (editMode.value) {
-        grandTotalVolume.value -= packageItem.volume;
-        grandTotalWeight.value -= packageItem.weight;
-        packageList.value.splice(editIndex.value, 1, {...packageItem})
+        packageList.value.splice(editIndex.value, 1, {...packageItem});
+        grandTotalWeight.value = packageList.value.reduce((accumulator, currentValue) => accumulator + currentValue.totalWeight, 0);
+        grandTotalVolume.value = packageList.value.reduce((accumulator, currentValue) => accumulator + currentValue.volume, 0);
+
+        calculatePayment();
     } else {
         const newItem = {...packageItem}; // Create a copy of packageItem
         packageList.value.push(newItem); // Add the new item to packageList
@@ -127,12 +128,12 @@ const addPackageData = () => {
         grandTotalWeight.value += newItem.weight;
         grandTotalVolume.value += newItem.volume;
 
+        calculatePayment();
+
         resetModal();
     }
     closeAddPackageModal();
 };
-
-
 
 // Watch for changes in length, width, height, or quantity to update volume and totalWeight
 watch(
@@ -161,20 +162,30 @@ watch(
     }
 );
 
+const vat = ref(0);
 
 watch(
     [
         () => form.other_charge,
         () => form.discount,
         () => form.freight_charge,
+        () => vat,
     ],
     ([newOtherCharge, newDiscount, newFreightCharge]) => {
         // Convert dimensions from cm to meters
-        hblTotal.value = (parseFloat(form.bill_charge) + parseFloat(form.freight_charge) + parseFloat(form.other_charge)) - form.discount;
+        hblTotal.value = (parseFloat(form.bill_charge) + parseFloat(form.freight_charge) + parseFloat(form.other_charge)) + parseFloat(vat.value) - form.discount;
         form.grand_total = hblTotal.value;
     }
 );
 
+watch(
+    [
+        () => form.cargo_type,
+    ],
+    ([newCargoType]) => {
+        calculatePayment();
+    }
+);
 
 const packageTypes = [
     'WOODEN BOX', 'CARTON', 'FRIDGE', 'TV CARTON', 'COOKER', 'W/MACHINE',
@@ -189,22 +200,97 @@ const updateTypeDescription = () => {
 };
 
 const hblTotal = ref(0);
-const currency = ref("SAR");
+const currency = ref(usePage().props.auth?.user?.primary_branch?.currency_symbol || "SAR");
+const isEditable = ref(false);
+
+// onBeforeMount(() => {
+//     calculatePayment();
+// })
 
 const calculatePayment = () => {
     const cargoType = form.cargo_type;
-    const freightCharge = ref(0);
+    const freightCharge = ref(props.hbl.freight_charge);
     const billCharge = ref(0);
+    const otherCharge = ref(0);
     if (cargoType === 'Sea Cargo') {
-        freightCharge.value = grandTotalVolume.value * 300;
-        billCharge.value = 50;
+        const priceRule = computed(() => {
+            return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Sea Cargo');
+        })
+
+        if (priceRule.value.price_mode === 'volume') {
+            const trueAction = priceRule.value.true_action.trim();
+            const operator = trueAction[0];
+            const value = parseFloat(trueAction.slice(1).trim());
+
+            switch (operator) {
+                case '*':
+                    freightCharge.value = grandTotalVolume.value * value;
+                    break;
+                case '+':
+                    freightCharge.value = grandTotalVolume.value + value;
+                    break;
+                case '-':
+                    freightCharge.value = grandTotalVolume.value - value;
+                    break;
+                case '/':
+                    if (value !== 0) {
+                        freightCharge.value = grandTotalVolume.value / value;
+                    } else {
+                        console.error('Division by zero error');
+                    }
+                    break;
+                default:
+                    console.error('Unsupported operation');
+                    break;
+            }
+        }
+
+        billCharge.value = priceRule.value.bill_price.toFixed(2) || 0;
+        otherCharge.value = parseFloat(priceRule.value.destination_charges).toFixed(2) || 0;
+        isEditable.value = Boolean(priceRule.value.is_editable);
+        vat.value = priceRule.value.bill_vat !== 0 ? parseFloat(priceRule.value.bill_vat) / 100 : 0;
     } else if (cargoType === 'Air Cargo') {
-        freightCharge.value = grandTotalWeight.value * 8;
-        billCharge.value = 40;
+        const priceRule = computed(() => {
+            return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Air Cargo');
+        })
+
+        if (priceRule.value.price_mode === 'weight') {
+            const trueAction = priceRule.value.true_action.trim();
+            const operator = trueAction[0];
+            const value = parseFloat(trueAction.slice(1).trim());
+
+            switch (operator) {
+                case '*':
+                    freightCharge.value = grandTotalVolume.value * value;
+                    break;
+                case '+':
+                    freightCharge.value = grandTotalVolume.value + value;
+                    break;
+                case '-':
+                    freightCharge.value = grandTotalVolume.value - value;
+                    break;
+                case '/':
+                    if (value !== 0) {
+                        freightCharge.value = grandTotalVolume.value / value;
+                    } else {
+                        console.error('Division by zero error');
+                    }
+                    break;
+                default:
+                    console.error('Unsupported operation');
+                    break;
+            }
+        }
+
+        billCharge.value = priceRule.value.bill_price.toFixed(2) || 0;
+        otherCharge.value = parseFloat(priceRule.value.destination_charges).toFixed(2) || 0;
+        isEditable.value = Boolean(priceRule.value.is_editable);
+        vat.value = priceRule.value.bill_vat !== 0 ? parseFloat(priceRule.value.bill_vat) / 100 : 0;
     }
 
     form.freight_charge = freightCharge.value.toFixed(2);
     form.bill_charge = billCharge.value;
+    form.other_charge = otherCharge.value;
 }
 const showConfirmRemovePackageModal = ref(false);
 const packageIndex = ref(null);
@@ -222,8 +308,9 @@ const closeModal = () => {
 const handleRemovePackage = () => {
     if (packageIndex.value !== null) {
         grandTotalVolume.value -= packageList.value[packageIndex.value].volume;
-        grandTotalWeight.value -= packageList.value[packageIndex.value].weight;
+        grandTotalWeight.value -= packageList.value[packageIndex.value].totalWeight;
         packageList.value.splice(packageIndex.value, 1);
+        calculatePayment();
         closeModal();
     }
 }
@@ -240,15 +327,12 @@ const editMode = ref(false);
 const editIndex = ref(null);
 
 const openEditModal = (index) => {
-    console.log('index', index)
     editMode.value = true;
     editIndex.value = index;
     showAddNewPackageDialog.value = true;
     // populate packageItem with existing data for editing
     Object.assign(packageItem, packageList.value[index])
 }
-
-
 </script>
 
 <template>
@@ -668,73 +752,37 @@ const openEditModal = (index) => {
                         <button type="button"
                                 @click="calculatePayment"
                                 class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90">
-                            Calculate Payment
+                            Re Calculate Payment
                         </button>
                     </div>
                     <div class="grid grid-cols-2 gap-5 mt-5">
                         <div>
                             <span>Freight Charge</span>
-                            <label class="block">
-                                <input
-                                    v-model="form.freight_charge"
-                                    class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    type="number"
-                                    min="0"
-                                />
-                            </label>
+                            <TextInput v-model="form.freight_charge" :disabled="!isEditable" class="w-full" min="0" step="any" type="number"/>
                             <InputError :message="form.errors.freight_charge"/>
                         </div>
 
                         <div>
                             <span>Bill Charge</span>
-                            <label class="block">
-                                <input
-                                    v-model="form.bill_charge"
-                                    class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    type="number"
-                                    min="0"
-                                />
-                            </label>
+                            <TextInput v-model="form.bill_charge" :disabled="!isEditable" class="w-full" min="0" step="any" type="number"/>
                             <InputError :message="form.errors.bill_charge"/>
                         </div>
 
                         <div>
-                            <span>Other Charge</span>
-                            <label class="block">
-                                <input
-                                    v-model="form.other_charge"
-                                    class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    type="number"
-                                    min="0"
-                                />
-                            </label>
+                            <span>Destination Charge</span>
+                            <TextInput v-model="form.other_charge" :disabled="!isEditable" class="w-full" min="0" step="any" type="number"/>
                             <InputError :message="form.errors.other_charge"/>
                         </div>
 
                         <div>
                             <span>Discount</span>
-                            <label class="block">
-                                <input
-                                    v-model="form.discount"
-                                    class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    placeholder="0"
-                                    type="number"
-                                />
-                            </label>
+                            <TextInput v-model="form.discount" :disabled="!isEditable" class="w-full" placeholder="0" step="any" type="number" />
                             <InputError :message="form.errors.discount"/>
                         </div>
 
                         <div class="col-span-2">
                             <span>Paid Amount</span>
-                            <label class="block">
-                                <input
-                                    v-model="form.paid_amount"
-                                    class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    type="number"
-                                    min="0"
-                                />
-                            </label>
-
+                            <TextInput v-model="form.paid_amount" :disabled="!isEditable" class="w-full" min="0" step="any" type="number" />
                             <InputError :message="form.errors.paid_amount"/>
                         </div>
 
@@ -838,7 +886,7 @@ const openEditModal = (index) => {
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.width }}</td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.height }}</td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.quantity }}</td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.weight }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.totalWeight }}</td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume }}</td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.remarks }}</td>
                         </tr>

@@ -3,7 +3,6 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {computed, reactive, ref, watch} from "vue";
-import notification from "@/magics/notification.js";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
@@ -11,6 +10,7 @@ import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import TextInput from "@/Components/TextInput.vue";
+import {push} from "notivue";
 
 const props = defineProps({
     hblTypes: {
@@ -97,10 +97,7 @@ const grandTotalVolume = ref(0);
 
 const addPackageData = () => {
     if (!packageItem.type || packageItem.length <= 0 || packageItem.width <= 0 || packageItem.height <= 0 || packageItem.quantity <= 0 || packageItem.volume <= 0 || packageItem.totalWeight <= 0) {
-        notification({
-            text: 'Please fill all required data',
-            variant: 'error',
-        });
+        push.error('Please fill all required data');
         return;
     }
 
@@ -184,7 +181,6 @@ watch(
         calculatePayment();
     }
 );
-
 
 const packageTypes = [
     'WOODEN BOX', 'CARTON', 'FRIDGE', 'TV CARTON', 'COOKER', 'W/MACHINE',

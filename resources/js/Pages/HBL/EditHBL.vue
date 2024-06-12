@@ -23,8 +23,12 @@ defineProps({
         type: Object,
         default: () => {
         }
+    },
+    priceRules: {
+        type: Object,
+        default: () => {
+        }
     }
-
 })
 </script>
 
@@ -35,7 +39,7 @@ defineProps({
         <Breadcrumb :hbl="hbl"/>
 
         <div class="grid grid-cols-1 mt-4 gap-4">
-            <EditHBLForm :hbl="hbl" :hbl-types="hblTypes" :cargo-types="cargoTypes" :warehouses="warehouses" />
+            <EditHBLForm :cargo-types="cargoTypes" :hbl="hbl" :hbl-types="hblTypes" :price-rules="priceRules" :warehouses="warehouses" />
         </div>
     </AppLayout>
 </template>
