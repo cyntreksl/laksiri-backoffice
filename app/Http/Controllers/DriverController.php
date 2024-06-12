@@ -46,8 +46,8 @@ class DriverController extends Controller
     {
         $user = User::find($id);
 
-        return Inertia::render('User/UserEdit', [
-            'user' => $user->load('roles', 'branches'),
+        return Inertia::render('Driver/DriverEdit', [
+            'user' => $user,
         ]);
 
     }

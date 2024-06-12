@@ -10,14 +10,6 @@ defineProps({
     type: Object,
     default: () => {},
   },
-  roles: {
-    type: Object,
-    default: () => {},
-  },
-  branches: {
-    type: Object,
-    default: () => {},
-  },
 });
 </script>
 
@@ -29,11 +21,7 @@ defineProps({
     <!-- <Breadcrumb /> -->
 
     <div class="grid grid-cols-1 mt-4 gap-4">
-      <!-- <UpdateDriverBasicDetailsForm
-        :user="user"
-        :roles="roles"
-        :branches="branches"
-      /> -->
+      <UpdateDriverBasicDetailsForm :user="user" />
     </div>
   </AppLayout>
 </template>

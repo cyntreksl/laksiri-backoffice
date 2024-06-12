@@ -10,23 +10,15 @@ const props = defineProps({
     type: Object,
     default: () => {},
   },
-  roles: {
-    type: Object,
-    default: () => {},
-  },
-  branches: {
-    type: Object,
-    default: () => {},
-  },
 });
 
 // console.log(props.user);
 
 const form = useForm({
-  name: props.user.name,
-  username: props.user.username,
-  email: props.user.email,
-  role_id: props.user.roles[0]?.id,
+  // name: props.user.name,
+  // username: props.user.username,
+  // email: props.user.email,
+  // role_id: props.user.roles[0]?.id,
 });
 
 const handleUpdateUser = () => {
