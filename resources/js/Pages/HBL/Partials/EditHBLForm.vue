@@ -105,8 +105,17 @@ const packageItem = reactive({
     remarks: ''
 });
 
-const grandTotalWeight = ref(0);
-const grandTotalVolume = ref(0);
+const grandTotalVolume = computed(() => {
+    return form.packages.reduce((acc, pack) => {
+        return acc + pack.volume
+    }, 0)
+})
+
+const grandTotalWeight = computed(() => {
+    return form.packages.reduce((acc, pack) => {
+        return acc + pack.weight
+    }, 0)
+})
 
 const addPackageData = () => {
     if (!packageItem.package_type || packageItem.length <= 0 || packageItem.width <= 0 || packageItem.height <= 0 || packageItem.quantity <= 0 || packageItem.volume <= 0 || packageItem.weight <= 0) {
@@ -203,15 +212,29 @@ const hblTotal = ref(0);
 const currency = ref(usePage().props.auth?.user?.primary_branch?.currency_symbol || "SAR");
 const isEditable = ref(false);
 
-// onBeforeMount(() => {
-//     calculatePayment();
-// })
+onBeforeMount(() => {
+    const cargoType = props.hbl.cargo_type;
+
+    if (cargoType === 'Sea Cargo') {
+        const priceRule = computed(() => {
+            return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Sea Cargo');
+        })
+
+        isEditable.value = Boolean(priceRule.value.is_editable);
+    } else if (cargoType === 'Air Cargo') {
+        const priceRule = computed(() => {
+            return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Air Cargo');
+        })
+
+        isEditable.value = Boolean(priceRule.value.is_editable);
+    }
+})
 
 const calculatePayment = () => {
     const cargoType = form.cargo_type;
     const freightCharge = ref(props.hbl.freight_charge);
-    const billCharge = ref(0);
-    const otherCharge = ref(0);
+    const billCharge = ref(props.hbl.bill_charge);
+    const otherCharge = ref(props.hbl.other_charge);
     if (cargoType === 'Sea Cargo') {
         const priceRule = computed(() => {
             return props.priceRules.find((priceRule) => priceRule.cargo_mode === 'Sea Cargo');
@@ -886,9 +909,9 @@ const openEditModal = (index) => {
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.width }}</td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.height }}</td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.quantity }}</td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.totalWeight }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.weight }}</td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume }}</td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.remarks }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.remarks || '-' }}</td>
                         </tr>
                         </tbody>
                     </table>
