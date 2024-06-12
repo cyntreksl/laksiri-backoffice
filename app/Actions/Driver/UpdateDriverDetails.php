@@ -18,7 +18,7 @@ class UpdateDriverDetails
             'contact' => $data['contact'],
             'working_hours_start' => $data['working_hours_start'],
             'working_hours_end' => $data['working_hours_end'],
-            'preferred_zone' => $data['preferred_zone'],
+            'preferred_zone' => implode(',', $data['preferred_zone']),
         ]);
 
         return $user;

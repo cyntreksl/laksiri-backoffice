@@ -76,6 +76,11 @@ Breadcrumbs::for('users.drivers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Driver Management', route('users.drivers.index'));
 });
+// Drivers > Edit
+Breadcrumbs::for('users.drivers.edit', function (BreadcrumbTrail $trail, $id) {
+    $trail->parent('users.drivers.index');
+    $trail->push('Driver Edit', route('users.drivers.edit', $id));
+});
 
 //Cash settlement
 Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail $trail) {
