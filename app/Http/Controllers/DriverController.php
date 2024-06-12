@@ -44,9 +44,12 @@ class DriverController extends Controller
 
     public function edit(User $user)
     {
-        return Inertia::render('Driver/DriverEdit', [
-            'zones' => $this->zoneRepository->getZones(),
-        ]);
+
+dd($user);
+
+        // return Inertia::render('Driver/DriverEdit', [
+        //     'user' => $user,
+        // ]);
     }
 
     public function update(Request $request, User $user)
