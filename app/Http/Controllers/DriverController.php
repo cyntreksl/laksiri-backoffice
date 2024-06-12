@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDriverRequest;
+use App\Http\Requests\UpdateDriverDetailsRequest;
+use App\Http\Requests\UpdateUserPasswordRequest;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Models\User;
@@ -48,11 +50,24 @@ class DriverController extends Controller
 
         return Inertia::render('Driver/DriverEdit', [
             'user' => $user,
+            'zones' => $this->zoneRepository->getZones(),
         ]);
 
     }
 
     public function update(Request $request, User $user)
     {
+    }
+
+    public function changeDriverBasicDetails(UpdateDriverDetailsRequest $request, User $user)
+    {
+        $this->driverRepository->updateDriverDetails($request->all(), $user);
+
+    }
+
+    public function changeDriverPassword(UpdateUserPasswordRequest $request, User $user)
+    {
+        $this->driverRepository->updateDriverPassword($request->all(), $user);
+
     }
 }

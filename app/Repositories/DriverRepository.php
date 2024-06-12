@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Actions\Driver\GetDrivers;
+use App\Actions\Driver\UpdateDriverDetails;
+use App\Actions\Driver\UpdateDriverPassword;
 use App\Actions\User\CreateUser;
 use App\Actions\Zone\CreateZone;
 use App\Factory\User\FilterFactory;
@@ -62,5 +64,17 @@ class DriverRepository implements DriverRepositoryInterface, GridJsInterface
             ],
         ]);
 
+    }
+
+    public function updateDriverDetails(array $data, User $user): void
+    {
+
+        UpdateDriverDetails::run($data, $user);
+
+    }
+
+    public function updateDriverPassword(array $data, User $user): void
+    {
+        UpdateDriverPassword::run($data, $user);
     }
 }
