@@ -171,7 +171,7 @@ const createColumns = () => [
                 h('button', {
                     className: 'btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2',
                     onClick: () => router.visit(route('hbls.edit', row.cells[0].data)),
-                    'x-tooltip..placement.bottom.info': "'Edit HBL'"
+                    'x-tooltip..placement.bottom.primary': "'Edit HBL'"
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
@@ -203,7 +203,7 @@ const createColumns = () => [
                 h('a', {
                     className: 'btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2',
                     onClick: () => confirmViewHBL(row.cells[0].data),
-                    'x-tooltip..placement.bottom.success': "'View HBL'"
+                    'x-tooltip..placement.bottom.primary': "'View HBL'"
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
@@ -279,6 +279,43 @@ const createColumns = () => [
                             }),
                         ])
                 ]),
+                h(
+                    "button",
+                    {
+                        className:
+                            "btn size-8 p-0 text-pink-500 hover:bg-pink-500/20 focus:bg-pink-500/20 active:bg-pink-500/25",
+                        onClick: () => alert(row.cells[0].data),
+                        'x-tooltip..placement.bottom.primary': "'Download HBL'"
+                    },
+                    [
+                        h('svg', {
+                            xmlns: 'http://www.w3.org/2000/svg',
+                            viewBox: '0 0 24 24',
+                            class: 'icon icon-tabler icons-tabler-outline icon-tabler-download',
+                            fill: 'none',
+                            height: 24,
+                            width: 24,
+                            stroke: 'currentColor',
+                            strokeLinecap: 'round',
+                            strokeLinejoin: 'round',
+                        }, [
+                            h('path', {
+                                d: 'M0 0h24v24H0z',
+                                fill: 'none',
+                                stroke: 'none',
+                            }),
+                            h('path', {
+                                d: 'M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2',
+                            }),
+                            h('path', {
+                                d: 'M7 11l5 5l5 -5',
+                            }),
+                            h('path', {
+                                d: 'M12 4l0 12',
+                            }),
+                        ])
+                    ]
+                ),
                 h(
                     "button",
                     {
