@@ -167,82 +167,115 @@ const createColumns = () => [
         sort: false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
-            return h('div', {}, [
+            return h('div', {className: 'flex space-x-2'}, [
                 h('button', {
                     className: 'btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2',
-                    onClick: () => router.visit(route('hbls.edit', row.cells[0].data))
-                }, [
-                    h('svg', {
-                        xmlns: 'http://www.w3.org/2000/svg',
-                        viewBox: '0 0 512 512',
-                        class: 'size-4.5',
-                        fill: 'none',
-                    }, [
-                        h('path', {
-                            d: 'M471 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152V424c0 48.6 39.4 88 88 88H360c48.6 0 88-39.4 88-88V312c0-13.3-10.7-24-24-24s-24 10.7-24 24V424c0 22.1-17.9 40-40 40H88c-22.1 0-40-17.9-40-40V152c0-22.1 17.9-40 40-40H200c13.3 0 24-10.7 24-24s-10.7-24-24-24H88z',
-                            fill: 'currentColor',
-                        })
-                    ])
-                ]),
-                h('a', {
-                    className: 'btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2',
-                    onClick: () => confirmViewHBL(row.cells[0].data),
+                    onClick: () => router.visit(route('hbls.edit', row.cells[0].data)),
+                    'x-tooltip..placement.bottom.info': "'Edit HBL'"
                 }, [
                     h('svg', {
                         xmlns: 'http://www.w3.org/2000/svg',
                         viewBox: '0 0 24 24',
-                        class: 'size-5',
+                        class: 'icon icon-tabler icons-tabler-outline icon-tabler-edit',
                         fill: 'none',
-                        strokeWidth: 2.5,
+                        height: 24,
+                        width: 24,
                         stroke: 'currentColor',
+                        strokeLinecap: 'round',
+                        strokeLinejoin: 'round',
                     }, [
                         h('path', {
-                            d: 'M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z',
-                            strokeLinecap: 'round',
-                            strokeLinejoin: 'round',
+                            d: 'M0 0h24v24H0z',
+                            fill: 'none',
+                            stroke: 'none',
                         }),
                         h('path', {
-                            d: 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
-                            strokeLinecap: 'round',
-                            strokeLinejoin: 'round',
+                            d: 'M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1',
+                        }),
+                        h('path', {
+                            d: 'M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z',
+                        }),
+                        h('path', {
+                            d: 'M16 5l3 3',
+                        }),
+                    ])
+                ]),
+                h('a', {
+                    className: 'btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2',
+                    onClick: () => confirmViewHBL(row.cells[0].data),
+                    'x-tooltip..placement.bottom.success': "'View HBL'"
+                }, [
+                    h('svg', {
+                        xmlns: 'http://www.w3.org/2000/svg',
+                        viewBox: '0 0 24 24',
+                        class: 'icon icon-tabler icons-tabler-outline icon-tabler-eye',
+                        fill: 'none',
+                        height: 24,
+                        width: 24,
+                        stroke: 'currentColor',
+                        strokeLinecap: 'round',
+                        strokeLinejoin: 'round',
+                    }, [
+                        h('path', {
+                            d: 'M0 0h24v24H0z',
+                            fill: 'none',
+                            stroke: 'none',
+                        }),
+                        h('path', {
+                            d: 'M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0',
+                        }),
+                        h('path', {
+                            d: 'M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6',
                         }),
                     ])
                 ]),
                 h('button', {
                     className: 'btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25',
-                    onClick: () => confirmIsHold(row.cells)
+                    onClick: () => confirmIsHold(row.cells),
+                    'x-tooltip..placement.bottom.primary': row.cells[14].data ? "'Release HBL'" : "'Hold HBL'"
                 }, [
                     row.cells[14].data ? h('svg', {
                             xmlns: 'http://www.w3.org/2000/svg',
                             viewBox: '0 0 24 24',
-                            class: 'size-4.5',
+                            class: 'icon icon-tabler icons-tabler-outline icon-tabler-player-play',
                             fill: 'none',
-                            stroke: "currentColor",
-                            strokeWidth: 1.5,
+                            height: 24,
+                            width: 24,
+                            stroke: 'currentColor',
+                            strokeLinecap: 'round',
+                            strokeLinejoin: 'round',
+
                         }, [
                             h('path', {
-                                strokeLinecap: "round",
-                                strokeLinejoin: 'round',
-                                d: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+                                d: 'M0 0h24v24H0z',
+                                fill: 'none',
+                                stroke: 'none',
                             }),
                             h('path', {
-                                strokeLinecap: "round",
-                                strokeLinejoin: 'round',
-                                d: 'M15.91 11.672a.375.375 0 0 1 0 .656l-5.603 3.113a.375.375 0 0 1-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112Z',
+                                d: 'M7 4v16l13 -8z',
                             }),
                         ]) :
                         h('svg', {
                             xmlns: 'http://www.w3.org/2000/svg',
                             viewBox: '0 0 24 24',
-                            class: 'size-4.5',
+                            class: 'icon icon-tabler icons-tabler-outline icon-tabler-player-pause',
                             fill: 'none',
-                            stroke: "currentColor",
-                            strokeWidth: 1.5,
+                            height: 24,
+                            width: 24,
+                            stroke: 'currentColor',
+                            strokeLinecap: 'round',
+                            strokeLinejoin: 'round',
                         }, [
                             h('path', {
-                                strokeLinecap: "round",
-                                strokeLinejoin: 'round',
-                                d: 'M14.25 9v6m-4.5 0V9M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+                                d: 'M0 0h24v24H0z',
+                                fill: 'none',
+                                stroke: 'none',
+                            }),
+                            h('path', {
+                                d: 'M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z',
+                            }),
+                            h('path', {
+                                d: 'M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z',
                             }),
                         ])
                 ]),
@@ -252,23 +285,41 @@ const createColumns = () => [
                         className:
                             "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
                         onClick: () => confirmDeleteHBL(row.cells[0].data),
+                        'x-tooltip..placement.bottom.error': "'Delete HBL'"
                     },
                     [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 448 512",
-                                class: "size-4.5",
-                                fill: "none",
-                            },
-                            [
-                                h("path", {
-                                    d: "M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z",
-                                    fill: "currentColor",
-                                }),
-                            ]
-                        ),
+                        h('svg', {
+                            xmlns: 'http://www.w3.org/2000/svg',
+                            viewBox: '0 0 24 24',
+                            class: 'icon icon-tabler icons-tabler-outline icon-tabler-trash',
+                            fill: 'none',
+                            height: 24,
+                            width: 24,
+                            stroke: 'currentColor',
+                            strokeLinecap: 'round',
+                            strokeLinejoin: 'round',
+                        }, [
+                            h('path', {
+                                d: 'M0 0h24v24H0z',
+                                fill: 'none',
+                                stroke: 'none',
+                            }),
+                            h('path', {
+                                d: 'M4 7l16 0',
+                            }),
+                            h('path', {
+                                d: 'M10 11l0 6',
+                            }),
+                            h('path', {
+                                d: 'M14 11l0 6',
+                            }),
+                            h('path', {
+                                d: 'M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12',
+                            }),
+                            h('path', {
+                                d: 'M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3',
+                            }),
+                        ])
                     ]
                 ),
             ]);
