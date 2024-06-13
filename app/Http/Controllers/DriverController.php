@@ -61,6 +61,7 @@ class DriverController extends Controller
 
     public function changeDriverBasicDetails(UpdateDriverDetailsRequest $request, User $user)
     {
+
         $this->driverRepository->updateDriverDetails($request->all(), $user);
 
     }
@@ -69,5 +70,11 @@ class DriverController extends Controller
     {
         $this->driverRepository->updateDriverPassword($request->all(), $user);
 
+    }
+
+    public function destroy($id)
+    {
+
+        $this->driverRepository->deleteDriver(User::find($id));
     }
 }

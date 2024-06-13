@@ -14,6 +14,7 @@ import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import FilterBorder from "@/Components/FilterBorder.vue";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
 import moment from "moment";
+import { push } from "notivue";
 
 defineProps({
   zones: {
@@ -224,14 +225,11 @@ const closeModal = () => {
 };
 
 const handleDeleteDriver = () => {
-  router.delete(route("users.destroy", driverId.value), {
+  router.delete(route("users.drivers.destroy", driverId.value), {
     preserveScroll: true,
     onSuccess: () => {
       closeModal();
-      notification({
-        text: "Driver Deleted Successfully!",
-        variant: "success",
-      });
+      push.success("Driver Deleted Successfully!");
       driverId.value = null;
       router.visit(route("users.drivers.index"), { only: ["users"] });
     },

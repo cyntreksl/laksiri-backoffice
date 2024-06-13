@@ -3,7 +3,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import { router, useForm } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import notification from "@/magics/notification.js";
+import { push } from "notivue";
 
 const props = defineProps({
   user: {
@@ -16,14 +16,14 @@ const props = defineProps({
   },
 });
 
-console.log(props.user);
-
 const form = useForm({
   name: props.user.name,
   contact: props.user.contact,
   working_hours_start: props.user.working_hours_start,
   working_hours_end: props.user.working_hours_end,
-  preferred_zone: props.user.preferred_zone.split(","),
+  preferred_zone: props.user.preferred_zone
+    ? props.user.preferred_zone.split(",")
+    : "",
 });
 
 const handleUpdateDriver = () => {
@@ -31,11 +31,8 @@ const handleUpdateDriver = () => {
     preserveScroll: true,
     preserveState: true,
     onSuccess: () => {
-      notification({
-        text: "Driver Details Updated Successfully!",
-        variant: "success",
-      });
-      // router.visit(route("users.edit", props.user.id));
+      push.success("Driver Details Updated Successfully!");
+      router.visit(route("users.drivers.index"));
     },
     onError: () => {
       form.reset();

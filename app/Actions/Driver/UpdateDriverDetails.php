@@ -13,12 +13,13 @@ class UpdateDriverDetails
     {
 
         // update driver information
+
         $user->update([
             'name' => $data['name'],
             'contact' => $data['contact'],
             'working_hours_start' => $data['working_hours_start'],
             'working_hours_end' => $data['working_hours_end'],
-            'preferred_zone' => implode(',', $data['preferred_zone']),
+            'preferred_zone' => is_array($data['preferred_zone']) ? implode(',', $data['preferred_zone']) : '',
         ]);
 
         return $user;

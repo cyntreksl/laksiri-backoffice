@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Actions\Driver\DeleteDriver;
 use App\Actions\Driver\GetDrivers;
 use App\Actions\Driver\UpdateDriverDetails;
 use App\Actions\Driver\UpdateDriverPassword;
@@ -76,5 +77,10 @@ class DriverRepository implements DriverRepositoryInterface, GridJsInterface
     public function updateDriverPassword(array $data, User $user): void
     {
         UpdateDriverPassword::run($data, $user);
+    }
+
+    public function deleteDriver(User $user): void
+    {
+        DeleteDriver::run($user);
     }
 }

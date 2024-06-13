@@ -3,7 +3,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import { router, useForm } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import notification from "@/magics/notification.js";
+import { push } from "notivue";
 
 const props = defineProps({
   user: {
@@ -11,8 +11,6 @@ const props = defineProps({
     default: () => {},
   },
 });
-
-// console.log(props.user);
 
 const form = useForm({
   username: props.user.username,
@@ -25,11 +23,8 @@ const handleUpdateDriverPassword = () => {
     preserveScroll: true,
     preserveState: true,
     onSuccess: () => {
-      notification({
-        text: "Driver Password Updated Successfully!",
-        variant: "success",
-      });
-      // router.visit(route("users.edit", props.user.id));
+      push.success("Driver Password Updated Successfully");
+      router.visit(route("users.drivers.index"));
     },
     onError: () => {
       form.reset();

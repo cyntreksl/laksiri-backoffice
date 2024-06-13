@@ -14,4 +14,6 @@ interface DriverRepositoryInterface
     public function updateDriverDetails(array $data, User $user);
 
     public function updateDriverPassword(array $data, User $user);
+
+    public function deleteDriver(User $user);
 }
