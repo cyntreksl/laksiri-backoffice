@@ -21,3 +21,4 @@ yarn-error.log
 # Scribe generated files
 /public/docs
 .scribe
+public/uploads

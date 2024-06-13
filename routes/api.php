@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\v1\Auth\LoginController;
+use App\Http\Controllers\Api\v1\DriverController;
 use App\Http\Controllers\Api\v1\HBLController;
 use App\Http\Controllers\Api\v1\PickupController;
 use Illuminate\Support\Facades\Route;
@@ -17,3 +18,8 @@ Route::domain('api.'.config('app.url'))
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
+
+//Driver
+Route::domain('api.'.config('app.url'))->middleware(['auth:sanctum'])->prefix('/v1/')->group(function () {
+    Route::post('/driver/update', [DriverController::class, 'store']);
+});
