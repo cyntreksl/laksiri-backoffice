@@ -24,4 +24,6 @@ interface HBLRepositoryInterface
     public function getLoadedHBLsByCargoType(Container $container, string $cargoType);
 
     public function getHBLWithUnloadedPackagesByReference(string $reference, string $cargo_type);
+
+    public function downloadHBLPDF(HBL $hbl);
 }

@@ -280,11 +280,11 @@ const createColumns = () => [
                         ])
                 ]),
                 h(
-                    "button",
+                    "a",
                     {
                         className:
                             "btn size-8 p-0 text-pink-500 hover:bg-pink-500/20 focus:bg-pink-500/20 active:bg-pink-500/25",
-                        onClick: () => alert(row.cells[0].data),
+                        href: route('hbls.download', row.cells[0].data),
                         'x-tooltip..placement.bottom.primary': "'Download HBL'"
                     },
                     [
