@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Actions\Container\CreateContainer;
+use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Unloading\UnloadHBL;
 use App\Enum\ContainerStatus;
 use App\Factory\Container\FilterFactory;
@@ -10,6 +11,11 @@ use App\Http\Resources\ContainerResource;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\Container;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+use ZipArchive;
 
 class ContainerRepositories implements ContainerRepositoryInterface, GridJsInterface
 {
@@ -64,5 +70,60 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function unloadHBLFromContainer(array $data, Container $container)
     {
         return UnloadHBL::run($data, $container);
+    }
+
+    public function batchHBLDownload(Container $container)
+    {
+        // Define the PDF and ZIP directories
+        $pdfDirectory = public_path('pdf/');
+        $zipDirectory = public_path('zip/');
+
+        // Ensure the PDF directory exists and clean it
+        if (! File::exists($pdfDirectory)) {
+            File::makeDirectory($pdfDirectory, 0755, true);
+        } else {
+            $pdfFile = new Filesystem();
+            $pdfFile->cleanDirectory($pdfDirectory);
+        }
+
+        // Ensure the ZIP directory exists
+        if (! File::exists($zipDirectory)) {
+            File::makeDirectory($zipDirectory, 0755, true);
+        }
+
+        $container = GetLoadedContainerById::run($container);
+
+        foreach ($container->hbls as $hbl) {
+            // create random filename for pdfs
+            $filename = $container->reference.'_'.date('Y_m_d_h_i_s').'_'.Str::random(10);
+            // save pdfs
+            PDF::loadView('pdf.hbls.hbl', [
+                'hbl' => $hbl,
+            ])->save($pdfDirectory.$filename.'.pdf');
+        }
+
+        // create new ZipArchive instance
+        $zip = new ZipArchive;
+        // creating file name for zip archive file
+        $zip_filename = $container->reference.'_'.date('Y_m_d_h_i_s').'.zip';
+        $zipPath = $zipDirectory.$zip_filename;
+
+        if (File::exists($zipPath)) {
+            File::delete($zipPath);
+        }
+
+        if ($zip->open($zipPath, ZipArchive::CREATE) === true) {
+
+            $files = File::files($pdfDirectory);
+
+            foreach ($files as $value) {
+                $relativeNameInZipFile = basename($value);
+                $zip->addFile($value, $relativeNameInZipFile);
+            }
+
+            $zip->close();
+        }
+
+        return response()->download($zipPath);
     }
 }
