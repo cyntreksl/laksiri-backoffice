@@ -11,7 +11,6 @@ class DeleteDriver
 
     public function handle(User $user): void
     {
-
         $user->delete();
     }
 }

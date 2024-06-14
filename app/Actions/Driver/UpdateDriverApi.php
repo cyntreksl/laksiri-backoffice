@@ -14,7 +14,6 @@ class UpdateDriverApi
     public function handle(Request $request)
     {
 
-        // dd($request);
         $user = User::find($request->id);
         $name = $request->name;
         $password = $request->password;

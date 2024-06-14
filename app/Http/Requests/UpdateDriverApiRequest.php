@@ -27,9 +27,9 @@ class UpdateDriverApiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'min:5', 'max:20'],
-            'profile_picture' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:3072'],
-            'password' => ['required', 'string', 'min:6'],
+            'name' => ['nullable', 'min:5', 'max:20'],
+            'profile_picture' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:3072'],
+            'password' => ['nullable', 'string', 'min:6'],
         ];
     }
 
