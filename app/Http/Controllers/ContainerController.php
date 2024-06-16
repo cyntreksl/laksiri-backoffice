@@ -82,4 +82,9 @@ class ContainerController extends Controller
     {
         return $this->HBLRepository->getHBLWithUnloadedPackagesByReference($request->reference, $request->cargo_type);
     }
+
+    public function batchDownloadPDF(Container $container)
+    {
+        return $this->containerRepository->batchHBLDownload($container);
+    }
 }

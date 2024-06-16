@@ -122,6 +122,9 @@ Route::middleware([
         Route::get('loading-points/{container}', [ContainerController::class, 'showLoadingPoint'])
             ->name('loading-points.index');
 
+        Route::get('containers/hbl/batch-downloads/{container}', [ContainerController::class, 'batchDownloadPDF'])
+            ->name('hbls.batch-downloads');
+
         // Loaded Container
         Route::resource('loaded-containers', LoadedContainerController::class)
             ->except(['create']);
