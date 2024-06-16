@@ -71,14 +71,6 @@ class HBLController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(HBL $hBL)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(HBL $hbl)
@@ -111,5 +103,10 @@ class HBLController extends Controller
     public function toggleHold(HBL $hbl)
     {
         $this->HBLRepository->toggleHold($hbl);
+    }
+
+    public function downloadHBLPDF(HBL $hbl)
+    {
+        return $this->HBLRepository->downloadHBLPDF($hbl);
     }
 }

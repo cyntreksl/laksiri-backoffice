@@ -53,12 +53,15 @@ Route::middleware([
     Route::get('pickup-exception-list', [PickupExceptionController::class, 'list']);
 
     // HBL
-    Route::resource('hbls', HBLController::class);
+    Route::resource('hbls', HBLController::class)->except('show');
 
     Route::get('hbl-list', [HBLController::class, 'list']);
 
     Route::put('hbls/toggle-hold/{hbl}', [HBLController::class, 'toggleHold'])
         ->name('hbls.toggle-hold');
+
+    Route::get('hbls/download/{hbl}', [HBLController::class, 'downloadHBLPDF'])
+        ->name('hbls.download');
 
     // User
     Route::resource('users', UserController::class)
