@@ -748,6 +748,10 @@ export default {
                             title: "All HBL",
                             route: "hbls.index",
                         },
+                        {
+                            title: "Cancelled HBL",
+                            route: "hbls.cancelled-hbls",
+                        },
                     );
                     break;
                 case "back-office":
