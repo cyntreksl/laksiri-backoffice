@@ -2,6 +2,7 @@
 
 namespace App\Actions\HBL;
 
+use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -14,7 +15,7 @@ class CreateHBL
     {
         $reference = GenerateHBLReferenceNumber::run();
 
-        return HBL::create([
+        $hbl = HBL::create([
             'reference' => $reference,
             'branch_id' => GetUserCurrentBranchID::run(),
             'cargo_type' => $data['cargo_type'],
@@ -42,5 +43,11 @@ class CreateHBL
             'pickup_id' => $data['pickup_id'] ?? null,
             'system_status' => $data['system_status'] ?? 3,
         ]);
+
+        if (! empty($data['paid_amount'])) {
+            UpdateHBLPayments::run($data['paid_amount'], $hbl);
+        }
+
+        return $hbl;
     }
 }
