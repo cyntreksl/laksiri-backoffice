@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Models\Scopes\BranchScope;
+use App\Observers\HBLObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,6 +17,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ScopedBy(BranchScope::class)]
+#[ObservedBy([HBLObserver::class])]
 class HBL extends Model
 {
     use HasFactory;
