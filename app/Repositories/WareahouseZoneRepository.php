@@ -4,16 +4,16 @@ namespace App\Repositories;
 
 use App\Actions\WarehouseZone\CreateWarehousezone;
 use App\Actions\WarehouseZone\DeleteWarehousezone;
-use App\Actions\Zone\GetZones;
+use App\Actions\WarehouseZone\GetWarehousezone;
+use App\Actions\WarehouseZone\UpdateWarehousezone;
 use App\Interfaces\WarehousezoneRepositoryInterface;
-use App\Models\Branch;
 use App\Models\WarehouseZone;
 
 class WareahouseZoneRepository implements WarehousezoneRepositoryInterface
 {
-    public function getWarehouseZones()
+    public function getWarehouseZone($id)
     {
-        // return GetZones::run();
+        return GetWarehousezone::run($id);
     }
 
     public function createWarehouseZone(array $data)
@@ -21,14 +21,14 @@ class WareahouseZoneRepository implements WarehousezoneRepositoryInterface
         return CreateWarehousezone::run($data);
     }
 
-    public function editWarehouseZone(array $data, Branch $branch)
+    public function editWarehouseZone(array $data)
     {
-
+        return UpdateWarehousezone::run($data);
     }
 
-    public function destroy(WarehouseZone $wz): void
+    public function destroy(WarehouseZone $warehouseZone): void
     {
-        DeleteWarehousezone::run($wz);
+        DeleteWarehousezone::run($warehouseZone);
     }
 }
 //

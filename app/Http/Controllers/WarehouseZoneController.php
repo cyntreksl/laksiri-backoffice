@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWareahouseZoneRequest;
-use App\Http\Resources\UserCollection;
 use App\Http\Resources\WarehouseZoneCollection;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\WarehousezoneRepositoryInterface;
-use App\Models\User;
 use App\Models\WarehouseZone;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -22,26 +20,11 @@ class WarehouseZoneController extends Controller
 
     public function index()
     {
-        return Inertia::render('Setting/WarehouseZoneList', [
-            'branches' => $this->branchRepository->getBranches(),
-        ]);
-    }
-
-    public function store(StoreWareahouseZoneRequest $request)
-    {
-        $this->warehousezoneRepository->createWarehouseZone($request->all());
-    }
-
-    public function delete($id)
-    {
-        $this->warehousezoneRepository->destroy(WarehouseZone::find($id));
+        return Inertia::render('Setting/WarehouseZoneList');
     }
 
     public function list(Request $request)
     {
-        // dd(WarehouseZone::with('branch')->find(2)->branch_name);
-        // dd(UserCollection::collection(User::all()));
-
         $limit = $request->input('limit', 10);
         $page = $request->input('offset', 1);
         $order = $request->input('order', 'id');
@@ -70,5 +53,27 @@ class WarehouseZoneController extends Controller
                 'lastPage' => ceil($totalwzones / $limit),
             ],
         ]);
+    }
+
+    public function store(StoreWareahouseZoneRequest $request)
+    {
+        $this->warehousezoneRepository->createWarehouseZone($request->all());
+    }
+
+    public function edit($id)
+    {
+        return Inertia::render('Setting/WarehousezonesEdit', [
+            'warehousezone' => $this->warehousezoneRepository->getWarehouseZone($id),
+        ]);
+    }
+
+    public function update(StoreWareahouseZoneRequest $request)
+    {
+        $this->warehousezoneRepository->editWarehouseZone($request->all());
+    }
+
+    public function delete($id)
+    {
+        $this->warehousezoneRepository->destroy(WarehouseZone::find($id));
     }
 }

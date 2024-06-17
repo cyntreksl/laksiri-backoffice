@@ -1,37 +1,32 @@
 <script setup>
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import DialogModal from "@/Components/DialogModal.vue";
 import { router, useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import { push } from "notivue";
 
-defineProps({
-  branches: {
+const props = defineProps({
+  warehousezone: {
     type: Object,
     default: () => {},
   },
 });
 
-const confirmingWaraehousezoneCreation = ref(false);
-
-const closeModal = () => {
-  confirmingWaraehousezoneCreation.value = false;
-};
-
 const form = useForm({
-  name: "",
-  description: "",
+  id: props.warehousezone.id,
+  name: props.warehousezone.name,
+  branch_id: props.warehousezone.branch_id,
+  description: props.warehousezone.description,
 });
 
-const createWarehousezone = () => {
-  form.post(route("setting.warehouse-zones.store"), {
+const updateWarehousezone = () => {
+  form.post(route("setting.warehouse-zones.update"), {
     onSuccess: () => {
       router.visit(route("setting.warehouse-zones.index"));
       form.reset();
-      push.success("Warehouse Zone Created Successfully!");
+      push.success("Warehouse Zone Updated Successfully!");
     },
     preserveScroll: true,
     preserveState: true,
@@ -40,24 +35,16 @@ const createWarehousezone = () => {
 </script>
 
 <template>
-  <div class="flex justify-end mx-5 mt-4">
-    <PrimaryButton
-      @click="
-        confirmingWaraehousezoneCreation = !confirmingWaraehousezoneCreation
-      "
-    >
-      Create New Warehouse Zone
-    </PrimaryButton>
-  </div>
-
-  <DialogModal
-    :maxWidth="'5xl'"
-    :show="confirmingWaraehousezoneCreation"
-    @close="closeModal"
-  >
-    <template #title> Create New Warehouse Zone </template>
-
-    <template #content>
+  <div class="card px-4 py-4 sm:px-5">
+    <div>
+      <h2
+        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+      >
+        Update Warehouse Zone
+      </h2>
+      <br />
+    </div>
+    <form @submit.prevent="updateWarehousezone">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div class="col-span-1 sm:col-span-2">
           <InputLabel value="Warehouse Zone Name" />
@@ -103,18 +90,18 @@ const createWarehousezone = () => {
           <InputError :message="form.errors.description" />
         </div>
       </div>
-    </template>
-
-    <template #footer>
-      <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
-      <PrimaryButton
-        :class="{ 'opacity-25': form.processing }"
-        :disabled="form.processing"
-        class="ms-3"
-        @click="createWarehousezone"
-      >
-        Create Warehouse Zone
-      </PrimaryButton>
-    </template>
-  </DialogModal>
+      <br />
+      <div class="flex col-span-2 justify-end">
+        <PrimaryButton
+          type="submit"
+          class="ms-3"
+          :class="{ 'opacity-25': form.processing }"
+          :disabled="form.processing"
+        >
+          Update Wareahouse Zone
+        </PrimaryButton>
+      </div>
+    </form>
+  </div>
 </template>
+

@@ -4,16 +4,9 @@ import { onMounted, reactive, ref } from "vue";
 import { Grid, h, html } from "gridjs";
 import Popper from "vue3-popper";
 import { router } from "@inertiajs/vue3";
-import notification from "@/magics/notification.js";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import CreateWarehousezoneForm from "@/Pages/Setting/Wareahousezones/Partials/CreateWarehousezoneForm.vue";
-// import UpdateWarehousezones from "@/Pages/Setting/Wareahousezones/Partials/UpdateWarehousezones.vue";
 import DeleteWarehousezoneConfirmationModal from "@/Pages/Setting/Wareahousezones/Partials/DeleteWarehousezoneConfirmationModal.vue";
-import DatePicker from "@/Components/DatePicker.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
-import FilterBorder from "@/Components/FilterBorder.vue";
-import FilterDrawer from "@/Components/FilterDrawer.vue";
 import moment from "moment";
 import { push } from "notivue";
 
@@ -138,7 +131,7 @@ const createColumns = () => [
           {
             className:
               "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
-            href: route("users.drivers.edit", row.cells[0].data),
+            href: route("setting.warehouse-zones.edit", row.cells[0].data),
           },
           [
             h(
@@ -188,14 +181,6 @@ const createColumns = () => [
   },
 ];
 
-const resolveStatus = (status) =>
-  ({
-    ACTIVE: "badge bg-success/10 text-success dark:bg-success/15",
-    DEACTIVATE: "badge bg-error/10 text-error dark:bg-error/15",
-    INACTIVE: "badge bg-warning/10 text-warning dark:bg-warning/15",
-    INVITED: "badge bg-info/10 text-info dark:bg-info/15",
-  }[status]);
-
 const updateGridConfig = () => {
   grid.updateConfig({
     columns: createColumns(),
@@ -227,7 +212,7 @@ const handleDeleteWarehousezone = () => {
       onSuccess: () => {
         router.visit(route("setting.warehouse-zones.index"));
         closeModal();
-        push.success("Warehousezone Deleted Successfully!");
+        push.success("Warehouse Zone Deleted Successfully!");
         warehousezoneid.value = null;
       },
     }
@@ -310,26 +295,6 @@ const applyFilters = () => {
                       >
                         <label class="inline-flex items-center space-x-2">
                           <input
-                            :checked="data.columnVisibility.id"
-                            class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                            type="checkbox"
-                            @change="toggleColumnVisibility('id', $event)"
-                          />
-                          <p>ID</p>
-                        </label>
-
-                        <label class="inline-flex items-center space-x-2">
-                          <input
-                            :checked="data.columnVisibility.username"
-                            class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                            type="checkbox"
-                            @change="toggleColumnVisibility('username', $event)"
-                          />
-                          <p>Username</p>
-                        </label>
-
-                        <label class="inline-flex items-center space-x-2">
-                          <input
                             :checked="data.columnVisibility.name"
                             class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                             type="checkbox"
@@ -340,14 +305,14 @@ const applyFilters = () => {
 
                         <label class="inline-flex items-center space-x-2">
                           <input
-                            :checked="data.columnVisibility.branch_name"
+                            :checked="data.columnVisibility.description"
                             class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                             type="checkbox"
                             @change="
-                              toggleColumnVisibility('branch_name', $event)
+                              toggleColumnVisibility('description', $event)
                             "
                           />
-                          <p>Primary Branch</p>
+                          <p>Description</p>
                         </label>
 
                         <label class="inline-flex items-center space-x-2">
@@ -360,16 +325,6 @@ const applyFilters = () => {
                             "
                           />
                           <p>Created At</p>
-                        </label>
-
-                        <label class="inline-flex items-center space-x-2">
-                          <input
-                            :checked="data.columnVisibility.status"
-                            class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                            type="checkbox"
-                            @change="toggleColumnVisibility('status', $event)"
-                          />
-                          <p>Status</p>
                         </label>
                       </div>
                     </div>
@@ -401,29 +356,5 @@ const applyFilters = () => {
       @close="closeModal"
       @delete-Warehousezone="handleDeleteWarehousezone"
     />
-
-    <!-- <FilterDrawer :show="showFilters" @close="showFilters = false">
-      <template #title> Filter Drivers </template>
-
-      <template #content>
-        <div>
-          <InputLabel value="From" />
-          <DatePicker v-model="filters.fromDate" placeholder="Choose date..." />
-        </div>
-
-        <div>
-          <InputLabel value="To" />
-          <DatePicker v-model="filters.toDate" placeholder="Choose date..." />
-        </div>
-
-        <FilterBorder />
-
-        
-        <SoftPrimaryButton class="space-x-2" @click="applyFilters">
-          <i class="fa-solid fa-filter"></i>
-          <span>Apply Filters</span>
-        </SoftPrimaryButton>
-      </template>
-    </FilterDrawer> -->
   </AppLayout>
 </template>

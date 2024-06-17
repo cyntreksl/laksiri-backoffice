@@ -206,9 +206,9 @@ Route::middleware([
         Route::get('warehouse-zones/list', [WarehouseZoneController::class, 'list'])->name('warehouse-zones.list');
         Route::get('warehouse-zones', [WarehouseZoneController::class, 'index'])->name('warehouse-zones.index');
         Route::delete('warehouse-zones/{id}', [WarehouseZoneController::class, 'delete'])->name('warehouse-zones.delete');
-
         Route::post('warehousezones/create', [WarehouseZoneController::class, 'store'])->name('warehouse-zones.store');
-        Route::put('warehousezones/update', [WarehouseZoneController::class, 'edit'])->name('warehouse-zones.edit');
+        Route::post('warehousezones/update', [WarehouseZoneController::class, 'update'])->name('warehouse-zones.update');
+        Route::get('warehousezones/{id}/edit', [WarehouseZoneController::class, 'edit'])->name('warehouse-zones.edit');
 
         //Pricing
         Route::resource('prices', PriceController::class)->except('show');

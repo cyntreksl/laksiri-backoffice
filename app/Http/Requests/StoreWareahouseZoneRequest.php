@@ -23,15 +23,6 @@ class StoreWareahouseZoneRequest extends FormRequest
     {
         return [
             'name' => ['required', 'min:5', 'max:20'],
-            'branch_id' => ['required', 'exists:branches,id'],
-
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'branch_id.required' => 'The branch is required.',
         ];
     }
 }
