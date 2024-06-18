@@ -36,7 +36,6 @@ class CashSettlementController extends Controller
         $order = $request->input('order', 'id');
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
-
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus']);
 
         return $this->cashSettlementRepository->dataset($limit, $page, $order, $dir, $search, $filters);
