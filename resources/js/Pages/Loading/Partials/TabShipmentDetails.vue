@@ -7,6 +7,10 @@ import InputLabel from "@/Components/InputLabel.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import AccordionPanel from "@/Components/AccordionPanel.vue";
 import TextInput from "@/Components/TextInput.vue";
+import DeleteLoadingConfirmationModal from "@/Pages/Loading/Partials/DeleteLoadingConfirmationModal.vue";
+import {ref} from "vue";
+import {router} from "@inertiajs/vue3";
+import {push} from "notivue";
 
 const props = defineProps({
     container: {
@@ -15,6 +19,34 @@ const props = defineProps({
         },
     }
 });
+
+const emit = defineEmits(['close']);
+
+const showConfirmDeleteLoadingModal = ref(false);
+
+const confirmDeleteLoadedShipment = () => {
+    showConfirmDeleteLoadingModal.value = true;
+};
+
+const closeDeleteConfirmationModal = () => {
+    showConfirmDeleteLoadingModal.value = false;
+}
+
+const handleDeleteLoadedShipment = () => {
+    router.put(route("loading.containers.delete-loading", props.container.id), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            emit('close')
+            closeDeleteConfirmationModal()
+            router.visit(route('loading.loaded-containers.index'))
+            push.success('Loaded Shipment Deleted Successfully!');
+        },
+        onError: () => {
+            closeDeleteConfirmationModal();
+            push.error('Something went to wrong!');
+        }
+    })
+}
 </script>
 
 <template>
@@ -155,7 +187,7 @@ const props = defineProps({
         </AccordionPanel>
 
         <div class="flex space-x-2 items-center justify-end">
-            <DangerOutlineButton>
+            <DangerOutlineButton @click.prevent="confirmDeleteLoadedShipment">
                 <svg class="size-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5"
                      viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -181,8 +213,6 @@ const props = defineProps({
             </PrimaryButton>
         </div>
     </Tab>
+
+    <DeleteLoadingConfirmationModal :show="showConfirmDeleteLoadingModal" @close="closeDeleteConfirmationModal" @delete-loading="handleDeleteLoadedShipment"/>
 </template>
-
-<style scoped>
-
-</style>

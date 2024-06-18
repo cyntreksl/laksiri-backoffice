@@ -68,7 +68,7 @@ const emit = defineEmits(['close']);
                     </svg>
                 </template>
 
-                <TabHBLUnderShipment :container="container"/>
+                <TabHBLUnderShipment :container="container" @close="emit('close')"/>
 
                 <TabShipmentDetails :container="container"/>
 

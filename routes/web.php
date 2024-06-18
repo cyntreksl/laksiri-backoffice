@@ -143,6 +143,9 @@ Route::middleware([
         Route::post('containers/get-hbl/packages', [ContainerController::class, 'getHBLWithUnloadedPackages'])
             ->name('containers.get-hbl-with-packages');
 
+        Route::put('containers/{container}/delete-loading', [ContainerController::class, 'deleteLoading'])
+            ->name('containers.delete-loading');
+
         // Manual Loadings
         Route::get('manual-loadings', function () {
             return Inertia::render('Loading/ManualLoading');

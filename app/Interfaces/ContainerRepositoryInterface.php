@@ -11,4 +11,6 @@ interface ContainerRepositoryInterface
     public function unloadHBLFromContainer(array $data, Container $container);
 
     public function batchHBLDownload(Container $container);
+
+    public function deleteLoading(Container $container);
 }
