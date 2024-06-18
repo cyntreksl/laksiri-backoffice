@@ -29,7 +29,8 @@ class UpdateDriverApi
         }
 
         if ($request->hasFile('profile_picture')) {
-            $folderPath = public_path('uploads');
+            $path = 'app/public/uploads/drivers/'; // file store path
+            $folderPath = storage_path($path);
             // Generate a unique file name
             $filename = time().'_'.$user->id.'.'.$request->profile_picture->getClientOriginalExtension();
             if (! file_exists($folderPath)) {
@@ -38,7 +39,7 @@ class UpdateDriverApi
             $request->profile_picture->move($folderPath, $filename);
 
             if (isset($user->profile_photo_path)) {
-                $exitsfilepath = public_path('uploads/'.$user->profile_photo_path);
+                $exitsfilepath = storage_path($path.$user->profile_photo_path);
 
                 if (file_exists($exitsfilepath)) { // delete exist image
                     unlink($exitsfilepath);
