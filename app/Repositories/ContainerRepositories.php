@@ -5,6 +5,8 @@ namespace App\Repositories;
 use App\Actions\Container\CreateContainer;
 use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Unloading\UnloadHBL;
+use App\Actions\Container\Unloading\UnloadHBLPackages;
+use App\Actions\Container\UpdateContainerStatus;
 use App\Enum\ContainerStatus;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
@@ -13,6 +15,7 @@ use App\Interfaces\GridJsInterface;
 use App\Models\Container;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use ZipArchive;
@@ -125,5 +128,21 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         }
 
         return response()->download($zipPath);
+    }
+
+    public function deleteLoading(Container $container)
+    {
+        try {
+            DB::beginTransaction();
+
+            UnloadHBLPackages::run($container);
+
+            UpdateContainerStatus::run($container, ContainerStatus::REQUESTED->value);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception('Failed to delete loaded shipment: '.$e->getMessage());
+        }
     }
 }

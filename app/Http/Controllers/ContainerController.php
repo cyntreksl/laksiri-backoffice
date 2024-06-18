@@ -87,4 +87,9 @@ class ContainerController extends Controller
     {
         return $this->containerRepository->batchHBLDownload($container);
     }
+
+    public function deleteLoading(Container $container)
+    {
+        return $this->containerRepository->deleteLoading($container);
+    }
 }
