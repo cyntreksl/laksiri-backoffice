@@ -37,12 +37,21 @@ watchEffect(() => {
 });
 
 const handleAssignDriver = () => {
-    form.post(route("pickups.driver.assign"), {
+    let routeName = '';
+
+    if (route().current() === 'pickups.index') {
+        routeName = 'pickups.driver.assign';
+    } else {
+        routeName = 'pickups.exceptions.driver.assign'
+    }
+
+    form.post(route(routeName), {
         preserveScroll: true,
         onSuccess: () => {
             emit('close');
             push.success('Driver Assigned!')
-            router.visit(route('pickups.index'))
+            const currentRoute = route().current();
+            router.visit(route(currentRoute));
         },
     })
 }

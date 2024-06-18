@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h, html} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
@@ -12,6 +12,8 @@ import FilterBorder from "@/Components/FilterBorder.vue";
 import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
 
 defineProps({
     drivers: {
@@ -101,7 +103,7 @@ const initializeGrid = () => {
             url: constructUrl(),
             then: data => data.data.map(item => {
                 const row = [];
-                // row.push({id: item.id})
+                row.push({id: item.id})
                 visibleColumns.forEach(column => {
                     row.push(item[column]);
                 });
@@ -120,7 +122,35 @@ const initializeGrid = () => {
     grid.render(wrapperRef.value);
 };
 
+const selectedData = ref([]);
+
 const createColumns = () => [
+    {
+        name: '#',
+        formatter: (_, row) => {
+            return h('input',
+                {
+                    type: 'checkbox',
+                    className: 'form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent',
+                    onChange: (event) => {
+                        const isChecked = event.target.checked;
+                        if (isChecked) {
+                            const rowData = row.cells.map(cell => cell.data); // Extract data from cells array
+                            selectedData.value.push(rowData); // Push extracted data into selectedData
+                        } else {
+                            // Remove the specific row from selectedData (assuming uniqueness of rows)
+                            const index = selectedData.value.findIndex(selectedRow => {
+                                const rowData = row.cells.map(cell => cell.data);
+                                return JSON.stringify(selectedRow) === JSON.stringify(rowData);
+                            });
+                            if (index !== -1) {
+                                selectedData.value.splice(index, 1);
+                            }
+                        }
+                    }
+                });
+        }
+    },
     {name: 'Reference', hidden: !data.columnVisibility.reference},
     {name: 'Name', hidden: !data.columnVisibility.name},
     {name: 'Zone', hidden: !data.columnVisibility.zone},
@@ -134,7 +164,13 @@ const createColumns = () => [
     {name: 'Address', hidden: !data.columnVisibility.address, sort: false},
     {name: 'Pickup Date', hidden: !data.columnVisibility.pickup_date},
     {name: 'Created Date', hidden: !data.columnVisibility.created_date},
-    {name: 'Driver', hidden: !data.columnVisibility.driver},
+    {
+        name: 'Driver',
+        hidden: !data.columnVisibility.driver,
+        formatter: (cell) => {
+            return cell ? html(`<div class="flex item-center"><svg xmlns="http://www.w3.org/2000/svg"  width="18"  height="18"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg> ${cell} </div>`) : null
+        }
+    },
     {name: 'Auth', hidden: !data.columnVisibility.auth},
     {
         name: 'Actions',
@@ -228,6 +264,21 @@ const applyFilters = () => {
         }
     });
     grid.forceRender();
+}
+
+const showConfirmAssignDriverModal = ref(false);
+const isDataEmpty = computed(() => selectedData.value.length === 0);
+const countOfSelectedData = computed(() => selectedData.value.length);
+const idList = ref([]);
+
+const confirmAssignDriver = () => {
+    idList.value = selectedData.value.map(item => item[0]);
+    showConfirmAssignDriverModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmAssignDriverModal.value = false;
+    idList.value = [];
 }
 </script>
 <template>
@@ -353,6 +404,11 @@ const applyFilters = () => {
                                 @click="showFilters=true">
                             <i class="fa-solid fa-filter"></i>
                         </button>
+
+                        <PrimaryButton :disabled="isDataEmpty" @click="confirmAssignDriver">
+                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"  fill="none"  height="18"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="18"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg>
+                            Assign Driver ({{countOfSelectedData}})
+                        </PrimaryButton>
                     </div>
                 </div>
 
@@ -363,6 +419,8 @@ const applyFilters = () => {
                 </div>
             </div>
         </div>
+
+        <AssignDriverModal :drivers="drivers" :id-list="idList" :show="showConfirmAssignDriverModal" @close="closeModal"/>
 
         <FilterDrawer :show="showFilters" @close="showFilters = false">
             <template #title>
