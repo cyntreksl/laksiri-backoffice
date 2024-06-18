@@ -15,8 +15,12 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import EditPickupModal from "@/Pages/Pickup/Partials/EditPickupModal.vue";
+import {router} from "@inertiajs/vue3";
+import {push} from "notivue";
+import DeletePickupConfirmationModal from "@/Pages/Pickup/Partials/DeletePickupConfirmationModal.vue";
 
-defineProps({
+const props = defineProps({
     drivers: {
         type: Object,
         default: () => {
@@ -65,6 +69,7 @@ const data = reactive({
         pickup_date: true,
         pickup_time_start: false,
         pickup_time_end: false,
+        actions: true,
     },
 });
 
@@ -187,6 +192,90 @@ const createColumns = () => [
     {name: 'Pickup Date', hidden: !data.columnVisibility.pickup_date},
     {name: 'Pickup Time Start', hidden: !data.columnVisibility.pickup_time_start},
     {name: 'Pickup Time End', hidden: !data.columnVisibility.pickup_time_end},
+    {
+        name: 'Actions',
+        sort: false,
+        hidden: !data.columnVisibility.actions,
+        formatter: (_, row) => {
+            return h('div', {className: 'flex space-x-2'}, [
+                h('button', {
+                    className: 'btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2',
+                    onClick: () => confirmEditPickup(row.cells[0].data?.id),
+                    'x-tooltip..placement.bottom.primary': "'Edit Pending Job'"
+                }, [
+                    h('svg', {
+                        xmlns: 'http://www.w3.org/2000/svg',
+                        viewBox: '0 0 24 24',
+                        class: 'icon icon-tabler icons-tabler-outline icon-tabler-edit',
+                        fill: 'none',
+                        height: 24,
+                        width: 24,
+                        stroke: 'currentColor',
+                        strokeLinecap: 'round',
+                        strokeLinejoin: 'round',
+                    }, [
+                        h('path', {
+                            d: 'M0 0h24v24H0z',
+                            fill: 'none',
+                            stroke: 'none',
+                        }),
+                        h('path', {
+                            d: 'M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1',
+                        }),
+                        h('path', {
+                            d: 'M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z',
+                        }),
+                        h('path', {
+                            d: 'M16 5l3 3',
+                        }),
+                    ])
+                ]),
+                h(
+                    "button",
+                    {
+                        className:
+                            "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
+                        onClick: () => confirmDeletePickup(row.cells[0].data?.id),
+                        'x-tooltip..placement.bottom.error': "'Delete HBL'"
+                    },
+                    [
+                        h('svg', {
+                            xmlns: 'http://www.w3.org/2000/svg',
+                            viewBox: '0 0 24 24',
+                            class: 'icon icon-tabler icons-tabler-outline icon-tabler-trash',
+                            fill: 'none',
+                            height: 24,
+                            width: 24,
+                            stroke: 'currentColor',
+                            strokeLinecap: 'round',
+                            strokeLinejoin: 'round',
+                        }, [
+                            h('path', {
+                                d: 'M0 0h24v24H0z',
+                                fill: 'none',
+                                stroke: 'none',
+                            }),
+                            h('path', {
+                                d: 'M4 7l16 0',
+                            }),
+                            h('path', {
+                                d: 'M10 11l0 6',
+                            }),
+                            h('path', {
+                                d: 'M14 11l0 6',
+                            }),
+                            h('path', {
+                                d: 'M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12',
+                            }),
+                            h('path', {
+                                d: 'M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3',
+                            }),
+                        ])
+                    ]
+                ),
+            ]);
+        },
+    },
 ];
 
 const updateGridConfig = () => {
@@ -238,9 +327,40 @@ const confirmAssignDriver = () => {
     showConfirmAssignDriverModal.value = true;
 };
 
+const showConfirmEditPickupModal = ref(false);
+const pickupId = ref(null);
+const showConfirmDeletePickupModal = ref(false);
+
+const confirmEditPickup = (id) => {
+    pickupId.value = id;
+    showConfirmEditPickupModal.value = true;
+};
+
 const closeModal = () => {
     showConfirmAssignDriverModal.value = false;
+    showConfirmEditPickupModal.value = false;
+    pickupId.value = null;
     idList.value = [];
+}
+
+const confirmDeletePickup = (id) => {
+    pickupId.value = id;
+    showConfirmDeletePickupModal.value = true;
+};
+
+const handleDeletePickup = () => {
+    router.delete(route("pickups.destroy", pickupId.value), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeModal();
+            push.success('Pickup record Deleted Successfully!');
+            router.visit(route('pickups.index'), {only: ['pickups']})
+        },
+        onError: () => {
+            closeModal();
+            push.error('Something went to wrong!');
+        }
+    })
 }
 </script>
 <template>
@@ -487,5 +607,9 @@ const closeModal = () => {
                 </SoftPrimaryButton>
             </template>
         </FilterDrawer>
+
+        <EditPickupModal :pickup-id="pickupId" :show="showConfirmEditPickupModal" :zones="zones" @close="closeModal" />
+
+        <DeletePickupConfirmationModal :show="showConfirmDeletePickupModal" @close="closeModal" @delete-pickup="handleDeletePickup"/>
     </AppLayout>
 </template>

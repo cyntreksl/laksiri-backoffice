@@ -6,6 +6,7 @@ use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
+use App\Http\Requests\UpdatePickupRequest;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
@@ -60,20 +61,19 @@ class PickupController extends Controller
         $this->pickupRepository->storePickup($request->all());
     }
 
-    public function show(PickUp $pickUp)
+    public function show(PickUp $pickup)
     {
+        return response()->json($pickup);
     }
 
-    public function edit(PickUp $pickUp)
+    public function update(UpdatePickupRequest $request, PickUp $pickup)
     {
+        return $this->pickupRepository->updatePickup($request->all(), $pickup);
     }
 
-    public function update(Request $request, PickUp $pickUp)
+    public function destroy(PickUp $pickup)
     {
-    }
-
-    public function destroy(PickUp $pickUp)
-    {
+        $this->pickupRepository->deletePickup($pickup);
     }
 
     public function assignDriver(AssignDriverRequest $request)

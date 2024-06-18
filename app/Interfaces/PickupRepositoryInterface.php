@@ -2,6 +2,7 @@
 
 namespace App\Interfaces;
 
+use App\Models\PickUp;
 use Illuminate\Http\Request;
 
 interface PickupRepositoryInterface
@@ -17,4 +18,8 @@ interface PickupRepositoryInterface
     public function getFilteredPickups(Request $request);
 
     public function savePickupOrder(array $pickups);
+
+    public function updatePickup(array $data, PickUp $pickup);
+
+    public function deletePickup(PickUp $pickup);
 }
