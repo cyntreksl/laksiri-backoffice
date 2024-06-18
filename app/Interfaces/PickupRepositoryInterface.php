@@ -20,4 +20,6 @@ interface PickupRepositoryInterface
     public function savePickupOrder(array $pickups);
 
     public function updatePickup(array $data, PickUp $pickup);
+
+    public function deletePickup(PickUp $pickup);
 }

@@ -71,8 +71,9 @@ class PickupController extends Controller
         return $this->pickupRepository->updatePickup($request->all(), $pickup);
     }
 
-    public function destroy(PickUp $pickUp)
+    public function destroy(PickUp $pickup)
     {
+        $this->pickupRepository->deletePickup($pickup);
     }
 
     public function assignDriver(AssignDriverRequest $request)
