@@ -34,7 +34,7 @@ const props = defineProps({
 });
 
 const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(1, "months").format("YYYY-MM-DD");
+const fromDate = moment(new Date()).subtract(7, "days").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 const wrapperRef = ref(null);
 let grid = null;
@@ -122,14 +122,11 @@ const createColumns = () => [
     name: "Is Hold",
     hidden: !data.columnVisibility.is_hold,
     formatter: (cell) => {
-      if (cell) {
-        const svgMarkup = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-success">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
-                </svg>`;
-        return html(svgMarkup);
-      }
-      return null;
+      return cell
+        ? html(`<div></div class="text-center"><svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg></div>`)
+        : null;
     },
     sort: false,
   },
@@ -314,6 +311,7 @@ const applyFilters = () => {
       then: (data) =>
         data.data.map((item) => {
           const row = [];
+          row.push({ id: item.id });
           visibleColumns.forEach((column) => {
             row.push(item[column]);
           });

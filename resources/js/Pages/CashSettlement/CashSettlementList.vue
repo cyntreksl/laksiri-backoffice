@@ -35,7 +35,7 @@ const props = defineProps({
 });
 
 const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(1, "months").format("YYYY-MM-DD");
+const fromDate = moment(new Date()).subtract(7, "days").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 const wrapperRef = ref(null);
 let grid = null;
@@ -344,9 +344,11 @@ const applyFilters = () => {
       then: (data) =>
         data.data.map((item) => {
           const row = [];
+          row.push({ id: item.id });
           visibleColumns.forEach((column) => {
             row.push(item[column]);
           });
+
           return row;
         }),
     },
