@@ -8,6 +8,7 @@ use App\Actions\PickUps\CreatePickUp;
 use App\Actions\PickUps\GetPickupByIds;
 use App\Actions\PickUps\GetPickups;
 use App\Actions\PickUps\SavePickUpOrder;
+use App\Actions\PickUps\UpdatePickUp;
 use App\Factory\Pickup\FilterFactory;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\GridJsInterface;
@@ -100,5 +101,10 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
         foreach ($pickups as $item) {
             SavePickUpOrder::run($item);
         }
+    }
+
+    public function updatePickup(array $data, PickUp $pickup)
+    {
+        return UpdatePickUp::run($data, $pickup);
     }
 }

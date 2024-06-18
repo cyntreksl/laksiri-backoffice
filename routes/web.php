@@ -38,7 +38,8 @@ Route::middleware([
     })->name('dashboard2');
 
     // Pick Up
-    Route::resource('pickups', PickupController::class);
+    Route::resource('pickups', PickupController::class)
+        ->except('edit');
 
     Route::get('pickup-list', [PickupController::class, 'list']);
     Route::get('pickup-list-order', [PickupController::class, 'showPickupOrder'])->name('pickups.ordering');
