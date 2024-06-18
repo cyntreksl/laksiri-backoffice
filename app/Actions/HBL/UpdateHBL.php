@@ -2,6 +2,7 @@
 
 namespace App\Actions\HBL;
 
+use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -35,6 +36,10 @@ class UpdateHBL
             'created_by' => auth()->id(),
             'pickup_id' => $data['pickup_id'] ?? null,
         ]);
+
+        if (! empty($data['paid_amount'])) {
+            UpdateHBLPayments::run($data['paid_amount'], $hbl);
+        }
 
         return $hbl;
     }
