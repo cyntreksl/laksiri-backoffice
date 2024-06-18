@@ -11,7 +11,7 @@ class GetHBLsWithPackages
 
     public function handle()
     {
-        return HBL::latest()
+        return HBL::withTrashed()->latest()
             ->withCount('packages')
             ->with('packages')
             ->withSum('packages', 'weight')

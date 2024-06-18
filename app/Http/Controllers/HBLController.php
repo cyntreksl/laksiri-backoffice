@@ -12,6 +12,7 @@ use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -108,5 +109,32 @@ class HBLController extends Controller
     public function downloadHBLPDF(HBL $hbl)
     {
         return $this->HBLRepository->downloadHBLPDF($hbl);
+    }
+
+    public function cancelledHBLs()
+    {
+        return Inertia::render('HBL/CancelledHBLList', [
+            'users' => $this->userRepository->getUsers(),
+            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
+            'paymentStatus' => HBLPaymentStatus::cases(),
+        ]);
+    }
+
+    public function cancelledList(Request $request): JsonResponse
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold', 'paymentStatus']);
+
+        return $this->HBLRepository->getCancelledList($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function restore($id)
+    {
+        return $this->HBLRepository->restore($id);
     }
 }

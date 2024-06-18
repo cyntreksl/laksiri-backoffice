@@ -59,6 +59,13 @@ Breadcrumbs::for('hbls.edit', function (BreadcrumbTrail $trail, $hbl) {
     $trail->push('Edit HBL', route('hbls.edit', $hbl->id));
 });
 
+// HBL > Cancelled HBLs
+Breadcrumbs::for('hbls.cancelled-hbls', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('HBL List', route('hbls.index'));
+    $trail->push('Cancelled HBL List', route('hbls.cancelled-hbls'));
+});
+
 // Users
 Breadcrumbs::for('users.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
