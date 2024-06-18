@@ -239,9 +239,7 @@ const updateTypeDescription = () => {
 };
 
 const hblTotal = ref(0);
-const currency = ref(
-  usePage().props.auth?.user?.primary_branch?.currency_symbol || "SAR"
-);
+const currency = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 const isEditable = ref(false);
 
 const calculatePayment = () => {
