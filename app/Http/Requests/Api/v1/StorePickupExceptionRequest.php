@@ -14,7 +14,6 @@ class StorePickupExceptionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'driver_id' => ['required'],
             'picker_note' => ['required', 'string'],
         ];
     }
