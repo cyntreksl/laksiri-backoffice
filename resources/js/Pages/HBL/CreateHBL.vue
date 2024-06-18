@@ -33,7 +33,6 @@ const props = defineProps({
 
 //branch set
 const currentBranch = usePage().props?.auth.user.active_branch_name;
-console.log(currentBranch);
 
 const findCountryCodeByBranch = computed(() => {
   switch (currentBranch) {
