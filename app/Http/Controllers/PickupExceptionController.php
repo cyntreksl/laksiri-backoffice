@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AssignDriverRequest;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
@@ -39,5 +40,10 @@ class PickupExceptionController extends Controller
         $filters = $request->only(['fromDate', 'toDate', 'createdBy', 'zoneBy']);
 
         return $this->pickupExceptionRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function assignDriver(AssignDriverRequest $request)
+    {
+        $this->pickupExceptionRepository->assignDriverToExceptions($request->all());
     }
 }

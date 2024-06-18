@@ -2,6 +2,8 @@
 
 namespace App\Repositories;
 
+use App\Actions\PickUps\Exception\AssignDriver;
+use App\Actions\PickUps\Exception\GetExceptionsByIds;
 use App\Factory\Pickup\FilterFactory;
 use App\Http\Resources\PickupExceptionResource;
 use App\Interfaces\GridJsInterface;
@@ -42,5 +44,14 @@ class PickupExceptionRepository implements GridJsInterface, PickupExceptionRepos
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function assignDriverToExceptions(array $data)
+    {
+        $pickupList = GetExceptionsByIds::run($data['job_ids']);
+
+        foreach ($pickupList as $pickup) {
+            AssignDriver::run($pickup, $data['driver_id']);
+        }
     }
 }
