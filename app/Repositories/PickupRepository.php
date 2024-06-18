@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\NoteType\GetNoteTypes;
 use App\Actions\PickUps\AssignDriver;
 use App\Actions\PickUps\CreatePickUp;
+use App\Actions\PickUps\DeletePickup;
 use App\Actions\PickUps\GetPickupByIds;
 use App\Actions\PickUps\GetPickups;
 use App\Actions\PickUps\SavePickUpOrder;
@@ -106,5 +107,10 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     public function updatePickup(array $data, PickUp $pickup)
     {
         return UpdatePickUp::run($data, $pickup);
+    }
+
+    public function deletePickup(PickUp $pickup)
+    {
+        return DeletePickup::run($pickup);
     }
 }
