@@ -34,7 +34,7 @@ const props = defineProps({
 });
 
 const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(7, "days").format("YYYY-MM-DD");
+const fromDate = moment(new Date()).subtract(1, "month").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 const wrapperRef = ref(null);
 let grid = null;
