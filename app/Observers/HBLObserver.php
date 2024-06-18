@@ -9,22 +9,6 @@ class HBLObserver
     protected static array $cascade_relations = ['packages', 'status', 'hblPayment'];
 
     /**
-     * Handle the HBL "created" event.
-     */
-    public function created(HBL $hBL): void
-    {
-        //
-    }
-
-    /**
-     * Handle the HBL "updated" event.
-     */
-    public function updated(HBL $hBL): void
-    {
-        //
-    }
-
-    /**
      * Handle the HBL "deleted" event.
      */
     public function deleted(HBL $hBL): void
@@ -46,13 +30,5 @@ class HBLObserver
                 $item->restore();
             }
         }
-    }
-
-    /**
-     * Handle the HBL "force deleted" event.
-     */
-    public function forceDeleted(HBL $hBL): void
-    {
-        //
     }
 }
