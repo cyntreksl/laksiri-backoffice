@@ -87,8 +87,6 @@ Route::middleware([
         })->name('driver-tracings.index');
     });
 
-    //Warehouse zone
-
     // Back Office
     Route::name('back-office.')->group(function () {
         // Cash Settlements
