@@ -124,7 +124,3 @@ const closeModal = () => {
     </Tab>
     <AddHBLModal :container="container" :show="showConfirmAddHBLModal" @close="closeModal"/>
 </template>
-
-<style scoped>
-
-</style>
