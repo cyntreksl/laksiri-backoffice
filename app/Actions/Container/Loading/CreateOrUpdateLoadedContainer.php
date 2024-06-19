@@ -2,6 +2,7 @@
 
 namespace App\Actions\Container\Loading;
 
+use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\Container\UpdateReferenceNumber;
 use App\Actions\HBL\HBLPackage\MarkAsLoaded;
@@ -48,6 +49,14 @@ class CreateOrUpdateLoadedContainer
             $reference = GenerateLoadingReferenceNumber::run(GetUserCurrentBranch::run()['branchName']);
 
             UpdateReferenceNumber::run($container, $reference);
+
+            // update container loading end datetime and who loaded by
+            $data = [
+                'loading_ended_at' => now(),
+                'loading_ended_by' => auth()->id(),
+            ];
+
+            UpdateContainer::run($container, $data);
 
             DB::commit();
         } catch (\Exception $e) {
