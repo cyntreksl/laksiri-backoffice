@@ -2,8 +2,10 @@
 
 namespace App\Actions\Container\Loading;
 
+use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\HBL\HBLPackage\MarkAsUnloaded;
 use App\Actions\HBL\UpdateHBLSystemStatus;
+use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\HBL;
 use App\Models\HBLPackage;
@@ -38,6 +40,11 @@ class DeleteDraftLoadedContainer
 
             if (! $isPartialLoaded) {
                 UpdateHBLSystemStatus::run($hbl, 4);
+            }
+
+            // update the container status as a 'requested' when full loading removed.
+            if (! $container->hbl_packages()->exists()) {
+                UpdateContainerStatus::run($container, ContainerStatus::REQUESTED->value);
             }
 
             DB::commit();
