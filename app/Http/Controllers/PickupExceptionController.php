@@ -46,4 +46,9 @@ class PickupExceptionController extends Controller
     {
         $this->pickupExceptionRepository->assignDriverToExceptions($request->all());
     }
+
+    public function deleteExceptions(Request $request)
+    {
+        $this->pickupExceptionRepository->deleteExceptions($request->exceptionIds);
+    }
 }

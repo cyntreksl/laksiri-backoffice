@@ -14,6 +14,10 @@ import Checkbox from "@/Components/Checkbox.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
+import DangerButton from "@/Components/DangerButton.vue";
+import DeleteExceptionConfirmationModal from "@/Pages/Pickup/Partials/DeleteExceptionConfirmationModal.vue";
+import {push} from "notivue";
+import {router} from "@inertiajs/vue3";
 
 defineProps({
     drivers: {
@@ -276,9 +280,33 @@ const confirmAssignDriver = () => {
     showConfirmAssignDriverModal.value = true;
 };
 
+const showConfirmDeleteExceptionModal = ref(false);
+
+const confirmDeleteExceptions = () => {
+    idList.value = selectedData.value.map(item => item[0]);
+    showConfirmDeleteExceptionModal.value = true;
+};
+
 const closeModal = () => {
     showConfirmAssignDriverModal.value = false;
+    showConfirmDeleteExceptionModal.value = false;
     idList.value = [];
+}
+
+const handleDeleteExceptions = () => {
+    router.post(route('pickups.exceptions.delete'), {
+        exceptionIds: idList.value
+    }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            push.success('Pickup Exception Deleted Successfully!');
+            const currentRoute = route().current();
+            router.visit(route(currentRoute));
+        },
+        onError: () => {
+            push.error('Something went to wrong!');
+        }
+    })
 }
 </script>
 <template>
@@ -343,7 +371,7 @@ const closeModal = () => {
                     </div>
 
 
-                    <div class="flex">
+                    <div class="flex space-x-2">
                         <ColumnVisibilityPopover>
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox :checked="data.columnVisibility.reference"
@@ -409,6 +437,11 @@ const closeModal = () => {
                             <svg class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"  fill="none"  height="18"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="18"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg>
                             Assign Driver ({{countOfSelectedData}})
                         </PrimaryButton>
+
+                        <DangerButton :disabled="isDataEmpty" @click="confirmDeleteExceptions">
+                            <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-trash mr-1"  fill="none"  height="18"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="18"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+                            Delete ({{countOfSelectedData}})
+                        </DangerButton>
                     </div>
                 </div>
 
@@ -482,5 +515,7 @@ const closeModal = () => {
                 </SoftPrimaryButton>
             </template>
         </FilterDrawer>
+
+        <DeleteExceptionConfirmationModal :count-of-selected-data="countOfSelectedData" :show="showConfirmDeleteExceptionModal" @close="closeModal" @delete-exceptions="handleDeleteExceptions"/>
     </AppLayout>
 </template>
