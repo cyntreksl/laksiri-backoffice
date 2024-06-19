@@ -37,7 +37,7 @@ class WarehouseZoneController extends Controller
             $query->where('name', 'like', '%'.$search.'%');
         }
 
-        $wzones = $query->orderBy($order, $dir)
+        $warehousezones = $query->orderBy($order, $dir)
             ->skip($page)
             ->take($limit)
             ->get();
@@ -45,7 +45,7 @@ class WarehouseZoneController extends Controller
         $totalwzones = WarehouseZone::count();
 
         return response()->json([
-            'data' => WarehouseZoneCollection::collection($wzones),
+            'data' => WarehouseZoneCollection::collection($warehousezones),
             'meta' => [
                 'total' => $totalwzones,
                 'page' => $page,
