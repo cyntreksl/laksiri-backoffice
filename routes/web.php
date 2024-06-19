@@ -95,6 +95,12 @@ Route::middleware([
 
         Route::get('driver-list', [DriverController::class, 'list']);
 
+        Route::put('drivers/{user}/change', [DriverController::class, 'changeDriverBasicDetails'])
+            ->name('driver.update');
+
+        Route::put('drivers/{user}/password/change', [DriverController::class, 'changeDriverPassword'])
+            ->name('driver.password.update');
+
         //Driver Tracking
         Route::get('driver-tracings', function () {
             return Inertia::render('User/DriverTracking');
