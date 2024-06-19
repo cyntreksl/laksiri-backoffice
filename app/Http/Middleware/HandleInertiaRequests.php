@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Actions\Branch\GetBranchById;
+use App\Actions\User\GetUserCurrentBranchID;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
@@ -34,6 +36,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'userBranch' => Auth::check() ? Auth::user()->branches()->pluck('name')->toArray() : [],
+            'currentBranch' => Auth::check() ? GetBranchById::run(GetUserCurrentBranchID::run()) : [],
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
