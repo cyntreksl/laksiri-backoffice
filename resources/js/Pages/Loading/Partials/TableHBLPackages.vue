@@ -1,8 +1,10 @@
 <script setup>
 import {router} from "@inertiajs/vue3";
 import {push} from "notivue";
+import {ref, watchEffect} from "vue";
+import DeleteHBLConfirmationModal from "@/Pages/Loading/Partials/DeleteHBLConfirmationModal.vue";
 
-defineProps({
+const props = defineProps({
     container: {
         type: Object,
         default: () => {
@@ -10,14 +12,39 @@ defineProps({
     }
 });
 
-const handleRemoveHBLFromContainer = (hblId) => {
-    router.put(route('loading.containers.unload.hbl', props.container.id), {
-            hbl_id: hblId
+const containerData = ref({});
+const showConfirmDeleteHBLModal = ref(false);
+const hblId = ref(null);
+
+watchEffect(() => {
+    containerData.value = props.container;
+});
+
+const confirmDeleteHBL = (id) => {
+    hblId.value = id;
+    showConfirmDeleteHBLModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmDeleteHBLModal.value = false;
+    hblId.value = null;
+};
+
+const handleRemoveHBLFromContainer = () => {
+    router.put(route('loading.containers.unload.hbl', containerData.value.id), {
+            hbl_id: hblId.value
         },
         {
             onSuccess: () => {
+                containerData.value = {
+                    ...containerData.value,
+                    hbls: containerData.value.hbls.filter(hbl => hbl.id !== hblId.value)
+                };
+                closeModal();
+                if (containerData.value.hbls.length === 0) {
+                    router.visit(route('loading.loaded-containers.index'));
+                }
                 push.success('Unloaded successfully!');
-                emit('close');
             },
             onError: () => {
                 console.error('Something went to wrong!');
@@ -82,7 +109,7 @@ const handleRemoveHBLFromContainer = (hblId) => {
             </tr>
             </thead>
             <tbody>
-            <tr v-for="hbl in container?.hbls"
+            <tr v-for="hbl in containerData?.hbls"
                 class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                 <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
                     {{ hbl.hbl || '-' }}
@@ -100,7 +127,7 @@ const handleRemoveHBLFromContainer = (hblId) => {
                     <button
                         class="btn size-8 p-0 rounded-full text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
                         x-tooltip.placement.bottom.error="'Remove From Shipment'"
-                        @click.prevent="handleRemoveHBLFromContainer(hbl.id)">
+                        @click.prevent="confirmDeleteHBL(hbl.id)">
                         <svg class="size-5" fill="none" stroke="currentColor"
                              stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -114,4 +141,6 @@ const handleRemoveHBLFromContainer = (hblId) => {
             </tbody>
         </table>
     </div>
+
+    <DeleteHBLConfirmationModal :show="showConfirmDeleteHBLModal" @close="closeModal" @unload-hbl="handleRemoveHBLFromContainer"/>
 </template>
