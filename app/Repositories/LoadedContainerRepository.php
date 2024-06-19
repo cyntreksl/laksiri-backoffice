@@ -13,6 +13,7 @@ use App\Interfaces\GridJsInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepositoryInterface
 {
@@ -77,9 +78,12 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         ]);
     }
 
-    public function downloadManifestFile(Container $container)
+    public function downloadManifestFile(Container $container): BinaryFileResponse
     {
-        return Excel::download(new LoadedContainerManifestExport($container), 'manifest.xlsx');
+        // generate file name
+        $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.xlsx';
+
+        return Excel::download(new LoadedContainerManifestExport($container), $filename);
     }
 
     public function getLoadedContainers()

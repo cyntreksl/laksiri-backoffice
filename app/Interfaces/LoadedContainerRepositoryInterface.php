@@ -3,6 +3,7 @@
 namespace App\Interfaces;
 
 use App\Models\Container;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 interface LoadedContainerRepositoryInterface
 {
@@ -10,7 +11,7 @@ interface LoadedContainerRepositoryInterface
 
     public function deleteDraft(array $data);
 
-    public function downloadManifestFile(Container $container);
+    public function downloadManifestFile(Container $container): BinaryFileResponse;
 
     public function getLoadedContainers();
 }
