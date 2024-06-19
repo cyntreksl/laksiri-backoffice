@@ -202,9 +202,14 @@ const props = defineProps({
                             Volume (M.CU)
                         </th>
                         <th
-                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
                             Remarks
+                        </th>
+                        <th
+                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
+                            Loaded
                         </th>
                     </tr>
                     </thead>
@@ -222,8 +227,17 @@ const props = defineProps({
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.quantity ?? 0 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.weight ?? 0 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume ?? 0 }}</td>
-                        <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
+                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                             {{ item.remarks ?? '-' }}
+                        </td>
+                        <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
+                            <svg v-if="item.is_loaded" class="size-6 text-success" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path clip-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" fill-rule="evenodd" />
+                            </svg>
+
+                            <svg v-else class="size-6 text-error" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path clip-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" fill-rule="evenodd" />
+                            </svg>
                         </td>
                     </tr>
                     </tbody>
