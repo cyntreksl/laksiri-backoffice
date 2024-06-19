@@ -72,7 +72,20 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
     public function unloadHBLFromContainer(array $data, Container $container)
     {
-        return UnloadHBL::run($data, $container);
+        try {
+            DB::beginTransaction();
+
+            UnloadHBL::run($data, $container);
+
+            if (! $container->hbl_packages()->exists()) {
+                UpdateContainerStatus::run($container, ContainerStatus::REQUESTED->value);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception('Failed to unload hbl from container: '.$e->getMessage());
+        }
     }
 
     public function batchHBLDownload(Container $container)
