@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enum\CargoType;
+use App\Enum\ContainerStatus;
 use App\Enum\ContainerType;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
@@ -26,6 +27,7 @@ class LoadedContainerController extends Controller
             'cargoTypes' => CargoType::cases(),
             'containers' => $this->loadedContainerRepository->getLoadedContainers(),
             'containerTypes' => ContainerType::cases(),
+            'containerStatus' => ContainerStatus::cases(),
         ]);
     }
 

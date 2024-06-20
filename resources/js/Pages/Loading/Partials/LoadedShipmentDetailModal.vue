@@ -14,7 +14,11 @@ const props = defineProps({
         type: Object,
         default: () => {
         },
-    }
+    },
+    containerStatus: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const emit = defineEmits(['close']);
@@ -70,7 +74,7 @@ const emit = defineEmits(['close']);
 
                 <TabHBLUnderShipment :container="container" @close="emit('close')"/>
 
-                <TabShipmentDetails :container="container"/>
+                <TabShipmentDetails :container="container" :container-status="containerStatus"/>
 
                 <TabDocuments />
             </Tabs>

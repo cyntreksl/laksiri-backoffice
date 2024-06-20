@@ -6,6 +6,7 @@ use App\Actions\Container\CreateContainer;
 use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Unloading\UnloadHBL;
 use App\Actions\Container\Unloading\UnloadHBLPackages;
+use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
 use App\Enum\ContainerStatus;
 use App\Factory\Container\FilterFactory;
@@ -156,6 +157,15 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         } catch (\Exception $e) {
             DB::rollBack();
             throw new \Exception('Failed to delete loaded shipment: '.$e->getMessage());
+        }
+    }
+
+    public function update(array $data, Container $container)
+    {
+        try {
+            UpdateContainer::run($container, $data);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to update loaded shipment container: '.$e->getMessage());
         }
     }
 }

@@ -64,6 +64,11 @@ class ContainerController extends Controller
         }
     }
 
+    public function update(Request $request, Container $container)
+    {
+        return $this->containerRepository->update($request->all(), $container);
+    }
+
     public function showLoadingPoint(Request $request, Container $container)
     {
         return Inertia::render('Loading/LoadingPoint', [

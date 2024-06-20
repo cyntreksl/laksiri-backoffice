@@ -4,20 +4,24 @@ import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Tab from "@/Components/Tab.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import DatePicker from "@/Components/DatePicker.vue";
 import AccordionPanel from "@/Components/AccordionPanel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import DeleteLoadingConfirmationModal from "@/Pages/Loading/Partials/DeleteLoadingConfirmationModal.vue";
 import {ref} from "vue";
-import {router} from "@inertiajs/vue3";
+import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
+import Checkbox from "@/Components/Checkbox.vue";
 
 const props = defineProps({
     container: {
         type: Object,
         default: () => {
         },
-    }
+    },
+    containerStatus: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const emit = defineEmits(['close']);
@@ -46,6 +50,31 @@ const handleDeleteLoadedShipment = () => {
             push.error('Something went to wrong!');
         }
     })
+}
+
+const form = useForm({
+    cargo_type: props.container.cargo_type,
+    reference: props.container.reference,
+    awb_number: props.container.awb_number,
+    estimated_time_of_departure: props.container.estimated_time_of_departure,
+    estimated_time_of_arrival: props.container.estimated_time_of_arrival,
+    status: props.container.status,
+    note: props.container.note,
+    is_reached: Boolean(props.container.is_reached),
+    reached_date: props.container.reached_date,
+});
+
+const handleUpdateContainer = () => {
+    form.put(route("loading.loading-containers.update", props.container.id), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            push.success('Container Updated Successfully!');
+        },
+        onError: () => {
+            form.reset();
+        }
+    });
 }
 </script>
 
@@ -86,42 +115,32 @@ const handleDeleteLoadedShipment = () => {
                     <div>
                         <label class="block">
                             <InputLabel value="Cargo Mode"/>
-                            <select
-                                class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                            >
-                                <option :value="null" disabled>
-                                    Select Cargo Mode
-                                </option>
-                                <option>
-                                    Sea Cargo
-                                </option>
-                            </select>
+                            <TextInput v-model="form.cargo_type" class="w-full" disabled/>
                         </label>
-                        <InputError/>
                     </div>
 
                     <div>
                         <InputLabel value="Reference"/>
-                        <TextInput class="w-full" placeholder="Reference"/>
-                        <InputError/>
+                        <TextInput v-model="form.reference" class="w-full" placeholder="Reference"/>
+                        <InputError :message="form.errors.reference"/>
                     </div>
 
                     <div>
                         <InputLabel value="AWB No"/>
-                        <TextInput class="w-full"/>
-                        <InputError/>
+                        <TextInput v-model="form.awb_number" class="w-full"/>
+                        <InputError :message="form.errors.awb_number"/>
                     </div>
 
                     <div>
                         <InputLabel value="EDT"/>
-                        <DatePicker/>
-                        <InputError/>
+                        <TextInput v-model="form.estimated_time_of_departure" class="w-full" type="date"/>
+                        <InputError :message="form.errors.estimated_time_of_departure"/>
                     </div>
 
                     <div>
                         <InputLabel value="ETA"/>
-                        <DatePicker/>
-                        <InputError/>
+                        <TextInput v-model="form.estimated_time_of_arrival" class="w-full" type="date"/>
+                        <InputError :message="form.errors.estimated_time_of_arrival"/>
                     </div>
                 </div>
 
@@ -152,35 +171,36 @@ const handleDeleteLoadedShipment = () => {
                         <label class="block">
                             <InputLabel value="Last Status"/>
                             <select
+                                v-model="form.status"
                                 class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                             >
                                 <option :value="null" disabled>
                                     Select Status
                                 </option>
-                                <option>
-                                    Status
+                                <option v-for="status in containerStatus">
+                                    {{ status }}
                                 </option>
                             </select>
                         </label>
-                        <InputError/>
+                        <InputError :message="form.errors.status"/>
                     </div>
 
                     <div>
                         <InputLabel value="Note"/>
-                        <TextInput class="w-full" placeholder="Type something..."/>
-                        <InputError/>
+                        <TextInput v-model="form.note" class="w-full" placeholder="Type something..."/>
+                        <InputError :message="form.errors.note"/>
                     </div>
 
                     <div>
                         <InputLabel value="Reached Destination?"/>
-                        <TextInput class="w-full"/>
-                        <InputError/>
+                        <Checkbox v-model="form.is_reached" />
+                        <InputError :message="form.errors.is_reached"/>
                     </div>
 
                     <div>
                         <InputLabel value="Reached Date"/>
-                        <DatePicker/>
-                        <InputError/>
+                        <TextInput v-model="form.reached_date" class="w-full" type="date"/>
+                        <InputError :message="form.errors.reached_date"/>
                     </div>
                 </div>
             </div>
@@ -199,7 +219,8 @@ const handleDeleteLoadedShipment = () => {
                 Delete Loading
             </DangerOutlineButton>
 
-            <PrimaryButton>
+            <PrimaryButton :class="{ 'opacity-25': form.processing }"
+                           :disabled="form.processing" @click="handleUpdateContainer">
                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-device-floppy size-5 mr-2"
                      fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                      stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
@@ -214,5 +235,6 @@ const handleDeleteLoadedShipment = () => {
         </div>
     </Tab>
 
-    <DeleteLoadingConfirmationModal :show="showConfirmDeleteLoadingModal" @close="closeDeleteConfirmationModal" @delete-loading="handleDeleteLoadedShipment"/>
+    <DeleteLoadingConfirmationModal :show="showConfirmDeleteLoadingModal" @close="closeDeleteConfirmationModal"
+                                    @delete-loading="handleDeleteLoadedShipment"/>
 </template>
