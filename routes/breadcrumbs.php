@@ -78,6 +78,18 @@ Breadcrumbs::for('users.edit', function (BreadcrumbTrail $trail, User $user) {
     $trail->push('User Edit', route('users.edit', $user->id));
 });
 
+// Warehouse Zone
+Breadcrumbs::for('setting.warehouse-zones.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Warehouse Zones', route('setting.warehouse-zones.index'));
+});
+
+// Warehouse Zone > Edit
+Breadcrumbs::for('setting.warehouse-zones.edit', function (BreadcrumbTrail $trail, $id) {
+    $trail->parent('setting.warehouse-zones.index');
+    $trail->push('Update Warehouse Zone', route('setting.warehouse-zones.edit', $id));
+});
+
 // Drivers
 Breadcrumbs::for('users.drivers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

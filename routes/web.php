@@ -11,6 +11,7 @@ use App\Http\Controllers\PickupExceptionController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\WarehouseZoneController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -228,10 +229,15 @@ Route::middleware([
         Route::get('driver-areas', function () {
             return Inertia::render('Setting/DriverAreaList');
         })->name('driver-areas.index');
+
         //Warehouse Zones
-        Route::get('warehouse-zones', function () {
-            return Inertia::render('Setting/WarehouseZoneList');
-        })->name('warehouse-zones.index');
+        Route::get('warehouse-zones/list', [WarehouseZoneController::class, 'list'])->name('warehouse-zones.list');
+        Route::get('warehouse-zones', [WarehouseZoneController::class, 'index'])->name('warehouse-zones.index');
+        Route::delete('warehouse-zones/{id}', [WarehouseZoneController::class, 'delete'])->name('warehouse-zones.delete');
+        Route::post('warehousezones/create', [WarehouseZoneController::class, 'store'])->name('warehouse-zones.store');
+        Route::post('warehousezones/update', [WarehouseZoneController::class, 'update'])->name('warehouse-zones.update');
+        Route::get('warehousezones/{id}/edit', [WarehouseZoneController::class, 'edit'])->name('warehouse-zones.edit');
+
         //Pricing
         Route::resource('prices', PriceController::class)->except('show');
     });
