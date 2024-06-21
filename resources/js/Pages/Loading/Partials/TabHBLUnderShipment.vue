@@ -2,10 +2,9 @@
 import Tab from "@/Components/Tab.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
-import {router} from "@inertiajs/vue3";
-import {push} from "notivue";
 import {ref} from "vue";
 import AddHBLModal from "@/Pages/Loading/Partials/AddHBLModal.vue";
+import TableHBLPackages from "@/Pages/Loading/Partials/TableHBLPackages.vue";
 
 const props = defineProps({
     container: {
@@ -14,24 +13,6 @@ const props = defineProps({
         },
     }
 });
-
-const handleRemoveHBLFromContainer = (hblId) => {
-    router.put(route('loading.containers.unload.hbl', props.container.id), {
-            hbl_id: hblId
-        },
-        {
-            onSuccess: () => {
-                push.success('Unloaded successfully!');
-                emit('close');
-            },
-            onError: () => {
-                console.error('Something went to wrong!');
-            },
-            preserveScroll: true,
-            preserveState: true,
-        }
-    )
-}
 
 const showConfirmAddHBLModal = ref(false);
 
@@ -55,7 +36,7 @@ const closeModal = () => {
                 <p class="mt-1 hidden sm:block">{{ container.reference }}</p>
             </div>
             <div class="flex items-center space-x-2">
-                <PrimaryOutlineButton @click="confirmViewLoadedShipment">
+                <PrimaryOutlineButton :disabled="container.status !== 'DRAFT'" @click="confirmViewLoadedShipment">
                     <svg class="size-5 mr-2" fill="none" stroke="currentColor"
                          stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke-linecap="round"
@@ -66,7 +47,7 @@ const closeModal = () => {
                 </PrimaryOutlineButton>
 
                 <a :href="route('loading.hbls.batch-downloads', container.id)">
-                    <PrimaryOutlineButton>
+                    <PrimaryOutlineButton :disabled="container.status !== 'LOADED'">
                         <svg class="size-5 mr-2" fill="none" stroke="currentColor"
                              stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -139,94 +120,7 @@ const closeModal = () => {
             </SimpleOverviewWidget>
         </div>
 
-        <div class="is-scrollbar-hidden min-w-full overflow-x-auto my-10">
-            <table class="is-hoverable w-full text-left">
-                <thead>
-                <tr>
-                    <th
-                        class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        HBL
-                    </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Packages
-                    </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Name
-                    </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        PP No
-                    </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Address
-                    </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Contact
-                    </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Consignee Name
-                    </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Consignee Address
-                    </th>
-                    <th
-                        class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Action
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="hbl in container?.hbls"
-                    class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
-                    <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
-                        {{ hbl.hbl || '-' }}
-                    </td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.packages_count || '-' }}</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                        {{ hbl.hbl_name || '-' }}
-                    </td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.address || '-' }}</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.contact_number || '-' }}</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.consignee_name || '-' }}</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.consignee_address || '-' }}</td>
-                    <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
-                        <button
-                            class="btn size-8 p-0 rounded-full text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
-                            x-tooltip.placement.bottom.error="'Remove From Shipment'"
-                            @click.prevent="handleRemoveHBLFromContainer(hbl.id)">
-                            <svg class="size-5" fill="none" stroke="currentColor"
-                                 stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+        <TableHBLPackages :container="container"/>
     </Tab>
     <AddHBLModal :container="container" :show="showConfirmAddHBLModal" @close="closeModal"/>
 </template>
-
-<style scoped>
-
-</style>

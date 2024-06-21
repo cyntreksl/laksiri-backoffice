@@ -2,6 +2,7 @@
 
 namespace App\Actions\Container\Loading;
 
+use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\HBL\HBLPackage\MarkAsLoaded;
 use App\Actions\HBL\UpdateHBLSystemStatus;
@@ -40,6 +41,14 @@ class CreateDraftLoadedContainer
             }
 
             UpdateContainerStatus::run($container, ContainerStatus::DRAFT->value);
+
+            // update container loading start datetime and who loaded by
+            $data = [
+                'loading_started_at' => now(),
+                'loading_started_by' => auth()->id(),
+            ];
+
+            UpdateContainer::run($container, $data);
 
             DB::commit();
         } catch (\Exception $e) {

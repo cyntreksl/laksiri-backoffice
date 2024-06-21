@@ -6,6 +6,7 @@ use App\Actions\Container\CreateContainer;
 use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Unloading\UnloadHBL;
 use App\Actions\Container\Unloading\UnloadHBLPackages;
+use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
 use App\Enum\ContainerStatus;
 use App\Factory\Container\FilterFactory;
@@ -72,7 +73,20 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
     public function unloadHBLFromContainer(array $data, Container $container)
     {
-        return UnloadHBL::run($data, $container);
+        try {
+            DB::beginTransaction();
+
+            UnloadHBL::run($data, $container);
+
+            if (! $container->hbl_packages()->exists()) {
+                UpdateContainerStatus::run($container, ContainerStatus::REQUESTED->value);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception('Failed to unload hbl from container: '.$e->getMessage());
+        }
     }
 
     public function batchHBLDownload(Container $container)
@@ -143,6 +157,15 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         } catch (\Exception $e) {
             DB::rollBack();
             throw new \Exception('Failed to delete loaded shipment: '.$e->getMessage());
+        }
+    }
+
+    public function update(array $data, Container $container)
+    {
+        try {
+            UpdateContainer::run($container, $data);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to update loaded shipment container: '.$e->getMessage());
         }
     }
 }
