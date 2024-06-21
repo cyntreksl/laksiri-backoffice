@@ -56,6 +56,9 @@ Route::middleware([
     Route::post('pickups/exceptions/driver/assign', [PickupExceptionController::class, 'assignDriver'])
         ->name('pickups.exceptions.driver.assign');
 
+    Route::post('pickups/exceptions/delete', [PickupExceptionController::class, 'deleteExceptions'])
+        ->name('pickups.exceptions.delete');
+
     // HBL
     Route::resource('hbls', HBLController::class)->except('show');
 

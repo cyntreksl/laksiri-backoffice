@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Actions\PickUps\Exception\AssignDriver;
+use App\Actions\PickUps\Exception\DeleteException;
 use App\Actions\PickUps\Exception\GetExceptionsByIds;
 use App\Factory\Pickup\FilterFactory;
 use App\Http\Resources\PickupExceptionResource;
@@ -52,6 +53,15 @@ class PickupExceptionRepository implements GridJsInterface, PickupExceptionRepos
 
         foreach ($pickupList as $pickup) {
             AssignDriver::run($pickup, $data['driver_id']);
+        }
+    }
+
+    public function deleteExceptions(array $exceptionIDs)
+    {
+        $exceptionList = GetExceptionsByIds::run($exceptionIDs);
+
+        foreach ($exceptionList as $exception) {
+            DeleteException::run($exception);
         }
     }
 }
