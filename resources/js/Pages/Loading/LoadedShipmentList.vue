@@ -32,6 +32,10 @@ const props = defineProps({
         default: () => {
         },
     },
+    containerStatus: {
+        type: Array,
+        default: () => [],
+    },
 })
 
 const wrapperRef = ref(null);
@@ -622,6 +626,6 @@ const closeModal = () => {
             </template>
         </FilterDrawer>
 
-        <LoadedShipmentDetailModal :container="selectedContainer" :show="showConfirmLoadedShipmentModal" @close="closeModal"/>
+        <LoadedShipmentDetailModal :container="selectedContainer" :container-status="containerStatus" :show="showConfirmLoadedShipmentModal" @close="closeModal"/>
     </AppLayout>
 </template>

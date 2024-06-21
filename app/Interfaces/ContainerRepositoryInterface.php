@@ -8,6 +8,8 @@ interface ContainerRepositoryInterface
 {
     public function store(array $data): Container;
 
+    public function update(array $data, Container $container);
+
     public function unloadHBLFromContainer(array $data, Container $container);
 
     public function batchHBLDownload(Container $container);
