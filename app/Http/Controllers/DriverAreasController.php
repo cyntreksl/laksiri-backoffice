@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreDriverAreasRequest;
 use App\Http\Resources\DriverAreasCollection;
 use App\Interfaces\BranchRepositoryInterface;
+use App\Interfaces\DriverAreasRepositoryInterface;
 use App\Models\Area;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,6 +14,7 @@ class DriverAreasController extends Controller
 {
     public function __construct(
         private readonly BranchRepositoryInterface $branchRepository,
+        private readonly DriverAreasRepositoryInterface $driverAreasRepositoryInterface,
     ) {
     }
 
@@ -52,25 +55,25 @@ class DriverAreasController extends Controller
         ]);
     }
 
-    // public function store(StoreWareahouseZoneRequest $request)
-    // {
-    //     $this->DriverAreasRepository->createDriverAreas($request->all());
-    // }
+    public function store(StoreDriverAreasRequest $request)
+    {
+        $this->driverAreasRepositoryInterface->createDriverAreas($request->all());
+    }
 
-    // public function edit($id)
-    // {
-    //     return Inertia::render('Setting/DriverAreassEdit', [
-    //         'DriverAreas' => $this->DriverAreasRepository->getDriverAreas($id),
-    //     ]);
-    // }
+    public function edit($id)
+    {
+        return Inertia::render('Setting/DriverAreasEdit', [
+            'driverareas' => $this->driverAreasRepositoryInterface->getDriverAreas($id),
+        ]);
+    }
 
-    // public function update(StoreWareahouseZoneRequest $request)
-    // {
-    //     $this->DriverAreasRepository->editDriverAreas($request->all());
-    // }
+    public function update(StoreDriverAreasRequest $request)
+    {
+        $this->driverAreasRepositoryInterface->editDriverAreas($request->all());
+    }
 
-    // public function delete($id)
-    // {
-    //     $this->DriverAreasRepository->destroy(DriverAreas::find($id));
-    // }
+    public function delete($id)
+    {
+        $this->driverAreasRepositoryInterface->destroy(Area::find($id));
+    }
 }

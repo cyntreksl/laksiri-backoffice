@@ -26,10 +26,10 @@ const form = useForm({
   description: "",
 });
 
-const createWarehousezone = () => {
-  form.post(route("setting.warehouse-zones.store"), {
+const createDriverareas = () => {
+  form.post(route("setting.driver-areas.store"), {
     onSuccess: () => {
-      router.visit(route("setting.warehouse-zones.index"));
+      router.visit(route("setting.driver-areas.index"));
       form.reset();
       push.success("Driver Area Created Successfully!");
     },
@@ -96,7 +96,7 @@ const createWarehousezone = () => {
         :class="{ 'opacity-25': form.processing }"
         :disabled="form.processing"
         class="ms-3"
-        @click="createWarehousezone"
+        @click="createDriverareas"
       >
         Create Driver Area
       </PrimaryButton>

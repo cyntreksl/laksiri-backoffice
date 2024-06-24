@@ -128,7 +128,7 @@ const createColumns = () => [
           {
             className:
               "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
-            href: route("setting.warehouse-zones.edit", row.cells[0].data),
+            href: route("setting.driver-areas.edit", row.cells[0].data),
           },
           [
             h(
@@ -201,13 +201,13 @@ const closeModal = () => {
 };
 
 const handleDeleteDriverAreas = () => {
-  router.delete(route("setting.warehouse-zones.delete", DriverAreasid.value), {
+  router.delete(route("setting.driver-areas.delete", DriverAreasid.value), {
     preserveScroll: true,
     preserveState: true,
     onSuccess: () => {
-      router.visit(route("setting.warehouse-zones.index"));
+      router.visit(route("setting.driver-areas.index"));
       closeModal();
-      push.success("Warehouse Zone Deleted Successfully!");
+      push.success("Driver Area Deleted Successfully!");
       DriverAreasid.value = null;
     },
   });
@@ -295,6 +295,18 @@ const applyFilters = () => {
                             @change="toggleColumnVisibility('name', $event)"
                           />
                           <p>Name</p>
+                        </label>
+
+                        <label class="inline-flex items-center space-x-2">
+                          <input
+                            :checked="data.columnVisibility.branch_name"
+                            class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                            type="checkbox"
+                            @change="
+                              toggleColumnVisibility('branch_name', $event)
+                            "
+                          />
+                          <p>Branch Name</p>
                         </label>
 
                         <label class="inline-flex items-center space-x-2">

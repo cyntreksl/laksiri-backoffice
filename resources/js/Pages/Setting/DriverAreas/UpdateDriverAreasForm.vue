@@ -1,32 +1,29 @@
 <script setup>
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { router, useForm } from "@inertiajs/vue3";
-import { ref } from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import { push } from "notivue";
 
 const props = defineProps({
-  warehousezone: {
+  driverareas: {
     type: Object,
     default: () => {},
   },
 });
 
 const form = useForm({
-  id: props.warehousezone.id,
-  name: props.warehousezone.name,
-  branch_id: props.warehousezone.branch_id,
-  description: props.warehousezone.description,
+  id: props.driverareas.id,
+  name: props.driverareas.name,
+  branch_id: props.driverareas.branch_id,
 });
 
-const updateWarehousezone = () => {
-  form.post(route("setting.warehouse-zones.update"), {
+const updatedriverarea = () => {
+  form.post(route("setting.driver-areas.update"), {
     onSuccess: () => {
-      router.visit(route("setting.warehouse-zones.index"));
+      router.visit(route("setting.driver-areas.index"));
       form.reset();
-      push.success("Warehouse Zone Updated Successfully!");
+      push.success("Driver Area Updated Successfully!");
     },
     preserveScroll: true,
     preserveState: true,
@@ -40,19 +37,19 @@ const updateWarehousezone = () => {
       <h2
         class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
       >
-        Update Warehouse Zone
+        Update Driver Area
       </h2>
       <br />
     </div>
-    <form @submit.prevent="updateWarehousezone">
+    <form @submit.prevent="updatedriverarea">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div class="col-span-1 sm:col-span-2">
-          <InputLabel value="Warehouse Zone Name" />
+          <InputLabel value="Driver Area Name" />
           <label class="relative flex">
             <input
               v-model="form.name"
               class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-              placeholder="Warehouse Zone Name"
+              placeholder="Driver Area Name"
               type="text"
             />
             <div
@@ -75,19 +72,6 @@ const updateWarehousezone = () => {
             </div>
           </label>
           <InputError :message="form.errors.name" />
-        </div>
-
-        <div class="col-span-1 sm:col-span-2">
-          <InputLabel value="Warehouse Zone Description" />
-          <label class="relative flex">
-            <textarea
-              v-model="form.description"
-              rows="4"
-              placeholder="Type Description..."
-              class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-            ></textarea>
-          </label>
-          <InputError :message="form.errors.description" />
         </div>
       </div>
       <br />

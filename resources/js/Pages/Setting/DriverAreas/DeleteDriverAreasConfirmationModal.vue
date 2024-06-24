@@ -10,23 +10,21 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["close", "deleteWarehouseZone"]);
+const emit = defineEmits(["close", "deleteDriverAreas"]);
 </script>
 
 <template>
   <ConfirmationModal :show="show">
-    <template #title> Delete Warehouse Zone? </template>
+    <template #title> Delete Driver Area? </template>
 
-    <template #content>
-      Would you like to delete this Warehouse Zone?
-    </template>
+    <template #content> Would you like to delete this Driver Area? </template>
 
     <template #footer>
       <div class="space-x-2">
         <SecondaryButton @click="$emit('close')"> Nevermind </SecondaryButton>
 
-        <DangerButton @click="$emit('deleteWarehousezone')">
-          Delete Warehouse Zone
+        <DangerButton @click="$emit('deleteDriverAreas')">
+          Delete Driver Area
         </DangerButton>
       </div>
     </template>
