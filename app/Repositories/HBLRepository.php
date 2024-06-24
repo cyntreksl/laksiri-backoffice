@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\DeleteHBL;
+use App\Actions\HBL\DownloadHBLInvoicePDF;
 use App\Actions\HBL\DownloadHBLPDF;
 use App\Actions\HBL\GetHBLByCargoTypeWithDraftLoadedPackages;
 use App\Actions\HBL\GetHBLByCargoTypeWithUnloadedPackages;
@@ -112,6 +113,11 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function downloadHBLPDF(HBL $hbl)
     {
         return DownloadHBLPDF::run($hbl);
+    }
+
+    public function downloadHBLInvoicePDF(HBL $hbl)
+    {
+        return DownloadHBLInvoicePDF::run($hbl);
     }
 
     public function getCancelledList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse

@@ -79,6 +79,9 @@ Route::middleware([
     Route::get('hbls/{hbl}/restore', [HBLController::class, 'restore'])
         ->name('hbls.restore');
 
+    Route::get('hbls/download/invoice/{hbl}', [HBLController::class, 'downloadHBLInvoicePDF'])
+        ->name('hbls.download.invoice');
+
     // User
     Route::resource('users', UserController::class)
         ->except(['create', 'show']);
