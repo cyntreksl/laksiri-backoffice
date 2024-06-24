@@ -142,4 +142,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->downloadHBLInvoicePDF($hbl);
     }
+
+    public function downloadHBLBarcodePDF(HBL $hbl)
+    {
+        return $this->HBLRepository->downloadHBLBarcodePDF($hbl);
+    }
 }

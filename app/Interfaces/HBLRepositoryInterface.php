@@ -30,6 +30,8 @@ interface HBLRepositoryInterface
 
     public function downloadHBLInvoicePDF(HBL $hbl);
 
+    public function downloadHBLBarcodePDF(HBL $hbl);
+
     public function getCancelledList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse;
 
     public function restore($id);

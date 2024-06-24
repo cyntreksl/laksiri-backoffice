@@ -82,6 +82,8 @@ Route::middleware([
     Route::get('hbls/download/invoice/{hbl}', [HBLController::class, 'downloadHBLInvoicePDF'])
         ->name('hbls.download.invoice');
 
+    Route::get('hbls/download/barcode/{hbl}', [HBLController::class, 'downloadHBLBarcodePDF'])
+        ->name('hbls.download.barcode');
     // User
     Route::resource('users', UserController::class)
         ->except(['create', 'show']);
