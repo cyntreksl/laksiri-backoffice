@@ -137,4 +137,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->restore($id);
     }
+
+    public function downloadHBLInvoicePDF(HBL $hbl)
+    {
+        return $this->HBLRepository->downloadHBLInvoicePDF($hbl);
+    }
 }

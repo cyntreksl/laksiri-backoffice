@@ -417,6 +417,38 @@ const createColumns = () => [
             ),
           ]
         ),
+
+        h(
+          "a",
+          {
+            className:
+              "btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25",
+            href: route("hbls.download.invoice", row.cells[0].data),
+            "x-tooltip..placement.bottom.primary": "'Invoice'",
+          },
+          [
+            h(
+              "svg",
+              {
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                class: "size-5",
+                fill: "none",
+                height: 24,
+                width: 24,
+                stroke: "currentColor",
+                "stroke-width": 2,
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+              },
+              [
+                h("path", {
+                  d: "M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z",
+                }),
+              ]
+            ),
+          ]
+        ),
       ]);
     },
   },
