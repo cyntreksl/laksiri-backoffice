@@ -23,7 +23,7 @@ const closeModal = () => {
 
 const form = useForm({
   name: "",
-  areas_list: [],
+  areas: "",
 });
 
 const createZone = () => {
@@ -91,24 +91,20 @@ const createZone = () => {
 
         <div class="col-span-1 sm:col-span-2 gap-5">
           <label class="block">
-            <InputLabel value="Areas" />
-            <select
-              v-model="form.areas_list"
-              autocomplete="off"
-              multiple
-              placeholder="Select Areas..."
+            <InputLabel value="Zone Areas" />
+            <input
+              v-model="form.areas"
+              class="w-full"
+              placeholder="Zone Areas"
+              type="text"
               x-init="$el._tom = new Tom($el,{create:true,plugins: ['caret_position','input_autogrow','remove_button']})"
-            >
-              <option v-for="area in areas" :key="area.id" :value="area.name">
-                {{ area.name }}
-              </option>
-            </select>
+            />
           </label>
           <span class="text-tiny+ text-slate-400 dark:text-navy-300"
             >Comma separated values. Auto Zone Area Assignments, it will come as
             a notification</span
           >
-          <InputError :message="form.errors.areas_list" />
+          <InputError :message="form.errors.areas" />
         </div>
       </div>
     </template>
