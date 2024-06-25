@@ -82,7 +82,7 @@ const form = useForm({
 const handleHBLCreate = () => {
   form.post(route("hbls.store"), {
     onSuccess: () => {
-      router.visit(route("hbls.index"));
+      router.visit(route("hbls.create"));
       form.reset();
     },
     onError: () => console.log("error"),
@@ -93,6 +93,7 @@ const handleHBLCreate = () => {
 };
 
 const showAddNewPackageDialog = ref(false);
+const editMode = ref(false);
 
 const showPackageDialog = () => {
   showAddNewPackageDialog.value = true;
@@ -105,7 +106,7 @@ const packageItem = reactive({
   length: 0,
   width: 0,
   height: 0,
-  quantity: 0,
+  quantity: 1,
   volume: 0,
   totalWeight: 0,
   remarks: "",
@@ -149,16 +150,6 @@ const addPackageData = () => {
     grandTotalVolume.value += newItem.volume;
 
     calculatePayment();
-
-    // Reset packageItem values for the next entry
-    packageItem.type = "";
-    packageItem.length = 0;
-    packageItem.width = 0;
-    packageItem.height = 0;
-    packageItem.quantity = 0;
-    packageItem.volume = 0;
-    packageItem.totalWeight = 0;
-    packageItem.remarks = "";
   }
   closeAddPackageModal();
 };
@@ -232,6 +223,7 @@ const packageTypes = [
   "BICYCLE",
 ];
 
+// const selectedType = ref("Choose one");
 const selectedType = ref("");
 
 const updateTypeDescription = () => {
@@ -282,9 +274,9 @@ const calculatePayment = () => {
       }
     }
 
-    billCharge.value = priceRule.value.bill_price.toFixed(2) || 0;
+    billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
     otherCharge.value =
-      parseFloat(priceRule.value.destination_charges).toFixed(2) || 0;
+      parseFloat(priceRule.value.destination_charges).toFixed(3) || 0;
     isEditable.value = Boolean(priceRule.value.is_editable);
     vat.value =
       priceRule.value.bill_vat !== 0
@@ -325,9 +317,9 @@ const calculatePayment = () => {
       }
     }
 
-    billCharge.value = priceRule.value.bill_price.toFixed(2) || 0;
+    billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
     otherCharge.value =
-      parseFloat(priceRule.value.destination_charges).toFixed(2) || 0;
+      parseFloat(priceRule.value.destination_charges).toFixed(3) || 0;
     isEditable.value = Boolean(priceRule.value.is_editable);
     vat.value =
       priceRule.value.bill_vat !== 0
@@ -335,7 +327,7 @@ const calculatePayment = () => {
         : 0;
   }
 
-  form.freight_charge = freightCharge.value.toFixed(2);
+  form.freight_charge = freightCharge.value.toFixed(3);
   form.bill_charge = billCharge.value;
   form.other_charge = otherCharge.value;
 };
@@ -350,6 +342,7 @@ const confirmRemovePackage = (index) => {
 
 const closeModal = () => {
   showConfirmRemovePackageModal.value = false;
+  editMode.value = false;
 };
 
 const handleRemovePackage = () => {
@@ -367,14 +360,28 @@ const closeAddPackageModal = () => {
   showAddNewPackageDialog.value = false;
   editIndex.value = null;
   editMode.value = false;
+  restModalFields();
 };
 
-const editMode = ref(false);
+const restModalFields = () => {
+  // selectedType.value = "Choose one";
+  // selectedType.value = "";
+  packageItem.type = "";
+  packageItem.length = 0;
+  packageItem.width = 0;
+  packageItem.height = 0;
+  packageItem.quantity = 1;
+  packageItem.volume = 0;
+  packageItem.totalWeight = 0;
+  packageItem.remarks = "";
+};
+
 const editIndex = ref(null);
 
 const openEditModal = (index) => {
   editMode.value = true;
   editIndex.value = index;
+  selectedType.value = packageList.value[index].type;
   showAddNewPackageDialog.value = true;
   // populate packageItem with existing data for editing
   Object.assign(packageItem, packageList.value[index]);
@@ -397,7 +404,7 @@ const openEditModal = (index) => {
               <h2
                 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
               >
-                Basic Details
+                Shipper Details
               </h2>
             </div>
             <div class="grid grid-cols-3 gap-5 mt-3">
@@ -490,12 +497,12 @@ const openEditModal = (index) => {
               </div>
 
               <div>
-                <span>NIC/Passport Number</span>
+                <span>PP or NIC No</span>
                 <label class="relative flex">
                   <input
                     v-model="form.nic"
                     class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="ID/PP Number"
+                    placeholder="PP or NIC No"
                     type="text"
                   />
                 </label>
@@ -503,12 +510,12 @@ const openEditModal = (index) => {
               </div>
 
               <div>
-                <span>IQ Number</span>
+                <span>Residency No</span>
                 <label class="relative flex">
                   <input
                     v-model="form.iq_number"
                     class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="IQ Number"
+                    placeholder="Residency No"
                     type="text"
                   />
                 </label>
@@ -571,12 +578,12 @@ const openEditModal = (index) => {
               </div>
 
               <div>
-                <span>NIC/Passport Number</span>
+                <span>PP or NIC No</span>
                 <label class="relative flex">
                   <input
                     v-model="form.consignee_nic"
                     class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="NIC/PP Number"
+                    placeholder="PP or NIC No"
                     type="text"
                   />
                 </label>
@@ -845,13 +852,13 @@ const openEditModal = (index) => {
                 <div class="flex justify-between">
                   <p class="line-clamp-1">Weight</p>
                   <p class="text-slate-700 dark:text-navy-100">
-                    {{ grandTotalWeight }}
+                    {{ grandTotalWeight.toFixed(3) }}
                   </p>
                 </div>
                 <div class="flex justify-between">
                   <p class="line-clamp-1">Volume</p>
                   <p class="text-slate-700 dark:text-navy-100">
-                    {{ grandTotalVolume }}
+                    {{ grandTotalVolume.toFixed(3) }}
                   </p>
                 </div>
               </div>
@@ -969,10 +976,10 @@ const openEditModal = (index) => {
                     {{ item.quantity }}
                   </td>
                   <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ item.totalWeight }}
+                    {{ item.totalWeight.toFixed(3) }}
                   </td>
                   <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ item.volume }}
+                    {{ item.volume.toFixed(3) }}
                   </td>
                   <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                     {{ item.remarks }}
@@ -1085,7 +1092,7 @@ const openEditModal = (index) => {
                 </label>
               </div>
 
-              <div>
+              <div class="col-span-1">
                 <label class="block">
                   <span
                     >Length (cm)
@@ -1100,9 +1107,12 @@ const openEditModal = (index) => {
                   />
                 </label>
               </div>
-              <div>
+              <div class="col-span-1">
                 <label class="block">
-                  <span>Width <span class="text-red-500 text-sm">*</span></span>
+                  <span
+                    >Width <br /><span class="text-red-500 text-sm">*</span>
+                  </span>
+
                   <input
                     v-model="packageItem.width"
                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
@@ -1113,11 +1123,12 @@ const openEditModal = (index) => {
                 </label>
               </div>
 
-              <div>
+              <div class="col-span-1">
                 <label class="block">
                   <span
-                    >Height <span class="text-red-500 text-sm">*</span></span
-                  >
+                    >Height <br /><span class="text-red-500 text-sm"
+                      >*<br /></span
+                  ></span>
                   <input
                     v-model="packageItem.height"
                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
@@ -1127,11 +1138,12 @@ const openEditModal = (index) => {
                   />
                 </label>
               </div>
-              <div>
+              <div class="col-span-1">
                 <label class="block">
                   <span
-                    >Quantity <span class="text-red-500 text-sm">*</span></span
-                  >
+                    >Quantity <br /><span class="text-red-500 text-sm"
+                      >*<br /></span
+                  ></span>
                   <input
                     v-model="packageItem.quantity"
                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"

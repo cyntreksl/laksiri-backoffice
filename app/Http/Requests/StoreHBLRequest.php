@@ -27,7 +27,6 @@ class StoreHBLRequest extends FormRequest
             'hbl_type' => ['required'],
             //            'hbl' => ['required'],
             'hbl_name' => ['required'],
-            'email' => ['required', 'email', 'max:254'],
             'contact_number' => ['nullable'],
             'nic' => ['nullable'],
             'iq_number' => ['nullable'],
