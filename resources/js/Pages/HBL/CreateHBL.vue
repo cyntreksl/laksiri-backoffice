@@ -97,6 +97,7 @@ const editMode = ref(false);
 
 const showPackageDialog = () => {
   showAddNewPackageDialog.value = true;
+  selectedType.value = "";
 };
 
 const packageList = ref([]);
@@ -223,7 +224,6 @@ const packageTypes = [
   "BICYCLE",
 ];
 
-// const selectedType = ref("Choose one");
 const selectedType = ref("");
 
 const updateTypeDescription = () => {
@@ -342,7 +342,6 @@ const confirmRemovePackage = (index) => {
 
 const closeModal = () => {
   showConfirmRemovePackageModal.value = false;
-  editMode.value = false;
 };
 
 const handleRemovePackage = () => {
@@ -364,8 +363,6 @@ const closeAddPackageModal = () => {
 };
 
 const restModalFields = () => {
-  // selectedType.value = "Choose one";
-  // selectedType.value = "";
   packageItem.type = "";
   packageItem.length = 0;
   packageItem.width = 0;
@@ -381,7 +378,6 @@ const editIndex = ref(null);
 const openEditModal = (index) => {
   editMode.value = true;
   editIndex.value = index;
-  selectedType.value = packageList.value[index].type;
   showAddNewPackageDialog.value = true;
   // populate packageItem with existing data for editing
   Object.assign(packageItem, packageList.value[index]);
