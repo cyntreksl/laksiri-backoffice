@@ -18,5 +18,7 @@ interface RoleRepositoryInterface
 
     public function storeRole(array $data);
 
+    public function updateRole(array $data, Role $role);
+
     public function deleteRole(Role $role);
 }

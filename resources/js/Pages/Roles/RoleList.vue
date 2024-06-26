@@ -116,11 +116,13 @@ const formatPermissionName = (name) => {
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
 
-                                    <button
-                                        class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
-                                    >
-                                        <i class="fa-solid fa-edit"></i>
-                                    </button>
+                                    <Link :href="route('users.roles.edit', item.id)">
+                                        <button
+                                            class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
+                                        >
+                                            <i class="fa-solid fa-edit"></i>
+                                        </button>
+                                    </Link>
                                 </td>
                             </tr>
                             </tbody>

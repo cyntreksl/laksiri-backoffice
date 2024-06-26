@@ -9,6 +9,7 @@ use App\Actions\Role\Permission\AssignPermissions;
 use App\Actions\Role\Permission\GetAllPermissions;
 use App\Actions\Role\Permission\GetPermissionGroup;
 use App\Actions\Role\Permission\GetPermissionsByGroupName;
+use App\Actions\Role\UpdateRole;
 use App\Interfaces\RoleRepositoryInterface;
 use Spatie\Permission\Models\Role;
 
@@ -60,5 +61,12 @@ class RoleRepository implements RoleRepositoryInterface
     public function deleteRole(Role $role)
     {
         DeleteRole::run($role);
+    }
+
+    public function updateRole(array $data, Role $role)
+    {
+        $role = UpdateRole::run($data['name'], $role);
+
+        AssignPermissions::run($role, $data['permissions']);
     }
 }

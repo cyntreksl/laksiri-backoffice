@@ -4,6 +4,7 @@ use App\Models\Branch;
 use App\Models\User;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
+use Spatie\Permission\Models\Role;
 
 // Home
 Breadcrumbs::for('dashboard', function (BreadcrumbTrail $trail) {
@@ -194,4 +195,9 @@ Breadcrumbs::for('users.roles.index', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('users.roles.create', function (BreadcrumbTrail $trail) {
     $trail->parent('users.roles.index');
     $trail->push('Create Role', route('users.roles.create'));
+});
+
+Breadcrumbs::for('users.roles.edit', function (BreadcrumbTrail $trail, Role $role) {
+    $trail->parent('users.roles.index');
+    $trail->push('Edit Role', route('users.roles.edit', $role->id));
 });
