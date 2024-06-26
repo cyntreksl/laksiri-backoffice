@@ -118,6 +118,7 @@ Route::middleware([
 
         // Roles
         Route::resource('roles', RoleController::class);
+        Route::get('/permissions/{groupName}', [RoleController::class, 'getPermissionByGroupName']);
     });
 
     // Back Office

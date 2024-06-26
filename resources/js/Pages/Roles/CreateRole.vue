@@ -1,0 +1,213 @@
+<script setup>
+import AppLayout from "@/Layouts/AppLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
+import {router, useForm} from "@inertiajs/vue3";
+import TextInput from "@/Components/TextInput.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import InputError from "@/Components/InputError.vue";
+import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import {onMounted, ref, watch} from "vue";
+import {push} from "notivue";
+
+const props = defineProps({
+    permissionGroups: {
+        type: Array,
+        default: () => [],
+    },
+    allPermissions: {
+        type: Object,
+        default: () => ({}),
+    },
+});
+
+const allChecked = ref(false);
+const groupChecked = ref([]);
+const permissionChecked = ref({});
+const permissions = ref({});
+
+const fetchPermissions = async () => {
+    try {
+        for (const group of props.permissionGroups) {
+            try {
+                const response = await fetch(`/permissions/${group.name}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                } else {
+                    permissions.value[group.name] = await response.json();
+                }
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching permissions:", error);
+    }
+};
+
+// Initialize groupChecked and permissionChecked arrays when props change
+const initializeChecks = () => {
+    groupChecked.value = props.permissionGroups.map(() => false);
+    permissionChecked.value = {};
+    Object.keys(permissions.value).forEach(groupName => {
+        permissions.value[groupName].forEach(permission => {
+            permissionChecked.value[permission.id] = false;
+        });
+    });
+};
+
+onMounted(async () => {
+    await fetchPermissions();
+    initializeChecks();
+});
+
+watch([() => props.permissionGroups], async () => {
+    await fetchPermissions();
+    initializeChecks();
+});
+
+const checkAllPermissions = () => {
+    const checked = allChecked.value;
+    groupChecked.value = props.permissionGroups.map(() => checked);
+    Object.keys(permissionChecked.value).forEach(id => {
+        permissionChecked.value[id] = checked;
+    });
+};
+
+const checkGroupPermissions = (index) => {
+    const checked = groupChecked.value[index];
+    const groupName = props.permissionGroups[index].name;
+    permissions.value[groupName].forEach(permission => {
+        permissionChecked.value[permission.id] = checked;
+    });
+};
+
+const checkSinglePermission = (index) => {
+    const groupName = props.permissionGroups[index].name;
+    const groupPermissions = permissions.value[groupName];
+    groupChecked.value[index] = groupPermissions.every(permission => permissionChecked.value[permission.id]);
+};
+
+const formatPermissionName = (name) => {
+    return name.split('.').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};
+
+const form = useForm({
+    role: "",
+    permissions: {},
+});
+
+const handleRoleCreate = () => {
+    form.permissions = Object.keys(permissionChecked.value)
+        .filter(id => permissionChecked.value[id])
+        .map(id => id);
+
+    form.post(route("users.roles.store"), {
+        onSuccess: () => {
+            router.visit(route("users.roles.index"));
+            form.reset();
+            push.success('Role Created Successfully!');
+        },
+        onError: () => {
+            push.error('Something went to wrong!');
+        },
+        preserveScroll: true,
+        preserveState: true,
+    });
+}
+</script>
+
+<template>
+    <AppLayout title="Create Role">
+        <template #header>Create Role</template>
+
+        <Breadcrumb/>
+
+        <form class="mt-5" @submit.prevent="handleRoleCreate">
+            <div class="sm:col-span-2 space-y-5">
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-5">
+                    <DangerOutlineButton @click="router.visit(route('users.roles.create'))"
+                    >Cancel
+                    </DangerOutlineButton
+                    >
+                    <PrimaryButton
+                        :class="{ 'opacity-50': form.processing }"
+                        :disabled="form.processing"
+                        class="space-x-2"
+                        type="submit"
+                    >
+                        <span>Create a Role</span>
+                        <svg
+                            class="size-5"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </PrimaryButton>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 my-4 gap-4">
+                <div class="sm:col-span-3 space-y-5">
+                    <div class="card px-4 py-4 sm:px-5">
+                        <div>
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Create Role
+                            </h2>
+                        </div>
+                        <div class="grid grid-cols-1 gap-5 mt-3">
+                            <div>
+                                <InputLabel value="Role Name"/>
+                                <TextInput v-model="form.role" class="w-full" placeholder="Enter Role Name"/>
+                                <InputError :message="form.errors.role"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Permissions"/>
+                                <label class="flex flex-row items-center py-3 cursor-pointer">
+                                    <input v-model="allChecked" class="text-indigo-600 focus:border-indigo-300 focus:ring-indigo-200" type="checkbox" @change="checkAllPermissions"/>
+                                    <span class="ml-2 text-gray-700 font-medium dark:text-dark-typography">All</span>
+                                </label>
+                            </div>
+
+                            <hr>
+
+                            <div v-for="(permissionGroup, index) in permissionGroups" :key="index" class="grid grid-cols-1 gap-2">
+                                <div class="col-span-3 sm:col-span-1">
+                                    <label class="flex flex-row items-center py-3 cursor-pointer">
+                                        <input :id="`group-${index}`" v-model="groupChecked[index]" class="text-indigo-600 focus:border-indigo-300 focus:ring-indigo-200" type="checkbox" @change="checkGroupPermissions(index)"/>
+                                        <span class="ml-2 text-gray-700 font-medium dark:text-dark-typography">{{ permissionGroup.name }}</span>
+                                    </label>
+                                </div>
+                                <div class="col-span-3 sm:col-span-2 py-3">
+                                    <label v-for="(permission, pIndex) in permissions[permissionGroup.name]" :key="pIndex" class="flex flex-row items-center cursor-pointer py-0">
+                                        <input :id="`permission-${permission.id}`" v-model="permissionChecked[permission.id]" class="text-indigo-600 focus:border-indigo-300 focus:ring-indigo-200" type="checkbox" @change="checkSinglePermission(index)"/>
+                                        <span class="ml-2 text-gray-700 dark:text-dark-typography">{{ formatPermissionName(permission.name) }}</span>
+                                    </label>
+                                </div>
+                                <hr v-if="index !== permissionGroups.length - 1" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </AppLayout>
+</template>

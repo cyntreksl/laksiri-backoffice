@@ -190,3 +190,8 @@ Breadcrumbs::for('users.roles.index', function (BreadcrumbTrail $trail) {
     $trail->push('User Management', route('users.index'));
     $trail->push('Roles & Permissions', route('users.roles.index'));
 });
+
+Breadcrumbs::for('users.roles.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('users.roles.index');
+    $trail->push('Create Role', route('users.roles.create'));
+});

@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\RoleRepositoryInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class RoleController extends Controller
 {
+    public function __construct(
+        private readonly RoleRepositoryInterface $roleRepository,
+    ) {
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -20,7 +26,10 @@ class RoleController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Roles/CreateRole', [
+            'allPermissions' => $this->roleRepository->getPermissions(),
+            'permissionGroups' => $this->roleRepository->getPermissionGroups(),
+        ]);
     }
 
     /**
@@ -61,5 +70,10 @@ class RoleController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function getPermissionByGroupName($groupName)
+    {
+        return $this->roleRepository->getPermissionsByGroupName($groupName);
     }
 }
