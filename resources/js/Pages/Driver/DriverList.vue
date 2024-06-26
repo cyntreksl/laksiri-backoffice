@@ -265,6 +265,12 @@ const applyFilters = () => {
   });
   grid.forceRender();
 };
+
+const resetFilter = () => {
+  filters.fromDate = fromDate;
+  filters.toDate = toDate;
+  applyFilters();
+};
 </script>
 
 <template>
@@ -427,6 +433,11 @@ const applyFilters = () => {
         <SoftPrimaryButton class="space-x-2" @click="applyFilters">
           <i class="fa-solid fa-filter"></i>
           <span>Apply Filters</span>
+        </SoftPrimaryButton>
+        <!--Filter Rest Button-->
+        <SoftPrimaryButton class="space-x-2" @click="resetFilter">
+          <i class="fa-solid fa-refresh"></i>
+          <span>Reset Filters</span>
         </SoftPrimaryButton>
       </template>
     </FilterDrawer>

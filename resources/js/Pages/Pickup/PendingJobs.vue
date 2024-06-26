@@ -67,7 +67,7 @@ const data = reactive({
     // pickup_time_start: false,
     // pickup_time_end: false,
     pickup_type: true,
-    pickup_note: false,
+    // pickup_note: false,
     actions: true,
   },
 });
@@ -324,6 +324,7 @@ const applyFilters = () => {
       then: (data) =>
         data.data.map((item) => {
           const row = [];
+          row.push({ id: item.id });
           visibleColumns.forEach((column) => {
             row.push(item[column]);
           });
@@ -331,6 +332,7 @@ const applyFilters = () => {
         }),
     },
   });
+
   grid.forceRender();
 };
 
@@ -378,6 +380,17 @@ const handleDeletePickup = () => {
       push.error("Something went to wrong!");
     },
   });
+};
+
+const resetFilter = () => {
+  filters.fromDate = fromDate;
+  filters.toDate = toDate;
+  filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
+  filters.isUrgent = false;
+  filters.isImportant = false;
+  filters.createdBy = "";
+  filters.zoneBy = "";
+  applyFilters();
 };
 </script>
 <template>
@@ -516,6 +529,14 @@ const handleDeletePickup = () => {
                   @change="toggleColumnVisibility('pickup_date', $event)"
                 />
                 <span class="hover:cursor-pointer">Pickup Date</span>
+              </label>
+
+              <label class="inline-flex items-center space-x-2">
+                <Checkbox
+                  :checked="data.columnVisibility.pickup_type"
+                  @change="toggleColumnVisibility('pickup_type', $event)"
+                />
+                <span class="hover:cursor-pointer">Pickup Type</span>
               </label>
 
               <label class="inline-flex items-center space-x-2">
@@ -707,6 +728,11 @@ const handleDeletePickup = () => {
         <SoftPrimaryButton class="space-x-2" @click="applyFilters">
           <i class="fa-solid fa-filter"></i>
           <span>Apply Filters</span>
+        </SoftPrimaryButton>
+        <!--Filter Rest Button-->
+        <SoftPrimaryButton class="space-x-2" @click="resetFilter">
+          <i class="fa-solid fa-refresh"></i>
+          <span>Reset Filters</span>
         </SoftPrimaryButton>
       </template>
     </FilterDrawer>

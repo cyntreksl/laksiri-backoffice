@@ -314,6 +314,17 @@ const applyFilters = () => {
   });
   grid.forceRender();
 };
+
+const resetFilter = () => {
+  filters.fromDate = fromDate;
+  filters.toDate = toDate;
+  filters.etdStartDate = "";
+  filters.etdEndDate = "";
+  filters.cargoType = Object.values(props.cargoTypes);
+  filters.containerType = Object.values(props.containerTypes);
+  filters.status = "";
+  applyFilters();
+};
 </script>
 <template>
   <AppLayout title="Container List">
@@ -758,6 +769,11 @@ const applyFilters = () => {
         <SoftPrimaryButton class="space-x-2" @click="applyFilters">
           <i class="fa-solid fa-filter"></i>
           <span>Apply Filters</span>
+        </SoftPrimaryButton>
+        <!--Filter Rest Button-->
+        <SoftPrimaryButton class="space-x-2" @click="resetFilter">
+          <i class="fa-solid fa-refresh"></i>
+          <span>Reset Filters</span>
         </SoftPrimaryButton>
       </template>
     </FilterDrawer>
