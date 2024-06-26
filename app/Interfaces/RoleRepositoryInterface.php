@@ -2,6 +2,8 @@
 
 namespace App\Interfaces;
 
+use Spatie\Permission\Models\Role;
+
 interface RoleRepositoryInterface
 {
     public function getRoles();
@@ -15,4 +17,6 @@ interface RoleRepositoryInterface
     public function roleHasPermissions($role, $permissions);
 
     public function storeRole(array $data);
+
+    public function deleteRole(Role $role);
 }

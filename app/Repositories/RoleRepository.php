@@ -3,12 +3,14 @@
 namespace App\Repositories;
 
 use App\Actions\Role\CreateRole;
+use App\Actions\Role\DeleteRole;
 use App\Actions\Role\GetRoles;
 use App\Actions\Role\Permission\AssignPermissions;
 use App\Actions\Role\Permission\GetAllPermissions;
 use App\Actions\Role\Permission\GetPermissionGroup;
 use App\Actions\Role\Permission\GetPermissionsByGroupName;
 use App\Interfaces\RoleRepositoryInterface;
+use Spatie\Permission\Models\Role;
 
 class RoleRepository implements RoleRepositoryInterface
 {
@@ -53,5 +55,10 @@ class RoleRepository implements RoleRepositoryInterface
         $role = CreateRole::run($data['name']);
 
         AssignPermissions::run($role, $data['permissions']);
+    }
+
+    public function deleteRole(Role $role)
+    {
+        DeleteRole::run($role);
     }
 }

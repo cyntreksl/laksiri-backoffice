@@ -6,6 +6,7 @@ use App\Http\Requests\StoreRoleRequest;
 use App\Interfaces\RoleRepositoryInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -70,9 +71,9 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Role $role)
     {
-        //
+        return $this->roleRepository->deleteRole($role);
     }
 
     public function getPermissionByGroupName($groupName)

@@ -5,6 +5,7 @@ import {Link, router} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {ref} from "vue";
 import {push} from "notivue";
+import DeleteRoleConfirmationModal from "@/Pages/Roles/Partials/DeleteRoleConfirmationModal.vue";
 
 const props = defineProps({
     roles: {
@@ -28,7 +29,7 @@ const closeModal = () => {
 };
 
 const handleDeleteRole = () => {
-    router.delete(route("hbls.destroy", roleId.value), {
+    router.delete(route("users.roles.destroy", roleId.value), {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
@@ -110,14 +111,13 @@ const formatPermissionName = (name) => {
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
                                     <button
                                         class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
-                                        @click.prevent="confirmRemovePackage(index)"
+                                        @click.prevent="confirmDeleteRole(item.id)"
                                     >
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
 
                                     <button
                                         class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
-                                        @click.prevent="openEditModal(index)"
                                     >
                                         <i class="fa-solid fa-edit"></i>
                                     </button>
@@ -129,5 +129,7 @@ const formatPermissionName = (name) => {
                 </div>
             </div>
         </div>
+
+        <DeleteRoleConfirmationModal :show="showConfirmDeleteRoleModal" @close="closeModal" @delete-role="handleDeleteRole"/>
     </AppLayout>
 </template>
