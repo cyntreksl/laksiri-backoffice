@@ -133,8 +133,8 @@ const handleRoleUpdate = () => {
 </script>
 
 <template>
-    <AppLayout title="Create Role">
-        <template #header>Create Role</template>
+    <AppLayout title="Edit Role">
+        <template #header>Edit Role</template>
 
         <Breadcrumb/>
 
@@ -177,7 +177,7 @@ const handleRoleUpdate = () => {
                             <h2
                                 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                Create Role
+                                Edit Role
                             </h2>
                         </div>
                         <div class="grid grid-cols-1 gap-5 mt-3">
