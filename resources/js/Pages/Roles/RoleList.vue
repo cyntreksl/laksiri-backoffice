@@ -110,7 +110,8 @@ const formatPermissionName = (name) => {
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
                                     <button
-                                        class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
+                                       :disabled="item.name === 'admin'"
+                                        class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25 disabled:text-gray-300"
                                         @click.prevent="confirmDeleteRole(item.id)"
                                     >
                                         <i class="fa-solid fa-trash"></i>
