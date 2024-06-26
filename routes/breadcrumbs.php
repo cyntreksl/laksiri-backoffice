@@ -183,3 +183,10 @@ Breadcrumbs::for('loading.loaded-containers.index', function (BreadcrumbTrail $t
     $trail->push('Containers');
     $trail->push('Loaded Shipments', route('loading.loaded-containers.index'));
 });
+
+// Roles
+Breadcrumbs::for('users.roles.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('User Management', route('users.index'));
+    $trail->push('Roles & Permissions', route('users.roles.index'));
+});

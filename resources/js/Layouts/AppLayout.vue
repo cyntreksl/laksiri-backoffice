@@ -849,6 +849,10 @@ export default {
                             title: "Driver Tracking",
                             route: "users.driver-tracings.index",
                         },
+                        {
+                            title: "Roles & Permissions",
+                            route: "users.roles.index",
+                        },
                     );
                     break;
                 case "setting":
