@@ -13,4 +13,6 @@ interface RoleRepositoryInterface
     public function getPermissionsByGroupName(string $group_name);
 
     public function roleHasPermissions($role, $permissions);
+
+    public function storeRole(array $data);
 }

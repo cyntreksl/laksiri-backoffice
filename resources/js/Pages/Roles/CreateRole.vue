@@ -100,7 +100,7 @@ const formatPermissionName = (name) => {
 };
 
 const form = useForm({
-    role: "",
+    name: "",
     permissions: {},
 });
 
@@ -175,8 +175,8 @@ const handleRoleCreate = () => {
                         <div class="grid grid-cols-1 gap-5 mt-3">
                             <div>
                                 <InputLabel value="Role Name"/>
-                                <TextInput v-model="form.role" class="w-full" placeholder="Enter Role Name"/>
-                                <InputError :message="form.errors.role"/>
+                                <TextInput v-model="form.name" class="w-full" placeholder="Enter Role Name"/>
+                                <InputError :message="form.errors.name"/>
                             </div>
 
                             <div>

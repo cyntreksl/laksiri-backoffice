@@ -2,7 +2,9 @@
 
 namespace App\Repositories;
 
+use App\Actions\Role\CreateRole;
 use App\Actions\Role\GetRoles;
+use App\Actions\Role\Permission\AssignPermissions;
 use App\Actions\Role\Permission\GetAllPermissions;
 use App\Actions\Role\Permission\GetPermissionGroup;
 use App\Actions\Role\Permission\GetPermissionsByGroupName;
@@ -44,5 +46,12 @@ class RoleRepository implements RoleRepositoryInterface
     public function getPermissions()
     {
         return GetAllPermissions::run();
+    }
+
+    public function storeRole(array $data)
+    {
+        $role = CreateRole::run($data['name']);
+
+        AssignPermissions::run($role, $data['permissions']);
     }
 }
