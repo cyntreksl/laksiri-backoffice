@@ -134,7 +134,7 @@ const handleRoleCreate = () => {
             <div class="sm:col-span-2 space-y-5">
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-5">
-                    <DangerOutlineButton @click="router.visit(route('users.roles.create'))"
+                    <DangerOutlineButton @click="router.visit(route('users.roles.index'))"
                     >Cancel
                     </DangerOutlineButton
                     >
