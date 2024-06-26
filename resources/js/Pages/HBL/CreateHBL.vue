@@ -84,6 +84,7 @@ const handleHBLCreate = () => {
     onSuccess: () => {
       router.visit(route("hbls.create"));
       form.reset();
+      push.success("HBL Created Successfully!");
     },
     onError: () => console.log("error"),
     onFinish: () => console.log("finish"),
