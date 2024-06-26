@@ -26,6 +26,8 @@ const props = defineProps({
   },
 });
 
+const actionTypes = ["Urgent Pickup", "VIP Customer", "Need Trolly"];
+
 const currentBranch = usePage().props?.auth.user.active_branch_name;
 
 const findCountryCodeByBranch = computed(() => {
@@ -57,6 +59,8 @@ const form = useForm({
   address: "",
   note_type: null,
   notes: "",
+  pickup_type: "",
+  pickup_note: "",
   cargo_type: "",
   location: "",
   zone_id: null,
@@ -139,7 +143,7 @@ watch(isUrgentPickup, (newValue) => {
               >
                 Basic Details
               </h2>
-              <div class="flex justify-end">
+              <!-- <div class="flex justify-end">
                 <button
                   type="button"
                   x-data="{ isImportant: true }"
@@ -174,7 +178,7 @@ watch(isUrgentPickup, (newValue) => {
                     ></path>
                   </svg>
                 </button>
-              </div>
+              </div> -->
             </div>
             <div class="grid grid-cols-2 gap-5 mt-3">
               <div class="col-span-2">
@@ -285,13 +289,13 @@ watch(isUrgentPickup, (newValue) => {
               <h2
                 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
               >
-                Notes
+                Packages
               </h2>
             </div>
             <div class="grid grid-cols-2 gap-5 mt-3">
               <div class="col-span-2">
                 <label class="block">
-                  <InputLabel value="Note Type" />
+                  <InputLabel value="Package Type" />
                   <select
                     v-model="form.note_type"
                     class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
@@ -310,16 +314,45 @@ watch(isUrgentPickup, (newValue) => {
               </div>
 
               <div class="col-span-2">
-                <InputLabel value="Note" />
+                <InputLabel value="Packages" />
                 <label class="block">
                   <textarea
                     v-model="form.notes"
                     rows="4"
-                    placeholder="Type note here..."
+                    placeholder="Type Packages here..."
                     class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                   ></textarea>
                 </label>
                 <InputError :message="form.errors.notes" />
+              </div>
+
+              <div class="col-span-2">
+                <label class="block">
+                  <InputLabel value="Pickup Type" />
+                  <select
+                    v-model="form.pickup_type"
+                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                  >
+                    <option value="" disabled>Select One</option>
+                    <option v-for="actionType in actionTypes" :key="actionType">
+                      {{ actionType }}
+                    </option>
+                  </select>
+                </label>
+                <InputError :message="form.errors.pickup_type" />
+              </div>
+
+              <div class="col-span-2">
+                <InputLabel value="Pickup Note" />
+                <label class="block">
+                  <textarea
+                    v-model="form.pickup_note"
+                    rows="4"
+                    placeholder="Type Pickup Note here..."
+                    class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                  ></textarea>
+                </label>
+                <InputError :message="form.errors.pickup_note" />
               </div>
             </div>
           </div>
@@ -332,7 +365,7 @@ watch(isUrgentPickup, (newValue) => {
               >
                 Cargo Type
               </h2>
-              <div class="flex justify-end">
+              <!-- <div class="flex justify-end">
                 <button
                   type="button"
                   x-data="{ isImportant: true }"
@@ -367,7 +400,7 @@ watch(isUrgentPickup, (newValue) => {
                     ></path>
                   </svg>
                 </button>
-              </div>
+              </div> -->
             </div>
             <div class="my-5">
               <div class="my-5">

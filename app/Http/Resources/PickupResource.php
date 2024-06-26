@@ -34,6 +34,8 @@ class PickupResource extends JsonResource
             'is_from_important_customer' => $this->is_from_important_customer,
             'pickup_order' => $this->pickup_order,
             'driver' => $this->driver?->name,
+            'pickup_type' => $this->pickup_type,
+            'pickup_note' => $this->pickup_note,
         ];
     }
 }
