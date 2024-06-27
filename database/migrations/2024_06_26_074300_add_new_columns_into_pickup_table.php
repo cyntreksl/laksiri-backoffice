@@ -15,7 +15,6 @@ return new class extends Migration
         Schema::table('pick_ups', function (Blueprint $table) {
             $table->enum('pickup_type', [PickupType::URGENT_PICKUP->value, PickupType::VIP_CUSTOMER->value, PickupType::NEED_TROLLY->value])->nullable();
             $table->text('pickup_note')->nullable();
-
         });
     }
 
@@ -25,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('pick_ups', function (Blueprint $table) {
-
+            $table->dropColumn(['pickup_type', 'pickup_note']);
         });
     }
 };
