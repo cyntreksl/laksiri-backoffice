@@ -90,6 +90,18 @@ Breadcrumbs::for('setting.warehouse-zones.edit', function (BreadcrumbTrail $trai
     $trail->push('Update Warehouse Zone', route('setting.warehouse-zones.edit', $id));
 });
 
+// Driver Area
+Breadcrumbs::for('setting.driver-areas.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Driver Areas', route('setting.driver-areas.index'));
+});
+
+// Driver Area > Edit
+Breadcrumbs::for('setting.driver-areas.edit', function (BreadcrumbTrail $trail, $id) {
+    $trail->parent('setting.driver-areas.index');
+    $trail->push('Update Driver Areas', route('setting.driver-areas.edit', $id));
+});
+
 // Drivers
 Breadcrumbs::for('users.drivers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

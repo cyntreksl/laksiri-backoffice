@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\ContainerRepositoryInterface;
+use App\Interfaces\DriverAreasRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
@@ -19,6 +20,7 @@ use App\Interfaces\ZoneRepositoryInterface;
 use App\Repositories\BranchRepository;
 use App\Repositories\CashSettlementRepository;
 use App\Repositories\ContainerRepositories;
+use App\Repositories\DriverAreasRepository;
 use App\Repositories\DriverRepository;
 use App\Repositories\HBLRepository;
 use App\Repositories\LoadedContainerRepository;
@@ -50,6 +52,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(WarehouseRepositoryInterface::class, WarehouseRepository::class);
         $this->app->bind(LoadedContainerRepositoryInterface::class, LoadedContainerRepository::class);
         $this->app->bind(WarehousezoneRepositoryInterface::class, WareahouseZoneRepository::class);
+        $this->app->bind(DriverAreasRepositoryInterface::class, DriverAreasRepository::class);
     }
 
     public function boot(): void
