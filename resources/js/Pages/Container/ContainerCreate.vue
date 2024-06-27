@@ -371,7 +371,7 @@ export default {
       type: Array,
       required: true,
     },
-    referencenum: {
+    referenceNum: {
       type: Object,
     },
   },
@@ -380,7 +380,7 @@ export default {
     const form = useForm({
       cargo_type: ref("Sea Cargo"),
       container_type: ref(""),
-      reference: props.referencenum,
+      reference: props.referenceNum,
       bl_number: "",
       awb_number: "",
       estimated_time_of_departure: "",

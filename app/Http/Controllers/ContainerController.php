@@ -50,7 +50,7 @@ class ContainerController extends Controller
         $reference = GenerateContainerReferenceNumber::run();
 
         return Inertia::render('Container/ContainerCreate', [
-            'referencenum' => $reference,
+            'referenceNum' => $reference,
             'containerTypes' => $containerTypes,
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
