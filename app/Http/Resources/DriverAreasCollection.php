@@ -20,6 +20,7 @@ class DriverAreasCollection extends JsonResource
             'name' => $this->name,
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
             'branch_name' => $this->branch?->name,
+            'zones' => $this->zones,
         ];
     }
 }

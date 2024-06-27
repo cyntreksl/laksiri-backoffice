@@ -23,6 +23,7 @@ const props = defineProps({
     default: () => {},
   },
 });
+
 const wrapperRef = ref(null);
 let grid = null;
 

@@ -10,7 +10,7 @@ import DeleteDriverAreasConfirmationModal from "@/Pages/Setting/DriverAreas/Dele
 import moment from "moment";
 import { push } from "notivue";
 
-defineProps({
+const props = defineProps({
   branches: {
     type: Object,
     default: () => {},
@@ -33,6 +33,7 @@ const data = reactive({
   columnVisibility: {
     id: false,
     name: true,
+    zones: true,
     branch_name: true,
     created_at: true,
     status: true,
@@ -84,13 +85,13 @@ const initializeGrid = () => {
     server: {
       url: constructUrl(),
       then: (data) =>
-        data.data.map((item) => {
-          const row = [];
-          visibleColumns.forEach((column) => {
-            row.push(item[column]);
-          });
-          return row;
-        }),
+        data.data.map((item) => [
+          item.id,
+          item.name,
+          item.zones.map((zone) => zone.name).join("/"),
+          item.branch_name,
+          item.created_at,
+        ]),
       total: (response) => {
         if (response && response.meta) {
           return response.meta.total;
@@ -107,6 +108,10 @@ const initializeGrid = () => {
 const createColumns = () => [
   { name: "ID", hidden: !data.columnVisibility.id },
   { name: "Name", hidden: !data.columnVisibility.name },
+  {
+    name: "Zones",
+    hidden: !data.columnVisibility.zones,
+  },
   {
     name: "Branch Name",
     hidden: !data.columnVisibility.branch_name,
