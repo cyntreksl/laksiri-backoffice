@@ -24,7 +24,7 @@ class StoreContainerRequest extends FormRequest
         return [
             'cargo_type' => ['required'],
             'container_type' => ['required'],
-            'reference' => ['required'],
+            'reference' => ['required', 'unique:containers,reference'],
             'bl_number' => ['required_if:cargo_type,Sea Cargo'],
             'awb_number' => ['required_if:cargo_type,Air Cargo'],
             'container_number' => ['required'],
