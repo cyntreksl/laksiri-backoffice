@@ -396,6 +396,18 @@ const handleRestoreHBL = () => {
     },
   });
 };
+
+const resetFilter = () => {
+    filters.fromDate = fromDate;
+    filters.toDate = toDate;
+    filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
+    filters.hblType = ["UBP", "Gift", "Door to Door"];
+    filters.isHold = false;
+    filters.warehouse = ["COLOMBO", "NINTAVUR"];
+    filters.createdBy = "";
+    filters.paymentStatus = [];
+    applyFilters();
+};
 </script>
 
 <template>
@@ -725,8 +737,15 @@ const handleRestoreHBL = () => {
           <i class="fa-solid fa-filter"></i>
           <span>Apply Filters</span>
         </SoftPrimaryButton>
+
+          <SoftPrimaryButton class="space-x-2" @click="resetFilter">
+              <i class="fa-solid fa-refresh"></i>
+              <span>Reset Filters</span>
+          </SoftPrimaryButton>
       </template>
     </FilterDrawer>
+
+
 
     <RestoreHBLConfirmationModal
       :show="showConfirmRestoreHBLModal"

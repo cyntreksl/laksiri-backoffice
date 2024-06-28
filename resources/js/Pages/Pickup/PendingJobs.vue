@@ -60,12 +60,14 @@ const data = reactive({
     address: true,
     contact_number: true,
     cargo_type: true,
-    is_urgent_pickup: true,
-    is_from_important_customer: true,
+    // is_urgent_pickup: false,
+    // is_from_important_customer: false,
     driver: true,
     pickup_date: true,
-    pickup_time_start: false,
-    pickup_time_end: false,
+    // pickup_time_start: false,
+    // pickup_time_end: false,
+    pickup_type: true,
+    // pickup_note: false,
     actions: true,
   },
 });
@@ -171,28 +173,7 @@ const createColumns = () => [
     sort: false,
   },
   { name: "Cargo Mode", hidden: !data.columnVisibility.cargo_type },
-  {
-    name: "VIP Customer",
-    hidden: !data.columnVisibility.is_from_important_customer,
-    formatter: (cell) => {
-      return cell
-        ? html(
-            `<div class="badge bg-info text-white dark:bg-navy-900 ml-2"><i class="text-white mr-2 fa-solid fa-crown"></i> VIP</div>`
-          )
-        : null;
-    },
-  },
-  {
-    name: "Urgent Pickup",
-    hidden: !data.columnVisibility.is_urgent_pickup,
-    formatter: (cell) => {
-      return cell
-        ? html(
-            `<div class="badge bg-success text-white dark:bg-navy-900 ml-2"><i class="text-white mr-2 fa-solid fa-star"></i> Urgent Pickup</div>`
-          )
-        : null;
-    },
-  },
+
   {
     name: "Driver",
     hidden: !data.columnVisibility.driver,
@@ -205,11 +186,13 @@ const createColumns = () => [
     },
   },
   { name: "Pickup Date", hidden: !data.columnVisibility.pickup_date },
-  {
-    name: "Pickup Time Start",
-    hidden: !data.columnVisibility.pickup_time_start,
-  },
-  { name: "Pickup Time End", hidden: !data.columnVisibility.pickup_time_end },
+  //   {
+  //     name: "Pickup Time Start",
+  //     hidden: !data.columnVisibility.pickup_time_start,
+  //   },
+  //   { name: "Pickup Time End", hidden: !data.columnVisibility.pickup_time_end },
+  { name: "Pickup Type", hidden: !data.columnVisibility.pickup_type },
+  //   { name: "Pickup Note", hidden: !data.columnVisibility.pickup_note },
   {
     name: "Actions",
     sort: false,
@@ -340,6 +323,7 @@ const applyFilters = () => {
       then: (data) =>
         data.data.map((item) => {
           const row = [];
+          row.push({ id: item.id });
           visibleColumns.forEach((column) => {
             row.push(item[column]);
           });
@@ -347,6 +331,7 @@ const applyFilters = () => {
         }),
     },
   });
+
   grid.forceRender();
 };
 
@@ -394,6 +379,17 @@ const handleDeletePickup = () => {
       push.error("Something went to wrong!");
     },
   });
+};
+
+const resetFilter = () => {
+  filters.fromDate = fromDate;
+  filters.toDate = toDate;
+  filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
+  filters.isUrgent = false;
+  filters.isImportant = false;
+  filters.createdBy = "";
+  filters.zoneBy = "";
+  applyFilters();
 };
 </script>
 <template>
@@ -715,6 +711,11 @@ const handleDeletePickup = () => {
         <SoftPrimaryButton class="space-x-2" @click="applyFilters">
           <i class="fa-solid fa-filter"></i>
           <span>Apply Filters</span>
+        </SoftPrimaryButton>
+        <!--Filter Rest Button-->
+        <SoftPrimaryButton class="space-x-2" @click="resetFilter">
+          <i class="fa-solid fa-refresh"></i>
+          <span>Reset Filters</span>
         </SoftPrimaryButton>
       </template>
     </FilterDrawer>

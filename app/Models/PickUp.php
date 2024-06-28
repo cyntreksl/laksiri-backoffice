@@ -21,7 +21,7 @@ class PickUp extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'reference', 'cargo_type', 'name', 'email', 'contact_number', 'address', 'location_name', 'location_longitude', 'location_latitude', 'zone_id', 'notes', 'driver_id', 'driver_assigned_at', 'hbl_id', 'created_by', 'deleted_at', 'branch_id', 'pickup_date', 'pickup_time_start', 'pickup_time_end', 'is_urgent_pickup', 'is_from_important_customer', 'pickup_order', 'system_status', 'status',
+        'reference', 'cargo_type', 'name', 'email', 'contact_number', 'address', 'location_name', 'location_longitude', 'location_latitude', 'zone_id', 'notes', 'driver_id', 'driver_assigned_at', 'hbl_id', 'created_by', 'deleted_at', 'branch_id', 'pickup_date', 'pickup_time_start', 'pickup_time_end', 'is_urgent_pickup', 'is_from_important_customer', 'pickup_order', 'system_status', 'status', 'pickup_type', 'pickup_note',
     ];
 
     protected array $SYSTEM_STATUS = [
