@@ -389,6 +389,54 @@ const resetFilter = () => {
   filters.status = "";
   applyFilters();
 };
+
+const planeIcon = ref(`
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="15"
+  height="15"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class="icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2"
+>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+  <path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" />
+</svg>
+`);
+
+const shipIcon = ref(`
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="15"
+  height="15"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
+>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+  <path d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1" />
+  <path d="M4 18l-1 -5h18l-2 4" />
+  <path d="M5 13v-6h8l4 6" />
+  <path d="M7 7v-4h-1" />
+</svg>
+`);
+
+const doorIcon = ref(`
+<svg  xmlns="http://www.w3.org/2000/svg"  width="15"  height="15"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  
+stroke-linejoin="round"  
+class="icon icon-tabler icons-tabler-outline icon-tabler-door mr-2">
+<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+<path d="M14 12v.01" /><path d="M3 21h18" />
+<path d="M6 21v-16a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v16" /></svg>
+`);
 </script>
 <template>
   <AppLayout title="Loaded Shipments">
@@ -449,6 +497,12 @@ const resetFilter = () => {
                     :key="index"
                     class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
                   >
+                    <span v-if="mode == 'Sea Cargo'">
+                      <div v-html="shipIcon"></div>
+                    </span>
+                    <span v-if="mode == 'Air Cargo'">
+                      <div v-html="planeIcon"></div>
+                    </span>
                     {{ mode }}
                   </div>
 
@@ -745,6 +799,12 @@ const resetFilter = () => {
             :label="cargoType"
             :value="cargoType"
           />
+          <span v-if="cargoType == 'Sea Cargo'">
+            <div v-html="shipIcon"></div>
+          </span>
+          <span v-if="cargoType == 'Air Cargo'">
+            <div v-html="planeIcon"></div>
+          </span>
         </label>
 
         <FilterBorder />
