@@ -52,7 +52,10 @@
             </a>
             <!-- Pickup -->
             <a
-              @mouseenter="setMenu('pickups')"
+              @mouseenter="
+                setMenu('pickups');
+                openSideBar();
+              "
               x-tooltip.placement.right="'Pickup'"
               :class="[
                 activeMenu === 'pickups' ? 'bg-primary/10 text-primary' : '',
@@ -81,7 +84,10 @@
             </a>
             <!-- HBL -->
             <a
-              @mouseenter="setMenu('hbls')"
+              @mouseenter="
+                setMenu('hbls');
+                openSideBar();
+              "
               x-tooltip.placement.right="'HBL'"
               :class="[
                 activeMenu === 'hbls' ? 'bg-primary/10 text-primary' : '',
@@ -110,7 +116,10 @@
             </a>
             <!-- Back Office -->
             <a
-              @mouseenter="setMenu('back-office')"
+              @mouseenter="
+                setMenu('back-office');
+                openSideBar();
+              "
               x-tooltip.placement.right="'Back Office'"
               :class="[
                 activeMenu === 'back-office'
@@ -144,7 +153,10 @@
             </a>
             <!-- Loading -->
             <a
-              @mouseenter="setMenu('loading')"
+              @mouseenter="
+                setMenu('loading');
+                openSideBar();
+              "
               x-tooltip.placement.right="'Loading'"
               :class="[
                 activeMenu === 'loading' ? 'bg-primary/10 text-primary' : '',
@@ -174,7 +186,10 @@
             </a>
             <!-- Arrivals -->
             <a
-              @mouseenter="setMenu('arrival')"
+              @mouseenter="
+                setMenu('arrival');
+                openSideBar();
+              "
               x-tooltip.placement.right="'Arrivals'"
               :class="[
                 activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
@@ -202,7 +217,10 @@
             </a>
             <!-- Delivery -->
             <a
-              @mouseenter="setMenu('delivery')"
+              @mouseenter="
+                setMenu('delivery');
+                openSideBar();
+              "
               x-tooltip.placement.right="'Delivery'"
               :class="[
                 activeMenu === 'delivery' ? 'bg-primary/10 text-primary' : '',
@@ -233,7 +251,10 @@
             </a>
             <!-- Reports -->
             <a
-              @mouseenter="setMenu('report')"
+              @mouseenter="
+                setMenu('report');
+                openSideBar();
+              "
               x-tooltip.placement.right="'Report'"
               :class="[
                 activeMenu === 'report' ? 'bg-primary/10 text-primary' : '',
@@ -266,7 +287,10 @@
 
             <!-- User Management -->
             <a
-              @mouseenter="setMenu('users')"
+              @mouseenter="
+                setMenu('users');
+                openSideBar();
+              "
               x-tooltip.placement.right="'User Management'"
               :class="[
                 activeMenu === 'users' ? 'bg-primary/10 text-primary' : '',
@@ -299,7 +323,10 @@
             <!-- Settings -->
 
             <a
-              @mouseenter="setMenu('setting')"
+              @mouseenter="
+                setMenu('setting');
+                openSideBar();
+              "
               x-tooltip.placement.right="'Setting'"
               :class="[
                 activeMenu === 'setting' ? 'bg-primary/10 text-primary' : '',
@@ -501,7 +528,7 @@
               <slot name="header" />
             </p>
             <button
-              @click="toggleSideBar"
+              @click="closeSideBar"
               class="btn size-7 rounded-full p-0 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent-light/80 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 xl:hidden"
             >
               <svg
@@ -806,6 +833,16 @@ export default {
       setSidebarState();
     };
 
+    const closeSideBar = () => {
+      localStorage.setItem("sidebar-expanded", false);
+      document.body.classList.remove("is-sidebar-open");
+    };
+
+    const openSideBar = () => {
+      localStorage.setItem("sidebar-expanded", true);
+      document.body.classList.add("is-sidebar-open");
+    };
+
     const setSidebarState = () => {
       if (isSidebarExpanded.value) {
         document.body.classList.add("is-sidebar-open");
@@ -1047,6 +1084,8 @@ export default {
       setBranch,
       showBranchPopper,
       isSidebarExpanded,
+      openSideBar,
+      closeSideBar,
     };
   },
 };
