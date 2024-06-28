@@ -45,7 +45,7 @@ const toDate = moment(new Date()).format("YYYY-MM-DD");
 const filters = reactive({
   fromDate: fromDate,
   toDate: toDate,
-  cargoMode: ["Air Cargo", "Sea Cargo", "Door to Door"],
+  cargoMode: ["Air Cargo", "Sea Cargo"],
   hblType: ["UBP", "Gift", "Door to Door"],
   isHold: false,
   warehouse: ["COLOMBO", "NINTAVUR"],
@@ -876,14 +876,6 @@ const resetFilter = () => {
             v-model="filters.cargoMode"
             label="Sea Cargo"
             value="Sea Cargo"
-          />
-        </label>
-
-        <label class="inline-flex items-center space-x-2 mt-2">
-          <Switch
-            v-model="filters.cargoMode"
-            label="Door to Door"
-            value="Door to Door"
           />
         </label>
 

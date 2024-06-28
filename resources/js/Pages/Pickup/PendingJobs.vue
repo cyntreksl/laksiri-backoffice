@@ -45,7 +45,7 @@ const toDate = moment(new Date()).format("YYYY-MM-DD");
 const filters = reactive({
   fromDate: fromDate,
   toDate: toDate,
-  cargoMode: ["Air Cargo", "Sea Cargo", "Door to Door"],
+  cargoMode: ["Air Cargo", "Sea Cargo"],
   isUrgent: false,
   isImportant: false,
   createdBy: "",
@@ -119,7 +119,6 @@ const initializeGrid = () => {
           visibleColumns.forEach((column) => {
             row.push(item[column]);
           });
-
           return row;
         }),
       total: (response) => {
@@ -533,14 +532,6 @@ const resetFilter = () => {
 
               <label class="inline-flex items-center space-x-2">
                 <Checkbox
-                  :checked="data.columnVisibility.pickup_type"
-                  @change="toggleColumnVisibility('pickup_type', $event)"
-                />
-                <span class="hover:cursor-pointer">Pickup Type</span>
-              </label>
-
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
                   :checked="data.columnVisibility.is_urgent_pickup"
                   @change="toggleColumnVisibility('is_urgent_pickup', $event)"
                 />
@@ -653,14 +644,6 @@ const resetFilter = () => {
             v-model="filters.cargoMode"
             label="Sea Cargo"
             value="Sea Cargo"
-          />
-        </label>
-
-        <label class="inline-flex items-center space-x-2 mt-2">
-          <Switch
-            v-model="filters.cargoMode"
-            label="Door to Door"
-            value="Door to Door"
           />
         </label>
 
