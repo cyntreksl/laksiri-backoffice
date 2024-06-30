@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\WarehouseZone\GetWarehouseZones;
 use App\Enum\HBLPaymentStatus;
+use App\Http\Requests\AssignZoneRequest;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
+use App\Models\HBL;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -25,6 +28,7 @@ class WarehouseController extends Controller
             'drivers' => $drivers,
             'officers' => $officers,
             'paymentStatus' => HBLPaymentStatus::cases(),
+            'warehouseZones' => GetWarehouseZones::run(),
         ]);
     }
 
@@ -46,5 +50,10 @@ class WarehouseController extends Controller
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers']);
 
         return $this->warehouseRepository->getSummery($filters);
+    }
+
+    public function assignZone(AssignZoneRequest $request, HBL $hbl)
+    {
+        return $this->warehouseRepository->assignWarehouseZone($hbl, $request->warehouse_zone_id);
     }
 }

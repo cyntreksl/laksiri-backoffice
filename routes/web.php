@@ -129,6 +129,7 @@ Route::middleware([
         Route::get('warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
         Route::get('get-warehouse-list', [WarehouseController::class, 'list'])->name('warehouses.list');
         Route::post('warehouse-summery', [WarehouseController::class, 'getSummery'])->name('warehouses.summery');
+        Route::put('warehouses/{hbl}/assign-zones', [WarehouseController::class, 'assignZone'])->name('warehouses.assign.zone');
     });
 
     //Loading
