@@ -566,9 +566,9 @@ const resetFilter = () => {
             </ColumnVisibilityPopover>
 
             <button
+              class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
               x-tooltip.placement.top="'Filters'"
               @click="showFilters = true"
-              class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
             >
               <i class="fa-solid fa-filter"></i>
             </button>

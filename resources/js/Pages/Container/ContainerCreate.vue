@@ -23,9 +23,9 @@
                 >
                   <input
                     v-model="form.cargo_type"
+                    :value="cargoType"
                     class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                     name="cargo_type"
-                    :value="cargoType"
                     type="radio"
                   />
                   <p>{{ cargoType }}</p>
@@ -52,10 +52,10 @@
                 >
                   <input
                     v-model="form.container_type"
-                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                    name="container_type"
                     :checked="containerType === 'Custom'"
                     :value="containerType"
+                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                    name="container_type"
                     type="radio"
                   />
                   <p>{{ containerType }}</p>
@@ -87,8 +87,8 @@
                   <input
                     v-model="form.reference"
                     class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    type="text"
                     min="0"
+                    type="text"
                   />
                 </label>
                 <InputError :message="form.errors.reference" />
@@ -99,8 +99,8 @@
                   <input
                     v-model="form.container_number"
                     class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    type="number"
                     min="0"
+                    type="number"
                   />
                 </label>
                 <InputError :message="form.errors.container_number" />
@@ -111,8 +111,8 @@
                   <input
                     v-model="form.seal_number"
                     class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    type="number"
                     min="0"
+                    type="number"
                   />
                 </label>
                 <InputError :message="form.errors.seal_number" />
@@ -124,8 +124,8 @@
                   <input
                     v-model="form.bl_number"
                     class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    type="number"
                     min="0"
+                    type="number"
                   />
                 </label>
                 <InputError :message="form.errors.bl_number" />
@@ -137,8 +137,8 @@
                   <input
                     v-model="form.awb_number"
                     class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    type="number"
                     min="0"
+                    type="number"
                   />
                 </label>
                 <InputError :message="form.errors.awb_number" />
@@ -316,17 +316,17 @@
             >
               <span>Create Container</span>
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
                 class="size-5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
+                  d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
                 />
               </svg>
             </PrimaryButton>
