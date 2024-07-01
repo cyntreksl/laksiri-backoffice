@@ -779,7 +779,10 @@
     </nav>
 
     <!-- Main Content Wrapper -->
-    <main class="main-content w-full h-screen pb-8 p-4">
+    <main
+      style="height: 100vh !important"
+      class="main-content w-full max-h-full pb-8 p-4"
+    >
       <Notivue v-slot="item">
         <Notification :item="item" />
       </Notivue>
