@@ -1,23 +1,23 @@
 <template xmlns="http://www.w3.org/1999/html">
-    <Head :title="title"/>
-    <div class="flex grow bg-slate-50 dark:bg-navy-900">
-        <!-- Sidebar -->
-        <div class="sidebar print:hidden">
-            <!-- Main Sidebar -->
-            <div class="main-sidebar">
-                <div
-                    class="flex h-full w-full flex-col items-center border-r border-slate-150 bg-white dark:border-navy-700 dark:bg-navy-800"
-                >
-                    <!-- Application Logo -->
-                    <div class="flex pt-4">
-                        <a :href="route('dashboard')">
-                            <img
-                                :src="logo"
-                                alt="logo"
-                                class="size-11 transition-transform duration-500 ease-in-out hover:rotate-[360deg]"
-                            />
-                        </a>
-                    </div>
+  <Head :title="title" />
+  <div class="flex grow bg-slate-50 dark:bg-navy-900">
+    <!-- Sidebar -->
+    <div class="sidebar print:hidden">
+      <!-- Main Sidebar -->
+      <div class="main-sidebar">
+        <div
+          class="flex h-full w-full flex-col items-center border-r border-slate-150 bg-white dark:border-navy-700 dark:bg-navy-800"
+        >
+          <!-- Application Logo -->
+          <div class="flex pt-4">
+            <a :href="route('dashboard')">
+              <img
+                :src="logo"
+                alt="logo"
+                class="size-11 transition-transform duration-500 ease-in-out hover:rotate-[360deg]"
+              />
+            </a>
+          </div>
 
           <!-- Main Sections Links -->
           <div
@@ -377,7 +377,6 @@
                   margin: 0px;
                   transform: translate(76px, -10px);
                 "
-                data-popper-placement="right-end"
               >
                 <div
                   class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700"
@@ -485,36 +484,36 @@
                       </div>
                     </a>
 
-                                        <div class="mt-3 px-4">
-                                            <form @submit.prevent="logout">
-                                                <button
-                                                    class="btn h-9 w-full space-x-2 bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                                >
-                                                    <svg
-                                                        class="size-5"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path
-                                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="1.5"
-                                                        ></path>
-                                                    </svg>
-                                                    <span>Logout</span>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="mt-3 px-4">
+                      <form @submit.prevent="logout">
+                        <button
+                          class="btn h-9 w-full space-x-2 bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                        >
+                          <svg
+                            class="size-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.5"
+                            ></path>
+                          </svg>
+                          <span>Logout</span>
+                        </button>
+                      </form>
                     </div>
+                  </div>
                 </div>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Sidebar Panel -->
       <div class="sidebar-panel">
@@ -622,45 +621,42 @@
       </div>
     </div>
 
-        <!-- App Header Wrapper-->
-        <nav
-            class="header before:bg-white dark:before:bg-navy-750 print:hidden"
-        >
-            <!-- App Header  -->
-            <div
-                class="header-container relative flex w-full bg-white dark:bg-navy-750 print:hidden"
+    <!-- App Header Wrapper-->
+    <nav class="header before:bg-white dark:before:bg-navy-750 print:hidden">
+      <!-- App Header  -->
+      <div
+        class="header-container relative flex w-full bg-white dark:bg-navy-750 print:hidden"
+      >
+        <!-- Header Items -->
+        <div class="flex w-full items-center justify-between">
+          <!-- Left: Sidebar Toggle Button -->
+          <div class="size-7">
+            <button
+              v-if="!isSidebarExpanded"
+              class="menu-toggle ml-0.5 flex size-7 flex-col justify-center space-y-1.5 text-primary outline-none focus:outline-none dark:text-accent-light/80"
+              @click="toggleSideBar"
             >
-                <!-- Header Items -->
-                <div class="flex w-full items-center justify-between">
-                    <!-- Left: Sidebar Toggle Button -->
-                    <div class="size-7">
-                        <button v-if="!isSidebarExpanded"
-                            class="menu-toggle ml-0.5 flex size-7 flex-col justify-center space-y-1.5 text-primary outline-none focus:outline-none dark:text-accent-light/80"
-                            @click="toggleSideBar"
-                        >
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </button>
-                        <button v-else
-                            @click="toggleSideBar">
-                        <svg
-                            class="size-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M15 19l-7-7 7-7"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                            ></path>
-                        </svg>
-                        </button>
-
-                    </div>
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+            <button v-else @click="toggleSideBar">
+              <svg
+                class="size-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15 19l-7-7 7-7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                ></path>
+              </svg>
+            </button>
+          </div>
 
           <!-- Right: Header buttons -->
           <div class="-mr-1.5 flex items-center space-x-2">
@@ -781,14 +777,14 @@
       </div>
     </nav>
 
-        <!-- Main Content Wrapper -->
-        <main class="main-content w-full h-screen pb-8 p-4">
-            <Notivue v-slot="item">
-                <Notification :item="item"/>
-            </Notivue>
-            <slot/>
-        </main>
-    </div>
+    <!-- Main Content Wrapper -->
+    <main class="main-content w-full h-screen pb-8 p-4">
+      <Notivue v-slot="item">
+        <Notification :item="item" />
+      </Notivue>
+      <slot />
+    </main>
+  </div>
 </template>
 <script>
 import { computed, customRef, reactive, ref } from "vue";
@@ -796,40 +792,40 @@ import { useMonochromeSelector } from "../composable/monochromeMode.js";
 import { useDarkModeSelector } from "../composable/darkMode.js";
 import { Head, router, usePage } from "@inertiajs/vue3";
 import logo from "../../images/logo_main.png";
-import {Link} from '@inertiajs/vue3'
+import { Link } from "@inertiajs/vue3";
 import Popper from "vue3-popper";
-import {Notification, Notivue} from "notivue";
+import { Notification, Notivue } from "notivue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 
 export default {
-    components: {Notification, Breadcrumb, Notivue, Head, Link, Popper},
-    props: {
-        title: "",
-    },
-    setup() {
-        const toggleProfileBar = ref(false);
+  components: { Notification, Breadcrumb, Notivue, Head, Link, Popper },
+  props: {
+    title: "",
+  },
+  setup() {
+    const toggleProfileBar = ref(false);
 
-        const monochromeModeSelector = useMonochromeSelector();
-        const darkModeSelector = useDarkModeSelector();
-        darkModeSelector.setDarkMode();
-        monochromeModeSelector.setMonochromeMode();
-        const isDarkMode = darkModeSelector.isDarkMode;
+    const monochromeModeSelector = useMonochromeSelector();
+    const darkModeSelector = useDarkModeSelector();
+    darkModeSelector.setDarkMode();
+    monochromeModeSelector.setMonochromeMode();
+    const isDarkMode = darkModeSelector.isDarkMode;
 
-        const toggleMonochromeMode = () => {
-            monochromeModeSelector.toggleMonochromeMode();
-        };
+    const toggleMonochromeMode = () => {
+      monochromeModeSelector.toggleMonochromeMode();
+    };
 
-        const toggleDarkMode = () => {
-            darkModeSelector.toggleDarkMode();
-        };
+    const toggleDarkMode = () => {
+      darkModeSelector.toggleDarkMode();
+    };
 
-        const logout = () => {
-            router.post(route("logout"));
-        };
+    const logout = () => {
+      router.post(route("logout"));
+    };
 
-        const isSidebarExpanded = ref(
-            localStorage.getItem("sidebar-expanded") === "true",
-        );
+    const isSidebarExpanded = ref(
+      localStorage.getItem("sidebar-expanded") === "true"
+    );
 
     const toggleSideBar = () => {
       isSidebarExpanded.value = !isSidebarExpanded.value;
@@ -855,203 +851,189 @@ export default {
       }
     };
 
-        setSidebarState();
+    setSidebarState();
 
-        const current = route().current();
-        const mainRoute = current.split('.')[0];
-        const activeMenu = ref(mainRoute);
+    const current = route().current();
+    const mainRoute = current.split(".")[0];
+    const activeMenu = ref(mainRoute);
 
-        const childMenuList = reactive([]);
+    const childMenuList = reactive([]);
 
-        const setMenu = (menu) => {
-            switch (menu) {
-                case "dashboard":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Dashboard",
-                            route: "dashboard",
-                        },
-                    );
-                    break;
-                case "pickups":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Create Job",
-                            route: "pickups.create",
-                        },
-                        {
-                            title: "Pending Jobs",
-                            route: "pickups.index",
-                        },
-                        {
-                            title: "Pickup Ordering",
-                            route: "pickups.ordering",
-                        },
-                        {
-                            title: "Pickup Exceptions",
-                            route: "pickups.exceptions",
-                        },
-                    );
-                    break;
-                case "hbls":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Create HBL",
-                            route: "hbls.create",
-                        },
-                        {
-                            title: "All HBL",
-                            route: "hbls.index",
-                        },
-                        {
-                            title: "Cancelled HBL",
-                            route: "hbls.cancelled-hbls",
-                        },
-                    );
-                    break;
-                case "back-office":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Cash Settlements",
-                            route: "back-office.cash-settlements.index",
-                        },
-                        {
-                            title: "Warehouse",
-                            route: "back-office.warehouses.index",
-                        },
-                    );
-                    break;
-                case "loading":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Containers",
-                            route: "loading.loading-containers.index",
-                        },
-                        {
-                            title: "Manual Loading",
-                            route: "loading.manual-loadings.index",
-                        },
-                        {
-                            title: "Loaded Shipment",
-                            route: "loading.loaded-containers.index",
-                        },
-                    );
-                    break;
-                case "arrival":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Shipments Arrivals",
-                            route: "arrival.shipments-arrivals.index",
-                        },
-                        {
-                            title: "Bonded Warehouse",
-                            route: "arrival.bonded-warehouses.index",
-                        },
-                        {
-                            title: "Unloading Issues",
-                            route: "arrival.unloading-issues.index",
-                        },
-                    );
-                    break;
-                case "delivery":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Delivery Warehouse",
-                            route: "delivery.delivery-warehouses.index",
-                        },
-                        {
-                            title: "Dispatch Point",
-                            route: "delivery.dispatch-points.index",
-                        },
-                        {
-                            title: "Dispatched Loads",
-                            route: "delivery.dispatched-loads.index",
-                        },
-                    );
-                    break;
-                case "report":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Payment Summery",
-                            route: "report.payment-summaries.index",
-                        },
-
-                    );
-                    break;
-                case "users":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "System Users",
-                            route: "users.index",
-                        },
-                        {
-                            title: "Drivers",
-                            route: "users.drivers.index",
-                        },
-                        {
-                            title: "Driver Tracking",
-                            route: "users.driver-tracings.index",
-                        },
-                        {
-                            title: "Roles & Permissions",
-                            route: "users.roles.index",
-                        },
-                    );
-                    break;
-                case "setting":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Driver Zones",
-                            route: "setting.driver-zones.index",
-                        },
-                        {
-                            title: "Driver Areas",
-                            route: "setting.driver-areas.index",
-                        },
-                        {
-                            title: "Warehouse Zones",
-                            route: "setting.warehouse-zones.index",
-                        },
-                        {
-                            title: "Pricing",
-                            route: "setting.prices.index",
-                        },
-
-                    );
-                    break;
-                case "settings":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Zones",
-                            route: "settings.zones.index",
-                        },
-                    );
-                    break;
+    const setMenu = (menu) => {
+      switch (menu) {
+        case "dashboard":
+          childMenuList.splice(0, childMenuList.length, {
+            title: "Dashboard",
+            route: "dashboard",
+          });
+          break;
+        case "pickups":
+          childMenuList.splice(
+            0,
+            childMenuList.length,
+            {
+              title: "Create Job",
+              route: "pickups.create",
+            },
+            {
+              title: "Pending Jobs",
+              route: "pickups.index",
+            },
+            {
+              title: "Pickup Ordering",
+              route: "pickups.ordering",
+            },
+            {
+              title: "Pickup Exceptions",
+              route: "pickups.exceptions",
             }
-            activeMenu.value = menu;
-        };
+          );
+          break;
+        case "hbls":
+          childMenuList.splice(
+            0,
+            childMenuList.length,
+            {
+              title: "Create HBL",
+              route: "hbls.create",
+            },
+            {
+              title: "All HBL",
+              route: "hbls.index",
+            },
+            {
+              title: "Cancelled HBL",
+              route: "hbls.cancelled-hbls",
+            }
+          );
+          break;
+        case "back-office":
+          childMenuList.splice(
+            0,
+            childMenuList.length,
+            {
+              title: "Cash Settlements",
+              route: "back-office.cash-settlements.index",
+            },
+            {
+              title: "Warehouse",
+              route: "back-office.warehouses.index",
+            }
+          );
+          break;
+        case "loading":
+          childMenuList.splice(
+            0,
+            childMenuList.length,
+            {
+              title: "Containers",
+              route: "loading.loading-containers.index",
+            },
+            {
+              title: "Manual Loading",
+              route: "loading.manual-loadings.index",
+            },
+            {
+              title: "Loaded Shipment",
+              route: "loading.loaded-containers.index",
+            }
+          );
+          break;
+        case "arrival":
+          childMenuList.splice(
+            0,
+            childMenuList.length,
+            {
+              title: "Shipments Arrivals",
+              route: "arrival.shipments-arrivals.index",
+            },
+            {
+              title: "Bonded Warehouse",
+              route: "arrival.bonded-warehouses.index",
+            },
+            {
+              title: "Unloading Issues",
+              route: "arrival.unloading-issues.index",
+            }
+          );
+          break;
+        case "delivery":
+          childMenuList.splice(
+            0,
+            childMenuList.length,
+            {
+              title: "Delivery Warehouse",
+              route: "delivery.delivery-warehouses.index",
+            },
+            {
+              title: "Dispatch Point",
+              route: "delivery.dispatch-points.index",
+            },
+            {
+              title: "Dispatched Loads",
+              route: "delivery.dispatched-loads.index",
+            }
+          );
+          break;
+        case "report":
+          childMenuList.splice(0, childMenuList.length, {
+            title: "Payment Summery",
+            route: "report.payment-summaries.index",
+          });
+          break;
+        case "users":
+          childMenuList.splice(
+            0,
+            childMenuList.length,
+            {
+              title: "System Users",
+              route: "users.index",
+            },
+            {
+              title: "Drivers",
+              route: "users.drivers.index",
+            },
+            {
+              title: "Driver Tracking",
+              route: "users.driver-tracings.index",
+            },
+            {
+              title: "Roles & Permissions",
+              route: "users.roles.index",
+            }
+          );
+          break;
+        case "setting":
+          childMenuList.splice(
+            0,
+            childMenuList.length,
+            {
+              title: "Driver Zones",
+              route: "setting.driver-zones.index",
+            },
+            {
+              title: "Driver Areas",
+              route: "setting.driver-areas.index",
+            },
+            {
+              title: "Warehouse Zones",
+              route: "setting.warehouse-zones.index",
+            },
+            {
+              title: "Pricing",
+              route: "setting.prices.index",
+            }
+          );
+          break;
+        case "settings":
+          childMenuList.splice(0, childMenuList.length, {
+            title: "Zones",
+            route: "settings.zones.index",
+          });
+          break;
+      }
+      activeMenu.value = menu;
+    };
 
     setMenu(mainRoute);
     const page = usePage();
