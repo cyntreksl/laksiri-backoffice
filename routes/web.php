@@ -10,6 +10,7 @@ use App\Http\Controllers\LoadedContainerController;
 use App\Http\Controllers\PickupController;
 use App\Http\Controllers\PickupExceptionController;
 use App\Http\Controllers\PriceController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WarehouseZoneController;
@@ -115,6 +116,10 @@ Route::middleware([
         Route::get('driver-tracings', function () {
             return Inertia::render('User/DriverTracking');
         })->name('driver-tracings.index');
+
+        // Roles
+        Route::resource('roles', RoleController::class);
+        Route::get('/permissions/{groupName}', [RoleController::class, 'getPermissionByGroupName']);
     });
 
     // Back Office
