@@ -12,9 +12,9 @@
                     <div class="flex pt-4">
                         <a :href="route('dashboard')">
                             <img
-                                class="size-11 transition-transform duration-500 ease-in-out hover:rotate-[360deg]"
                                 :src="logo"
                                 alt="logo"
+                                class="size-11 transition-transform duration-500 ease-in-out hover:rotate-[360deg]"
                             />
                         </a>
                     </div>
@@ -116,17 +116,17 @@
             </a>
             <!-- Back Office -->
             <a
+              x-tooltip.placement.right="'Back Office'"
+              @mouseenter="
+                setMenu('back-office');
+                openSideBar();
+              "
               :class="[
                 activeMenu === 'back-office'
                   ? 'bg-primary/10 text-primary'
                   : '',
               ]"
               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Back Office'"
-              @mouseenter="
-                setMenu('back-office');
-                openSideBar();
-              "
             >
               <svg
                 class="icon icon-tabler icon-tabler-building"
@@ -299,14 +299,14 @@
             >
               <svg
                 class="icon icon-tabler icons-tabler-outline icon-tabler-users"
-                fill="none"
                 height="24"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
                 stroke-width="2"
                 viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
                 width="24"
+                stroke-linecap="round"
+                stroke-linejoin="round"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path d="M0 0h24v24H0z" fill="none" stroke="none" />
@@ -377,6 +377,7 @@
                   margin: 0px;
                   transform: translate(76px, -10px);
                 "
+                data-popper-placement="right-end"
               >
                 <div
                   class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700"
@@ -386,15 +387,15 @@
                   >
                     <div class="avatar size-14">
                       <img
+                        class="rounded-full"
                         :src="$page.props.auth.user.profile_photo_url"
                         alt="avatar"
-                        class="rounded-full"
                       />
                     </div>
                     <div>
                       <a
-                        class="text-base font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light"
                         href="#"
+                        class="text-base font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light"
                       >
                         {{ $page.props.auth.user.name }}
                       </a>
@@ -455,17 +456,17 @@
                         class="flex size-8 items-center justify-center rounded-lg bg-warning text-white"
                       >
                         <svg
+                          viewBox="0 0 24 24"
                           class="size-4.5"
                           fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
                           stroke="currentColor"
                           stroke-width="2"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                             stroke-linecap="round"
                             stroke-linejoin="round"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                           ></path>
                         </svg>
                       </div>
@@ -490,17 +491,17 @@
                                                     class="btn h-9 w-full space-x-2 bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                                                 >
                                                     <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
                                                         class="size-5"
                                                         fill="none"
-                                                        viewBox="0 0 24 24"
                                                         stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                        xmlns="http://www.w3.org/2000/svg"
                                                     >
                                                         <path
+                                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                                                             stroke-linecap="round"
                                                             stroke-linejoin="round"
                                                             stroke-width="1.5"
-                                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                                                         ></path>
                                                     </svg>
                                                     <span>Logout</span>
@@ -528,21 +529,21 @@
               <slot name="header" />
             </p>
             <button
-              class="btn size-7 rounded-full p-0 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent-light/80 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 xl:hidden"
               @click="closeSideBar"
+              class="btn size-7 rounded-full p-0 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent-light/80 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 xl:hidden"
             >
               <svg
+                viewBox="0 0 24 24"
                 class="size-6"
                 fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
+                stroke="currentColor"
               >
                 <path
-                  d="M15 19l-7-7 7-7"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
+                  d="M15 19l-7-7 7-7"
                 ></path>
               </svg>
             </button>
@@ -560,11 +561,11 @@
               <div class="simplebar-mask">
                 <div class="simplebar-offset" style="right: 0px; bottom: 0px">
                   <div
-                    aria-label="scrollable content"
                     class="simplebar-content-wrapper"
+                    aria-label="scrollable content"
                     role="region"
-                    style="height: 100%; overflow: hidden scroll"
                     tabindex="0"
+                    style="height: 100%; overflow: hidden scroll"
                   >
                     <div
                       class="simplebar-content"
@@ -573,12 +574,12 @@
                       <ul class="flex flex-1 flex-col px-4 font-inter">
                         <li v-for="item in childMenuList">
                           <Link
+                            :href="route(item.route)"
                             :class="
                               route().current() === item.route
                                 ? 'font-medium text-primary dark:text-accent-light'
                                 : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50   dark:hover:bg-neutral-500'
                             "
-                            :href="route(item.route)"
                             class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
                           >
                             <sapn class="ml-2"> {{ item.title }} </sapn>
@@ -634,8 +635,8 @@
                     <!-- Left: Sidebar Toggle Button -->
                     <div class="size-7">
                         <button v-if="!isSidebarExpanded"
-                            @click="toggleSideBar"
                             class="menu-toggle ml-0.5 flex size-7 flex-col justify-center space-y-1.5 text-primary outline-none focus:outline-none dark:text-accent-light/80"
+                            @click="toggleSideBar"
                         >
                             <span></span>
                             <span></span>
@@ -644,129 +645,141 @@
                         <button v-else
                             @click="toggleSideBar">
                         <svg
-                            xmlns="http://www.w3.org/2000/svg"
                             class="size-6"
                             fill="none"
-                            viewBox="0 0 24 24"
                             stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
                         >
                             <path
+                                d="M15 19l-7-7 7-7"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 stroke-width="2"
-                                d="M15 19l-7-7 7-7"
                             ></path>
                         </svg>
                         </button>
 
                     </div>
 
-                    <!-- Right: Header buttons -->
-                    <div class="-mr-1.5 flex items-center space-x-2">
-                        <!-- Dark Mode Toggle -->
-                        <button
-                            @click="toggleDarkMode"
-                            class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        >
-                            <svg
-                                v-if="isDarkMode"
-                                class="size-6 text-amber-400"
-                                fill="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    d="M11.75 3.412a.818.818 0 01-.07.917 6.332 6.332 0 00-1.4 3.971c0 3.564 2.98 6.494 6.706 6.494a6.86 6.86 0 002.856-.617.818.818 0 011.1 1.047C19.593 18.614 16.218 21 12.283 21 7.18 21 3 16.973 3 11.956c0-4.563 3.46-8.31 7.925-8.948a.818.818 0 01.826.404z"
-                                ></path>
-                            </svg>
-                            <svg
-                                v-else
-                                xmlns="http://www.w3.org/2000/svg"
-                                x-show="!$store.global.isDarkModeEnabled"
-                                x-transition:enter="transition-transform duration-200 ease-out absolute origin-top"
-                                x-transition:enter-start="scale-75"
-                                x-transition:enter-end="scale-100 static"
-                                class="size-6 text-amber-400"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                                    clip-rule="evenodd"
-                                ></path>
-                            </svg>
-                        </button>
+          <!-- Right: Header buttons -->
+          <div class="-mr-1.5 flex items-center space-x-2">
+            <!-- Dark Mode Toggle -->
+            <button
+              @click="toggleDarkMode"
+              class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+            >
+              <svg
+                v-if="isDarkMode"
+                class="size-6 text-amber-400"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M11.75 3.412a.818.818 0 01-.07.917 6.332 6.332 0 00-1.4 3.971c0 3.564 2.98 6.494 6.706 6.494a6.86 6.86 0 002.856-.617.818.818 0 011.1 1.047C19.593 18.614 16.218 21 12.283 21 7.18 21 3 16.973 3 11.956c0-4.563 3.46-8.31 7.925-8.948a.818.818 0 01.826.404z"
+                ></path>
+              </svg>
+              <svg
+                v-else
+                class="size-6 text-amber-400"
+                x-show="!$store.global.isDarkModeEnabled"
+                x-transition:enter="transition-transform duration-200 ease-out absolute origin-top"
+                fill="currentColor"
+                x-transition:enter-end="scale-100 static"
+                viewBox="0 0 20 20"
+                x-transition:enter-start="scale-75"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                ></path>
+              </svg>
+            </button>
 
-                        <!-- Dark Mode Toggle -->
-                        <button
-                            @click="toggleMonochromeMode"
-                            class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        >
-                            <i
-                                class="fa-solid fa-palette bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-lg font-semibold"
-                            ></i>
-                        </button>
+            <!-- Dark Mode Toggle -->
+            <button
+              @click="toggleMonochromeMode"
+              class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+            >
+              <i
+                class="fa-solid fa-palette bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-lg font-semibold"
+              ></i>
+            </button>
 
-                        <!-- Notification-->
-                        <div class="flex">
-                            <button
-                                class="btn relative size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="size-5 text-slate-500 dark:text-navy-100"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="1.5"
-                                        d="M15.375 17.556h-6.75m6.75 0H21l-1.58-1.562a2.254 2.254 0 01-.67-1.596v-3.51a6.612 6.612 0 00-1.238-3.85 6.744 6.744 0 00-3.262-2.437v-.379c0-.59-.237-1.154-.659-1.571A2.265 2.265 0 0012 2c-.597 0-1.169.234-1.591.65a2.208 2.208 0 00-.659 1.572v.38c-2.621.915-4.5 3.385-4.5 6.287v3.51c0 .598-.24 1.172-.67 1.595L3 17.556h12.375zm0 0v1.11c0 .885-.356 1.733-.989 2.358A3.397 3.397 0 0112 22a3.397 3.397 0 01-2.386-.976 3.313 3.313 0 01-.989-2.357v-1.111h6.75z"
-                                    ></path>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <!-- Branch-->
-                        <Popper class="">
-                            <button @click="showBranchPopper=!showBranchPopper"
-                                class="btn space-x-1  ml-3 bg-slate-150 font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
-                                <span class="text-xs">{{$page.props.auth.user.active_branch_name}} </span>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="size-4 transition-transform duration-200"
-                                    :class="showBranchPopper && 'rotate-180'"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M19 9l-7 7-7-7"
-                                    />
-                                </svg>
-                            </button>
-                            <template #content >
-                                <div  class="popper-root" :class="showBranchPopper?'show':''">
-                                    <div class="popper-box cursor-pointer rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700">
-                                        <ul>
-                                            <li v-for="branch in userBranches">
-                                                <a @click="setBranch(branch)"
-                                                    class="flex  items-center px-3 h-8 pr-12 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">{{branch}}</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </template>
-                        </Popper>
-                    </div>
-                </div>
+            <!-- Notification-->
+            <div class="flex">
+              <button
+                class="btn relative size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              >
+                <svg
+                  fill="none"
+                  class="size-5 text-slate-500 dark:text-navy-100"
+                  stroke="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="M15.375 17.556h-6.75m6.75 0H21l-1.58-1.562a2.254 2.254 0 01-.67-1.596v-3.51a6.612 6.612 0 00-1.238-3.85 6.744 6.744 0 00-3.262-2.437v-.379c0-.59-.237-1.154-.659-1.571A2.265 2.265 0 0012 2c-.597 0-1.169.234-1.591.65a2.208 2.208 0 00-.659 1.572v.38c-2.621.915-4.5 3.385-4.5 6.287v3.51c0 .598-.24 1.172-.67 1.595L3 17.556h12.375zm0 0v1.11c0 .885-.356 1.733-.989 2.358A3.397 3.397 0 0112 22a3.397 3.397 0 01-2.386-.976 3.313 3.313 0 01-.989-2.357v-1.111h6.75z"
+                  ></path>
+                </svg>
+              </button>
             </div>
-        </nav>
+
+            <!-- Branch-->
+            <Popper class="">
+              <button
+                @click="showBranchPopper = !showBranchPopper"
+                class="btn space-x-1 ml-3 bg-slate-150 font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+              >
+                <span class="text-xs"
+                  >{{ $page.props.auth.user.active_branch_name }}
+                </span>
+                <svg
+                  class="size-4 transition-transform duration-200"
+                  viewBox="0 0 24 24"
+                  :class="showBranchPopper && 'rotate-180'"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+              <template #content>
+                <div
+                  class="popper-root"
+                  :class="showBranchPopper ? 'show' : ''"
+                >
+                  <div
+                    class="popper-box cursor-pointer rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700"
+                  >
+                    <ul>
+                      <li v-for="branch in userBranches">
+                        <a
+                          @click="setBranch(branch)"
+                          class="flex items-center px-3 h-8 pr-12 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100"
+                          >{{ branch }}</a
+                        >
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </template>
+            </Popper>
+          </div>
+        </div>
+      </div>
+    </nav>
 
         <!-- Main Content Wrapper -->
         <main class="main-content w-full h-screen pb-8 p-4">
@@ -1040,39 +1053,43 @@ export default {
             activeMenu.value = menu;
         };
 
-        setMenu(mainRoute);
-        const page = usePage()
-        const userBranches = page.props.userBranch;
+    setMenu(mainRoute);
+    const page = usePage();
+    const userBranches = page.props.userBranch;
 
-        const showBranchPopper = ref(false)
-        const setBranch = (branch) =>{
-            showBranchPopper.value = false;
+    const showBranchPopper = ref(false);
+    const setBranch = (branch) => {
+      showBranchPopper.value = false;
 
-            fetch('/switch-branch', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ branch_name: branch })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to switch branch');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (route().current('branches.edit')) {
-                        router.visit(route('branches.edit', data.branchId), {replace: true})
-                    } else {
-                        window.location.reload();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
+      fetch("/switch-branch", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute("content"),
+        },
+        body: JSON.stringify({ branch_name: branch }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to switch branch");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          if (route().current("branches.edit")) {
+            router.visit(route("branches.edit", data.branchId), {
+              replace: true,
+            });
+          } else {
+            window.location.reload();
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    };
 
     return {
       toggleSideBar,
