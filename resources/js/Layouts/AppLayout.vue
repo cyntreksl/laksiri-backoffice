@@ -19,364 +19,470 @@
                         </a>
                     </div>
 
-                    <!-- Main Sections Links -->
-                    <div
-                        class="is-scrollbar-hidden flex grow flex-col space-y-4 overflow-y-auto pt-6"
-                    >
-                        <!-- Dashboard -->
-                        <a
-                            @click="setMenu('dashboard')"
-                            x-tooltip.placement.right="'Dashboard'"
-                            :class="[
-                                activeMenu === 'dashboard'
-                                    ? 'bg-primary/10 text-primary'
-                                    : '',
-                            ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-navy-600 dark:text-accent-light dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-home">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M5 12l-2 0l9 -9l9 9l-2 0"/>
-                                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/>
-                                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
-                            </svg>
-                        </a>
-                        <!-- Pickup -->
-                        <a
-                            @click="setMenu('pickups')"
-                            x-tooltip.placement.right="'Pickup'"
-                            :class="[
-                                activeMenu === 'pickups'
-                                    ? 'bg-primary/10 text-primary'
-                                    : '',
-                            ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round"
-                                 class="icon icon-tabler icons-tabler-outline icon-tabler-truck">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                <path d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/>
-                            </svg>
-                        </a>
-                        <!-- HBL -->
-                        <a
-                            @click="setMenu('hbls')"
-                            x-tooltip.placement.right="'HBL'"
-                            :class="[
-                                activeMenu === 'hbls'
-                                    ? 'bg-primary/10 text-primary'
-                                    : '',
-                            ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round"
-                                 class="icon icon-tabler icons-tabler-outline icon-tabler-app-window">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path
-                                    d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/>
-                                <path d="M6 8h.01"/>
-                                <path d="M9 8h.01"/>
-                            </svg>
-                        </a>
-                        <!-- Back Office -->
-                        <a
-                            @click="setMenu('back-office')"
-                            x-tooltip.placement.right="'Back Office'"
-                            :class="[
-                                activeMenu === 'back-office'
-                                    ? 'bg-primary/10 text-primary'
-                                    : '',
-                            ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-building" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M3 21l18 0" />
-                                <path d="M9 8l1 0" />
-                                <path d="M9 12l1 0" />
-                                <path d="M9 16l1 0" />
-                                <path d="M14 8l1 0" />
-                                <path d="M14 12l1 0" />
-                                <path d="M14 16l1 0" />
-                                <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16" />
-                            </svg>
-                        </a>
-                        <!-- Loading -->
-                        <a
-                            @click="setMenu('loading')"
-                            x-tooltip.placement.right="'Loading'"
-                            :class="[
-                                activeMenu === 'loading'
-                                    ? 'bg-primary/10 text-primary'
-                                    : '',
-                            ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-truck-loading" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15" />
-                                <path d="M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z" />
-                                <path d="M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                            </svg>
+          <!-- Main Sections Links -->
+          <div
+            class="is-scrollbar-hidden flex grow flex-col space-y-4 overflow-y-auto pt-6"
+          >
+            <!-- Dashboard -->
+            <a
+              :class="[
+                activeMenu === 'dashboard' ? 'bg-primary/10 text-primary' : '',
+              ]"
+              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-navy-600 dark:text-accent-light dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+              x-tooltip.placement.right="'Dashboard'"
+              @click="setMenu('dashboard')"
+            >
+              <svg
+                class="icon icon-tabler icons-tabler-outline icon-tabler-home"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
+                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+              </svg>
+            </a>
+            <!-- Pickup -->
+            <a
+              :class="[
+                activeMenu === 'pickups' ? 'bg-primary/10 text-primary' : '',
+              ]"
+              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Pickup'"
+              @mouseenter="
+                setMenu('pickups');
+                openSideBar();
+              "
+            >
+              <svg
+                class="icon icon-tabler icons-tabler-outline icon-tabler-truck"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                <path
+                  d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"
+                />
+              </svg>
+            </a>
+            <!-- HBL -->
+            <a
+              :class="[
+                activeMenu === 'hbls' ? 'bg-primary/10 text-primary' : '',
+              ]"
+              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'HBL'"
+              @mouseenter="
+                setMenu('hbls');
+                openSideBar();
+              "
+            >
+              <svg
+                class="icon icon-tabler icons-tabler-outline icon-tabler-app-window"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                <path
+                  d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"
+                />
+                <path d="M6 8h.01" />
+                <path d="M9 8h.01" />
+              </svg>
+            </a>
+            <!-- Back Office -->
+            <a
+              :class="[
+                activeMenu === 'back-office'
+                  ? 'bg-primary/10 text-primary'
+                  : '',
+              ]"
+              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Back Office'"
+              @mouseenter="
+                setMenu('back-office');
+                openSideBar();
+              "
+            >
+              <svg
+                class="icon icon-tabler icon-tabler-building"
+                fill="none"
+                height="24"
+                stroke="#2c3e50"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                <path d="M3 21l18 0" />
+                <path d="M9 8l1 0" />
+                <path d="M9 12l1 0" />
+                <path d="M9 16l1 0" />
+                <path d="M14 8l1 0" />
+                <path d="M14 12l1 0" />
+                <path d="M14 16l1 0" />
+                <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16" />
+              </svg>
+            </a>
+            <!-- Loading -->
+            <a
+              :class="[
+                activeMenu === 'loading' ? 'bg-primary/10 text-primary' : '',
+              ]"
+              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Loading'"
+              @mouseenter="
+                setMenu('loading');
+                openSideBar();
+              "
+            >
+              <svg
+                class="icon icon-tabler icon-tabler-truck-loading"
+                fill="none"
+                height="24"
+                stroke="#2c3e50"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                <path d="M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15" />
+                <path
+                  d="M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z"
+                />
+                <path d="M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+              </svg>
+            </a>
+            <!-- Arrivals -->
+            <a
+              :class="[
+                activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
+              ]"
+              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Arrivals'"
+              @mouseenter="
+                setMenu('arrival');
+                openSideBar();
+              "
+            >
+              <svg
+                class="icon icon-tabler icon-tabler-inbox"
+                fill="none"
+                height="24"
+                stroke="#2c3e50"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                <path
+                  d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"
+                />
+                <path d="M4 13h3l3 3h4l3 -3h3" />
+              </svg>
+            </a>
+            <!-- Delivery -->
+            <a
+              :class="[
+                activeMenu === 'delivery' ? 'bg-primary/10 text-primary' : '',
+              ]"
+              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Delivery'"
+              @mouseenter="
+                setMenu('delivery');
+                openSideBar();
+              "
+            >
+              <svg
+                class="icon icon-tabler icon-tabler-trolley"
+                fill="none"
+                height="24"
+                stroke="#2c3e50"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                <path d="M11 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                <path d="M6 16l3 2" />
+                <path d="M12 17l8 -12" />
+                <path d="M17 10l2 1" />
+                <path
+                  d="M9.592 4.695l3.306 2.104a1.3 1.3 0 0 1 .396 1.8l-3.094 4.811a1.3 1.3 0 0 1 -1.792 .394l-3.306 -2.104a1.3 1.3 0 0 1 -.396 -1.8l3.094 -4.81a1.3 1.3 0 0 1 1.792 -.394z"
+                />
+              </svg>
+            </a>
+            <!-- Reports -->
+            <a
+              :class="[
+                activeMenu === 'report' ? 'bg-primary/10 text-primary' : '',
+              ]"
+              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Report'"
+              @mouseenter="
+                setMenu('report');
+                openSideBar();
+              "
+            >
+              <svg
+                class="icon icon-tabler icon-tabler-clipboard-text"
+                fill="none"
+                height="24"
+                stroke="#2c3e50"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                <path
+                  d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"
+                />
+                <path
+                  d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"
+                />
+                <path d="M9 12h6" />
+                <path d="M9 16h6" />
+              </svg>
+            </a>
 
+            <!-- User Management -->
+            <a
+              :class="[
+                activeMenu === 'users' ? 'bg-primary/10 text-primary' : '',
+              ]"
+              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'User Management'"
+              @mouseenter="
+                setMenu('users');
+                openSideBar();
+              "
+            >
+              <svg
+                class="icon icon-tabler icons-tabler-outline icon-tabler-users"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
+              </svg>
+            </a>
+          </div>
 
-                        </a>
-                        <!-- Arrivals -->
-                        <a
-                            @click="setMenu('arrival')"
-                            x-tooltip.placement.right="'Arrivals'"
-                            :class="[
-                                activeMenu === 'arrival'
-                                    ? 'bg-primary/10 text-primary'
-                                    : '',
-                            ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-inbox" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
-                                <path d="M4 13h3l3 3h4l3 -3h3" />
-                            </svg>
+          <!-- Bottom Links -->
+          <div class="flex flex-col items-center space-y-3 py-3">
+            <!-- Settings -->
 
-                        </a>
-                        <!-- Delivery -->
-                        <a
-                            @click="setMenu('delivery')"
-                            x-tooltip.placement.right="'Delivery'"
-                            :class="[
-                                activeMenu === 'delivery'
-                                    ? 'bg-primary/10 text-primary'
-                                    : '',
-                            ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trolley" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M11 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                <path d="M6 16l3 2" />
-                                <path d="M12 17l8 -12" />
-                                <path d="M17 10l2 1" />
-                                <path d="M9.592 4.695l3.306 2.104a1.3 1.3 0 0 1 .396 1.8l-3.094 4.811a1.3 1.3 0 0 1 -1.792 .394l-3.306 -2.104a1.3 1.3 0 0 1 -.396 -1.8l3.094 -4.81a1.3 1.3 0 0 1 1.792 -.394z" />
-                            </svg>
+            <a
+              :class="[
+                activeMenu === 'setting' ? 'bg-primary/10 text-primary' : '',
+              ]"
+              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Setting'"
+              @mouseenter="
+                setMenu('setting');
+                openSideBar();
+              "
+            >
+              <svg
+                class="size-7"
+                fill="none"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 12.947v-1.771c0-1.047.85-1.913 1.899-1.913 1.81 0 2.549-1.288 1.64-2.868a1.919 1.919 0 0 1 .699-2.607l1.729-.996c.79-.474 1.81-.192 2.279.603l.11.192c.9 1.58 2.379 1.58 3.288 0l.11-.192c.47-.795 1.49-1.077 2.279-.603l1.73.996a1.92 1.92 0 0 1 .699 2.607c-.91 1.58-.17 2.868 1.639 2.868 1.04 0 1.899.856 1.899 1.912v1.772c0 1.047-.85 1.912-1.9 1.912-1.808 0-2.548 1.288-1.638 2.869.52.915.21 2.083-.7 2.606l-1.729.997c-.79.473-1.81.191-2.279-.604l-.11-.191c-.9-1.58-2.379-1.58-3.288 0l-.11.19c-.47.796-1.49 1.078-2.279.605l-1.73-.997a1.919 1.919 0 0 1-.699-2.606c.91-1.58.17-2.869-1.639-2.869A1.911 1.911 0 0 1 2 12.947Z"
+                  fill="currentColor"
+                  fill-opacity="0.3"
+                ></path>
+                <path
+                  d="M11.995 15.332c1.794 0 3.248-1.464 3.248-3.27 0-1.807-1.454-3.272-3.248-3.272-1.794 0-3.248 1.465-3.248 3.271 0 1.807 1.454 3.271 3.248 3.271Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </a>
 
+            <!-- Profile -->
+            <div class="flex">
+              <button
+                class="avatar size-12"
+                @click="toggleProfileBar = !toggleProfileBar"
+              >
+                <img
+                  :src="$page.props.auth.user.profile_photo_url"
+                  alt="avatar"
+                  class="rounded-full"
+                />
+                <span
+                  class="absolute right-0 size-3.5 rounded-full border-2 border-white bg-success dark:border-navy-700"
+                ></span>
+              </button>
 
-                        </a>
-                        <!-- Reports -->
-                        <a
-                            @click="setMenu('report')"
-                            x-tooltip.placement.right="'Report'"
-                            :class="[
-                                activeMenu === 'report'
-                                    ? 'bg-primary/10 text-primary'
-                                    : '',
-                            ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-text" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-                                <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
-                                <path d="M9 12h6" />
-                                <path d="M9 16h6" />
-                            </svg>
-
-                        </a>
-
-                        <!-- User Management -->
-                        <a
-                            @click="setMenu('users')"
-                            x-tooltip.placement.right="'User Management'"
-                            :class="[
-                                activeMenu === 'users'
-                                    ? 'bg-primary/10 text-primary'
-                                    : '',
-                            ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round"
-                                 class="icon icon-tabler icons-tabler-outline icon-tabler-users">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
-                                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
-                            </svg>
-                        </a>
-
-
+              <div
+                :class="[toggleProfileBar ? 'show' : '']"
+                class="popper-root fixed"
+                data-popper-placement="right-end"
+                style="
+                  position: fixed;
+                  inset: auto auto 0px 0px;
+                  margin: 0px;
+                  transform: translate(76px, -10px);
+                "
+              >
+                <div
+                  class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700"
+                >
+                  <div
+                    class="flex items-center space-x-4 rounded-t-lg bg-slate-100 py-5 px-4 dark:bg-navy-800"
+                  >
+                    <div class="avatar size-14">
+                      <img
+                        :src="$page.props.auth.user.profile_photo_url"
+                        alt="avatar"
+                        class="rounded-full"
+                      />
                     </div>
+                    <div>
+                      <a
+                        class="text-base font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light"
+                        href="#"
+                      >
+                        {{ $page.props.auth.user.name }}
+                      </a>
+                      <p class="text-xs text-slate-400 dark:text-navy-300">
+                        {{ $page.props.auth.user.email }}
+                      </p>
+                    </div>
+                  </div>
 
-                    <!-- Bottom Links -->
-                    <div class="flex flex-col items-center space-y-3 py-3">
-                        <!-- Settings -->
-
-                        <a
-                            @click="setMenu('setting')"
-                            x-tooltip.placement.right="'Setting'"
-                            :class="[
-                                activeMenu === 'setting'
-                                    ? 'bg-primary/10 text-primary'
-                                    : '',
-                            ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                  <div class="flex flex-col pt-2 pb-5">
+                    <a
+                      :href="
+                        route(
+                          'branches.edit',
+                          $page.props.auth.user.active_branch_id
+                        )
+                      "
+                      class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
+                    >
+                      <div
+                        class="flex size-8 items-center justify-center rounded-lg bg-pink-500 text-white"
+                      >
+                        <svg
+                          class="size-4.5"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
                         >
-                            <svg
-                                class="size-7"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    fill-opacity="0.3"
-                                    fill="currentColor"
-                                    d="M2 12.947v-1.771c0-1.047.85-1.913 1.899-1.913 1.81 0 2.549-1.288 1.64-2.868a1.919 1.919 0 0 1 .699-2.607l1.729-.996c.79-.474 1.81-.192 2.279.603l.11.192c.9 1.58 2.379 1.58 3.288 0l.11-.192c.47-.795 1.49-1.077 2.279-.603l1.73.996a1.92 1.92 0 0 1 .699 2.607c-.91 1.58-.17 2.868 1.639 2.868 1.04 0 1.899.856 1.899 1.912v1.772c0 1.047-.85 1.912-1.9 1.912-1.808 0-2.548 1.288-1.638 2.869.52.915.21 2.083-.7 2.606l-1.729.997c-.79.473-1.81.191-2.279-.604l-.11-.191c-.9-1.58-2.379-1.58-3.288 0l-.11.19c-.47.796-1.49 1.078-2.279.605l-1.73-.997a1.919 1.919 0 0 1-.699-2.606c.91-1.58.17-2.869-1.639-2.869A1.911 1.911 0 0 1 2 12.947Z"
-                                ></path>
-                                <path
-                                    fill="currentColor"
-                                    d="M11.995 15.332c1.794 0 3.248-1.464 3.248-3.27 0-1.807-1.454-3.272-3.248-3.272-1.794 0-3.248 1.465-3.248 3.271 0 1.807 1.454 3.271 3.248 3.271Z"
-                                ></path>
-                            </svg>
+                          <path
+                            d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </div>
 
-                        </a>
+                      <div>
+                        <h2
+                          class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
+                        >
+                          Business Profile
+                        </h2>
+                        <div
+                          class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
+                        >
+                          Branch Configurations
+                        </div>
+                      </div>
+                    </a>
 
-                        <!-- Profile -->
-                        <div class="flex">
-                            <button
-                                @click="toggleProfileBar = !toggleProfileBar"
-                                class="avatar size-12"
-                            >
-                                <img
-                                    class="rounded-full"
-                                    :src="
-                                        $page.props.auth.user.profile_photo_url
-                                    "
-                                    alt="avatar"
-                                />
-                                <span
-                                    class="absolute right-0 size-3.5 rounded-full border-2 border-white bg-success dark:border-navy-700"
-                                ></span>
-                            </button>
+                    <a
+                      :href="route('profile.show')"
+                      class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
+                    >
+                      <div
+                        class="flex size-8 items-center justify-center rounded-lg bg-warning text-white"
+                      >
+                        <svg
+                          class="size-4.5"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                        </svg>
+                      </div>
 
-                            <div
-                                class="popper-root fixed"
-                                :class="[toggleProfileBar ? 'show' : '']"
-                                style="
-                                    position: fixed;
-                                    inset: auto auto 0px 0px;
-                                    margin: 0px;
-                                    transform: translate(76px, -10px);
-                                "
-                                data-popper-placement="right-end"
-                            >
-                                <div
-                                    class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700"
-                                >
-                                    <div
-                                        class="flex items-center space-x-4 rounded-t-lg bg-slate-100 py-5 px-4 dark:bg-navy-800"
-                                    >
-                                        <div class="avatar size-14">
-                                            <img
-                                                class="rounded-full"
-                                                :src="
-                                                    $page.props.auth.user
-                                                        .profile_photo_url
-                                                "
-                                                alt="avatar"
-                                            />
-                                        </div>
-                                        <div>
-                                            <a
-                                                href="#"
-                                                class="text-base font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light"
-                                            >
-                                                {{ $page.props.auth.user.name }}
-                                            </a>
-                                            <p
-                                                class="text-xs text-slate-400 dark:text-navy-300"
-                                            >
-                                                {{
-                                                    $page.props.auth.user.email
-                                                }}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex flex-col pt-2 pb-5">
-
-                                        <a
-                                            :href="route('branches.edit', $page.props.auth.user.active_branch_id)"
-                                            class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
-                                        >
-                                            <div
-                                                class="flex size-8 items-center justify-center rounded-lg bg-pink-500 text-white"
-                                            >
-                                                <svg class="size-4.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" stroke-linecap="round" stroke-linejoin="round" />
-                                                </svg>
-
-                                            </div>
-
-                                            <div>
-                                                <h2
-                                                    class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
-                                                >
-                                                    Business Profile
-                                                </h2>
-                                                <div
-                                                    class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
-                                                >
-                                                    Branch Configurations
-                                                </div>
-                                            </div>
-                                        </a>
-
-                                        <a
-                                            :href="route('profile.show')"
-                                            class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
-                                        >
-                                            <div
-                                                class="flex size-8 items-center justify-center rounded-lg bg-warning text-white"
-                                            >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    class="size-4.5"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                    stroke-width="2"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                                    ></path>
-                                                </svg>
-                                            </div>
-
-                                            <div>
-                                                <h2
-                                                    class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
-                                                >
-                                                    Profile
-                                                </h2>
-                                                <div
-                                                    class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
-                                                >
-                                                    Your profile setting
-                                                </div>
-                                            </div>
-                                        </a>
+                      <div>
+                        <h2
+                          class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
+                        >
+                          Profile
+                        </h2>
+                        <div
+                          class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
+                        >
+                          Your profile setting
+                        </div>
+                      </div>
+                    </a>
 
                                         <div class="mt-3 px-4">
                                             <form @submit.prevent="logout">
@@ -409,79 +515,111 @@
                 </div>
             </div>
 
-            <!-- Sidebar Panel -->
-            <div class="sidebar-panel">
-                <div
-                    class="flex h-full grow flex-col bg-white pl-[var(--main-sidebar-width)] dark:bg-navy-750"
-                >
-                    <!-- Sidebar Panel Header -->
-                    <div
-                        class="flex h-18 w-full items-center justify-between pl-4 pr-1"
-                    >
-                        <p
-                            class="text-base tracking-wider text-slate-800 dark:text-navy-100"
-                        >
-                            <slot name="header"/>
-                        </p>
-                        <button @click="toggleSideBar"
-                            class="btn size-7 rounded-full p-0 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent-light/80 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 xl:hidden"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="size-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M15 19l-7-7 7-7"
-                                ></path>
-                            </svg>
-                        </button>
-                    </div>
+      <!-- Sidebar Panel -->
+      <div class="sidebar-panel">
+        <div
+          class="flex h-full grow flex-col bg-white pl-[var(--main-sidebar-width)] dark:bg-navy-750"
+        >
+          <!-- Sidebar Panel Header -->
+          <div class="flex h-18 w-full items-center justify-between pl-4 pr-1">
+            <p
+              class="text-base tracking-wider text-slate-800 dark:text-navy-100"
+            >
+              <slot name="header" />
+            </p>
+            <button
+              class="btn size-7 rounded-full p-0 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent-light/80 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 xl:hidden"
+              @click="closeSideBar"
+            >
+              <svg
+                class="size-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15 19l-7-7 7-7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                ></path>
+              </svg>
+            </button>
+          </div>
 
-                    <!-- Sidebar Panel Body -->
-                    <div class="h-[calc(100%-4.5rem)] overflow-x-hidden pb-6 simplebar-scrollable-y"
-                         data-simplebar="init">
-                        <div class="simplebar-wrapper" style="margin: 0px 0px -24px">
-                            <div class="simplebar-height-auto-observer-wrapper">
-                                <div class="simplebar-height-auto-observer"></div>
-                            </div>
-                            <div class="simplebar-mask">
-                                <div class="simplebar-offset" style="right: 0px; bottom: 0px">
-                                    <div class="simplebar-content-wrapper" tabindex="0" role="region"
-                                         aria-label="scrollable content"
-                                         style=" height: 100%;overflow: hidden scroll; ">
-                                        <div class="simplebar-content" style="padding: 0px 0px 24px">
-                                            <ul class="flex flex-1 flex-col px-4 font-inter">
-                                                <li v-for="item in childMenuList">
-                                                    <Link :href="route(item.route)"
-                                                          :class="route().current() ===item.route? 'font-medium text-primary dark:text-accent-light': 'text-slate-600 hover:text-slate-900 dark:text-navy-200 dark:hover:text-navy-50'"
-                                                          class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light">
-                                                        {{ item.title }}
-                                                    </Link>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="simplebar-placeholder" style="width: 240px; height: 686px"></div>
-                        </div>
-                        <div class="simplebar-track simplebar-horizontal" style="visibility: hidden">
-                            <div class="simplebar-scrollbar" style="width: 0px; display: none"></div>
-                        </div>
-                        <div class="simplebar-track simplebar-vertical" style="visibility: visible">
-                            <div class="simplebar-scrollbar"
-                                 style="height: 126px;display: block;transform: translate3d(0px, 0px, 0px);"></div>
-                        </div>
+          <!-- Sidebar Panel Body -->
+          <div
+            class="h-[calc(100%-4.5rem)] overflow-x-hidden pb-6 simplebar-scrollable-y"
+            data-simplebar="init"
+          >
+            <div class="simplebar-wrapper" style="margin: 0px 0px -24px">
+              <div class="simplebar-height-auto-observer-wrapper">
+                <div class="simplebar-height-auto-observer"></div>
+              </div>
+              <div class="simplebar-mask">
+                <div class="simplebar-offset" style="right: 0px; bottom: 0px">
+                  <div
+                    aria-label="scrollable content"
+                    class="simplebar-content-wrapper"
+                    role="region"
+                    style="height: 100%; overflow: hidden scroll"
+                    tabindex="0"
+                  >
+                    <div
+                      class="simplebar-content"
+                      style="padding: 1px 1px 24px"
+                    >
+                      <ul class="flex flex-1 flex-col px-4 font-inter">
+                        <li v-for="item in childMenuList">
+                          <Link
+                            :class="
+                              route().current() === item.route
+                                ? 'font-medium text-primary dark:text-accent-light'
+                                : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50   dark:hover:bg-neutral-500'
+                            "
+                            :href="route(item.route)"
+                            class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
+                          >
+                            <sapn class="ml-2"> {{ item.title }} </sapn>
+                          </Link>
+                        </li>
+                      </ul>
                     </div>
+                  </div>
                 </div>
+              </div>
+              <div
+                class="simplebar-placeholder"
+                style="width: 240px; height: 686px"
+              ></div>
             </div>
+            <div
+              class="simplebar-track simplebar-horizontal"
+              style="visibility: hidden"
+            >
+              <div
+                class="simplebar-scrollbar"
+                style="width: 0px; display: none"
+              ></div>
+            </div>
+            <div
+              class="simplebar-track simplebar-vertical"
+              style="visibility: visible"
+            >
+              <div
+                class="simplebar-scrollbar"
+                style="
+                  height: 126px;
+                  display: block;
+                  transform: translate3d(0px, 0px, 0px);
+                "
+              ></div>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
 
         <!-- App Header Wrapper-->
         <nav
@@ -640,10 +778,10 @@
     </div>
 </template>
 <script>
-import {computed, customRef, reactive, ref} from "vue";
-import {useMonochromeSelector} from "../composable/monochromeMode.js";
-import {useDarkModeSelector} from "../composable/darkMode.js";
-import {Head, router, usePage} from "@inertiajs/vue3";
+import { computed, customRef, reactive, ref } from "vue";
+import { useMonochromeSelector } from "../composable/monochromeMode.js";
+import { useDarkModeSelector } from "../composable/darkMode.js";
+import { Head, router, usePage } from "@inertiajs/vue3";
 import logo from "../../images/logo_main.png";
 import {Link} from '@inertiajs/vue3'
 import Popper from "vue3-popper";
@@ -680,19 +818,29 @@ export default {
             localStorage.getItem("sidebar-expanded") === "true",
         );
 
-        const toggleSideBar = () => {
-            isSidebarExpanded.value = !isSidebarExpanded.value;
-            localStorage.setItem("sidebar-expanded", isSidebarExpanded.value);
-            setSidebarState();
-        };
+    const toggleSideBar = () => {
+      isSidebarExpanded.value = !isSidebarExpanded.value;
+      localStorage.setItem("sidebar-expanded", isSidebarExpanded.value);
+      setSidebarState();
+    };
 
-        const setSidebarState = () => {
-            if (isSidebarExpanded.value) {
-                document.body.classList.add("is-sidebar-open");
-            } else {
-                document.body.classList.remove("is-sidebar-open");
-            }
-        };
+    const closeSideBar = () => {
+      localStorage.setItem("sidebar-expanded", false);
+      document.body.classList.remove("is-sidebar-open");
+    };
+
+    const openSideBar = () => {
+      localStorage.setItem("sidebar-expanded", true);
+      document.body.classList.add("is-sidebar-open");
+    };
+
+    const setSidebarState = () => {
+      if (isSidebarExpanded.value) {
+        document.body.classList.add("is-sidebar-open");
+      } else {
+        document.body.classList.remove("is-sidebar-open");
+      }
+    };
 
         setSidebarState();
 
@@ -926,22 +1074,30 @@ export default {
                 });
         }
 
-        return {
-            toggleSideBar,
-            toggleDarkMode,
-            toggleProfileBar,
-            toggleMonochromeMode,
-            isDarkMode,
-            logout,
-            logo,
-            setMenu,
-            childMenuList,
-            activeMenu,
-            userBranches,
-            setBranch,
-            showBranchPopper,
-            isSidebarExpanded
-        };
-    },
+    return {
+      toggleSideBar,
+      toggleDarkMode,
+      toggleProfileBar,
+      toggleMonochromeMode,
+      isDarkMode,
+      logout,
+      logo,
+      setMenu,
+      childMenuList,
+      activeMenu,
+      userBranches,
+      setBranch,
+      showBranchPopper,
+      isSidebarExpanded,
+      openSideBar,
+      closeSideBar,
+    };
+  },
 };
 </script>
+
+<style scoped>
+a {
+  font-size: 15px;
+}
+</style>
