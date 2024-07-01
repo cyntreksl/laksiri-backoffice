@@ -618,7 +618,7 @@ const shipIcon = ref(`
 
     <Breadcrumb />
 
-    <div class="grid grid-cols-6 gap-4 mt-4">
+    <div class="grid sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 mt-3">
       <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
         <div class="flex justify-between space-x-1">
           <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
