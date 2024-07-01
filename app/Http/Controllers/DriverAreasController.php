@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Zone\GetZones;
 use App\Http\Requests\StoreDriverAreasRequest;
 use App\Http\Resources\DriverAreasCollection;
-use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\DriverAreasRepositoryInterface;
 use App\Models\Area;
 use Illuminate\Http\Request;
@@ -13,14 +13,15 @@ use Inertia\Inertia;
 class DriverAreasController extends Controller
 {
     public function __construct(
-        private readonly BranchRepositoryInterface $branchRepository,
         private readonly DriverAreasRepositoryInterface $driverAreasRepositoryInterface,
     ) {
     }
 
     public function index()
     {
-        return Inertia::render('Setting/DriverAreaList');
+        return Inertia::render('Setting/DriverAreaList', [
+            'zones' => GetZones::run(),
+        ]);
     }
 
     public function list(Request $request)
@@ -42,15 +43,15 @@ class DriverAreasController extends Controller
             ->take($limit)
             ->get();
 
-        $totaldriverares = Area::count();
+        $totalDriverAres = Area::count();
 
         return response()->json([
             'data' => DriverAreasCollection::collection($DriverAreas),
             'meta' => [
-                'total' => $totaldriverares,
+                'total' => $totalDriverAres,
                 'page' => $page,
                 'perPage' => $limit,
-                'lastPage' => ceil($totaldriverares / $limit),
+                'lastPage' => ceil($totalDriverAres / $limit),
             ],
         ]);
     }
@@ -63,7 +64,9 @@ class DriverAreasController extends Controller
     public function edit($id)
     {
         return Inertia::render('Setting/DriverAreasEdit', [
-            'driverareas' => $this->driverAreasRepositoryInterface->getDriverAreas($id),
+            'driverAreas' => $this->driverAreasRepositoryInterface->getDriverAreas($id),
+            'zoneIds' => $this->driverAreasRepositoryInterface->getDriverAreaZoneIDs($id),
+            'zones' => GetZones::run(),
         ]);
     }
 
@@ -72,7 +75,7 @@ class DriverAreasController extends Controller
         $this->driverAreasRepositoryInterface->editDriverAreas($request->all());
     }
 
-    public function delete($id)
+    public function destroy($id)
     {
         $this->driverAreasRepositoryInterface->destroy(Area::find($id));
     }
