@@ -71,6 +71,13 @@ class HBLController extends Controller
         $this->HBLRepository->storeHBL($request->all());
     }
 
+    public function show(HBL $hbl)
+    {
+        return response()->json([
+            'hbl' => $hbl->load('packages'),
+        ]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      */

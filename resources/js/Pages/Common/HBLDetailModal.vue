@@ -1,13 +1,7 @@
 <script setup>
 import DialogModal from "@/Components/DialogModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import AccordionPanel from "@/Components/AccordionPanel.vue";
-import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import Tabs from "@/Components/Tabs.vue";
-import Tab from "@/Components/Tab.vue";
-import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
-import TextInput from "@/Components/TextInput.vue";
-import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import TabHBLDetails from "@/Pages/Common/Partials/TabHBLDetails.vue";
 import TabStatus from "@/Pages/Common/Partials/TabStatus.vue";
 import TabDocuments from "@/Pages/Common/Partials/TabDocuments.vue";

@@ -63,7 +63,7 @@ Route::middleware([
         ->name('pickups.exceptions.delete');
 
     // HBL
-    Route::resource('hbls', HBLController::class)->except('show');
+    Route::resource('hbls', HBLController::class);
 
     Route::get('hbl-list', [HBLController::class, 'list']);
 
