@@ -781,7 +781,7 @@
     <!-- Main Content Wrapper -->
     <main
       style="height: 100vh !important"
-      class="main-content w-full max-h-full pb-8 p-4"
+      class="main-content w-full h-full pb-8 p-4"
     >
       <Notivue v-slot="item">
         <Notification :item="item" />

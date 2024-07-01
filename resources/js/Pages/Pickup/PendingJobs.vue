@@ -534,10 +534,10 @@ const shipIcon = ref(`
               >
                 Filter Options:
               </div>
-              <div class="flex -space-x-px">
+              <div class="flex space-x-px">
                 <div>
                   <div
-                    class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="mb-1 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
                     From Date
                   </div>
@@ -549,7 +549,7 @@ const shipIcon = ref(`
                 </div>
                 <div>
                   <div
-                    class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="mb-1 ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
                     To Date
                   </div>
@@ -564,7 +564,7 @@ const shipIcon = ref(`
                     v-for="(mode, index) in filters.cargoMode"
                     v-if="filters.cargoMode"
                     :key="index"
-                    class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
+                    class="mb-1 badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
                   >
                     <span v-if="mode == 'Sea Cargo'">
                       <div v-html="shipIcon"></div>
@@ -578,14 +578,14 @@ const shipIcon = ref(`
 
                   <div
                     v-if="filters.isUrgent"
-                    class="badge bg-success text-white ml-2"
+                    class="mb-1 badge bg-success text-white ml-2"
                   >
                     Is Urgent
                   </div>
 
                   <div
                     v-if="filters.isImportant"
-                    class="badge bg-cyan-500 text-white ml-2"
+                    class="mb-1 badge bg-cyan-500 text-white ml-2"
                   >
                     VIP Customer
                   </div>
@@ -688,7 +688,7 @@ const shipIcon = ref(`
             </ColumnVisibilityPopover>
 
             <button
-              class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
               x-tooltip.placement.top="'Filters'"
               @click="showFilters = true"
             >
@@ -697,7 +697,7 @@ const shipIcon = ref(`
 
             <PrimaryButton :disabled="isDataEmpty" @click="confirmAssignDriver">
               <svg
-                class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
+                class="flex icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
                 fill="none"
                 height="18"
                 stroke="currentColor"
