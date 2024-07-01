@@ -10,6 +10,7 @@ import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import TextInput from "@/Components/TextInput.vue";
+import Checkbox from "@/Components/Checkbox.vue";
 import { push } from "notivue";
 
 const props = defineProps({
@@ -229,6 +230,32 @@ const packageTypes = [
 
 const selectedType = ref("");
 
+const isChecked = ref(false);
+
+const addToConsigneeDetails = () => {
+  if (isChecked.value) {
+    form.consignee_name = form.hbl_name;
+    consignee_contact.value = contactNumber.value;
+    form.consignee_nic = form.nic;
+    form.consignee_address = form.address;
+  } else {
+    resetConsigneeDetails();
+  }
+};
+
+watch([() => form.hbl_type], ([val]) => {
+  if (form.hbl_type !== "Door to Door") {
+    resetConsigneeDetails();
+  }
+});
+
+const resetConsigneeDetails = () => {
+  form.consignee_name = "";
+  consignee_contact.value = "";
+  form.consignee_nic = "";
+  form.consignee_address = "";
+};
+
 const updateTypeDescription = () => {
   packageItem.type += (packageItem.type ? " " : "") + selectedType.value;
 };
@@ -385,6 +412,45 @@ const openEditModal = (index) => {
   // populate packageItem with existing data for editing
   Object.assign(packageItem, packageList.value[index]);
 };
+
+const planeIcon = ref(`
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class="icon icon-tabler icons-tabler-outline icon-tabler-plane"
+>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+  <path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" />
+</svg>
+`);
+
+const shipIcon = ref(`
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class="icon icon-tabler icons-tabler-outline icon-tabler-ship"
+>
+  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+  <path d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1" />
+  <path d="M4 18l-1 -5h18l-2 4" />
+  <path d="M5 13v-6h8l4 6" />
+  <path d="M7 7v-4h-1" />
+</svg>
+`);
 </script>
 
 <template>
@@ -533,6 +599,14 @@ const openEditModal = (index) => {
                 </label>
                 <InputError :message="form.errors.address" />
               </div>
+            </div>
+            <div class="col-span-2" v-if="form.hbl_type === 'Door to Door'">
+              <Checkbox
+                v-model="isChecked"
+                @change="addToConsigneeDetails"
+              ></Checkbox>
+
+              <span class="ml-5">Same as Consignee Details</span>
             </div>
           </div>
 
@@ -695,6 +769,12 @@ const openEditModal = (index) => {
                     type="radio"
                   />
                   <p>{{ cargoType }}</p>
+                  <span v-if="cargoType == 'Sea Cargo'">
+                    <div v-html="shipIcon"></div>
+                  </span>
+                  <span v-if="cargoType == 'Air Cargo'">
+                    <div v-html="planeIcon"></div>
+                  </span>
                 </label>
               </div>
               <InputError :message="form.errors.cargo_type" />
