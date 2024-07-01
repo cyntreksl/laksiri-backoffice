@@ -803,22 +803,22 @@ const shipIcon = ref(`
               >
                 Filter Options:
               </div>
-              <div class="flex -space-x-px">
+              <div class="flex">
                 <div>
                   <div
-                    class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="mb-1 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
                     From Date
                   </div>
                   <div
-                    class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    class="mb-1 tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     {{ filters.fromDate }}
                   </div>
                 </div>
                 <div>
                   <div
-                    class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="mb-1 ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
                     To Date
                   </div>
@@ -828,12 +828,12 @@ const shipIcon = ref(`
                     {{ filters.toDate }}
                   </div>
                 </div>
-                <div>
+                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
                   <div
                     v-for="(mode, index) in filters.cargoMode"
                     v-if="filters.cargoMode"
                     :key="index"
-                    class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
+                    class="mb-1 badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
                   >
                     <span v-if="mode == 'Sea Cargo'">
                       <div v-html="shipIcon"></div>
@@ -849,7 +849,7 @@ const shipIcon = ref(`
                     v-for="(type, index) in filters.hblType"
                     v-if="filters.hblType"
                     :key="index"
-                    class="badge bg-fuchsia-600 text-white dark:bg-fuchsia-600 ml-2"
+                    class="mb-1 badge bg-fuchsia-600 text-white dark:bg-fuchsia-600 ml-2"
                   >
                     {{ type }}
                   </div>
@@ -858,7 +858,7 @@ const shipIcon = ref(`
                     v-for="(item, index) in filters.warehouse"
                     v-if="filters.warehouse"
                     :key="index"
-                    class="badge bg-pink-600 text-white dark:bg-pink-600 ml-2"
+                    class="mb-1 badge bg-pink-600 text-white dark:bg-pink-600 ml-2"
                   >
                     {{ item }}
                   </div>
