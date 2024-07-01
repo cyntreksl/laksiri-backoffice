@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
+use App\Enum\PickupType;
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\UpdatePickupRequest;
@@ -50,6 +51,7 @@ class PickupController extends Controller
     public function create()
     {
         return Inertia::render('Pickup/CreateJob', [
+            'pickupTypes' => PickupType::cases(),
             'cargoTypes' => CargoType::cases(),
             'noteTypes' => $this->pickupRepository->getNoteTypes(),
             'zones' => GetZones::run(),

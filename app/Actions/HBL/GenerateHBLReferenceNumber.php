@@ -2,6 +2,7 @@
 
 namespace App\Actions\HBL;
 
+use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class GenerateHBLReferenceNumber
@@ -10,6 +11,13 @@ class GenerateHBLReferenceNumber
 
     public function handle(): string
     {
-        return 'REF'.str_pad(mt_rand(1, 999999), 6, '0', STR_PAD_LEFT);
+
+        $last_hbl = HBL::latest()->first();
+
+        $next_reference = $last_hbl ? ((int) substr($last_hbl->reference, 6) + 1) : 000001;
+
+        $reference = 'REF'.str_pad($next_reference, 6, '0', STR_PAD_LEFT);
+
+        return $reference;
     }
 }

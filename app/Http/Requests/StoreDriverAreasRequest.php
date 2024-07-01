@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreContainerRequest extends FormRequest
+class StoreDriverAreasRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,12 +22,7 @@ class StoreContainerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cargo_type' => ['required'],
-            'container_type' => ['required'],
-            'reference' => ['required', 'unique:containers,reference'],
-            'bl_number' => ['required_if:cargo_type,Sea Cargo'],
-            'awb_number' => ['required_if:cargo_type,Air Cargo'],
-            'container_number' => ['required'],
+            'name' => ['required', 'min:5', 'max:20'],
         ];
     }
 }
