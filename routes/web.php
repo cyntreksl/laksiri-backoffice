@@ -73,7 +73,7 @@ Route::middleware([
     Route::get('hbls/download/{hbl}', [HBLController::class, 'downloadHBLPDF'])
         ->name('hbls.download');
 
-    Route::get('hbls/cancelled-hbls', [HBLController::class, 'cancelledHBLs'])
+    Route::get('hbls/show/cancelled-hbls', [HBLController::class, 'cancelledHBLs'])
         ->name('hbls.cancelled-hbls');
 
     Route::get('hbl-cancelled-list', [HBLController::class, 'cancelledList']);

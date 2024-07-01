@@ -71,10 +71,12 @@ class HBLController extends Controller
         $this->HBLRepository->storeHBL($request->all());
     }
 
-    public function show(HBL $hbl)
+    public function show($hbl_id)
     {
+        $hbl = HBL::withTrashed()->with('packages')->find($hbl_id);
+
         return response()->json([
-            'hbl' => $hbl->load('packages'),
+            'hbl' => $hbl,
         ]);
     }
 
