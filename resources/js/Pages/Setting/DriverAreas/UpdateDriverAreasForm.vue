@@ -77,10 +77,10 @@ const updatedriverarea = () => {
       <br />
       <div class="flex col-span-2 justify-end">
         <PrimaryButton
-          type="submit"
-          class="ms-3"
           :class="{ 'opacity-25': form.processing }"
           :disabled="form.processing"
+          class="ms-3"
+          type="submit"
         >
           Update Wareahouse Zone
         </PrimaryButton>

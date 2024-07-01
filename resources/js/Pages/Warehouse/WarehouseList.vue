@@ -16,21 +16,30 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import HoldConfirmationModal from "@/Pages/Warehouse/Partials/HoldConfirmationModal.vue";
-import { router } from "@inertiajs/vue3";
+import {router} from "@inertiajs/vue3";
+import AssignZoneModal from "@/Pages/Warehouse/Partials/AssignZoneModal.vue";
 
 const props = defineProps({
-  drivers: {
-    type: Object,
-    default: () => {},
-  },
-  officers: {
-    type: Object,
-    default: () => {},
-  },
-  paymentStatus: {
-    type: Object,
-    default: () => {},
-  },
+    drivers: {
+        type: Object,
+        default: () => {
+        },
+    },
+    officers: {
+        type: Object,
+        default: () => {
+        },
+    },
+    paymentStatus: {
+        type: Object,
+        default: () => {
+        },
+    },
+    warehouseZones: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const showFilters = ref(false);
@@ -49,22 +58,23 @@ const filters = reactive({
 });
 
 const data = reactive({
-  columnVisibility: {
-    hbl: true,
-    hbl_name: true,
-    address: false,
-    picked_date: true,
-    weight: true,
-    volume: true,
-    grand_total: true,
-    paid_amount: true,
-    cargo_type: true,
-    hbl_type: false,
-    officer: false,
-    is_hold: true,
-    status: true,
-    actions: true,
-  },
+    columnVisibility: {
+        hbl: true,
+        hbl_name: true,
+        address: false,
+        picked_date: true,
+        weight: true,
+        volume: true,
+        grand_total: true,
+        paid_amount: true,
+        cargo_type: true,
+        hbl_type: false,
+        officer: false,
+        is_hold: true,
+        status: true,
+        zone:true,
+        actions: true,
+    },
 });
 
 const toggleColumnVisibility = (columnName) => {
@@ -226,88 +236,142 @@ const createColumns = () => [
     <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
     <span>${cell}</span>
   </div>`);
-      } else {
-        return cell;
-      }
+            } else {
+                return cell;
+            }
+        },
     },
-  },
-  { name: "Officer", hidden: !data.columnVisibility.officer },
-  {
-    name: "Actions",
-    hidden: !data.columnVisibility.actions,
-    sort: false,
-    formatter: (_, row) => {
-      return h("div", {}, [
-        h(
-          "button",
-          {
-            className:
-              "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-            onClick: () => confirmIsHold(row.cells),
-            "x-tooltip..placement.bottom.primary": row.cells[12].data
-              ? "'Release HBL'"
-              : "'Hold HBL'",
-          },
-          [
-            row.cells[12].data
-              ? h(
-                  "svg",
-                  {
-                    xmlns: "http://www.w3.org/2000/svg",
-                    viewBox: "0 0 24 24",
-                    class:
-                      "icon icon-tabler icons-tabler-outline icon-tabler-player-play",
-                    fill: "none",
-                    height: 24,
-                    width: 24,
-                    stroke: "currentColor",
-                    strokeLinecap: "round",
-                    strokeLinejoin: "round",
-                  },
-                  [
-                    h("path", {
-                      d: "M0 0h24v24H0z",
-                      fill: "none",
-                      stroke: "none",
-                    }),
-                    h("path", {
-                      d: "M7 4v16l13 -8z",
-                    }),
-                  ]
-                )
-              : h(
-                  "svg",
-                  {
-                    xmlns: "http://www.w3.org/2000/svg",
-                    viewBox: "0 0 24 24",
-                    class:
-                      "icon icon-tabler icons-tabler-outline icon-tabler-player-pause",
-                    fill: "none",
-                    height: 24,
-                    width: 24,
-                    stroke: "currentColor",
-                    strokeLinecap: "round",
-                    strokeLinejoin: "round",
-                  },
-                  [
-                    h("path", {
-                      d: "M0 0h24v24H0z",
-                      fill: "none",
-                      stroke: "none",
-                    }),
-                    h("path", {
-                      d: "M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
-                    }),
-                    h("path", {
-                      d: "M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
-                    }),
-                  ]
+    {
+        name: "Zone",
+        hidden: !data.columnVisibility.zone,
+        sort: false,
+        formatter: (_, row) => {
+            return h("div", {className: 'flex items-center'}, [
+                row._cells[14].data ? row._cells[14].data : null,
+                h(
+                    "button",
+                    {
+                        className:
+                            "ml-2 btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+                        onClick: () => confirmAssignZone(row._cells[0].data?.id),
+                        "x-tooltip..placement": 'Assign Warehouse Zone'
+                    },
+                    [
+                        h(
+                            "svg",
+                            {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                viewBox: "0 0 24 24",
+                                class:
+                                    "icon icon-tabler icons-tabler-outline icon-tabler-home-plus",
+                                fill: "none",
+                                height: 24,
+                                width: 24,
+                                stroke: "currentColor",
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                            },
+                            [
+                                h("path", {
+                                    d: "M0 0h24v24H0z",
+                                    fill: "none",
+                                    stroke: "none",
+                                }),
+                                h("path", {
+                                    d: "M19 12h2l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h5.5",
+                                }),
+                                h("path", {
+                                    d: "M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2",
+                                }),
+                                h("path", {
+                                    d: "M16 19h6",
+                                }),
+                                h("path", {
+                                    d: "M19 16v6",
+                                }),
+                            ]
+                        )
+                    ]
                 ),
-          ]
-        ),
-      ]);
+            ]);
+        }
     },
-  },
+    {
+        name: "Actions",
+        hidden: !data.columnVisibility.actions,
+        sort: false,
+        formatter: (_, row) => {
+            return h("div", {}, [
+                h(
+                    "button",
+                    {
+                        className:
+                            "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+                        onClick: () => confirmIsHold(row.cells),
+                        "x-tooltip..placement.bottom.primary": row.cells[12].data
+                            ? "'Release HBL'"
+                            : "'Hold HBL'",
+                    },
+                    [
+                        row.cells[12].data
+                            ? h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "icon icon-tabler icons-tabler-outline icon-tabler-player-play",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M7 4v16l13 -8z",
+                                    }),
+                                ]
+                            )
+                            : h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "icon icon-tabler icons-tabler-outline icon-tabler-player-pause",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
+                                    }),
+                                    h("path", {
+                                        d: "M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
+                                    }),
+                                ]
+                            ),
+                    ]
+                ),
+            ]);
+        },
+    },
 ];
 
 const baseUrl = ref("/get-warehouse-list");
@@ -484,6 +548,19 @@ const resetFilter = () => {
   filters.cargoMode = ["Air Cargo", "Sea Cargo"];
   filters.paymentStatus = [];
   applyFilters();
+};
+
+const showConfirmAssignZoneModal = ref(false);
+const hblId = ref(null);
+
+const confirmAssignZone = (id) => {
+    hblId.value = id;
+    showConfirmAssignZoneModal.value = true;
+};
+
+const closeAssignZoneModal = () => {
+    hblId.value = null;
+    showConfirmAssignZoneModal.value = false;
 };
 
 const planeIcon = ref(`
@@ -786,11 +863,13 @@ const shipIcon = ref(`
       </template>
     </FilterDrawer>
 
-    <HoldConfirmationModal
-      :hbl-data="hblData"
-      :show="showConfirmHoldModal"
-      @close="closeHoldModal"
-      @toggle-hold="toggleHold"
-    />
-  </AppLayout>
+        <HoldConfirmationModal
+            :hbl-data="hblData"
+            :show="showConfirmHoldModal"
+            @close="closeHoldModal"
+            @toggle-hold="toggleHold"
+        />
+
+        <AssignZoneModal :hbl-id="hblId" :show="showConfirmAssignZoneModal" :warehouse-zones="warehouseZones" @close="closeAssignZoneModal"/>
+    </AppLayout>
 </template>

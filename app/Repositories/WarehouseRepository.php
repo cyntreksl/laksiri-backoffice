@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Actions\HBL\Warehouse\AssignZone;
 use App\Factory\Warehouse\FilterFactory;
 use App\Http\Resources\CashSettlementCollection;
 use App\Interfaces\GridJsInterface;
@@ -65,5 +66,10 @@ class WarehouseRepository implements GridJsInterface, WarehouseRepositoryInterfa
             'sumAmount' => $sumAmount,
             'sumPaidAmount' => $sumPaidAmount,
         ];
+    }
+
+    public function assignWarehouseZone(HBL $hbl, int $warehouse_zone_id)
+    {
+        return AssignZone::run($hbl, $warehouse_zone_id);
     }
 }

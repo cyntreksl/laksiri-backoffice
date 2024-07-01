@@ -1,23 +1,23 @@
 <template xmlns="http://www.w3.org/1999/html">
-  <Head :title="title" />
-  <div class="flex grow bg-slate-50 dark:bg-navy-900">
-    <!-- Sidebar -->
-    <div class="sidebar print:hidden">
-      <!-- Main Sidebar -->
-      <div class="main-sidebar">
-        <div
-          class="flex h-full w-full flex-col items-center border-r border-slate-150 bg-white dark:border-navy-700 dark:bg-navy-800"
-        >
-          <!-- Application Logo -->
-          <div class="flex pt-4">
-            <a :href="route('dashboard')">
-              <img
-                class="size-11 transition-transform duration-500 ease-in-out hover:rotate-[360deg]"
-                :src="logo"
-                alt="logo"
-              />
-            </a>
-          </div>
+    <Head :title="title"/>
+    <div class="flex grow bg-slate-50 dark:bg-navy-900">
+        <!-- Sidebar -->
+        <div class="sidebar print:hidden">
+            <!-- Main Sidebar -->
+            <div class="main-sidebar">
+                <div
+                    class="flex h-full w-full flex-col items-center border-r border-slate-150 bg-white dark:border-navy-700 dark:bg-navy-800"
+                >
+                    <!-- Application Logo -->
+                    <div class="flex pt-4">
+                        <a :href="route('dashboard')">
+                            <img
+                                :src="logo"
+                                alt="logo"
+                                class="size-11 transition-transform duration-500 ease-in-out hover:rotate-[360deg]"
+                            />
+                        </a>
+                    </div>
 
           <!-- Main Sections Links -->
           <div
@@ -25,26 +25,26 @@
           >
             <!-- Dashboard -->
             <a
-              @click="setMenu('dashboard')"
-              x-tooltip.placement.right="'Dashboard'"
               :class="[
                 activeMenu === 'dashboard' ? 'bg-primary/10 text-primary' : '',
               ]"
               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-navy-600 dark:text-accent-light dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+              x-tooltip.placement.right="'Dashboard'"
+              @click="setMenu('dashboard')"
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-home"
                 fill="none"
+                height="24"
                 stroke="currentColor"
-                stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-home"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
                 <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
                 <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
                 <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
@@ -52,29 +52,29 @@
             </a>
             <!-- Pickup -->
             <a
-              @mouseenter="
-                setMenu('pickups');
-                openSideBar();
-              "
-              x-tooltip.placement.right="'Pickup'"
               :class="[
                 activeMenu === 'pickups' ? 'bg-primary/10 text-primary' : '',
               ]"
               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Pickup'"
+              @mouseenter="
+                setMenu('pickups');
+                openSideBar();
+              "
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-truck"
                 fill="none"
+                height="24"
                 stroke="currentColor"
-                stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-truck"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
                 <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
                 <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
                 <path
@@ -84,29 +84,29 @@
             </a>
             <!-- HBL -->
             <a
-              @mouseenter="
-                setMenu('hbls');
-                openSideBar();
-              "
-              x-tooltip.placement.right="'HBL'"
               :class="[
                 activeMenu === 'hbls' ? 'bg-primary/10 text-primary' : '',
               ]"
               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'HBL'"
+              @mouseenter="
+                setMenu('hbls');
+                openSideBar();
+              "
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-app-window"
                 fill="none"
+                height="24"
                 stroke="currentColor"
-                stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-app-window"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
                 <path
                   d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"
                 />
@@ -116,11 +116,11 @@
             </a>
             <!-- Back Office -->
             <a
+              x-tooltip.placement.right="'Back Office'"
               @mouseenter="
                 setMenu('back-office');
                 openSideBar();
               "
-              x-tooltip.placement.right="'Back Office'"
               :class="[
                 activeMenu === 'back-office'
                   ? 'bg-primary/10 text-primary'
@@ -129,18 +129,18 @@
               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
                 class="icon icon-tabler icon-tabler-building"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="#2c3e50"
                 fill="none"
+                height="24"
+                stroke="#2c3e50"
                 stroke-linecap="round"
                 stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
                 <path d="M3 21l18 0" />
                 <path d="M9 8l1 0" />
                 <path d="M9 12l1 0" />
@@ -153,29 +153,29 @@
             </a>
             <!-- Loading -->
             <a
-              @mouseenter="
-                setMenu('loading');
-                openSideBar();
-              "
-              x-tooltip.placement.right="'Loading'"
               :class="[
                 activeMenu === 'loading' ? 'bg-primary/10 text-primary' : '',
               ]"
               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Loading'"
+              @mouseenter="
+                setMenu('loading');
+                openSideBar();
+              "
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
                 class="icon icon-tabler icon-tabler-truck-loading"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="#2c3e50"
                 fill="none"
+                height="24"
+                stroke="#2c3e50"
                 stroke-linecap="round"
                 stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
                 <path d="M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15" />
                 <path
                   d="M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z"
@@ -186,29 +186,29 @@
             </a>
             <!-- Arrivals -->
             <a
-              @mouseenter="
-                setMenu('arrival');
-                openSideBar();
-              "
-              x-tooltip.placement.right="'Arrivals'"
               :class="[
                 activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
               ]"
               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Arrivals'"
+              @mouseenter="
+                setMenu('arrival');
+                openSideBar();
+              "
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
                 class="icon icon-tabler icon-tabler-inbox"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="#2c3e50"
                 fill="none"
+                height="24"
+                stroke="#2c3e50"
                 stroke-linecap="round"
                 stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
                 <path
                   d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"
                 />
@@ -217,29 +217,29 @@
             </a>
             <!-- Delivery -->
             <a
-              @mouseenter="
-                setMenu('delivery');
-                openSideBar();
-              "
-              x-tooltip.placement.right="'Delivery'"
               :class="[
                 activeMenu === 'delivery' ? 'bg-primary/10 text-primary' : '',
               ]"
               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Delivery'"
+              @mouseenter="
+                setMenu('delivery');
+                openSideBar();
+              "
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
                 class="icon icon-tabler icon-tabler-trolley"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="#2c3e50"
                 fill="none"
+                height="24"
+                stroke="#2c3e50"
                 stroke-linecap="round"
                 stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
                 <path d="M11 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
                 <path d="M6 16l3 2" />
                 <path d="M12 17l8 -12" />
@@ -251,29 +251,29 @@
             </a>
             <!-- Reports -->
             <a
-              @mouseenter="
-                setMenu('report');
-                openSideBar();
-              "
-              x-tooltip.placement.right="'Report'"
               :class="[
                 activeMenu === 'report' ? 'bg-primary/10 text-primary' : '',
               ]"
               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Report'"
+              @mouseenter="
+                setMenu('report');
+                openSideBar();
+              "
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
                 class="icon icon-tabler icon-tabler-clipboard-text"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="#2c3e50"
                 fill="none"
+                height="24"
+                stroke="#2c3e50"
                 stroke-linecap="round"
                 stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
                 <path
                   d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"
                 />
@@ -287,29 +287,29 @@
 
             <!-- User Management -->
             <a
-              @mouseenter="
-                setMenu('users');
-                openSideBar();
-              "
-              x-tooltip.placement.right="'User Management'"
               :class="[
                 activeMenu === 'users' ? 'bg-primary/10 text-primary' : '',
               ]"
               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'User Management'"
+              @mouseenter="
+                setMenu('users');
+                openSideBar();
+              "
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-users"
                 height="24"
+                stroke-width="2"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
+                width="24"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-users"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
                 <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
                 <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
@@ -323,30 +323,30 @@
             <!-- Settings -->
 
             <a
-              @mouseenter="
-                setMenu('setting');
-                openSideBar();
-              "
-              x-tooltip.placement.right="'Setting'"
               :class="[
                 activeMenu === 'setting' ? 'bg-primary/10 text-primary' : '',
               ]"
               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              x-tooltip.placement.right="'Setting'"
+              @mouseenter="
+                setMenu('setting');
+                openSideBar();
+              "
             >
               <svg
                 class="size-7"
-                viewBox="0 0 24 24"
                 fill="none"
+                viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  fill-opacity="0.3"
-                  fill="currentColor"
                   d="M2 12.947v-1.771c0-1.047.85-1.913 1.899-1.913 1.81 0 2.549-1.288 1.64-2.868a1.919 1.919 0 0 1 .699-2.607l1.729-.996c.79-.474 1.81-.192 2.279.603l.11.192c.9 1.58 2.379 1.58 3.288 0l.11-.192c.47-.795 1.49-1.077 2.279-.603l1.73.996a1.92 1.92 0 0 1 .699 2.607c-.91 1.58-.17 2.868 1.639 2.868 1.04 0 1.899.856 1.899 1.912v1.772c0 1.047-.85 1.912-1.9 1.912-1.808 0-2.548 1.288-1.638 2.869.52.915.21 2.083-.7 2.606l-1.729.997c-.79.473-1.81.191-2.279-.604l-.11-.191c-.9-1.58-2.379-1.58-3.288 0l-.11.19c-.47.796-1.49 1.078-2.279.605l-1.73-.997a1.919 1.919 0 0 1-.699-2.606c.91-1.58.17-2.869-1.639-2.869A1.911 1.911 0 0 1 2 12.947Z"
+                  fill="currentColor"
+                  fill-opacity="0.3"
                 ></path>
                 <path
-                  fill="currentColor"
                   d="M11.995 15.332c1.794 0 3.248-1.464 3.248-3.27 0-1.807-1.454-3.272-3.248-3.272-1.794 0-3.248 1.465-3.248 3.271 0 1.807 1.454 3.271 3.248 3.271Z"
+                  fill="currentColor"
                 ></path>
               </svg>
             </a>
@@ -354,13 +354,13 @@
             <!-- Profile -->
             <div class="flex">
               <button
-                @click="toggleProfileBar = !toggleProfileBar"
                 class="avatar size-12"
+                @click="toggleProfileBar = !toggleProfileBar"
               >
                 <img
-                  class="rounded-full"
                   :src="$page.props.auth.user.profile_photo_url"
                   alt="avatar"
+                  class="rounded-full"
                 />
                 <span
                   class="absolute right-0 size-3.5 rounded-full border-2 border-white bg-success dark:border-navy-700"
@@ -368,8 +368,9 @@
               </button>
 
               <div
-                class="popper-root fixed"
                 :class="[toggleProfileBar ? 'show' : '']"
+                class="popper-root fixed"
+                data-popper-placement="right-end"
                 style="
                   position: fixed;
                   inset: auto auto 0px 0px;
@@ -455,10 +456,10 @@
                         class="flex size-8 items-center justify-center rounded-lg bg-warning text-white"
                       >
                         <svg
-                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
                           class="size-4.5"
                           fill="none"
-                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
                           stroke="currentColor"
                           stroke-width="2"
                         >
@@ -484,36 +485,36 @@
                       </div>
                     </a>
 
-                    <div class="mt-3 px-4">
-                      <form @submit.prevent="logout">
-                        <button
-                          class="btn h-9 w-full space-x-2 bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="size-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.5"
-                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                            ></path>
-                          </svg>
-                          <span>Logout</span>
-                        </button>
-                      </form>
+                                        <div class="mt-3 px-4">
+                                            <form @submit.prevent="logout">
+                                                <button
+                                                    class="btn h-9 w-full space-x-2 bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                                                >
+                                                    <svg
+                                                        class="size-5"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                        <path
+                                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            stroke-width="1.5"
+                                                        ></path>
+                                                    </svg>
+                                                    <span>Logout</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
-              </div>
             </div>
-          </div>
-        </div>
-      </div>
 
       <!-- Sidebar Panel -->
       <div class="sidebar-panel">
@@ -532,10 +533,10 @@
               class="btn size-7 rounded-full p-0 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent-light/80 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 xl:hidden"
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
                 class="size-6"
                 fill="none"
-                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
                 stroke="currentColor"
               >
                 <path
@@ -561,9 +562,9 @@
                 <div class="simplebar-offset" style="right: 0px; bottom: 0px">
                   <div
                     class="simplebar-content-wrapper"
-                    tabindex="0"
-                    role="region"
                     aria-label="scrollable content"
+                    role="region"
+                    tabindex="0"
                     style="height: 100%; overflow: hidden scroll"
                   >
                     <div
@@ -621,42 +622,45 @@
       </div>
     </div>
 
-    <!-- App Header Wrapper-->
-    <nav class="header before:bg-white dark:before:bg-navy-750 print:hidden">
-      <!-- App Header  -->
-      <div
-        class="header-container relative flex w-full bg-white dark:bg-navy-750 print:hidden"
-      >
-        <!-- Header Items -->
-        <div class="flex w-full items-center justify-between">
-          <!-- Left: Sidebar Toggle Button -->
-          <div class="size-7">
-            <button
-              v-if="!isSidebarExpanded"
-              @click="toggleSideBar"
-              class="menu-toggle ml-0.5 flex size-7 flex-col justify-center space-y-1.5 text-primary outline-none focus:outline-none dark:text-accent-light/80"
+        <!-- App Header Wrapper-->
+        <nav
+            class="header before:bg-white dark:before:bg-navy-750 print:hidden"
+        >
+            <!-- App Header  -->
+            <div
+                class="header-container relative flex w-full bg-white dark:bg-navy-750 print:hidden"
             >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
-            <button v-else @click="toggleSideBar">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="size-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 19l-7-7 7-7"
-                ></path>
-              </svg>
-            </button>
-          </div>
+                <!-- Header Items -->
+                <div class="flex w-full items-center justify-between">
+                    <!-- Left: Sidebar Toggle Button -->
+                    <div class="size-7">
+                        <button v-if="!isSidebarExpanded"
+                            class="menu-toggle ml-0.5 flex size-7 flex-col justify-center space-y-1.5 text-primary outline-none focus:outline-none dark:text-accent-light/80"
+                            @click="toggleSideBar"
+                        >
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+                        <button v-else
+                            @click="toggleSideBar">
+                        <svg
+                            class="size-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M15 19l-7-7 7-7"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                            ></path>
+                        </svg>
+                        </button>
+
+                    </div>
 
           <!-- Right: Header buttons -->
           <div class="-mr-1.5 flex items-center space-x-2">
@@ -677,19 +681,19 @@
               </svg>
               <svg
                 v-else
-                xmlns="http://www.w3.org/2000/svg"
+                class="size-6 text-amber-400"
                 x-show="!$store.global.isDarkModeEnabled"
                 x-transition:enter="transition-transform duration-200 ease-out absolute origin-top"
-                x-transition:enter-start="scale-75"
-                x-transition:enter-end="scale-100 static"
-                class="size-6 text-amber-400"
-                viewBox="0 0 20 20"
                 fill="currentColor"
+                x-transition:enter-end="scale-100 static"
+                viewBox="0 0 20 20"
+                x-transition:enter-start="scale-75"
+                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   fill-rule="evenodd"
-                  d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
                   clip-rule="evenodd"
+                  d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
                 ></path>
               </svg>
             </button>
@@ -710,10 +714,10 @@
                 class="btn relative size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
               >
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
                   class="size-5 text-slate-500 dark:text-navy-100"
                   stroke="currentColor"
-                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                 >
                   <path
@@ -736,11 +740,11 @@
                   >{{ $page.props.auth.user.active_branch_name }}
                 </span>
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
                   class="size-4 transition-transform duration-200"
+                  viewBox="0 0 24 24"
                   :class="showBranchPopper && 'rotate-180'"
                   fill="none"
-                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
                   stroke="currentColor"
                   stroke-width="2"
                 >
@@ -777,14 +781,14 @@
       </div>
     </nav>
 
-    <!-- Main Content Wrapper -->
-    <main class="main-content w-full h-screen pb-8 p-4">
-      <Notivue v-slot="item">
-        <Notification :item="item" />
-      </Notivue>
-      <slot />
-    </main>
-  </div>
+        <!-- Main Content Wrapper -->
+        <main class="main-content w-full h-screen pb-8 p-4">
+            <Notivue v-slot="item">
+                <Notification :item="item"/>
+            </Notivue>
+            <slot/>
+        </main>
+    </div>
 </template>
 <script>
 import { computed, customRef, reactive, ref } from "vue";
@@ -792,40 +796,40 @@ import { useMonochromeSelector } from "../composable/monochromeMode.js";
 import { useDarkModeSelector } from "../composable/darkMode.js";
 import { Head, router, usePage } from "@inertiajs/vue3";
 import logo from "../../images/logo_main.png";
-import { Link } from "@inertiajs/vue3";
+import {Link} from '@inertiajs/vue3'
 import Popper from "vue3-popper";
-import { Notification, Notivue } from "notivue";
+import {Notification, Notivue} from "notivue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 
 export default {
-  components: { Notification, Breadcrumb, Notivue, Head, Link, Popper },
-  props: {
-    title: "",
-  },
-  setup() {
-    const toggleProfileBar = ref(false);
+    components: {Notification, Breadcrumb, Notivue, Head, Link, Popper},
+    props: {
+        title: "",
+    },
+    setup() {
+        const toggleProfileBar = ref(false);
 
-    const monochromeModeSelector = useMonochromeSelector();
-    const darkModeSelector = useDarkModeSelector();
-    darkModeSelector.setDarkMode();
-    monochromeModeSelector.setMonochromeMode();
-    const isDarkMode = darkModeSelector.isDarkMode;
+        const monochromeModeSelector = useMonochromeSelector();
+        const darkModeSelector = useDarkModeSelector();
+        darkModeSelector.setDarkMode();
+        monochromeModeSelector.setMonochromeMode();
+        const isDarkMode = darkModeSelector.isDarkMode;
 
-    const toggleMonochromeMode = () => {
-      monochromeModeSelector.toggleMonochromeMode();
-    };
+        const toggleMonochromeMode = () => {
+            monochromeModeSelector.toggleMonochromeMode();
+        };
 
-    const toggleDarkMode = () => {
-      darkModeSelector.toggleDarkMode();
-    };
+        const toggleDarkMode = () => {
+            darkModeSelector.toggleDarkMode();
+        };
 
-    const logout = () => {
-      router.post(route("logout"));
-    };
+        const logout = () => {
+            router.post(route("logout"));
+        };
 
-    const isSidebarExpanded = ref(
-      localStorage.getItem("sidebar-expanded") === "true"
-    );
+        const isSidebarExpanded = ref(
+            localStorage.getItem("sidebar-expanded") === "true",
+        );
 
     const toggleSideBar = () => {
       isSidebarExpanded.value = !isSidebarExpanded.value;
@@ -851,185 +855,203 @@ export default {
       }
     };
 
-    setSidebarState();
+        setSidebarState();
 
-    const current = route().current();
-    const mainRoute = current.split(".")[0];
-    const activeMenu = ref(mainRoute);
+        const current = route().current();
+        const mainRoute = current.split('.')[0];
+        const activeMenu = ref(mainRoute);
 
-    const childMenuList = reactive([]);
+        const childMenuList = reactive([]);
 
-    const setMenu = (menu) => {
-      switch (menu) {
-        case "dashboard":
-          childMenuList.splice(0, childMenuList.length, {
-            title: "Dashboard",
-            route: "dashboard",
-          });
-          break;
-        case "pickups":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Create Job",
-              route: "pickups.create",
-            },
-            {
-              title: "Pending Jobs",
-              route: "pickups.index",
-            },
-            {
-              title: "Pickup Ordering",
-              route: "pickups.ordering",
-            },
-            {
-              title: "Pickup Exceptions",
-              route: "pickups.exceptions",
+        const setMenu = (menu) => {
+            switch (menu) {
+                case "dashboard":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Dashboard",
+                            route: "dashboard",
+                        },
+                    );
+                    break;
+                case "pickups":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Create Job",
+                            route: "pickups.create",
+                        },
+                        {
+                            title: "Pending Jobs",
+                            route: "pickups.index",
+                        },
+                        {
+                            title: "Pickup Ordering",
+                            route: "pickups.ordering",
+                        },
+                        {
+                            title: "Pickup Exceptions",
+                            route: "pickups.exceptions",
+                        },
+                    );
+                    break;
+                case "hbls":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Create HBL",
+                            route: "hbls.create",
+                        },
+                        {
+                            title: "All HBL",
+                            route: "hbls.index",
+                        },
+                        {
+                            title: "Cancelled HBL",
+                            route: "hbls.cancelled-hbls",
+                        },
+                    );
+                    break;
+                case "back-office":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Cash Settlements",
+                            route: "back-office.cash-settlements.index",
+                        },
+                        {
+                            title: "Warehouse",
+                            route: "back-office.warehouses.index",
+                        },
+                    );
+                    break;
+                case "loading":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Containers",
+                            route: "loading.loading-containers.index",
+                        },
+                        {
+                            title: "Manual Loading",
+                            route: "loading.manual-loadings.index",
+                        },
+                        {
+                            title: "Loaded Shipment",
+                            route: "loading.loaded-containers.index",
+                        },
+                    );
+                    break;
+                case "arrival":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Shipments Arrivals",
+                            route: "arrival.shipments-arrivals.index",
+                        },
+                        {
+                            title: "Bonded Warehouse",
+                            route: "arrival.bonded-warehouses.index",
+                        },
+                        {
+                            title: "Unloading Issues",
+                            route: "arrival.unloading-issues.index",
+                        },
+                    );
+                    break;
+                case "delivery":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Delivery Warehouse",
+                            route: "delivery.delivery-warehouses.index",
+                        },
+                        {
+                            title: "Dispatch Point",
+                            route: "delivery.dispatch-points.index",
+                        },
+                        {
+                            title: "Dispatched Loads",
+                            route: "delivery.dispatched-loads.index",
+                        },
+                    );
+                    break;
+                case "report":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Payment Summery",
+                            route: "report.payment-summaries.index",
+                        },
+
+                    );
+                    break;
+                case "users":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "System Users",
+                            route: "users.index",
+                        },
+                        {
+                            title: "Drivers",
+                            route: "users.drivers.index",
+                        },
+                        {
+                            title: "Driver Tracking",
+                            route: "users.driver-tracings.index",
+                        },
+                        {
+                            title: "Roles & Permissions",
+                            route: "users.roles.index",
+                        },
+                    );
+                    break;
+                case "setting":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Driver Zones",
+                            route: "setting.driver-zones.index",
+                        },
+                        {
+                            title: "Driver Areas",
+                            route: "setting.driver-areas.index",
+                        },
+                        {
+                            title: "Warehouse Zones",
+                            route: "setting.warehouse-zones.index",
+                        },
+                        {
+                            title: "Pricing",
+                            route: "setting.prices.index",
+                        },
+
+                    );
+                    break;
+                case "settings":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Zones",
+                            route: "settings.zones.index",
+                        },
+                    );
+                    break;
             }
-          );
-          break;
-        case "hbls":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Create HBL",
-              route: "hbls.create",
-            },
-            {
-              title: "All HBL",
-              route: "hbls.index",
-            },
-            {
-              title: "Cancelled HBL",
-              route: "hbls.cancelled-hbls",
-            }
-          );
-          break;
-        case "back-office":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Cash Settlements",
-              route: "back-office.cash-settlements.index",
-            },
-            {
-              title: "Warehouse",
-              route: "back-office.warehouses.index",
-            }
-          );
-          break;
-        case "loading":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Containers",
-              route: "loading.loading-containers.index",
-            },
-            {
-              title: "Manual Loading",
-              route: "loading.manual-loadings.index",
-            },
-            {
-              title: "Loaded Shipment",
-              route: "loading.loaded-containers.index",
-            }
-          );
-          break;
-        case "arrival":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Shipments Arrivals",
-              route: "arrival.shipments-arrivals.index",
-            },
-            {
-              title: "Bonded Warehouse",
-              route: "arrival.bonded-warehouses.index",
-            },
-            {
-              title: "Unloading Issues",
-              route: "arrival.unloading-issues.index",
-            }
-          );
-          break;
-        case "delivery":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Delivery Warehouse",
-              route: "delivery.delivery-warehouses.index",
-            },
-            {
-              title: "Dispatch Point",
-              route: "delivery.dispatch-points.index",
-            },
-            {
-              title: "Dispatched Loads",
-              route: "delivery.dispatched-loads.index",
-            }
-          );
-          break;
-        case "report":
-          childMenuList.splice(0, childMenuList.length, {
-            title: "Payment Summery",
-            route: "report.payment-summaries.index",
-          });
-          break;
-        case "users":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "System Users",
-              route: "users.index",
-            },
-            {
-              title: "Drivers",
-              route: "users.drivers.index",
-            },
-            {
-              title: "Driver Tracking",
-              route: "users.driver-tracings.index",
-            }
-          );
-          break;
-        case "setting":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Driver Zones",
-              route: "setting.driver-zones.index",
-            },
-            {
-              title: "Driver Areas",
-              route: "setting.driver-areas.index",
-            },
-            {
-              title: "Warehouse Zones",
-              route: "setting.warehouse-zones.index",
-            },
-            {
-              title: "Pricing",
-              route: "setting.prices.index",
-            }
-          );
-          break;
-        case "settings":
-          childMenuList.splice(0, childMenuList.length, {
-            title: "Zones",
-            route: "settings.zones.index",
-          });
-          break;
-      }
-      activeMenu.value = menu;
-    };
+            activeMenu.value = menu;
+        };
 
     setMenu(mainRoute);
     const page = usePage();
