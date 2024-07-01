@@ -6,6 +6,7 @@ use App\Actions\DriverAreas\CreateDriverAreas;
 use App\Actions\DriverAreas\DeleteDriverAreas;
 use App\Actions\DriverAreas\GetAllDriverAreas;
 use App\Actions\DriverAreas\GetDriverAreas;
+use App\Actions\DriverAreas\GetDriverAreaZoneIDs;
 use App\Actions\DriverAreas\UpdateDriverAreas;
 use App\Interfaces\DriverAreasRepositoryInterface;
 use App\Models\Area;
@@ -35,5 +36,10 @@ class DriverAreasRepository implements DriverAreasRepositoryInterface
     public function destroy(Area $DriverAreas): void
     {
         DeleteDriverAreas::run($DriverAreas);
+    }
+
+    public function getDriverAreaZoneIDs($id)
+    {
+        return GetDriverAreaZoneIDs::run($id);
     }
 }
