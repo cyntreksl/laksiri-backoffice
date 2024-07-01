@@ -57,7 +57,7 @@ const handleDeletePriceRule = () => {
       </Link>
     </div>
 
-    <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
+    <div class="min-w-full overflow-auto">
       <table class="is-hoverable w-full text-left">
         <thead>
           <tr>
