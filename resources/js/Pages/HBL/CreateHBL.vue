@@ -1027,7 +1027,7 @@ const openEditModal = (index) => {
       ></div>
 
       <div
-        class="relative w-1/3 rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
+        class="relative w-auto sm:w-1/3 rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
       >
         <div
           class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5"
@@ -1092,10 +1092,10 @@ const openEditModal = (index) => {
                 </label>
               </div>
 
-              <div class="col-span-1">
+              <div class="col-span-4 md:col-span-1">
                 <label class="block">
                   <span
-                    >Length (cm)
+                    >Length (cm) <br />
                     <span class="text-red-500 text-sm">*</span></span
                   >
                   <input
@@ -1107,7 +1107,7 @@ const openEditModal = (index) => {
                   />
                 </label>
               </div>
-              <div class="col-span-1">
+              <div class="col-span-4 md:col-span-1">
                 <label class="block">
                   <span
                     >Width <br /><span class="text-red-500 text-sm">*</span>
@@ -1123,7 +1123,7 @@ const openEditModal = (index) => {
                 </label>
               </div>
 
-              <div class="col-span-1">
+              <div class="col-span-4 md:col-span-1">
                 <label class="block">
                   <span
                     >Height <br /><span class="text-red-500 text-sm"
@@ -1138,7 +1138,7 @@ const openEditModal = (index) => {
                   />
                 </label>
               </div>
-              <div class="col-span-1">
+              <div class="col-span-4 md:col-span-1">
                 <label class="block">
                   <span
                     >Quantity <br /><span class="text-red-500 text-sm"
