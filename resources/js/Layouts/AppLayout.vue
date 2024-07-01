@@ -525,7 +525,8 @@
             <p
               class="text-base tracking-wider text-slate-800 dark:text-navy-100"
             >
-              <slot name="header" />
+              <!-- <slot name="header" /> -->
+              {{ activeTitle }}
             </p>
             <button
               @click="closeSideBar"
@@ -859,6 +860,12 @@ export default {
 
     const childMenuList = reactive([]);
 
+    const activeTitle = ref("");
+
+    const changeSidePanelTitle = (title) => {
+      activeTitle.value = title;
+    };
+
     const setMenu = (menu) => {
       switch (menu) {
         case "dashboard":
@@ -866,6 +873,7 @@ export default {
             title: "Dashboard",
             route: "dashboard",
           });
+          changeSidePanelTitle("Dashboard");
           break;
         case "pickups":
           childMenuList.splice(
@@ -888,6 +896,7 @@ export default {
               route: "pickups.exceptions",
             }
           );
+          changeSidePanelTitle("Pickups");
           break;
         case "hbls":
           childMenuList.splice(
@@ -906,6 +915,7 @@ export default {
               route: "hbls.cancelled-hbls",
             }
           );
+          changeSidePanelTitle("HBL");
           break;
         case "back-office":
           childMenuList.splice(
@@ -920,6 +930,7 @@ export default {
               route: "back-office.warehouses.index",
             }
           );
+          changeSidePanelTitle("Back Office");
           break;
         case "loading":
           childMenuList.splice(
@@ -938,6 +949,7 @@ export default {
               route: "loading.loaded-containers.index",
             }
           );
+          changeSidePanelTitle("Loading");
           break;
         case "arrival":
           childMenuList.splice(
@@ -956,6 +968,7 @@ export default {
               route: "arrival.unloading-issues.index",
             }
           );
+          changeSidePanelTitle("Arrivals");
           break;
         case "delivery":
           childMenuList.splice(
@@ -974,12 +987,14 @@ export default {
               route: "delivery.dispatched-loads.index",
             }
           );
+          changeSidePanelTitle("Delivery");
           break;
         case "report":
           childMenuList.splice(0, childMenuList.length, {
             title: "Payment Summery",
             route: "report.payment-summaries.index",
           });
+          changeSidePanelTitle("Report");
           break;
         case "users":
           childMenuList.splice(
@@ -1002,6 +1017,7 @@ export default {
               route: "users.roles.index",
             }
           );
+          changeSidePanelTitle("Users");
           break;
         case "setting":
           childMenuList.splice(
@@ -1024,12 +1040,14 @@ export default {
               route: "setting.prices.index",
             }
           );
+          changeSidePanelTitle("Setting");
           break;
         case "settings":
           childMenuList.splice(0, childMenuList.length, {
             title: "Zones",
             route: "settings.zones.index",
           });
+          changeSidePanelTitle("Settings");
           break;
       }
       activeMenu.value = menu;
@@ -1090,6 +1108,8 @@ export default {
       isSidebarExpanded,
       openSideBar,
       closeSideBar,
+      activeTitle,
+      changeSidePanelTitle,
     };
   },
 };
