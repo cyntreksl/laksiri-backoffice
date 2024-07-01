@@ -110,7 +110,7 @@ Breadcrumbs::for('setting.driver-areas.edit', function (BreadcrumbTrail $trail, 
 // Drivers
 Breadcrumbs::for('users.drivers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Driver Management', route('users.drivers.index'));
+    $trail->push('User Management', route('users.drivers.index'));
     $trail->push('Drivers', route('users.drivers.index'));
 });
 // Drivers > Edit
