@@ -10,6 +10,8 @@ interface DriverAreasRepositoryInterface
 
     public function getDriverAreas($id);
 
+    public function getDriverAreaZoneIDs($id);
+
     public function createDriverAreas(array $data);
 
     public function editDriverAreas(array $data);

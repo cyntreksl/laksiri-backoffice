@@ -655,10 +655,33 @@ const handleDeleteHBL = () => {
 };
 
 const showConfirmViewHBLModal = ref(false);
+const hblRecord = ref({});
 
-const confirmViewHBL = (id) => {
-  selectedHBL.value = props.hbls.find((hbl) => hbl.id === id);
-  showConfirmViewHBLModal.value = true;
+const fetchHBL = async (id) => {
+    try {
+        const response = await fetch(`hbls/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            hblRecord.value = data.hbl;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const confirmViewHBL = async (id) => {
+    await fetchHBL(id);
+    showConfirmViewHBLModal.value = true;
 };
 
 const hblData = ref({});
@@ -1100,7 +1123,7 @@ const shipIcon = ref(`
     />
 
     <HBLDetailModal
-      :hbl="selectedHBL"
+      :hbl="hblRecord"
       :show="showConfirmViewHBLModal"
       @close="closeModal"
     />

@@ -63,7 +63,7 @@ Route::middleware([
         ->name('pickups.exceptions.delete');
 
     // HBL
-    Route::resource('hbls', HBLController::class)->except('show');
+    Route::resource('hbls', HBLController::class);
 
     Route::get('hbl-list', [HBLController::class, 'list']);
 
@@ -73,7 +73,7 @@ Route::middleware([
     Route::get('hbls/download/{hbl}', [HBLController::class, 'downloadHBLPDF'])
         ->name('hbls.download');
 
-    Route::get('hbls/cancelled-hbls', [HBLController::class, 'cancelledHBLs'])
+    Route::get('hbls/show/cancelled-hbls', [HBLController::class, 'cancelledHBLs'])
         ->name('hbls.cancelled-hbls');
 
     Route::get('hbl-cancelled-list', [HBLController::class, 'cancelledList']);
@@ -239,12 +239,8 @@ Route::middleware([
             ->except(['create', 'show'])->name('index', 'driver-zones.index');
 
         //Driver Areas
+        Route::resource('driver-areas', DriverAreasController::class)->except('show');
         Route::get('driver-areas/list', [DriverAreasController::class, 'list'])->name('driver-area.list');
-        Route::get('driver-areas', [DriverAreasController::class, 'index'])->name('driver-areas.index');
-        Route::delete('driver-areas/{id}', [DriverAreasController::class, 'delete'])->name('driver-areas.delete');
-        Route::post('driver-areas/create', [DriverAreasController::class, 'store'])->name('driver-areas.store');
-        Route::post('driver-areas/update', [DriverAreasController::class, 'update'])->name('driver-areas.update');
-        Route::get('driver-areas/{id}/edit', [DriverAreasController::class, 'edit'])->name('driver-areas.edit');
 
         //Warehouse Zones
         Route::get('warehouse-zones/list', [WarehouseZoneController::class, 'list'])->name('warehouse-zones.list');

@@ -11,14 +11,14 @@ class UpdateDriverAreas
 
     public function handle(array $data)
     {
+        $driverArea = Area::find($data['id']);
 
-        $DriverAreas = Area::find($data['id']);
-
-        $DriverAreas->update([
+        $driverArea->update([
             'name' => $data['name'],
         ]);
 
-        return $DriverAreas;
+        $driverArea->zones()->sync($data['zone_ids']);
 
+        return $driverArea;
     }
 }

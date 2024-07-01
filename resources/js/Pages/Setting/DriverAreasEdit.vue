@@ -4,22 +4,32 @@ import UpdateDriverAreasForm from "@/Pages/Setting/DriverAreas/UpdateDriverAreas
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 
 defineProps({
-  driverareas: {
-    type: Object,
-    default: () => {},
-  },
+    driverAreas: {
+        type: Object,
+        default: () => {
+        },
+    },
+    zones: {
+        type: Object,
+        default: () => {
+        },
+    },
+    zoneIds: {
+        type: Array,
+        default: () => [],
+    },
 });
 </script>
 
 <template>
-  <AppLayout title="Edit Driver Area">
-    <template #header>Driver Area</template>
+    <AppLayout title="Edit Driver Area">
+        <template #header>Driver Area</template>
 
-    <!-- Breadcrumb -->
-    <Breadcrumb :driverareas="driverareas" />
+        <!-- Breadcrumb -->
+        <Breadcrumb :driverAreas="driverAreas"/>
 
-    <div class="grid grid-cols-1 mt-4 gap-4">
-      <UpdateDriverAreasForm :driverareas="driverareas" />
-    </div>
-  </AppLayout>
+        <div class="grid grid-cols-1 mt-4 gap-4">
+            <UpdateDriverAreasForm :driverAreas="driverAreas" :zone-ids="zoneIds" :zones="zones"/>
+        </div>
+    </AppLayout>
 </template>
