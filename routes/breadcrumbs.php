@@ -20,7 +20,7 @@ Breadcrumbs::for('pickups.index', function (BreadcrumbTrail $trail) {
 // pickups > pickup ordering
 Breadcrumbs::for('pickups.ordering', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Pickup Ordering');
+    $trail->push('Pickup');
     $trail->push('Pickup Ordering', route('pickups.ordering'));
 });
 
@@ -34,14 +34,14 @@ Breadcrumbs::for('pickups.create', function (BreadcrumbTrail $trail) {
 // pickups > exceptions
 Breadcrumbs::for('pickups.exceptions', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Pickups Exceptions');
+    $trail->push('Pickup');
     $trail->push('Exceptions', route('pickups.exceptions'));
 });
 
 // HBLs
 Breadcrumbs::for('hbls.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('HBL List');
+    $trail->push('HBL');
     $trail->push('HBL List', route('hbls.index'));
 });
 
@@ -55,14 +55,14 @@ Breadcrumbs::for('hbls.create', function (BreadcrumbTrail $trail) {
 // HBL > edit
 Breadcrumbs::for('hbls.edit', function (BreadcrumbTrail $trail, $hbl) {
     $trail->parent('dashboard');
-    $trail->push('HBL List', route('hbls.index'));
+    $trail->push('HBL', route('hbls.index'));
     $trail->push('Edit HBL', route('hbls.edit', $hbl->id));
 });
 
 // HBL > Cancelled HBLs
 Breadcrumbs::for('hbls.cancelled-hbls', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('HBL List', route('hbls.index'));
+    $trail->push('HBL', route('hbls.index'));
     $trail->push('Cancelled HBL List', route('hbls.cancelled-hbls'));
 });
 
@@ -70,6 +70,7 @@ Breadcrumbs::for('hbls.cancelled-hbls', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('users.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('User Management', route('users.index'));
+    $trail->push('System Users', route('users.index'));
 });
 
 // Users > Edit
@@ -81,6 +82,7 @@ Breadcrumbs::for('users.edit', function (BreadcrumbTrail $trail, User $user) {
 // Warehouse Zone
 Breadcrumbs::for('setting.warehouse-zones.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
+    $trail->push('Settings');
     $trail->push('Warehouse Zones', route('setting.warehouse-zones.index'));
 });
 
@@ -90,10 +92,25 @@ Breadcrumbs::for('setting.warehouse-zones.edit', function (BreadcrumbTrail $trai
     $trail->push('Update Warehouse Zone', route('setting.warehouse-zones.edit', $id));
 });
 
+// Driver Area
+Breadcrumbs::for('setting.driver-areas.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Driver Areas', route('setting.driver-areas.index'));
+});
+
+// Driver Area > Edit
+Breadcrumbs::for('setting.driver-areas.edit', function (BreadcrumbTrail $trail, $id) {
+    $trail->parent('setting.driver-areas.index');
+    $trail->push('Settings');
+    $trail->push('Update Driver Areas', route('setting.driver-areas.edit', $id));
+});
+
 // Drivers
 Breadcrumbs::for('users.drivers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Driver Management', route('users.drivers.index'));
+    $trail->push('Drivers', route('users.drivers.index'));
 });
 // Drivers > Edit
 Breadcrumbs::for('users.drivers.edit', function (BreadcrumbTrail $trail, $id) {
@@ -104,8 +121,8 @@ Breadcrumbs::for('users.drivers.edit', function (BreadcrumbTrail $trail, $id) {
 //Cash settlement
 Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Cash Settlements');
-    $trail->push('Settlement List', route('back-office.cash-settlements.index'));
+    $trail->push('Back Office');
+    $trail->push('Cash Settlement List', route('back-office.cash-settlements.index'));
 });
 
 // Settings > Zones
@@ -118,27 +135,28 @@ Breadcrumbs::for('setting.driver-zones.index', function (BreadcrumbTrail $trail)
 // Loading > Container Index
 Breadcrumbs::for('loading.loading-containers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard'); // replace with 'settings.index'
-    $trail->push('Containers');
+    $trail->push('Loading');
     $trail->push('Containers List', route('loading.loading-containers.index'));
 });
 
 // Loading > Container Create
 Breadcrumbs::for('loading.loading-containers.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard'); // replace with 'settings.index'
-    $trail->push('Containers', route('loading.loading-containers.index'));
+    $trail->push('Loading', route('loading.loading-containers.index'));
     $trail->push('Containers Create', route('loading.loading-containers.create'));
 });
 
 // Branches
 Breadcrumbs::for('branches.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Branches');
+    $trail->push('Branchs');
     $trail->push('List', route('branches.index'));
 });
 
 // Branches > Create
 Breadcrumbs::for('branches.create', function (BreadcrumbTrail $trail) {
     $trail->parent('branches.index');
+    $trail->push('Branch');
     $trail->push('Create', route('branches.create'));
 });
 
@@ -166,20 +184,20 @@ Breadcrumbs::for('setting.prices.create', function (BreadcrumbTrail $trail) {
 // Branches > Edit
 Breadcrumbs::for('setting.prices.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->parent('dashboard');
-    $trail->push('Branch');
+    $trail->push('Settings');
     $trail->push('Edit', route('setting.prices.edit', $id));
 });
 
 //Cash settlement
 Breadcrumbs::for('back-office.warehouses.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Warehouse');
+    $trail->push('Back Office');
     $trail->push('Warehouse List', route('back-office.warehouses.index'));
 });
 
 // Loaded Shipments
 Breadcrumbs::for('loading.loaded-containers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Containers');
+    $trail->push('Loading');
     $trail->push('Loaded Shipments', route('loading.loaded-containers.index'));
 });

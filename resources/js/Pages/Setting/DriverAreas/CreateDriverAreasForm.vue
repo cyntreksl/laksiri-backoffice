@@ -6,35 +6,32 @@ import { router, useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
-import notification from "@/magics/notification.js";
+import { push } from "notivue";
 
 defineProps({
-  areas: {
+  branches: {
     type: Object,
     default: () => {},
   },
 });
 
-const confirmingZoneCreation = ref(false);
+const confirmingDriverAreasCreation = ref(false);
 
 const closeModal = () => {
-  confirmingZoneCreation.value = false;
+  confirmingDriverAreasCreation.value = false;
 };
 
 const form = useForm({
   name: "",
-  areas: "",
+  description: "",
 });
 
-const createZone = () => {
-  form.post(route("setting.zones.store"), {
+const createDriverareas = () => {
+  form.post(route("setting.driver-areas.store"), {
     onSuccess: () => {
-      router.visit(route("setting.driver-zones.index"));
+      router.visit(route("setting.driver-areas.index"));
       form.reset();
-      notification({
-        text: "Zone Created Successfully!",
-        variant: "success",
-      });
+      push.success("Driver Area Created Successfully!");
     },
     preserveScroll: true,
     preserveState: true,
@@ -44,28 +41,30 @@ const createZone = () => {
 
 <template>
   <div class="flex justify-end mx-5 mt-4">
-    <PrimaryButton @click="confirmingZoneCreation = !confirmingZoneCreation">
-      Create New Zone
+    <PrimaryButton
+      @click="confirmingDriverAreasCreation = !confirmingDriverAreasCreation"
+    >
+      Create New Driver Area
     </PrimaryButton>
   </div>
 
   <DialogModal
     :maxWidth="'5xl'"
-    :show="confirmingZoneCreation"
+    :show="confirmingDriverAreasCreation"
     @close="closeModal"
   >
-    <template #title> Create New Zone </template>
+    <template #title> Create New Driver Area </template>
 
     <template #content>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div class="col-span-1 sm:col-span-2">
-          <InputLabel value="Zone Name" />
+          <InputLabel value="Driver Area Name" />
           <label class="relative flex">
             <input
               v-model="form.name"
               class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-              placeholder="Zone Name"
-              type="email"
+              placeholder="Driver Area Name"
+              type="text"
             />
             <div
               class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
@@ -88,24 +87,6 @@ const createZone = () => {
           </label>
           <InputError :message="form.errors.name" />
         </div>
-
-        <div class="col-span-1 sm:col-span-2 gap-5">
-          <label class="block">
-            <InputLabel value="Zone Areas" />
-            <input
-              v-model="form.areas"
-              class="w-full"
-              placeholder="Zone Areas"
-              type="text"
-              x-init="$el._tom = new Tom($el,{create:true,plugins: ['caret_position','input_autogrow','remove_button']})"
-            />
-          </label>
-          <span class="text-tiny+ text-slate-400 dark:text-navy-300"
-            >Comma separated values. Auto Zone Area Assignments, it will come as
-            a notification</span
-          >
-          <InputError :message="form.errors.areas" />
-        </div>
       </div>
     </template>
 
@@ -115,9 +96,9 @@ const createZone = () => {
         :class="{ 'opacity-25': form.processing }"
         :disabled="form.processing"
         class="ms-3"
-        @click="createZone"
+        @click="createDriverareas"
       >
-        Create Zone
+        Create Driver Area
       </PrimaryButton>
     </template>
   </DialogModal>

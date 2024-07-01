@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreZoneRequest;
 use App\Http\Resources\ZoneCollection;
+use App\Interfaces\DriverAreasRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Models\Zone;
 use Illuminate\Http\Request;
@@ -11,13 +12,19 @@ use Inertia\Inertia;
 
 class ZoneController extends Controller
 {
-    public function __construct(private readonly ZoneRepositoryInterface $zoneRepository)
-    {
+    public function __construct(
+        private readonly ZoneRepositoryInterface $zoneRepository,
+        private readonly DriverAreasRepositoryInterface $driverAreasRepositoryInterface,
+    ) {
     }
 
     public function index()
     {
-        return Inertia::render('Settings/Zone/ZoneList');
+
+        return Inertia::render('Settings/Zone/ZoneList', [
+            'areas' => $this->driverAreasRepositoryInterface->getAreas(),
+        ]);
+
     }
 
     public function list(Request $request)

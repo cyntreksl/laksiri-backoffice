@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Container\GenerateContainerReferenceNumber;
 use App\Enum\CargoType;
 use App\Enum\ContainerType;
 use App\Http\Requests\StoreContainerRequest;
@@ -46,8 +47,10 @@ class ContainerController extends Controller
         $seaContainerOptions = ContainerType::getSeaCargoOptions();
         $airContainerOptions = ContainerType::getAirCargoOptions();
         $cargoTypes = CargoType::getCargoTypeOptions();
+        $reference = GenerateContainerReferenceNumber::run();
 
         return Inertia::render('Container/ContainerCreate', [
+            'referenceNum' => $reference,
             'containerTypes' => $containerTypes,
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,

@@ -3,6 +3,7 @@
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CashSettlementController;
 use App\Http\Controllers\ContainerController;
+use App\Http\Controllers\DriverAreasController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HBLController;
 use App\Http\Controllers\LoadedContainerController;
@@ -231,10 +232,14 @@ Route::middleware([
         Route::get('zones/list', [ZoneController::class, 'list'])->name('driver-zones.list');
         Route::resource('zones', ZoneController::class)
             ->except(['create', 'show'])->name('index', 'driver-zones.index');
+
         //Driver Areas
-        Route::get('driver-areas', function () {
-            return Inertia::render('Setting/DriverAreaList');
-        })->name('driver-areas.index');
+        Route::get('driver-areas/list', [DriverAreasController::class, 'list'])->name('driver-area.list');
+        Route::get('driver-areas', [DriverAreasController::class, 'index'])->name('driver-areas.index');
+        Route::delete('driver-areas/{id}', [DriverAreasController::class, 'delete'])->name('driver-areas.delete');
+        Route::post('driver-areas/create', [DriverAreasController::class, 'store'])->name('driver-areas.store');
+        Route::post('driver-areas/update', [DriverAreasController::class, 'update'])->name('driver-areas.update');
+        Route::get('driver-areas/{id}/edit', [DriverAreasController::class, 'edit'])->name('driver-areas.edit');
 
         //Warehouse Zones
         Route::get('warehouse-zones/list', [WarehouseZoneController::class, 'list'])->name('warehouse-zones.list');

@@ -45,7 +45,7 @@ const toDate = moment(new Date()).format("YYYY-MM-DD");
 const filters = reactive({
   fromDate: fromDate,
   toDate: toDate,
-  cargoMode: ["Air Cargo", "Sea Cargo", "Door to Door"],
+  cargoMode: ["Air Cargo", "Sea Cargo"],
   hblType: ["UBP", "Gift", "Door to Door"],
   isHold: false,
   warehouse: ["COLOMBO", "NINTAVUR"],
@@ -619,6 +619,18 @@ const toggleHold = () => {
     }
   );
 };
+
+const resetFilter = () => {
+  filters.fromDate = fromDate;
+  filters.toDate = toDate;
+  filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
+  filters.hblType = ["UBP", "Gift", "Door to Door"];
+  filters.isHold = false;
+  filters.warehouse = ["COLOMBO", "NINTAVUR"];
+  filters.createdBy = "";
+  filters.paymentStatus = [];
+  applyFilters();
+};
 </script>
 
 <template>
@@ -867,14 +879,6 @@ const toggleHold = () => {
           />
         </label>
 
-        <label class="inline-flex items-center space-x-2 mt-2">
-          <Switch
-            v-model="filters.cargoMode"
-            label="Door to Door"
-            value="Door to Door"
-          />
-        </label>
-
         <FilterBorder />
 
         <FilterHeader value="HBL Type" />
@@ -955,6 +959,11 @@ const toggleHold = () => {
         <SoftPrimaryButton class="space-x-2" @click="applyFilters">
           <i class="fa-solid fa-filter"></i>
           <span>Apply Filters</span>
+        </SoftPrimaryButton>
+        <!--Filter Rest Button-->
+        <SoftPrimaryButton class="space-x-2" @click="resetFilter">
+          <i class="fa-solid fa-refresh"></i>
+          <span>Reset Filters</span>
         </SoftPrimaryButton>
       </template>
     </FilterDrawer>
