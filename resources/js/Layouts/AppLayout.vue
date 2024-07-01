@@ -377,7 +377,6 @@
                   margin: 0px;
                   transform: translate(76px, -10px);
                 "
-                data-popper-placement="right-end"
               >
                 <div
                   class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700"
