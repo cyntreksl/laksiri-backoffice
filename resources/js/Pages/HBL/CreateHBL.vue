@@ -10,6 +10,7 @@ import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import TextInput from "@/Components/TextInput.vue";
+import Checkbox from "@/Components/Checkbox.vue";
 import { push } from "notivue";
 
 const props = defineProps({
@@ -228,6 +229,32 @@ const packageTypes = [
 ];
 
 const selectedType = ref("");
+
+const isChecked = ref(false);
+
+const addToConsigneeDetails = () => {
+  if (isChecked.value) {
+    form.consignee_name = form.hbl_name;
+    consignee_contact.value = contactNumber.value;
+    form.consignee_nic = form.nic;
+    form.consignee_address = form.address;
+  } else {
+    resetConsigneeDetails();
+  }
+};
+
+watch([() => form.hbl_type], ([val]) => {
+  if (form.hbl_type !== "Door to Door") {
+    resetConsigneeDetails();
+  }
+});
+
+const resetConsigneeDetails = () => {
+  form.consignee_name = "";
+  consignee_contact.value = "";
+  form.consignee_nic = "";
+  form.consignee_address = "";
+};
 
 const updateTypeDescription = () => {
   packageItem.type += (packageItem.type ? " " : "") + selectedType.value;
@@ -572,6 +599,14 @@ const shipIcon = ref(`
                 </label>
                 <InputError :message="form.errors.address" />
               </div>
+            </div>
+            <div class="col-span-2" v-if="form.hbl_type === 'Door to Door'">
+              <Checkbox
+                v-model="isChecked"
+                @change="addToConsigneeDetails"
+              ></Checkbox>
+
+              <span class="ml-5">Same as Consignee Details</span>
             </div>
           </div>
 
