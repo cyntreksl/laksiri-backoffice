@@ -51,6 +51,7 @@ class StorePickupRequest extends FormRequest
     {
         return [
             'contact_number' => 'mobile number',
+            'notes' => 'packages',
         ];
     }
 
