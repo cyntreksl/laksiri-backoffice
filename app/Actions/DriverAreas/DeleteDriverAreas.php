@@ -9,8 +9,10 @@ class DeleteDriverAreas
 {
     use AsAction;
 
-    public function handle(Area $DriverAreas)
+    public function handle(Area $driverAreas)
     {
-        $DriverAreas->delete();
+        $driverAreas->zones()->detach();
+
+        $driverAreas->delete();
     }
 }

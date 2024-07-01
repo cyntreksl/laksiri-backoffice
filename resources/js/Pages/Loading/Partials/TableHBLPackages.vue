@@ -3,6 +3,7 @@ import {router} from "@inertiajs/vue3";
 import {push} from "notivue";
 import {ref, watchEffect} from "vue";
 import DeleteHBLConfirmationModal from "@/Pages/Loading/Partials/DeleteHBLConfirmationModal.vue";
+import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 
 const props = defineProps({
     container: {
@@ -54,6 +55,40 @@ const handleRemoveHBLFromContainer = () => {
         }
     )
 }
+
+const showConfirmViewHBLModal = ref(false);
+const hblRecord = ref({});
+
+const fetchHBL = async (id) => {
+    try {
+        const response = await fetch(`hbls/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            hblRecord.value = data.hbl;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const confirmViewHBL = async (id) => {
+    await fetchHBL(id);
+    showConfirmViewHBLModal.value = true;
+};
+
+const closeShowHBLModal = () => {
+    showConfirmViewHBLModal.value = false;
+};
 </script>
 
 <template>
@@ -125,6 +160,13 @@ const handleRemoveHBLFromContainer = () => {
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.consignee_address || '-' }}</td>
                 <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
                     <button
+                        class="btn size-8 p-0 rounded-full text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
+                        x-tooltip.placement.bottom.error="'Show HBL'"
+                        @click.prevent="confirmViewHBL(hbl.id)">
+                        <svg  class="size-5 icon icon-tabler icons-tabler-outline icon-tabler-eye"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                    </button>
+
+                    <button
                         class="btn size-8 p-0 rounded-full text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
                         x-tooltip.placement.bottom.error="'Remove From Shipment'"
                         @click.prevent="confirmDeleteHBL(hbl.id)">
@@ -143,4 +185,10 @@ const handleRemoveHBLFromContainer = () => {
     </div>
 
     <DeleteHBLConfirmationModal :show="showConfirmDeleteHBLModal" @close="closeModal" @unload-hbl="handleRemoveHBLFromContainer"/>
+
+    <HBLDetailModal
+        :hbl="hblRecord"
+        :show="showConfirmViewHBLModal"
+        @close="closeShowHBLModal"
+    />
 </template>

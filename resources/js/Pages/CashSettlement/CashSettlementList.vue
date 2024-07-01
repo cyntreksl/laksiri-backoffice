@@ -18,6 +18,7 @@ import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import HoldConfirmationModal from "@/Pages/CashSettlement/Partials/HoldConfirmationModal.vue";
 import { router } from "@inertiajs/vue3";
+import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 
 const props = defineProps({
   drivers: {
@@ -242,6 +243,44 @@ const createColumns = () => [
     sort: false,
     formatter: (_, row) => {
       return h("div", {}, [
+          h(
+              "a",
+              {
+                  className:
+                      "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
+                  onClick: () => confirmViewHBL(row.cells[0].data?.id),
+                  "x-tooltip..placement.bottom.primary": "'View HBL'",
+              },
+              [
+                  h(
+                      "svg",
+                      {
+                          xmlns: "http://www.w3.org/2000/svg",
+                          viewBox: "0 0 24 24",
+                          class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
+                          fill: "none",
+                          height: 24,
+                          width: 24,
+                          stroke: "currentColor",
+                          strokeLinecap: "round",
+                          strokeLinejoin: "round",
+                      },
+                      [
+                          h("path", {
+                              d: "M0 0h24v24H0z",
+                              fill: "none",
+                              stroke: "none",
+                          }),
+                          h("path", {
+                              d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                          }),
+                          h("path", {
+                              d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                          }),
+                      ]
+                  ),
+              ]
+          ),
         h(
           "button",
           {
@@ -571,6 +610,40 @@ const resetFilter = () => {
   filters.cargoMode = ["Air Cargo", "Sea Cargo"];
   filters.paymentStatus = [];
   applyFilters();
+};
+
+const showConfirmViewHBLModal = ref(false);
+const hblRecord = ref({});
+
+const fetchHBL = async (id) => {
+    try {
+        const response = await fetch(`hbls/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            hblRecord.value = data.hbl;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const confirmViewHBL = async (id) => {
+    await fetchHBL(id);
+    showConfirmViewHBLModal.value = true;
+};
+
+const closeShowHBLModal = () => {
+    showConfirmViewHBLModal.value = false;
 };
 
 const planeIcon = ref(`
@@ -934,5 +1007,11 @@ const shipIcon = ref(`
       @close="closeHoldModal"
       @toggle-hold="toggleHold"
     />
+
+  <HBLDetailModal
+      :hbl="hblRecord"
+      :show="showConfirmViewHBLModal"
+      @close="closeShowHBLModal"
+  />
   </AppLayout>
 </template>
