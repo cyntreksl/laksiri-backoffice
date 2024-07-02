@@ -779,14 +779,8 @@
     </nav>
 
     <!-- Main Content Wrapper -->
-    <main
-      id="main-content"
-      v-bind:class="
-        changeDarkModeMainTag()
-          ? 'main-content w-full pb-8 p-4 h-screen'
-          : 'main-content w-full pb-8 p-4'
-      "
-    >
+
+    <main style="height: 100vh !important" class="main-content w-full pb-8 p-4">
       <Notivue v-slot="item">
         <Notification :item="item" />
       </Notivue>

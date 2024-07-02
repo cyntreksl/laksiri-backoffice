@@ -1134,7 +1134,7 @@ const shipIcon = ref(`
 
     <div
       v-if="showAddNewPackageDialog"
-      class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden"
+      class="fixed px-2 inset-0 z-[100] flex flex-col items-center justify-center overflow-y-auto"
       role="dialog"
     >
       <div
@@ -1144,7 +1144,7 @@ const shipIcon = ref(`
       ></div>
 
       <div
-        class="relative w-auto sm:w-1/3 rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
+        class="relative w-auto sm:w-1/2 h-auto sm:h-1/5 md:h-fit lg:h-fit rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
       >
         <div
           class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5"
