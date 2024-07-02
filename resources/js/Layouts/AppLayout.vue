@@ -525,7 +525,6 @@
             <p
               class="text-base tracking-wider text-slate-800 dark:text-navy-100"
             >
-              <!-- <slot name="header" /> -->
               {{ activeTitle }}
             </p>
             <button
@@ -574,6 +573,7 @@
                       <ul class="flex flex-1 flex-col px-4 font-inter">
                         <li v-for="item in childMenuList">
                           <Link
+                            @click="getTitle(item.title)"
                             :href="route(item.route)"
                             :class="
                               route().current() === item.route
@@ -780,8 +780,12 @@
 
     <!-- Main Content Wrapper -->
     <main
-      style="height: 100vh !important"
-      class="main-content w-full h-full pb-8 p-4"
+      id="main-content"
+      v-bind:class="
+        changeDarkModeMainTag()
+          ? 'main-content w-full pb-8 p-4 h-screen'
+          : 'main-content w-full pb-8 p-4'
+      "
     >
       <Notivue v-slot="item">
         <Notification :item="item" />
@@ -864,9 +868,23 @@ export default {
     const childMenuList = reactive([]);
 
     const activeTitle = ref("");
+    const activePageTitle = ref("");
 
     const changeSidePanelTitle = (title) => {
       activeTitle.value = title;
+    };
+
+    const getTitle = (title) => {
+      activePageTitle.value = title;
+    };
+
+    const changeDarkModeMainTag = () => {
+      switch (activePageTitle.value) {
+        case "Cancelled HBL":
+          return true;
+        default:
+          return false;
+      }
     };
 
     const setMenu = (menu) => {
@@ -1113,6 +1131,9 @@ export default {
       closeSideBar,
       activeTitle,
       changeSidePanelTitle,
+      changeDarkModeMainTag,
+      activePageTitle,
+      getTitle,
     };
   },
 };

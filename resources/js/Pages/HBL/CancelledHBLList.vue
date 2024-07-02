@@ -452,30 +452,31 @@ const closeModal = () => {
 const hblRecord = ref({});
 
 const fetchHBL = async (id) => {
-    try {
-        const response = await fetch(route('hbls.show', id), {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            },
-        });
+  try {
+    const response = await fetch(route("hbls.show", id), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": document
+          .querySelector('meta[name="csrf-token"]')
+          .getAttribute("content"),
+      },
+    });
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-            hblRecord.value = data.hbl;
-        }
-
-    } catch (error) {
-        console.log(error);
+    if (!response.ok) {
+      throw new Error("Network response was not ok.");
+    } else {
+      const data = await response.json();
+      hblRecord.value = data.hbl;
     }
-}
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const confirmViewHBL = async (id) => {
-    await fetchHBL(id);
-    showConfirmViewHBLModal.value = true;
+  await fetchHBL(id);
+  showConfirmViewHBLModal.value = true;
 };
 
 const confirmRestoreHBL = (id) => {
@@ -899,10 +900,10 @@ const shipIcon = ref(`
       @restore-hbl="handleRestoreHBL"
     />
 
-      <HBLDetailModal
-          :hbl="hblRecord"
-          :show="showConfirmViewHBLModal"
-          @close="closeModal"
-      />
+    <HBLDetailModal
+      :hbl="hblRecord"
+      :show="showConfirmViewHBLModal"
+      @close="closeModal"
+    />
   </AppLayout>
 </template>

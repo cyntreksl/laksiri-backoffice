@@ -48,6 +48,14 @@ const findCountryCodeByBranch = computed(() => {
   }
 });
 
+const isMobile = () => {
+  if (screen.width <= 760) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 const countryCodes = ["+94", "+966", "+971", "+965"];
 const countryCode = ref(findCountryCodeByBranch.value);
 const contactNumber = ref("");
@@ -718,7 +726,7 @@ const shipIcon = ref(`
         </div>
         <div class="sm:col-span-2 space-y-5">
           <!-- Action Buttons -->
-          <div class="flex justify-end space-x-5">
+          <div v-if="!isMobile()" class="flex justify-end space-x-5">
             <DangerOutlineButton @click="router.visit(route('hbls.index'))"
               >Cancel</DangerOutlineButton
             >
@@ -1092,6 +1100,35 @@ const shipIcon = ref(`
             </PrimaryOutlineButton>
           </div>
         </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div v-if="isMobile()" class="flex justify-end space-x-5">
+        <DangerOutlineButton @click="router.visit(route('hbls.index'))"
+          >Cancel</DangerOutlineButton
+        >
+        <PrimaryButton
+          :class="{ 'opacity-50': form.processing }"
+          :disabled="form.processing"
+          class="space-x-2"
+          type="submit"
+        >
+          <span>Create a HBL</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+            />
+          </svg>
+        </PrimaryButton>
       </div>
     </form>
 
