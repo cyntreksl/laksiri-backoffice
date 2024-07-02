@@ -524,16 +524,16 @@ const shipIcon = ref(`
                 Pending Pickups
               </h2>
             </div>
+            <div
+              class="mr-4 cursor-pointer"
+              x-tooltip.info.placement.bottom="'Applied Filters'"
+            >
+              Filter Options:
+            </div>
 
             <div
-              class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
+              class="grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
             >
-              <div
-                class="mr-4 cursor-pointer"
-                x-tooltip.info.placement.bottom="'Applied Filters'"
-              >
-                Filter Options:
-              </div>
               <div class="flex space-x-px">
                 <div>
                   <div
@@ -594,129 +594,141 @@ const shipIcon = ref(`
             </div>
           </div>
 
-          <div class="flex">
-            <ColumnVisibilityPopover>
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.reference"
-                  @change="toggleColumnVisibility('reference', $event)"
-                />
-                <span class="hover:cursor-pointer">Reference</span>
-              </label>
+          <div class="mt-1 ml-1 grid sm:grid-cols-2 md:grid-cols-2 item-center">
+            <div class="flex">
+              <ColumnVisibilityPopover>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.reference"
+                    @change="toggleColumnVisibility('reference', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Reference</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.name"
-                  @change="toggleColumnVisibility('name', $event)"
-                />
-                <span class="hover:cursor-pointer">Name</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.name"
+                    @change="toggleColumnVisibility('name', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Name</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.email"
-                  @change="toggleColumnVisibility('email', $event)"
-                />
-                <span class="hover:cursor-pointer">Email</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.email"
+                    @change="toggleColumnVisibility('email', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Email</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.address"
-                  @change="toggleColumnVisibility('address', $event)"
-                />
-                <span class="hover:cursor-pointer">Address</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.address"
+                    @change="toggleColumnVisibility('address', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Address</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.contact_number"
-                  @change="toggleColumnVisibility('contact_number', $event)"
-                />
-                <span class="hover:cursor-pointer">Contact</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.contact_number"
+                    @change="toggleColumnVisibility('contact_number', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Contact</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.cargo_type"
-                  @change="toggleColumnVisibility('cargo_type', $event)"
-                />
-                <span class="hover:cursor-pointer">Cargo Mode</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.cargo_type"
+                    @change="toggleColumnVisibility('cargo_type', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Cargo Mode</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.pickup_date"
-                  @change="toggleColumnVisibility('pickup_date', $event)"
-                />
-                <span class="hover:cursor-pointer">Pickup Date</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.pickup_date"
+                    @change="toggleColumnVisibility('pickup_date', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Pickup Date</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.is_urgent_pickup"
-                  @change="toggleColumnVisibility('is_urgent_pickup', $event)"
-                />
-                <span class="hover:cursor-pointer">Urgent Pickup</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.is_urgent_pickup"
+                    @change="toggleColumnVisibility('is_urgent_pickup', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Urgent Pickup</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.is_from_important_customer"
-                  @change="
-                    toggleColumnVisibility('is_from_important_customer', $event)
-                  "
-                />
-                <span class="hover:cursor-pointer">VIP Customer</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.is_from_important_customer"
+                    @change="
+                      toggleColumnVisibility(
+                        'is_from_important_customer',
+                        $event
+                      )
+                    "
+                  />
+                  <span class="hover:cursor-pointer">VIP Customer</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.pickup_time_start"
-                  @change="toggleColumnVisibility('pickup_time_start', $event)"
-                />
-                <span class="hover:cursor-pointer">Pickup Time Start</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.pickup_time_start"
+                    @change="
+                      toggleColumnVisibility('pickup_time_start', $event)
+                    "
+                  />
+                  <span class="hover:cursor-pointer">Pickup Time Start</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.pickup_time_end"
-                  @change="toggleColumnVisibility('pickup_time_end', $event)"
-                />
-                <span class="hover:cursor-pointer">Pickup Time End</span>
-              </label>
-            </ColumnVisibilityPopover>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.pickup_time_end"
+                    @change="toggleColumnVisibility('pickup_time_end', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Pickup Time End</span>
+                </label>
+              </ColumnVisibilityPopover>
 
-            <button
-              class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.top="'Filters'"
-              @click="showFilters = true"
-            >
-              <i class="fa-solid fa-filter"></i>
-            </button>
-
-            <PrimaryButton :disabled="isDataEmpty" @click="confirmAssignDriver">
-              <svg
-                class="flex icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
-                fill="none"
-                height="18"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="18"
-                xmlns="http://www.w3.org/2000/svg"
+              <button
+                class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                x-tooltip.placement.top="'Filters'"
+                @click="showFilters = true"
               >
-                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
-                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                <path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                <path d="M12 14l0 7" />
-                <path d="M10 12l-6.75 -2" />
-                <path d="M14 12l6.75 -2" />
-              </svg>
-              Assign Driver ({{ countOfSelectedData }})
-            </PrimaryButton>
+                <i class="fa-solid fa-filter"></i>
+              </button>
+            </div>
+            <div>
+              <PrimaryButton
+                class="flex"
+                :disabled="isDataEmpty"
+                @click="confirmAssignDriver"
+              >
+                <svg
+                  class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
+                  fill="none"
+                  height="18"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                  <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                  <path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                  <path d="M12 14l0 7" />
+                  <path d="M10 12l-6.75 -2" />
+                  <path d="M14 12l6.75 -2" />
+                </svg>
+                Assign Driver ({{ countOfSelectedData }})
+              </PrimaryButton>
+            </div>
           </div>
         </div>
 
