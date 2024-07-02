@@ -16,31 +16,27 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import HoldConfirmationModal from "@/Pages/Warehouse/Partials/HoldConfirmationModal.vue";
-import {router} from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import AssignZoneModal from "@/Pages/Warehouse/Partials/AssignZoneModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 
 const props = defineProps({
-    drivers: {
-        type: Object,
-        default: () => {
-        },
-    },
-    officers: {
-        type: Object,
-        default: () => {
-        },
-    },
-    paymentStatus: {
-        type: Object,
-        default: () => {
-        },
-    },
-    warehouseZones: {
-        type: Object,
-        default: () => {
-        },
-    },
+  drivers: {
+    type: Object,
+    default: () => {},
+  },
+  officers: {
+    type: Object,
+    default: () => {},
+  },
+  paymentStatus: {
+    type: Object,
+    default: () => {},
+  },
+  warehouseZones: {
+    type: Object,
+    default: () => {},
+  },
 });
 
 const showFilters = ref(false);
@@ -59,23 +55,23 @@ const filters = reactive({
 });
 
 const data = reactive({
-    columnVisibility: {
-        hbl: true,
-        hbl_name: true,
-        address: false,
-        picked_date: true,
-        weight: true,
-        volume: true,
-        grand_total: true,
-        paid_amount: true,
-        cargo_type: true,
-        hbl_type: false,
-        officer: false,
-        is_hold: true,
-        status: true,
-        zone:true,
-        actions: true,
-    },
+  columnVisibility: {
+    hbl: true,
+    hbl_name: true,
+    address: false,
+    picked_date: true,
+    weight: true,
+    volume: true,
+    grand_total: true,
+    paid_amount: true,
+    cargo_type: true,
+    hbl_type: false,
+    officer: false,
+    is_hold: true,
+    status: true,
+    zone: true,
+    actions: true,
+  },
 });
 
 const toggleColumnVisibility = (columnName) => {
@@ -237,180 +233,180 @@ const createColumns = () => [
     <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
     <span>${cell}</span>
   </div>`);
-            } else {
-                return cell;
-            }
-        },
+      } else {
+        return cell;
+      }
     },
-    {
-        name: "Zone",
-        hidden: !data.columnVisibility.zone,
-        sort: false,
-        formatter: (_, row) => {
-            return h("div", {className: 'flex items-center'}, [
-                row._cells[14].data ? row._cells[14].data : null,
-                h(
-                    "button",
-                    {
-                        className:
-                            "ml-2 btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                        onClick: () => confirmAssignZone(row._cells[0].data?.id),
-                        "x-tooltip..placement": 'Assign Warehouse Zone'
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "icon icon-tabler icons-tabler-outline icon-tabler-home-plus",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                    stroke: "none",
-                                }),
-                                h("path", {
-                                    d: "M19 12h2l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h5.5",
-                                }),
-                                h("path", {
-                                    d: "M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2",
-                                }),
-                                h("path", {
-                                    d: "M16 19h6",
-                                }),
-                                h("path", {
-                                    d: "M19 16v6",
-                                }),
-                            ]
-                        )
-                    ]
-                ),
-            ]);
-        }
+  },
+  {
+    name: "Zone",
+    hidden: !data.columnVisibility.zone,
+    sort: false,
+    formatter: (_, row) => {
+      return h("div", { className: "flex items-center" }, [
+        row._cells[14].data ? row._cells[14].data : null,
+        h(
+          "button",
+          {
+            className:
+              "ml-2 btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+            onClick: () => confirmAssignZone(row._cells[0].data?.id),
+            "x-tooltip..placement": "Assign Warehouse Zone",
+          },
+          [
+            h(
+              "svg",
+              {
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                class:
+                  "icon icon-tabler icons-tabler-outline icon-tabler-home-plus",
+                fill: "none",
+                height: 24,
+                width: 24,
+                stroke: "currentColor",
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+              },
+              [
+                h("path", {
+                  d: "M0 0h24v24H0z",
+                  fill: "none",
+                  stroke: "none",
+                }),
+                h("path", {
+                  d: "M19 12h2l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h5.5",
+                }),
+                h("path", {
+                  d: "M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2",
+                }),
+                h("path", {
+                  d: "M16 19h6",
+                }),
+                h("path", {
+                  d: "M19 16v6",
+                }),
+              ]
+            ),
+          ]
+        ),
+      ]);
     },
-    {
-        name: "Actions",
-        hidden: !data.columnVisibility.actions,
-        sort: false,
-        formatter: (_, row) => {
-            return h("div", {}, [
-                h(
-                    "a",
-                    {
-                        className:
-                            "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                        onClick: () => confirmViewHBL(row.cells[0].data?.id),
-                        "x-tooltip..placement.bottom.primary": "'View HBL'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                    stroke: "none",
-                                }),
-                                h("path", {
-                                    d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                }),
-                            ]
-                        ),
-                    ]
+  },
+  {
+    name: "Actions",
+    hidden: !data.columnVisibility.actions,
+    sort: false,
+    formatter: (_, row) => {
+      return h("div", {}, [
+        h(
+          "a",
+          {
+            className:
+              "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
+            onClick: () => confirmViewHBL(row.cells[0].data?.id),
+            "x-tooltip..placement.bottom.primary": "'View HBL'",
+          },
+          [
+            h(
+              "svg",
+              {
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
+                fill: "none",
+                height: 24,
+                width: 24,
+                stroke: "currentColor",
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+              },
+              [
+                h("path", {
+                  d: "M0 0h24v24H0z",
+                  fill: "none",
+                  stroke: "none",
+                }),
+                h("path", {
+                  d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                }),
+                h("path", {
+                  d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                }),
+              ]
+            ),
+          ]
+        ),
+        h(
+          "button",
+          {
+            className:
+              "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+            onClick: () => confirmIsHold(row.cells),
+            "x-tooltip..placement.bottom.primary": row.cells[12].data
+              ? "'Release HBL'"
+              : "'Hold HBL'",
+          },
+          [
+            row.cells[12].data
+              ? h(
+                  "svg",
+                  {
+                    xmlns: "http://www.w3.org/2000/svg",
+                    viewBox: "0 0 24 24",
+                    class:
+                      "icon icon-tabler icons-tabler-outline icon-tabler-player-play",
+                    fill: "none",
+                    height: 24,
+                    width: 24,
+                    stroke: "currentColor",
+                    strokeLinecap: "round",
+                    strokeLinejoin: "round",
+                  },
+                  [
+                    h("path", {
+                      d: "M0 0h24v24H0z",
+                      fill: "none",
+                      stroke: "none",
+                    }),
+                    h("path", {
+                      d: "M7 4v16l13 -8z",
+                    }),
+                  ]
+                )
+              : h(
+                  "svg",
+                  {
+                    xmlns: "http://www.w3.org/2000/svg",
+                    viewBox: "0 0 24 24",
+                    class:
+                      "icon icon-tabler icons-tabler-outline icon-tabler-player-pause",
+                    fill: "none",
+                    height: 24,
+                    width: 24,
+                    stroke: "currentColor",
+                    strokeLinecap: "round",
+                    strokeLinejoin: "round",
+                  },
+                  [
+                    h("path", {
+                      d: "M0 0h24v24H0z",
+                      fill: "none",
+                      stroke: "none",
+                    }),
+                    h("path", {
+                      d: "M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
+                    }),
+                    h("path", {
+                      d: "M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
+                    }),
+                  ]
                 ),
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                        onClick: () => confirmIsHold(row.cells),
-                        "x-tooltip..placement.bottom.primary": row.cells[12].data
-                            ? "'Release HBL'"
-                            : "'Hold HBL'",
-                    },
-                    [
-                        row.cells[12].data
-                            ? h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class:
-                                        "icon icon-tabler icons-tabler-outline icon-tabler-player-play",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M7 4v16l13 -8z",
-                                    }),
-                                ]
-                            )
-                            : h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class:
-                                        "icon icon-tabler icons-tabler-outline icon-tabler-player-pause",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
-                                    }),
-                                    h("path", {
-                                        d: "M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
-                                    }),
-                                ]
-                            ),
-                    ]
-                ),
-            ]);
-        },
+          ]
+        ),
+      ]);
     },
+  },
 ];
 
 const baseUrl = ref("/get-warehouse-list");
@@ -593,47 +589,48 @@ const showConfirmAssignZoneModal = ref(false);
 const hblId = ref(null);
 
 const confirmAssignZone = (id) => {
-    hblId.value = id;
-    showConfirmAssignZoneModal.value = true;
+  hblId.value = id;
+  showConfirmAssignZoneModal.value = true;
 };
 
 const closeAssignZoneModal = () => {
-    hblId.value = null;
-    showConfirmAssignZoneModal.value = false;
+  hblId.value = null;
+  showConfirmAssignZoneModal.value = false;
 };
 
 const showConfirmViewHBLModal = ref(false);
 const hblRecord = ref({});
 
 const fetchHBL = async (id) => {
-    try {
-        const response = await fetch(`hbls/${id}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            },
-        });
+  try {
+    const response = await fetch(`hbls/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": document
+          .querySelector('meta[name="csrf-token"]')
+          .getAttribute("content"),
+      },
+    });
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-            hblRecord.value = data.hbl;
-        }
-
-    } catch (error) {
-        console.log(error);
+    if (!response.ok) {
+      throw new Error("Network response was not ok.");
+    } else {
+      const data = await response.json();
+      hblRecord.value = data.hbl;
     }
-}
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const confirmViewHBL = async (id) => {
-    await fetchHBL(id);
-    showConfirmViewHBLModal.value = true;
+  await fetchHBL(id);
+  showConfirmViewHBLModal.value = true;
 };
 
 const closeShowHBLModal = () => {
-    showConfirmViewHBLModal.value = false;
+  showConfirmViewHBLModal.value = false;
 };
 
 const planeIcon = ref(`
@@ -681,7 +678,7 @@ const shipIcon = ref(`
 
     <Breadcrumb />
 
-    <div class="grid grid-cols-6 gap-4 mt-4">
+    <div class="grid sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 mt-3">
       <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
         <div class="flex justify-between space-x-1">
           <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
@@ -734,29 +731,31 @@ const shipIcon = ref(`
               <div class="flex -space-x-px">
                 <div>
                   <div
-                    class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
+                    <i class="mr-1 fas fa-calendar-alt"></i>
                     From Date
                   </div>
                   <div
-                    class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    class="badge bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     {{ filters.fromDate }}
                   </div>
                 </div>
                 <div>
                   <div
-                    class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="ml-2 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
-                    To Date
+                    <i class="mr-1 far fa-calendar-alt"></i>
+                    To &nbsp;Date
                   </div>
                   <div
-                    class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    class="badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     {{ filters.toDate }}
                   </div>
                 </div>
-                <div>
+                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
                   <div
                     v-for="(mode, index) in filters.cargoMode"
                     v-if="filters.cargoMode"
@@ -872,21 +871,21 @@ const shipIcon = ref(`
           />
           <div v-html="shipIcon"></div>
         </label>
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.cargoMode"
-                        label="Sea Cargo"
-                        value="Sea Cargo"
-                    />
-                </label>
+        <label class="inline-flex items-center space-x-2 mt-2">
+          <Switch
+            v-model="filters.cargoMode"
+            label="Sea Cargo"
+            value="Sea Cargo"
+          />
+        </label>
 
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.cargoMode"
-                        label="Door to Door"
-                        value="Door to Door"
-                    />
-                </label>
+        <label class="inline-flex items-center space-x-2 mt-2">
+          <Switch
+            v-model="filters.cargoMode"
+            label="Door to Door"
+            value="Door to Door"
+          />
+        </label>
 
         <FilterBorder />
 
@@ -951,19 +950,24 @@ const shipIcon = ref(`
       </template>
     </FilterDrawer>
 
-        <HoldConfirmationModal
-            :hbl-data="hblData"
-            :show="showConfirmHoldModal"
-            @close="closeHoldModal"
-            @toggle-hold="toggleHold"
-        />
+    <HoldConfirmationModal
+      :hbl-data="hblData"
+      :show="showConfirmHoldModal"
+      @close="closeHoldModal"
+      @toggle-hold="toggleHold"
+    />
 
-        <AssignZoneModal :hbl-id="hblId" :show="showConfirmAssignZoneModal" :warehouse-zones="warehouseZones" @close="closeAssignZoneModal"/>
+    <AssignZoneModal
+      :hbl-id="hblId"
+      :show="showConfirmAssignZoneModal"
+      :warehouse-zones="warehouseZones"
+      @close="closeAssignZoneModal"
+    />
 
-      <HBLDetailModal
-          :hbl="hblRecord"
-          :show="showConfirmViewHBLModal"
-          @close="closeShowHBLModal"
-      />
-    </AppLayout>
+    <HBLDetailModal
+      :hbl="hblRecord"
+      :show="showConfirmViewHBLModal"
+      @close="closeShowHBLModal"
+    />
+  </AppLayout>
 </template>

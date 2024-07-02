@@ -45,7 +45,7 @@
               </h2>
             </div>
             <div class="my-5">
-              <div class="space-x-5 flex flex-row">
+              <div class="grid sm:grid-cols-2 md:grid-cols-2">
                 <label
                   v-for="containerType in containerTypes"
                   class="inline-flex items-center space-x-2 my-2"
@@ -80,9 +80,10 @@
                 Container Details
               </h2>
             </div>
-            <div class="grid grid-cols-3 gap-5 mt-3">
-              <div>
+            <div class="grid grid-cols-4 gap-5 mt-3">
+              <div class="col-span-2">
                 <span>Reference</span>
+
                 <label class="block">
                   <input
                     v-model="form.reference"
@@ -93,7 +94,7 @@
                 </label>
                 <InputError :message="form.errors.reference" />
               </div>
-              <div>
+              <div class="col-span-2">
                 <span>Container Number</span>
                 <label class="block">
                   <input
@@ -105,7 +106,7 @@
                 </label>
                 <InputError :message="form.errors.container_number" />
               </div>
-              <div>
+              <div class="col-span-2">
                 <span>Seal Number</span>
                 <label class="block">
                   <input
@@ -118,7 +119,7 @@
                 <InputError :message="form.errors.seal_number" />
               </div>
 
-              <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-3">
+              <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">
                 <span>BL Number</span>
                 <label class="block">
                   <input
@@ -158,7 +159,7 @@
                 />
               </div>
 
-              <div class="col-span-1">
+              <div class="col-span-2">
                 <span>Estimated Arrival Date to Destination</span>
                 <label class="block">
                   <input

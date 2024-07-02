@@ -572,21 +572,23 @@ const shipIcon = ref(`
                 Cancelled HBL List
               </h2>
             </div>
+            <br />
+            <div
+              class="mr-4 cursor-pointer"
+              x-tooltip.info.placement.bottom="'Applied Filters'"
+            >
+              Filter Options:
+            </div>
 
             <div
               class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
             >
-              <div
-                class="mr-4 cursor-pointer"
-                x-tooltip.info.placement.bottom="'Applied Filters'"
-              >
-                Filter Options:
-              </div>
               <div class="flex -space-x-px">
                 <div>
                   <div
                     class="mb-1 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
+                    <i class="mr-1 fas fa-calendar-alt"></i>
                     From Date
                   </div>
                   <div
@@ -599,7 +601,8 @@ const shipIcon = ref(`
                   <div
                     class="mb-1 ml-4 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
-                    To Date
+                    <i class="mr-1 far fa-calendar-alt"></i>
+                    To &nbsp;Date
                   </div>
                   <div
                     class="badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
