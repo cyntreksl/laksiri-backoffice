@@ -96,9 +96,13 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         return SwitchHoldStatus::run($hbl);
     }
 
-    public function getUnloadedHBLsByCargoType(string $cargoType)
+    public function getUnloadedHBLsByCargoType(array $data): JsonResponse
     {
-        return GetHBLByCargoTypeWithUnloadedPackages::run($cargoType);
+        $result = GetHBLByCargoTypeWithUnloadedPackages::run($data);
+
+        return response()->json([
+            'data' => $result,
+        ]);
     }
 
     public function getLoadedHBLsByCargoType(Container $container, string $cargoType)

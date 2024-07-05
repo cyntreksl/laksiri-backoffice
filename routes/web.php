@@ -86,6 +86,7 @@ Route::middleware([
 
     Route::get('hbls/download/barcode/{hbl}', [HBLController::class, 'downloadHBLBarcodePDF'])
         ->name('hbls.download.barcode');
+
     // User
     Route::resource('users', UserController::class)
         ->except(['create', 'show']);
@@ -158,6 +159,8 @@ Route::middleware([
 
         Route::get('containers/hbl/batch-downloads/{container}', [ContainerController::class, 'batchDownloadPDF'])
             ->name('hbls.batch-downloads');
+
+        Route::get('hbls/get-unloaded-hbl/list', [ContainerController::class, 'getUnloadedHBLs']);
 
         // Loaded Container
         Route::resource('loaded-containers', LoadedContainerController::class)

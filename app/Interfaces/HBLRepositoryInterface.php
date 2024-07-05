@@ -20,7 +20,7 @@ interface HBLRepositoryInterface
 
     public function toggleHold(HBL $hbl);
 
-    public function getUnloadedHBLsByCargoType(string $cargoType);
+    public function getUnloadedHBLsByCargoType(array $data);
 
     public function getLoadedHBLsByCargoType(Container $container, string $cargoType);
 

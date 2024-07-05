@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Actions\Container\GenerateContainerReferenceNumber;
 use App\Enum\CargoType;
 use App\Enum\ContainerType;
+use App\Enum\HBLType;
+use App\Enum\WarehouseType;
 use App\Http\Requests\StoreContainerRequest;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
@@ -76,10 +78,16 @@ class ContainerController extends Controller
     {
         return Inertia::render('Loading/LoadingPoint', [
             'container' => $container,
-            'unloadedHBLs' => $this->HBLRepository->getUnloadedHBLsByCargoType($request->cargoType),
             'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
             'cargoTypes' => CargoType::getCargoTypeOptions(),
+            'hblTypes' => HBLType::getHBLTypeOptions(),
+            'warehouses' => WarehouseType::getWarehouseOptions(),
         ]);
+    }
+
+    public function getUnloadedHBLs(Request $request)
+    {
+        return $this->HBLRepository->getUnloadedHBLsByCargoType($request->all());
     }
 
     public function unloadHBLFromContainer(Request $request, Container $container)
