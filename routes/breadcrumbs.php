@@ -219,3 +219,10 @@ Breadcrumbs::for('users.roles.edit', function (BreadcrumbTrail $trail, Role $rol
     $trail->parent('users.roles.index');
     $trail->push('Edit Role', route('users.roles.edit', $role->id));
 });
+
+// Shipments Arrivals
+Breadcrumbs::for('arrival.shipments-arrivals.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Arrivals');
+    $trail->push('Shipments Arrivals', route('arrival.shipments-arrivals.index'));
+});

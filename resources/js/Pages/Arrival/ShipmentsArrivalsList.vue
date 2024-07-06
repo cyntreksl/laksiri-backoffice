@@ -13,7 +13,6 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
-import RadioButton from "@/Components/RadioButton.vue";
 import LoadedShipmentDetailModal from "@/Pages/Loading/Partials/LoadedShipmentDetailModal.vue";
 
 const props = defineProps({
@@ -36,6 +35,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    branches: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const wrapperRef = ref(null);
@@ -50,27 +53,28 @@ const filters = reactive({
     toDate: toDate,
     cargoType: Object.values(props.cargoTypes),
     containerType: Object.values(props.containerTypes),
-    status: "",
+    branch: Object.values(props.branches.map(b => b.id)),
 });
 
 const data = reactive({
     columnVisibility: {
         id: false,
         cargo_type: true,
+        branch: true,
         container_type: true,
         reference: true,
         bl_number: true,
         awb_number: true,
         container_number: true,
-        seal_number: true,
+        seal_number: false,
         maximum_volume: false,
         minimum_volume: false,
         maximum_weight: false,
         minimum_weight: false,
         maximum_volumetric_weight: false,
         minimum_volumetric_weight: false,
-        estimated_time_of_departure: true,
-        estimated_time_of_arrival: true,
+        estimated_time_of_departure: false,
+        estimated_time_of_arrival: false,
         vessel_name: false,
         voyage_number: false,
         shipping_line: false,
@@ -90,6 +94,8 @@ const data = reactive({
         loading_ended_by: false,
         unloading_started_by: false,
         unloading_ended_by: false,
+        note: true,
+        is_reached: true,
         actions: true,
     },
 });
@@ -236,12 +242,13 @@ const createColumns = () => [
                         row.cells[1].data,
                     ]),
     },
+    {name: "Origin", hidden: !data.columnVisibility.branch},
     {name: "Container Type", hidden: !data.columnVisibility.cargo_type},
     {name: "Reference", hidden: !data.columnVisibility.reference},
-    {name: "BL Number", hidden: !data.columnVisibility.bl_number},
-    {name: "AWB Number", hidden: !data.columnVisibility.awb_number},
-    {name: "Container Number", hidden: !data.columnVisibility.container_number},
-    {name: "Seal Number", hidden: !data.columnVisibility.seal_number},
+    {name: "BL Number", hidden: !data.columnVisibility.bl_number, sort: false},
+    {name: "AWB Number", hidden: !data.columnVisibility.awb_number, sort: false},
+    {name: "Container Number", hidden: !data.columnVisibility.container_number, sort: false},
+    {name: "Seal Number", hidden: !data.columnVisibility.seal_number, sort: false},
     {name: "Maximum Volume", hidden: !data.columnVisibility.maximum_volume},
     {name: "Minimum Volume", hidden: !data.columnVisibility.minimum_volume},
     {name: "Maximum Weight", hidden: !data.columnVisibility.maximum_weight},
@@ -289,15 +296,99 @@ const createColumns = () => [
     {
         name: "Loading Started By",
         hidden: !data.columnVisibility.loading_started_by,
+        sort: false,
     },
     {name: "Loading Ended By", hidden: !data.columnVisibility.loading_ended_by},
     {
         name: "Unloading Started By",
         hidden: !data.columnVisibility.unloading_started_by,
+        sort: false,
     },
     {
         name: "Unloading Ended By",
         hidden: !data.columnVisibility.unloading_ended_by,
+        sort: false,
+    },
+    {
+        name: "Note",
+        hidden: !data.columnVisibility.note,
+        sort: false,
+    },
+    {
+        name: "Reached ?",
+        hidden: !data.columnVisibility.is_reached,
+        formatter: (_, row) => {
+            return h("div", {className: 'flex items-center'}, [
+                row._cells[37].data === 'REACHED'
+                    ?
+                    h('span', {className: 'flex item-center text-success'}, [
+                        h(
+                            "svg",
+                            {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                viewBox: "0 0 24 24",
+                                class:
+                                    "icon icon-tabler icons-tabler-outline icon-tabler-circle-check mr-2",
+                                fill: "none",
+                                height: 24,
+                                width: 24,
+                                stroke: "currentColor",
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                            },
+                            [
+                                h("path", {
+                                    d: "M0 0h24v24H0z",
+                                    fill: "none",
+                                    stroke: "none",
+                                }),
+                                h("path", {
+                                    d: "M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0",
+                                }),
+                                h("path", {
+                                    d: "M9 12l2 2l4 -4",
+                                }),
+                            ]
+                        ),
+                        row._cells[37].data
+                    ])
+                    :
+                    h('span', {className: 'flex items-center text-warning'}, [
+                        h(
+                            "svg",
+                            {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                viewBox: "0 0 24 24",
+                                class:
+                                    "icon icon-tabler icons-tabler-outline icon-tabler-exclamation-circle mr-2",
+                                fill: "none",
+                                height: 24,
+                                width: 24,
+                                stroke: "currentColor",
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                            },
+                            [
+                                h("path", {
+                                    d: "M0 0h24v24H0z",
+                                    fill: "none",
+                                    stroke: "none",
+                                }),
+                                h("path", {
+                                    d: "M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0",
+                                }),
+                                h("path", {
+                                    d: "M12 9v4",
+                                }),
+                                h("path", {
+                                    d: "M12 16v.01",
+                                }),
+                            ]
+                        ),
+                        row._cells[37].data
+                    ])
+            ]);
+        }
     },
     {
         name: "Actions",
@@ -508,8 +599,8 @@ class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
 `);
 </script>
 <template>
-    <AppLayout title="Loaded Shipments">
-        <template #header>Loaded Shipments</template>
+    <AppLayout title="Shipments Arrivals">
+        <template #header>Shipments Arrivals</template>
 
         <Breadcrumb/>
 
@@ -521,7 +612,7 @@ class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
                             <h2
                                 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                Loaded Shipments
+                                Shipments Arrivals
                             </h2>
                         </div>
 
@@ -582,13 +673,6 @@ class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
                                         class="mb-1 badge bg-cyan-500 text-white dark:bg-cyan-900 ml-2"
                                     >
                                         {{ mode }}
-                                    </div>
-
-                                    <div
-                                        v-if="filters.status"
-                                        class="mb-1 badge bg-success text-white ml-2"
-                                    >
-                                        {{ filters.status }}
                                     </div>
                                 </div>
                             </div>
@@ -875,6 +959,20 @@ class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
                 </label>
 
                 <FilterBorder/>
+
+                <FilterHeader value="Origins"/>
+
+                <label
+                    v-for="branch in branches"
+                    :key="branch.id"
+                    class="inline-flex items-center space-x-2 mt-2"
+                >
+                    <Switch
+                        v-model="filters.branch"
+                        :label="branch.name"
+                        :value="branch.id"
+                    />
+                </label>
 
                 <!--Filter Now Action Button-->
                 <SoftPrimaryButton class="space-x-2" @click="applyFilters">

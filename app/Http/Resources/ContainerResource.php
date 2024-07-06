@@ -17,6 +17,7 @@ class ContainerResource extends JsonResource
         return [
             'id' => $this->id,
             'cargo_type' => $this->cargo_type,
+            'branch' => $this->branch->name,
             'container_type' => $this->container_type,
             'reference' => $this->reference,
             'bl_number' => $this->bl_number,
@@ -50,6 +51,8 @@ class ContainerResource extends JsonResource
             'loading_ended_by' => $this->loading_ended_by,
             'unloading_started_by' => $this->unloading_started_by,
             'unloading_ended_by' => $this->unloading_ended_by,
+            'note' => $this->note,
+            'is_reached' => $this->is_reached ? 'REACHED' : 'PENDING',
         ];
     }
 }

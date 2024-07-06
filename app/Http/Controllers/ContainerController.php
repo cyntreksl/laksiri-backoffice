@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Branch\GetBranches;
 use App\Actions\Container\GenerateContainerReferenceNumber;
 use App\Enum\CargoType;
 use App\Enum\ContainerStatus;
@@ -118,6 +119,7 @@ class ContainerController extends Controller
             'containers' => $this->containerRepository->getLoadedContainers(),
             'containerTypes' => ContainerType::cases(),
             'containerStatus' => ContainerStatus::cases(),
+            'branches' => GetBranches::run(),
         ]);
     }
 }
