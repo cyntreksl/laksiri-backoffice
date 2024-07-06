@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Actions\Container\CreateContainer;
 use App\Actions\Container\Loading\GetLoadedContainerById;
+use App\Actions\Container\Loading\GetLoadedContainers;
 use App\Actions\Container\Unloading\UnloadHBL;
 use App\Actions\Container\Unloading\UnloadHBLPackages;
 use App\Actions\Container\UpdateContainer;
@@ -167,5 +168,10 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         } catch (\Exception $e) {
             throw new \Exception('Failed to update loaded shipment container: '.$e->getMessage());
         }
+    }
+
+    public function getLoadedContainers()
+    {
+        return GetLoadedContainers::run();
     }
 }
