@@ -70,6 +70,13 @@ class RolePermissionSeeder extends Seeder
                     'pickups.delete',
                 ],
             ],
+
+            [
+                'group_name' => 'Arrivals',
+                'permissions' => [
+                    'arrivals.list',
+                ],
+            ],
         ];
     }
 }
