@@ -14,6 +14,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import LoadedShipmentDetailModal from "@/Pages/Loading/Partials/LoadedShipmentDetailModal.vue";
+import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
     cargoTypes: {
@@ -483,6 +484,67 @@ const createColumns = () => [
                                 }),
                                 h("path", {
                                     d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                                }),
+                            ]
+                        ),
+                    ]
+                ),
+                h(
+                    "button",
+                    {
+                        className:
+                            "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25",
+                        onClick: () =>
+                            router.visit(
+                                route("arrival.unloading-points.index", {
+                                    container: row.cells[0].data,
+                                })
+                            ),
+                        "x-tooltip..placement.bottom.success": "'Unload'",
+                    },
+                    [
+                        h(
+                            "svg",
+                            {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                viewBox: "0 0 24 24",
+                                class:
+                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-wrecking-ball",
+                                fill: "none",
+                                stroke: "currentColor",
+                                strokeWidth: 2,
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                            },
+                            [
+                                h("path", {
+                                    stroke: "none",
+                                    d: "M0 0h24v24H0z",
+                                    fill: "none",
+                                }),
+                                h("path", {
+                                    d: "M19 13m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+                                }),
+                                h("path", {
+                                    d: "M4 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+                                }),
+                                h("path", {
+                                    d: "M13 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+                                }),
+                                h("path", {
+                                    d: "M13 19l-9 0",
+                                }),
+                                h("path", {
+                                    d: "M4 15l9 0",
+                                }),
+                                h("path", {
+                                    d: "M8 12v-5h2a3 3 0 0 1 3 3v5",
+                                }),
+                                h("path", {
+                                    d: "M5 15v-2a1 1 0 0 1 1 -1h7",
+                                }),
+                                h("path", {
+                                    d: "M19 11v-7l-6 7",
                                 }),
                             ]
                         ),

@@ -87,6 +87,8 @@ Route::middleware([
     Route::get('hbls/download/barcode/{hbl}', [HBLController::class, 'downloadHBLBarcodePDF'])
         ->name('hbls.download.barcode');
 
+    Route::get('get-hbl/{package_id}', [HBLController::class, 'getHBLByPackageId']);
+
     // User
     Route::resource('users', UserController::class)
         ->except(['create', 'show']);
@@ -193,6 +195,9 @@ Route::middleware([
     Route::name('arrival.')->group(function () {
         // Shipments Arrivals
         Route::get('shipments-arrivals', [ContainerController::class, 'showShipmentArrivals'])->name('shipments-arrivals.index');
+
+        Route::get('unloading-points/{container?}', [ContainerController::class, 'showUnloadingPoint'])
+            ->name('unloading-points.index');
 
         // Bonded Warehouse
         Route::get('bonded-warehouses', function () {

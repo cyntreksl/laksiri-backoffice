@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Branch\GetBranches;
 use App\Actions\Container\GenerateContainerReferenceNumber;
+use App\Actions\Container\GetContainerWithoutGlobalScopesById;
 use App\Enum\CargoType;
 use App\Enum\ContainerStatus;
 use App\Enum\ContainerType;
@@ -120,6 +121,16 @@ class ContainerController extends Controller
             'containerTypes' => ContainerType::cases(),
             'containerStatus' => ContainerStatus::cases(),
             'branches' => GetBranches::run(),
+        ]);
+    }
+
+    public function showUnloadingPoint($container_id)
+    {
+        return Inertia::render('Arrival/UnloadingPoint', [
+            'container' => GetContainerWithoutGlobalScopesById::run($container_id),
+            'cargoTypes' => CargoType::getCargoTypeOptions(),
+            'hblTypes' => HBLType::getHBLTypeOptions(),
+            'warehouses' => WarehouseType::getWarehouseOptions(),
         ]);
     }
 }

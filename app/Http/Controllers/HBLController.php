@@ -156,4 +156,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->downloadHBLBarcodePDF($hbl);
     }
+
+    public function getHBLByPackageId($hbl_package_id)
+    {
+        return $this->HBLRepository->getHBLByPackageId($hbl_package_id);
+    }
 }
