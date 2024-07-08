@@ -199,6 +199,12 @@ Route::middleware([
         Route::get('unloading-points/{container?}', [ContainerController::class, 'showUnloadingPoint'])
             ->name('unloading-points.index');
 
+        Route::post('/unload-container/unload', [ContainerController::class, 'unloadContainer'])
+            ->name('unload-container.unload');
+
+        Route::post('/unload-container/reload', [ContainerController::class, 'reloadContainer'])
+            ->name('unload-container.reload');
+
         // Bonded Warehouse
         Route::get('bonded-warehouses', function () {
             return Inertia::render('Arrival/BondedWarehouseList');

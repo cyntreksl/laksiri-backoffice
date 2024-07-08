@@ -3,9 +3,10 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import draggable from 'vuedraggable'
-import ReviewModal from "@/Pages/Loading/Partials/ReviewModal.vue";
 import ActionMessage from "@/Components/ActionMessage.vue";
 import {computed, ref, watch} from "vue";
+import {router} from "@inertiajs/vue3";
+import ReviewModal from "@/Pages/Arrival/Partials/ReviewModal.vue";
 
 const props = defineProps({
     container: {
@@ -28,8 +29,8 @@ const props = defineProps({
 })
 
 const searchQuery = ref('');
-const containerArr = ref(props.container.hbl_packages);
-const warehouseArr = ref([]);
+const containerArr = ref(props.container.hbl_packages.filter(p => p.pivot?.status !== 'draft-unload'));
+const warehouseArr = ref(props.container.hbl_packages.filter(p => p.pivot?.status === 'draft-unload'));
 
 const filteredPackages = computed(() => {
     if (!searchQuery.value) {
@@ -53,10 +54,64 @@ const handleReLoadToContainer = (index) => {
     }
 }
 
+const showReviewModal = ref(false);
+
 const handlePackageChange = () => {
     containerArr.value = [...containerArr.value];
     warehouseArr.value = [...warehouseArr.value];
 }
+
+const draftTextEnabled = ref(false);
+
+const handleCreateDraftUnload = (packages) => {
+    router.post(route("arrival.unload-container.unload"), {
+            container_id: route().params.container,
+            packages,
+            is_draft: true,
+        },
+        {
+            onSuccess: () => {
+                draftTextEnabled.value = true;
+                setTimeout(() => draftTextEnabled.value = false, 3000);
+            },
+            onError: () => {
+                console.error('Something went to wrong!');
+            },
+            preserveScroll: true,
+            preserveState: true,
+        });
+}
+
+const handleRemoveDraftUnload = (packages) => {
+    router.post(route("arrival.unload-container.reload"), {
+            container_id: route().params.container,
+            package_id: packages[0].id,
+        },
+        {
+            onSuccess: () => {
+                draftTextEnabled.value = true;
+                setTimeout(() => draftTextEnabled.value = false, 3000);
+            },
+            onError: () => {
+                console.error('Something went to wrong!');
+            },
+            preserveScroll: true,
+            preserveState: true,
+        });
+}
+
+// Watch for changes in the container array
+watch(warehouseArr, (newValue, oldValue) => {
+    const added = newValue.filter(item => !oldValue.includes(item));
+    const removed = oldValue.filter(item => !newValue.includes(item));
+
+    if (added.length > 0) {
+        handleCreateDraftUnload(added);
+    }
+    if (removed.length > 0) {
+        handleRemoveDraftUnload(removed);
+    }
+});
 </script>
 
 <template>
@@ -432,8 +487,9 @@ const handlePackageChange = () => {
                 </div>
             </div>
         </main>
-<!--        <ReviewModal :container-array="containerArr" :find-hbl-by-package-id="findHblByPackageId"-->
-<!--                     :show="showReviewModal" @close="showReviewModal = false"/>-->
+
+        <ReviewModal :show="showReviewModal"
+                     :warehouse-array="warehouseArr" @close="showReviewModal = false"/>
     </AppLayout>
 </template>
 

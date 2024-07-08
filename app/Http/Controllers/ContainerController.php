@@ -133,4 +133,14 @@ class ContainerController extends Controller
             'warehouses' => WarehouseType::getWarehouseOptions(),
         ]);
     }
+
+    public function unloadContainer(Request $request)
+    {
+        $this->containerRepository->unloadContainer($request->all());
+    }
+
+    public function reloadContainer(Request $request)
+    {
+        $this->containerRepository->reloadContainer($request->all());
+    }
 }
