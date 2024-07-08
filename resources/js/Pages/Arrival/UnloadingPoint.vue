@@ -5,7 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import draggable from 'vuedraggable'
 import ReviewModal from "@/Pages/Loading/Partials/ReviewModal.vue";
 import ActionMessage from "@/Components/ActionMessage.vue";
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 
 const props = defineProps({
     container: {
@@ -28,23 +28,30 @@ const props = defineProps({
 })
 
 const searchQuery = ref('');
+const containerArr = ref(props.container.hbl_packages);
 const warehouseArr = ref([]);
 
 const filteredPackages = computed(() => {
     if (!searchQuery.value) {
-        return props.container.hbl_packages;
+        return containerArr.value;
     }
-    return props.container.hbl_packages.filter(packageData => {
+    return containerArr.value.filter(packageData => {
         return packageData.hbl?.reference.toLowerCase().includes(searchQuery.value.toLowerCase());
     });
 })
 
-const handleUnloadToWarehouse = (index) => {}
-const handleReLoadToContainer = (index) => {}
-
-const showReviewModal = ref(false);
-
-const draftTextEnabled = ref(false);
+const handleUnloadToWarehouse = (index) => {
+    if (index !== -1) {
+        warehouseArr.value = [...warehouseArr.value, containerArr.value[index]];
+        containerArr.value = containerArr.value.filter((_, i) => i !== index);
+    }
+}
+const handleReLoadToContainer = (index) => {
+    if (index !== -1) {
+        containerArr.value = [...containerArr.value, warehouseArr.value[index]];
+        warehouseArr.value = warehouseArr.value.filter((_, i) => i !== index);
+    }
+}
 
 const handlePackageChange = () => {
     containerArr.value = [...containerArr.value];
@@ -310,7 +317,7 @@ const handlePackageChange = () => {
                                                 <div>
                                                     <div class="flex justify-between">
                                                         <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
-                                                            {{ findHblByPackageId(element.id).hbl }}
+                                                            {{element.hbl?.reference}}
                                                         </p>
                                                     </div>
                                                 </div>
