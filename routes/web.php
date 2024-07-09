@@ -192,9 +192,7 @@ Route::middleware([
     //Arrivals
     Route::name('arrival.')->group(function () {
         // Shipments Arrivals
-        Route::get('shipments-arrivals', function () {
-            return Inertia::render('Arrival/ShipmentsArrivalsList');
-        })->name('shipments-arrivals.index');
+        Route::get('shipments-arrivals', [ContainerController::class, 'showShipmentArrivals'])->name('shipments-arrivals.index');
 
         // Bonded Warehouse
         Route::get('bonded-warehouses', function () {
