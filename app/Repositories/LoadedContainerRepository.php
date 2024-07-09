@@ -11,6 +11,7 @@ use App\Http\Resources\ContainerResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
+use App\Models\Scopes\BranchScope;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -43,7 +44,11 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = Container::query()->loadedContainers();
+        if (request()->header('referer') === route('arrival.shipments-arrivals.index')) {
+            $query = Container::query()->loadedContainers()->withoutGlobalScope(BranchScope::class);
+        } else {
+            $query = Container::query()->loadedContainers();
+        }
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {

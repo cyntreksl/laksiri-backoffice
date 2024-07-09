@@ -5,6 +5,9 @@ namespace App\Repositories;
 use App\Actions\Container\CreateContainer;
 use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Loading\GetLoadedContainers;
+use App\Actions\Container\Unloading\CreateDraftUnload;
+use App\Actions\Container\Unloading\CreateFullyUnload;
+use App\Actions\Container\Unloading\UndoUnloadContainer;
 use App\Actions\Container\Unloading\UnloadHBL;
 use App\Actions\Container\Unloading\UnloadHBLPackages;
 use App\Actions\Container\UpdateContainer;
@@ -173,5 +176,27 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function getLoadedContainers()
     {
         return GetLoadedContainers::run();
+    }
+
+    public function unloadContainer(array $data)
+    {
+        try {
+            if (isset($data['is_draft'])) {
+                return CreateDraftUnload::run($data);
+            } else {
+                return CreateFullyUnload::run($data);
+            }
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to unload container: '.$e->getMessage());
+        }
+    }
+
+    public function reloadContainer(array $data)
+    {
+        try {
+            return UndoUnloadContainer::run($data);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to delete draft unloaded: '.$e->getMessage());
+        }
     }
 }

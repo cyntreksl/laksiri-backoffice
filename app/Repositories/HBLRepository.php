@@ -23,6 +23,8 @@ use App\Interfaces\GridJsInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Models\Container;
 use App\Models\HBL;
+use App\Models\HBLPackage;
+use App\Models\Scopes\BranchScope;
 use Illuminate\Http\JsonResponse;
 
 class HBLRepository implements GridJsInterface, HBLRepositoryInterface
@@ -164,5 +166,16 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function restore($id)
     {
         return RestoreHBL::run($id);
+    }
+
+    public function getHBLByPackageId($package_id): JsonResponse
+    {
+        $hbl_package = HBLPackage::withoutGlobalScope(BranchScope::class)->where('id', $package_id)->first();
+
+        $hbl = $hbl_package->hbl()->withoutGlobalScope(BranchScope::class)->first();
+
+        return response()->json([
+            'data' => $hbl,
+        ]);
     }
 }

@@ -31,7 +31,9 @@ class HBL extends Model
         3.1 => 'HBL created - Job Converted to HBL',
         4.0 => 'Cash Collected',
         4.1 => 'Partial Loaded',
-        4.2 => 'Full Loaded',
+        4.2 => 'Fully Loaded',
+        4.3 => 'Partial Unloaded',
+        4.4 => 'Fully Unloaded',
     ];
 
     protected $fillable = [
