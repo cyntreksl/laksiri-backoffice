@@ -12,6 +12,4 @@ interface LoadedContainerRepositoryInterface
     public function deleteDraft(array $data);
 
     public function downloadManifestFile(Container $container): BinaryFileResponse;
-
-    public function getLoadedContainers();
 }

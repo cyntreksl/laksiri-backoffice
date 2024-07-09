@@ -20,7 +20,7 @@ interface HBLRepositoryInterface
 
     public function toggleHold(HBL $hbl);
 
-    public function getUnloadedHBLsByCargoType(string $cargoType);
+    public function getUnloadedHBLsByCargoType(array $data);
 
     public function getLoadedHBLsByCargoType(Container $container, string $cargoType);
 
@@ -35,4 +35,6 @@ interface HBLRepositoryInterface
     public function getCancelledList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse;
 
     public function restore($id);
+
+    public function getHBLByPackageId($package_id);
 }

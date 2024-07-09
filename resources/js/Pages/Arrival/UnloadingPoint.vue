@@ -2,20 +2,14 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {computed, reactive, ref, watch} from "vue";
 import draggable from 'vuedraggable'
-import ReviewModal from "@/Pages/Loading/Partials/ReviewModal.vue";
-import {router} from "@inertiajs/vue3";
 import ActionMessage from "@/Components/ActionMessage.vue";
-import RadioButton from "@/Components/RadioButton.vue";
+import {computed, ref, watch} from "vue";
+import {router} from "@inertiajs/vue3";
+import ReviewModal from "@/Pages/Arrival/Partials/ReviewModal.vue";
 
 const props = defineProps({
     container: {
-        type: Object,
-        default: () => {
-        }
-    },
-    loadedHBLs: {
         type: Object,
         default: () => {
         }
@@ -35,125 +29,28 @@ const props = defineProps({
 })
 
 const searchQuery = ref('');
-const unloadedHBLs = ref([]);
-const hblPackagesArr = ref([]);
-
-const params = route().params;
-
-const filters = reactive({
-    cargoMode: '',
-    hblType: '',
-    warehouse: '',
-});
-
-watch(
-    () => params.cargoType,
-    (newCargoType) => {
-        filters.cargoMode = newCargoType;
-    },
-    {immediate: true}
-);
-
-watch(
-    () => params.hblType,
-    (newHblType) => {
-        if (newHblType) {
-            filters.hblType = newHblType;
-            console.log('ho')
-        }
-    },
-    {immediate: true}
-);
-
-watch(
-    () => params.warehouse,
-    (newWarehouse) => {
-        if (newWarehouse) {
-            filters.warehouse = newWarehouse;
-        }
-    },
-    {immediate: true}
-);
-
-watch(() => filters.cargoMode,
-    (newCargoMode) => {
-        getUnloadedHBLs()
-    })
-
-watch(() => filters.hblType,
-    (newHblType) => {
-        getUnloadedHBLs()
-    })
-
-watch(() => filters.warehouse,
-    (newWarehouse) => {
-        getUnloadedHBLs()
-    })
-
-const getUnloadedHBLs = async () => {
-    const response = await fetch(`/hbls/get-unloaded-hbl/list?cargoType=${filters.cargoMode}&hblType=${filters.hblType}&warehouse=${filters.warehouse}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-        },
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        if (errorData.errors && errorData.errors.reference) {
-            throw new Error(errorData.errors.reference[0]);
-        } else {
-            throw new Error('Network response was not ok.');
-        }
-    } else {
-        const data = await response.json();
-        unloadedHBLs.value = data.data;
-    }
-}
-
-getUnloadedHBLs();
-
-watch(unloadedHBLs, (newVal) => {
-    hblPackagesArr.value = newVal.flatMap(hbl => hbl.packages);
-});
+const containerArr = ref(props.container.hbl_packages.filter(p => p.pivot?.status !== 'draft-unload'));
+const warehouseArr = ref(props.container.hbl_packages.filter(p => p.pivot?.status === 'draft-unload'));
 
 const filteredPackages = computed(() => {
     if (!searchQuery.value) {
-        return hblPackagesArr.value;
+        return containerArr.value;
     }
-    return hblPackagesArr.value.filter(packageData => {
-        const hbl = findHblByPackageId(packageData.id).hbl;
-        return hbl.toLowerCase().includes(searchQuery.value.toLowerCase());
+    return containerArr.value.filter(packageData => {
+        return packageData.hbl?.reference.toLowerCase().includes(searchQuery.value.toLowerCase());
     });
 })
 
-const containerArr = ref(props.loadedHBLs.flatMap(hbl => hbl.packages));
-
-const handleLoad = (index) => {
+const handleUnloadToWarehouse = (index) => {
     if (index !== -1) {
-        containerArr.value = [...containerArr.value, hblPackagesArr.value[index]];
-        hblPackagesArr.value = hblPackagesArr.value.filter((_, i) => i !== index);
-    }
-}
-
-const handleUnload = (index) => {
-    if (index !== -1) {
-        hblPackagesArr.value = [...hblPackagesArr.value, containerArr.value[index]];
+        warehouseArr.value = [...warehouseArr.value, containerArr.value[index]];
         containerArr.value = containerArr.value.filter((_, i) => i !== index);
     }
 }
-
-// find HBL by packageId
-const findHblByPackageId = (packageId) => {
-    // First, check if the package ID exists in any of the unloaded HBLs
-    const packageExists = unloadedHBLs.value.some(hbl => hbl.packages.some(p => p.id === packageId));
-
-    // If the package ID exists, find and return the corresponding HBL
-    if (packageExists) {
-        return unloadedHBLs.value.find(hbl => hbl.packages.some(p => p.id === packageId));
-    } else {
-        return props.loadedHBLs.find(hbl => hbl.packages.some(p => p.id === packageId));
+const handleReLoadToContainer = (index) => {
+    if (index !== -1) {
+        containerArr.value = [...containerArr.value, warehouseArr.value[index]];
+        warehouseArr.value = warehouseArr.value.filter((_, i) => i !== index);
     }
 }
 
@@ -161,15 +58,14 @@ const showReviewModal = ref(false);
 
 const handlePackageChange = () => {
     containerArr.value = [...containerArr.value];
-    hblPackagesArr.value = [...hblPackagesArr.value];
+    warehouseArr.value = [...warehouseArr.value];
 }
 
 const draftTextEnabled = ref(false);
 
-const handleCreateDraftLoadedContainer = (packages) => {
-    router.post(route("loading.loaded-containers.store"), {
+const handleCreateDraftUnload = (packages) => {
+    router.post(route("arrival.unload-container.unload"), {
             container_id: route().params.container,
-            cargo_type: route().params.cargoType,
             packages,
             is_draft: true,
         },
@@ -186,8 +82,8 @@ const handleCreateDraftLoadedContainer = (packages) => {
         });
 }
 
-const handleRemoveDraftLoadedContainer = (packages) => {
-    router.post(route("loading.loaded-containers.remove"), {
+const handleRemoveDraftUnload = (packages) => {
+    router.post(route("arrival.unload-container.reload"), {
             container_id: route().params.container,
             package_id: packages[0].id,
         },
@@ -205,29 +101,29 @@ const handleRemoveDraftLoadedContainer = (packages) => {
 }
 
 // Watch for changes in the container array
-watch(containerArr, (newValue, oldValue) => {
+watch(warehouseArr, (newValue, oldValue) => {
     const added = newValue.filter(item => !oldValue.includes(item));
     const removed = oldValue.filter(item => !newValue.includes(item));
 
     if (added.length > 0) {
-        handleCreateDraftLoadedContainer(added);
+        handleCreateDraftUnload(added);
     }
     if (removed.length > 0) {
-        handleRemoveDraftLoadedContainer(removed);
+        handleRemoveDraftUnload(removed);
     }
 });
 </script>
 
 <template>
-    <AppLayout title="Loading Points">
-        <template #header>Loading Points</template>
+    <AppLayout title="Unloading Point">
+        <template #header>Unloading Point</template>
 
         <main class="kanban-app w-full">
             <div
                 class="flex items-center justify-between space-x-2 px-[var(--margin-x)] py-5 transition-all duration-[.25s]">
                 <div class="flex items-center space-x-1">
                     <h3 class="text-lg font-medium text-slate-700 line-clamp-1 dark:text-navy-50">
-                        Loading Point
+                        Unloading Point
                     </h3>
                 </div>
                 <div class="flex space-x-5 items-center">
@@ -245,13 +141,13 @@ watch(containerArr, (newValue, oldValue) => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <PrimaryButton :disabled="containerArr.length === 0" @click.prevent="showReviewModal = true">
+                    <PrimaryButton :disabled="warehouseArr.length === 0" @click.prevent="showReviewModal = true">
                         Proceed to Review
                     </PrimaryButton>
                 </div>
             </div>
 
-            <div class="px-[var(--margin-x)]">
+            <div class="px-[var(--margin-x)] mb-3">
                 <label class="relative hidden w-full max-w-[16rem] sm:flex">
                     <input
                         v-model="searchQuery"
@@ -268,108 +164,50 @@ watch(containerArr, (newValue, oldValue) => {
                 </label>
             </div>
 
-            <div class="flex flex-wrap space-x-10 items-center p-4 my-4 rounded bg-white border border-indigo-400 mx-[var(--margin-x)]">
-                <div class="flex space-x-4 bg-green-100 p-5 rounded-lg">
-                    <label
-                        v-for="cargoType in cargoTypes"
-                        :key="cargoType"
-                        class="flex space-x-2 items-center"
-                    >
-                        <RadioButton
-                            v-model="filters.cargoMode"
-                            :label="cargoType"
-                            name="cargoType"
-                            :value="cargoType"
-                        />
-                        <svg
-                            v-if="cargoType === 'Air Cargo'"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-plane"
-                            fill="none"
-                            height="15"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            width="15"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                            <path
-                                d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z"/>
-                        </svg>
-                        <svg
-                            v-else
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
-                            fill="none"
-                            height="15"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            width="15"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                            <path
-                                d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1"/>
-                            <path d="M4 18l-1 -5h18l-2 4"/>
-                            <path d="M5 13v-6h8l4 6"/>
-                            <path d="M7 7v-4h-1"/>
-                        </svg>
-                    </label>
-                </div>
-                <div class="flex space-x-4 bg-blue-100 p-5 rounded-lg">
-                    <label
-                        v-for="hblType in hblTypes"
-                        :key="hblType"
-                        class="flex space-x-2 items-center"
-                    >
-                        <RadioButton
-                            v-model="filters.hblType"
-                            :label="hblType"
-                            :value="hblType"
-                            name="hblType"
-                        />
-                    </label>
-                </div>
-                <div class="flex space-x-4 bg-amber-100 p-5 rounded-lg">
-                    <label
-                        v-for="warehouse in warehouses"
-                        :key="warehouse"
-                        class="flex space-x-2 items-center"
-                    >
-                        <RadioButton
-                            v-model="filters.warehouse"
-                            :label="warehouse"
-                            :value="warehouse"
-                            name="warehouse"
-                        />
-                    </label>
-                </div>
-            </div>
-
             <div class="flex h-[calc(100vh-8.5rem)] flex-grow flex-col">
                 <div
                     class="kanban-scrollbar grid grid-cols-1 sm:grid-cols-2 space-x-4 overflow-x-auto overflow-y-auto px-[var(--margin-x)] transition-all duration-[.25s]">
                     <div class="relative flex max-h-full shrink-0 flex-col">
                         <div class="board-draggable-handler flex items-center justify-between px-0.5 pb-3">
                             <div class="flex items-center space-x-2">
-                                <div class="flex size-8 items-center justify-center rounded-lg bg-info/10 text-info">
-                                    <i class="fa fa-boxes-packing text-base"></i>
+                                <div
+                                    class="flex size-8 items-center justify-center rounded-lg bg-warning/10 text-warning">
+                                    <svg
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-tir"
+                                        fill="none"
+                                        height="24"
+                                        stroke="currentColor"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        viewBox="0 0 24 24"
+                                        width="24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                                        <path d="M5 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                        <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                        <path d="M7 18h8m4 0h2v-6a5 7 0 0 0 -5 -7h-1l1.5 7h4.5" />
+                                        <path d="M12 18v-13h3" />
+                                        <path d="M3 17l0 -5l9 0" />
+                                    </svg>
                                 </div>
                                 <h3 class="text-base text-slate-700 dark:text-navy-100">
-                                    HBL Packages
+                                    {{ container.cargo_type }} Container ({{ container?.reference }})
+                                </h3>
+                            </div>
+                            <div>
+                                <h3 class="text-base text-slate-700 dark:text-navy-100">
+                                    {{ container.container_type }}
                                 </h3>
                             </div>
                         </div>
                         <div>
                             <draggable v-if="Object.keys(filteredPackages).length > 0" v-model="filteredPackages"
-                                       @change="handlePackageChange"
                                        class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
                                        group="people"
-                                       item-key="id">
+                                       item-key="id"
+                                       @change="handlePackageChange">
                                 <template #item="{element, index}">
                                     <div class="card cursor-pointer shadow-sm">
                                         <div class="flex justify-between items-center">
@@ -377,7 +215,7 @@ watch(containerArr, (newValue, oldValue) => {
                                                 <div>
                                                     <div class="flex justify-between">
                                                         <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                            {{ findHblByPackageId(element.id).hbl }}
+                                                            {{element.hbl?.reference}}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -460,9 +298,9 @@ watch(containerArr, (newValue, oldValue) => {
                                                     fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                                     width="24"
-                                                    x-tooltip.placement.top.success="'Click to Load'"
+                                                    x-tooltip.placement.top.success="'Click to Unload'"
                                                     xmlns="http://www.w3.org/2000/svg"
-                                                    @click.prevent="handleLoad(index)">
+                                                    @click.prevent="handleUnloadToWarehouse(index)">
                                                     <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                                     <path d="M4 18v-6a3 3 0 0 1 3 -3h7"/>
                                                     <path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4"/>
@@ -495,26 +333,37 @@ watch(containerArr, (newValue, oldValue) => {
                         <div class="board-draggable-handler flex items-center justify-between px-0.5 pb-3">
                             <div class="flex items-center space-x-2">
                                 <div
-                                    class="flex size-8 items-center justify-center rounded-lg bg-warning/10 text-warning">
-                                    <i class="fa fa-boxes-alt text-base"></i>
+                                    class="flex size-8 items-center justify-center rounded-lg bg-success/10 text-success">
+                                    <svg
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-building-warehouse"
+                                        fill="none"
+                                        height="24"
+                                        stroke="currentColor"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        viewBox="0 0 24 24"
+                                        width="24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                                        <path d="M3 21v-13l9 -4l9 4v13" />
+                                        <path d="M13 13h4v8h-10v-6h6" />
+                                        <path d="M13 21v-9a1 1 0 0 0 -1 -1h-2a1 1 0 0 0 -1 1v3" />
+                                    </svg>
                                 </div>
                                 <h3 class="text-base text-slate-700 dark:text-navy-100">
-                                    {{ container.cargo_type }} Container ({{ container?.reference }})
-                                </h3>
-                            </div>
-                            <div>
-                                <h3 class="text-base text-slate-700 dark:text-navy-100">
-                                    {{ container.container_type }}
+                                    Warehouse
                                 </h3>
                             </div>
                         </div>
                         <div class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5">
                             <draggable
-                                v-if="containerArr.length > 0"
-                                v-model="containerArr" @change="handlePackageChange"
-                                class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
+                                v-if="warehouseArr.length > 0"
+                                v-model="warehouseArr" class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
                                 group="people"
                                 item-key="id"
+                                @change="handlePackageChange"
                             >
                                 <template #item="{element, index}">
                                     <div class="card cursor-pointer shadow-sm">
@@ -523,7 +372,7 @@ watch(containerArr, (newValue, oldValue) => {
                                                 <div>
                                                     <div class="flex justify-between">
                                                         <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
-                                                            {{ findHblByPackageId(element.id).hbl }}
+                                                            {{element.hbl?.reference}}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -606,9 +455,9 @@ watch(containerArr, (newValue, oldValue) => {
                                                     fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                                     width="24"
-                                                    x-tooltip.placement.top.error="'Click to Unload'"
+                                                    x-tooltip.placement.top.error="'Click to Re-Load'"
                                                     xmlns="http://www.w3.org/2000/svg"
-                                                    @click.prevent="handleUnload(index)">
+                                                    @click.prevent="handleReLoadToContainer(index)">
                                                     <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                                     <path d="M19 18v-6a3 3 0 0 0 -3 -3h-7"/>
                                                     <path d="M13 13l-4 -4l4 -4m-5 8l-4 -4l4 -4"/>
@@ -618,17 +467,17 @@ watch(containerArr, (newValue, oldValue) => {
                                     </div>
                                 </template>
                             </draggable>
-                            <div v-if="containerArr.length === 0"
+                            <div v-if="warehouseArr.length === 0"
                                  class="cursor-pointer border-2 rounded-lg border-dashed">
                                 <div class="flex justify-center items-center space-x-3 px-2.5 pb-2 pt-1.5 h-24">
                                     <div class="text-center">
                                         <p
                                             class="font-medium text-lg tracking-wide text-slate-400 line-clamp-2 dark:text-navy-100">
-                                            {{ container.container_type }} Empty Container
+                                            Warehouse
                                         </p>
 
                                         <p class="mt-px text-xs text-slate-400 dark:text-navy-300">
-                                            Active to loading process
+                                            Active to unloading process
                                         </p>
                                     </div>
                                 </div>
@@ -638,7 +487,12 @@ watch(containerArr, (newValue, oldValue) => {
                 </div>
             </div>
         </main>
-        <ReviewModal :container-array="containerArr" :find-hbl-by-package-id="findHblByPackageId"
-                     :show="showReviewModal" @close="showReviewModal = false"/>
+
+        <ReviewModal :show="showReviewModal"
+                     :warehouse-array="warehouseArr" @close="showReviewModal = false"/>
     </AppLayout>
 </template>
+
+<style scoped>
+
+</style>

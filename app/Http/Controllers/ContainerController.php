@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Branch\GetBranches;
 use App\Actions\Container\GenerateContainerReferenceNumber;
+use App\Actions\Container\GetContainerWithoutGlobalScopesById;
 use App\Enum\CargoType;
+use App\Enum\ContainerStatus;
 use App\Enum\ContainerType;
+use App\Enum\HBLType;
+use App\Enum\WarehouseType;
 use App\Http\Requests\StoreContainerRequest;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
@@ -76,9 +81,16 @@ class ContainerController extends Controller
     {
         return Inertia::render('Loading/LoadingPoint', [
             'container' => $container,
-            'unloadedHBLs' => $this->HBLRepository->getUnloadedHBLsByCargoType($request->cargoType),
             'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
+            'cargoTypes' => CargoType::getCargoTypeOptions(),
+            'hblTypes' => HBLType::getHBLTypeOptions(),
+            'warehouses' => WarehouseType::getWarehouseOptions(),
         ]);
+    }
+
+    public function getUnloadedHBLs(Request $request)
+    {
+        return $this->HBLRepository->getUnloadedHBLsByCargoType($request->all());
     }
 
     public function unloadHBLFromContainer(Request $request, Container $container)
@@ -99,5 +111,36 @@ class ContainerController extends Controller
     public function deleteLoading(Container $container)
     {
         return $this->containerRepository->deleteLoading($container);
+    }
+
+    public function showShipmentArrivals()
+    {
+        return Inertia::render('Arrival/ShipmentsArrivalsList', [
+            'cargoTypes' => CargoType::cases(),
+            'containers' => $this->containerRepository->getLoadedContainers(),
+            'containerTypes' => ContainerType::cases(),
+            'containerStatus' => ContainerStatus::cases(),
+            'branches' => GetBranches::run(),
+        ]);
+    }
+
+    public function showUnloadingPoint($container_id)
+    {
+        return Inertia::render('Arrival/UnloadingPoint', [
+            'container' => GetContainerWithoutGlobalScopesById::run($container_id),
+            'cargoTypes' => CargoType::getCargoTypeOptions(),
+            'hblTypes' => HBLType::getHBLTypeOptions(),
+            'warehouses' => WarehouseType::getWarehouseOptions(),
+        ]);
+    }
+
+    public function unloadContainer(Request $request)
+    {
+        $this->containerRepository->unloadContainer($request->all());
+    }
+
+    public function reloadContainer(Request $request)
+    {
+        $this->containerRepository->reloadContainer($request->all());
     }
 }
