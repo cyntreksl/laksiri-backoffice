@@ -243,44 +243,44 @@ const createColumns = () => [
     sort: false,
     formatter: (_, row) => {
       return h("div", {}, [
-          h(
-              "a",
+        h(
+          "a",
+          {
+            className:
+              "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
+            onClick: () => confirmViewHBL(row.cells[0].data?.id),
+            "x-tooltip..placement.bottom.primary": "'View HBL'",
+          },
+          [
+            h(
+              "svg",
               {
-                  className:
-                      "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                  onClick: () => confirmViewHBL(row.cells[0].data?.id),
-                  "x-tooltip..placement.bottom.primary": "'View HBL'",
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
+                fill: "none",
+                height: 24,
+                width: 24,
+                stroke: "currentColor",
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
               },
               [
-                  h(
-                      "svg",
-                      {
-                          xmlns: "http://www.w3.org/2000/svg",
-                          viewBox: "0 0 24 24",
-                          class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                          fill: "none",
-                          height: 24,
-                          width: 24,
-                          stroke: "currentColor",
-                          strokeLinecap: "round",
-                          strokeLinejoin: "round",
-                      },
-                      [
-                          h("path", {
-                              d: "M0 0h24v24H0z",
-                              fill: "none",
-                              stroke: "none",
-                          }),
-                          h("path", {
-                              d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                          }),
-                          h("path", {
-                              d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                          }),
-                      ]
-                  ),
+                h("path", {
+                  d: "M0 0h24v24H0z",
+                  fill: "none",
+                  stroke: "none",
+                }),
+                h("path", {
+                  d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                }),
+                h("path", {
+                  d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                }),
               ]
-          ),
+            ),
+          ]
+        ),
         h(
           "button",
           {
@@ -616,34 +616,35 @@ const showConfirmViewHBLModal = ref(false);
 const hblRecord = ref({});
 
 const fetchHBL = async (id) => {
-    try {
-        const response = await fetch(`hbls/${id}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            },
-        });
+  try {
+    const response = await fetch(`hbls/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": document
+          .querySelector('meta[name="csrf-token"]')
+          .getAttribute("content"),
+      },
+    });
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-            hblRecord.value = data.hbl;
-        }
-
-    } catch (error) {
-        console.log(error);
+    if (!response.ok) {
+      throw new Error("Network response was not ok.");
+    } else {
+      const data = await response.json();
+      hblRecord.value = data.hbl;
     }
-}
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const confirmViewHBL = async (id) => {
-    await fetchHBL(id);
-    showConfirmViewHBLModal.value = true;
+  await fetchHBL(id);
+  showConfirmViewHBLModal.value = true;
 };
 
 const closeShowHBLModal = () => {
-    showConfirmViewHBLModal.value = false;
+  showConfirmViewHBLModal.value = false;
 };
 
 const planeIcon = ref(`
@@ -758,37 +759,40 @@ const shipIcon = ref(`
                 Cash Settlement List
               </h2>
             </div>
+            <br />
+            <div
+              class="mr-4 cursor-pointer"
+              x-tooltip.info.placement.bottom="'Applied Filters'"
+            >
+              Filter Options:
+            </div>
 
             <div
-              class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
+              class="grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
             >
-              <div
-                class="mr-4 cursor-pointer"
-                x-tooltip.info.placement.bottom="'Applied Filters'"
-              >
-                Filter Options:
-              </div>
               <div class="flex -space-x-px">
                 <div>
                   <div
-                    class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
+                    <i class="mr-1 fas fa-calendar-alt"></i>
                     From Date
                   </div>
                   <div
-                    class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    class="tag badge bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     {{ filters.fromDate }}
                   </div>
                 </div>
                 <div>
                   <div
-                    class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="ml-2 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
-                    To Date
+                    <i class="mr-1 far fa-calendar-alt"></i>
+                    To &nbsp;Date
                   </div>
                   <div
-                    class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    class="badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     {{ filters.toDate }}
                   </div>
@@ -821,61 +825,64 @@ const shipIcon = ref(`
             </div>
           </div>
 
-          <div class="flex space-x-2">
-            <ColumnVisibilityPopover>
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.address"
-                  @change="toggleColumnVisibility('address', $event)"
-                />
-                <span class="hover:cursor-pointer">Address</span>
-              </label>
+          <div class="mt-1 ml-1 grid sm:grid-cols-2 md:grid-cols-2">
+            <div class="flex ml-5">
+              <ColumnVisibilityPopover>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.address"
+                    @change="toggleColumnVisibility('address', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Address</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.cargo_type"
-                  @change="toggleColumnVisibility('cargo_type', $event)"
-                />
-                <span class="hover:cursor-pointer">Cargo Mode</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.cargo_type"
+                    @change="toggleColumnVisibility('cargo_type', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Cargo Mode</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.hbl_type"
-                  @change="toggleColumnVisibility('hbl_type', $event)"
-                />
-                <span class="hover:cursor-pointer">Delivery Type</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.hbl_type"
+                    @change="toggleColumnVisibility('hbl_type', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Delivery Type</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.officer"
-                  @change="toggleColumnVisibility('officer', $event)"
-                />
-                <span class="hover:cursor-pointer">Officer</span>
-              </label>
-            </ColumnVisibilityPopover>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.officer"
+                    @change="toggleColumnVisibility('officer', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Officer</span>
+                </label>
+              </ColumnVisibilityPopover>
 
-            <button
-              x-tooltip.placement.top="'Filter result'"
-              @click="showFilters = true"
-              class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-            >
-              <i class="fa-solid fa-filter"></i>
-            </button>
-
-            <button
-              @click="cashReceived"
-              :disabled="isDataEmpty"
-              class="btn font-medium text-white"
-              :class="{
-                'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90':
-                  !isDataEmpty,
-                'bg-gray-300 cursor-not-allowed': isDataEmpty,
-              }"
-            >
-              Cash Received
-            </button>
+              <button
+                x-tooltip.placement.top="'Filter result'"
+                @click="showFilters = true"
+                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              >
+                <i class="fa-solid fa-filter"></i>
+              </button>
+            </div>
+            <div>
+              <button
+                @click="cashReceived"
+                :disabled="isDataEmpty"
+                class="btn font-medium text-white"
+                :class="{
+                  'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90':
+                    !isDataEmpty,
+                  'bg-gray-300 cursor-not-allowed': isDataEmpty,
+                }"
+              >
+                Cash Received
+              </button>
+            </div>
           </div>
         </div>
         <div class="mt-3">
@@ -1008,10 +1015,10 @@ const shipIcon = ref(`
       @toggle-hold="toggleHold"
     />
 
-  <HBLDetailModal
+    <HBLDetailModal
       :hbl="hblRecord"
       :show="showConfirmViewHBLModal"
       @close="closeShowHBLModal"
-  />
+    />
   </AppLayout>
 </template>

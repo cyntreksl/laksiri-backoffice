@@ -524,6 +524,7 @@ const shipIcon = ref(`
                 Pending Pickups
               </h2>
             </div>
+            <br />
             <div
               class="mr-4 cursor-pointer"
               x-tooltip.info.placement.bottom="'Applied Filters'"
@@ -537,29 +538,31 @@ const shipIcon = ref(`
               <div class="flex space-x-px">
                 <div>
                   <div
-                    class="mb-1 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="mb-1 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
+                    <i class="mr-1 fas fa-calendar-alt"></i>
                     From Date
                   </div>
                   <div
-                    class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    class="tag badge bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     {{ filters.fromDate }}
                   </div>
                 </div>
                 <div>
                   <div
-                    class="mb-1 ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="mb-1 ml-1 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
-                    To Date
+                    <i class="mr-1 far fa-calendar-alt"></i>
+                    To &nbsp;Date
                   </div>
                   <div
-                    class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    class="tag badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     {{ filters.toDate }}
                   </div>
                 </div>
-                <div>
+                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
                   <div
                     v-for="(mode, index) in filters.cargoMode"
                     v-if="filters.cargoMode"
@@ -594,8 +597,8 @@ const shipIcon = ref(`
             </div>
           </div>
 
-          <div class="mt-1 ml-1 grid sm:grid-cols-2 md:grid-cols-2 item-center">
-            <div class="flex">
+          <div class="mt-1 ml-1 grid sm:grid-cols-2 md:grid-cols-2">
+            <div class="flex ml-5">
               <ColumnVisibilityPopover>
                 <label class="inline-flex items-center space-x-2">
                   <Checkbox

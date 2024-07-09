@@ -364,37 +364,40 @@ const resetFilter = () => {
                 Pickups Exceptions
               </h2>
             </div>
+            <br />
+            <div
+              class="mr-4 cursor-pointer"
+              x-tooltip.info.placement.bottom="'Applied Filters'"
+            >
+              Filter Options:
+            </div>
 
             <div
-              class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
+              class="grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
             >
-              <div
-                class="mr-4 cursor-pointer"
-                x-tooltip.info.placement.bottom="'Applied Filters'"
-              >
-                Filter Options:
-              </div>
-              <div class="flex -space-x-px">
+              <div class="flex space-x-px">
                 <div>
                   <div
-                    class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="badge mb-1 bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
+                    <i class="mr-1 fas fa-calendar-alt"></i>
                     From Date
                   </div>
                   <div
-                    class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    class="badge bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     {{ filters.fromDate }}
                   </div>
                 </div>
                 <div>
                   <div
-                    class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="ml-2 badge mb-1 bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
-                    To Date
+                    <i class="mr-1 far fa-calendar-alt"></i>
+                    To &nbsp;&nbsp;Date
                   </div>
                   <div
-                    class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    class="badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     {{ filters.toDate }}
                   </div>
@@ -423,137 +426,153 @@ const resetFilter = () => {
             </div>
           </div>
 
-          <div class="flex space-x-2">
-            <ColumnVisibilityPopover>
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.reference"
-                  @change="toggleColumnVisibility('reference', $event)"
-                />
-                <span class="hover:cursor-pointer">Reference</span>
-              </label>
+          <div
+            class="mt-1 ml-1 grid sm:grid-cols-1 md:grid-cols-1 justify-items-end"
+          >
+            <div class="flex">
+              <ColumnVisibilityPopover>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.reference"
+                    @change="toggleColumnVisibility('reference', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Reference</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.name"
-                  @change="toggleColumnVisibility('name', $event)"
-                />
-                <span class="hover:cursor-pointer">Name</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.name"
+                    @change="toggleColumnVisibility('name', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Name</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.zone"
-                  @change="toggleColumnVisibility('zone', $event)"
-                />
-                <span class="hover:cursor-pointer">Zone</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.zone"
+                    @change="toggleColumnVisibility('zone', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Zone</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.picker_note"
-                  @change="toggleColumnVisibility('picker_note', $event)"
-                />
-                <span class="hover:cursor-pointer">Pickup Note</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.picker_note"
+                    @change="toggleColumnVisibility('picker_note', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Pickup Note</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.address"
-                  @change="toggleColumnVisibility('address', $event)"
-                />
-                <span class="hover:cursor-pointer">Address</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.address"
+                    @change="toggleColumnVisibility('address', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Address</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.pickup_date"
-                  @change="toggleColumnVisibility('pickup_date', $event)"
-                />
-                <span class="hover:cursor-pointer">Pickup Date</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.pickup_date"
+                    @change="toggleColumnVisibility('pickup_date', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Pickup Date</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.created_date"
-                  @change="toggleColumnVisibility('created_date', $event)"
-                />
-                <span class="hover:cursor-pointer">Created Date</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.created_date"
+                    @change="toggleColumnVisibility('created_date', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Created Date</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.driver"
-                  @change="toggleColumnVisibility('driver', $event)"
-                />
-                <span class="hover:cursor-pointer">Driver</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.driver"
+                    @change="toggleColumnVisibility('driver', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Driver</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.auth"
-                  @change="toggleColumnVisibility('auth', $event)"
-                />
-                <span class="hover:cursor-pointer">Auth</span>
-              </label>
-            </ColumnVisibilityPopover>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.auth"
+                    @change="toggleColumnVisibility('auth', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Auth</span>
+                </label>
+              </ColumnVisibilityPopover>
 
-            <button
-              class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.top="'Filters'"
-              @click="showFilters = true"
-            >
-              <i class="fa-solid fa-filter"></i>
-            </button>
-
-            <PrimaryButton :disabled="isDataEmpty" @click="confirmAssignDriver">
-              <svg
-                class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
-                fill="none"
-                height="18"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="18"
-                xmlns="http://www.w3.org/2000/svg"
+              <button
+                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                x-tooltip.placement.top="'Filters'"
+                @click="showFilters = true"
               >
-                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
-                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                <path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                <path d="M12 14l0 7" />
-                <path d="M10 12l-6.75 -2" />
-                <path d="M14 12l6.75 -2" />
-              </svg>
-              Assign Driver ({{ countOfSelectedData }})
-            </PrimaryButton>
+                <i class="fa-solid fa-filter"></i>
+              </button>
 
-            <DangerButton
-              :disabled="isDataEmpty"
-              @click="confirmDeleteExceptions"
-            >
-              <svg
-                class="icon icon-tabler icons-tabler-outline icon-tabler-trash mr-1"
-                fill="none"
-                height="18"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="18"
-                xmlns="http://www.w3.org/2000/svg"
+              <div
+                class="mt-1 ml-1 grid sm:grid-cols-2 md:grid-cols-2 gap-1 item-center"
               >
-                <path d="M0 0h24v24H0z" fill="none" stroke="none" />
-                <path d="M4 7l16 0" />
-                <path d="M10 11l0 6" />
-                <path d="M14 11l0 6" />
-                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-              </svg>
-              Delete ({{ countOfSelectedData }})
-            </DangerButton>
+                <div class="flex">
+                  <PrimaryButton
+                    :disabled="isDataEmpty"
+                    @click="confirmAssignDriver"
+                  >
+                    <svg
+                      class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
+                      fill="none"
+                      height="18"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="18"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                      <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                      <path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                      <path d="M12 14l0 7" />
+                      <path d="M10 12l-6.75 -2" />
+                      <path d="M14 12l6.75 -2" />
+                    </svg>
+                    Assign Driver ({{ countOfSelectedData }})
+                  </PrimaryButton>
+                </div>
+                <div>
+                  <DangerButton
+                    :disabled="isDataEmpty"
+                    @click="confirmDeleteExceptions"
+                  >
+                    <svg
+                      class="icon icon-tabler icons-tabler-outline icon-tabler-trash mr-1"
+                      fill="none"
+                      height="18"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="18"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                      <path d="M4 7l16 0" />
+                      <path d="M10 11l0 6" />
+                      <path d="M14 11l0 6" />
+                      <path
+                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"
+                      />
+                      <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                    </svg>
+                    Delete <br />({{ countOfSelectedData }})
+                  </DangerButton>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -625,18 +644,17 @@ const resetFilter = () => {
             {{ zone.name }}
           </option>
         </select>
-        <div class="flex">
-          <!--Filter Now Action Button-->
-          <SoftPrimaryButton class="space-x-2" @click="applyFilters">
-            <i class="fa-solid fa-filter"></i>
-            <span>Apply Filters</span>
-          </SoftPrimaryButton>
-          <!--Filter Rest Button-->
-          <SoftPrimaryButton class="space-x-2" @click="resetFilter">
-            <i class="fa-solid fa-refresh"></i>
-            <span>Reset Filters</span>
-          </SoftPrimaryButton>
-        </div>
+
+        <!--Filter Now Action Button-->
+        <SoftPrimaryButton class="space-x-2" @click="applyFilters">
+          <i class="fa-solid fa-filter"></i>
+          <span>Apply Filters</span>
+        </SoftPrimaryButton>
+        <!--Filter Rest Button-->
+        <SoftPrimaryButton class="space-x-2" @click="resetFilter">
+          <i class="fa-solid fa-refresh"></i>
+          <span>Reset Filters</span>
+        </SoftPrimaryButton>
       </template>
     </FilterDrawer>
 
