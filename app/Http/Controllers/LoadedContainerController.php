@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enum\CargoType;
 use App\Enum\ContainerStatus;
 use App\Enum\ContainerType;
+use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
 use App\Models\LoadedContainer;
@@ -15,6 +16,7 @@ class LoadedContainerController extends Controller
 {
     public function __construct(
         private readonly LoadedContainerRepositoryInterface $loadedContainerRepository,
+        private readonly ContainerRepositoryInterface $containerRepository,
     ) {
     }
 
@@ -25,7 +27,7 @@ class LoadedContainerController extends Controller
     {
         return Inertia::render('Loading/LoadedShipmentList', [
             'cargoTypes' => CargoType::cases(),
-            'containers' => $this->loadedContainerRepository->getLoadedContainers(),
+            'containers' => $this->containerRepository->getLoadedContainers(),
             'containerTypes' => ContainerType::cases(),
             'containerStatus' => ContainerStatus::cases(),
         ]);
@@ -39,7 +41,7 @@ class LoadedContainerController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'etdStartDate', 'etdEndDate', 'cargoType', 'containerType', 'status']);
+        $filters = $request->only(['fromDate', 'toDate', 'etdStartDate', 'etdEndDate', 'cargoType', 'containerType', 'status', 'branch']);
 
         return $this->loadedContainerRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }

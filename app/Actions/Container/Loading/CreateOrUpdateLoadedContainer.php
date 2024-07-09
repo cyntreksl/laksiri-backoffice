@@ -54,6 +54,7 @@ class CreateOrUpdateLoadedContainer
             $data = [
                 'loading_ended_at' => now(),
                 'loading_ended_by' => auth()->id(),
+                'note' => $data['note'],
             ];
 
             UpdateContainer::run($container, $data);

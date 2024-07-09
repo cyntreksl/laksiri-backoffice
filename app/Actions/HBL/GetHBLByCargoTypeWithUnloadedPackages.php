@@ -9,10 +9,23 @@ class GetHBLByCargoTypeWithUnloadedPackages
 {
     use AsAction;
 
-    public function handle(string $cargoType)
+    public function handle(array $data)
     {
-        return HBL::where('cargo_type', $cargoType)
-            ->whereIn('system_status', [4, 4.1])
+        $query = HBL::query();
+
+        if (isset($data['cargoType'])) {
+            $query->where('cargo_type', $data['cargoType']);
+        }
+
+        if (isset($data['hblType'])) {
+            $query->where('hbl_type', $data['hblType']);
+        }
+
+        if (isset($data['warehouse'])) {
+            $query->where('warehouse', $data['warehouse']);
+        }
+
+        return $query->whereIn('system_status', [4, 4.1])
             ->latest()
             ->with(['packages' => function ($query) {
                 $query->where('is_loaded', false);

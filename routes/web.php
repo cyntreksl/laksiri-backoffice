@@ -86,6 +86,9 @@ Route::middleware([
 
     Route::get('hbls/download/barcode/{hbl}', [HBLController::class, 'downloadHBLBarcodePDF'])
         ->name('hbls.download.barcode');
+
+    Route::get('get-hbl/{package_id}', [HBLController::class, 'getHBLByPackageId']);
+
     // User
     Route::resource('users', UserController::class)
         ->except(['create', 'show']);
@@ -159,6 +162,8 @@ Route::middleware([
         Route::get('containers/hbl/batch-downloads/{container}', [ContainerController::class, 'batchDownloadPDF'])
             ->name('hbls.batch-downloads');
 
+        Route::get('hbls/get-unloaded-hbl/list', [ContainerController::class, 'getUnloadedHBLs']);
+
         // Loaded Container
         Route::resource('loaded-containers', LoadedContainerController::class)
             ->except(['create']);
@@ -189,9 +194,16 @@ Route::middleware([
     //Arrivals
     Route::name('arrival.')->group(function () {
         // Shipments Arrivals
-        Route::get('shipments-arrivals', function () {
-            return Inertia::render('Arrival/ShipmentsArrivalsList');
-        })->name('shipments-arrivals.index');
+        Route::get('shipments-arrivals', [ContainerController::class, 'showShipmentArrivals'])->name('shipments-arrivals.index');
+
+        Route::get('unloading-points/{container?}', [ContainerController::class, 'showUnloadingPoint'])
+            ->name('unloading-points.index');
+
+        Route::post('/unload-container/unload', [ContainerController::class, 'unloadContainer'])
+            ->name('unload-container.unload');
+
+        Route::post('/unload-container/reload', [ContainerController::class, 'reloadContainer'])
+            ->name('unload-container.reload');
 
         // Bonded Warehouse
         Route::get('bonded-warehouses', function () {

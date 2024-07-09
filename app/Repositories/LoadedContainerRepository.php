@@ -5,13 +5,13 @@ namespace App\Repositories;
 use App\Actions\Container\Loading\CreateDraftLoadedContainer;
 use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
-use App\Actions\Container\Loading\GetLoadedContainers;
 use App\Exports\LoadedContainerManifestExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
+use App\Models\Scopes\BranchScope;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -44,7 +44,11 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = Container::query()->loadedContainers();
+        if (request()->header('referer') === route('arrival.shipments-arrivals.index')) {
+            $query = Container::query()->loadedContainers()->withoutGlobalScope(BranchScope::class);
+        } else {
+            $query = Container::query()->loadedContainers();
+        }
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {
@@ -84,10 +88,5 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.xlsx';
 
         return Excel::download(new LoadedContainerManifestExport($container), $filename);
-    }
-
-    public function getLoadedContainers()
-    {
-        return GetLoadedContainers::run();
     }
 }
