@@ -29,6 +29,7 @@ class HBLPackage extends Model
         'volume',
         'weight',
         'is_loaded',
+        'is_unloaded',
         'remarks',
     ];
 

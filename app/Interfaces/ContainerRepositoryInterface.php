@@ -17,4 +17,8 @@ interface ContainerRepositoryInterface
     public function deleteLoading(Container $container);
 
     public function getLoadedContainers();
+
+    public function unloadContainer(array $data);
+
+    public function reloadContainer(array $data);
 }
