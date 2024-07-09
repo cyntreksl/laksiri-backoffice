@@ -210,6 +210,8 @@ Route::middleware([
         Route::get('bonded-warehouses', [BondedWarehouseController::class, 'index'])
             ->name('bonded-warehouses.index');
 
+        Route::get('bonded-warehouse-list', [BondedWarehouseController::class, 'list']);
+
         //Unloading Issues
         Route::get('unloading-issues', function () {
             return Inertia::render('Arrival/UnloadingIssueList');

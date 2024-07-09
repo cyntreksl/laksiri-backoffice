@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, reactive, ref} from "vue";
-import {Grid, h} from "gridjs";
+import {Grid, h, html} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
@@ -32,7 +32,7 @@ const toDate = moment(new Date()).format("YYYY-MM-DD");
 const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
-    hblType: Object.values(props.hblTypes),
+    deliveryType: Object.values(props.hblTypes),
 });
 
 const data = reactive({
@@ -50,7 +50,7 @@ const data = reactive({
     },
 });
 
-const baseUrl = ref("/loaded-container-list");
+const baseUrl = ref("/bonded-warehouse-list");
 
 const toggleColumnVisibility = (columnName) => {
     data.columnVisibility[columnName] = !data.columnVisibility[columnName];
@@ -118,8 +118,43 @@ const createColumns = () => [
     {name: "Name", hidden: !data.columnVisibility.hbl_name},
     {name: "Consignee Name", hidden: !data.columnVisibility.consignee_name},
     {name: "Created Date", hidden: !data.columnVisibility.created_at},
-    {name: "Weight", hidden: !data.columnVisibility.weight},
-    {name: "Volume", hidden: !data.columnVisibility.volume},
+    {
+        name: "Weight",
+        hidden: !data.columnVisibility.weight,
+        formatter: (_, row) => {
+            return html(`<div class="flex items-center">
+<svg class="icon icon-tabler icons-tabler-outline icon-tabler-weight text-info mr-2"
+                         fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                        <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                        <path
+                            d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
+                    </svg> ${row.cells[5].data}
+</div>`)
+        }
+    },
+    {
+        name: "Volume",
+        hidden: !data.columnVisibility.volume,
+        formatter: (_, row) => {
+            return html(`<div class="flex items-center">
+<svg class="icon icon-tabler icons-tabler-outline icon-tabler-scale text-info mr-2"
+                         fill="none"
+                         height="24" stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                        <path d="M7 20l10 0"/>
+                        <path d="M6 6l6 -1l6 1"/>
+                        <path d="M12 3l0 17"/>
+                        <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
+                        <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
+                    </svg> ${row.cells[6].data}
+</div>`)
+        }
+    },
     {name: "Quantity", hidden: !data.columnVisibility.quantity},
     {name: "Type", hidden: !data.columnVisibility.hbl_type},
     {
@@ -186,7 +221,7 @@ const createColumns = () => [
                                 xmlns: "http://www.w3.org/2000/svg",
                                 viewBox: "0 0 24 24",
                                 class:
-                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-wrecking-ball",
+                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-rosette-discount-check",
                                 fill: "none",
                                 stroke: "currentColor",
                                 strokeWidth: 2,
@@ -200,28 +235,10 @@ const createColumns = () => [
                                     fill: "none",
                                 }),
                                 h("path", {
-                                    d: "M19 13m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+                                    d: "M5 7.2a2.2 2.2 0 0 1 2.2 -2.2h1a2.2 2.2 0 0 0 1.55 -.64l.7 -.7a2.2 2.2 0 0 1 3.12 0l.7 .7c.412 .41 .97 .64 1.55 .64h1a2.2 2.2 0 0 1 2.2 2.2v1c0 .58 .23 1.138 .64 1.55l.7 .7a2.2 2.2 0 0 1 0 3.12l-.7 .7a2.2 2.2 0 0 0 -.64 1.55v1a2.2 2.2 0 0 1 -2.2 2.2h-1a2.2 2.2 0 0 0 -1.55 .64l-.7 .7a2.2 2.2 0 0 1 -3.12 0l-.7 -.7a2.2 2.2 0 0 0 -1.55 -.64h-1a2.2 2.2 0 0 1 -2.2 -2.2v-1a2.2 2.2 0 0 0 -.64 -1.55l-.7 -.7a2.2 2.2 0 0 1 0 -3.12l.7 -.7a2.2 2.2 0 0 0 .64 -1.55v-1",
                                 }),
                                 h("path", {
-                                    d: "M4 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M13 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M13 19l-9 0",
-                                }),
-                                h("path", {
-                                    d: "M4 15l9 0",
-                                }),
-                                h("path", {
-                                    d: "M8 12v-5h2a3 3 0 0 1 3 3v5",
-                                }),
-                                h("path", {
-                                    d: "M5 15v-2a1 1 0 0 1 1 -1h7",
-                                }),
-                                h("path", {
-                                    d: "M19 11v-7l-6 7",
+                                    d: "M9 12l2 2l4 -4",
                                 }),
                             ]
                         ),
@@ -231,7 +248,7 @@ const createColumns = () => [
                     "button",
                     {
                         className:
-                            "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25",
+                            "btn size-8 p-0 text-warning hover:bg-warning/20 focus:bg-warning/20 active:bg-warning/25",
                         onClick: () =>
                             router.visit(
                                 route("arrival.unloading-points.index", {
@@ -247,7 +264,7 @@ const createColumns = () => [
                                 xmlns: "http://www.w3.org/2000/svg",
                                 viewBox: "0 0 24 24",
                                 class:
-                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-wrecking-ball",
+                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-viewport-short",
                                 fill: "none",
                                 stroke: "currentColor",
                                 strokeWidth: 2,
@@ -261,28 +278,22 @@ const createColumns = () => [
                                     fill: "none",
                                 }),
                                 h("path", {
-                                    d: "M19 13m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+                                    d: "M12 3v7l3 -3",
                                 }),
                                 h("path", {
-                                    d: "M4 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+                                    d: "M9 7l3 3",
                                 }),
                                 h("path", {
-                                    d: "M13 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+                                    d: "M12 21v-7l3 3",
                                 }),
                                 h("path", {
-                                    d: "M13 19l-9 0",
+                                    d: "M9 17l3 -3",
                                 }),
                                 h("path", {
-                                    d: "M4 15l9 0",
+                                    d: "M18 9h1a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-1",
                                 }),
                                 h("path", {
-                                    d: "M8 12v-5h2a3 3 0 0 1 3 3v5",
-                                }),
-                                h("path", {
-                                    d: "M5 15v-2a1 1 0 0 1 1 -1h7",
-                                }),
-                                h("path", {
-                                    d: "M19 11v-7l-6 7",
+                                    d: "M6 9h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1",
                                 }),
                             ]
                         ),
@@ -351,7 +362,7 @@ const closeModal = () => {
 const resetFilter = () => {
     filters.fromDate = fromDate;
     filters.toDate = toDate;
-    filters.hblType = Object.values(props.hblTypes);
+    filters.deliveryType = Object.values(props.hblTypes);
     applyFilters();
 };
 </script>
@@ -482,7 +493,7 @@ const resetFilter = () => {
                     class="inline-flex items-center space-x-2 mt-2"
                 >
                     <Switch
-                        v-model="filters.hblType"
+                        v-model="filters.deliveryType"
                         :label="hblType"
                         :value="hblType"
                     />
