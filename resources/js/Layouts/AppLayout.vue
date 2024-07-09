@@ -586,34 +586,6 @@
                                                             <Link
                                                                 v-if="item.title === 'Shipments Arrivals'"
                                                                 :class="
-          <!-- Sidebar Panel Body -->
-          <div
-            class="h-[calc(100%-4.5rem)] overflow-x-hidden pb-6 simplebar-scrollable-y"
-            data-simplebar="init"
-          >
-            <div class="simplebar-wrapper" style="margin: 0px 0px -24px">
-              <div class="simplebar-height-auto-observer-wrapper">
-                <div class="simplebar-height-auto-observer"></div>
-              </div>
-              <div class="simplebar-mask">
-                <div class="simplebar-offset" style="right: 0px; bottom: 0px">
-                  <div
-                    class="simplebar-content-wrapper"
-                    aria-label="scrollable content"
-                    role="region"
-                    tabindex="0"
-                    style="height: 100%; overflow: hidden scroll"
-                  >
-                    <div
-                      class="simplebar-content"
-                      style="padding: 1px 1px 24px"
-                    >
-                      <ul class="flex flex-1 flex-col px-4 font-inter">
-                        <li v-for="item in childMenuList">
-                          <Link
-                            @click="getTitle(item.title)"
-                            :href="route(item.route)"
-                            :class="
                               route().current() === item.route
                                 ? 'font-medium text-primary dark:text-accent-light'
                                 : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50   dark:hover:bg-neutral-500'
@@ -934,8 +906,7 @@ export default {
 
         const childMenuList = reactive([]);
 
-    const activeTitle = ref("");
-    const activePageTitle = ref("");
+        const activeTitle = ref("");
 
         const changeSidePanelTitle = (title) => {
             activeTitle.value = title;
@@ -1127,205 +1098,6 @@ export default {
             }
             activeMenu.value = menu;
         };
-    const getTitle = (title) => {
-      activePageTitle.value = title;
-    };
-
-    const changeDarkModeMainTag = () => {
-      switch (activePageTitle.value) {
-        case "Cancelled HBL":
-          return true;
-        default:
-          return false;
-      }
-    };
-
-    const setMenu = (menu) => {
-      switch (menu) {
-        case "dashboard":
-          childMenuList.splice(0, childMenuList.length, {
-            title: "Dashboard",
-            route: "dashboard",
-          });
-          changeSidePanelTitle("Dashboard");
-          break;
-        case "pickups":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Create Job",
-              route: "pickups.create",
-            },
-            {
-              title: "Pending Jobs",
-              route: "pickups.index",
-            },
-            {
-              title: "Pickup Ordering",
-              route: "pickups.ordering",
-            },
-            {
-              title: "Pickup Exceptions",
-              route: "pickups.exceptions",
-            }
-          );
-          changeSidePanelTitle("Pickups");
-          break;
-        case "hbls":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Create HBL",
-              route: "hbls.create",
-            },
-            {
-              title: "All HBL",
-              route: "hbls.index",
-            },
-            {
-              title: "Cancelled HBL",
-              route: "hbls.cancelled-hbls",
-            }
-          );
-          changeSidePanelTitle("HBL");
-          break;
-        case "back-office":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Cash Settlements",
-              route: "back-office.cash-settlements.index",
-            },
-            {
-              title: "Warehouse",
-              route: "back-office.warehouses.index",
-            }
-          );
-          changeSidePanelTitle("Back Office");
-          break;
-        case "loading":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Containers",
-              route: "loading.loading-containers.index",
-            },
-            {
-              title: "Manual Loading",
-              route: "loading.manual-loadings.index",
-            },
-            {
-              title: "Loaded Shipment",
-              route: "loading.loaded-containers.index",
-            }
-          );
-          changeSidePanelTitle("Loading");
-          break;
-        case "arrival":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Shipments Arrivals",
-              route: "arrival.shipments-arrivals.index",
-            },
-            {
-              title: "Bonded Warehouse",
-              route: "arrival.bonded-warehouses.index",
-            },
-            {
-              title: "Unloading Issues",
-              route: "arrival.unloading-issues.index",
-            }
-          );
-          changeSidePanelTitle("Arrivals");
-          break;
-        case "delivery":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Delivery Warehouse",
-              route: "delivery.delivery-warehouses.index",
-            },
-            {
-              title: "Dispatch Point",
-              route: "delivery.dispatch-points.index",
-            },
-            {
-              title: "Dispatched Loads",
-              route: "delivery.dispatched-loads.index",
-            }
-          );
-          changeSidePanelTitle("Delivery");
-          break;
-        case "report":
-          childMenuList.splice(0, childMenuList.length, {
-            title: "Payment Summery",
-            route: "report.payment-summaries.index",
-          });
-          changeSidePanelTitle("Report");
-          break;
-        case "users":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "System Users",
-              route: "users.index",
-            },
-            {
-              title: "Drivers",
-              route: "users.drivers.index",
-            },
-            {
-              title: "Driver Tracking",
-              route: "users.driver-tracings.index",
-            },
-            {
-              title: "Roles & Permissions",
-              route: "users.roles.index",
-            }
-          );
-          changeSidePanelTitle("Users");
-          break;
-        case "setting":
-          childMenuList.splice(
-            0,
-            childMenuList.length,
-            {
-              title: "Driver Zones",
-              route: "setting.driver-zones.index",
-            },
-            {
-              title: "Driver Areas",
-              route: "setting.driver-areas.index",
-            },
-            {
-              title: "Warehouse Zones",
-              route: "setting.warehouse-zones.index",
-            },
-            {
-              title: "Pricing",
-              route: "setting.prices.index",
-            }
-          );
-          changeSidePanelTitle("Setting");
-          break;
-        case "settings":
-          childMenuList.splice(0, childMenuList.length, {
-            title: "Zones",
-            route: "settings.zones.index",
-          });
-          changeSidePanelTitle("Settings");
-          break;
-      }
-      activeMenu.value = menu;
-    };
 
         setMenu(mainRoute);
         const page = usePage();
@@ -1365,30 +1137,27 @@ export default {
                 });
         };
 
-    return {
-      toggleSideBar,
-      toggleDarkMode,
-      toggleProfileBar,
-      toggleMonochromeMode,
-      isDarkMode,
-      logout,
-      logo,
-      setMenu,
-      childMenuList,
-      activeMenu,
-      userBranches,
-      setBranch,
-      showBranchPopper,
-      isSidebarExpanded,
-      openSideBar,
-      closeSideBar,
-      activeTitle,
-      changeSidePanelTitle,
-      changeDarkModeMainTag,
-      activePageTitle,
-      getTitle,
-    };
-  },
+        return {
+            toggleSideBar,
+            toggleDarkMode,
+            toggleProfileBar,
+            toggleMonochromeMode,
+            isDarkMode,
+            logout,
+            logo,
+            setMenu,
+            childMenuList,
+            activeMenu,
+            userBranches,
+            setBranch,
+            showBranchPopper,
+            isSidebarExpanded,
+            openSideBar,
+            closeSideBar,
+            activeTitle,
+            changeSidePanelTitle,
+        };
+    },
 };
 </script>
 
