@@ -28,6 +28,7 @@ class BondedWarehouseCollection extends JsonResource
             'volume' => $totalVolume,
             'quantity' => $totalQuantity,
             'hbl_type' => $this->hbl_type ?? '-',
+            'is_short_load' => $this->is_short_loading,
         ];
     }
 }

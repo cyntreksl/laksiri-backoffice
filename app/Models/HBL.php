@@ -37,7 +37,7 @@ class HBL extends Model
     ];
 
     protected $fillable = [
-        'reference', 'warehouse_zone_id', 'cargo_type', 'hbl_type', 'hbl', 'hbl_name', 'email', 'contact_number', 'nic', 'iq_number', 'address', 'consignee_name', 'consignee_nic', 'consignee_contact', 'consignee_address', 'consignee_note', 'warehouse', 'freight_charge', 'bill_charge', 'other_charge', 'discount', 'paid_amount', 'grand_total', 'status', 'created_by', 'branch_id', 'system_status', 'pickup_id', 'is_hold',
+        'reference', 'warehouse_zone_id', 'cargo_type', 'hbl_type', 'hbl', 'hbl_name', 'email', 'contact_number', 'nic', 'iq_number', 'address', 'consignee_name', 'consignee_nic', 'consignee_contact', 'consignee_address', 'consignee_note', 'warehouse', 'freight_charge', 'bill_charge', 'other_charge', 'discount', 'paid_amount', 'grand_total', 'status', 'created_by', 'branch_id', 'system_status', 'pickup_id', 'is_hold', 'is_short_loading',
     ];
 
     public function scopeCashSettlement(Builder $query)

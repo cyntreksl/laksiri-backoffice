@@ -33,4 +33,9 @@ class BondedWarehouseController extends Controller
 
         return $this->bondedWarehouseRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
+
+    public function markAsShortLoading($hbl_id)
+    {
+        $this->bondedWarehouseRepository->markAsShortLoading($hbl_id);
+    }
 }

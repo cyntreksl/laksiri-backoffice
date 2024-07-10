@@ -212,6 +212,9 @@ Route::middleware([
 
         Route::get('bonded-warehouse-list', [BondedWarehouseController::class, 'list']);
 
+        Route::get('hbl/mark-as-short-loading/{hbl_id}', [BondedWarehouseController::class, 'markAsShortLoading'])
+            ->name('hbls.mark-as-short-loading');
+
         //Unloading Issues
         Route::get('unloading-issues', function () {
             return Inertia::render('Arrival/UnloadingIssueList');

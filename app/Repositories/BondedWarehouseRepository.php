@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Actions\HBL\MarkAsShortLoading;
 use App\Factory\BondedWarehouse\FilterFactory;
 use App\Http\Resources\BondedWarehouseCollection;
 use App\Interfaces\BondedWarehouseRepositoryInterface;
@@ -44,5 +45,13 @@ class BondedWarehouseRepository implements BondedWarehouseRepositoryInterface, G
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function markAsShortLoading($hbl_id)
+    {
+        $hbl = HBL::withoutGlobalScope(BranchScope::class)
+            ->find($hbl_id);
+
+        MarkAsShortLoading::run($hbl);
     }
 }
