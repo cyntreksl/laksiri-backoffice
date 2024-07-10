@@ -19,6 +19,7 @@ class GetContainerWithoutGlobalScopesById
                     'hbl' => function ($query) {
                         $query->withoutGlobalScopes([BranchScope::class]);
                     },
+                    'unloadingIssue',
                 ]);
             }])
             ->first();
