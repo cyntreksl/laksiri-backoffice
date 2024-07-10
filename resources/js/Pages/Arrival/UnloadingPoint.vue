@@ -117,7 +117,10 @@ watch(warehouseArr, (newValue, oldValue) => {
 
 const showUnloadingIssueModal = ref(false);
 
+const hblPackageId = ref(null);
+
 const confirmShowCreateIssueModal = (index) => {
+    hblPackageId.value = warehouseArr.value[index].id;
     showUnloadingIssueModal.value = true;
 }
 </script>
@@ -275,7 +278,7 @@ const confirmShowCreateIssueModal = (index) => {
                                                             <path
                                                                 d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                         </svg>
-                                                        <span>Weight {{ element.volume }}</span>
+                                                        <span>Weight {{ element.weight }}</span>
                                                     </div>
 
                                                     <div
@@ -379,7 +382,18 @@ const confirmShowCreateIssueModal = (index) => {
                                         <div class="flex justify-between items-center">
                                             <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
                                                 <div>
-                                                    <div class="flex justify-between">
+                                                    <div class="flex items-center">
+                                                        <svg v-show="element.unloading_issue" class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle text-warning mr-2" fill="none" height="24"
+                                                             stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                             stroke-width="2" viewBox="0 0 24 24" width="24"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                            <path d="M12 9v4"/>
+                                                            <path
+                                                                d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
+                                                            <path d="M12 16h.01"/>
+                                                        </svg>
+
                                                         <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
                                                             {{ element.hbl?.reference }}
                                                         </p>
@@ -433,7 +447,7 @@ const confirmShowCreateIssueModal = (index) => {
                                                             <path
                                                                 d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                         </svg>
-                                                        <span>Weight {{ element.volume }}</span>
+                                                        <span>Weight {{ element.weight }}</span>
                                                     </div>
 
                                                     <div
@@ -459,7 +473,7 @@ const confirmShowCreateIssueModal = (index) => {
                                                 </p>
                                             </div>
                                             <div class="flex items-center space-x-8 px-2.5">
-                                                <WarningButton @click.prevent="confirmShowCreateIssueModal(index)">
+                                                <WarningButton :disabled="element.unloading_issue" @click.prevent="confirmShowCreateIssueModal(index)">
                                                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle mr-2" fill="none" height="24"
                                                          stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                                          stroke-width="2" viewBox="0 0 24 24" width="24"
@@ -514,7 +528,7 @@ const confirmShowCreateIssueModal = (index) => {
         <ReviewModal :show="showReviewModal"
                      :warehouse-array="warehouseArr" @close="showReviewModal = false"/>
 
-        <CreateUnloadingIssueModal :show="showUnloadingIssueModal" @close="showUnloadingIssueModal = false"/>
+        <CreateUnloadingIssueModal :hbl-package-id="hblPackageId" :show="showUnloadingIssueModal" @close="showUnloadingIssueModal = false"/>
     </AppLayout>
 </template>
 

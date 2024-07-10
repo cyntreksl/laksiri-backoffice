@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ScopedBy(BranchScope::class)]
@@ -43,5 +44,10 @@ class HBLPackage extends Model
         return $this->belongsToMany(Container::class, 'container_hbl_package', 'hbl_package_id', 'container_id')
             ->withPivot('status', 'loaded_by')
             ->withTimestamps();
+    }
+
+    public function unloadingIssue(): HasOne
+    {
+        return $this->hasOne(UnloadingIssue::class, 'hbl_package_id', 'id');
     }
 }

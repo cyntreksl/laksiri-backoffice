@@ -206,6 +206,9 @@ Route::middleware([
         Route::post('/unload-container/reload', [ContainerController::class, 'reloadContainer'])
             ->name('unload-container.reload');
 
+        Route::post('/unloading-points/create/unloading-issue', [ContainerController::class, 'storeUnloadingIssue'])
+            ->name('unloading-points.create.unloading-issue');
+
         // Bonded Warehouse
         Route::get('bonded-warehouses', [BondedWarehouseController::class, 'index'])
             ->name('bonded-warehouses.index');
