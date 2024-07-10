@@ -14,6 +14,8 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import {router} from "@inertiajs/vue3";
+import ShortLoadingConfirmationModal from "@/Pages/Arrival/Partials/ShortLoadingConfirmationModal.vue";
+import {push} from "notivue";
 
 const props = defineProps({
     hblTypes: {
@@ -46,6 +48,7 @@ const data = reactive({
         volume: true,
         quantity: true,
         hbl_type: true,
+        is_short_load: true,
         actions: true,
     },
 });
@@ -158,6 +161,15 @@ const createColumns = () => [
     {name: "Quantity", hidden: !data.columnVisibility.quantity},
     {name: "Type", hidden: !data.columnVisibility.hbl_type},
     {
+        name: "Is Short Load",
+        hidden: !data.columnVisibility.is_short_load,
+        formatter: (_, row) => {
+            if (row.cells[9].data) {
+                return html('<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-circle-check text-error"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>')
+            }
+        }
+    },
+    {
         name: "Actions",
         sort: false,
         hidden: !data.columnVisibility.actions,
@@ -244,17 +256,13 @@ const createColumns = () => [
                         ),
                     ]
                 ),
+                row.cells[9].data === 1 ||
                 h(
                     "button",
                     {
                         className:
                             "btn size-8 p-0 text-warning hover:bg-warning/20 focus:bg-warning/20 active:bg-warning/25",
-                        onClick: () =>
-                            router.visit(
-                                route("arrival.unloading-points.index", {
-                                    container: row.cells[0].data,
-                                })
-                            ),
+                        onClick: () => confirmShortLoading(row.cells[0].data),
                         "x-tooltip..placement.bottom.success": "'Mark As Short Loading'",
                     },
                     [
@@ -365,6 +373,30 @@ const resetFilter = () => {
     filters.deliveryType = Object.values(props.hblTypes);
     applyFilters();
 };
+
+const showConfirmShortLoadingModal = ref(false);
+const hblId = ref(null);
+
+const confirmShortLoading = (id) => {
+    hblId.value = id;
+    showConfirmShortLoadingModal.value = true;
+};
+
+const closeShortLoadingModal = () => {
+    hblId.value = null;
+    showConfirmShortLoadingModal.value = false;
+};
+
+const handleMarkAsShortLoading = () => {
+    router.get(route("arrival.hbls.mark-as-short-loading", hblId.value), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeModal();
+            push.success("Mark As a Short Loaded");
+            router.visit(route("arrival.bonded-warehouses.index"));
+        },
+    });
+}
 </script>
 <template>
     <AppLayout title="Bonded Warehouse">
@@ -513,5 +545,7 @@ const resetFilter = () => {
                 </SoftPrimaryButton>
             </template>
         </FilterDrawer>
+
+        <ShortLoadingConfirmationModal :show="showConfirmShortLoadingModal" @close="closeShortLoadingModal" @short-loading="handleMarkAsShortLoading" />
     </AppLayout>
 </template>

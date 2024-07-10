@@ -143,4 +143,9 @@ class ContainerController extends Controller
     {
         $this->containerRepository->reloadContainer($request->all());
     }
+
+    public function storeUnloadingIssue(Request $request)
+    {
+        $this->containerRepository->createUnloadingIssue($request->all());
+    }
 }

@@ -7,6 +7,8 @@ import ActionMessage from "@/Components/ActionMessage.vue";
 import {computed, ref, watch} from "vue";
 import {router} from "@inertiajs/vue3";
 import ReviewModal from "@/Pages/Arrival/Partials/ReviewModal.vue";
+import WarningButton from "@/Components/WarningButton.vue";
+import CreateUnloadingIssueModal from "@/Pages/Arrival/Partials/CreateUnloadingIssueModal.vue";
 
 const props = defineProps({
     container: {
@@ -112,6 +114,15 @@ watch(warehouseArr, (newValue, oldValue) => {
         handleRemoveDraftUnload(removed);
     }
 });
+
+const showUnloadingIssueModal = ref(false);
+
+const hblPackageId = ref(null);
+
+const confirmShowCreateIssueModal = (index) => {
+    hblPackageId.value = warehouseArr.value[index].id;
+    showUnloadingIssueModal.value = true;
+}
 </script>
 
 <template>
@@ -184,12 +195,12 @@ watch(warehouseArr, (newValue, oldValue) => {
                                         width="24"
                                         xmlns="http://www.w3.org/2000/svg"
                                     >
-                                        <path d="M0 0h24v24H0z" fill="none" stroke="none" />
-                                        <path d="M5 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                        <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                        <path d="M7 18h8m4 0h2v-6a5 7 0 0 0 -5 -7h-1l1.5 7h4.5" />
-                                        <path d="M12 18v-13h3" />
-                                        <path d="M3 17l0 -5l9 0" />
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path d="M5 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                        <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                        <path d="M7 18h8m4 0h2v-6a5 7 0 0 0 -5 -7h-1l1.5 7h4.5"/>
+                                        <path d="M12 18v-13h3"/>
+                                        <path d="M3 17l0 -5l9 0"/>
                                     </svg>
                                 </div>
                                 <h3 class="text-base text-slate-700 dark:text-navy-100">
@@ -215,7 +226,7 @@ watch(warehouseArr, (newValue, oldValue) => {
                                                 <div>
                                                     <div class="flex justify-between">
                                                         <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                            {{element.hbl?.reference}}
+                                                            {{ element.hbl?.reference }}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -267,7 +278,7 @@ watch(warehouseArr, (newValue, oldValue) => {
                                                             <path
                                                                 d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                         </svg>
-                                                        <span>Weight {{ element.volume }}</span>
+                                                        <span>Weight {{ element.weight }}</span>
                                                     </div>
 
                                                     <div
@@ -346,10 +357,10 @@ watch(warehouseArr, (newValue, oldValue) => {
                                         width="24"
                                         xmlns="http://www.w3.org/2000/svg"
                                     >
-                                        <path d="M0 0h24v24H0z" fill="none" stroke="none" />
-                                        <path d="M3 21v-13l9 -4l9 4v13" />
-                                        <path d="M13 13h4v8h-10v-6h6" />
-                                        <path d="M13 21v-9a1 1 0 0 0 -1 -1h-2a1 1 0 0 0 -1 1v3" />
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path d="M3 21v-13l9 -4l9 4v13"/>
+                                        <path d="M13 13h4v8h-10v-6h6"/>
+                                        <path d="M13 21v-9a1 1 0 0 0 -1 -1h-2a1 1 0 0 0 -1 1v3"/>
                                     </svg>
                                 </div>
                                 <h3 class="text-base text-slate-700 dark:text-navy-100">
@@ -360,7 +371,8 @@ watch(warehouseArr, (newValue, oldValue) => {
                         <div class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5">
                             <draggable
                                 v-if="warehouseArr.length > 0"
-                                v-model="warehouseArr" class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
+                                v-model="warehouseArr"
+                                class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
                                 group="people"
                                 item-key="id"
                                 @change="handlePackageChange"
@@ -370,9 +382,20 @@ watch(warehouseArr, (newValue, oldValue) => {
                                         <div class="flex justify-between items-center">
                                             <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
                                                 <div>
-                                                    <div class="flex justify-between">
+                                                    <div class="flex items-center">
+                                                        <svg v-show="element.unloading_issue" class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle text-warning mr-2" fill="none" height="24"
+                                                             stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                             stroke-width="2" viewBox="0 0 24 24" width="24"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                            <path d="M12 9v4"/>
+                                                            <path
+                                                                d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
+                                                            <path d="M12 16h.01"/>
+                                                        </svg>
+
                                                         <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
-                                                            {{element.hbl?.reference}}
+                                                            {{ element.hbl?.reference }}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -424,7 +447,7 @@ watch(warehouseArr, (newValue, oldValue) => {
                                                             <path
                                                                 d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                         </svg>
-                                                        <span>Weight {{ element.volume }}</span>
+                                                        <span>Weight {{ element.weight }}</span>
                                                     </div>
 
                                                     <div
@@ -449,7 +472,21 @@ watch(warehouseArr, (newValue, oldValue) => {
                                                     {{ element.package_type }}
                                                 </p>
                                             </div>
-                                            <div class="px-2.5">
+                                            <div class="flex items-center space-x-8 px-2.5">
+                                                <WarningButton :disabled="element.unloading_issue" @click.prevent="confirmShowCreateIssueModal(index)">
+                                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle mr-2" fill="none" height="24"
+                                                         stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                         stroke-width="2" viewBox="0 0 24 24" width="24"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                        <path d="M12 9v4"/>
+                                                        <path
+                                                            d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
+                                                        <path d="M12 16h.01"/>
+                                                    </svg>
+
+                                                    Create Unloading Issue
+                                                </WarningButton>
                                                 <svg
                                                     class=" hover:text-error icon icon-tabler icons-tabler-outline icon-tabler-corner-up-left-double"
                                                     fill="none" height="24" stroke="currentColor" stroke-linecap="round"
@@ -490,6 +527,8 @@ watch(warehouseArr, (newValue, oldValue) => {
 
         <ReviewModal :show="showReviewModal"
                      :warehouse-array="warehouseArr" @close="showReviewModal = false"/>
+
+        <CreateUnloadingIssueModal :hbl-package-id="hblPackageId" :show="showUnloadingIssueModal" @close="showUnloadingIssueModal = false"/>
     </AppLayout>
 </template>
 

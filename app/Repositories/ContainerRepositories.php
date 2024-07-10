@@ -12,6 +12,7 @@ use App\Actions\Container\Unloading\UnloadHBL;
 use App\Actions\Container\Unloading\UnloadHBLPackages;
 use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
+use App\Actions\UnloadingIssue\CreateUnloadingIssue;
 use App\Enum\ContainerStatus;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
@@ -198,5 +199,10 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         } catch (\Exception $e) {
             throw new \Exception('Failed to delete draft unloaded: '.$e->getMessage());
         }
+    }
+
+    public function createUnloadingIssue(array $data): void
+    {
+        CreateUnloadingIssue::run($data);
     }
 }

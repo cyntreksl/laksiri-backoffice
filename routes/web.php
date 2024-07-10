@@ -206,11 +206,17 @@ Route::middleware([
         Route::post('/unload-container/reload', [ContainerController::class, 'reloadContainer'])
             ->name('unload-container.reload');
 
+        Route::post('/unloading-points/create/unloading-issue', [ContainerController::class, 'storeUnloadingIssue'])
+            ->name('unloading-points.create.unloading-issue');
+
         // Bonded Warehouse
         Route::get('bonded-warehouses', [BondedWarehouseController::class, 'index'])
             ->name('bonded-warehouses.index');
 
         Route::get('bonded-warehouse-list', [BondedWarehouseController::class, 'list']);
+
+        Route::get('hbl/mark-as-short-loading/{hbl_id}', [BondedWarehouseController::class, 'markAsShortLoading'])
+            ->name('hbls.mark-as-short-loading');
 
         //Unloading Issues
         Route::get('unloading-issues', function () {
