@@ -226,3 +226,10 @@ Breadcrumbs::for('arrival.shipments-arrivals.index', function (BreadcrumbTrail $
     $trail->push('Arrivals');
     $trail->push('Shipments Arrivals', route('arrival.shipments-arrivals.index'));
 });
+
+// Bonded Warehouse
+Breadcrumbs::for('arrival.bonded-warehouses.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Arrivals');
+    $trail->push('Bonded Warehouse', route('arrival.bonded-warehouses.index'));
+});

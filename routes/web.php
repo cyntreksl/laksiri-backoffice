@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BondedWarehouseController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CashSettlementController;
 use App\Http\Controllers\ContainerController;
@@ -206,9 +207,10 @@ Route::middleware([
             ->name('unload-container.reload');
 
         // Bonded Warehouse
-        Route::get('bonded-warehouses', function () {
-            return Inertia::render('Arrival/BondedWarehouseList');
-        })->name('bonded-warehouses.index');
+        Route::get('bonded-warehouses', [BondedWarehouseController::class, 'index'])
+            ->name('bonded-warehouses.index');
+
+        Route::get('bonded-warehouse-list', [BondedWarehouseController::class, 'list']);
 
         //Unloading Issues
         Route::get('unloading-issues', function () {

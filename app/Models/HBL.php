@@ -60,6 +60,13 @@ class HBL extends Model
         return $this->hasMany(HBLPackage::class, 'hbl_id', 'id');
     }
 
+    public function unloadedPackagesWithoutGlobalScope(): HasMany
+    {
+        return $this->hasMany(HBLPackage::class, 'hbl_id', 'id')
+            ->withoutGlobalScope(BranchScope::class)
+            ->where('is_unloaded', true);
+    }
+
     /**
      * Get the user who created this HBL.
      */
