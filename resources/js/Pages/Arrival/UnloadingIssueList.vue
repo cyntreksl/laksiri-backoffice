@@ -126,7 +126,7 @@ const createColumns = () => [
                         <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
                         <path
                             d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
-                    </svg> ${row.cells[5].data}
+                    </svg> ${row.cells[6].data}
 </div>`)
         }
     },
@@ -146,73 +146,63 @@ const createColumns = () => [
                         <path d="M12 3l0 17"/>
                         <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                         <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                    </svg> ${row.cells[6].data}
+                    </svg> ${row.cells[7].data}
 </div>`)
         }
     },
     {name: "Quantity", hidden: !data.columnVisibility.quantity},
-    {name: "Type", hidden: !data.columnVisibility.hbl_type},
-    {
-        name: "Is Short Load",
-        hidden: !data.columnVisibility.is_short_load,
-        formatter: (_, row) => {
-            if (row.cells[9].data) {
-                return html('<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-circle-check text-error"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>')
-            }
-        }
-    },
     {name: "Issue", hidden: !data.columnVisibility.issue},
     {name: "RTF", hidden: !data.columnVisibility.rtf},
     {name: "Damaged", hidden: !data.columnVisibility.is_damaged},
     {name: "Type", hidden: !data.columnVisibility.type},
     {name: "Fix", hidden: !data.columnVisibility.is_fixed},
-    {
-        name: "Actions",
-        sort: false,
-        hidden: !data.columnVisibility.actions,
-        formatter: (_, row) => {
-            return h("div", {}, [
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                        onClick: () => confirmViewLoadedShipment(row.cells[0].data),
-                        "x-tooltip..placement.bottom.primary": "'View'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: 2,
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
-            ]);
-        },
-    },
+    // {
+    //     name: "Actions",
+    //     sort: false,
+    //     hidden: !data.columnVisibility.actions,
+    //     formatter: (_, row) => {
+    //         return h("div", {}, [
+    //             h(
+    //                 "button",
+    //                 {
+    //                     className:
+    //                         "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+    //                     onClick: () => confirmViewLoadedShipment(row.cells[0].data),
+    //                     "x-tooltip..placement.bottom.primary": "'View'",
+    //                 },
+    //                 [
+    //                     h(
+    //                         "svg",
+    //                         {
+    //                             xmlns: "http://www.w3.org/2000/svg",
+    //                             viewBox: "0 0 24 24",
+    //                             class:
+    //                                 "size-6 icon icon-tabler icons-tabler-outline icon-tabler-eye",
+    //                             fill: "none",
+    //                             stroke: "currentColor",
+    //                             strokeWidth: 2,
+    //                             strokeLinecap: "round",
+    //                             strokeLinejoin: "round",
+    //                         },
+    //                         [
+    //                             h("path", {
+    //                                 stroke: "none",
+    //                                 d: "M0 0h24v24H0z",
+    //                                 fill: "none",
+    //                             }),
+    //                             h("path", {
+    //                                 d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+    //                             }),
+    //                             h("path", {
+    //                                 d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+    //                             }),
+    //                         ]
+    //                     ),
+    //                 ]
+    //             ),
+    //         ]);
+    //     },
+    // },
 ];
 
 const updateGridConfig = () => {

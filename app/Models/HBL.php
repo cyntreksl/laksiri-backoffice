@@ -89,4 +89,9 @@ class HBL extends Model
     {
         return $this->belongsTo(WarehouseZone::class, 'warehouse_zone_id');
     }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
 }
