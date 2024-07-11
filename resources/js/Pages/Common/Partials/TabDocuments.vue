@@ -1,7 +1,6 @@
 <script setup>
-import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import Tab from "@/Components/Tab.vue";
-import TextInput from "@/Components/TextInput.vue";
+import {useForm} from "@inertiajs/vue3";
 
 const props = defineProps({
     hbl: {
@@ -10,70 +9,61 @@ const props = defineProps({
         },
     }
 });
+
+const form = useForm({
+    hbl_id: props.hbl.id,
+    document_name: null,
+    document: null,
+})
+
+const handleFileUpload = () => {
+    form.post(route('hbls.upload.document'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            console.log('Done');
+        }
+    })
+}
 </script>
 
 <template>
     <Tab label="Documents" name="tabDocuments">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <div class="col-span-1 space-y-3">
-                <div class="filepond fp-bg-filled">
-                    <input multiple type="file" x-init="$el._x_filepond = FilePond.create($el)"/>
-                </div>
-                <div>
-                    <TextInput class="w-full" placeholder="Notes"/>
-                </div>
-                <div>
-                    <PrimaryOutlineButton>
-                        Upload
-                    </PrimaryOutlineButton>
-                </div>
-            </div>
+        <div class="grid grid-cols-1 gap-5">
             <div class="col-span-1 sm:col-span-2">
                 <h2 class="text-base font-medium tracking-wide text-slate-800 line-clamp-1 dark:text-navy-100">
-                    List of Uploaded Documents
+                    List of Documents
                 </h2>
                 <div class="is-scrollbar-hidden min-w-full overflow-x-auto mt-5">
                     <table class="is-hoverable w-full text-left">
-                        <thead>
-                        <tr>
-                            <th
-                                class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                HBL
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Document Name
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Uploaded Details
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Notes
-                            </th>
-                            <th
-                                class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Actions
-                            </th>
-                        </tr>
-                        </thead>
                         <tbody>
-                        <tr class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                        <tr>
                             <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
-                                -
+                                BL From Shipping Line
                             </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                -
+                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                <form @submit.prevent="handleFileUpload">
+                                    <input v-model="form.document_name" type="text" value="BL From Shipping Line">
+                                    <input type="file" @input="form.document = $event.target.files[0]" />
+<!--                                    <progress v-if="form.progress" :value="form.progress.percentage" max="100">-->
+<!--                                        {{ form.progress.percentage }}%-->
+<!--                                    </progress>-->
+                                    <button type="submit">Submit</button>
+                                </form>
                             </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                        </tr>
+                        <tr>
+                            <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
+                                Manifest
+                            </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">-</td>
+                        </tr>
+                        <tr>
+                            <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
+                                Receipt for Freight Charges
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                -
+                            </td>
                         </tr>
                         </tbody>
                     </table>

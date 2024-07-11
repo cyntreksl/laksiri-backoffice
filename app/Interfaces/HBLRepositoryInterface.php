@@ -37,4 +37,6 @@ interface HBLRepositoryInterface
     public function restore($id);
 
     public function getHBLByPackageId($package_id);
+
+    public function uploadDocument(array $data);
 }

@@ -161,4 +161,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->getHBLByPackageId($hbl_package_id);
     }
+
+    public function uploadDocument(Request $request)
+    {
+        return $this->HBLRepository->uploadDocument($request->all());
+    }
 }

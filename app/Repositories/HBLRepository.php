@@ -178,4 +178,9 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             'data' => $hbl,
         ]);
     }
+
+    public function uploadDocument(array $data)
+    {
+        // TODO: Implement uploadDocument() method.
+    }
 }
