@@ -23,6 +23,7 @@ use App\Interfaces\GridJsInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Models\Container;
 use App\Models\HBL;
+use App\Models\HBLDocument;
 use App\Models\HBLPackage;
 use App\Models\Scopes\BranchScope;
 use Illuminate\Http\JsonResponse;
@@ -181,6 +182,13 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function uploadDocument(array $data)
     {
-        // TODO: Implement uploadDocument() method.
+        if (isset($data['hbl_id'])) {
+            $hbl_document = new HBLDocument();
+            $hbl_document->hbl_id = $data['hbl_id'];
+            $hbl_document->uploaded_by = auth()->id();
+            $hbl_document->document_name = $data['document_name'];
+            $hbl_document->updateFile($data['document'], 'document', 'hbl/docs');
+            $hbl_document->save();
+        }
     }
 }
