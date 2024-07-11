@@ -166,4 +166,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->uploadDocument($request->all());
     }
+
+    public function getHBLDocuments(HBL $hbl)
+    {
+        return response()->json($hbl->hblDocuments);
+    }
 }

@@ -94,6 +94,8 @@ Route::middleware([
     Route::post('hbls/uploads/document', [HBLController::class, 'uploadDocument'])
         ->name('hbls.upload.document');
 
+    Route::get('hbls/get-hbl-documents/{hbl}', [HBLController::class, 'getHBLDocuments']);
+
     // User
     Route::resource('users', UserController::class)
         ->except(['create', 'show']);
