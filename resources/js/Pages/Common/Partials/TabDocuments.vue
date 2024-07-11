@@ -71,7 +71,8 @@ const handleFileUpload = () => {
     form.post(route('hbls.upload.document'), {
         preserveScroll: true,
         onSuccess: () => {
-            push.success('Document Uploaded!')
+            push.success('Document Uploaded!');
+            form.reset();
             fetchHBLDocuments();
         },
         onError: () => {
