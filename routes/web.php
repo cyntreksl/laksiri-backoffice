@@ -12,6 +12,7 @@ use App\Http\Controllers\PickupController;
 use App\Http\Controllers\PickupExceptionController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UnloadingIssueController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WarehouseZoneController;
@@ -219,9 +220,10 @@ Route::middleware([
             ->name('hbls.mark-as-short-loading');
 
         //Unloading Issues
-        Route::get('unloading-issues', function () {
-            return Inertia::render('Arrival/UnloadingIssueList');
-        })->name('unloading-issues.index');
+        Route::get('unloading-issues', [UnloadingIssueController::class, 'index'])
+            ->name('unloading-issues.index');
+
+        Route::get('unloading-issues-list', [UnloadingIssueController::class, 'list']);
     });
 
     //Delivery
