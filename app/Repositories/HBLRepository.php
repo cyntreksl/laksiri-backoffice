@@ -17,6 +17,8 @@ use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
 use App\Actions\HBL\UpdateHBLPackages;
+use App\Actions\HBLDocument\DeleteDocument;
+use App\Actions\HBLDocument\UploadDocument;
 use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\GridJsInterface;
@@ -180,21 +182,21 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         ]);
     }
 
-    public function uploadDocument(array $data)
+    public function uploadDocument(array $data): void
     {
-        if (isset($data['hbl_id'])) {
-            $hbl_document = HBLDocument::firstOrNew(
-                [
-                    'document_name' => $data['document_name'],
-                ],
-                [
-                    'uploaded_by' => auth()->id(),
-                    'hbl_id' => $data['hbl_id'],
-                ]
-            );
+        try {
+            UploadDocument::run($data);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to upload hbl document: '.$e->getMessage());
+        }
+    }
 
-            $hbl_document->updateFile($data['document'], 'document', 'hbl/docs');
-            $hbl_document->save();
+    public function deleteDocument(HBLDocument $hblDocument)
+    {
+        try {
+            DeleteDocument::run($hblDocument);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to delete hbl document: '.$e->getMessage());
         }
     }
 }

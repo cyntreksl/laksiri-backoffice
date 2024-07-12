@@ -4,6 +4,7 @@ namespace App\Interfaces;
 
 use App\Models\Container;
 use App\Models\HBL;
+use App\Models\HBLDocument;
 use Illuminate\Http\JsonResponse;
 
 interface HBLRepositoryInterface
@@ -39,4 +40,6 @@ interface HBLRepositoryInterface
     public function getHBLByPackageId($package_id);
 
     public function uploadDocument(array $data);
+
+    public function deleteDocument(HBLDocument $hblDocument);
 }

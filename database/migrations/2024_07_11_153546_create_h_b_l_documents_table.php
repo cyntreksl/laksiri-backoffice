@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('hbl_id')->constrained('hbl')->cascadeOnDelete();
             $table->unsignedBigInteger('uploaded_by');
             $table->string('document_name');
-            $table->string('document');
+            $table->string('document')->nullable();
             $table->timestamps();
         });
     }

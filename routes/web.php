@@ -96,6 +96,9 @@ Route::middleware([
 
     Route::get('hbls/get-hbl-documents/{hbl}', [HBLController::class, 'getHBLDocuments']);
 
+    Route::delete('hbls-documents/{hbl_document}', [HBLController::class, 'destroyHBLDocument'])
+        ->name('hbls.destroy.document');
+
     // User
     Route::resource('users', UserController::class)
         ->except(['create', 'show']);
