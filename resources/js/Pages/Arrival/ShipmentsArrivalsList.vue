@@ -550,6 +550,47 @@ const createColumns = () => [
                         ),
                     ]
                 ),
+                h(
+                    "button",
+                    {
+                        className:
+                            "btn size-8 p-0 text-secondary hover:bg-secondary/20 focus:bg-secondary/20 active:bg-secondary/25",
+                        onClick: () =>
+                            router.visit(
+                                route("arrival.shipments-arrivals.containers.markAsReachedContainer", row.cells[0].data)
+                            ),
+                        "x-tooltip..placement.bottom.success": "'Mark As Reached'",
+                    },
+                    [
+                        h(
+                            "svg",
+                            {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                viewBox: "0 0 24 24",
+                                class:
+                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-navigation-check",
+                                fill: "none",
+                                stroke: "currentColor",
+                                strokeWidth: 2,
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                            },
+                            [
+                                h("path", {
+                                    stroke: "none",
+                                    d: "M0 0h24v24H0z",
+                                    fill: "none",
+                                }),
+                                h("path", {
+                                    d: "M17.487 14.894l-5.487 -11.894l-7.97 17.275c-.07 .2 -.017 .424 .135 .572c.15 .148 .374 .193 .57 .116l6.275 -2.127",
+                                }),
+                                h("path", {
+                                    d: "M15 19l2 2l4 -4",
+                                }),
+                            ]
+                        ),
+                    ]
+                ),
             ]);
         },
     },

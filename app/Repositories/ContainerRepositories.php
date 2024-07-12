@@ -19,6 +19,7 @@ use App\Http\Resources\ContainerResource;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\Container;
+use App\Models\Scopes\BranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
@@ -204,5 +205,12 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function createUnloadingIssue(array $data): void
     {
         CreateUnloadingIssue::run($data);
+    }
+
+    public function markAsReached($containerId)
+    {
+        $container = Container::withoutGlobalScope(BranchScope::class)->find($containerId);
+
+        dd($container);
     }
 }
