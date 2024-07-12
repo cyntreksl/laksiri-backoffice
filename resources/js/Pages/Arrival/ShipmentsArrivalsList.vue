@@ -15,6 +15,7 @@ import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import LoadedShipmentDetailModal from "@/Pages/Loading/Partials/LoadedShipmentDetailModal.vue";
 import {router} from "@inertiajs/vue3";
+import {push} from "notivue";
 
 const props = defineProps({
     cargoTypes: {
@@ -557,8 +558,9 @@ const createColumns = () => [
                             "btn size-8 p-0 text-secondary hover:bg-secondary/20 focus:bg-secondary/20 active:bg-secondary/25",
                         onClick: () =>
                             router.visit(
-                                route("arrival.shipments-arrivals.containers.markAsReachedContainer", row.cells[0].data)
-                            ),
+                                route("arrival.shipments-arrivals.containers.markAsReachedContainer", row.cells[0].data), {
+                                    onSuccess: () => push.success('Mark As Reached')
+                                }),
                         "x-tooltip..placement.bottom.success": "'Mark As Reached'",
                     },
                     [

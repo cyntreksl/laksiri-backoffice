@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\Container\CreateContainer;
 use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Loading\GetLoadedContainers;
+use App\Actions\Container\MarkAsReached;
 use App\Actions\Container\Unloading\CreateDraftUnload;
 use App\Actions\Container\Unloading\CreateFullyUnload;
 use App\Actions\Container\Unloading\UndoUnloadContainer;
@@ -209,8 +210,26 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
     public function markAsReached($containerId)
     {
-        $container = Container::withoutGlobalScope(BranchScope::class)->find($containerId);
+        $container = Container::query()
+            ->withoutGlobalScope(BranchScope::class)
+            ->where('id', $containerId)
+            ->with(['hbl_packages' => function ($query) {
+                $query->withoutGlobalScope(BranchScope::class)->with(['hbl' => function ($query) {
+                    $query->withoutGlobalScope(BranchScope::class);
+                }]);
+            }])
+            ->first();
 
-        dd($container);
+        $hbls = $container->hbl_packages->pluck('hbl');
+
+        try {
+            foreach ($hbls as $hbl) {
+                $hbl->status = 'reached';
+                $hbl->save();
+            }
+            MarkAsReached::run($container);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to mark as reached container: '.$e->getMessage());
+        }
     }
 }
