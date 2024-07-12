@@ -12,6 +12,7 @@ use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
+use App\Models\HBLDocument;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -160,5 +161,20 @@ class HBLController extends Controller
     public function getHBLByPackageId($hbl_package_id)
     {
         return $this->HBLRepository->getHBLByPackageId($hbl_package_id);
+    }
+
+    public function uploadDocument(Request $request)
+    {
+        return $this->HBLRepository->uploadDocument($request->all());
+    }
+
+    public function getHBLDocuments(HBL $hbl)
+    {
+        return response()->json($hbl->hblDocuments);
+    }
+
+    public function destroyHBLDocument(HBLDocument $hblDocument)
+    {
+        $this->HBLRepository->deleteDocument($hblDocument);
     }
 }

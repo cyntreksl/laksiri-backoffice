@@ -14,6 +14,7 @@ use App\Interfaces\PickupExceptionRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
+use App\Interfaces\UnloadingIssuesRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Interfaces\WarehousezoneRepositoryInterface;
@@ -30,6 +31,7 @@ use App\Repositories\PickupExceptionRepository;
 use App\Repositories\PickupRepository;
 use App\Repositories\PriceRepository;
 use App\Repositories\RoleRepository;
+use App\Repositories\UnloadingIssuesRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WareahouseZoneRepository;
 use App\Repositories\WarehouseRepository;
@@ -56,6 +58,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(WarehousezoneRepositoryInterface::class, WareahouseZoneRepository::class);
         $this->app->bind(DriverAreasRepositoryInterface::class, DriverAreasRepository::class);
         $this->app->bind(BondedWarehouseRepositoryInterface::class, BondedWarehouseRepository::class);
+        $this->app->bind(UnloadingIssuesRepositoryInterface::class, UnloadingIssuesRepository::class);
     }
 
     public function boot(): void

@@ -23,4 +23,6 @@ interface ContainerRepositoryInterface
     public function reloadContainer(array $data);
 
     public function createUnloadingIssue(array $data);
+
+    public function markAsReached($containerId);
 }

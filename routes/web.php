@@ -12,6 +12,7 @@ use App\Http\Controllers\PickupController;
 use App\Http\Controllers\PickupExceptionController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UnloadingIssueController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WarehouseZoneController;
@@ -89,6 +90,14 @@ Route::middleware([
         ->name('hbls.download.barcode');
 
     Route::get('get-hbl/{package_id}', [HBLController::class, 'getHBLByPackageId']);
+
+    Route::post('hbls/uploads/document', [HBLController::class, 'uploadDocument'])
+        ->name('hbls.upload.document');
+
+    Route::get('hbls/get-hbl-documents/{hbl}', [HBLController::class, 'getHBLDocuments']);
+
+    Route::delete('hbls-documents/{hbl_document}', [HBLController::class, 'destroyHBLDocument'])
+        ->name('hbls.destroy.document');
 
     // User
     Route::resource('users', UserController::class)
@@ -209,6 +218,9 @@ Route::middleware([
         Route::post('/unloading-points/create/unloading-issue', [ContainerController::class, 'storeUnloadingIssue'])
             ->name('unloading-points.create.unloading-issue');
 
+        Route::get('/shipments-arrivals/containers/{container_id}', [ContainerController::class, 'markAsReachedContainer'])
+            ->name('shipments-arrivals.containers.markAsReachedContainer');
+
         // Bonded Warehouse
         Route::get('bonded-warehouses', [BondedWarehouseController::class, 'index'])
             ->name('bonded-warehouses.index');
@@ -219,9 +231,10 @@ Route::middleware([
             ->name('hbls.mark-as-short-loading');
 
         //Unloading Issues
-        Route::get('unloading-issues', function () {
-            return Inertia::render('Arrival/UnloadingIssueList');
-        })->name('unloading-issues.index');
+        Route::get('unloading-issues', [UnloadingIssueController::class, 'index'])
+            ->name('unloading-issues.index');
+
+        Route::get('unloading-issues-list', [UnloadingIssueController::class, 'list']);
     });
 
     //Delivery
