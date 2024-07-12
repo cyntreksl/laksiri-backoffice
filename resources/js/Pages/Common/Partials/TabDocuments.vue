@@ -3,7 +3,6 @@ import Tab from "@/Components/Tab.vue";
 import {router, useForm} from "@inertiajs/vue3";
 import {ref} from "vue";
 import {push} from "notivue";
-import notification from "@/magics/notification.js";
 import DeleteDocConfirmationModal from "@/Pages/Common/Partials/DeleteDocConfirmationModal.vue";
 
 const props = defineProps({
@@ -123,9 +122,9 @@ const handleDeleteDoc = () => {
                         <tbody>
                         <tr>
                             <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5 flex items-center">
-                                <svg v-if="hblDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')" class="icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                <svg v-if="hblDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')" class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M5 12l5 5l10 -10" /></svg>
 
-                                <svg v-else  class="icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 19v.01" /><path d="M12 15v-10" /></svg>
+                                <svg v-else  class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 19v.01" /><path d="M12 15v-10" /></svg>
 
                                 BL From Shipping Line
                             </td>
@@ -145,7 +144,7 @@ const handleDeleteDoc = () => {
 
                                     <button
                                         v-if="hblDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')"
-                                        class="btn size-9 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
+                                        class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
                                         @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').id, 'BL From Shipping Line')"
                                     >
                                         <svg  class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"  fill="currentColor"  viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z" /><path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" /></svg>
@@ -155,9 +154,9 @@ const handleDeleteDoc = () => {
                         </tr>
                         <tr>
                             <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5 flex items-center">
-                                <svg v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Manifest')" class="icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                <svg v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Manifest')" class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M5 12l5 5l10 -10" /></svg>
 
-                                <svg v-else  class="icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 19v.01" /><path d="M12 15v-10" /></svg>
+                                <svg v-else  class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 19v.01" /><path d="M12 15v-10" /></svg>
 
                                 Manifest
                             </td>
@@ -177,7 +176,7 @@ const handleDeleteDoc = () => {
 
                                     <button
                                         v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Manifest')"
-                                        class="btn size-9 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
+                                        class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
                                         @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Manifest').id, 'Manifest')"
                                     >
                                         <svg  class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"  fill="currentColor"  viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z" /><path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" /></svg>
@@ -187,9 +186,9 @@ const handleDeleteDoc = () => {
                         </tr>
                         <tr>
                             <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5 flex items-center">
-                                <svg v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')" class="icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                <svg v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')" class="icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success size-7"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M5 12l5 5l10 -10" /></svg>
 
-                                <svg v-else  class="icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 19v.01" /><path d="M12 15v-10" /></svg>
+                                <svg v-else  class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 19v.01" /><path d="M12 15v-10" /></svg>
 
                                 Receipt for Freight Charges
                             </td>
@@ -209,7 +208,7 @@ const handleDeleteDoc = () => {
 
                                     <button
                                         v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')"
-                                        class="btn size-9 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
+                                        class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
                                         @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id, 'Receipt for Freight Charges')"
                                     >
                                         <svg  class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"  fill="currentColor"  viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z" /><path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" /></svg>
