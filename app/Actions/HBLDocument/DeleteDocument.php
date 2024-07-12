@@ -11,7 +11,7 @@ class DeleteDocument
 
     public function handle(HBLDocument $hblDocument): void
     {
-        $hblDocument->deleteFile('hbl/docs', 'document');
+        $hblDocument->deleteFile('/hbl/docs', 'document');
 
         $hblDocument->delete();
     }

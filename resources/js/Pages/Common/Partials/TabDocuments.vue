@@ -103,11 +103,8 @@ const handleDeleteDoc = () => {
     router.delete(route("hbls.destroy.document", docId.value), {
         preserveScroll: true,
         onSuccess: () => {
-            closeModal();
-            notification({
-                text: "Document Deleted Successfully!",
-                variant: "success",
-            });
+            closeDeleteModal();
+            push.success('Document Deleted Successfully!');
             fetchHBLDocuments();
         },
     });

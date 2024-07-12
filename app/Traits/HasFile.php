@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 trait HasFile
@@ -38,7 +39,15 @@ trait HasFile
      */
     public function deleteFile(string $path, string $column): void
     {
-        Storage::disk('public')->delete($path);
+        if (Storage::disk('public')->exists($path)) {
+            if (Storage::disk('public')->delete($path)) {
+                Log::info("File deleted successfully: {$path}");
+            } else {
+                Log::error("Failed to delete file: {$path}");
+            }
+        } else {
+            Log::warning("File does not exist: {$path}");
+        }
 
         $this->forceFill([
             $column => null,
