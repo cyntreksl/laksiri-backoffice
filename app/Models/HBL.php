@@ -94,4 +94,9 @@ class HBL extends Model
     {
         return $this->belongsTo(Branch::class, 'branch_id');
     }
+
+    public function hblDocuments(): HasMany
+    {
+        return $this->hasMany(HBLDocument::class, 'hbl_id', 'id');
+    }
 }

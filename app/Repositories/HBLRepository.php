@@ -17,12 +17,15 @@ use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
 use App\Actions\HBL\UpdateHBLPackages;
+use App\Actions\HBLDocument\DeleteDocument;
+use App\Actions\HBLDocument\UploadDocument;
 use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Models\Container;
 use App\Models\HBL;
+use App\Models\HBLDocument;
 use App\Models\HBLPackage;
 use App\Models\Scopes\BranchScope;
 use Illuminate\Http\JsonResponse;
@@ -177,5 +180,23 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         return response()->json([
             'data' => $hbl,
         ]);
+    }
+
+    public function uploadDocument(array $data): void
+    {
+        try {
+            UploadDocument::run($data);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to upload hbl document: '.$e->getMessage());
+        }
+    }
+
+    public function deleteDocument(HBLDocument $hblDocument)
+    {
+        try {
+            DeleteDocument::run($hblDocument);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to delete hbl document: '.$e->getMessage());
+        }
     }
 }

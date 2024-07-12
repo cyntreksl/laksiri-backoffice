@@ -148,4 +148,9 @@ class ContainerController extends Controller
     {
         $this->containerRepository->createUnloadingIssue($request->all());
     }
+
+    public function markAsReachedContainer($container_id)
+    {
+        $this->containerRepository->markAsReached($container_id);
+    }
 }

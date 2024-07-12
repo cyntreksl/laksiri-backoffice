@@ -91,6 +91,14 @@ Route::middleware([
 
     Route::get('get-hbl/{package_id}', [HBLController::class, 'getHBLByPackageId']);
 
+    Route::post('hbls/uploads/document', [HBLController::class, 'uploadDocument'])
+        ->name('hbls.upload.document');
+
+    Route::get('hbls/get-hbl-documents/{hbl}', [HBLController::class, 'getHBLDocuments']);
+
+    Route::delete('hbls-documents/{hbl_document}', [HBLController::class, 'destroyHBLDocument'])
+        ->name('hbls.destroy.document');
+
     // User
     Route::resource('users', UserController::class)
         ->except(['create', 'show']);
@@ -209,6 +217,9 @@ Route::middleware([
 
         Route::post('/unloading-points/create/unloading-issue', [ContainerController::class, 'storeUnloadingIssue'])
             ->name('unloading-points.create.unloading-issue');
+
+        Route::get('/shipments-arrivals/containers/{container_id}', [ContainerController::class, 'markAsReachedContainer'])
+            ->name('shipments-arrivals.containers.markAsReachedContainer');
 
         // Bonded Warehouse
         Route::get('bonded-warehouses', [BondedWarehouseController::class, 'index'])
