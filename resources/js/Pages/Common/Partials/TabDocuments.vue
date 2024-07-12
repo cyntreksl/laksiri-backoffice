@@ -101,7 +101,7 @@ const handleFileUpload = () => {
                                 BL From Shipping Line
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <form class="flex items-center space-x-4" @submit.prevent="handleFileUpload()">
+                                <form class="flex items-center space-x-4 float-right" @submit.prevent="handleFileUpload()">
 
                                     <input ref="blDocumentInput" hidden type="file" @input="handleFileInput($event, 'blDocument')"/>
 
@@ -122,7 +122,7 @@ const handleFileUpload = () => {
                                 Manifest
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <form class="flex items-center space-x-4" @submit.prevent="handleFileUpload()">
+                                <form class="flex items-center space-x-4 float-right" @submit.prevent="handleFileUpload()">
 
                                     <input ref="manifestDocumentInput" hidden type="file" @input="handleFileInput($event, 'manifestDocument')"/>
 
@@ -143,7 +143,7 @@ const handleFileUpload = () => {
                                 Receipt for Freight Charges
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <form class="flex items-center space-x-4" @submit.prevent="handleFileUpload()">
+                                <form class="flex items-center space-x-4 float-right" @submit.prevent="handleFileUpload()">
 
                                     <input ref="receiptDocumentInput" hidden type="file" @input="handleFileInput($event, 'receiptDocument')"/>
 
