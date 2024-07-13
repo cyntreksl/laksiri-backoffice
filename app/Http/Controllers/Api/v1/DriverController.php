@@ -13,6 +13,13 @@ class DriverController extends Controller
     ) {
     }
 
+    /**
+     * Update Driver
+     *
+     * Update the authenticated driver.
+     *
+     * @group Driver
+     */
     public function store(UpdateDriverApiRequest $request)
     {
         return $this->DriverRepository->updateDriver($request);

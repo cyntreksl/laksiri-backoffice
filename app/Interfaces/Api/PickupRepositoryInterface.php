@@ -56,4 +56,13 @@ interface PickupRepositoryInterface
      * @method POST api.laksiri.world/v1/pickups/exceptions/{pickup_id}
      */
     public function savePickupException(array $data, PickUp $pickup): JsonResponse;
+
+    /**
+     * Retrieve a list of completed pickups with HBLs.
+     *
+     * This method retrieves a list of completed pickups along with their corresponding HBLs.
+     *
+     * @method GET api.laksiri.world/v1/pickups/completed/list
+     */
+    public function completedPickupWithHBL(): JsonResponse;
 }

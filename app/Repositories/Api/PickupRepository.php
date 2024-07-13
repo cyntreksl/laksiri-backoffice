@@ -74,4 +74,18 @@ class PickupRepository implements PickupRepositoryInterface
             return $this->error($e->getMessage(), $e->getCode());
         }
     }
+
+    public function completedPickupWithHBL(): JsonResponse
+    {
+        try {
+            $pickups = PickUp::where('status', 3)->with('hbl')->get();
+
+            // Transform pickups into resource format
+            $completedPickupsResource = PickupResource::collection($pickups);
+
+            return $this->success('Completed pickup list received successfully!', $completedPickupsResource);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), $e->getCode());
+        }
+    }
 }
