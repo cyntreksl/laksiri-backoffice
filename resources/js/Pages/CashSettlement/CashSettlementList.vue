@@ -19,6 +19,7 @@ import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import HoldConfirmationModal from "@/Pages/CashSettlement/Partials/HoldConfirmationModal.vue";
 import { router } from "@inertiajs/vue3";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 
 const props = defineProps({
   drivers: {
@@ -692,59 +693,17 @@ const shipIcon = ref(`
     <Breadcrumb />
 
     <div class="grid sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 mt-3">
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ totalRecord }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">HBL Count</p>
-      </div>
+        <SimpleOverviewWidget :count="totalRecord" bg-color="white" title="HBL Count" />
 
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ totalGrandAmount.toLocaleString() }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">HBL Amount</p>
-      </div>
+        <SimpleOverviewWidget :count="totalGrandAmount.toLocaleString()" bg-color="white" title="HBL Amount" />
 
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ totalPaidAmount.toLocaleString() }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">HBL Paid Amount</p>
-      </div>
+        <SimpleOverviewWidget :count="totalPaidAmount.toLocaleString()" bg-color="white" title="HBL Paid Amount" />
 
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ countOfSelectedData }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">Selected HBL Count</p>
-      </div>
+        <SimpleOverviewWidget :count="countOfSelectedData" bg-color="white" title="Selected HBL Count" />
 
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ valueOfSelectedData.toLocaleString() }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">Selected HBL Amount</p>
-      </div>
+        <SimpleOverviewWidget :count="valueOfSelectedData.toLocaleString()" bg-color="white" title="Selected HBL Amount" />
 
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ paidValueOfSelectedData.toLocaleString() }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">Selected HBL Paid Amount</p>
-      </div>
+        <SimpleOverviewWidget :count="paidValueOfSelectedData.toLocaleString()" bg-color="white" title="Selected HBL Paid Amount" />
     </div>
 
     <div class="card mt-4">
