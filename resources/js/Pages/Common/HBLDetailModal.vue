@@ -22,7 +22,7 @@ const hbl = ref({});
 
 const fetchHBL = async () => {
     try {
-        const response = await fetch(`hbls/${props.hblId}`, {
+        const response = await fetch(`/hbls/${props.hblId}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -35,6 +35,7 @@ const fetchHBL = async () => {
         } else {
             const data = await response.json();
             hbl.value = data.hbl;
+            console.log(hbl.value)
         }
 
     } catch (error) {
