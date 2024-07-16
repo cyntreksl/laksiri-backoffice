@@ -99,7 +99,7 @@ const emit = defineEmits(['close']);
 
                 <TabHBLDetails :hbl="hbl"/>
 
-                <TabStatus />
+                <TabStatus :hbl-id="hbl?.id"/>
 
                 <TabDocuments :hbl-id="hbl?.id"/>
             </Tabs>

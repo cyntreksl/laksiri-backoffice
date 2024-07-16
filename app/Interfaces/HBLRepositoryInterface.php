@@ -42,4 +42,6 @@ interface HBLRepositoryInterface
     public function uploadDocument(array $data);
 
     public function deleteDocument(HBLDocument $hblDocument);
+
+    public function getPickupStatus(HBL $hbl);
 }

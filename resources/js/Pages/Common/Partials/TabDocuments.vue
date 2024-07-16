@@ -34,7 +34,7 @@ const fetchHBLDocuments = async (id) => {
     }
 }
 
-watch([() => props.hblId], ([newId]) => {
+watch(() => props.hblId, (newId) => {
     if (newId) {
         form.hbl_id = newId;
         fetchHBLDocuments(newId)
