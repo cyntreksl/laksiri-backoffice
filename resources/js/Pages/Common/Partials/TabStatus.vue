@@ -76,6 +76,21 @@ const pickupStatusColor = (status) => {
             return 'bg-error';
     }
 };
+
+const hblStatusColor = (status) => {
+    switch (status) {
+        case 'HBL Preparation by warehouse':
+            return 'bg-primary';
+        case 'Cash Received by Accountant':
+            return 'bg-secondary';
+        case 'Container Loading':
+            return 'bg-success';
+        case 'Container Shipped':
+            return 'bg-error';
+        case 'Container Arrival':
+            return 'bg-slate-500';
+    }
+};
 </script>
 
 <template>
@@ -141,11 +156,11 @@ const pickupStatusColor = (status) => {
                         <ol class="timeline max-w-sm">
                             <li v-for="(log, index) in hblStatus" class="timeline-item">
                                 <div
-                                    :class="`bg-success timeline-item-point rounded-full dark:bg-accent`"
+                                    :class="`${hblStatusColor(log.status)} timeline-item-point rounded-full dark:bg-accent`"
                                 >
                                      <span
                                          v-if="index === Object.keys(hblStatus).length - 1"
-                                         :class="`inline-flex h-full w-full animate-ping rounded-full bg-success opacity-80`"
+                                         :class="`inline-flex h-full w-full animate-ping rounded-full ${hblStatusColor(log.status)} opacity-80`"
                                      ></span>
                                 </div>
                                 <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
