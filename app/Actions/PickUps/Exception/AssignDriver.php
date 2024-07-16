@@ -19,8 +19,9 @@ class AssignDriver
             'system_status' => PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
         ]);
 
-        $pickup = PickUp::find($pickupException);
-
-        $pickup->addStatus('Pickup Exception: Assigned Driver');
+        if ($pickupException->pickup_id) {
+            $pickup = PickUp::find($pickupException->pickup_id);
+            $pickup->addStatus('Pickup Exception: Assigned Driver');
+        }
     }
 }

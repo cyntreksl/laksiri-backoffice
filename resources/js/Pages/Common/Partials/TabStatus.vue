@@ -47,6 +47,8 @@ const pickupStatusColor = (status) => {
             return 'bg-secondary';
         case 'Cargo collected by driver':
             return 'bg-success';
+        case 'Pickup Exception: Assigned Driver':
+            return 'bg-error';
     }
 };
 </script>
