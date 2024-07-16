@@ -10,6 +10,7 @@ use App\Actions\User\GetUserCurrentBranch;
 use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\HBL;
+use App\Models\HBLPackage;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -22,7 +23,6 @@ class CreateOrUpdateLoadedContainer
      */
     public function handle(array $data)
     {
-
         try {
             DB::beginTransaction();
 
@@ -44,7 +44,8 @@ class CreateOrUpdateLoadedContainer
                 // Run the MarkAsLoaded action for the package ID
                 MarkAsLoaded::run($package['id']);
 
-                $hbl = HBL::find($package['id']);
+                $hbl_package = HBLPackage::find($package['id']);
+                $hbl = HBL::find($hbl_package->hbl_id);
 
                 $hbl->addStatus('Container Shipped');
             }

@@ -9,8 +9,9 @@ trait HasStatusLogs
 {
     public function addStatus($status, $description = null): void
     {
-        $this->statusLogs()->create([
+        $this->statusLogs()->updateOrCreate([
             'status' => $status,
+        ], [
             'user_id' => auth()->id(),
             'description' => $description,
         ]);
