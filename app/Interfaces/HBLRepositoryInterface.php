@@ -43,5 +43,7 @@ interface HBLRepositoryInterface
 
     public function deleteDocument(HBLDocument $hblDocument);
 
-    public function getPickupStatus(HBL $hbl);
+    public function getPickupStatus(HBL $hbl): JsonResponse;
+
+    public function getHBLStatus(HBL $hbl): JsonResponse;
 }

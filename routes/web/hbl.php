@@ -38,3 +38,5 @@ Route::delete('hbls-documents/{hbl_document}', [HBLController::class, 'destroyHB
     ->name('hbls.destroy.document');
 
 Route::get('get-pickup-status/{hbl}', [HBLController::class, 'getPickupStatus']);
+
+Route::get('get-hbl-status/{hbl}', [HBLController::class, 'getHBLStatus']);

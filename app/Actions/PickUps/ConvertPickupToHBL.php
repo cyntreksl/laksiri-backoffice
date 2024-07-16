@@ -43,6 +43,9 @@ class ConvertPickupToHBL
         try {
             DB::beginTransaction();
             $hbl = CreateHBL::run($data);
+
+            $hbl->addStatus('HBL Preparation by driver');
+
             $pickup->update([
                 'status' => PickupStatus::COLLECTED->value,
                 'hbl_id' => $hbl->id,

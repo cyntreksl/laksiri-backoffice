@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Scopes\BranchScope;
 use App\Observers\HBLObserver;
+use App\Traits\HasStatusLogs;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,6 +22,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class HBL extends Model
 {
     use HasFactory;
+    use HasStatusLogs;
     use LogsActivity;
     use SoftDeletes;
 
@@ -52,9 +54,12 @@ class HBL extends Model
         'reference', 'warehouse_zone_id', 'cargo_type', 'hbl_type', 'hbl', 'hbl_name', 'email', 'contact_number', 'nic', 'iq_number', 'address', 'consignee_name', 'consignee_nic', 'consignee_contact', 'consignee_address', 'consignee_note', 'warehouse', 'freight_charge', 'bill_charge', 'other_charge', 'discount', 'paid_amount', 'grand_total', 'status', 'created_by', 'branch_id', 'system_status', 'pickup_id', 'is_hold', 'is_short_loading',
     ];
 
-    public function scopeCashSettlement(Builder $query)
+    public function scopeCashSettlement(Builder $query): void
     {
-        $query->whereIn('system_status', [3, 3.1]);
+        $query->whereIn('system_status', [
+            self::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
+            self::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE,
+        ]);
     }
 
     public function status(): HasMany
@@ -92,9 +97,11 @@ class HBL extends Model
         return $this->hasOne(HBLPayment::class, 'hbl_id', 'id');
     }
 
-    public function scopeWarehouse(Builder $query)
+    public function scopeWarehouse(Builder $query): void
     {
-        $query->whereIn('system_status', [4, 4.1]);
+        $query->whereIn('system_status', [
+            self::SYSTEM_STATUS_CASH_RECEIVED, 4.1,
+        ]);
     }
 
     public function warehouseZone(): BelongsTo

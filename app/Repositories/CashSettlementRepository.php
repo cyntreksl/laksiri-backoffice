@@ -75,7 +75,9 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         $hblList = GetCashSettlementByIds::run($hblIds);
 
         foreach ($hblList as $hbl) {
-            UpdateHBLSystemStatus::run($hbl, 4);
+            UpdateHBLSystemStatus::run($hbl, HBL::SYSTEM_STATUS_CASH_RECEIVED);
+            $hbl = HBL::find($hbl->id);
+            $hbl->addStatus('Cash Received by Accountant');
         }
 
         return $this->success('Cash Received', []);

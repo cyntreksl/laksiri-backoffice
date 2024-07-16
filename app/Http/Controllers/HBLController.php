@@ -182,4 +182,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->getPickupStatus($hbl);
     }
+
+    public function getHBLStatus(HBL $hbl)
+    {
+        return $this->HBLRepository->getHBLStatus($hbl);
+    }
 }

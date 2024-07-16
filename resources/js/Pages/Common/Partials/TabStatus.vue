@@ -12,6 +12,7 @@ const props = defineProps({
 })
 
 const pickupStatus = ref([]);
+const hblStatus = ref([]);
 
 const fetchPickupStatus = async () => {
     try {
@@ -35,9 +36,33 @@ const fetchPickupStatus = async () => {
     }
 }
 
+const fetchHBLStatus = async () => {
+    try {
+        const response = await fetch(`get-hbl-status/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            hblStatus.value = data.status;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 watch(() => props.hblId, () => {
     fetchPickupStatus()
+    fetchHBLStatus()
 })
+
 
 const pickupStatusColor = (status) => {
     switch (status) {
@@ -112,8 +137,29 @@ const pickupStatusColor = (status) => {
                         </ol>
                     </div>
 
-                    <div>
-
+                    <div v-if="hblStatus">
+                        <ol class="timeline max-w-sm">
+                            <li v-for="(log, index) in hblStatus" class="timeline-item">
+                                <div
+                                    :class="`bg-success timeline-item-point rounded-full dark:bg-accent`"
+                                >
+                                     <span
+                                         v-if="index === Object.keys(hblStatus).length - 1"
+                                         :class="`inline-flex h-full w-full animate-ping rounded-full bg-success opacity-80`"
+                                     ></span>
+                                </div>
+                                <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
+                                    <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
+                                        <p
+                                            class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
+                                        >
+                                            {{ log.status }}
+                                        </p>
+                                    </div>
+                                    <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
+                                </div>
+                            </li>
+                        </ol>
                     </div>
 
                 </div>

@@ -44,6 +44,8 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         $packagesData = $data['packages'];
         CreateHBLPackages::run($hbl, $packagesData);
 
+        $hbl->addStatus('HBL Preparation by warehouse');
+
         return $hbl;
     }
 
@@ -201,7 +203,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         }
     }
 
-    public function getPickupStatus(HBL $hbl)
+    public function getPickupStatus(HBL $hbl): JsonResponse
     {
         if ($hbl->pickup_id) {
             $pickup = PickUp::find($hbl->pickup_id);
@@ -211,6 +213,15 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ]);
         }
 
-        return response()->json([]);
+        return response()->json([
+            'status' => [],
+        ]);
+    }
+
+    public function getHBLStatus(HBL $hbl): JsonResponse
+    {
+        return response()->json([
+            'status' => $hbl->statusLogs,
+        ]);
     }
 }
