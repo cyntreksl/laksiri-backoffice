@@ -26,6 +26,18 @@ class HBL extends Model
 
     protected $table = 'hbl';
 
+    public const SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER = 1.3;
+
+    public const SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE = 2.1;
+
+    public const SYSTEM_STATUS_CASH_RECEIVED = 2.2;
+
+    public const SYSTEM_STATUS_MANIFEST_PREPARATION = 2.3;
+
+    public const SYSTEM_STATUS_D2D_DOC_PREPARATION = 2.4;
+
+    public const SYSTEM_STATUS_PALLETIZE_CARGO = 2.5;
+
     protected $SYSTEM_STATUS = [
         3.0 => 'HBL created',
         3.1 => 'HBL created - Job Converted to HBL',

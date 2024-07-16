@@ -17,5 +17,7 @@ class AssignDriver
             'driver_assigned_at' => Carbon::now(),
             'system_status' => PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
         ]);
+
+        $pickup->addStatus('Driver Assigned');
     }
 }
