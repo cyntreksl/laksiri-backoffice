@@ -9,6 +9,7 @@ use App\Actions\HBL\HBLPackage\MarkAsLoaded;
 use App\Actions\User\GetUserCurrentBranch;
 use App\Enum\ContainerStatus;
 use App\Models\Container;
+use App\Models\HBL;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -42,6 +43,10 @@ class CreateOrUpdateLoadedContainer
 
                 // Run the MarkAsLoaded action for the package ID
                 MarkAsLoaded::run($package['id']);
+
+                $hbl = HBL::find($package['id']);
+
+                $hbl->addStatus('Container Shipped');
             }
 
             UpdateContainerStatus::run($container, ContainerStatus::LOADED->value);
