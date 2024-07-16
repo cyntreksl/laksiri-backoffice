@@ -38,36 +38,124 @@ import AccordionPanel from "@/Components/AccordionPanel.vue";
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8">
 
                     <div>
-                        <ol class="steps">
-                            <li class="step before:bg-primary dark:before:bg-accent">
+<!--                        <ol class="steps">-->
+<!--                            <li class="step before:bg-primary dark:before:bg-accent">-->
+<!--                                <div-->
+<!--                                    class="step-header rounded-full bg-primary text-white dark:bg-accent"-->
+<!--                                >-->
+<!--                                    1-->
+<!--                                </div>-->
+<!--                                <h3 class="text-slate-600 dark:text-navy-100">Job Added</h3>-->
+<!--                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">TESTDRIVER |-->
+<!--                                    2024-05-12 17:12</h3>-->
+<!--                            </li>-->
+<!--                            <li class="step before:bg-primary dark:before:bg-accent">-->
+<!--                                <div-->
+<!--                                    class="step-header rounded-full bg-primary text-white dark:bg-accent"-->
+<!--                                >-->
+<!--                                    2-->
+<!--                                </div>-->
+<!--                                <h3 class="text-slate-600 dark:text-navy-100">Tentative Pickup</h3>-->
+<!--                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">TESTDRIVER |-->
+<!--                                    2024-05-12 17:12</h3>-->
+<!--                            </li>-->
+<!--                            <li class="step before:bg-primary dark:before:bg-accent">-->
+<!--                                <div-->
+<!--                                    class="step-header rounded-full bg-primary text-white dark:bg-accent"-->
+<!--                                >-->
+<!--                                    3-->
+<!--                                </div>-->
+<!--                                <h3 class="text-slate-600 dark:text-navy-100">Picked on</h3>-->
+<!--                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">2024-05-26 19:26-->
+<!--                                    N/A</h3>-->
+<!--                            </li>-->
+<!--                        </ol>-->
+                        <ol class="timeline max-w-sm">
+                            <li class="timeline-item">
                                 <div
-                                    class="step-header rounded-full bg-primary text-white dark:bg-accent"
-                                >
-                                    1
+                                    class="timeline-item-point rounded-full bg-slate-300 dark:bg-navy-400"
+                                ></div>
+                                <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
+                                    <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
+                                        <p
+                                            class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
+                                        >
+                                            User Photo Changed
+                                        </p>
+                                        <span class="text-xs text-slate-400 dark:text-navy-300"
+                                        >12 minute ago</span
+                                        >
+                                    </div>
+                                    <p class="py-1">John Doe changed his avatar photo</p>
                                 </div>
-                                <h3 class="text-slate-600 dark:text-navy-100">Job Added</h3>
-                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">TESTDRIVER |
-                                    2024-05-12 17:12</h3>
                             </li>
-                            <li class="step before:bg-primary dark:before:bg-accent">
+                            <li class="timeline-item">
                                 <div
-                                    class="step-header rounded-full bg-primary text-white dark:bg-accent"
-                                >
-                                    2
+                                    class="timeline-item-point rounded-full bg-primary dark:bg-accent"
+                                ></div>
+                                <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
+                                    <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
+                                        <p
+                                            class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
+                                        >
+                                            Video Added
+                                        </p>
+                                        <span class="text-xs text-slate-400 dark:text-navy-300"
+                                        >1 hour ago</span
+                                        >
+                                    </div>
+                                    <p class="py-1">Mores Clarke added new video</p>
                                 </div>
-                                <h3 class="text-slate-600 dark:text-navy-100">Tentative Pickup</h3>
-                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">TESTDRIVER |
-                                    2024-05-12 17:12</h3>
                             </li>
-                            <li class="step before:bg-primary dark:before:bg-accent">
-                                <div
-                                    class="step-header rounded-full bg-primary text-white dark:bg-accent"
-                                >
-                                    3
+                            <li class="timeline-item">
+                                <div class="timeline-item-point rounded-full bg-success"></div>
+                                <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
+                                    <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
+                                        <p
+                                            class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
+                                        >
+                                            Design Completed
+                                        </p>
+                                        <span class="text-xs text-slate-400 dark:text-navy-300"
+                                        >3 hours ago</span
+                                        >
+                                    </div>
+                                    <p class="py-1">
+                                        Robert Nolan completed the design of the CRM application
+                                    </p>
                                 </div>
-                                <h3 class="text-slate-600 dark:text-navy-100">Picked on</h3>
-                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">2024-05-26 19:26
-                                    N/A</h3>
+                            </li>
+                            <li class="timeline-item">
+                                <div class="timeline-item-point rounded-full bg-warning"></div>
+                                <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
+                                    <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
+                                        <p
+                                            class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
+                                        >
+                                            ER Diagram
+                                        </p>
+                                        <span class="text-xs text-slate-400 dark:text-navy-300"
+                                        >a day ago</span
+                                        >
+                                    </div>
+                                    <p class="py-1">Team completed the ER diagram app</p>
+                                </div>
+                            </li>
+                            <li class="timeline-item">
+                                <div class="timeline-item-point rounded-full bg-error"></div>
+                                <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
+                                    <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
+                                        <p
+                                            class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
+                                        >
+                                            Weekly Report
+                                        </p>
+                                        <span class="text-xs text-slate-400 dark:text-navy-300"
+                                        >a day ago</span
+                                        >
+                                    </div>
+                                    <p class="py-1">The weekly report was uploaded</p>
+                                </div>
                             </li>
                         </ol>
                     </div>
