@@ -5,6 +5,7 @@ namespace App\Actions\PickUps;
 use App\Actions\HBL\CreateHBL;
 use App\Enum\PickupStatus;
 use App\Models\HBL;
+use App\Models\PickUp;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -36,7 +37,7 @@ class ConvertPickupToHBL
             'paid_amount' => $request->paid_amount,
             'grand_total' => $request->grand_total,
             'pickup_id' => $pickUp->id,
-            'system_status' => 3.1,
+            'system_status' => PickUp::SYSTEM_STATUS_CARGO_COLLECTED,
         ];
 
         try {

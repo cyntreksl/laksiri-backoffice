@@ -32,6 +32,7 @@ class CreatePickUp
             'pickup_type' => $data['pickup_type'],
             'pickup_note' => Str::title($data['pickup_note']),
             'created_by' => auth()->id(),
+            'system_status' => PickUp::SYSTEM_STATUS_PICKUP_CREATED,
         ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Scopes\BranchScope;
+use App\Traits\HasStatusLogs;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,17 +18,22 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class PickUp extends Model
 {
     use HasFactory;
+    use HasStatusLogs;
     use LogsActivity;
     use SoftDeletes;
 
+    public const SYSTEM_STATUS_INQUIRY = 1.1;
+
+    public const SYSTEM_STATUS_PICKUP_CREATED = 1.2;
+
+    public const SYSTEM_STATUS_DRIVER_ASSIGNED = 1.3;
+
+    public const SYSTEM_STATUS_CARGO_COLLECTED = 1.4;
+
+    public const SYSTEM_STATUS_CARGO_RETURNED = 1.5;
+
     protected $fillable = [
         'reference', 'cargo_type', 'name', 'email', 'contact_number', 'address', 'location_name', 'location_longitude', 'location_latitude', 'zone_id', 'notes', 'driver_id', 'driver_assigned_at', 'hbl_id', 'created_by', 'deleted_at', 'branch_id', 'pickup_date', 'pickup_time_start', 'pickup_time_end', 'is_urgent_pickup', 'is_from_important_customer', 'pickup_order', 'system_status', 'status', 'pickup_type', 'pickup_note',
-    ];
-
-    protected array $SYSTEM_STATUS = [
-        1 => 'Pickup Created',
-        2 => 'Driver Assigned',
-        3 => 'Picked By Driver',
     ];
 
     public function getActivitylogOptions(): LogOptions
