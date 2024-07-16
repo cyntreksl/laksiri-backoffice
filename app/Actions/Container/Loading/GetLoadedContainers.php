@@ -3,6 +3,7 @@
 namespace App\Actions\Container\Loading;
 
 use App\Models\Container;
+use App\Models\Scopes\BranchScope;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class GetLoadedContainers
@@ -12,9 +13,10 @@ class GetLoadedContainers
     public function handle()
     {
         // Retrieve containers with their loaded HBLs
-        $containersWithLoadedHBLs = Container::with(['hbl_packages' => function ($query) {
-            $query->wherePivot('status', 'loaded');
-        }])
+        $containersWithLoadedHBLs = Container::withoutGlobalScope(BranchScope::class)
+            ->with(['hbl_packages' => function ($query) {
+                $query->wherePivot('status', 'loaded');
+            }])
             ->withCount('hbl_packages')
             ->withSum('hbl_packages', 'weight')
             ->withSum('hbl_packages', 'volume')
