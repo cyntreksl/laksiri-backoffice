@@ -56,6 +56,10 @@ class CreateOrUpdateLoadedContainer
 
             UpdateReferenceNumber::run($container, $reference);
 
+            $container->addStatus('Container Loaded');
+
+            $container->addStatus('Container Shipped');
+
             // update container loading end datetime and who loaded by
             $data = [
                 'loading_ended_at' => now(),

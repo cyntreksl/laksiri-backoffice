@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enum\ContainerStatus;
 use App\Models\Scopes\BranchScope;
+use App\Traits\HasStatusLogs;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,8 +19,27 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Container extends Model
 {
     use HasFactory;
+    use HasStatusLogs;
     use LogsActivity;
     use SoftDeletes;
+
+    public const SYSTEM_STATUS_BOOK_CONTAINER = 3.1;
+
+    public const SYSTEM_STATUS_CONTAINER_LOADING = 3.2;
+
+    public const SYSTEM_STATUS_CONTAINER_SHIPPED = 3.3;
+
+    public const SYSTEM_STATUS_CONTAINER_TRANSIT_TIME = 3.4;
+
+    public const SYSTEM_STATUS_CONTAINER_ARRIVAL = 3.5;
+
+    public const SYSTEM_STATUS_CONTAINER_RETURNED = 5.1;
+
+    public const SYSTEM_STATUS_CONTAINER_CLEARED = 4.2;
+
+    public const SYSTEM_STATUS_CONTAINER_TRANSPORTED = 4.3;
+
+    public const SYSTEM_STATUS_CONTAINER_DE_STUFFING_AT_WAREHOUSE = 4.4;
 
     protected $fillable = [
         'branch_id', 'cargo_type', 'container_type', 'reference', 'bl_number', 'awb_number', 'container_number', 'seal_number', 'maximum_volume', 'minimum_volume', 'maximum_weight', 'minimum_weight', 'maximum_volumetric_weight', 'minimum_volumetric_weight', 'estimated_time_of_departure', 'estimated_time_of_arrival', 'vessel_name', 'voyage_number', 'shipping_line', 'port_of_loading', 'port_of_discharge', 'flight_number', 'airline_name', 'airport_of_departure', 'airport_of_arrival', 'cargo_class', 'status', 'system_status', 'loading_started_at', 'loading_ended_at', 'unloading_started_at', 'unloading_ended_at', 'loading_started_by', 'loading_ended_by', 'unloading_started_by', 'unloading_ended_by', 'created_by', 'note', 'is_reached', 'reached_date',

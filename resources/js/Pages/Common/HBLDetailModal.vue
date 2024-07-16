@@ -35,7 +35,6 @@ const fetchHBL = async () => {
         } else {
             const data = await response.json();
             hbl.value = data.hbl;
-            console.log(hbl.value)
         }
 
     } catch (error) {

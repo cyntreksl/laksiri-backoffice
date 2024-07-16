@@ -89,6 +89,8 @@ const hblStatusColor = (status) => {
             return 'bg-error';
         case 'Container Arrival':
             return 'bg-slate-500';
+        case 'Blocked By RTF':
+            return 'bg-red-500';
     }
 };
 </script>
