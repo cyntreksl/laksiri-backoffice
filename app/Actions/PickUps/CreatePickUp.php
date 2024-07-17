@@ -13,6 +13,12 @@ class CreatePickUp
 
     public function handle(array $data): PickUp
     {
+        $is_from_important_customer = isset($data['is_from_important_customer']) && (bool) $data['is_from_important_customer'];
+
+        $is_urgent_pickup = isset($data['is_urgent_pickup']) && (bool) $data['is_urgent_pickup'];
+
+        $pickup_note = isset($data['pickup_note']) ? Str::title($data['pickup_note']) : null;
+
         $pickup = PickUp::create([
             'reference' => GeneratePickupReferenceNumber::run(GetUserCurrentBranch::run()['branchName']),
             'branch_id' => GetUserCurrentBranch::run()['branchId'],
@@ -21,16 +27,16 @@ class CreatePickUp
             'email' => $data['email'],
             'contact_number' => $data['contact_number'],
             'address' => Str::title($data['address']),
-            'location_name' => $data['location'],
-            'zone_id' => $data['zone_id'],
+            'location_name' => $data['location'] ?? null,
+            'zone_id' => $data['zone_id'] ?? null,
             'notes' => Str::title($data['notes']),
             'pickup_date' => $data['pickup_date'],
             'pickup_time_start' => $data['pickup_time_start'],
             'pickup_time_end' => $data['pickup_time_end'],
-            'is_from_important_customer' => (bool) $data['is_from_important_customer'],
-            'is_urgent_pickup' => (bool) $data['is_urgent_pickup'],
-            'pickup_type' => $data['pickup_type'],
-            'pickup_note' => Str::title($data['pickup_note']),
+            'is_from_important_customer' => $is_from_important_customer,
+            'is_urgent_pickup' => $is_urgent_pickup,
+            'pickup_type' => $data['pickup_type'] ?? null,
+            'pickup_note' => $pickup_note,
             'created_by' => auth()->id(),
             'system_status' => PickUp::SYSTEM_STATUS_PICKUP_CREATED,
         ]);
