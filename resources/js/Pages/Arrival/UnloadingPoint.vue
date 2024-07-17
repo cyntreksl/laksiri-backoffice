@@ -31,7 +31,27 @@ const props = defineProps({
 })
 
 const searchQuery = ref('');
-const containerArr = ref(props.container.hbl_packages.filter(p => p.pivot?.status !== 'draft-unload'));
+const containerArr = ref([]);
+
+const groupedPackages = props.container.hbl_packages
+    .filter(p => p.pivot?.status !== 'draft-unload')
+    .reduce((acc, p) => {
+        const reference = p.hbl.reference;
+        if (!acc[reference]) {
+            acc[reference] = [];
+        }
+        acc[reference].push(p);
+        return acc;
+    }, {});
+
+containerArr.value = Object.keys(groupedPackages).map(reference => {
+    return {
+        reference: reference,
+        expanded: true,
+        packages: groupedPackages[reference]
+    };
+});
+
 const warehouseArr = ref(props.container.hbl_packages.filter(p => p.pivot?.status === 'draft-unload'));
 
 const filteredPackages = computed(() => {
@@ -39,20 +59,33 @@ const filteredPackages = computed(() => {
         return containerArr.value;
     }
     return containerArr.value.filter(packageData => {
-        return packageData.hbl?.reference.toLowerCase().includes(searchQuery.value.toLowerCase());
+        return packageData?.reference.toLowerCase().includes(searchQuery.value.toLowerCase());
     });
 })
 
-const handleUnloadToWarehouse = (index) => {
-    if (index !== -1) {
-        warehouseArr.value = [...warehouseArr.value, containerArr.value[index]];
-        containerArr.value = containerArr.value.filter((_, i) => i !== index);
+const handleUnloadToWarehouse = (groupIndex, packageIndex) => {
+    if (groupIndex !== -1 && packageIndex !== -1) {
+        const packageToMove = containerArr.value[groupIndex].packages.splice(packageIndex, 1)[0];
+        warehouseArr.value.push(packageToMove);
+        // If the group is empty after removal, remove the group
+        if (containerArr.value[groupIndex].packages.length === 0) {
+            containerArr.value.splice(groupIndex, 1);
+        }
     }
 }
 const handleReLoadToContainer = (index) => {
     if (index !== -1) {
-        containerArr.value = [...containerArr.value, warehouseArr.value[index]];
-        warehouseArr.value = warehouseArr.value.filter((_, i) => i !== index);
+        const packageToMove = warehouseArr.value.splice(index, 1)[0];
+        const group = containerArr.value.find(g => g.reference === packageToMove.hbl.reference);
+        if (group) {
+            group.packages.push(packageToMove);
+        } else {
+            containerArr.value.push({
+                reference: packageToMove.hbl.reference,
+                expanded: true,
+                packages: [packageToMove]
+            });
+        }
     }
 }
 
@@ -62,6 +95,22 @@ const handlePackageChange = () => {
     containerArr.value = [...containerArr.value];
     warehouseArr.value = [...warehouseArr.value];
 }
+
+// Watch for changes in the container array
+watch(warehouseArr, (newValue, oldValue) => {
+    const newIds = new Set(newValue.map(item => item.id));
+    const oldIds = new Set(oldValue.map(item => item.id));
+
+    const added = newValue.filter(item => oldIds.has(item.id));
+    const removed = oldValue.filter(item => newIds.has(item.id));
+
+    if (added.length > 0) {
+        handleCreateDraftUnload(added);
+    }
+    if (removed.length > 0) {
+        handleRemoveDraftUnload(removed);
+    }
+}, { deep: true });
 
 const draftTextEnabled = ref(false);
 
@@ -101,19 +150,6 @@ const handleRemoveDraftUnload = (packages) => {
             preserveState: true,
         });
 }
-
-// Watch for changes in the container array
-watch(warehouseArr, (newValue, oldValue) => {
-    const added = newValue.filter(item => !oldValue.includes(item));
-    const removed = oldValue.filter(item => !newValue.includes(item));
-
-    if (added.length > 0) {
-        handleCreateDraftUnload(added);
-    }
-    if (removed.length > 0) {
-        handleRemoveDraftUnload(removed);
-    }
-});
 
 const showUnloadingIssueModal = ref(false);
 
@@ -214,113 +250,165 @@ const confirmShowCreateIssueModal = (index) => {
                             </div>
                         </div>
                         <div>
-                            <draggable v-if="Object.keys(filteredPackages).length > 0" v-model="filteredPackages"
-                                       class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
-                                       group="people"
-                                       item-key="id"
-                                       @change="handlePackageChange">
-                                <template #item="{element, index}">
-                                    <div class="card cursor-pointer shadow-sm">
-                                        <div class="flex justify-between items-center">
-                                            <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
-                                                <div>
-                                                    <div class="flex justify-between">
-                                                        <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                            {{ element.hbl?.reference }}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div class="flex flex-wrap gap-1">
-                                                    <div
-                                                        class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
-                                                        <svg class="size-3.5" fill="none" stroke="currentColor"
-                                                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                            <path
-                                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"/>
-                                                        </svg>
-                                                        <span>{{
-                                                                moment(element.created_at).format('YYYY-MM-DD')
-                                                            }}</span>
-                                                    </div>
-
-                                                    <div
-                                                        class="badge space-x-1 bg-warning/10 py-1 px-1.5 text-warning dark:bg-warning/15">
-                                                        <svg
-                                                            class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
-                                                            fill="none"
-                                                            stroke="currentColor" stroke-linecap="round"
-                                                            stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                                            width="24"
-                                                            xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                            <path d="M7 20l10 0"/>
-                                                            <path d="M6 6l6 -1l6 1"/>
-                                                            <path d="M12 3l0 17"/>
-                                                            <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                            <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                        </svg>
-                                                        <span>Volume {{ element.volume }}</span>
-                                                    </div>
-
-                                                    <div
-                                                        class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15">
-                                                        <svg
-                                                            class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
-                                                            fill="none" height="24" stroke="currentColor"
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                                            width="24"
-                                                            xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                            <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
-                                                            <path
-                                                                d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
-                                                        </svg>
-                                                        <span>Weight {{ element.weight }}</span>
-                                                    </div>
-
-                                                    <div
-                                                        class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15">
-                                                        <svg
-                                                            class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hash"
-                                                            fill="none" stroke="currentColor"
-                                                            stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            viewBox="0 0 24 24"
-                                                            xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                            <path d="M5 9l14 0"/>
-                                                            <path d="M5 15l14 0"/>
-                                                            <path d="M11 4l-4 16"/>
-                                                            <path d="M17 4l-4 16"/>
-                                                        </svg>
-                                                        <span>Quantity {{ element.quantity }}</span>
-                                                    </div>
-                                                </div>
-                                                <p class="mt-px font-medium text-slate-400 dark:text-navy-300">
-                                                    {{ element.package_type }}
-                                                </p>
-                                            </div>
-                                            <div class="px-2.5">
-                                                <svg
-                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
-                                                    fill="none" height="24" stroke="currentColor" stroke-linecap="round"
-                                                    stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                                    width="24"
-                                                    x-tooltip.placement.top.success="'Click to Unload'"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    @click.prevent="handleUnloadToWarehouse(index)">
-                                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                    <path d="M4 18v-6a3 3 0 0 1 3 -3h7"/>
-                                                    <path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4"/>
-                                                </svg>
-                                            </div>
-                                        </div>
+                            <ul v-if="Object.keys(filteredPackages).length > 0" class="space-y-1 font-inter font-medium">
+                                <li v-for="(hbl, groupIndex) in filteredPackages" :key="hbl.id">
+                                    <div
+                                        v-if="Object.keys(hbl.packages).length > 0"
+                                        class="flex cursor-pointer items-center rounded px-2 py-1 tracking-wide text-slate-800 outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:text-navy-100 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100"
+                                        tabindex="0"
+                                    >
+                                        <button
+                                            class="btn mr-1 size-5 rounded-lg p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                            @click="hbl.expanded = !hbl.expanded"
+                                        >
+                                            <svg
+                                                :class="hbl.expanded && 'rotate-90'"
+                                                class="size-7 transition-transform"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    clip-rule="evenodd"
+                                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                                    fill-rule="evenodd"
+                                                ></path>
+                                            </svg>
+                                        </button>
+                                        <svg
+                                            class="mr-3 size-9 text-primary"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                            ></path>
+                                        </svg>
+                                        <span>{{ hbl.reference }}</span>
                                     </div>
-                                </template>
-                            </draggable>
+                                    <ul v-show="hbl.expanded" class="pl-4">
+                                        <draggable v-model="hbl.packages"
+                                                   class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
+                                                   group="people"
+                                                   item-key="id"
+                                                   @change="handlePackageChange">
+                                            <template #item="{element, index}">
+                                                <div class="card cursor-pointer shadow-sm">
+                                                    <div class="flex justify-between items-center">
+                                                        <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
+                                                            <div>
+                                                                <div class="flex justify-between">
+                                                                    <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
+                                                                        {{ hbl?.reference }}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="flex flex-wrap gap-1">
+                                                                <div
+                                                                    class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
+                                                                    <svg class="size-3.5" fill="none"
+                                                                         stroke="currentColor"
+                                                                         viewBox="0 0 24 24"
+                                                                         xmlns="http://www.w3.org/2000/svg">
+                                                                        <path
+                                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                                            stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            stroke-width="2"/>
+                                                                    </svg>
+                                                                    <span>{{
+                                                                            moment(element.created_at).format('YYYY-MM-DD')
+                                                                        }}</span>
+                                                                </div>
+
+                                                                <div
+                                                                    class="badge space-x-1 bg-warning/10 py-1 px-1.5 text-warning dark:bg-warning/15">
+                                                                    <svg
+                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
+                                                                        fill="none"
+                                                                        stroke="currentColor" stroke-linecap="round"
+                                                                        stroke-linejoin="round" stroke-width="2"
+                                                                        viewBox="0 0 24 24"
+                                                                        width="24"
+                                                                        xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M0 0h24v24H0z" fill="none"
+                                                                              stroke="none"/>
+                                                                        <path d="M7 20l10 0"/>
+                                                                        <path d="M6 6l6 -1l6 1"/>
+                                                                        <path d="M12 3l0 17"/>
+                                                                        <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
+                                                                        <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
+                                                                    </svg>
+                                                                    <span>Volume {{ element.volume }}</span>
+                                                                </div>
+
+                                                                <div
+                                                                    class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15">
+                                                                    <svg
+                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
+                                                                        fill="none" height="24" stroke="currentColor"
+                                                                        stroke-linecap="round"
+                                                                        stroke-linejoin="round" stroke-width="2"
+                                                                        viewBox="0 0 24 24"
+                                                                        width="24"
+                                                                        xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M0 0h24v24H0z" fill="none"
+                                                                              stroke="none"/>
+                                                                        <path
+                                                                            d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                                                        <path
+                                                                            d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
+                                                                    </svg>
+                                                                    <span>Weight {{ element.weight }}</span>
+                                                                </div>
+
+                                                                <div
+                                                                    class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15">
+                                                                    <svg
+                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hash"
+                                                                        fill="none" stroke="currentColor"
+                                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        viewBox="0 0 24 24"
+                                                                        xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M0 0h24v24H0z" fill="none"
+                                                                              stroke="none"/>
+                                                                        <path d="M5 9l14 0"/>
+                                                                        <path d="M5 15l14 0"/>
+                                                                        <path d="M11 4l-4 16"/>
+                                                                        <path d="M17 4l-4 16"/>
+                                                                    </svg>
+                                                                    <span>Quantity {{ element.quantity }}</span>
+                                                                </div>
+                                                            </div>
+                                                            <p class="mt-px font-medium text-slate-400 dark:text-navy-300">
+                                                                {{ element.package_type }}
+                                                            </p>
+                                                        </div>
+                                                        <div class="px-2.5">
+                                                            <svg
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
+                                                                fill="none" height="24" stroke="currentColor"
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round" stroke-width="2"
+                                                                viewBox="0 0 24 24"
+                                                                width="24"
+                                                                x-tooltip.placement.top.success="'Click to Unload'"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                @click.prevent="handleUnloadToWarehouse(groupIndex, index)">
+                                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                                <path d="M4 18v-6a3 3 0 0 1 3 -3h7"/>
+                                                                <path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4"/>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </draggable>
+                                    </ul>
+                                </li>
+                            </ul>
 
                             <div v-else
                                  class="cursor-pointer border-2 border-error/20 bg-error/10 rounded-lg border-dashed">
