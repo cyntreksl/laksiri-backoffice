@@ -32,6 +32,7 @@ const props = defineProps({
 
 const searchQuery = ref('');
 const containerArr = ref([]);
+const warehouseArr = ref([]);
 
 const groupedPackages = props.container.hbl_packages
     .filter(p => p.pivot?.status !== 'draft-unload')
@@ -44,6 +45,9 @@ const groupedPackages = props.container.hbl_packages
         return acc;
     }, {});
 
+const groupedWarehousePackages = props.container.hbl_packages
+    .filter(p => p.pivot?.status  === 'draft-unload');
+
 containerArr.value = Object.keys(groupedPackages).map(reference => {
     return {
         reference: reference,
@@ -52,7 +56,7 @@ containerArr.value = Object.keys(groupedPackages).map(reference => {
     };
 });
 
-const warehouseArr = ref(props.container.hbl_packages.filter(p => p.pivot?.status === 'draft-unload'));
+warehouseArr.value = groupedWarehousePackages;
 
 const filteredPackages = computed(() => {
     if (!searchQuery.value) {
@@ -71,6 +75,7 @@ const handleUnloadToWarehouse = (groupIndex, packageIndex) => {
         if (containerArr.value[groupIndex].packages.length === 0) {
             containerArr.value.splice(groupIndex, 1);
         }
+        handleCreateDraftUnload([packageToMove]);
     }
 }
 const handleReLoadToContainer = (index) => {
@@ -86,6 +91,7 @@ const handleReLoadToContainer = (index) => {
                 packages: [packageToMove]
             });
         }
+        handleRemoveDraftUnload([packageToMove]);
     }
 }
 
@@ -95,22 +101,6 @@ const handlePackageChange = () => {
     containerArr.value = [...containerArr.value];
     warehouseArr.value = [...warehouseArr.value];
 }
-
-// Watch for changes in the container array
-watch(warehouseArr, (newValue, oldValue) => {
-    const newIds = new Set(newValue.map(item => item.id));
-    const oldIds = new Set(oldValue.map(item => item.id));
-
-    const added = newValue.filter(item => oldIds.has(item.id));
-    const removed = oldValue.filter(item => newIds.has(item.id));
-
-    if (added.length > 0) {
-        handleCreateDraftUnload(added);
-    }
-    if (removed.length > 0) {
-        handleRemoveDraftUnload(removed);
-    }
-}, { deep: true });
 
 const draftTextEnabled = ref(false);
 
