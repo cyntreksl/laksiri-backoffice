@@ -126,6 +126,15 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'Loaded Shipment',
+                'permissions' => [
+                    'shipment.index',
+                    'shipment.show',
+                    'shipment.download manifest',
+                ],
+            ],
+
+            [
                 'group_name' => 'Arrivals',
                 'permissions' => [
                     'arrivals.list',
