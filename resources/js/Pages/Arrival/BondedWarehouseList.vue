@@ -13,7 +13,7 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import ShortLoadingConfirmationModal from "@/Pages/Arrival/Partials/ShortLoadingConfirmationModal.vue";
 import {push} from "notivue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
@@ -176,138 +176,141 @@ const createColumns = () => [
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h("div", {}, [
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                        onClick: () => confirmViewHBL(row.cells[0].data?.id),
-                        "x-tooltip..placement.bottom.primary": "'View'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: 2,
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
+                usePage().props.user.permissions.includes('bonded.show') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+                            onClick: () => confirmViewHBL(row.cells[0].data?.id),
+                            "x-tooltip..placement.bottom.primary": "'View'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "size-6 icon icon-tabler icons-tabler-outline icon-tabler-eye",
                                     fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25",
-                        onClick: () =>
-                            router.visit(
-                                route("arrival.unloading-points.index", {
-                                    container: row.cells[0].data,
-                                })
+                                    stroke: "currentColor",
+                                    strokeWidth: 2,
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        stroke: "none",
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                                    }),
+                                    h("path", {
+                                        d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                                    }),
+                                ]
                             ),
-                        "x-tooltip..placement.bottom.success": "'Complete Reception'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-rosette-discount-check",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: 2,
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
+                        ]
+                    ) : null,
+                usePage().props.user.permissions.includes('bonded.complete registration') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25",
+                            onClick: () =>
+                                router.visit(
+                                    route("arrival.unloading-points.index", {
+                                        container: row.cells[0].data,
+                                    })
+                                ),
+                            "x-tooltip..placement.bottom.success": "'Complete Reception'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "size-6 icon icon-tabler icons-tabler-outline icon-tabler-rosette-discount-check",
                                     fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M5 7.2a2.2 2.2 0 0 1 2.2 -2.2h1a2.2 2.2 0 0 0 1.55 -.64l.7 -.7a2.2 2.2 0 0 1 3.12 0l.7 .7c.412 .41 .97 .64 1.55 .64h1a2.2 2.2 0 0 1 2.2 2.2v1c0 .58 .23 1.138 .64 1.55l.7 .7a2.2 2.2 0 0 1 0 3.12l-.7 .7a2.2 2.2 0 0 0 -.64 1.55v1a2.2 2.2 0 0 1 -2.2 2.2h-1a2.2 2.2 0 0 0 -1.55 .64l-.7 .7a2.2 2.2 0 0 1 -3.12 0l-.7 -.7a2.2 2.2 0 0 0 -1.55 -.64h-1a2.2 2.2 0 0 1 -2.2 -2.2v-1a2.2 2.2 0 0 0 -.64 -1.55l-.7 -.7a2.2 2.2 0 0 1 0 -3.12l.7 -.7a2.2 2.2 0 0 0 .64 -1.55v-1",
-                                }),
-                                h("path", {
-                                    d: "M9 12l2 2l4 -4",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
-                row.cells[9].data === 1 ||
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-warning hover:bg-warning/20 focus:bg-warning/20 active:bg-warning/25",
-                        onClick: () => confirmShortLoading(row.cells[0].data),
-                        "x-tooltip..placement.bottom.success": "'Mark As Short Loading'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-viewport-short",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: 2,
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
+                                    stroke: "currentColor",
+                                    strokeWidth: 2,
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        stroke: "none",
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M5 7.2a2.2 2.2 0 0 1 2.2 -2.2h1a2.2 2.2 0 0 0 1.55 -.64l.7 -.7a2.2 2.2 0 0 1 3.12 0l.7 .7c.412 .41 .97 .64 1.55 .64h1a2.2 2.2 0 0 1 2.2 2.2v1c0 .58 .23 1.138 .64 1.55l.7 .7a2.2 2.2 0 0 1 0 3.12l-.7 .7a2.2 2.2 0 0 0 -.64 1.55v1a2.2 2.2 0 0 1 -2.2 2.2h-1a2.2 2.2 0 0 0 -1.55 .64l-.7 .7a2.2 2.2 0 0 1 -3.12 0l-.7 -.7a2.2 2.2 0 0 0 -1.55 -.64h-1a2.2 2.2 0 0 1 -2.2 -2.2v-1a2.2 2.2 0 0 0 -.64 -1.55l-.7 -.7a2.2 2.2 0 0 1 0 -3.12l.7 -.7a2.2 2.2 0 0 0 .64 -1.55v-1",
+                                    }),
+                                    h("path", {
+                                        d: "M9 12l2 2l4 -4",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
+                usePage().props.user.permissions.includes('bonded.mark as short loading') ?
+                    row.cells[9].data === 1 ||
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-warning hover:bg-warning/20 focus:bg-warning/20 active:bg-warning/25",
+                            onClick: () => confirmShortLoading(row.cells[0].data),
+                            "x-tooltip..placement.bottom.success": "'Mark As Short Loading'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "size-6 icon icon-tabler icons-tabler-outline icon-tabler-viewport-short",
                                     fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M12 3v7l3 -3",
-                                }),
-                                h("path", {
-                                    d: "M9 7l3 3",
-                                }),
-                                h("path", {
-                                    d: "M12 21v-7l3 3",
-                                }),
-                                h("path", {
-                                    d: "M9 17l3 -3",
-                                }),
-                                h("path", {
-                                    d: "M18 9h1a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-1",
-                                }),
-                                h("path", {
-                                    d: "M6 9h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
+                                    stroke: "currentColor",
+                                    strokeWidth: 2,
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        stroke: "none",
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M12 3v7l3 -3",
+                                    }),
+                                    h("path", {
+                                        d: "M9 7l3 3",
+                                    }),
+                                    h("path", {
+                                        d: "M12 21v-7l3 3",
+                                    }),
+                                    h("path", {
+                                        d: "M9 17l3 -3",
+                                    }),
+                                    h("path", {
+                                        d: "M18 9h1a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-1",
+                                    }),
+                                    h("path", {
+                                        d: "M6 9h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
             ]);
         },
     },
@@ -543,7 +546,8 @@ const closeShowHBLModal = () => {
             </template>
         </FilterDrawer>
 
-        <ShortLoadingConfirmationModal :show="showConfirmShortLoadingModal" @close="closeShortLoadingModal" @short-loading="handleMarkAsShortLoading" />
+        <ShortLoadingConfirmationModal :show="showConfirmShortLoadingModal" @close="closeShortLoadingModal"
+                                       @short-loading="handleMarkAsShortLoading"/>
 
         <HBLDetailModal
             :hbl-id="hblId"

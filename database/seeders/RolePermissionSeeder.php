@@ -135,6 +135,16 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'Bonded Warehouse',
+                'permissions' => [
+                    'bonded.index',
+                    'bonded.show',
+                    'bonded.mark as short loading',
+                    'bonded.complete registration',
+                ],
+            ],
+
+            [
                 'group_name' => 'Unloading Issues',
                 'permissions' => [
                     'issues.index',
