@@ -104,7 +104,12 @@ const checkSinglePermission = (index) => {
 };
 
 const formatPermissionName = (name) => {
-    return name.split('.').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    // Remove the first word before the first dot
+    let parts = name.split('.');
+    parts.shift(); // Remove the first part
+
+    // Capitalize the first letter of each remaining word and join them with a space
+    return parts.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 
 const form = useForm({

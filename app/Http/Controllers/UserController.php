@@ -12,6 +12,7 @@ use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
 use Exception;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +20,8 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly UserRepositoryInterface $userRepository,
         private readonly RoleRepositoryInterface $roleRepository,
@@ -31,6 +34,8 @@ class UserController extends Controller
      */
     public function index()
     {
+        $this->authorize('users.list');
+
         return Inertia::render('User/UserList', [
             'roles' => $this->roleRepository->getRoles(),
             'branches' => $this->branchRepository->getBranches(),
@@ -84,6 +89,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        $this->authorize('users.edit');
+
         return Inertia::render('User/UserEdit', [
             'user' => $user->load('roles', 'branches'),
             'roles' => $this->roleRepository->getRoles(),
@@ -104,6 +111,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        $this->authorize('users.delete');
+
         $this->userRepository->deleteUser($user);
     }
 

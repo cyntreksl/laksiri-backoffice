@@ -105,19 +105,21 @@ const formatPermissionName = (name) => {
                                         v-for="permission in item.permissions"
                                         class="badge bg-primary/10 text-primary dark:bg-accent-light/15 dark:text-accent-light"
                                     >
-                                        {{formatPermissionName(permission.name)}}
+                                        {{ formatPermissionName(permission.name) }}
                                     </div>
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
                                     <button
-                                       :disabled="item.name === 'admin'"
+                                        v-if="$page.props.user.permissions.includes('roles.delete')"
+                                        :disabled="item.name === 'admin'"
                                         class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25 disabled:text-gray-300"
                                         @click.prevent="confirmDeleteRole(item.id)"
                                     >
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
 
-                                    <Link :href="route('users.roles.edit', item.id)">
+                                    <Link v-if="$page.props.user.permissions.includes('roles.edit')"
+                                          :href="route('users.roles.edit', item.id)">
                                         <button
                                             class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
                                         >
@@ -133,6 +135,7 @@ const formatPermissionName = (name) => {
             </div>
         </div>
 
-        <DeleteRoleConfirmationModal :show="showConfirmDeleteRoleModal" @close="closeModal" @delete-role="handleDeleteRole"/>
+        <DeleteRoleConfirmationModal :show="showConfirmDeleteRoleModal" @close="closeModal"
+                                     @delete-role="handleDeleteRole"/>
     </AppLayout>
 </template>

@@ -1,9 +1,9 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { reactive, ref } from "vue";
-import { Grid, h, html } from "gridjs";
-import { push } from "notivue";
+import {reactive, ref} from "vue";
+import {Grid, h, html} from "gridjs";
+import {push} from "notivue";
 import moment from "moment";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
@@ -16,7 +16,7 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import HoldConfirmationModal from "@/Pages/Warehouse/Partials/HoldConfirmationModal.vue";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import AssignZoneModal from "@/Pages/Warehouse/Partials/AssignZoneModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
@@ -60,23 +60,23 @@ const filters = reactive({
 });
 
 const data = reactive({
-  columnVisibility: {
-    hbl: true,
-    hbl_name: true,
-    address: false,
-    picked_date: true,
-    weight: true,
-    volume: true,
-    grand_total: true,
-    paid_amount: true,
-    cargo_type: true,
-    hbl_type: false,
-    officer: false,
-    is_hold: true,
-    status: true,
-    zone: true,
-    actions: true,
-  },
+    columnVisibility: {
+        hbl: true,
+        hbl_name: true,
+        address: false,
+        picked_date: true,
+        weight: true,
+        volume: true,
+        grand_total: true,
+        paid_amount: true,
+        cargo_type: true,
+        hbl_type: false,
+        officer: false,
+        is_hold: true,
+        status: true,
+        zone: true,
+        actions: true,
+    },
 });
 
 const toggleColumnVisibility = (columnName) => {
@@ -250,51 +250,52 @@ const createColumns = () => [
         formatter: (_, row) => {
             return h("div", {className: 'flex items-center'}, [
                 row._cells[14].data ? row._cells[14].data : null,
-                h(
-                    "button",
-                    {
-                        className:
-                            "ml-2 btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                        onClick: () => confirmAssignZone(row._cells[0].data?.id),
-                        "x-tooltip..placement": 'Assign Warehouse Zone'
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "icon icon-tabler icons-tabler-outline icon-tabler-home-plus",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    d: "M0 0h24v24H0z",
+                usePage().props.user.permissions.includes('warehouse.assign zone') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "ml-2 btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+                            onClick: () => confirmAssignZone(row._cells[0].data?.id),
+                            "x-tooltip..placement": 'Assign Warehouse Zone'
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "icon icon-tabler icons-tabler-outline icon-tabler-home-plus",
                                     fill: "none",
-                                    stroke: "none",
-                                }),
-                                h("path", {
-                                    d: "M19 12h2l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h5.5",
-                                }),
-                                h("path", {
-                                    d: "M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2",
-                                }),
-                                h("path", {
-                                    d: "M16 19h6",
-                                }),
-                                h("path", {
-                                    d: "M19 16v6",
-                                }),
-                            ]
-                        )
-                    ]
-                ),
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M19 12h2l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h5.5",
+                                    }),
+                                    h("path", {
+                                        d: "M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2",
+                                    }),
+                                    h("path", {
+                                        d: "M16 19h6",
+                                    }),
+                                    h("path", {
+                                        d: "M19 16v6",
+                                    }),
+                                ]
+                            )
+                        ]
+                    ) : null,
             ]);
         }
     },
@@ -304,63 +305,22 @@ const createColumns = () => [
         sort: false,
         formatter: (_, row) => {
             return h("div", {}, [
-                h(
-                    "a",
-                    {
-                        className:
-                            "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                        onClick: () => confirmViewHBL(row.cells[0].data?.id),
-                        "x-tooltip..placement.bottom.primary": "'View HBL'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                    stroke: "none",
-                                }),
-                                h("path", {
-                                    d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                        onClick: () => confirmIsHold(row.cells),
-                        "x-tooltip..placement.bottom.primary": row.cells[12].data
-                            ? "'Release HBL'"
-                            : "'Hold HBL'",
-                    },
-                    [
-                        row.cells[12].data
-                            ? h(
+                usePage().props.user.permissions.includes('warehouse.show') ?
+                    h(
+                        "a",
+                        {
+                            className:
+                                "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
+                            onClick: () => confirmViewHBL(row.cells[0].data?.id),
+                            "x-tooltip..placement.bottom.primary": "'View HBL'",
+                        },
+                        [
+                            h(
                                 "svg",
                                 {
                                     xmlns: "http://www.w3.org/2000/svg",
                                     viewBox: "0 0 24 24",
-                                    class:
-                                        "icon icon-tabler icons-tabler-outline icon-tabler-player-play",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
                                     fill: "none",
                                     height: 24,
                                     width: 24,
@@ -375,40 +335,83 @@ const createColumns = () => [
                                         stroke: "none",
                                     }),
                                     h("path", {
-                                        d: "M7 4v16l13 -8z",
-                                    }),
-                                ]
-                            )
-                            : h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class:
-                                        "icon icon-tabler icons-tabler-outline icon-tabler-player-pause",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
+                                        d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
                                     }),
                                     h("path", {
-                                        d: "M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
-                                    }),
-                                    h("path", {
-                                        d: "M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
+                                        d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
                                     }),
                                 ]
                             ),
-                    ]
-                ),
+                        ]
+                    ) : null,
+                usePage().props.user.permissions.includes('warehouse.hold and release') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+                            onClick: () => confirmIsHold(row.cells),
+                            "x-tooltip..placement.bottom.primary": row.cells[12].data
+                                ? "'Release HBL'"
+                                : "'Hold HBL'",
+                        },
+                        [
+                            row.cells[12].data
+                                ? h(
+                                    "svg",
+                                    {
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        viewBox: "0 0 24 24",
+                                        class:
+                                            "icon icon-tabler icons-tabler-outline icon-tabler-player-play",
+                                        fill: "none",
+                                        height: 24,
+                                        width: 24,
+                                        stroke: "currentColor",
+                                        strokeLinecap: "round",
+                                        strokeLinejoin: "round",
+                                    },
+                                    [
+                                        h("path", {
+                                            d: "M0 0h24v24H0z",
+                                            fill: "none",
+                                            stroke: "none",
+                                        }),
+                                        h("path", {
+                                            d: "M7 4v16l13 -8z",
+                                        }),
+                                    ]
+                                )
+                                : h(
+                                    "svg",
+                                    {
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        viewBox: "0 0 24 24",
+                                        class:
+                                            "icon icon-tabler icons-tabler-outline icon-tabler-player-pause",
+                                        fill: "none",
+                                        height: 24,
+                                        width: 24,
+                                        stroke: "currentColor",
+                                        strokeLinecap: "round",
+                                        strokeLinejoin: "round",
+                                    },
+                                    [
+                                        h("path", {
+                                            d: "M0 0h24v24H0z",
+                                            fill: "none",
+                                            stroke: "none",
+                                        }),
+                                        h("path", {
+                                            d: "M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
+                                        }),
+                                        h("path", {
+                                            d: "M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
+                                        }),
+                                    ]
+                                ),
+                        ]
+                    ) : null,
             ]);
         },
     },
@@ -510,7 +513,7 @@ const totalWeight = ref(0);
 const totalVolume = ref(0);
 const totalQuantity = ref(0);
 
-const getCashSettlementSummary = async (filters) => {
+const getWarehouseSummary = async (filters) => {
     try {
         const response = await fetch("/warehouse-summery", {
             method: "POST",
@@ -540,7 +543,7 @@ const getCashSettlementSummary = async (filters) => {
 };
 
 const pageReady = async () => {
-    await getCashSettlementSummary();
+    await getWarehouseSummary();
     if (totalRecord.value > 0) {
         initializeGrid();
     } else {
@@ -718,7 +721,7 @@ const shipIcon = ref(`
                                         class="ml-2 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                                     >
                                         <i class="mr-1 far fa-calendar-alt"></i>
-                    To &nbsp;Date
+                                        To &nbsp;Date
                                     </div>
                                     <div
                                         class="badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
