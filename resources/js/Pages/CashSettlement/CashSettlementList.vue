@@ -614,32 +614,10 @@ const resetFilter = () => {
 };
 
 const showConfirmViewHBLModal = ref(false);
-const hblRecord = ref({});
-
-const fetchHBL = async (id) => {
-    try {
-        const response = await fetch(`hbls/${id}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-            hblRecord.value = data.hbl;
-        }
-
-    } catch (error) {
-        console.log(error);
-    }
-}
+const hblId = ref(null);
 
 const confirmViewHBL = async (id) => {
-    await fetchHBL(id);
+    hblId.value = id;
     showConfirmViewHBLModal.value = true;
 };
 
@@ -968,7 +946,7 @@ const shipIcon = ref(`
     />
 
   <HBLDetailModal
-      :hbl="hblRecord"
+      :hbl-id="hblId"
       :show="showConfirmViewHBLModal"
       @close="closeShowHBLModal"
   />

@@ -41,7 +41,7 @@ class CreateHBL
             'grand_total' => $data['grand_total'],
             'created_by' => auth()->id(),
             'pickup_id' => $data['pickup_id'] ?? null,
-            'system_status' => $data['system_status'] ?? 3,
+            'system_status' => $data['system_status'] ?? HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE,
         ]);
 
         if (! empty($data['paid_amount'])) {

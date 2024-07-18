@@ -2,6 +2,7 @@
 
 namespace App\Actions\PickUps\Exception;
 
+use App\Models\PickUp;
 use App\Models\PickupException;
 use Carbon\Carbon;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -15,7 +16,12 @@ class AssignDriver
         $pickupException->update([
             'driver_id' => $driver_id,
             'driver_assigned_at' => Carbon::now(),
-            'system_status' => 2,
+            'system_status' => PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
         ]);
+
+        if ($pickupException->pickup_id) {
+            $pickup = PickUp::find($pickupException->pickup_id);
+            $pickup->addStatus('Pickup Exception: Assigned Driver');
+        }
     }
 }

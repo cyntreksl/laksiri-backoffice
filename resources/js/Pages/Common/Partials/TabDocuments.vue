@@ -1,23 +1,22 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
 import {router, useForm} from "@inertiajs/vue3";
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import {push} from "notivue";
 import DeleteDocConfirmationModal from "@/Pages/Common/Partials/DeleteDocConfirmationModal.vue";
 
 const props = defineProps({
-    hbl: {
-        type: Object,
-        default: () => {
-        },
+    hblId: {
+        type: Number,
+        required: true,
     }
 });
 
 const hblDocumentsRecords = ref([]);
 
-const fetchHBLDocuments = async () => {
+const fetchHBLDocuments = async (id) => {
     try {
-        const response = await fetch(`hbls/get-hbl-documents/${props.hbl.id}`, {
+        const response = await fetch(`hbls/get-hbl-documents/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -35,7 +34,12 @@ const fetchHBLDocuments = async () => {
     }
 }
 
-fetchHBLDocuments();
+watch(() => props.hblId, (newId) => {
+    if (newId) {
+        form.hbl_id = newId;
+        fetchHBLDocuments(newId)
+    }
+});
 
 const blDocumentInput = ref(null);
 const manifestDocumentInput = ref(null);
@@ -63,7 +67,7 @@ const handleFileInput = (event, docType) => {
 };
 
 const form = useForm({
-    hbl_id: props.hbl.id,
+    hbl_id: null,
     document_name: null,
     document: null,
 })
@@ -245,7 +249,7 @@ const handleDeleteDoc = () => {
                         </div>
                         <span class="font-medium text-slate-700 dark:text-navy-100">HBL Record</span>
                     </div>
-                    <a :href="route('hbls.download', hbl.id)">
+                    <a v-if="hblId" :href="route('hbls.download', hblId)">
                         <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
                     </a>
                 </div>
