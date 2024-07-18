@@ -79,7 +79,7 @@ class PickupRepository implements PickupRepositoryInterface
     public function completedPickupWithHBL(): JsonResponse
     {
         try {
-            $pickups = PickUp::where('status', PickupStatus::COLLECTED)->with('hbl')->get();
+            $pickups = PickUp::where('status', PickupStatus::COLLECTED)->where('driver_id', auth()->id())->with('hbl')->get();
 
             // Transform pickups into resource format
             $completedPickupsResource = PickupResource::collection($pickups);
