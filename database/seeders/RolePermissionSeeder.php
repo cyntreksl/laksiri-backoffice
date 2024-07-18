@@ -55,7 +55,7 @@ class RolePermissionSeeder extends Seeder
                 'group_name' => 'Role',
                 'permissions' => [
                     'roles.create',
-                    'roles.view',
+                    'roles.list',
                     'roles.edit',
                     'roles.delete',
                 ],
