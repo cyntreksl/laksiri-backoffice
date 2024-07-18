@@ -16,6 +16,7 @@ import FilterHeader from "@/Components/FilterHeader.vue";
 import {router} from "@inertiajs/vue3";
 import ShortLoadingConfirmationModal from "@/Pages/Arrival/Partials/ShortLoadingConfirmationModal.vue";
 import {push} from "notivue";
+import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 
 const props = defineProps({
     hblTypes: {
@@ -180,7 +181,7 @@ const createColumns = () => [
                     {
                         className:
                             "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                        onClick: () => confirmViewLoadedShipment(row.cells[0].data),
+                        onClick: () => confirmViewHBL(row.cells[0].data?.id),
                         "x-tooltip..placement.bottom.primary": "'View'",
                     },
                     [
@@ -352,21 +353,6 @@ const applyFilters = () => {
     grid.forceRender();
 };
 
-const selectedContainer = ref({});
-const showConfirmLoadedShipmentModal = ref(false);
-
-const confirmViewLoadedShipment = (id) => {
-    selectedContainer.value = props.containers.find(
-        (container) => container.id === id
-    );
-    showConfirmLoadedShipmentModal.value = true;
-};
-
-const closeModal = () => {
-    showConfirmLoadedShipmentModal.value = false;
-    selectedContainer.value = {};
-};
-
 const resetFilter = () => {
     filters.fromDate = fromDate;
     filters.toDate = toDate;
@@ -391,12 +377,23 @@ const handleMarkAsShortLoading = () => {
     router.get(route("arrival.hbls.mark-as-short-loading", hblId.value), {
         preserveScroll: true,
         onSuccess: () => {
-            closeModal();
+            closeShortLoadingModal();
             push.success("Mark As a Short Loaded");
             router.visit(route("arrival.bonded-warehouses.index"));
         },
     });
 }
+
+const showConfirmViewHBLModal = ref(false);
+
+const confirmViewHBL = async (id) => {
+    hblId.value = id;
+    showConfirmViewHBLModal.value = true;
+};
+
+const closeShowHBLModal = () => {
+    showConfirmViewHBLModal.value = false;
+};
 </script>
 <template>
     <AppLayout title="Bonded Warehouse">
@@ -547,5 +544,11 @@ const handleMarkAsShortLoading = () => {
         </FilterDrawer>
 
         <ShortLoadingConfirmationModal :show="showConfirmShortLoadingModal" @close="closeShortLoadingModal" @short-loading="handleMarkAsShortLoading" />
+
+        <HBLDetailModal
+            :hbl-id="hblId"
+            :show="showConfirmViewHBLModal"
+            @close="closeShowHBLModal"
+        />
     </AppLayout>
 </template>

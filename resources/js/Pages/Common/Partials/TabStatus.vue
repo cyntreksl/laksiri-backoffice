@@ -1,6 +1,98 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
 import AccordionPanel from "@/Components/AccordionPanel.vue";
+import {ref, watch} from "vue";
+import moment from "moment";
+
+const props = defineProps({
+    hblId: {
+        type: Number,
+        required: true,
+    }
+})
+
+const pickupStatus = ref([]);
+const hblStatus = ref([]);
+
+const fetchPickupStatus = async () => {
+    try {
+        const response = await fetch(`get-pickup-status/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            pickupStatus.value = data.status;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const fetchHBLStatus = async () => {
+    try {
+        const response = await fetch(`get-hbl-status/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            hblStatus.value = data.status;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+watch(() => props.hblId, () => {
+    fetchPickupStatus()
+    fetchHBLStatus()
+})
+
+
+const pickupStatusColor = (status) => {
+    switch (status) {
+        case 'Pickup Created':
+            return 'bg-primary';
+        case 'Driver Assigned':
+            return 'bg-secondary';
+        case 'Cargo collected by driver':
+            return 'bg-success';
+        case 'Pickup Exception: Assigned Driver':
+            return 'bg-error';
+    }
+};
+
+const hblStatusColor = (status) => {
+    switch (status) {
+        case 'HBL Preparation by warehouse':
+            return 'bg-primary';
+        case 'Cash Received by Accountant':
+            return 'bg-secondary';
+        case 'Container Loading':
+            return 'bg-success';
+        case 'Container Shipped':
+            return 'bg-error';
+        case 'Container Arrival':
+            return 'bg-slate-500';
+        case 'Blocked By RTF':
+            return 'bg-red-500';
+    }
+};
 </script>
 
 <template>
@@ -37,72 +129,52 @@ import AccordionPanel from "@/Components/AccordionPanel.vue";
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8">
 
-                    <div>
-                        <ol class="steps">
-                            <li class="step before:bg-primary dark:before:bg-accent">
+                    <div v-if="pickupStatus">
+                        <ol class="timeline max-w-sm">
+                            <li v-for="(log, index) in pickupStatus" class="timeline-item">
                                 <div
-                                    class="step-header rounded-full bg-primary text-white dark:bg-accent"
+                                    :class="`${pickupStatusColor(log.status)} timeline-item-point rounded-full dark:bg-accent`"
                                 >
-                                    1
+                                     <span
+                                         v-if="index === Object.keys(pickupStatus).length - 1"
+                                         :class="`inline-flex h-full w-full animate-ping rounded-full ${pickupStatusColor(log.status)} opacity-80`"
+                                     ></span>
                                 </div>
-                                <h3 class="text-slate-600 dark:text-navy-100">Job Added</h3>
-                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">TESTDRIVER |
-                                    2024-05-12 17:12</h3>
-                            </li>
-                            <li class="step before:bg-primary dark:before:bg-accent">
-                                <div
-                                    class="step-header rounded-full bg-primary text-white dark:bg-accent"
-                                >
-                                    2
+                                <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
+                                    <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
+                                        <p
+                                            class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
+                                        >
+                                            {{ log.status }}
+                                        </p>
+                                    </div>
+                                    <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
                                 </div>
-                                <h3 class="text-slate-600 dark:text-navy-100">Tentative Pickup</h3>
-                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">TESTDRIVER |
-                                    2024-05-12 17:12</h3>
-                            </li>
-                            <li class="step before:bg-primary dark:before:bg-accent">
-                                <div
-                                    class="step-header rounded-full bg-primary text-white dark:bg-accent"
-                                >
-                                    3
-                                </div>
-                                <h3 class="text-slate-600 dark:text-navy-100">Picked on</h3>
-                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">2024-05-26 19:26
-                                    N/A</h3>
                             </li>
                         </ol>
                     </div>
 
-                    <div>
-                        <ol class="steps">
-                            <li class="step before:bg-lime-600 dark:before:bg-accent">
+                    <div v-if="hblStatus">
+                        <ol class="timeline max-w-sm">
+                            <li v-for="(log, index) in hblStatus" class="timeline-item">
                                 <div
-                                    class="step-header rounded-full bg-lime-600 text-white dark:bg-accent"
+                                    :class="`${hblStatusColor(log.status)} timeline-item-point rounded-full dark:bg-accent`"
                                 >
-                                    1
+                                     <span
+                                         v-if="index === Object.keys(hblStatus).length - 1"
+                                         :class="`inline-flex h-full w-full animate-ping rounded-full ${hblStatusColor(log.status)} opacity-80`"
+                                     ></span>
                                 </div>
-                                <h3 class="text-slate-600 dark:text-navy-100">HBL Added on</h3>
-                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">2024-05-26
-                                    19:26</h3>
-                            </li>
-                            <li class="step before:bg-lime-600 dark:before:bg-accent">
-                                <div
-                                    class="step-header rounded-full bg-lime-600 text-white dark:bg-accent"
-                                >
-                                    2
+                                <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
+                                    <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
+                                        <p
+                                            class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
+                                        >
+                                            {{ log.status }}
+                                        </p>
+                                    </div>
+                                    <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
                                 </div>
-                                <h3 class="text-slate-600 dark:text-navy-100">Cash Collected</h3>
-                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">2024-05-26
-                                    19:26</h3>
-                            </li>
-                            <li class="step before:bg-lime-600 dark:before:bg-accent">
-                                <div
-                                    class="step-header rounded-full bg-lime-600 text-white dark:bg-accent"
-                                >
-                                    3
-                                </div>
-                                <h3 class="text-slate-600 dark:text-navy-100">Warehouse</h3>
-                                <h3 class="text-slate-600 dark:text-navy-100 font-bold">2024-05-26
-                                    19:26</h3>
                             </li>
                         </ol>
                     </div>

@@ -5,6 +5,7 @@ namespace App\Actions\PickUps;
 use App\Actions\HBL\CreateHBL;
 use App\Enum\PickupStatus;
 use App\Models\HBL;
+use App\Models\PickUp;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -12,17 +13,17 @@ class ConvertPickupToHBL
 {
     use AsAction;
 
-    public function handle($pickUp, $request): HBL
+    public function handle($pickup, $request): HBL
     {
         $data = [
-            'cargo_type' => $pickUp->cargo_type,
+            'cargo_type' => $pickup->cargo_type,
             'hbl_type' => $request->hbl_type,
-            'hbl_name' => $pickUp->name,
-            'email' => $pickUp->email,
-            'contact_number' => $pickUp->contact_number,
+            'hbl_name' => $pickup->name,
+            'email' => $pickup->email,
+            'contact_number' => $pickup->contact_number,
             'nic' => $request->nic,
             'iq_number' => $request->iq_number,
-            'address' => $pickUp->address,
+            'address' => $pickup->address,
             'consignee_name' => $request->consignee_name,
             'consignee_nic' => $request->consignee_nic,
             'consignee_contact' => $request->consignee_contact,
@@ -35,18 +36,24 @@ class ConvertPickupToHBL
             'discount' => $request->discount,
             'paid_amount' => $request->paid_amount,
             'grand_total' => $request->grand_total,
-            'pickup_id' => $pickUp->id,
-            'system_status' => 3.1,
+            'pickup_id' => $pickup->id,
+            'system_status' => HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
         ];
 
         try {
             DB::beginTransaction();
             $hbl = CreateHBL::run($data);
-            $pickUp->update([
+
+            $hbl->addStatus('HBL Preparation by driver');
+
+            $pickup->update([
                 'status' => PickupStatus::COLLECTED->value,
                 'hbl_id' => $hbl->id,
-                'system_status' => 3,
+                'system_status' => PickUp::SYSTEM_STATUS_CARGO_COLLECTED,
             ]);
+
+            $pickup->addStatus('Cargo collected by driver');
+
             DB::commit();
 
             return $hbl;

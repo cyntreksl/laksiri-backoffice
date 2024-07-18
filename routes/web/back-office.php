@@ -1,0 +1,29 @@
+<?php
+
+use App\Http\Controllers\CashSettlementController;
+use App\Http\Controllers\WarehouseController;
+use Illuminate\Support\Facades\Route;
+
+Route::name('back-office.')->group(function () {
+    // Cash Settlements
+    Route::get('cash-settlements', [CashSettlementController::class, 'index'])
+        ->name('cash-settlements.index');
+    Route::get('cash-settlement-list', [CashSettlementController::class, 'list'])
+        ->name('cash-settlements.list');
+    Route::post('cash-settlement-summery', [CashSettlementController::class, 'getSummery'])
+        ->name('cash-settlements.summery');
+    Route::post('cash-received', [CashSettlementController::class, 'cashReceived'])
+        ->name('cash-settlements.cashReceived');
+    Route::put('update/payments/{hbl}', [CashSettlementController::class, 'paymentUpdate'])
+        ->name('cash-settlements.payment.update');
+
+    // Warehouse
+    Route::get('warehouses', [WarehouseController::class, 'index'])
+        ->name('warehouses.index');
+    Route::get('get-warehouse-list', [WarehouseController::class, 'list'])
+        ->name('warehouses.list');
+    Route::post('warehouse-summery', [WarehouseController::class, 'getSummery'])
+        ->name('warehouses.summery');
+    Route::put('warehouses/{hbl}/assign-zones', [WarehouseController::class, 'assignZone'])
+        ->name('warehouses.assign.zone');
+});

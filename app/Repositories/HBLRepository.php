@@ -27,6 +27,7 @@ use App\Models\Container;
 use App\Models\HBL;
 use App\Models\HBLDocument;
 use App\Models\HBLPackage;
+use App\Models\PickUp;
 use App\Models\Scopes\BranchScope;
 use Illuminate\Http\JsonResponse;
 
@@ -42,6 +43,8 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         $hbl = CreateHBL::run($data);
         $packagesData = $data['packages'];
         CreateHBLPackages::run($hbl, $packagesData);
+
+        $hbl->addStatus('HBL Preparation by warehouse');
 
         return $hbl;
     }
@@ -198,5 +201,27 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         } catch (\Exception $e) {
             throw new \Exception('Failed to delete hbl document: '.$e->getMessage());
         }
+    }
+
+    public function getPickupStatus(HBL $hbl): JsonResponse
+    {
+        if ($hbl->pickup_id) {
+            $pickup = PickUp::find($hbl->pickup_id);
+
+            return response()->json([
+                'status' => $pickup->statusLogs,
+            ]);
+        }
+
+        return response()->json([
+            'status' => [],
+        ]);
+    }
+
+    public function getHBLStatus(HBL $hbl): JsonResponse
+    {
+        return response()->json([
+            'status' => $hbl->statusLogs,
+        ]);
     }
 }

@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
 import {Grid, h} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
@@ -642,10 +642,16 @@ const selectedContainer = ref({});
 const showConfirmLoadedShipmentModal = ref(false);
 
 const confirmViewLoadedShipment = (id) => {
-    selectedContainer.value = props.containers.find(
+    const container = props.containers.find(
         (container) => container.id === id
     );
-    showConfirmLoadedShipmentModal.value = true;
+
+    if (container) {
+        selectedContainer.value = container;
+        showConfirmLoadedShipmentModal.value = true;
+    } else {
+        console.error('Container not found with id:', id);
+    }
 };
 
 const closeModal = () => {

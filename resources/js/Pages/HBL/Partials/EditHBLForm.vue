@@ -429,17 +429,17 @@ const openEditModal = (index) => {
                   class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
                     class="size-4.5 transition-colors duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
+                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                     />
                   </svg>
                 </div>
@@ -461,17 +461,17 @@ const openEditModal = (index) => {
                   class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
                     class="size-4.5 transition-colors duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
+                      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
                     />
                   </svg>
                 </div>
@@ -513,17 +513,17 @@ const openEditModal = (index) => {
                   class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
                     class="size-4.5 transition-colors duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
+                      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
                     />
                   </svg>
                 </div>
@@ -544,17 +544,17 @@ const openEditModal = (index) => {
                   class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
                     class="size-4.5 transition-colors duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
+                      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
                     />
                   </svg>
                 </div>
@@ -567,9 +567,9 @@ const openEditModal = (index) => {
               <label class="block">
                 <textarea
                   v-model="form.address"
-                  rows="4"
-                  placeholder="Type address here..."
                   class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                  placeholder="Type address here..."
+                  rows="4"
                 ></textarea>
               </label>
               <InputError :message="form.errors.address" />
@@ -599,17 +599,17 @@ const openEditModal = (index) => {
                   class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
                     class="size-4.5 transition-colors duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
+                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                     />
                   </svg>
                 </div>
@@ -630,17 +630,17 @@ const openEditModal = (index) => {
                   class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
                     class="size-4.5 transition-colors duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
+                      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
                     />
                   </svg>
                 </div>
@@ -674,9 +674,9 @@ const openEditModal = (index) => {
               <label class="block">
                 <textarea
                   v-model="form.consignee_address"
-                  rows="4"
-                  placeholder="Type address here..."
                   class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                  placeholder="Type address here..."
+                  rows="4"
                 ></textarea>
               </label>
               <InputError :message="form.errors.consignee_address" />
@@ -687,9 +687,9 @@ const openEditModal = (index) => {
               <label class="block">
                 <textarea
                   v-model="form.consignee_note"
-                  rows="4"
-                  placeholder="Type note here..."
                   class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                  placeholder="Type note here..."
+                  rows="4"
                 ></textarea>
               </label>
               <InputError :message="form.errors.consignee_note" />
@@ -706,17 +706,17 @@ const openEditModal = (index) => {
           <PrimaryButton class="space-x-2" type="submit">
             <span>Update HBL</span>
             <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
               class="size-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
             >
               <path
+                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
               />
             </svg>
           </PrimaryButton>
@@ -739,9 +739,9 @@ const openEditModal = (index) => {
               >
                 <input
                   v-model="form.cargo_type"
+                  :value="cargoType"
                   class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                   name="cargo_type"
-                  :value="cargoType"
                   type="radio"
                 />
                 <p>{{ cargoType }}</p>
@@ -768,9 +768,9 @@ const openEditModal = (index) => {
               >
                 <input
                   v-model="form.hbl_type"
+                  :value="hblType"
                   class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                   name="hbl_type"
-                  :value="hblType"
                   type="radio"
                 />
                 <p>{{ hblType }}</p>
@@ -797,9 +797,9 @@ const openEditModal = (index) => {
               >
                 <input
                   v-model="form.warehouse"
+                  :value="warehouse"
                   class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                   name="warehouse"
-                  :value="warehouse"
                   type="radio"
                 />
                 <p>{{ warehouse }}</p>
@@ -818,9 +818,9 @@ const openEditModal = (index) => {
               Price and Payment
             </h2>
             <button
+              class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
               type="button"
               @click="calculatePayment"
-              class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
             >
               Re Calculate Payment
             </button>
@@ -1001,8 +1001,8 @@ const openEditModal = (index) => {
                   </button>
 
                   <button
-                    @click.prevent="openEditModal(index)"
                     class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
+                    @click.prevent="openEditModal(index)"
                   >
                     <i class="fa-solid fa-edit"></i>
                   </button>
@@ -1045,10 +1045,10 @@ const openEditModal = (index) => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
+                d="M12 9l-2 2-2-2m4 2h4a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2h4m4-2l2 2 2-2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M12 9l-2 2-2-2m4 2h4a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2h4m4-2l2 2 2-2"
               ></path>
             </svg>
             <p class="text-gray-600">
@@ -1071,17 +1071,17 @@ const openEditModal = (index) => {
         <PrimaryButton class="space-x-2" type="submit">
           <span>Update HBL</span>
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
             class="size-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
           >
             <path
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
             />
           </svg>
         </PrimaryButton>
@@ -1104,9 +1104,9 @@ const openEditModal = (index) => {
             >
               <input
                 v-model="form.cargo_type"
+                :value="cargoType"
                 class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                 name="cargo_type"
-                :value="cargoType"
                 type="radio"
               />
               <p>{{ cargoType }}</p>
@@ -1133,9 +1133,9 @@ const openEditModal = (index) => {
             >
               <input
                 v-model="form.hbl_type"
+                :value="hblType"
                 class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                 name="hbl_type"
-                :value="hblType"
                 type="radio"
               />
               <p>{{ hblType }}</p>
@@ -1162,9 +1162,9 @@ const openEditModal = (index) => {
             >
               <input
                 v-model="form.warehouse"
+                :value="warehouse"
                 class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                 name="warehouse"
-                :value="warehouse"
                 type="radio"
               />
               <p>{{ warehouse }}</p>
@@ -1183,9 +1183,9 @@ const openEditModal = (index) => {
             Price and Payment
           </h2>
           <button
+            class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
             type="button"
             @click="calculatePayment"
-            class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
           >
             Re Calculate Payment
           </button>
@@ -1296,17 +1296,17 @@ const openEditModal = (index) => {
         <PrimaryButton class="space-x-2" type="submit">
           <span>Update HBL</span>
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
             class="size-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
           >
             <path
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
             />
           </svg>
         </PrimaryButton>
@@ -1329,9 +1329,9 @@ const openEditModal = (index) => {
             >
               <input
                 v-model="form.cargo_type"
+                :value="cargoType"
                 class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                 name="cargo_type"
-                :value="cargoType"
                 type="radio"
               />
               <p>{{ cargoType }}</p>
@@ -1358,9 +1358,9 @@ const openEditModal = (index) => {
             >
               <input
                 v-model="form.hbl_type"
+                :value="hblType"
                 class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                 name="hbl_type"
-                :value="hblType"
                 type="radio"
               />
               <p>{{ hblType }}</p>
@@ -1387,9 +1387,9 @@ const openEditModal = (index) => {
             >
               <input
                 v-model="form.warehouse"
+                :value="warehouse"
                 class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                 name="warehouse"
-                :value="warehouse"
                 type="radio"
               />
               <p>{{ warehouse }}</p>
@@ -1408,9 +1408,9 @@ const openEditModal = (index) => {
             Price and Payment
           </h2>
           <button
+            class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
             type="button"
             @click="calculatePayment"
-            class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
           >
             Re Calculate Payment
           </button>
@@ -1520,17 +1520,17 @@ const openEditModal = (index) => {
       <PrimaryButton class="space-x-2" type="submit">
         <span>Update HBL</span>
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
           class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
         >
           <path
+            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
           />
         </svg>
       </PrimaryButton>
@@ -1544,8 +1544,8 @@ const openEditModal = (index) => {
   >
     <div
       class="absolute inset-0 bg-slate-900/60 transition-opacity duration-300"
-      @click="false"
       x-show="true"
+      @click="false"
     ></div>
 
     <div
@@ -1558,21 +1558,21 @@ const openEditModal = (index) => {
           {{ editMode ? "Edit Package" : "Add New Package" }}
         </h3>
         <button
-          @click="closeAddPackageModal"
           class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+          @click="closeAddPackageModal"
         >
           <svg
-            xmlns="http://www.w3.org/2000/svg"
             class="size-4.5"
             fill="none"
-            viewBox="0 0 24 24"
             stroke="currentColor"
             stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
           >
             <path
+              d="M6 18L18 6M6 6l12 12"
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
             ></path>
           </svg>
         </button>
@@ -1589,8 +1589,8 @@ const openEditModal = (index) => {
                 <span>Type </span>
                 <select
                   v-model="selectedType"
-                  @change="updateTypeDescription"
                   class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                  @change="updateTypeDescription"
                 >
                   <option
                     v-for="package_type in packageTypes"
@@ -1706,9 +1706,9 @@ const openEditModal = (index) => {
                 <span>Remarks</span>
                 <textarea
                   v-model="packageItem.remarks"
-                  rows="4"
-                  placeholder="Enter Text"
                   class="form-textarea mt-1.5 w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                  placeholder="Enter Text"
+                  rows="4"
                 ></textarea>
               </label>
             </div>

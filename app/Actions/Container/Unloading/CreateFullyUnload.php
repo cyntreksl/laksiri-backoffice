@@ -36,6 +36,8 @@ class CreateFullyUnload
 
             UpdateContainerStatus::run($container, ContainerStatus::UNLOADED->value);
 
+            $container->addStatus('Container cleared');
+
             // update container loading end datetime and who loaded by
             $data = [
                 'unloading_ended_at' => now(),

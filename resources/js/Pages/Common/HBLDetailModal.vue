@@ -5,18 +5,46 @@ import Tabs from "@/Components/Tabs.vue";
 import TabHBLDetails from "@/Pages/Common/Partials/TabHBLDetails.vue";
 import TabStatus from "@/Pages/Common/Partials/TabStatus.vue";
 import TabDocuments from "@/Pages/Common/Partials/TabDocuments.vue";
+import {ref, watch} from "vue";
 
 const props = defineProps({
     show: {
         type: Boolean,
         default: false,
     },
-    hbl: {
-        type: Object,
-        default: () => {
-        },
+    hblId: {
+        type: Number,
+        required: true,
     }
 });
+
+const hbl = ref({});
+
+const fetchHBL = async () => {
+    try {
+        const response = await fetch(`/hbls/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            hbl.value = data.hbl;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+watch(() => {
+    fetchHBL()
+})
 
 const emit = defineEmits(['close']);
 </script>
@@ -71,9 +99,9 @@ const emit = defineEmits(['close']);
 
                 <TabHBLDetails :hbl="hbl"/>
 
-                <TabStatus />
+                <TabStatus :hbl-id="hbl?.id"/>
 
-                <TabDocuments :hbl="hbl"/>
+                <TabDocuments :hbl-id="hbl?.id"/>
             </Tabs>
         </template>
 

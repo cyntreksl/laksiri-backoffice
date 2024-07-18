@@ -19,6 +19,7 @@ import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import HoldConfirmationModal from "@/Pages/CashSettlement/Partials/HoldConfirmationModal.vue";
 import { router } from "@inertiajs/vue3";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 
 const props = defineProps({
   drivers: {
@@ -243,44 +244,44 @@ const createColumns = () => [
     sort: false,
     formatter: (_, row) => {
       return h("div", {}, [
-        h(
-          "a",
-          {
-            className:
-              "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-            onClick: () => confirmViewHBL(row.cells[0].data?.id),
-            "x-tooltip..placement.bottom.primary": "'View HBL'",
-          },
-          [
-            h(
-              "svg",
+          h(
+              "a",
               {
-                xmlns: "http://www.w3.org/2000/svg",
-                viewBox: "0 0 24 24",
-                class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                fill: "none",
-                height: 24,
-                width: 24,
-                stroke: "currentColor",
-                strokeLinecap: "round",
-                strokeLinejoin: "round",
+                  className:
+                      "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
+                  onClick: () => confirmViewHBL(row.cells[0].data?.id),
+                  "x-tooltip..placement.bottom.primary": "'View HBL'",
               },
               [
-                h("path", {
-                  d: "M0 0h24v24H0z",
-                  fill: "none",
-                  stroke: "none",
-                }),
-                h("path", {
-                  d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                }),
-                h("path", {
-                  d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                }),
+                  h(
+                      "svg",
+                      {
+                          xmlns: "http://www.w3.org/2000/svg",
+                          viewBox: "0 0 24 24",
+                          class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
+                          fill: "none",
+                          height: 24,
+                          width: 24,
+                          stroke: "currentColor",
+                          strokeLinecap: "round",
+                          strokeLinejoin: "round",
+                      },
+                      [
+                          h("path", {
+                              d: "M0 0h24v24H0z",
+                              fill: "none",
+                              stroke: "none",
+                          }),
+                          h("path", {
+                              d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                          }),
+                          h("path", {
+                              d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                          }),
+                      ]
+                  ),
               ]
-            ),
-          ]
-        ),
+          ),
         h(
           "button",
           {
@@ -613,38 +614,15 @@ const resetFilter = () => {
 };
 
 const showConfirmViewHBLModal = ref(false);
-const hblRecord = ref({});
-
-const fetchHBL = async (id) => {
-  try {
-    const response = await fetch(`hbls/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": document
-          .querySelector('meta[name="csrf-token"]')
-          .getAttribute("content"),
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok.");
-    } else {
-      const data = await response.json();
-      hblRecord.value = data.hbl;
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
+const hblId = ref(null);
 
 const confirmViewHBL = async (id) => {
-  await fetchHBL(id);
-  showConfirmViewHBLModal.value = true;
+    hblId.value = id;
+    showConfirmViewHBLModal.value = true;
 };
 
 const closeShowHBLModal = () => {
-  showConfirmViewHBLModal.value = false;
+    showConfirmViewHBLModal.value = false;
 };
 
 const planeIcon = ref(`
@@ -693,59 +671,17 @@ const shipIcon = ref(`
     <Breadcrumb />
 
     <div class="grid sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 mt-3">
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ totalRecord }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">HBL Count</p>
-      </div>
+        <SimpleOverviewWidget :count="totalRecord" bg-color="white" title="HBL Count" />
 
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ totalGrandAmount.toLocaleString() }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">HBL Amount</p>
-      </div>
+        <SimpleOverviewWidget :count="totalGrandAmount.toLocaleString()" bg-color="white" title="HBL Amount" />
 
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ totalPaidAmount.toLocaleString() }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">HBL Paid Amount</p>
-      </div>
+        <SimpleOverviewWidget :count="totalPaidAmount.toLocaleString()" bg-color="white" title="HBL Paid Amount" />
 
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ countOfSelectedData }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">Selected HBL Count</p>
-      </div>
+        <SimpleOverviewWidget :count="countOfSelectedData" bg-color="white" title="Selected HBL Count" />
 
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ valueOfSelectedData.toLocaleString() }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">Selected HBL Amount</p>
-      </div>
+        <SimpleOverviewWidget :count="valueOfSelectedData.toLocaleString()" bg-color="white" title="Selected HBL Amount" />
 
-      <div class="rounded-lg bg-white p-4 dark:bg-navy-600">
-        <div class="flex justify-between space-x-1">
-          <p class="text-xl font-semibold text-slate-700 dark:text-navy-100">
-            {{ paidValueOfSelectedData.toLocaleString() }}
-          </p>
-        </div>
-        <p class="mt-1 text-xs+">Selected HBL Paid Amount</p>
-      </div>
+        <SimpleOverviewWidget :count="paidValueOfSelectedData.toLocaleString()" bg-color="white" title="Selected HBL Paid Amount" />
     </div>
 
     <div class="card mt-4">
@@ -759,40 +695,37 @@ const shipIcon = ref(`
                 Cash Settlement List
               </h2>
             </div>
-            <br />
-            <div
-              class="mr-4 cursor-pointer"
-              x-tooltip.info.placement.bottom="'Applied Filters'"
-            >
-              Filter Options:
-            </div>
 
             <div
-              class="grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
+              class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
             >
+              <div
+                class="mr-4 cursor-pointer"
+                x-tooltip.info.placement.bottom="'Applied Filters'"
+              >
+                Filter Options:
+              </div>
               <div class="flex -space-x-px">
                 <div>
                   <div
-                    class="badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
-                    <i class="mr-1 fas fa-calendar-alt"></i>
                     From Date
                   </div>
                   <div
-                    class="tag badge bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     {{ filters.fromDate }}
                   </div>
                 </div>
                 <div>
                   <div
-                    class="ml-2 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                    class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                   >
-                    <i class="mr-1 far fa-calendar-alt"></i>
-                    To &nbsp;Date
+                    To Date
                   </div>
                   <div
-                    class="badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     {{ filters.toDate }}
                   </div>
@@ -862,23 +795,23 @@ const shipIcon = ref(`
               </ColumnVisibilityPopover>
 
               <button
+                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                 x-tooltip.placement.top="'Filter result'"
                 @click="showFilters = true"
-                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
               >
                 <i class="fa-solid fa-filter"></i>
               </button>
             </div>
             <div>
               <button
-                @click="cashReceived"
-                :disabled="isDataEmpty"
-                class="btn font-medium text-white"
                 :class="{
                   'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90':
                     !isDataEmpty,
                   'bg-gray-300 cursor-not-allowed': isDataEmpty,
                 }"
+                :disabled="isDataEmpty"
+                class="btn font-medium text-white"
+                @click="cashReceived"
               >
                 Cash Received
               </button>
@@ -1015,10 +948,10 @@ const shipIcon = ref(`
       @toggle-hold="toggleHold"
     />
 
-    <HBLDetailModal
-      :hbl="hblRecord"
+  <HBLDetailModal
+      :hbl-id="hblId"
       :show="showConfirmViewHBLModal"
       @close="closeShowHBLModal"
-    />
+  />
   </AppLayout>
 </template>

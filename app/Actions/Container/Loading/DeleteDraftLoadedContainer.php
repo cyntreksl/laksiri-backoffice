@@ -39,7 +39,7 @@ class DeleteDraftLoadedContainer
                 ->exists();
 
             if (! $isPartialLoaded) {
-                UpdateHBLSystemStatus::run($hbl, 4);
+                UpdateHBLSystemStatus::run($hbl, HBL::SYSTEM_STATUS_CASH_RECEIVED);
             }
 
             // update the container status as a 'requested' when full loading removed.

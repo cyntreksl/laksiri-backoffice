@@ -6,6 +6,7 @@ use App\Interfaces\BondedWarehouseRepositoryInterface;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\ContainerRepositoryInterface;
+use App\Interfaces\DashboardRepositoryInterface;
 use App\Interfaces\DriverAreasRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
@@ -23,6 +24,7 @@ use App\Repositories\BondedWarehouseRepository;
 use App\Repositories\BranchRepository;
 use App\Repositories\CashSettlementRepository;
 use App\Repositories\ContainerRepositories;
+use App\Repositories\DashboardRepository;
 use App\Repositories\DriverAreasRepository;
 use App\Repositories\DriverRepository;
 use App\Repositories\HBLRepository;
@@ -59,6 +61,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DriverAreasRepositoryInterface::class, DriverAreasRepository::class);
         $this->app->bind(BondedWarehouseRepositoryInterface::class, BondedWarehouseRepository::class);
         $this->app->bind(UnloadingIssuesRepositoryInterface::class, UnloadingIssuesRepository::class);
+        $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
     }
 
     public function boot(): void

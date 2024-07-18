@@ -18,8 +18,13 @@ class CreateContainer
         try {
             $data['created_by'] = auth()->id();
             $data['branch_id'] = GetUserCurrentBranchID::run();
+            $data['system_status'] = Container::SYSTEM_STATUS_BOOK_CONTAINER;
 
-            return Container::create($data);
+            $container = Container::create($data);
+
+            $container->addStatus('Container Booked');
+
+            return $container;
         } catch (\Exception $e) {
             throw new \Exception('Failed to create container: '.$e->getMessage());
         }
