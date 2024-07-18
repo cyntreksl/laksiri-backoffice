@@ -50,7 +50,7 @@ const selectNewDoc = (refName) => {
         blDocumentInput.value.click();
     } else if (refName === 'manifestDocumentInput') {
         manifestDocumentInput.value.click();
-    } else{
+    } else {
         receiptDocumentInput.value.click();
     }
 };
@@ -126,97 +126,219 @@ const handleDeleteDoc = () => {
                         <tbody>
                         <tr>
                             <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5 flex items-center">
-                                <svg v-if="hblDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')" class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                <svg
+                                    v-if="hblDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')"
+                                    class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success"
+                                    fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M5 12l5 5l10 -10"/>
+                                </svg>
 
-                                <svg v-else  class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 19v.01" /><path d="M12 15v-10" /></svg>
+                                <svg v-else
+                                     class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"
+                                     fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M12 19v.01"/>
+                                    <path d="M12 15v-10"/>
+                                </svg>
 
                                 BL From Shipping Line
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <form class="flex items-center space-x-4 float-right" @submit.prevent="handleFileUpload()">
+                                <form v-if="$page.props.user.permissions.includes('hbls.upload documents')"
+                                      class="flex items-center space-x-4 float-right"
+                                      @submit.prevent="handleFileUpload()">
 
-                                    <input ref="blDocumentInput" hidden type="file" @input="handleFileInput($event, 'blDocument')"/>
+                                    <input ref="blDocumentInput" hidden type="file"
+                                           @input="handleFileInput($event, 'blDocument')"/>
 
-                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-upload hover:cursor-pointer" fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"  @click.prevent="selectNewDoc('blDocumentInput')"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>
+                                    <svg
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-upload hover:cursor-pointer"
+                                        fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        @click.prevent="selectNewDoc('blDocumentInput')">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+                                        <path d="M7 9l5 -5l5 5"/>
+                                        <path d="M12 4l0 12"/>
+                                    </svg>
 
                                     <button
-                                        v-show="form.document_name === 'BL From Shipping Line'" class="btn py-1 font-medium text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:text-accent-light dark:hover:bg-accent-light/20 dark:focus:bg-accent-light/20 dark:active:bg-accent-light/25"
+                                        v-show="form.document_name === 'BL From Shipping Line'"
+                                        class="btn py-1 font-medium text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:text-accent-light dark:hover:bg-accent-light/20 dark:focus:bg-accent-light/20 dark:active:bg-accent-light/25"
                                         type="submit"
                                     >
                                         Save
                                     </button>
 
-                                    <button
-                                        v-if="hblDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')"
-                                        class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
-                                        @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').id, 'BL From Shipping Line')"
-                                    >
-                                        <svg  class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"  fill="currentColor"  viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z" /><path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" /></svg>
-                                    </button>
+                                    <template v-if="$page.props.user.permissions.includes('hbls.delete documents')">
+                                        <button
+                                            v-if="hblDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')"
+                                            class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
+                                            @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').id, 'BL From Shipping Line')"
+                                        >
+                                            <svg
+                                                class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"
+                                                fill="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                <path
+                                                    d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z"/>
+                                                <path
+                                                    d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z"/>
+                                            </svg>
+                                        </button>
+                                    </template>
                                 </form>
                             </td>
                         </tr>
                         <tr>
                             <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5 flex items-center">
-                                <svg v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Manifest')" class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                <svg v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Manifest')"
+                                     class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success"
+                                     fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M5 12l5 5l10 -10"/>
+                                </svg>
 
-                                <svg v-else  class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 19v.01" /><path d="M12 15v-10" /></svg>
+                                <svg v-else
+                                     class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"
+                                     fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M12 19v.01"/>
+                                    <path d="M12 15v-10"/>
+                                </svg>
 
                                 Manifest
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <form class="flex items-center space-x-4 float-right" @submit.prevent="handleFileUpload()">
+                                <form v-if="$page.props.user.permissions.includes('hbls.upload documents')"
+                                      class="flex items-center space-x-4 float-right"
+                                      @submit.prevent="handleFileUpload()">
 
-                                    <input ref="manifestDocumentInput" hidden type="file" @input="handleFileInput($event, 'manifestDocument')"/>
+                                    <input ref="manifestDocumentInput" hidden type="file"
+                                           @input="handleFileInput($event, 'manifestDocument')"/>
 
-                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-upload hover:cursor-pointer" fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"  @click.prevent="selectNewDoc('manifestDocumentInput')"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>
+                                    <svg
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-upload hover:cursor-pointer"
+                                        fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        @click.prevent="selectNewDoc('manifestDocumentInput')">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+                                        <path d="M7 9l5 -5l5 5"/>
+                                        <path d="M12 4l0 12"/>
+                                    </svg>
 
                                     <button
-                                        v-show="form.document_name === 'Manifest'" class="btn py-1 font-medium text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:text-accent-light dark:hover:bg-accent-light/20 dark:focus:bg-accent-light/20 dark:active:bg-accent-light/25"
+                                        v-show="form.document_name === 'Manifest'"
+                                        class="btn py-1 font-medium text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:text-accent-light dark:hover:bg-accent-light/20 dark:focus:bg-accent-light/20 dark:active:bg-accent-light/25"
                                         type="submit"
                                     >
                                         Save
                                     </button>
 
-                                    <button
-                                        v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Manifest')"
-                                        class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
-                                        @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Manifest').id, 'Manifest')"
-                                    >
-                                        <svg  class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"  fill="currentColor"  viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z" /><path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" /></svg>
-                                    </button>
+                                    <template v-if="$page.props.user.permissions.includes('hbls.delete documents')">
+                                        <button
+                                            v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Manifest')"
+                                            class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
+                                            @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Manifest').id, 'Manifest')"
+                                        >
+                                            <svg
+                                                class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"
+                                                fill="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                <path
+                                                    d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z"/>
+                                                <path
+                                                    d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z"/>
+                                            </svg>
+                                        </button>
+                                    </template>
                                 </form>
                             </td>
                         </tr>
                         <tr>
                             <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5 flex items-center">
-                                <svg v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')" class="icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success size-7"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                <svg
+                                    v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')"
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-check mr-3 text-success size-7"
+                                    fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M5 12l5 5l10 -10"/>
+                                </svg>
 
-                                <svg v-else  class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M12 19v.01" /><path d="M12 15v-10" /></svg>
+                                <svg v-else
+                                     class="size-7 icon icon-tabler icons-tabler-outline icon-tabler-exclamation-mark mr-3 text-warning"
+                                     fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M12 19v.01"/>
+                                    <path d="M12 15v-10"/>
+                                </svg>
 
                                 Receipt for Freight Charges
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <form class="flex items-center space-x-4 float-right" @submit.prevent="handleFileUpload()">
+                                <form v-if="$page.props.user.permissions.includes('hbls.upload documents')"
+                                      class="flex items-center space-x-4 float-right"
+                                      @submit.prevent="handleFileUpload()">
 
-                                    <input ref="receiptDocumentInput" hidden type="file" @input="handleFileInput($event, 'receiptDocument')"/>
+                                    <input ref="receiptDocumentInput" hidden type="file"
+                                           @input="handleFileInput($event, 'receiptDocument')"/>
 
-                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-upload hover:cursor-pointer" fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"  @click.prevent="selectNewDoc('receiptDocumentInput')"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>
+                                    <svg
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-upload hover:cursor-pointer"
+                                        fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        @click.prevent="selectNewDoc('receiptDocumentInput')">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+                                        <path d="M7 9l5 -5l5 5"/>
+                                        <path d="M12 4l0 12"/>
+                                    </svg>
 
                                     <button
-                                        v-show="form.document_name === 'Receipt for Freight Charges'" class="btn py-1 font-medium text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:text-accent-light dark:hover:bg-accent-light/20 dark:focus:bg-accent-light/20 dark:active:bg-accent-light/25"
+                                        v-show="form.document_name === 'Receipt for Freight Charges'"
+                                        class="btn py-1 font-medium text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:text-accent-light dark:hover:bg-accent-light/20 dark:focus:bg-accent-light/20 dark:active:bg-accent-light/25"
                                         type="submit"
                                     >
                                         Save
                                     </button>
 
-                                    <button
-                                        v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')"
-                                        class="btn size-6 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
-                                        @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id, 'Receipt for Freight Charges')"
-                                    >
-                                        <svg  class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"  fill="currentColor"  viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z" /><path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" /></svg>
-                                    </button>
+                                    <template v-if="$page.props.user.permissions.includes('hbls.delete documents')">
+                                        <button
+                                            v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')"
+                                            class="btn size-6 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
+                                            @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id, 'Receipt for Freight Charges')"
+                                        >
+                                            <svg
+                                                class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"
+                                                fill="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                <path
+                                                    d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z"/>
+                                                <path
+                                                    d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z"/>
+                                            </svg>
+                                        </button>
+                                    </template>
                                 </form>
                             </td>
                         </tr>
@@ -236,10 +358,12 @@ const handleDeleteDoc = () => {
                     <div class="flex items-center space-x-4">
                         <div
                             class="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 dark:bg-accent">
-                            <svg class="size-5.5 text-primary dark:text-white icon icon-tabler icons-tabler-outline icon-tabler-pdf" fill="none" height="24" stroke="currentColor"
-                                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                 width="24"
-                                 xmlns="http://www.w3.org/2000/svg">
+                            <svg
+                                class="size-5.5 text-primary dark:text-white icon icon-tabler icons-tabler-outline icon-tabler-pdf"
+                                fill="none" height="24" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                width="24"
+                                xmlns="http://www.w3.org/2000/svg">
                                 <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                 <path d="M10 8v8h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-2z"/>
                                 <path d="M3 12h2a2 2 0 1 0 0 -4h-2v8"/>
@@ -249,13 +373,23 @@ const handleDeleteDoc = () => {
                         </div>
                         <span class="font-medium text-slate-700 dark:text-navy-100">HBL Record</span>
                     </div>
-                    <a v-if="hblId" :href="route('hbls.download', hblId)">
-                        <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
-                    </a>
+                    <template v-if="$page.props.user.permissions.includes('hbls.download pdf')">
+                        <a v-if="hblId" :href="route('hbls.download', hblId)">
+                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-download" fill="none" height="24"
+                                 stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                 viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+                                <path d="M7 11l5 5l5 -5"/>
+                                <path d="M12 4l0 12"/>
+                            </svg>
+                        </a>
+                    </template>
                 </div>
             </div>
         </div>
 
-        <DeleteDocConfirmationModal :doc-name="docName" :show="showConfirmDeleteDocModal" @close="closeDeleteModal" @delete-doc="handleDeleteDoc"/>
+        <DeleteDocConfirmationModal :doc-name="docName" :show="showConfirmDeleteDocModal" @close="closeDeleteModal"
+                                    @delete-doc="handleDeleteDoc"/>
     </Tab>
 </template>

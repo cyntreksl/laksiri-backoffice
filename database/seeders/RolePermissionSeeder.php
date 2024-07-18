@@ -77,6 +77,25 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'HBL',
+                'permissions' => [
+                    'hbls.index',
+                    'hbls.create',
+                    'hbls.show',
+                    'hbls.edit',
+                    'hbls.delete',
+                    'hbls.hold and release',
+                    'hbls.show cancelled hbls',
+                    'hbls.restore',
+                    'hbls.download pdf',
+                    'hbls.download invoice',
+                    'hbls.download barcode',
+                    'hbls.upload documents',
+                    'hbls.delete documents',
+                ],
+            ],
+
+            [
                 'group_name' => 'Arrivals',
                 'permissions' => [
                     'arrivals.list',
