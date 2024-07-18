@@ -96,6 +96,17 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'Cash Settlement',
+                'permissions' => [
+                    'cash.index',
+                    'cash.show',
+                    'cash.hold and release',
+                    'cash.update payment',
+                    'cash.cash received',
+                ],
+            ],
+
+            [
                 'group_name' => 'Arrivals',
                 'permissions' => [
                     'arrivals.list',
