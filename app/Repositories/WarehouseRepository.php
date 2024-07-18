@@ -55,16 +55,26 @@ class WarehouseRepository implements GridJsInterface, WarehouseRepositoryInterfa
         //apply filters
         FilterFactory::apply($query, $filters);
 
-        $records = $query->get();
+        $records = $query
+            ->withSum('packages', 'weight')
+            ->withSum('packages', 'volume')
+            ->withSum('packages', 'quantity')
+            ->get();
 
         $sumAmount = $records->sum('grand_total');
         $sumPaidAmount = $records->sum('paid_amount');
         $countRecords = $records->count();
+        $sumWeight = $records->sum('packages_sum_weight');
+        $sumVolume = $records->sum('packages_sum_volume');
+        $sumQuantity = $records->sum('packages_sum_quantity');
 
         return [
             'totalRecords' => $countRecords,
             'sumAmount' => $sumAmount,
             'sumPaidAmount' => $sumPaidAmount,
+            'sumWeight' => $sumWeight,
+            'sumVolume' => $sumVolume,
+            'sumQuantity' => $sumQuantity,
         ];
     }
 
