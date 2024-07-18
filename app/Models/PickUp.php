@@ -67,4 +67,9 @@ class PickUp extends Model
     {
         return $this->hasMany(PickupException::class, 'pickup_id');
     }
+
+    public function hbl()
+    {
+        return $this->belongsTo(HBL::class, 'hbl_id');
+    }
 }

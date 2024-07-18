@@ -75,4 +75,16 @@ class PickupController extends Controller
     {
         return $this->pickupRepository->savePickupException($request->all(), $pickup);
     }
+
+    /**
+     * Completed Pickup with HBL
+     *
+     * Display the list of completed pickups with HBL.
+     *
+     * @group Pickups
+     */
+    public function completedPickupWithHBL()
+    {
+        return $this->pickupRepository->completedPickupWithHBL();
+    }
 }

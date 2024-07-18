@@ -1,7 +1,7 @@
 <script setup>
-import {onMounted, reactive, ref} from "vue";
-import {Link, router} from "@inertiajs/vue3";
-import {Grid, h, html} from "gridjs";
+import { onMounted, reactive, ref } from "vue";
+import { Link, router } from "@inertiajs/vue3";
+import { Grid, h, html } from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -15,26 +15,23 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
-import {push} from "notivue";
+import { push } from "notivue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import RestoreHBLConfirmationModal from "@/Pages/HBL/Partials/RestoreHBLConfirmationModal.vue";
 
 const props = defineProps({
-    users: {
-        type: Object,
-        default: () => {
-        },
-    },
-    hbls: {
-        type: Object,
-        default: () => {
-        },
-    },
-    paymentStatus: {
-        type: Object,
-        default: () => {
-        },
-    },
+  users: {
+    type: Object,
+    default: () => {},
+  },
+  hbls: {
+    type: Object,
+    default: () => {},
+  },
+  paymentStatus: {
+    type: Object,
+    default: () => {},
+  },
 });
 
 const wrapperRef = ref(null);
@@ -87,56 +84,56 @@ const toggleColumnVisibility = (columnName) => {
 const initializeGrid = () => {
     const visibleColumns = Object.keys(data.columnVisibility);
 
-    grid = new Grid({
-        columns: createColumns(),
-        search: {
-            debounceTimeout: 1000,
-            server: {
-                url: (prev, keyword) => `${prev}&search=${keyword}`,
-            },
-        },
-        sort: {
-            multiColumn: false,
-            server: {
-                url: (prev, columns) => {
-                    if (!columns.length) return prev;
-                    const col = columns[0];
-                    const dir = col.direction === 1 ? "asc" : "desc";
-                    let colName = visibleColumns[col.index];
+  grid = new Grid({
+    columns: createColumns(),
+    search: {
+      debounceTimeout: 1000,
+      server: {
+        url: (prev, keyword) => `${prev}&search=${keyword}`,
+      },
+    },
+    sort: {
+      multiColumn: false,
+      server: {
+        url: (prev, columns) => {
+          if (!columns.length) return prev;
+          const col = columns[0];
+          const dir = col.direction === 1 ? "asc" : "desc";
+          let colName = visibleColumns[col.index];
 
-                    return `${prev}&order=${colName}&dir=${dir}`;
-                },
-            },
+          return `${prev}&order=${colName}&dir=${dir}`;
         },
-        pagination: {
-            limit: 10,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
-        },
-        server: {
-            url: constructUrl(),
-            then: (data) =>
-                data.data.map((item) => {
-                    const row = [];
-                    // row.push({id: item.id})
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                }),
-            total: (response) => {
-                if (response && response.meta) {
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
+      },
+    },
+    pagination: {
+      limit: 10,
+      server: {
+        url: (prev, page, limit) =>
+          `${prev}&limit=${limit}&offset=${page * limit}`,
+      },
+    },
+    server: {
+      url: constructUrl(),
+      then: (data) =>
+        data.data.map((item) => {
+          const row = [];
+          // row.push({id: item.id})
+          visibleColumns.forEach((column) => {
+            row.push(item[column]);
+          });
+          return row;
+        }),
+      total: (response) => {
+        if (response && response.meta) {
+          return response.meta.total;
+        } else {
+          throw new Error("Invalid total count in server response");
+        }
+      },
+    },
+  });
 
-    grid.render(wrapperRef.value);
+  grid.render(wrapperRef.value);
 };
 
 const createColumns = () => [
@@ -533,65 +530,68 @@ const shipIcon = ref(`
     <AppLayout title="Cancelled HBL List">
         <template #header>Cancelled HBL List</template>
 
-        <Breadcrumb/>
-        <div class="flex justify-end mt-5">
-            <Link :href="route('hbls.create')">
-                <PrimaryButton> Create New HBL</PrimaryButton>
-            </Link>
-        </div>
-        <div class="card mt-4">
-            <div>
-                <div class="flex items-center justify-between p-2">
-                    <div class="">
-                        <div class="flex">
-                            <h2
-                                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Cancelled HBL List
-                            </h2>
-                        </div>
+    <Breadcrumb />
+    <div class="flex justify-end mt-5">
+      <Link :href="route('hbls.create')">
+        <PrimaryButton> Create New HBL </PrimaryButton>
+      </Link>
+    </div>
+    <div class="card mt-4">
+      <div>
+        <div class="flex items-center justify-between p-2">
+          <div class="">
+            <div class="flex">
+              <h2
+                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+              >
+                Cancelled HBL List
+              </h2>
+            </div>
+            <br />
+            <div
+              class="mr-4 cursor-pointer"
+              x-tooltip.info.placement.bottom="'Applied Filters'"
+            >
+              Filter Options:
+            </div>
 
-                        <div
-                            class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
-                        >
-                            <div
-                                class="mr-4 cursor-pointer"
-                                x-tooltip.info.placement.bottom="'Applied Filters'"
-                            >
-                                Filter Options:
-                            </div>
-                            <div class="flex -space-x-px">
-                                <div>
-                                    <div
-                                        class="mb-1 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        From Date
-                                    </div>
-                                    <div
-                                        class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.fromDate }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div
-                                        class="mb-1 ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        To Date
-                                    </div>
-                                    <div
-                                        class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.toDate }}
-                                    </div>
-                                </div>
-                                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-                                    <div
-                                        v-for="(mode, index) in filters.cargoMode"
-                                        v-if="filters.cargoMode"
-                                        :key="index"
-                                        class="mb-1 badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
-                                    >
+            <div
+              class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
+            >
+              <div class="flex -space-x-px">
+                <div>
+                  <div
+                    class="mb-1 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                  >
+                    <i class="mr-1 fas fa-calendar-alt"></i>
+                    From Date
+                  </div>
+                  <div
+                    class="badge bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                  >
+                    {{ filters.fromDate }}
+                  </div>
+                </div>
+                <div>
+                  <div
+                    class="mb-1 ml-2 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                  >
+                    <i class="mr-1 far fa-calendar-alt"></i>
+                    To &nbsp;Date
+                  </div>
+                  <div
+                    class="badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                  >
+                    {{ filters.toDate }}
+                  </div>
+                </div>
+                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+                  <div
+                    v-for="(mode, index) in filters.cargoMode"
+                    v-if="filters.cargoMode"
+                    :key="index"
+                    class="mb-1 badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
+                  >
                     <span v-if="mode == 'Sea Cargo'">
                       <div v-html="shipIcon"></div>
                     </span>

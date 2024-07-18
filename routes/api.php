@@ -11,6 +11,7 @@ Route::domain('api.'.config('app.url'))
     ->prefix('/v1/')->group(function () {
         Route::get('/pending-pickup-list', [PickupController::class, 'index']);
         Route::get('/pickups/{pickup}', [PickupController::class, 'show']);
+        Route::get('/pickups/completed/list', [PickupController::class, 'completedPickupWithHBL']);
         Route::post('/pickup-to-hbl/{pickUp}', [PickupController::class, 'pickupToHbl']);
         Route::post('/pickups', [PickupController::class, 'store']);
         Route::apiResource('hbls', HBLController::class)->only(['store', 'show']);

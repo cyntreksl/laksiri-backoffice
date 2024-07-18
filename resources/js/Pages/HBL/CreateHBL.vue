@@ -48,6 +48,14 @@ const findCountryCodeByBranch = computed(() => {
   }
 });
 
+const isMobile = () => {
+  if (screen.width <= 760) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 const countryCodes = ["+94", "+966", "+971", "+965"];
 const countryCode = ref(findCountryCodeByBranch.value);
 const contactNumber = ref("");
@@ -718,7 +726,7 @@ const shipIcon = ref(`
         </div>
         <div class="sm:col-span-2 space-y-5">
           <!-- Action Buttons -->
-          <div class="flex justify-end space-x-5">
+          <div v-if="!isMobile()" class="flex justify-end space-x-5">
             <DangerOutlineButton @click="router.visit(route('hbls.index'))"
               >Cancel</DangerOutlineButton
             >
@@ -1093,11 +1101,40 @@ const shipIcon = ref(`
           </div>
         </div>
       </div>
+
+      <!-- Action Buttons -->
+      <div v-if="isMobile()" class="flex justify-end space-x-5">
+        <DangerOutlineButton @click="router.visit(route('hbls.index'))"
+          >Cancel</DangerOutlineButton
+        >
+        <PrimaryButton
+          :class="{ 'opacity-50': form.processing }"
+          :disabled="form.processing"
+          class="space-x-2"
+          type="submit"
+        >
+          <span>Create a HBL</span>
+          <svg
+            class="size-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </PrimaryButton>
+      </div>
     </form>
 
     <div
       v-if="showAddNewPackageDialog"
-      class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden"
+      class="fixed px-2 inset-0 z-[100] flex flex-col items-center justify-center overflow-y-auto"
       role="dialog"
     >
       <div
@@ -1107,7 +1144,7 @@ const shipIcon = ref(`
       ></div>
 
       <div
-        class="relative w-auto sm:w-1/3 rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
+        class="relative w-auto sm:w-1/2 h-auto sm:h-1/5 md:h-fit lg:h-fit rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
       >
         <div
           class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5"

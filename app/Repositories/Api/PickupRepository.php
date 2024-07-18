@@ -6,6 +6,7 @@ use App\Actions\PickUps\ConvertPickupToHBL;
 use App\Actions\PickUps\CreatePickUp;
 use App\Actions\PickUps\Exception\CreatePickUpException;
 use App\Actions\PickUps\GetPickupsByDriver;
+use App\Enum\PickupStatus;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\Api\PickupRepositoryInterface;
 use App\Models\PickUp;
@@ -70,6 +71,20 @@ class PickupRepository implements PickupRepositoryInterface
             $pickupException = CreatePickUpException::run($data, $pickup);
 
             return $this->success('Pickup exception created successfully!', $pickupException);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), $e->getCode());
+        }
+    }
+
+    public function completedPickupWithHBL(): JsonResponse
+    {
+        try {
+            $pickups = PickUp::where('status', PickupStatus::COLLECTED)->with('hbl')->get();
+
+            // Transform pickups into resource format
+            $completedPickupsResource = PickupResource::collection($pickups);
+
+            return $this->success('Completed pickup list received successfully!', $completedPickupsResource);
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());
         }

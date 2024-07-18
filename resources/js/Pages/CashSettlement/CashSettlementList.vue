@@ -758,61 +758,64 @@ const shipIcon = ref(`
             </div>
           </div>
 
-          <div class="flex space-x-2">
-            <ColumnVisibilityPopover>
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.address"
-                  @change="toggleColumnVisibility('address', $event)"
-                />
-                <span class="hover:cursor-pointer">Address</span>
-              </label>
+          <div class="mt-1 ml-1 grid sm:grid-cols-2 md:grid-cols-2">
+            <div class="flex ml-5">
+              <ColumnVisibilityPopover>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.address"
+                    @change="toggleColumnVisibility('address', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Address</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.cargo_type"
-                  @change="toggleColumnVisibility('cargo_type', $event)"
-                />
-                <span class="hover:cursor-pointer">Cargo Mode</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.cargo_type"
+                    @change="toggleColumnVisibility('cargo_type', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Cargo Mode</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.hbl_type"
-                  @change="toggleColumnVisibility('hbl_type', $event)"
-                />
-                <span class="hover:cursor-pointer">Delivery Type</span>
-              </label>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.hbl_type"
+                    @change="toggleColumnVisibility('hbl_type', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Delivery Type</span>
+                </label>
 
-              <label class="inline-flex items-center space-x-2">
-                <Checkbox
-                  :checked="data.columnVisibility.officer"
-                  @change="toggleColumnVisibility('officer', $event)"
-                />
-                <span class="hover:cursor-pointer">Officer</span>
-              </label>
-            </ColumnVisibilityPopover>
+                <label class="inline-flex items-center space-x-2">
+                  <Checkbox
+                    :checked="data.columnVisibility.officer"
+                    @change="toggleColumnVisibility('officer', $event)"
+                  />
+                  <span class="hover:cursor-pointer">Officer</span>
+                </label>
+              </ColumnVisibilityPopover>
 
-            <button
-              x-tooltip.placement.top="'Filter result'"
-              @click="showFilters = true"
-              class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-            >
-              <i class="fa-solid fa-filter"></i>
-            </button>
-
-            <button
-              @click="cashReceived"
-              :disabled="isDataEmpty"
-              class="btn font-medium text-white"
-              :class="{
-                'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90':
-                  !isDataEmpty,
-                'bg-gray-300 cursor-not-allowed': isDataEmpty,
-              }"
-            >
-              Cash Received
-            </button>
+              <button
+                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                x-tooltip.placement.top="'Filter result'"
+                @click="showFilters = true"
+              >
+                <i class="fa-solid fa-filter"></i>
+              </button>
+            </div>
+            <div>
+              <button
+                :class="{
+                  'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90':
+                    !isDataEmpty,
+                  'bg-gray-300 cursor-not-allowed': isDataEmpty,
+                }"
+                :disabled="isDataEmpty"
+                class="btn font-medium text-white"
+                @click="cashReceived"
+              >
+                Cash Received
+              </button>
+            </div>
           </div>
         </div>
         <div class="mt-3">

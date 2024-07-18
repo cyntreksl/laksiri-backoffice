@@ -54,7 +54,7 @@ const handleUpdateDriver = () => {
     </div>
 
     <form @submit.prevent="handleUpdateDriver">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div class="grid grid-cols-2 gap-5">
         <div>
           <InputLabel value="Name" />
           <label class="relative flex">

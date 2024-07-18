@@ -1,9 +1,9 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {reactive, ref} from "vue";
-import {Grid, h, html} from "gridjs";
-import {push} from "notivue";
+import { reactive, ref } from "vue";
+import { Grid, h, html } from "gridjs";
+import { push } from "notivue";
 import moment from "moment";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
@@ -60,23 +60,23 @@ const filters = reactive({
 });
 
 const data = reactive({
-    columnVisibility: {
-        hbl: true,
-        hbl_name: true,
-        address: false,
-        picked_date: true,
-        weight: true,
-        volume: true,
-        grand_total: true,
-        paid_amount: true,
-        cargo_type: true,
-        hbl_type: false,
-        officer: false,
-        is_hold: true,
-        status: true,
-        zone: true,
-        actions: true,
-    },
+  columnVisibility: {
+    hbl: true,
+    hbl_name: true,
+    address: false,
+    picked_date: true,
+    weight: true,
+    volume: true,
+    grand_total: true,
+    paid_amount: true,
+    cargo_type: true,
+    hbl_type: false,
+    officer: false,
+    is_hold: true,
+    status: true,
+    zone: true,
+    actions: true,
+  },
 });
 
 const toggleColumnVisibility = (columnName) => {
@@ -703,29 +703,30 @@ const shipIcon = ref(`
                             <div class="flex -space-x-px">
                                 <div>
                                     <div
-                                        class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
+                                        class="badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                                    ><i class="mr-1 fas fa-calendar-alt"></i>
                                         From Date
                                     </div>
                                     <div
-                                        class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                                        class="badge bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                                     >
                                         {{ filters.fromDate }}
                                     </div>
                                 </div>
                                 <div>
                                     <div
-                                        class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                                        class="ml-2 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                                     >
-                                        To Date
+                                        <i class="mr-1 far fa-calendar-alt"></i>
+                    To &nbsp;Date
                                     </div>
                                     <div
-                                        class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                                        class="badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                                     >
                                         {{ filters.toDate }}
                                     </div>
                                 </div>
-                                <div>
+                                <divclass="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
                                     <div
                                         v-for="(mode, index) in filters.cargoMode"
                                         v-if="filters.cargoMode"

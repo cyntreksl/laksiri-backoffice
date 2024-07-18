@@ -45,7 +45,7 @@ const handleUpdateDriverPassword = () => {
       <br />
     </div>
     <form @submit.prevent="handleUpdateDriverPassword">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div class="grid sm:grid-cols-2 gap-5">
         <div class="col-span-1 sm:col-span-2">
           <InputLabel value="Username" />
           <label class="relative flex">
