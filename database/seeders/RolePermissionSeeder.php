@@ -135,6 +135,17 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'Shipment Arrivals',
+                'permissions' => [
+                    'arrivals.index',
+                    'arrivals.show',
+                    'arrivals.download manifest',
+                    'arrivals.unload',
+                    'arrivals.mark as reached',
+                ],
+            ],
+
+            [
                 'group_name' => 'Bonded Warehouse',
                 'permissions' => [
                     'bonded.index',

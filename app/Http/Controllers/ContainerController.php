@@ -124,6 +124,8 @@ class ContainerController extends Controller
 
     public function showShipmentArrivals()
     {
+        $this->authorize('arrivals.index');
+
         return Inertia::render('Arrival/ShipmentsArrivalsList', [
             'cargoTypes' => CargoType::cases(),
             'containers' => $this->containerRepository->getLoadedContainers(),
@@ -135,6 +137,8 @@ class ContainerController extends Controller
 
     public function showUnloadingPoint($container_id)
     {
+        $this->authorize('arrivals.unload');
+
         return Inertia::render('Arrival/UnloadingPoint', [
             'container' => GetContainerWithoutGlobalScopesById::run($container_id),
             'cargoTypes' => CargoType::getCargoTypeOptions(),
@@ -160,6 +164,8 @@ class ContainerController extends Controller
 
     public function markAsReachedContainer($container_id)
     {
+        $this->authorize('arrivals.mark as reached');
+
         $this->containerRepository->markAsReached($container_id);
     }
 }

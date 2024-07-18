@@ -14,7 +14,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import LoadedShipmentDetailModal from "@/Pages/Loading/Partials/LoadedShipmentDetailModal.vue";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 
 const props = defineProps({
@@ -398,201 +398,205 @@ const createColumns = () => [
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h("div", {}, [
-                h(
-                    "a",
-                    {
-                        href: route(
-                            "loading.loaded-containers.manifest.export",
-                            row.cells[0].data
-                        ),
-                    },
-                    [
-                        h(
-                            "button",
-                            {
-                                className:
-                                    "btn size-8 p-0 text-warning hover:bg-warning/20 focus:bg-warning/20 active:bg-warning/25",
-                                "x-tooltip..placement.bottom.warning": "'Download Manifest'",
-                            },
-                            [
-                                h(
-                                    "svg",
-                                    {
-                                        xmlns: "http://www.w3.org/2000/svg",
-                                        viewBox: "0 0 24 24",
-                                        class:
-                                            "size-6 icon icon-tabler icons-tabler-outline icon-tabler-file-download",
-                                        fill: "none",
-                                        stroke: "currentColor",
-                                        strokeWidth: 2,
-                                        strokeLinecap: "round",
-                                        strokeLinejoin: "round",
-                                    },
-                                    [
-                                        h("path", {
-                                            stroke: "none",
-                                            d: "M0 0h24v24H0z",
-                                            fill: "none",
-                                        }),
-                                        h("path", {
-                                            d: "M14 3v4a1 1 0 0 0 1 1h4",
-                                        }),
-                                        h("path", {
-                                            d: "M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z",
-                                        }),
-                                        h("path", {
-                                            d: "M12 17v-6",
-                                        }),
-                                        h("path", {
-                                            d: "M9.5 14.5l2.5 2.5l2.5 -2.5",
-                                        }),
-                                    ]
-                                ),
-                            ]
-                        ),
-                    ]
-                ),
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                        onClick: () => confirmViewLoadedShipment(row.cells[0].data),
-                        "x-tooltip..placement.bottom.primary": "'View'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: 2,
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25",
-                        onClick: () =>
-                            router.visit(
-                                route("arrival.unloading-points.index", {
-                                    container: row.cells[0].data,
-                                })
+                usePage().props.user.permissions.includes('arrivals.download manifest') ?
+                    h(
+                        "a",
+                        {
+                            href: route(
+                                "loading.loaded-containers.manifest.export",
+                                row.cells[0].data
                             ),
-                        "x-tooltip..placement.bottom.success": "'Unload'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-wrecking-ball",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: 2,
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
+                        },
+                        [
+                            h(
+                                "button",
+                                {
+                                    className:
+                                        "btn size-8 p-0 text-warning hover:bg-warning/20 focus:bg-warning/20 active:bg-warning/25",
+                                    "x-tooltip..placement.bottom.warning": "'Download Manifest'",
+                                },
+                                [
+                                    h(
+                                        "svg",
+                                        {
+                                            xmlns: "http://www.w3.org/2000/svg",
+                                            viewBox: "0 0 24 24",
+                                            class:
+                                                "size-6 icon icon-tabler icons-tabler-outline icon-tabler-file-download",
+                                            fill: "none",
+                                            stroke: "currentColor",
+                                            strokeWidth: 2,
+                                            strokeLinecap: "round",
+                                            strokeLinejoin: "round",
+                                        },
+                                        [
+                                            h("path", {
+                                                stroke: "none",
+                                                d: "M0 0h24v24H0z",
+                                                fill: "none",
+                                            }),
+                                            h("path", {
+                                                d: "M14 3v4a1 1 0 0 0 1 1h4",
+                                            }),
+                                            h("path", {
+                                                d: "M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z",
+                                            }),
+                                            h("path", {
+                                                d: "M12 17v-6",
+                                            }),
+                                            h("path", {
+                                                d: "M9.5 14.5l2.5 2.5l2.5 -2.5",
+                                            }),
+                                        ]
+                                    ),
+                                ]
+                            ),
+                        ]
+                    ) : null,
+                usePage().props.user.permissions.includes('arrivals.show') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+                            onClick: () => confirmViewLoadedShipment(row.cells[0].data),
+                            "x-tooltip..placement.bottom.primary": "'View'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "size-6 icon icon-tabler icons-tabler-outline icon-tabler-eye",
                                     fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M19 13m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M4 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M13 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M13 19l-9 0",
-                                }),
-                                h("path", {
-                                    d: "M4 15l9 0",
-                                }),
-                                h("path", {
-                                    d: "M8 12v-5h2a3 3 0 0 1 3 3v5",
-                                }),
-                                h("path", {
-                                    d: "M5 15v-2a1 1 0 0 1 1 -1h7",
-                                }),
-                                h("path", {
-                                    d: "M19 11v-7l-6 7",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-secondary hover:bg-secondary/20 focus:bg-secondary/20 active:bg-secondary/25",
-                        onClick: () =>
-                            router.visit(
-                                route("arrival.shipments-arrivals.containers.markAsReachedContainer", row.cells[0].data), {
-                                    onSuccess: () => push.success('Mark As Reached')
-                                }),
-                        "x-tooltip..placement.bottom.success": "'Mark As Reached'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "size-6 icon icon-tabler icons-tabler-outline icon-tabler-navigation-check",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: 2,
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
+                                    stroke: "currentColor",
+                                    strokeWidth: 2,
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        stroke: "none",
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                                    }),
+                                    h("path", {
+                                        d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
+                usePage().props.user.permissions.includes('arrivals.unload') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25",
+                            onClick: () =>
+                                router.visit(
+                                    route("arrival.unloading-points.index", {
+                                        container: row.cells[0].data,
+                                    })
+                                ),
+                            "x-tooltip..placement.bottom.success": "'Unload'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "size-6 icon icon-tabler icons-tabler-outline icon-tabler-wrecking-ball",
                                     fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M17.487 14.894l-5.487 -11.894l-7.97 17.275c-.07 .2 -.017 .424 .135 .572c.15 .148 .374 .193 .57 .116l6.275 -2.127",
-                                }),
-                                h("path", {
-                                    d: "M15 19l2 2l4 -4",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
+                                    stroke: "currentColor",
+                                    strokeWidth: 2,
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        stroke: "none",
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M19 13m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+                                    }),
+                                    h("path", {
+                                        d: "M4 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+                                    }),
+                                    h("path", {
+                                        d: "M13 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0",
+                                    }),
+                                    h("path", {
+                                        d: "M13 19l-9 0",
+                                    }),
+                                    h("path", {
+                                        d: "M4 15l9 0",
+                                    }),
+                                    h("path", {
+                                        d: "M8 12v-5h2a3 3 0 0 1 3 3v5",
+                                    }),
+                                    h("path", {
+                                        d: "M5 15v-2a1 1 0 0 1 1 -1h7",
+                                    }),
+                                    h("path", {
+                                        d: "M19 11v-7l-6 7",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
+                usePage().props.user.permissions.includes('arrivals.mark as reached') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-secondary hover:bg-secondary/20 focus:bg-secondary/20 active:bg-secondary/25",
+                            onClick: () =>
+                                router.visit(
+                                    route("arrival.shipments-arrivals.containers.markAsReachedContainer", row.cells[0].data), {
+                                        onSuccess: () => push.success('Mark As Reached')
+                                    }),
+                            "x-tooltip..placement.bottom.success": "'Mark As Reached'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "size-6 icon icon-tabler icons-tabler-outline icon-tabler-navigation-check",
+                                    fill: "none",
+                                    stroke: "currentColor",
+                                    strokeWidth: 2,
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        stroke: "none",
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M17.487 14.894l-5.487 -11.894l-7.97 17.275c-.07 .2 -.017 .424 .135 .572c.15 .148 .374 .193 .57 .116l6.275 -2.127",
+                                    }),
+                                    h("path", {
+                                        d: "M15 19l2 2l4 -4",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
             ]);
         },
     },
