@@ -58,6 +58,7 @@ const createUser = () => {
 <template>
     <div class="flex justify-end mx-5 mt-4">
         <PrimaryButton
+            v-if="$page.props.user.permissions.includes('users.create')"
             @click="confirmingUserCreation = !confirmingUserCreation"
         >
             Create New User

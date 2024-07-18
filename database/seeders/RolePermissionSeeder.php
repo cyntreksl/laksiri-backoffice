@@ -45,7 +45,7 @@ class RolePermissionSeeder extends Seeder
                 'group_name' => 'User',
                 'permissions' => [
                     'users.create',
-                    'users.view',
+                    'users.list',
                     'users.edit',
                     'users.delete',
                 ],
@@ -159,13 +159,6 @@ class RolePermissionSeeder extends Seeder
                 'group_name' => 'Unloading Issues',
                 'permissions' => [
                     'issues.index',
-                ],
-            ],
-
-            [
-                'group_name' => 'Arrivals',
-                'permissions' => [
-                    'arrivals.list',
                 ],
             ],
         ];
