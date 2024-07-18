@@ -43,8 +43,7 @@ class PickUp extends Model
 
     public function scopeAssignedToDriver(Builder $query): void
     {
-        $query->where('system_status', 2)
-            ->where('driver_id', auth()->id());
+        $query->where('driver_id', auth()->id());
     }
 
     /**
