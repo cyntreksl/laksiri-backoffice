@@ -14,11 +14,14 @@ use App\Http\Requests\StoreContainerRequest;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Models\Container;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ContainerController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly ContainerRepositoryInterface $containerRepository,
         private readonly HBLRepositoryInterface $HBLRepository,
@@ -27,6 +30,8 @@ class ContainerController extends Controller
 
     public function index()
     {
+        $this->authorize('container.index');
+
         return Inertia::render('Container/ContainerList', [
             'cargoTypes' => CargoType::cases(),
             'containerTypes' => ContainerType::cases(),
@@ -48,6 +53,8 @@ class ContainerController extends Controller
 
     public function create()
     {
+        $this->authorize('container.create');
+
         $containerTypes = ContainerType::getDropdownOptions();
         $seaContainerOptions = ContainerType::getSeaCargoOptions();
         $airContainerOptions = ContainerType::getAirCargoOptions();
@@ -79,6 +86,8 @@ class ContainerController extends Controller
 
     public function showLoadingPoint(Request $request, Container $container)
     {
+        $this->authorize('container.load to container');
+
         return Inertia::render('Loading/LoadingPoint', [
             'container' => $container,
             'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),

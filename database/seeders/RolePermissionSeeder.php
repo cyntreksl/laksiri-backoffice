@@ -117,6 +117,15 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'Container',
+                'permissions' => [
+                    'container.index',
+                    'container.create',
+                    'container.load to container',
+                ],
+            ],
+
+            [
                 'group_name' => 'Arrivals',
                 'permissions' => [
                     'arrivals.list',
