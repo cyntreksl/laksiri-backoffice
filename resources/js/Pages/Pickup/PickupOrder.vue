@@ -179,6 +179,7 @@ const handleSave = () => {
             <PrimaryButton
               :disabled="!hasOrderChanged"
               @click.prevent="handleSave"
+              v-if="$page.props.user.permissions.includes('pickups.update pickup order')"
             >
               Save Order
               <svg

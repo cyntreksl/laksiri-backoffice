@@ -64,10 +64,15 @@ class RolePermissionSeeder extends Seeder
             [
                 'group_name' => 'Pickup',
                 'permissions' => [
+                    'pickups.pending pickups',
                     'pickups.create',
-                    'pickups.view',
+                    'pickups.show',
                     'pickups.edit',
                     'pickups.delete',
+                    'pickups.assign driver',
+                    'pickups.show pickup order',
+                    'pickups.update pickup order',
+                    'pickups.show pickup exceptions',
                 ],
             ],
 
