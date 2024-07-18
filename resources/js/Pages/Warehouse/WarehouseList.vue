@@ -726,7 +726,7 @@ const shipIcon = ref(`
                                         {{ filters.toDate }}
                                     </div>
                                 </div>
-                                <divclass="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+                                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
                                     <div
                                         v-for="(mode, index) in filters.cargoMode"
                                         v-if="filters.cargoMode"
