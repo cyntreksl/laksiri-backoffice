@@ -54,6 +54,7 @@ const createDriver = () => {
 <template>
     <div class="flex justify-end  mt-4">
         <PrimaryButton
+            v-if="$page.props.user.permissions.includes('users.create')"
             @click="confirmingDriverCreation = !confirmingDriverCreation"
         >
             Create New Driver

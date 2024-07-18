@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted, reactive, ref } from "vue";
-import { Link, router } from "@inertiajs/vue3";
-import { Grid, h, html } from "gridjs";
+import {onMounted, reactive, ref} from "vue";
+import {Link, router, usePage} from "@inertiajs/vue3";
+import {Grid, h, html} from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -15,23 +15,26 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
-import { push } from "notivue";
+import {push} from "notivue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import RestoreHBLConfirmationModal from "@/Pages/HBL/Partials/RestoreHBLConfirmationModal.vue";
 
 const props = defineProps({
-  users: {
-    type: Object,
-    default: () => {},
-  },
-  hbls: {
-    type: Object,
-    default: () => {},
-  },
-  paymentStatus: {
-    type: Object,
-    default: () => {},
-  },
+    users: {
+        type: Object,
+        default: () => {
+        },
+    },
+    hbls: {
+        type: Object,
+        default: () => {
+        },
+    },
+    paymentStatus: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const wrapperRef = ref(null);
@@ -84,56 +87,56 @@ const toggleColumnVisibility = (columnName) => {
 const initializeGrid = () => {
     const visibleColumns = Object.keys(data.columnVisibility);
 
-  grid = new Grid({
-    columns: createColumns(),
-    search: {
-      debounceTimeout: 1000,
-      server: {
-        url: (prev, keyword) => `${prev}&search=${keyword}`,
-      },
-    },
-    sort: {
-      multiColumn: false,
-      server: {
-        url: (prev, columns) => {
-          if (!columns.length) return prev;
-          const col = columns[0];
-          const dir = col.direction === 1 ? "asc" : "desc";
-          let colName = visibleColumns[col.index];
-
-          return `${prev}&order=${colName}&dir=${dir}`;
+    grid = new Grid({
+        columns: createColumns(),
+        search: {
+            debounceTimeout: 1000,
+            server: {
+                url: (prev, keyword) => `${prev}&search=${keyword}`,
+            },
         },
-      },
-    },
-    pagination: {
-      limit: 10,
-      server: {
-        url: (prev, page, limit) =>
-          `${prev}&limit=${limit}&offset=${page * limit}`,
-      },
-    },
-    server: {
-      url: constructUrl(),
-      then: (data) =>
-        data.data.map((item) => {
-          const row = [];
-          // row.push({id: item.id})
-          visibleColumns.forEach((column) => {
-            row.push(item[column]);
-          });
-          return row;
-        }),
-      total: (response) => {
-        if (response && response.meta) {
-          return response.meta.total;
-        } else {
-          throw new Error("Invalid total count in server response");
-        }
-      },
-    },
-  });
+        sort: {
+            multiColumn: false,
+            server: {
+                url: (prev, columns) => {
+                    if (!columns.length) return prev;
+                    const col = columns[0];
+                    const dir = col.direction === 1 ? "asc" : "desc";
+                    let colName = visibleColumns[col.index];
 
-  grid.render(wrapperRef.value);
+                    return `${prev}&order=${colName}&dir=${dir}`;
+                },
+            },
+        },
+        pagination: {
+            limit: 10,
+            server: {
+                url: (prev, page, limit) =>
+                    `${prev}&limit=${limit}&offset=${page * limit}`,
+            },
+        },
+        server: {
+            url: constructUrl(),
+            then: (data) =>
+                data.data.map((item) => {
+                    const row = [];
+                    // row.push({id: item.id})
+                    visibleColumns.forEach((column) => {
+                        row.push(item[column]);
+                    });
+                    return row;
+                }),
+            total: (response) => {
+                if (response && response.meta) {
+                    return response.meta.total;
+                } else {
+                    throw new Error("Invalid total count in server response");
+                }
+            },
+        },
+    });
+
+    grid.render(wrapperRef.value);
 };
 
 const createColumns = () => [
@@ -258,140 +261,143 @@ const createColumns = () => [
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h("div", {className: "flex space-x-2"}, [
-                h(
-                    "a",
-                    {
-                        className:
-                            "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                        onClick: () => confirmViewHBL(row.cells[0].data),
-                        "x-tooltip..placement.bottom.primary": "'View HBL'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    d: "M0 0h24v24H0z",
+                usePage().props.user.permissions.includes('hbls.show') ?
+                    h(
+                        "a",
+                        {
+                            className:
+                                "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
+                            onClick: () => confirmViewHBL(row.cells[0].data),
+                            "x-tooltip..placement.bottom.primary": "'View HBL'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
                                     fill: "none",
-                                    stroke: "none",
-                                }),
-                                h("path", {
-                                    d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
-                h(
-                    "a",
-                    {
-                        className:
-                            "btn size-8 p-0 text-pink-500 hover:bg-pink-500/20 focus:bg-pink-500/20 active:bg-pink-500/25",
-                        href: route("hbls.download", row.cells[0].data),
-                        "x-tooltip..placement.bottom.primary": "'Download HBL'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "icon icon-tabler icons-tabler-outline icon-tabler-download",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    d: "M0 0h24v24H0z",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                                    }),
+                                    h("path", {
+                                        d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
+                usePage().props.user.permissions.includes('hbls.download pdf') ?
+                    h(
+                        "a",
+                        {
+                            className:
+                                "btn size-8 p-0 text-pink-500 hover:bg-pink-500/20 focus:bg-pink-500/20 active:bg-pink-500/25",
+                            href: route("hbls.download", row.cells[0].data),
+                            "x-tooltip..placement.bottom.primary": "'Download HBL'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "icon icon-tabler icons-tabler-outline icon-tabler-download",
                                     fill: "none",
-                                    stroke: "none",
-                                }),
-                                h("path", {
-                                    d: "M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2",
-                                }),
-                                h("path", {
-                                    d: "M7 11l5 5l5 -5",
-                                }),
-                                h("path", {
-                                    d: "M12 4l0 12",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                        onClick: () => confirmRestoreHBL(row.cells[0].data),
-                        "x-tooltip..placement.bottom.error": "'Restore HBL'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "icon icon-tabler icons-tabler-outline icon-tabler-trash-off",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    d: "M0 0h24v24H0z",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2",
+                                    }),
+                                    h("path", {
+                                        d: "M7 11l5 5l5 -5",
+                                    }),
+                                    h("path", {
+                                        d: "M12 4l0 12",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
+                usePage().props.user.permissions.includes('hbls.restore') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
+                            onClick: () => confirmRestoreHBL(row.cells[0].data),
+                            "x-tooltip..placement.bottom.error": "'Restore HBL'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "icon icon-tabler icons-tabler-outline icon-tabler-trash-off",
                                     fill: "none",
-                                    stroke: "none",
-                                }),
-                                h("path", {
-                                    d: "M3 3l18 18",
-                                }),
-                                h("path", {
-                                    d: "M4 7h3m4 0h9",
-                                }),
-                                h("path", {
-                                    d: "M10 11l0 6",
-                                }),
-                                h("path", {
-                                    d: "M14 14l0 3",
-                                }),
-                                h("path", {
-                                    d: "M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l.077 -.923",
-                                }),
-                                h("path", {
-                                    d: "M18.384 14.373l.616 -7.373",
-                                }),
-                                h("path", {
-                                    d: "M9 5v-1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M3 3l18 18",
+                                    }),
+                                    h("path", {
+                                        d: "M4 7h3m4 0h9",
+                                    }),
+                                    h("path", {
+                                        d: "M10 11l0 6",
+                                    }),
+                                    h("path", {
+                                        d: "M14 14l0 3",
+                                    }),
+                                    h("path", {
+                                        d: "M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l.077 -.923",
+                                    }),
+                                    h("path", {
+                                        d: "M18.384 14.373l.616 -7.373",
+                                    }),
+                                    h("path", {
+                                        d: "M9 5v-1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
             ]);
         },
     },
@@ -530,68 +536,68 @@ const shipIcon = ref(`
     <AppLayout title="Cancelled HBL List">
         <template #header>Cancelled HBL List</template>
 
-    <Breadcrumb />
-    <div class="flex justify-end mt-5">
-      <Link :href="route('hbls.create')">
-        <PrimaryButton> Create New HBL </PrimaryButton>
-      </Link>
-    </div>
-    <div class="card mt-4">
-      <div>
-        <div class="flex items-center justify-between p-2">
-          <div class="">
-            <div class="flex">
-              <h2
-                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-              >
-                Cancelled HBL List
-              </h2>
-            </div>
-            <br />
-            <div
-              class="mr-4 cursor-pointer"
-              x-tooltip.info.placement.bottom="'Applied Filters'"
-            >
-              Filter Options:
-            </div>
+        <Breadcrumb/>
+        <div class="flex justify-end mt-5">
+            <Link v-if="$page.props.user.permissions.includes('hbls.create')" :href="route('hbls.create')">
+                <PrimaryButton> Create New HBL</PrimaryButton>
+            </Link>
+        </div>
+        <div class="card mt-4">
+            <div>
+                <div class="flex items-center justify-between p-2">
+                    <div class="">
+                        <div class="flex">
+                            <h2
+                                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Cancelled HBL List
+                            </h2>
+                        </div>
+                        <br/>
+                        <div
+                            class="mr-4 cursor-pointer"
+                            x-tooltip.info.placement.bottom="'Applied Filters'"
+                        >
+                            Filter Options:
+                        </div>
 
-            <div
-              class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
-            >
-              <div class="flex -space-x-px">
-                <div>
-                  <div
-                    class="mb-1 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                  >
-                    <i class="mr-1 fas fa-calendar-alt"></i>
-                    From Date
-                  </div>
-                  <div
-                    class="badge bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                  >
-                    {{ filters.fromDate }}
-                  </div>
-                </div>
-                <div>
-                  <div
-                    class="mb-1 ml-2 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                  >
-                    <i class="mr-1 far fa-calendar-alt"></i>
-                    To &nbsp;Date
-                  </div>
-                  <div
-                    class="badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                  >
-                    {{ filters.toDate }}
-                  </div>
-                </div>
-                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-                  <div
-                    v-for="(mode, index) in filters.cargoMode"
-                    v-if="filters.cargoMode"
-                    :key="index"
-                    class="mb-1 badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
-                  >
+                        <div
+                            class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
+                        >
+                            <div class="flex -space-x-px">
+                                <div>
+                                    <div
+                                        class="mb-1 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                                    >
+                                        <i class="mr-1 fas fa-calendar-alt"></i>
+                                        From Date
+                                    </div>
+                                    <div
+                                        class="badge bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                                    >
+                                        {{ filters.fromDate }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div
+                                        class="mb-1 ml-2 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                                    >
+                                        <i class="mr-1 far fa-calendar-alt"></i>
+                                        To &nbsp;Date
+                                    </div>
+                                    <div
+                                        class="badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                                    >
+                                        {{ filters.toDate }}
+                                    </div>
+                                </div>
+                                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+                                    <div
+                                        v-for="(mode, index) in filters.cargoMode"
+                                        v-if="filters.cargoMode"
+                                        :key="index"
+                                        class="mb-1 badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
+                                    >
                     <span v-if="mode == 'Sea Cargo'">
                       <div v-html="shipIcon"></div>
                     </span>

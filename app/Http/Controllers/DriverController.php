@@ -8,11 +8,14 @@ use App\Http\Requests\UpdateUserPasswordRequest;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DriverController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly ZoneRepositoryInterface $zoneRepository,
@@ -21,6 +24,8 @@ class DriverController extends Controller
 
     public function index()
     {
+        $this->authorize('users.list');
+
         return Inertia::render('Driver/DriverList', [
             'zones' => $this->zoneRepository->getZones(),
         ]);
@@ -46,10 +51,12 @@ class DriverController extends Controller
 
     public function edit($id)
     {
+        $this->authorize('users.edit');
+
         $user = User::find($id);
 
         return Inertia::render('Driver/DriverEdit', [
-            'user' => $user,
+            'driver' => $user,
             'zones' => $this->zoneRepository->getZones(),
         ]);
 
@@ -74,6 +81,7 @@ class DriverController extends Controller
 
     public function destroy($id)
     {
+        $this->authorize('users.delete');
 
         $this->driverRepository->deleteDriver(User::find($id));
     }

@@ -5,7 +5,7 @@ import UpdateDriverPasswordForm from "@/Pages/Driver/Partials/UpdateDriverPasswo
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 
 defineProps({
-  user: {
+  driver: {
     type: Object,
     default: () => {},
   },
@@ -24,8 +24,8 @@ defineProps({
     <Breadcrumb />
 
     <div class="grid grid-cols-1 mt-4 gap-4">
-      <UpdateDriverBasicDetailsForm :user="user" :zones="zones" />
-      <UpdateDriverPasswordForm :user="user" />
+      <UpdateDriverBasicDetailsForm :user="driver" :zones="zones" />
+      <UpdateDriverPasswordForm :user="driver" />
     </div>
   </AppLayout>
 </template>

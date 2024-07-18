@@ -45,7 +45,7 @@ class RolePermissionSeeder extends Seeder
                 'group_name' => 'User',
                 'permissions' => [
                     'users.create',
-                    'users.view',
+                    'users.list',
                     'users.edit',
                     'users.delete',
                 ],
@@ -55,7 +55,7 @@ class RolePermissionSeeder extends Seeder
                 'group_name' => 'Role',
                 'permissions' => [
                     'roles.create',
-                    'roles.view',
+                    'roles.list',
                     'roles.edit',
                     'roles.delete',
                 ],
@@ -64,17 +64,101 @@ class RolePermissionSeeder extends Seeder
             [
                 'group_name' => 'Pickup',
                 'permissions' => [
+                    'pickups.pending pickups',
                     'pickups.create',
-                    'pickups.view',
+                    'pickups.show',
                     'pickups.edit',
                     'pickups.delete',
+                    'pickups.assign driver',
+                    'pickups.show pickup order',
+                    'pickups.update pickup order',
+                    'pickups.show pickup exceptions',
                 ],
             ],
 
             [
-                'group_name' => 'Arrivals',
+                'group_name' => 'HBL',
                 'permissions' => [
-                    'arrivals.list',
+                    'hbls.index',
+                    'hbls.create',
+                    'hbls.show',
+                    'hbls.edit',
+                    'hbls.delete',
+                    'hbls.hold and release',
+                    'hbls.show cancelled hbls',
+                    'hbls.restore',
+                    'hbls.download pdf',
+                    'hbls.download invoice',
+                    'hbls.download barcode',
+                    'hbls.upload documents',
+                    'hbls.delete documents',
+                ],
+            ],
+
+            [
+                'group_name' => 'Cash Settlement',
+                'permissions' => [
+                    'cash.index',
+                    'cash.show',
+                    'cash.hold and release',
+                    'cash.update payment',
+                    'cash.cash received',
+                ],
+            ],
+
+            [
+                'group_name' => 'Warehouse',
+                'permissions' => [
+                    'warehouse.index',
+                    'warehouse.show',
+                    'warehouse.assign zone',
+                    'warehouse.hold and release',
+                ],
+            ],
+
+            [
+                'group_name' => 'Container',
+                'permissions' => [
+                    'container.index',
+                    'container.create',
+                    'container.load to container',
+                ],
+            ],
+
+            [
+                'group_name' => 'Loaded Shipment',
+                'permissions' => [
+                    'shipment.index',
+                    'shipment.show',
+                    'shipment.download manifest',
+                ],
+            ],
+
+            [
+                'group_name' => 'Shipment Arrivals',
+                'permissions' => [
+                    'arrivals.index',
+                    'arrivals.show',
+                    'arrivals.download manifest',
+                    'arrivals.unload',
+                    'arrivals.mark as reached',
+                ],
+            ],
+
+            [
+                'group_name' => 'Bonded Warehouse',
+                'permissions' => [
+                    'bonded.index',
+                    'bonded.show',
+                    'bonded.mark as short loading',
+                    'bonded.complete registration',
+                ],
+            ],
+
+            [
+                'group_name' => 'Unloading Issues',
+                'permissions' => [
+                    'issues.index',
                 ],
             ],
         ];

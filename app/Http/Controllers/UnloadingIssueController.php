@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Interfaces\UnloadingIssuesRepositoryInterface;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class UnloadingIssueController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly UnloadingIssuesRepositoryInterface $unloadingIssuesRepository,
     ) {
@@ -15,6 +18,8 @@ class UnloadingIssueController extends Controller
 
     public function index()
     {
+        $this->authorize('issues.index');
+
         return Inertia::render('Arrival/UnloadingIssueList');
     }
 

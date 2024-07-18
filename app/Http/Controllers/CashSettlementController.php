@@ -6,11 +6,14 @@ use App\Enum\HBLPaymentStatus;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Models\HBL;
 use App\Repositories\CashSettlementRepository;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CashSettlementController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly CashSettlementRepository $cashSettlementRepository,
@@ -19,6 +22,8 @@ class CashSettlementController extends Controller
 
     public function index()
     {
+        $this->authorize('cash.index');
+
         $drivers = $this->driverRepository->getAllDrivers();
         $officers = [];
 
@@ -50,6 +55,8 @@ class CashSettlementController extends Controller
 
     public function cashReceived(Request $request)
     {
+        $this->authorize('cash.cash received');
+
         $hblIds = $request->hbl_ids;
 
         return $this->cashSettlementRepository->cashReceived($hblIds);
@@ -57,6 +64,8 @@ class CashSettlementController extends Controller
 
     public function paymentUpdate(Request $request, HBL $hbl)
     {
+        $this->authorize('cash.update payment');
+
         $this->cashSettlementRepository->updatePayment($request->all(), $hbl);
     }
 }

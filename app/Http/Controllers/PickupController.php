@@ -13,11 +13,14 @@ use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Models\PickUp;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PickupController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly PickupRepositoryInterface $pickupRepository,
         private readonly DriverRepositoryInterface $driverRepository,
@@ -28,6 +31,8 @@ class PickupController extends Controller
 
     public function index()
     {
+        $this->authorize('pickups.pending pickups');
+
         return Inertia::render('Pickup/PendingJobs', [
             'drivers' => $this->driverRepository->getAllDrivers(),
             'users' => $this->userRepository->getUsers(),
@@ -50,6 +55,8 @@ class PickupController extends Controller
 
     public function create()
     {
+        $this->authorize('pickups.create');
+
         return Inertia::render('Pickup/CreateJob', [
             'pickupTypes' => PickupType::cases(),
             'cargoTypes' => CargoType::cases(),
@@ -65,26 +72,36 @@ class PickupController extends Controller
 
     public function show(PickUp $pickup)
     {
+        $this->authorize('pickups.show');
+
         return response()->json($pickup);
     }
 
     public function update(UpdatePickupRequest $request, PickUp $pickup)
     {
+        $this->authorize('pickups.edit');
+
         return $this->pickupRepository->updatePickup($request->all(), $pickup);
     }
 
     public function destroy(PickUp $pickup)
     {
+        $this->authorize('pickups.delete');
+
         $this->pickupRepository->deletePickup($pickup);
     }
 
     public function assignDriver(AssignDriverRequest $request)
     {
+        $this->authorize('pickups.assign driver');
+
         return $this->pickupRepository->assignDriverToPickups($request->all());
     }
 
     public function showPickupOrder(Request $request)
     {
+        $this->authorize('pickups.show pickup order');
+
         return Inertia::render('Pickup/PickupOrder', [
             'filters' => $request->only('fromDate', 'toDate', 'driverId'),
             'drivers' => $this->driverRepository->getAllDrivers(),
@@ -94,6 +111,8 @@ class PickupController extends Controller
 
     public function updatePickupOrder(Request $request)
     {
+        $this->authorize('pickups.update pickup order');
+
         if ($request->pickups) {
             $this->pickupRepository->savePickupOrder($request->pickups);
         }

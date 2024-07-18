@@ -8,12 +8,14 @@ use App\Enum\ContainerType;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
-use App\Models\LoadedContainer;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class LoadedContainerController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly LoadedContainerRepositoryInterface $loadedContainerRepository,
         private readonly ContainerRepositoryInterface $containerRepository,
@@ -25,6 +27,8 @@ class LoadedContainerController extends Controller
      */
     public function index()
     {
+        $this->authorize('shipment.index');
+
         return Inertia::render('Loading/LoadedShipmentList', [
             'cargoTypes' => CargoType::cases(),
             'containers' => $this->containerRepository->getLoadedContainers(),
@@ -57,7 +61,7 @@ class LoadedContainerController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(LoadedContainer $loadedContainer)
+    public function show($loadedContainer)
     {
         //
     }
@@ -65,7 +69,7 @@ class LoadedContainerController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(LoadedContainer $loadedContainer)
+    public function edit($loadedContainer)
     {
         //
     }
@@ -73,7 +77,7 @@ class LoadedContainerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, LoadedContainer $loadedContainer)
+    public function update(Request $request, $loadedContainer)
     {
         //
     }
@@ -81,7 +85,7 @@ class LoadedContainerController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(LoadedContainer $loadedContainer)
+    public function destroy($loadedContainer)
     {
         //
     }
@@ -93,6 +97,8 @@ class LoadedContainerController extends Controller
 
     public function exportManifest(Container $container)
     {
+        $this->authorize('shipment.download manifest');
+
         return $this->loadedContainerRepository->downloadManifestFile($container);
     }
 }

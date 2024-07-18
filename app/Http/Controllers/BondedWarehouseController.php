@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Enum\HBLType;
 use App\Interfaces\BondedWarehouseRepositoryInterface;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class BondedWarehouseController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly BondedWarehouseRepositoryInterface $bondedWarehouseRepository,
     ) {
@@ -16,6 +19,8 @@ class BondedWarehouseController extends Controller
 
     public function index()
     {
+        $this->authorize('bonded.index');
+
         return Inertia::render('Arrival/BondedWarehouseList', [
             'hblTypes' => HBLType::cases(),
         ]);
@@ -36,6 +41,8 @@ class BondedWarehouseController extends Controller
 
     public function markAsShortLoading($hbl_id)
     {
+        $this->authorize('bonded.mark as short loading');
+
         $this->bondedWarehouseRepository->markAsShortLoading($hbl_id);
     }
 }

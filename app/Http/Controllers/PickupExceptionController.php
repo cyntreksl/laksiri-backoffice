@@ -7,11 +7,14 @@ use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PickupExceptionController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly UserRepositoryInterface $userRepository,
@@ -22,6 +25,8 @@ class PickupExceptionController extends Controller
 
     public function index()
     {
+        $this->authorize('pickups.show pickup exceptions');
+
         return Inertia::render('Pickup/Exceptions', [
             'drivers' => $this->driverRepository->getAllDrivers(),
             'users' => $this->userRepository->getUsers(),
@@ -44,11 +49,15 @@ class PickupExceptionController extends Controller
 
     public function assignDriver(AssignDriverRequest $request)
     {
+        $this->authorize('pickups.assign driver');
+
         $this->pickupExceptionRepository->assignDriverToExceptions($request->all());
     }
 
     public function deleteExceptions(Request $request)
     {
+        $this->authorize('pickups.delete');
+
         $this->pickupExceptionRepository->deleteExceptions($request->exceptionIds);
     }
 }
