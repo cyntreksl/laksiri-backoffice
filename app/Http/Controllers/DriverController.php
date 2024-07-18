@@ -56,7 +56,7 @@ class DriverController extends Controller
         $user = User::find($id);
 
         return Inertia::render('Driver/DriverEdit', [
-            'user' => $user,
+            'driver' => $user,
             'zones' => $this->zoneRepository->getZones(),
         ]);
 
