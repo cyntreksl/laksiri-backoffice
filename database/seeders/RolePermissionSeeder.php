@@ -135,6 +135,13 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'Unloading Issues',
+                'permissions' => [
+                    'issues.index',
+                ],
+            ],
+
+            [
                 'group_name' => 'Arrivals',
                 'permissions' => [
                     'arrivals.list',
