@@ -107,6 +107,16 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'Warehouse',
+                'permissions' => [
+                    'warehouse.index',
+                    'warehouse.show',
+                    'warehouse.assign zone',
+                    'warehouse.hold and release',
+                ],
+            ],
+
+            [
                 'group_name' => 'Arrivals',
                 'permissions' => [
                     'arrivals.list',
