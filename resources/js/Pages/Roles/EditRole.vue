@@ -9,6 +9,7 @@ import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import {onMounted, ref, watch} from "vue";
 import {push} from "notivue";
+import AppPreLoader from "@/Components/AppPreLoader.vue";
 
 const props = defineProps({
     permissionGroups: {
@@ -29,8 +30,10 @@ const allChecked = ref(false);
 const groupChecked = ref([]);
 const permissionChecked = ref({});
 const permissions = ref({});
+const loading = ref(false);
 
 const fetchPermissions = async () => {
+    loading.value = true;
     try {
         for (const group of props.permissionGroups) {
             try {
@@ -53,6 +56,8 @@ const fetchPermissions = async () => {
         }
     } catch (error) {
         console.error("Error fetching permissions:", error);
+    } finally {
+        loading.value = false;
     }
 };
 
@@ -143,7 +148,9 @@ const handleRoleUpdate = () => {
 
         <Breadcrumb/>
 
-        <form class="mt-5" @submit.prevent="handleRoleUpdate">
+        <AppPreLoader v-if="loading" />
+
+        <form v-else class="mt-5" @submit.prevent="handleRoleUpdate">
             <div class="sm:col-span-2 space-y-5">
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-5">
