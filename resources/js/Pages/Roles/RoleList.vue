@@ -84,7 +84,7 @@ const formatPermissionName = (name) => {
                                     Role Name
                                 </th>
                                 <th
-                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                    class="bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                                 >
                                     Permissions
                                 </th>
@@ -100,7 +100,7 @@ const formatPermissionName = (name) => {
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                     {{ item.name }}
                                 </td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
+                                <td class="px-4 py-3 sm:px-5 space-x-2 space-y-2">
                                     <div
                                         v-for="permission in item.permissions"
                                         class="badge bg-primary/10 text-primary dark:bg-accent-light/15 dark:text-accent-light"
