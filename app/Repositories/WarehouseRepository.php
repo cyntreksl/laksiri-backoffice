@@ -3,12 +3,14 @@
 namespace App\Repositories;
 
 use App\Actions\HBL\Warehouse\AssignZone;
+use App\Exports\WarehouseExport;
 use App\Factory\Warehouse\FilterFactory;
 use App\Http\Resources\CashSettlementCollection;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Models\HBL;
 use App\Traits\ResponseAPI;
+use Maatwebsite\Excel\Facades\Excel;
 
 class WarehouseRepository implements GridJsInterface, WarehouseRepositoryInterface
 {
@@ -81,5 +83,10 @@ class WarehouseRepository implements GridJsInterface, WarehouseRepositoryInterfa
     public function assignWarehouseZone(HBL $hbl, int $warehouse_zone_id)
     {
         return AssignZone::run($hbl, $warehouse_zone_id);
+    }
+
+    public function export(array $filters)
+    {
+        return Excel::download(new WarehouseExport($filters), 'warehouse.xlsx');
     }
 }

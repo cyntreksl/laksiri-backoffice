@@ -16,6 +16,7 @@ Route::name('back-office.')->group(function () {
         ->name('cash-settlements.cashReceived');
     Route::put('update/payments/{hbl}', [CashSettlementController::class, 'paymentUpdate'])
         ->name('cash-settlements.payment.update');
+    Route::get('cash-settlements/export', [CashSettlementController::class, 'export']);
 
     // Warehouse
     Route::get('warehouses', [WarehouseController::class, 'index'])
@@ -26,6 +27,5 @@ Route::name('back-office.')->group(function () {
         ->name('warehouses.summery');
     Route::put('warehouses/{hbl}/assign-zones', [WarehouseController::class, 'assignZone'])
         ->name('warehouses.assign.zone');
-
-    Route::get('cash-settlements/export', [CashSettlementController::class, 'export']);
+    Route::get('warehouses/export', [WarehouseController::class, 'export']);
 });
