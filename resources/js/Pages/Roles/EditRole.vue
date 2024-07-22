@@ -9,6 +9,7 @@ import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import {onMounted, ref, watch} from "vue";
 import {push} from "notivue";
+import AppPreLoader from "@/Components/AppPreLoader.vue";
 
 const props = defineProps({
     permissionGroups: {
@@ -29,8 +30,10 @@ const allChecked = ref(false);
 const groupChecked = ref([]);
 const permissionChecked = ref({});
 const permissions = ref({});
+const loading = ref(false);
 
 const fetchPermissions = async () => {
+    loading.value = true;
     try {
         for (const group of props.permissionGroups) {
             try {
@@ -53,6 +56,8 @@ const fetchPermissions = async () => {
         }
     } catch (error) {
         console.error("Error fetching permissions:", error);
+    } finally {
+        loading.value = false;
     }
 };
 
@@ -143,7 +148,9 @@ const handleRoleUpdate = () => {
 
         <Breadcrumb/>
 
-        <form class="mt-5" @submit.prevent="handleRoleUpdate">
+        <AppPreLoader v-if="loading" />
+
+        <form v-else class="mt-5" @submit.prevent="handleRoleUpdate">
             <div class="sm:col-span-2 space-y-5">
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-5">
@@ -202,20 +209,21 @@ const handleRoleUpdate = () => {
 
                             <hr>
 
-                            <div v-for="(permissionGroup, index) in permissionGroups" :key="index" class="grid grid-cols-1 gap-2">
+                            <div v-for="(permissionGroup, index) in permissionGroups" :key="index" class="grid grid-cols-1 gap-2 bg-slate-100 px-5 rounded-lg">
                                 <div class="col-span-3 sm:col-span-1">
                                     <label class="flex flex-row items-center py-3 cursor-pointer">
-                                        <input :id="`group-${index}`" v-model="groupChecked[index]" class="text-indigo-600 focus:border-indigo-300 focus:ring-indigo-200" type="checkbox" @change="checkGroupPermissions(index)"/>
-                                        <span class="ml-2 text-gray-700 font-medium dark:text-dark-typography">{{ permissionGroup.name }}</span>
+                                        <input :id="`group-${index}`" v-model="groupChecked[index]" class="text-green-600 focus:border-green-300 focus:ring-green-200" type="checkbox" @change="checkGroupPermissions(index)"/>
+                                        <span class="ml-2 text-gray-700 font-bold dark:text-dark-typography">{{ permissionGroup.name }}</span>
                                     </label>
                                 </div>
                                 <div class="col-span-3 sm:col-span-2 py-3">
-                                    <label v-for="(permission, pIndex) in permissions[permissionGroup.name]" :key="pIndex" class="flex flex-row items-center cursor-pointer py-0">
-                                        <input :id="`permission-${permission.id}`" v-model="permissionChecked[permission.id]" class="text-indigo-600 focus:border-indigo-300 focus:ring-indigo-200" type="checkbox" @change="checkSinglePermission(index)"/>
-                                        <span class="ml-2 text-gray-700 dark:text-dark-typography">{{ formatPermissionName(permission.name) }}</span>
-                                    </label>
+                                    <div class="grid grid-cols-4 gap-4">
+                                        <label v-for="(permission, pIndex) in permissions[permissionGroup.name]" :key="pIndex" class="flex flex-row items-center cursor-pointer py-0">
+                                            <input :id="`permission-${permission.id}`" v-model="permissionChecked[permission.id]" class="text-indigo-600 focus:border-indigo-300 focus:ring-indigo-200" type="checkbox" @change="checkSinglePermission(index)"/>
+                                            <span class="ml-2 text-gray-700 dark:text-dark-typography">{{ formatPermissionName(permission.name) }}</span>
+                                        </label>
+                                    </div>
                                 </div>
-                                <hr v-if="index !== permissionGroups.length - 1" />
                             </div>
                         </div>
                     </div>
