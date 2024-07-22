@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h, html} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
@@ -397,6 +397,16 @@ const confirmViewHBL = async (id) => {
 const closeShowHBLModal = () => {
     showConfirmViewHBLModal.value = false;
 };
+
+const exportURL = computed(() => {
+    const params = new URLSearchParams();
+    for (const key in filters) {
+        if (filters.hasOwnProperty(key)) {
+            params.append(key, filters[key].toString());
+        }
+    }
+    return '/bonded-warehouse/list/export' + "?" + params.toString();
+});
 </script>
 <template>
     <AppLayout title="Bonded Warehouse">
@@ -490,6 +500,15 @@ const closeShowHBLModal = () => {
                         >
                             <i class="fa-solid fa-filter"></i>
                         </button>
+
+                        <a :href="exportURL">
+                            <button
+                                class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.top="'Download CSV'"
+                            >
+                                <i class="fa-solid fa-cloud-arrow-down"></i>
+                            </button>
+                        </a>
                     </div>
                 </div>
 

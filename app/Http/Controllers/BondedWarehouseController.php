@@ -45,4 +45,11 @@ class BondedWarehouseController extends Controller
 
         $this->bondedWarehouseRepository->markAsShortLoading($hbl_id);
     }
+
+    public function export(Request $request)
+    {
+        $filters = $request->only(['fromDate', 'toDate', 'deliveryType']);
+
+        return $this->bondedWarehouseRepository->export($filters);
+    }
 }
