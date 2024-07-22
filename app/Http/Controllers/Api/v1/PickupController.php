@@ -87,4 +87,16 @@ class PickupController extends Controller
     {
         return $this->pickupRepository->completedPickupWithHBL();
     }
+
+    /**
+     * Get pickup exceptions for driver
+     *
+     * Display the pickup exceptions for the authenticated driver.
+     *
+     * @group Pickups
+     */
+    public function getPickupExceptions()
+    {
+        return $this->pickupRepository->getPickupExceptionsForDriver();
+    }
 }

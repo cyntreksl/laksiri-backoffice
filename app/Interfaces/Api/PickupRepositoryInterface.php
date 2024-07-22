@@ -65,4 +65,11 @@ interface PickupRepositoryInterface
      * @method GET api.laksiri.world/v1/pickups/completed/list
      */
     public function completedPickupWithHBL(): JsonResponse;
+
+    /**
+     * Retrieve pickup exceptions to the authenticated driver.
+     *
+     * @method  GET api.laksiri.world/v1/pickups/exceptions/list
+     */
+    public function getPickupExceptionsForDriver(): JsonResponse;
 }
