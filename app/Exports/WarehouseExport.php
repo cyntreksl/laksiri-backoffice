@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Factory\Pickup\FilterFactory;
+use App\Factory\Warehouse\FilterFactory;
 use App\Models\HBL;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;

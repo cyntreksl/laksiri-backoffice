@@ -168,4 +168,11 @@ class ContainerController extends Controller
 
         $this->containerRepository->markAsReached($container_id);
     }
+
+    public function export(Request $request)
+    {
+        $filters = $request->only(['fromDate', 'toDate', 'etdStartDate', 'etdEndDate', 'cargoType', 'containerType', 'status']);
+
+        return $this->containerRepository->export($filters);
+    }
 }

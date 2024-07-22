@@ -27,6 +27,8 @@ Route::name('loading.')->group(function () {
 
     Route::get('hbls/get-unloaded-hbl/list', [ContainerController::class, 'getUnloadedHBLs']);
 
+    Route::get('containers/list/export', [ContainerController::class, 'export']);
+
     // Loaded Container
     Route::resource('loaded-containers', LoadedContainerController::class)
         ->except(['create']);

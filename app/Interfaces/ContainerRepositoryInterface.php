@@ -25,4 +25,6 @@ interface ContainerRepositoryInterface
     public function createUnloadingIssue(array $data);
 
     public function markAsReached($containerId);
+
+    public function export(array $filters);
 }
