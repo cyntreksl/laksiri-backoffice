@@ -25,6 +25,8 @@ Route::name('arrival.')->group(function () {
     Route::get('/shipments-arrivals/containers/{container_id}', [ContainerController::class, 'markAsReachedContainer'])
         ->name('shipments-arrivals.containers.markAsReachedContainer');
 
+    Route::get('shipments-arrivals/list/export', [ContainerController::class, 'exportShipmentArrivals']);
+
     // Bonded Warehouse
     Route::get('bonded-warehouses', [BondedWarehouseController::class, 'index'])
         ->name('bonded-warehouses.index');

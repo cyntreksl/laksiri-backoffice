@@ -182,4 +182,11 @@ class ContainerController extends Controller
 
         return $this->containerRepository->exportLoadedShipments($filters);
     }
+
+    public function exportShipmentArrivals(Request $request)
+    {
+        $filters = $request->only(['fromDate', 'toDate', 'etdStartDate', 'etdEndDate', 'cargoType', 'containerType', 'status', 'branch']);
+
+        return $this->containerRepository->exportShipmentArrivals($filters);
+    }
 }

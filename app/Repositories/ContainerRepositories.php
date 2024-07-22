@@ -17,6 +17,7 @@ use App\Actions\UnloadingIssue\CreateUnloadingIssue;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
 use App\Exports\LoadedShipmentsExport;
+use App\Exports\ShipmentArrivalsExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
 use App\Interfaces\ContainerRepositoryInterface;
@@ -244,5 +245,10 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function exportLoadedShipments(array $filters)
     {
         return Excel::download(new LoadedShipmentsExport($filters), 'loaded-shipments.xlsx');
+    }
+
+    public function exportShipmentArrivals(array $filters)
+    {
+        return Excel::download(new ShipmentArrivalsExport($filters), 'shipment-arrivals.xlsx');
     }
 }

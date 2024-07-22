@@ -29,4 +29,6 @@ interface ContainerRepositoryInterface
     public function export(array $filters);
 
     public function exportLoadedShipments(array $filters);
+
+    public function exportShipmentArrivals(array $filters);
 }
