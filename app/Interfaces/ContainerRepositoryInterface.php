@@ -27,4 +27,6 @@ interface ContainerRepositoryInterface
     public function markAsReached($containerId);
 
     public function export(array $filters);
+
+    public function exportLoadedShipments(array $filters);
 }

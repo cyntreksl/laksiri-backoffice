@@ -50,6 +50,8 @@ Route::name('loading.')->group(function () {
     Route::put('containers/{container}/delete-loading', [ContainerController::class, 'deleteLoading'])
         ->name('containers.delete-loading');
 
+    Route::get('loaded-containers/list/export', [ContainerController::class, 'exportLoadedShipments']);
+
     // Manual Loadings
     Route::get('manual-loadings', function () {
         return Inertia::render('Loading/ManualLoading');
