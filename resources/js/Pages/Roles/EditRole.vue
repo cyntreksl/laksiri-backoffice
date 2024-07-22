@@ -202,20 +202,21 @@ const handleRoleUpdate = () => {
 
                             <hr>
 
-                            <div v-for="(permissionGroup, index) in permissionGroups" :key="index" class="grid grid-cols-1 gap-2">
+                            <div v-for="(permissionGroup, index) in permissionGroups" :key="index" class="grid grid-cols-1 gap-2 bg-slate-100 px-5 rounded-lg">
                                 <div class="col-span-3 sm:col-span-1">
                                     <label class="flex flex-row items-center py-3 cursor-pointer">
-                                        <input :id="`group-${index}`" v-model="groupChecked[index]" class="text-indigo-600 focus:border-indigo-300 focus:ring-indigo-200" type="checkbox" @change="checkGroupPermissions(index)"/>
-                                        <span class="ml-2 text-gray-700 font-medium dark:text-dark-typography">{{ permissionGroup.name }}</span>
+                                        <input :id="`group-${index}`" v-model="groupChecked[index]" class="text-green-600 focus:border-green-300 focus:ring-green-200" type="checkbox" @change="checkGroupPermissions(index)"/>
+                                        <span class="ml-2 text-gray-700 font-bold dark:text-dark-typography">{{ permissionGroup.name }}</span>
                                     </label>
                                 </div>
                                 <div class="col-span-3 sm:col-span-2 py-3">
-                                    <label v-for="(permission, pIndex) in permissions[permissionGroup.name]" :key="pIndex" class="flex flex-row items-center cursor-pointer py-0">
-                                        <input :id="`permission-${permission.id}`" v-model="permissionChecked[permission.id]" class="text-indigo-600 focus:border-indigo-300 focus:ring-indigo-200" type="checkbox" @change="checkSinglePermission(index)"/>
-                                        <span class="ml-2 text-gray-700 dark:text-dark-typography">{{ formatPermissionName(permission.name) }}</span>
-                                    </label>
+                                    <div class="grid grid-cols-4 gap-4">
+                                        <label v-for="(permission, pIndex) in permissions[permissionGroup.name]" :key="pIndex" class="flex flex-row items-center cursor-pointer py-0">
+                                            <input :id="`permission-${permission.id}`" v-model="permissionChecked[permission.id]" class="text-indigo-600 focus:border-indigo-300 focus:ring-indigo-200" type="checkbox" @change="checkSinglePermission(index)"/>
+                                            <span class="ml-2 text-gray-700 dark:text-dark-typography">{{ formatPermissionName(permission.name) }}</span>
+                                        </label>
+                                    </div>
                                 </div>
-                                <hr v-if="index !== permissionGroups.length - 1" />
                             </div>
                         </div>
                     </div>
