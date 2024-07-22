@@ -32,6 +32,8 @@ Route::name('users.')->group(function () {
     Route::put('drivers/{user}/password/change', [DriverController::class, 'changeDriverPassword'])
         ->name('driver.password.update');
 
+    Route::get('drivers/list/export', [DriverController::class, 'export']);
+
     //Driver Tracking
     Route::get('driver-tracings', function () {
         return Inertia::render('User/DriverTracking');
