@@ -48,4 +48,6 @@ interface HBLRepositoryInterface
     public function getHBLStatus(HBL $hbl): JsonResponse;
 
     public function export(array $filters);
+
+    public function exportCancelled(array $filters);
 }

@@ -42,3 +42,5 @@ Route::get('get-pickup-status/{hbl}', [HBLController::class, 'getPickupStatus'])
 Route::get('get-hbl-status/{hbl}', [HBLController::class, 'getHBLStatus']);
 
 Route::get('hbls/list/export', [HBLController::class, 'export']);
+
+Route::get('hbls/cancelled/list/export', [HBLController::class, 'exportCancelled']);
