@@ -16,6 +16,7 @@ Route::domain('api.'.config('app.url'))
         Route::post('/pickups', [PickupController::class, 'store']);
         Route::apiResource('hbls', HBLController::class)->only(['store', 'show']);
         Route::post('/pickups/exceptions/{pickup}', [PickupController::class, 'storePickupException']);
+        Route::get('/pickups/exceptions/list', [PickupController::class, 'getPickupExceptions']);
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
