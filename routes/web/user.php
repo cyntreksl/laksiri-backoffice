@@ -17,6 +17,8 @@ Route::put('users/{user}/branch/change', [UserController::class, 'changeBranch']
 
 Route::get('user-list', [UserController::class, 'list']);
 
+Route::get('users/export', [UserController::class, 'export'])->name('users.export');
+
 Route::post('switch-branch', [UserController::class, 'switchBranch']);
 
 Route::name('users.')->group(function () {

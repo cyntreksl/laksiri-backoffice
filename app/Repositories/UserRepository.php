@@ -10,8 +10,10 @@ use App\Actions\User\SwitchUserBranch;
 use App\Actions\User\UpdateUser;
 use App\Actions\User\UpdateUserBranch;
 use App\Actions\User\UpdateUserPassword;
+use App\Exports\UsersExport;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -57,5 +59,10 @@ class UserRepository implements UserRepositoryInterface
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());
         }
+    }
+
+    public function export()
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
     }
 }

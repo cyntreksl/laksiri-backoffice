@@ -139,4 +139,9 @@ class UserController extends Controller
             return response()->json([]);
         }
     }
+
+    public function export()
+    {
+        return $this->userRepository->export();
+    }
 }
