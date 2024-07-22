@@ -117,4 +117,11 @@ class PickupController extends Controller
             $this->pickupRepository->savePickupOrder($request->pickups);
         }
     }
+
+    public function export(Request $request)
+    {
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'zoneBy']);
+
+        return $this->pickupRepository->export($filters);
+    }
 }

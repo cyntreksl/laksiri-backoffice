@@ -22,4 +22,6 @@ interface PickupRepositoryInterface
     public function updatePickup(array $data, PickUp $pickup);
 
     public function deletePickup(PickUp $pickup);
+
+    public function export(array $filters);
 }
