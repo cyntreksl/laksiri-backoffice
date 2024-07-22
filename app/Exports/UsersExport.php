@@ -39,7 +39,7 @@ class UsersExport implements FromCollection, ShouldAutoSize, WithHeadings, WithS
 
     public function collection()
     {
-        $users = User::all();
+        $users = User::currentBranch()->get();
 
         return UserCollection::collection($users);
     }
