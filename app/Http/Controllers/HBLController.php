@@ -214,4 +214,11 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->getHBLStatus($hbl);
     }
+
+    public function export(Request $request)
+    {
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold', 'paymentStatus']);
+
+        return $this->HBLRepository->export($filters);
+    }
 }
