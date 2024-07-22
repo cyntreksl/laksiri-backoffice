@@ -31,3 +31,6 @@ Route::post('pickups/exceptions/delete', [PickupExceptionController::class, 'del
 
 Route::get('pickups/list/export', [PickupController::class, 'export'])
     ->name('pickups.export');
+
+Route::get('pickups/exceptions/list/export', [PickupExceptionController::class, 'export'])
+    ->name('pickups.exceptions.export');
