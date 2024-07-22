@@ -26,4 +26,6 @@ Route::name('back-office.')->group(function () {
         ->name('warehouses.summery');
     Route::put('warehouses/{hbl}/assign-zones', [WarehouseController::class, 'assignZone'])
         ->name('warehouses.assign.zone');
+
+    Route::get('cash-settlements/export', [CashSettlementController::class, 'export']);
 });
