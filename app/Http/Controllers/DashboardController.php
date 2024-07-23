@@ -23,6 +23,9 @@ class DashboardController extends Controller
             'totalContainers' => $this->dashboardRepository->countTotalContainers(),
             'warehouses' => $this->dashboardRepository->countTotalWarehouses(),
             'cashSettlements' => $this->dashboardRepository->countCashSettlements(),
+            'totalDrivers' => $this->dashboardRepository->countTotalDrivers(),
+            'driverAssignedJobs' => $this->dashboardRepository->countDriverAssignedJobs(),
+            'driverChartData' => $this->dashboardRepository->getTotalDriverAssignedJobsByMonth(),
         ]);
     }
 }
