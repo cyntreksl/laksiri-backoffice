@@ -754,14 +754,6 @@ const shipIcon = ref(`
                     </span>
                                         {{ mode }}
                                     </div>
-                                    <div
-                                        v-for="(type, index) in filters.deliveryType"
-                                        v-if="filters.deliveryType"
-                                        :key="index"
-                                        class="badge bg-success text-white ml-2"
-                                    >
-                                        {{ type }}
-                                    </div>
                                 </div>
                             </div>
                         </div>
