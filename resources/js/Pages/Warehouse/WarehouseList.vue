@@ -864,21 +864,6 @@ const shipIcon = ref(`
                     />
                     <div v-html="shipIcon"></div>
                 </label>
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.cargoMode"
-                        label="Sea Cargo"
-                        value="Sea Cargo"
-                    />
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.cargoMode"
-                        label="Door to Door"
-                        value="Door to Door"
-                    />
-                </label>
 
                 <FilterBorder/>
 
