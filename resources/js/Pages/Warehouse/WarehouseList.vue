@@ -412,6 +412,56 @@ const createColumns = () => [
                                 ),
                         ]
                     ) : null,
+                usePage().props.user.permissions.includes('warehouse.download barcode') ?
+                    h(
+                        "a",
+                        {
+                            className:
+                                "btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25",
+                            href: route("back-office.warehouses.download.barcode", row.cells[0].data?.id),
+                            "x-tooltip..placement.bottom.primary": "'Download Barcode'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "icon icon-tabler icons-tabler-outline icon-tabler-file-barcode",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                    strokeWidth: 2,
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M14 3v4a1 1 0 0 0 1 1h4",
+                                    }),
+                                    h("path", {
+                                        d: "M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z",
+                                    }),
+                                    h("path", {
+                                        d: "M8 13h1v3h-1z",
+                                    }),
+                                    h("path", {
+                                        d: "M12 13v3",
+                                    }),
+                                    h("path", {
+                                        d: "M15 13h1v3h-1z",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
             ]);
         },
     },

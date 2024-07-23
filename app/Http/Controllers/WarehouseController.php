@@ -6,6 +6,7 @@ use App\Actions\WarehouseZone\GetWarehouseZones;
 use App\Enum\HBLPaymentStatus;
 use App\Http\Requests\AssignZoneRequest;
 use App\Interfaces\DriverRepositoryInterface;
+use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Models\HBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -19,6 +20,7 @@ class WarehouseController extends Controller
     public function __construct(
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly WarehouseRepositoryInterface $warehouseRepository,
+        private readonly HBLRepositoryInterface $HBLRepository,
     ) {
     }
 
@@ -69,5 +71,12 @@ class WarehouseController extends Controller
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus']);
 
         return $this->warehouseRepository->export($filters);
+    }
+
+    public function downloadBarcode(HBL $hbl)
+    {
+        $this->authorize('warehouse.download barcode');
+
+        return $this->HBLRepository->downloadHBLBarcodePDF($hbl);
     }
 }
