@@ -874,7 +874,7 @@ export default {
         };
 
         const isSidebarExpanded = ref(
-            localStorage.getItem("sidebar-expanded") === "true"
+            localStorage.getItem("sidebar-expanded") === "false"
         );
 
         const toggleSideBar = () => {
