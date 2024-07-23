@@ -62,15 +62,11 @@ const data = reactive({
         email: false,
         address: true,
         contact_number: true,
-        cargo_type: true,
-        // is_urgent_pickup: false,
-        // is_from_important_customer: false,
-        driver: true,
         pickup_date: true,
-        // pickup_time_start: false,
-        // pickup_time_end: false,
+        cargo_type: true,
+        driver: true,
         pickup_type: true,
-        // pickup_note: false,
+        pickup_note: true,
         actions: true,
     },
 });
@@ -173,14 +169,19 @@ const createColumns = () => [
     {
         name: "Contact",
         hidden: !data.columnVisibility.contact_number,
-        sort: false,
+        sort: true,
+    },
+    {
+        name: "Pickup Date",
+        hidden: !data.columnVisibility.pickup_date,
+        sort: true,
     },
     {
         name: "Cargo Mode",
-        sort: false,
+        sort: true,
         hidden: !data.columnVisibility.cargo_type,
         formatter: (_, row) =>
-            row.cells[6].data == "Sea Cargo"
+            row.cells[7].data == "Sea Cargo"
                 ? h(
                     "span",
                     {className: "flex"},
@@ -219,9 +220,9 @@ const createColumns = () => [
                             }),
                         ]
                     ),
-                    row.cells[6].data
+                    row.cells[7].data
                 )
-                : row.cells[6].data == "Air Cargo"
+                : row.cells[7].data == "Air Cargo"
                     ? h("span", {className: "flex space-x-2"}, [
                         h(
                             "svg",
@@ -249,9 +250,9 @@ const createColumns = () => [
                                 }),
                             ]
                         ),
-                        row.cells[6].data,
+                        row.cells[7].data,
                     ])
-                    : row.cells[6].data,
+                    : row.cells[7].data,
     },
 
     {
@@ -265,14 +266,8 @@ const createColumns = () => [
                 : null;
         },
     },
-    {name: "Pickup Date", hidden: !data.columnVisibility.pickup_date},
-    //   {
-    //     name: "Pickup Time Start",
-    //     hidden: !data.columnVisibility.pickup_time_start,
-    //   },
-    //   { name: "Pickup Time End", hidden: !data.columnVisibility.pickup_time_end },
     {name: "Pickup Type", hidden: !data.columnVisibility.pickup_type},
-    //   { name: "Pickup Note", hidden: !data.columnVisibility.pickup_note },
+    {name: "Package Description", hidden: !data.columnVisibility.pickup_note},
     {
         name: "Actions",
         sort: false,
