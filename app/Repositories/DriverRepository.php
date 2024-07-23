@@ -8,12 +8,14 @@ use App\Actions\Driver\UpdateDriverDetails;
 use App\Actions\Driver\UpdateDriverPassword;
 use App\Actions\User\CreateUser;
 use App\Actions\Zone\CreateZone;
+use App\Exports\DriversExport;
 use App\Factory\User\FilterFactory;
 use App\Http\Resources\DriverCollection;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DriverRepository implements DriverRepositoryInterface, GridJsInterface
 {
@@ -82,5 +84,10 @@ class DriverRepository implements DriverRepositoryInterface, GridJsInterface
     public function deleteDriver(User $user): void
     {
         DeleteDriver::run($user);
+    }
+
+    public function export(array $filters)
+    {
+        return Excel::download(new DriversExport($filters), 'drivers.xlsx');
     }
 }

@@ -10,12 +10,14 @@ use App\Actions\PickUps\GetPickupByIds;
 use App\Actions\PickUps\GetPickups;
 use App\Actions\PickUps\SavePickUpOrder;
 use App\Actions\PickUps\UpdatePickUp;
+use App\Exports\PickupsExport;
 use App\Factory\Pickup\FilterFactory;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Models\PickUp;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PickupRepository implements GridJsInterface, PickupRepositoryInterface
 {
@@ -112,5 +114,10 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     public function deletePickup(PickUp $pickup)
     {
         return DeletePickup::run($pickup);
+    }
+
+    public function export(array $filters)
+    {
+        return Excel::download(new PickupsExport($filters), 'pickups.xlsx');
     }
 }

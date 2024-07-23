@@ -15,6 +15,9 @@ use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
 use App\Enum\ContainerStatus;
+use App\Exports\ContainersExport;
+use App\Exports\LoadedShipmentsExport;
+use App\Exports\ShipmentArrivalsExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
 use App\Interfaces\ContainerRepositoryInterface;
@@ -26,6 +29,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 use ZipArchive;
 
 class ContainerRepositories implements ContainerRepositoryInterface, GridJsInterface
@@ -231,5 +235,20 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         } catch (\Exception $e) {
             throw new \Exception('Failed to mark as reached container: '.$e->getMessage());
         }
+    }
+
+    public function export(array $filters)
+    {
+        return Excel::download(new ContainersExport($filters), 'containers.xlsx');
+    }
+
+    public function exportLoadedShipments(array $filters)
+    {
+        return Excel::download(new LoadedShipmentsExport($filters), 'loaded-shipments.xlsx');
+    }
+
+    public function exportShipmentArrivals(array $filters)
+    {
+        return Excel::download(new ShipmentArrivalsExport($filters), 'shipment-arrivals.xlsx');
     }
 }

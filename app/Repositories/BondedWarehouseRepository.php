@@ -3,12 +3,14 @@
 namespace App\Repositories;
 
 use App\Actions\HBL\MarkAsShortLoading;
+use App\Exports\BondedWarehouseExport;
 use App\Factory\BondedWarehouse\FilterFactory;
 use App\Http\Resources\BondedWarehouseCollection;
 use App\Interfaces\BondedWarehouseRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BondedWarehouseRepository implements BondedWarehouseRepositoryInterface, GridJsInterface
 {
@@ -53,5 +55,10 @@ class BondedWarehouseRepository implements BondedWarehouseRepositoryInterface, G
             ->find($hbl_id);
 
         MarkAsShortLoading::run($hbl);
+    }
+
+    public function export(array $filters)
+    {
+        return Excel::download(new BondedWarehouseExport($filters), 'bonded-warehouse.xlsx');
     }
 }

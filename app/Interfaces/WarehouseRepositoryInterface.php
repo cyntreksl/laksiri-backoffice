@@ -9,4 +9,6 @@ interface WarehouseRepositoryInterface
     public function getSummery(array $filters = []);
 
     public function assignWarehouseZone(HBL $hbl, int $warehouse_zone_id);
+
+    public function export(array $filters);
 }

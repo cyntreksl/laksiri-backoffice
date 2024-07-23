@@ -28,3 +28,9 @@ Route::post('pickups/exceptions/driver/assign', [PickupExceptionController::clas
 
 Route::post('pickups/exceptions/delete', [PickupExceptionController::class, 'deleteExceptions'])
     ->name('pickups.exceptions.delete');
+
+Route::get('pickups/list/export', [PickupController::class, 'export'])
+    ->name('pickups.export');
+
+Route::get('pickups/exceptions/list/export', [PickupExceptionController::class, 'export'])
+    ->name('pickups.exceptions.export');

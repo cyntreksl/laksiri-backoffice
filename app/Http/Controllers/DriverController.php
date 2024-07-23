@@ -85,4 +85,11 @@ class DriverController extends Controller
 
         $this->driverRepository->deleteDriver(User::find($id));
     }
+
+    public function export(Request $request)
+    {
+        $filters = $request->only(['fromDate', 'toDate']);
+
+        return $this->driverRepository->export($filters);
+    }
 }

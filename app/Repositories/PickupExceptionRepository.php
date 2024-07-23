@@ -5,11 +5,13 @@ namespace App\Repositories;
 use App\Actions\PickUps\Exception\AssignDriver;
 use App\Actions\PickUps\Exception\DeleteException;
 use App\Actions\PickUps\Exception\GetExceptionsByIds;
+use App\Exports\PickupExceptionsExport;
 use App\Factory\Pickup\FilterFactory;
 use App\Http\Resources\PickupExceptionResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
 use App\Models\PickupException;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PickupExceptionRepository implements GridJsInterface, PickupExceptionRepositoryInterface
 {
@@ -63,5 +65,10 @@ class PickupExceptionRepository implements GridJsInterface, PickupExceptionRepos
         foreach ($exceptionList as $exception) {
             DeleteException::run($exception);
         }
+    }
+
+    public function export(array $filters)
+    {
+        return Excel::download(new PickupExceptionsExport($filters), 'pickup-exception.xlsx');
     }
 }

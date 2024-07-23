@@ -19,4 +19,6 @@ interface UserRepositoryInterface
     public function updateBranch(array $data, User $user);
 
     public function switchBranch(string $branchName);
+
+    public function export();
 }

@@ -68,4 +68,11 @@ class CashSettlementController extends Controller
 
         $this->cashSettlementRepository->updatePayment($request->all(), $hbl);
     }
+
+    public function export(Request $request)
+    {
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus']);
+
+        return $this->cashSettlementRepository->export($filters);
+    }
 }

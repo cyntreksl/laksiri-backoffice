@@ -11,4 +11,6 @@ interface CashSettlementInterface
     public function cashReceived(array $hblIds);
 
     public function updatePayment(array $data, HBL $hbl);
+
+    public function export(array $filters);
 }

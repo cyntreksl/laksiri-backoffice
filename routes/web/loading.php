@@ -27,6 +27,8 @@ Route::name('loading.')->group(function () {
 
     Route::get('hbls/get-unloaded-hbl/list', [ContainerController::class, 'getUnloadedHBLs']);
 
+    Route::get('containers/list/export', [ContainerController::class, 'export']);
+
     // Loaded Container
     Route::resource('loaded-containers', LoadedContainerController::class)
         ->except(['create']);
@@ -47,6 +49,8 @@ Route::name('loading.')->group(function () {
 
     Route::put('containers/{container}/delete-loading', [ContainerController::class, 'deleteLoading'])
         ->name('containers.delete-loading');
+
+    Route::get('loaded-containers/list/export', [ContainerController::class, 'exportLoadedShipments']);
 
     // Manual Loadings
     Route::get('manual-loadings', function () {

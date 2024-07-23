@@ -349,6 +349,16 @@ const resetFilter = () => {
     filters.zoneBy = "";
     applyFilters();
 };
+
+const exportURL = computed(() => {
+    const params = new URLSearchParams();
+    for (const key in filters) {
+        if (filters.hasOwnProperty(key)) {
+            params.append(key, filters[key].toString());
+        }
+    }
+    return '/pickups/exceptions/list/export' + "?" + params.toString();
+});
 </script>
 <template>
     <AppLayout title="Pickups Exceptions">
@@ -514,6 +524,15 @@ const resetFilter = () => {
                             >
                                 <i class="fa-solid fa-filter"></i>
                             </button>
+
+                            <a :href="exportURL">
+                                <button
+                                    class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                    x-tooltip.placement.top="'Download CSV'"
+                                >
+                                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                                </button>
+                            </a>
 
                             <div
                                 class="mt-1 ml-1 grid sm:grid-cols-2 md:grid-cols-2 gap-1 item-center"

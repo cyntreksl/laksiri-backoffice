@@ -5,12 +5,14 @@ namespace App\Repositories;
 use App\Actions\HBL\CashSettlement\GetCashSettlementByIds;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\UpdateHBLSystemStatus;
+use App\Exports\CashSettlementsExport;
 use App\Factory\CashSettlement\FilterFactory;
 use App\Http\Resources\CashSettlementCollection;
 use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\HBL;
 use App\Traits\ResponseAPI;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CashSettlementRepository implements CashSettlementInterface, GridJsInterface
 {
@@ -90,5 +92,10 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         $total_paid_amount = $old_paid_amount + $new_paid_amount;
 
         UpdateHBLPayments::run($total_paid_amount, $hbl);
+    }
+
+    public function export(array $filters)
+    {
+        return Excel::download(new CashSettlementsExport($filters), 'cash-settlements.xlsx');
     }
 }

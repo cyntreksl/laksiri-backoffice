@@ -19,6 +19,8 @@ use App\Actions\HBL\UpdateHBL;
 use App\Actions\HBL\UpdateHBLPackages;
 use App\Actions\HBLDocument\DeleteDocument;
 use App\Actions\HBLDocument\UploadDocument;
+use App\Exports\CancelledHBLExport;
+use App\Exports\HBLExport;
 use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\GridJsInterface;
@@ -30,6 +32,7 @@ use App\Models\HBLPackage;
 use App\Models\PickUp;
 use App\Models\Scopes\BranchScope;
 use Illuminate\Http\JsonResponse;
+use Maatwebsite\Excel\Facades\Excel;
 
 class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 {
@@ -223,5 +226,15 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         return response()->json([
             'status' => $hbl->statusLogs,
         ]);
+    }
+
+    public function export(array $filters)
+    {
+        return Excel::download(new HBLExport($filters), 'hbls.xlsx');
+    }
+
+    public function exportCancelled(array $filters)
+    {
+        return Excel::download(new CancelledHBLExport($filters), 'hbls-cancelled.xlsx');
     }
 }

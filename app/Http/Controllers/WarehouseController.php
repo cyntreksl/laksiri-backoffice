@@ -63,4 +63,11 @@ class WarehouseController extends Controller
 
         return $this->warehouseRepository->assignWarehouseZone($hbl, $request->warehouse_zone_id);
     }
+
+    public function export(Request $request)
+    {
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus']);
+
+        return $this->warehouseRepository->export($filters);
+    }
 }

@@ -60,4 +60,11 @@ class PickupExceptionController extends Controller
 
         $this->pickupExceptionRepository->deleteExceptions($request->exceptionIds);
     }
+
+    public function export(Request $request)
+    {
+        $filters = $request->only(['fromDate', 'toDate', 'createdBy', 'zoneBy']);
+
+        return $this->pickupExceptionRepository->export($filters);
+    }
 }
