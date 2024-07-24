@@ -93,6 +93,7 @@ const data = reactive({
         loading_ended_by: false,
         unloading_started_by: false,
         unloading_ended_by: false,
+        note: true,
         actions: true,
     },
 });
@@ -301,6 +302,19 @@ const createColumns = () => [
     {
         name: "Unloading Ended By",
         hidden: !data.columnVisibility.unloading_ended_by,
+    },
+    {
+        name: "Note",
+        hidden: !data.columnVisibility.note,
+        formatter: (cell) => {
+            if (!cell) return '';
+            let value = cell.toString();
+
+            if (value.length < 20) {
+                return value;
+            }
+            return value.substring(0, 20) + '...';
+        }
     },
     {
         name: "Actions",

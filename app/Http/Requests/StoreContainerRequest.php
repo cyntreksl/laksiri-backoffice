@@ -27,7 +27,7 @@ class StoreContainerRequest extends FormRequest
             'reference' => ['required', 'unique:containers,reference'],
             'bl_number' => ['required_if:cargo_type,Sea Cargo'],
             'awb_number' => ['required_if:cargo_type,Air Cargo'],
-            'container_number' => ['required'],
+            'container_number' => ['required_if:cargo_type,Sea Cargo'],
         ];
     }
 }
