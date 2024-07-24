@@ -860,7 +860,7 @@ const shipIcon = ref(`
                 @click="calculatePayment"
                 class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
               >
-                Re Calculate Payment
+                Calculate
               </button>
             </div>
             <div class="grid grid-cols-2 gap-5 mt-5">
@@ -1220,6 +1220,7 @@ const shipIcon = ref(`
                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                     placeholder="1.00"
                     step="0.01"
+                    min="0.00"
                     type="number"
                   />
                 </label>
@@ -1235,6 +1236,7 @@ const shipIcon = ref(`
                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                     placeholder="1.00"
                     step="0.01"
+                    min="0.00"
                     type="number"
                   />
                 </label>
@@ -1251,6 +1253,7 @@ const shipIcon = ref(`
                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                     placeholder="1.00"
                     step="0.01"
+                    min="0.00"
                     type="number"
                   />
                 </label>
@@ -1265,6 +1268,7 @@ const shipIcon = ref(`
                     v-model="packageItem.quantity"
                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                     placeholder="1"
+                    min="0"
                     step="1"
                     type="number"
                   />
@@ -1288,13 +1292,11 @@ const shipIcon = ref(`
               </div>
               <div class="col-span-2">
                 <label class="block">
-                  <span
-                    >Total Weight
-                    <span class="text-red-500 text-sm">*</span></span
-                  >
+                  <span>Total Weight</span>
                   <input
                     v-model="packageItem.totalWeight"
                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                    min="0"
                     placeholder="1"
                     step="1"
                     type="number"

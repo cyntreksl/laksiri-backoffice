@@ -27,7 +27,7 @@ const props = defineProps({
 });
 
 const form = reactive({
-  fromDate: props.filters.fromDate || moment(new Date()).format("YYYY-MM-DD"),
+  fromDate: props.filters.fromDate || moment(new Date()).subtract(7,'d').format("YYYY-MM-DD"),
   toDate: props.filters.toDate || moment(new Date()).format("YYYY-MM-DD"),
   driverId: props.filters.driverId || null,
 });
@@ -174,7 +174,7 @@ const handleSave = () => {
           </div>
         </div>
 
-        <div v-if="localPickups.length > 0" class="card mx-5 mb-5">
+        <div v-if="localPickups.length > 0" class="mx-5 mb-5">
           <div class="flex my-5 space-x-4 items-center">
             <PrimaryButton
               :disabled="!hasOrderChanged"
@@ -200,7 +200,7 @@ const handleSave = () => {
             <p class="text-error">Total Records {{ localPickups.length }}</p>
           </div>
 
-          <div class="min-w-full overflow-auto">
+          <div class="min-w-full overflow-y-auto h-[500px]">
             <table class="is-hoverable w-full text-left">
               <thead>
                 <tr>
@@ -338,13 +338,13 @@ const handleSave = () => {
                     {{ pickup.zone_id ? pickup.zone?.name : "-" }}
                   </td>
                   <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ pickup.address }}
+                    {{ pickup.address.length > 20 ? pickup.address.substring(0, 20) + "..." : pickup.address }}
                   </td>
                   <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                     {{ moment(pickup.created_at).format("YYYY-MM-DD") }}
                   </td>
                   <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ pickup.notes }}
+                      {{ pickup.notes.length > 30 ? pickup.notes.substring(0, 30) + "..." : pickup.notes }}
                   </td>
                 </tr>
               </tbody>
