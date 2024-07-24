@@ -20,7 +20,6 @@ const props = defineProps({
         default: () => [],
     },
 });
-
 const emit = defineEmits(['close']);
 </script>
 
@@ -76,7 +75,7 @@ const emit = defineEmits(['close']);
 
                 <TabShipmentDetails :container="container" :container-status="containerStatus"/>
 
-                <TabDocuments />
+                <TabDocuments :container-id="container?.id"/>
             </Tabs>
         </template>
     </DialogModal>
