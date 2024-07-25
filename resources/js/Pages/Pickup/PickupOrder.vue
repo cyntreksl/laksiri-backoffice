@@ -4,7 +4,7 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import {reactive, ref, watch} from "vue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -231,6 +231,7 @@ const closeModal = () => {
                                     Move
                                 </th>
                                 <th
+                                    v-if="usePage().props.user.permissions.includes('pickups.show')"
                                     class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                                 >
                                     Show
@@ -317,7 +318,7 @@ const closeModal = () => {
                                         </svg>
                                     </button>
                                 </td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                <td v-if="usePage().props.user.permissions.includes('pickups.show')" class="whitespace-nowrap px-4 py-3 sm:px-5">
                                     <button
                                         class="btn size-9 rounded-full p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
                                         @click.prevent="confirmViewPickup(pickup.id)"

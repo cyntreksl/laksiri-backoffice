@@ -69,6 +69,7 @@ const data = reactive({
         driver: true,
         pickup_type: true,
         pickup_note: true,
+        exception_note: true,
         actions: true,
     },
 });
@@ -318,6 +319,7 @@ const createColumns = () => [
     {
         name: "Package Description",
         hidden: !data.columnVisibility.pickup_note,
+        sort: false,
         formatter: (cell) => {
             if (!cell) return '';
             let value = cell.toString();
@@ -329,12 +331,24 @@ const createColumns = () => [
         }
     },
     {
+        name: "Exception",
+        hidden: !data.columnVisibility.exception_note,
+        sort: false,
+        formatter: (cell) => {
+            return cell
+                ? html(
+                    `<div class="badge space-x-2.5 bg-red-100 text-red-500 dark:bg-red-100"> ${cell}</div>`
+                )
+                : null;
+        }
+    },
+    {
         name: "Actions",
         sort: false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h("div", {className: "flex space-x-2"}, [
-                usePage().props.user.permissions.includes('hbls.show') ?
+                usePage().props.user.permissions.includes('pickups.show') ?
                     h(
                         "a",
                         {
