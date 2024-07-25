@@ -442,7 +442,7 @@ const exportURL = computed(() => {
                     <div
                         class="mt-1 ml-1 grid sm:grid-cols-1 md:grid-cols-1 justify-items-end"
                     >
-                        <div class="flex">
+                        <div class="flex space-x-2">
                             <ColumnVisibilityPopover>
                                 <label class="inline-flex items-center space-x-2">
                                     <Checkbox
@@ -534,68 +534,61 @@ const exportURL = computed(() => {
                                 </button>
                             </a>
 
-                            <div
-                                class="mt-1 ml-1 grid sm:grid-cols-2 md:grid-cols-2 gap-1 item-center"
+                            <PrimaryButton
+                                v-if="$page.props.user.permissions.includes('pickups.assign driver')"
+                                :disabled="isDataEmpty"
+                                @click="confirmAssignDriver"
                             >
-                                <div class="flex">
-                                    <PrimaryButton
-                                        v-if="$page.props.user.permissions.includes('pickups.assign driver')"
-                                        :disabled="isDataEmpty"
-                                        @click="confirmAssignDriver"
-                                    >
-                                        <svg
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
-                                            fill="none"
-                                            height="18"
-                                            stroke="currentColor"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            viewBox="0 0 24 24"
-                                            width="18"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
-                                            <path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                            <path d="M12 14l0 7"/>
-                                            <path d="M10 12l-6.75 -2"/>
-                                            <path d="M14 12l6.75 -2"/>
-                                        </svg>
-                                        Assign Driver ({{ countOfSelectedData }})
-                                    </PrimaryButton>
-                                </div>
-                                <div>
-                                    <DangerButton
-                                        v-if="$page.props.user.permissions.includes('pickups.delete')"
-                                        :disabled="isDataEmpty"
-                                        @click="confirmDeleteExceptions"
-                                    >
-                                        <svg
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-trash mr-1"
-                                            fill="none"
-                                            height="18"
-                                            stroke="currentColor"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            viewBox="0 0 24 24"
-                                            width="18"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                            <path d="M4 7l16 0"/>
-                                            <path d="M10 11l0 6"/>
-                                            <path d="M14 11l0 6"/>
-                                            <path
-                                                d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"
-                                            />
-                                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
-                                        </svg>
-                                        Delete <br/>({{ countOfSelectedData }})
-                                    </DangerButton>
-                                </div>
-                            </div>
+                                <svg
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
+                                    fill="none"
+                                    height="18"
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                    width="18"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
+                                    <path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                    <path d="M12 14l0 7"/>
+                                    <path d="M10 12l-6.75 -2"/>
+                                    <path d="M14 12l6.75 -2"/>
+                                </svg>
+                                Assign Driver ({{ countOfSelectedData }})
+                            </PrimaryButton>
+
+                            <DangerButton
+                                v-if="$page.props.user.permissions.includes('pickups.delete')"
+                                :disabled="isDataEmpty"
+                                @click="confirmDeleteExceptions"
+                            >
+                                <svg
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-trash mr-1"
+                                    fill="none"
+                                    height="18"
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                    width="18"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M4 7l16 0"/>
+                                    <path d="M10 11l0 6"/>
+                                    <path d="M14 11l0 6"/>
+                                    <path
+                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"
+                                    />
+                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
+                                </svg>
+                                Delete ({{ countOfSelectedData }})
+                            </DangerButton>
                         </div>
                     </div>
                 </div>
