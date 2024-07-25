@@ -228,4 +228,9 @@ class HBLController extends Controller
 
         return $this->HBLRepository->exportCancelled($filters);
     }
+
+    public function getHBLByReference($reference = null)
+    {
+        return $this->HBLRepository->getHBLByReference($reference);
+    }
 }
