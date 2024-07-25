@@ -2,6 +2,8 @@
 
 namespace App\Interfaces;
 
+use Illuminate\Support\Collection;
+
 interface DashboardRepositoryInterface
 {
     public function countAssignedJobs(): int;
@@ -19,4 +21,10 @@ interface DashboardRepositoryInterface
     public function countTotalWarehouses(): int;
 
     public function countCashSettlements(): int;
+
+    public function countTotalDrivers(): int;
+
+    public function countDriverAssignedJobs(): int;
+
+    public function getTotalDriverAssignedJobsByMonth(): Collection;
 }

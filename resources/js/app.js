@@ -2,7 +2,7 @@ import './bootstrap';
 import '../css/app.css';
 import 'notivue/notification.css' // Only needed if using built-in notifications
 import 'notivue/animations.css' // Only needed if using built-in animations
-
+import VueApexCharts from "vue3-apexcharts";
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
@@ -103,6 +103,7 @@ createInertiaApp({
             .use(momentPlugin)
             .use(pinia)
             .use(notivue)
+            .use(VueApexCharts)
             .mount(el);
     },
     progress: {
