@@ -24,8 +24,11 @@ const props = defineProps({
 
 const hbl = ref({});
 const pickup = ref({});
+const isLoading = ref(false);
 
 const fetchHBL = async () => {
+    isLoading.value = true;
+
     try {
         const response = await fetch(`/hbls/${props.hblId}`, {
             method: "GET",
@@ -44,10 +47,14 @@ const fetchHBL = async () => {
 
     } catch (error) {
         console.log(error);
+    } finally {
+        isLoading.value = false;
     }
 }
 
 const fetchPickup = async () => {
+    isLoading.value = true;
+
     try {
         const response = await fetch(`/pickups/${props.pickupId}`, {
             method: "GET",
@@ -66,6 +73,8 @@ const fetchPickup = async () => {
 
     } catch (error) {
         console.log(error);
+    } finally {
+        isLoading.value = false;
     }
 }
 
@@ -132,11 +141,11 @@ const emit = defineEmits(['close']);
                     </svg>
                 </template>
 
-                <TabHBLDetails :hbl="hbl" :pickup="pickup"/>
+                <TabHBLDetails :hbl="hbl" :is-loading="isLoading" :pickup="pickup"/>
 
-                <TabStatus :hbl-id="hbl?.id"/>
+                <TabStatus v-if="hbl" :hbl-id="hbl?.id"/>
 
-                <TabDocuments :hbl-id="hbl?.id"/>
+                <TabDocuments v-if="hbl" :hbl-id="hbl?.id"/>
             </Tabs>
         </template>
 
