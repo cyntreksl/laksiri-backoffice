@@ -13,6 +13,7 @@ class DownloadHBLBarcodePDF
     public function handle(HBL $hbl)
     {
         $customPaper = [0, 0, 283.80, 567.00];
+
         $pdf = Pdf::loadView('pdf.hbls.hblBarcode', [
             'hbl' => $hbl->load('packages'),
         ])->setPaper($customPaper);

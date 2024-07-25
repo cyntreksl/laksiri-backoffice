@@ -113,6 +113,7 @@ class RolePermissionSeeder extends Seeder
                     'warehouse.show',
                     'warehouse.assign zone',
                     'warehouse.hold and release',
+                    'warehouse.download barcode',
                 ],
             ],
 

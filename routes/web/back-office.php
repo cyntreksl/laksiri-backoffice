@@ -28,4 +28,6 @@ Route::name('back-office.')->group(function () {
     Route::put('warehouses/{hbl}/assign-zones', [WarehouseController::class, 'assignZone'])
         ->name('warehouses.assign.zone');
     Route::get('warehouses/export', [WarehouseController::class, 'export']);
+    Route::get('warehouses/download/barcode/{hbl}', [WarehouseController::class, 'downloadBarcode'])
+        ->name('warehouses.download.barcode');
 });
