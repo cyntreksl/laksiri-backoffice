@@ -9,13 +9,18 @@ const props = defineProps({
         type: Object,
         default: () => {
         },
+    },
+    pickup: {
+        type: Object,
+        default: () => {
+        },
     }
 });
 </script>
 
 <template>
     <Tab label="HBL Details" name="tabHome">
-        <AccordionPanel show-panel title="HBL Basic Details">
+        <AccordionPanel :title="hbl ? 'HBL Basic Details' : 'Pickup Details'" show-panel>
             <template #header-image>
                 <div
                     class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
@@ -35,8 +40,7 @@ const props = defineProps({
                 </div>
             </template>
             <div class="px-4 py-4 sm:px-5">
-                <div class="grid grid-cols-3 gap-x-4 gap-y-8">
-
+                <div v-if="hbl" class="grid grid-cols-3 gap-x-4 gap-y-8">
                     <InfoDisplay :value="hbl?.reference" label="Job Ref"/>
 
                     <InfoDisplay :value="hbl?.hbl" label="HBL"/>
@@ -60,6 +64,28 @@ const props = defineProps({
                     <InfoDisplay :value="hbl?.hbl_type" label="Delivery Type"/>
 
                     <InfoDisplay :value="hbl?.cargo_type" label="Cargo Mode"/>
+                </div>
+
+                <div v-if="pickup" class="grid grid-cols-3 gap-x-4 gap-y-8">
+                    <InfoDisplay :value="pickup?.reference" label="Job Ref"/>
+
+                    <InfoDisplay :value="pickup?.name" label="Name"/>
+
+                    <InfoDisplay :value="pickup?.email" label="Email"/>
+
+                    <InfoDisplay :value="pickup?.contact_number" label="Contact"/>
+
+                    <InfoDisplay :value="pickup?.address" label="Address"/>
+
+                    <InfoDisplay :value="pickup?.notes" label="Notes"/>
+
+                    <InfoDisplay :value="pickup?.cargo_type" label="Cargo Mode"/>
+
+                    <InfoDisplay :value="pickup?.pickup_date" label="Pickup Date"/>
+
+                    <InfoDisplay :value="pickup?.pickup_time_start" label="Pickup Time Start"/>
+
+                    <InfoDisplay :value="pickup?.pickup_time_end" label="Pickup Time End"/>
                 </div>
             </div>
         </AccordionPanel>
