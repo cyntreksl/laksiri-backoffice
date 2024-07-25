@@ -1,8 +1,8 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { router, useForm, usePage } from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { computed, reactive, ref, watch } from "vue";
+import {computed, reactive, ref, watch} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
@@ -11,24 +11,29 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
-import { push } from "notivue";
+import {push} from "notivue";
+import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 
 const props = defineProps({
   hblTypes: {
     type: Object,
-    default: () => {},
+    default: () => {
+    },
   },
   cargoTypes: {
     type: Object,
-    default: () => {},
+    default: () => {
+    },
   },
   warehouses: {
     type: Object,
-    default: () => {},
+    default: () => {
+    },
   },
   priceRules: {
     type: Object,
-    default: () => {},
+    default: () => {
+    },
   },
 });
 
@@ -72,7 +77,7 @@ const form = useForm({
   consignee_name: "",
   consignee_nic: "",
   consignee_contact: computed(
-    () => countryCode.value + consignee_contact.value
+      () => countryCode.value + consignee_contact.value
   ),
   consignee_address: "",
   consignee_note: "",
@@ -130,38 +135,38 @@ const grandTotalVolume = ref(0);
 
 const addPackageData = () => {
   if (
-    !packageItem.type ||
-    packageItem.length <= 0 ||
-    packageItem.width <= 0 ||
-    packageItem.height <= 0 ||
-    packageItem.quantity <= 0 ||
-    packageItem.volume <= 0
+      !packageItem.type ||
+      packageItem.length <= 0 ||
+      packageItem.width <= 0 ||
+      packageItem.height <= 0 ||
+      packageItem.quantity <= 0 ||
+      packageItem.volume <= 0
   ) {
     push.error("Please fill all required data");
     return;
   }
 
   if (form.cargo_type === 'Air Cargo') {
-      if (packageItem.totalWeight <= 0) {
-          push.error("Please fill the total weight");
-          return;
-      }
+    if (packageItem.totalWeight <= 0) {
+      push.error("Please fill the total weight");
+      return;
+    }
   }
 
   if (editMode.value) {
-    packageList.value.splice(editIndex.value, 1, { ...packageItem });
+    packageList.value.splice(editIndex.value, 1, {...packageItem});
     grandTotalWeight.value = packageList.value.reduce(
-      (accumulator, currentValue) => accumulator + currentValue.totalWeight,
-      0
+        (accumulator, currentValue) => accumulator + currentValue.totalWeight,
+        0
     );
     grandTotalVolume.value = packageList.value.reduce(
-      (accumulator, currentValue) => accumulator + currentValue.volume,
-      0
+        (accumulator, currentValue) => accumulator + currentValue.volume,
+        0
     );
 
     calculatePayment();
   } else {
-    const newItem = { ...packageItem }; // Create a copy of packageItem
+    const newItem = {...packageItem}; // Create a copy of packageItem
     packageList.value.push(newItem); // Add the new item to packageList
     form.packages = packageList.value;
 
@@ -175,51 +180,51 @@ const addPackageData = () => {
 
 // Watch for changes in length, width, height, or quantity to update volume and totalWeight
 watch(
-  [
-    () => packageItem.length,
-    () => packageItem.width,
-    () => packageItem.height,
-    () => packageItem.quantity,
-  ],
-  ([newLength, newWidth, newHeight, newQuantity]) => {
-    // Convert dimensions from cm to meters
-    const lengthMeters = newLength / 100; // 1 cm = 0.01 meters
-    const widthMeters = newWidth / 100;
-    const heightMeters = newHeight / 100;
+    [
+      () => packageItem.length,
+      () => packageItem.width,
+      () => packageItem.height,
+      () => packageItem.quantity,
+    ],
+    ([newLength, newWidth, newHeight, newQuantity]) => {
+      // Convert dimensions from cm to meters
+      const lengthMeters = newLength / 100; // 1 cm = 0.01 meters
+      const widthMeters = newWidth / 100;
+      const heightMeters = newHeight / 100;
 
-    // Calculate volume in cubic meters (m³)
-    const volumeCubicMeters =
-      lengthMeters * widthMeters * heightMeters * newQuantity;
+      // Calculate volume in cubic meters (m³)
+      const volumeCubicMeters =
+          lengthMeters * widthMeters * heightMeters * newQuantity;
 
-    // Assuming weight is directly proportional to volume
-    // Convert weight from grams to kilograms
-    const totalWeightKg = (volumeCubicMeters * newQuantity) / 1000; // 1 gram = 0.001 kilograms
+      // Assuming weight is directly proportional to volume
+      // Convert weight from grams to kilograms
+      const totalWeightKg = (volumeCubicMeters * newQuantity) / 1000; // 1 gram = 0.001 kilograms
 
-    // Update reactive properties
-    packageItem.volume = volumeCubicMeters;
-    // packageItem.totalWeight = totalWeightKg;
-  }
+      // Update reactive properties
+      packageItem.volume = volumeCubicMeters;
+      // packageItem.totalWeight = totalWeightKg;
+    }
 );
 
 const vat = ref(0);
 
 watch(
-  [
-    () => form.other_charge,
-    () => form.discount,
-    () => form.freight_charge,
-    () => vat,
-  ],
-  ([newOtherCharge, newDiscount, newFreightCharge]) => {
-    // Convert dimensions from cm to meters
-    hblTotal.value =
-      parseFloat(form.bill_charge) +
-      parseFloat(form.freight_charge * grandTotalWeight.value.toFixed(3)) +
-      parseFloat(form.other_charge) +
-      parseFloat(vat.value) -
-      form.discount;
-    form.grand_total = hblTotal.value;
-  }
+    [
+      () => form.other_charge,
+      () => form.discount,
+      () => form.freight_charge,
+      () => vat,
+    ],
+    ([newOtherCharge, newDiscount, newFreightCharge]) => {
+      // Convert dimensions from cm to meters
+      hblTotal.value =
+          parseFloat(form.bill_charge) +
+          parseFloat(form.freight_charge * grandTotalWeight.value.toFixed(3)) +
+          parseFloat(form.other_charge) +
+          parseFloat(vat.value) -
+          form.discount;
+      form.grand_total = hblTotal.value;
+    }
 );
 
 watch([() => form.cargo_type], ([newCargoType]) => {
@@ -286,7 +291,7 @@ const calculatePayment = () => {
   if (cargoType === "Sea Cargo") {
     const priceRule = computed(() => {
       return props.priceRules.find(
-        (priceRule) => priceRule.cargo_mode === "Sea Cargo"
+          (priceRule) => priceRule.cargo_mode === "Sea Cargo"
       );
     });
 
@@ -320,16 +325,16 @@ const calculatePayment = () => {
 
     billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
     otherCharge.value =
-      parseFloat(priceRule.value.destination_charges).toFixed(3) || 0;
+        parseFloat(priceRule.value.destination_charges).toFixed(3) || 0;
     isEditable.value = Boolean(priceRule.value.is_editable);
     vat.value =
-      priceRule.value.bill_vat !== 0
-        ? parseFloat(priceRule.value.bill_vat) / 100
-        : 0;
+        priceRule.value.bill_vat !== 0
+            ? parseFloat(priceRule.value.bill_vat) / 100
+            : 0;
   } else if (cargoType === "Air Cargo") {
     const priceRule = computed(() => {
       return props.priceRules.find(
-        (priceRule) => priceRule.cargo_mode === "Air Cargo"
+          (priceRule) => priceRule.cargo_mode === "Air Cargo"
       );
     });
 
@@ -363,12 +368,12 @@ const calculatePayment = () => {
 
     billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
     otherCharge.value =
-      parseFloat(priceRule.value.destination_charges).toFixed(3) || 0;
+        parseFloat(priceRule.value.destination_charges).toFixed(3) || 0;
     isEditable.value = Boolean(priceRule.value.is_editable);
     vat.value =
-      priceRule.value.bill_vat !== 0
-        ? parseFloat(priceRule.value.bill_vat) / 100
-        : 0;
+        priceRule.value.bill_vat !== 0
+            ? parseFloat(priceRule.value.bill_vat) / 100
+            : 0;
   }
 
   form.freight_charge = freightCharge.value.toFixed(3);
@@ -472,50 +477,64 @@ const shipIcon = ref(`
     <template #header>HBL - Create</template>
 
     <!-- Breadcrumb -->
-    <Breadcrumb />
+    <Breadcrumb/>
 
     <!-- Create Pickup Form -->
     <form @submit.prevent="handleHBLCreate">
       <div class="grid grid-cols-1 sm:grid-cols-5 my-4 gap-4">
         <div class="sm:col-span-3 space-y-5">
           <div class="card px-4 py-4 sm:px-5">
-            <div>
+            <div class="flex justify-between items-center">
               <h2
-                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                  class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
               >
                 Shipper Details
               </h2>
+
+              <SoftPrimaryButton class="flex items-center" type="button">
+                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                     xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                  <path
+                      d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
+                  <path
+                      d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
+                </svg>
+
+                Copy From HBL
+              </SoftPrimaryButton>
             </div>
             <div class="grid grid-cols-3 gap-5 mt-3">
               <div class="col-span-3">
                 <span>Name</span>
                 <label class="relative flex">
                   <input
-                    v-model="form.hbl_name"
-                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="Name"
-                    type="text"
+                      v-model="form.hbl_name"
+                      class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Name"
+                      type="text"
                   />
                   <div
-                    class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                      class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
                   >
                     <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="size-4.5 transition-colors duration-200"
+                        class="size-4.5 transition-colors duration-200"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                          d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
                       />
                     </svg>
                   </div>
                 </label>
-                <InputError :message="form.errors.hbl_name" />
+                <InputError :message="form.errors.hbl_name"/>
               </div>
             </div>
             <div class="grid grid-cols-2 gap-5 mt-3">
@@ -523,101 +542,101 @@ const shipIcon = ref(`
                 <span>Email</span>
                 <label class="relative flex">
                   <input
-                    v-model="form.email"
-                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="Email"
-                    type="email"
+                      v-model="form.email"
+                      class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Email"
+                      type="email"
                   />
                   <div
-                    class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                      class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
                   >
                     <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="size-4.5 transition-colors duration-200"
+                        class="size-4.5 transition-colors duration-200"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
+                          d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
                       />
                     </svg>
                   </div>
                 </label>
-                <InputError :message="form.errors.email" />
+                <InputError :message="form.errors.email"/>
               </div>
 
               <div>
                 <span>Mobile Number</span>
                 <div class="flex -space-x-px">
                   <select
-                    v-model="countryCode"
-                    class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                      v-model="countryCode"
+                      class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                   >
                     <option
-                      v-for="(countryCode, index) in countryCodes"
-                      :key="index"
+                        v-for="(countryCode, index) in countryCodes"
+                        :key="index"
                     >
                       {{ countryCode }}
                     </option>
                   </select>
 
                   <input
-                    v-model="contactNumber"
-                    class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                    placeholder="123 4567 890"
-                    type="text"
+                      v-model="contactNumber"
+                      class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                      placeholder="123 4567 890"
+                      type="text"
                   />
                 </div>
-                <InputError :message="form.errors.contact_number" />
+                <InputError :message="form.errors.contact_number"/>
               </div>
 
               <div>
                 <span>PP or NIC No</span>
                 <label class="relative flex">
                   <input
-                    v-model="form.nic"
-                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="PP or NIC No"
-                    type="text"
+                      v-model="form.nic"
+                      class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="PP or NIC No"
+                      type="text"
                   />
                 </label>
-                <InputError :message="form.errors.nic" />
+                <InputError :message="form.errors.nic"/>
               </div>
 
               <div>
                 <span>Residency No</span>
                 <label class="relative flex">
                   <input
-                    v-model="form.iq_number"
-                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="Residency No"
-                    type="text"
+                      v-model="form.iq_number"
+                      class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Residency No"
+                      type="text"
                   />
                 </label>
-                <InputError :message="form.errors.iq_number" />
+                <InputError :message="form.errors.iq_number"/>
               </div>
 
               <div class="col-span-2">
                 <span>Address</span>
                 <label class="block">
                   <textarea
-                    v-model="form.address"
-                    rows="4"
-                    placeholder="Type address here..."
-                    class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      v-model="form.address"
+                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Type address here..."
+                      rows="4"
                   ></textarea>
                 </label>
-                <InputError :message="form.errors.address" />
+                <InputError :message="form.errors.address"/>
               </div>
             </div>
             <div class="col-span-2" v-if="form.hbl_type === 'Door to Door'">
               <Checkbox
-                v-model="isChecked"
-                @change="addToConsigneeDetails"
+                  v-model="isChecked"
+                  @change="addToConsigneeDetails"
               ></Checkbox>
 
               <span class="ml-5">Same as Consignee Details</span>
@@ -625,107 +644,121 @@ const shipIcon = ref(`
           </div>
 
           <div class="card px-4 py-4 sm:px-5">
-            <div>
+            <div class="flex justify-between items-center">
               <h2
-                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                  class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
               >
                 Consignee Details
               </h2>
+
+                <SoftPrimaryButton class="flex items-center" type="button">
+                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                        <path
+                            d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
+                        <path
+                            d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
+                    </svg>
+
+                    Copy From HBL
+                </SoftPrimaryButton>
             </div>
             <div class="grid grid-cols-2 gap-5 mt-3">
               <div class="col-span-2">
                 <span>Name</span>
                 <label class="relative flex">
                   <input
-                    v-model="form.consignee_name"
-                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="Name"
-                    type="text"
+                      v-model="form.consignee_name"
+                      class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Name"
+                      type="text"
                   />
                   <div
-                    class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                      class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
                   >
                     <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="size-4.5 transition-colors duration-200"
+                        class="size-4.5 transition-colors duration-200"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                          d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
                       />
                     </svg>
                   </div>
                 </label>
-                <InputError :message="form.errors.consignee_name" />
+                <InputError :message="form.errors.consignee_name"/>
               </div>
 
               <div>
                 <span>PP or NIC No</span>
                 <label class="relative flex">
                   <input
-                    v-model="form.consignee_nic"
-                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="PP or NIC No"
-                    type="text"
+                      v-model="form.consignee_nic"
+                      class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="PP or NIC No"
+                      type="text"
                   />
                 </label>
-                <InputError :message="form.errors.consignee_nic" />
+                <InputError :message="form.errors.consignee_nic"/>
               </div>
 
               <div>
                 <span>Mobile Number</span>
                 <div class="flex -space-x-px">
                   <select
-                    v-model="countryCode"
-                    class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                      v-model="countryCode"
+                      class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                   >
                     <option
-                      v-for="(countryCode, index) in countryCodes"
-                      :key="index"
+                        v-for="(countryCode, index) in countryCodes"
+                        :key="index"
                     >
                       {{ countryCode }}
                     </option>
                   </select>
 
                   <input
-                    v-model="consignee_contact"
-                    class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                    placeholder="123 4567 890"
-                    type="text"
+                      v-model="consignee_contact"
+                      class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                      placeholder="123 4567 890"
+                      type="text"
                   />
                 </div>
-                <InputError :message="form.errors.consignee_contact" />
+                <InputError :message="form.errors.consignee_contact"/>
               </div>
 
               <div class="col-span-2">
                 <span>Address</span>
                 <label class="block">
                   <textarea
-                    v-model="form.consignee_address"
-                    rows="4"
-                    placeholder="Type address here..."
-                    class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      v-model="form.consignee_address"
+                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Type address here..."
+                      rows="4"
                   ></textarea>
                 </label>
-                <InputError :message="form.errors.consignee_address" />
+                <InputError :message="form.errors.consignee_address"/>
               </div>
 
               <div class="col-span-2">
                 <span>Note</span>
                 <label class="block">
                   <textarea
-                    v-model="form.consignee_note"
-                    rows="4"
-                    placeholder="Type note here..."
-                    class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      v-model="form.consignee_note"
+                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Type note here..."
+                      rows="4"
                   ></textarea>
                 </label>
-                <InputError :message="form.errors.consignee_note" />
+                <InputError :message="form.errors.consignee_note"/>
               </div>
             </div>
           </div>
@@ -734,27 +767,28 @@ const shipIcon = ref(`
           <!-- Action Buttons -->
           <div v-if="!isMobile()" class="flex justify-end space-x-5">
             <DangerOutlineButton @click="router.visit(route('hbls.index'))"
-              >Cancel</DangerOutlineButton
+            >Cancel
+            </DangerOutlineButton
             >
             <PrimaryButton
-              :class="{ 'opacity-50': form.processing }"
-              :disabled="form.processing"
-              class="space-x-2"
-              type="submit"
+                :class="{ 'opacity-50': form.processing }"
+                :disabled="form.processing"
+                class="space-x-2"
+                type="submit"
             >
               <span>Create a HBL</span>
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-5"
+                  class="size-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                 />
               </svg>
             </PrimaryButton>
@@ -764,7 +798,7 @@ const shipIcon = ref(`
           <div class="card px-4 py-4 sm:px-5">
             <div>
               <h2
-                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                  class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
               >
                 Cargo Type
               </h2>
@@ -772,15 +806,15 @@ const shipIcon = ref(`
             <div class="my-5">
               <div class="space-x-5">
                 <label
-                  v-for="cargoType in cargoTypes"
-                  class="inline-flex items-center space-x-2"
+                    v-for="cargoType in cargoTypes"
+                    class="inline-flex items-center space-x-2"
                 >
                   <input
-                    v-model="form.cargo_type"
-                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                    name="cargo_type"
-                    :value="cargoType"
-                    type="radio"
+                      v-model="form.cargo_type"
+                      :value="cargoType"
+                      class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                      name="cargo_type"
+                      type="radio"
                   />
                   <p>{{ cargoType }}</p>
                   <span v-if="cargoType == 'Sea Cargo'">
@@ -791,7 +825,7 @@ const shipIcon = ref(`
                   </span>
                 </label>
               </div>
-              <InputError :message="form.errors.cargo_type" />
+              <InputError :message="form.errors.cargo_type"/>
             </div>
           </div>
 
@@ -799,7 +833,7 @@ const shipIcon = ref(`
           <div class="card px-4 py-4 sm:px-5">
             <div>
               <h2
-                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                  class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
               >
                 Type
               </h2>
@@ -807,20 +841,20 @@ const shipIcon = ref(`
             <div class="my-5">
               <div class="space-x-5">
                 <label
-                  v-for="hblType in hblTypes"
-                  class="inline-flex items-center space-x-2"
+                    v-for="hblType in hblTypes"
+                    class="inline-flex items-center space-x-2"
                 >
                   <input
-                    v-model="form.hbl_type"
-                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                    name="hbl_type"
-                    :value="hblType"
-                    type="radio"
+                      v-model="form.hbl_type"
+                      :value="hblType"
+                      class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                      name="hbl_type"
+                      type="radio"
                   />
                   <p>{{ hblType }}</p>
                 </label>
               </div>
-              <InputError :message="form.errors.hbl_type" />
+              <InputError :message="form.errors.hbl_type"/>
             </div>
           </div>
 
@@ -828,7 +862,7 @@ const shipIcon = ref(`
           <div class="card px-4 py-4 sm:px-5">
             <div>
               <h2
-                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                  class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
               >
                 Warehouse
               </h2>
@@ -836,20 +870,20 @@ const shipIcon = ref(`
             <div class="my-5">
               <div class="space-x-5">
                 <label
-                  v-for="warehouse in warehouses"
-                  class="inline-flex items-center space-x-2"
+                    v-for="warehouse in warehouses"
+                    class="inline-flex items-center space-x-2"
                 >
                   <input
-                    v-model="form.warehouse"
-                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                    name="warehouse"
-                    :value="warehouse"
-                    type="radio"
+                      v-model="form.warehouse"
+                      :value="warehouse"
+                      class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                      name="warehouse"
+                      type="radio"
                   />
                   <p>{{ warehouse }}</p>
                 </label>
               </div>
-              <InputError :message="form.errors.warehouse" />
+              <InputError :message="form.errors.warehouse"/>
             </div>
           </div>
 
@@ -857,14 +891,14 @@ const shipIcon = ref(`
           <div class="card px-4 py-4 sm:px-5">
             <div class="flex justify-between items-center">
               <h2
-                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                  class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
               >
                 Price and Payment
               </h2>
               <button
-                type="button"
-                @click="calculatePayment"
-                class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
+                  class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
+                  type="button"
+                  @click="calculatePayment"
               >
                 Calculate
               </button>
@@ -873,66 +907,66 @@ const shipIcon = ref(`
               <div>
                 <span>Freight Charge</span>
                 <TextInput
-                  v-model="form.freight_charge"
-                  :disabled="!isEditable"
-                  class="w-full"
-                  min="0"
-                  step="any"
-                  type="number"
+                    v-model="form.freight_charge"
+                    :disabled="!isEditable"
+                    class="w-full"
+                    min="0"
+                    step="any"
+                    type="number"
                 />
-                <InputError :message="form.errors.freight_charge" />
+                <InputError :message="form.errors.freight_charge"/>
               </div>
 
               <div>
                 <span>Bill Charge</span>
                 <TextInput
-                  v-model="form.bill_charge"
-                  :disabled="!isEditable"
-                  class="w-full"
-                  min="0"
-                  step="any"
-                  type="number"
+                    v-model="form.bill_charge"
+                    :disabled="!isEditable"
+                    class="w-full"
+                    min="0"
+                    step="any"
+                    type="number"
                 />
-                <InputError :message="form.errors.bill_charge" />
+                <InputError :message="form.errors.bill_charge"/>
               </div>
 
               <div>
                 <span>Destination Charge</span>
                 <TextInput
-                  v-model="form.other_charge"
-                  :disabled="!isEditable"
-                  class="w-full"
-                  min="0"
-                  step="any"
-                  type="number"
+                    v-model="form.other_charge"
+                    :disabled="!isEditable"
+                    class="w-full"
+                    min="0"
+                    step="any"
+                    type="number"
                 />
-                <InputError :message="form.errors.other_charge" />
+                <InputError :message="form.errors.other_charge"/>
               </div>
 
               <div>
                 <span>Discount</span>
                 <TextInput
-                  v-model="form.discount"
-                  :disabled="!isEditable"
-                  class="w-full"
-                  placeholder="0"
-                  step="any"
-                  type="number"
+                    v-model="form.discount"
+                    :disabled="!isEditable"
+                    class="w-full"
+                    placeholder="0"
+                    step="any"
+                    type="number"
                 />
-                <InputError :message="form.errors.discount" />
+                <InputError :message="form.errors.discount"/>
               </div>
 
               <div class="col-span-2">
                 <span>Paid Amount</span>
                 <TextInput
-                  v-model="form.paid_amount"
-                  :disabled="!isEditable"
-                  class="w-full"
-                  min="0"
-                  step="any"
-                  type="number"
+                    v-model="form.paid_amount"
+                    :disabled="!isEditable"
+                    class="w-full"
+                    min="0"
+                    step="any"
+                    type="number"
                 />
-                <InputError :message="form.errors.paid_amount" />
+                <InputError :message="form.errors.paid_amount"/>
               </div>
 
               <div class="col-start-2 mt-2 space-y-2.5 font-bold">
@@ -958,7 +992,7 @@ const shipIcon = ref(`
 
               <div class="col-span-2">
                 <div
-                  class="flex justify-between text-2xl text-success font-bold"
+                    class="flex justify-between text-2xl text-success font-bold"
                 >
                   <p class="line-clamp-1">Grand Total</p>
                   <p>{{ hblTotal }} {{ currency }}</p>
@@ -972,7 +1006,7 @@ const shipIcon = ref(`
       <div class="card col-span-5 px-4 py-4 sm:px-5 mb-10">
         <div class="flex justify-between items-center">
           <h2
-            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+              class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
           >
             Package Details
           </h2>
@@ -983,118 +1017,118 @@ const shipIcon = ref(`
 
         <div class="mt-5">
           <div
-            v-if="packageList.length > 0"
-            class="is-scrollbar-hidden min-w-full overflow-x-auto"
+              v-if="packageList.length > 0"
+              class="is-scrollbar-hidden min-w-full overflow-x-auto"
           >
             <table class="is-zebra w-full text-left">
               <thead>
-                <tr>
-                  <th
+              <tr>
+                <th
                     class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 text-center"
-                  >
-                    <span class="hidden">Actions</span>
-                  </th>
-                  <th
+                >
+                  <span class="hidden">Actions</span>
+                </th>
+                <th
                     class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                  >
-                    Type
-                  </th>
-                  <th
+                >
+                  Type
+                </th>
+                <th
                     class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                  >
-                    Length (CM)
-                  </th>
-                  <th
+                >
+                  Length (CM)
+                </th>
+                <th
                     class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                  >
-                    Width
-                  </th>
-                  <th
+                >
+                  Width
+                </th>
+                <th
                     class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                  >
-                    Height
-                  </th>
-                  <th
+                >
+                  Height
+                </th>
+                <th
                     class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                  >
-                    Quantity
-                  </th>
-                  <th
+                >
+                  Quantity
+                </th>
+                <th
                     class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                  >
-                    Weight
-                  </th>
-                  <th
+                >
+                  Weight
+                </th>
+                <th
                     class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                  >
-                    Volume (M.CU)
-                  </th>
-                  <th
+                >
+                  Volume (M.CU)
+                </th>
+                <th
                     class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                  >
-                    Remark
-                  </th>
-                </tr>
+                >
+                  Remark
+                </th>
+              </tr>
               </thead>
               <tbody>
-                <tr v-for="(item, index) in packageList">
-                  <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
-                    <button
+              <tr v-for="(item, index) in packageList">
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
+                  <button
                       class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
                       @click.prevent="confirmRemovePackage(index)"
-                    >
-                      <i class="fa-solid fa-trash"></i>
-                    </button>
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
 
-                    <button
+                  <button
                       @click.prevent="openEditModal(index)"
                       class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
-                    >
-                      <i class="fa-solid fa-edit"></i>
-                    </button>
-                  </td>
-                  <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ item.type }}
-                  </td>
-                  <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ item.length }}
-                  </td>
-                  <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ item.width }}
-                  </td>
-                  <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ item.height }}
-                  </td>
-                  <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ item.quantity }}
-                  </td>
-                  <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ item.totalWeight.toFixed(3) }}
-                  </td>
-                  <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ item.volume.toFixed(3) }}
-                  </td>
-                  <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                    {{ item.remarks }}
-                  </td>
-                </tr>
+                  >
+                    <i class="fa-solid fa-edit"></i>
+                  </button>
+                </td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                  {{ item.type }}
+                </td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                  {{ item.length }}
+                </td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                  {{ item.width }}
+                </td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                  {{ item.height }}
+                </td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                  {{ item.quantity }}
+                </td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                  {{ item.totalWeight.toFixed(3) }}
+                </td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                  {{ item.volume.toFixed(3) }}
+                </td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                  {{ item.remarks }}
+                </td>
+              </tr>
               </tbody>
             </table>
           </div>
           <div v-else class="text-center">
             <div class="text-center mb-8">
               <svg
-                class="w-24 h-24 mx-auto mb-4 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+                  class="w-24 h-24 mx-auto mb-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 9l-2 2-2-2m4 2h4a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2h4m4-2l2 2 2-2"
+                    d="M12 9l-2 2-2-2m4 2h4a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2h4m4-2l2 2 2-2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
                 ></path>
               </svg>
               <p class="text-gray-600">
@@ -1111,27 +1145,28 @@ const shipIcon = ref(`
       <!-- Action Buttons -->
       <div v-if="isMobile()" class="flex justify-end space-x-5">
         <DangerOutlineButton @click="router.visit(route('hbls.index'))"
-          >Cancel</DangerOutlineButton
+        >Cancel
+        </DangerOutlineButton
         >
         <PrimaryButton
-          :class="{ 'opacity-50': form.processing }"
-          :disabled="form.processing"
-          class="space-x-2"
-          type="submit"
+            :class="{ 'opacity-50': form.processing }"
+            :disabled="form.processing"
+            class="space-x-2"
+            type="submit"
         >
           <span>Create a HBL</span>
           <svg
-            class="size-5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
+              class="size-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
             />
           </svg>
         </PrimaryButton>
@@ -1139,41 +1174,41 @@ const shipIcon = ref(`
     </form>
 
     <div
-      v-if="showAddNewPackageDialog"
-      class="fixed px-2 inset-0 z-[100] flex flex-col items-center justify-center overflow-y-auto"
-      role="dialog"
+        v-if="showAddNewPackageDialog"
+        class="fixed px-2 inset-0 z-[100] flex flex-col items-center justify-center overflow-y-auto"
+        role="dialog"
     >
       <div
-        class="absolute inset-0 bg-slate-900/60 transition-opacity duration-300"
-        @click="false"
-        x-show="true"
+          class="absolute inset-0 bg-slate-900/60 transition-opacity duration-300"
+          x-show="true"
+          @click="false"
       ></div>
 
       <div
-        class="relative w-auto sm:w-1/2 h-auto sm:h-1/5 md:h-fit lg:h-fit rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
+          class="relative w-auto sm:w-1/2 h-auto sm:h-1/5 md:h-fit lg:h-fit rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
       >
         <div
-          class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5"
+            class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5"
         >
           <h3 class="text-base font-medium text-slate-700 dark:text-navy-100">
             {{ editMode ? "Edit Package" : "Add New Package" }}
           </h3>
           <button
-            @click="closeAddPackageModal"
-            class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+              @click="closeAddPackageModal"
           >
             <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="size-4.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
+                class="size-4.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M6 18L18 6M6 6l12 12"
+                  d="M6 18L18 6M6 6l12 12"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
               ></path>
             </svg>
           </button>
@@ -1189,9 +1224,9 @@ const shipIcon = ref(`
                 <label class="block">
                   <span>Type </span>
                   <select
-                    v-model="selectedType"
-                    @change="updateTypeDescription"
-                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                      v-model="selectedType"
+                      class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                      @change="updateTypeDescription"
                   >
                     <option value="">Choose one</option>
                     <option v-for="type in packageTypes" :key="type">
@@ -1203,14 +1238,14 @@ const shipIcon = ref(`
               <div class="col-span-2">
                 <label class="block">
                   <span
-                    >Type Description
+                  >Type Description
                     <span class="text-red-500 text-sm">*</span></span
                   >
                   <input
-                    v-model="packageItem.type"
-                    class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="Sofa set"
-                    type="text"
+                      v-model="packageItem.type"
+                      class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Sofa set"
+                      type="text"
                   />
                 </label>
               </div>
@@ -1218,32 +1253,32 @@ const shipIcon = ref(`
               <div class="col-span-4 md:col-span-1">
                 <label class="block">
                   <span
-                    >Length (cm) <br />
+                  >Length (cm) <br/>
                     <span class="text-red-500 text-sm">*</span></span
                   >
                   <input
-                    v-model="packageItem.length"
-                    class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="1.00"
-                    step="0.01"
-                    min="0.00"
-                    type="number"
+                      v-model="packageItem.length"
+                      class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      min="0.00"
+                      placeholder="1.00"
+                      step="0.01"
+                      type="number"
                   />
                 </label>
               </div>
               <div class="col-span-4 md:col-span-1">
                 <label class="block">
                   <span
-                    >Width <br /><span class="text-red-500 text-sm">*</span>
+                  >Width <br/><span class="text-red-500 text-sm">*</span>
                   </span>
 
                   <input
-                    v-model="packageItem.width"
-                    class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="1.00"
-                    step="0.01"
-                    min="0.00"
-                    type="number"
+                      v-model="packageItem.width"
+                      class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      min="0.00"
+                      placeholder="1.00"
+                      step="0.01"
+                      type="number"
                   />
                 </label>
               </div>
@@ -1251,32 +1286,32 @@ const shipIcon = ref(`
               <div class="col-span-4 md:col-span-1">
                 <label class="block">
                   <span
-                    >Height <br /><span class="text-red-500 text-sm"
-                      >*<br /></span
+                  >Height <br/><span class="text-red-500 text-sm"
+                  >*<br/></span
                   ></span>
                   <input
-                    v-model="packageItem.height"
-                    class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="1.00"
-                    step="0.01"
-                    min="0.00"
-                    type="number"
+                      v-model="packageItem.height"
+                      class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      min="0.00"
+                      placeholder="1.00"
+                      step="0.01"
+                      type="number"
                   />
                 </label>
               </div>
               <div class="col-span-4 md:col-span-1">
                 <label class="block">
                   <span
-                    >Quantity <br /><span class="text-red-500 text-sm"
-                      >*<br /></span
+                  >Quantity <br/><span class="text-red-500 text-sm"
+                  >*<br/></span
                   ></span>
                   <input
-                    v-model="packageItem.quantity"
-                    class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="1"
-                    min="0"
-                    step="1"
-                    type="number"
+                      v-model="packageItem.quantity"
+                      class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      min="0"
+                      placeholder="1"
+                      step="1"
+                      type="number"
                   />
                 </label>
               </div>
@@ -1284,15 +1319,15 @@ const shipIcon = ref(`
               <div class="col-span-2">
                 <label class="block">
                   <span
-                    >Volume (M.CU)
+                  >Volume (M.CU)
                     <span class="text-red-500 text-sm">*</span></span
                   >
                   <input
-                    v-model="packageItem.volume"
-                    class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="1.00"
-                    step="0.01"
-                    type="number"
+                      v-model="packageItem.volume"
+                      class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="1.00"
+                      step="0.01"
+                      type="number"
                   />
                 </label>
               </div>
@@ -1300,12 +1335,12 @@ const shipIcon = ref(`
                 <label class="block">
                   <span>Total Weight</span>
                   <input
-                    v-model="packageItem.totalWeight"
-                    class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    min="0"
-                    placeholder="1"
-                    step="1"
-                    type="number"
+                      v-model="packageItem.totalWeight"
+                      class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      min="0"
+                      placeholder="1"
+                      step="1"
+                      type="number"
                   />
                 </label>
               </div>
@@ -1314,10 +1349,10 @@ const shipIcon = ref(`
                 <label class="block">
                   <span>Remarks</span>
                   <textarea
-                    v-model="packageItem.remarks"
-                    rows="4"
-                    placeholder="Enter Text"
-                    class="form-textarea mt-1.5 w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      v-model="packageItem.remarks"
+                      class="form-textarea mt-1.5 w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Enter Text"
+                      rows="4"
                   ></textarea>
                 </label>
               </div>
@@ -1325,15 +1360,15 @@ const shipIcon = ref(`
 
             <div class="space-x-2 text-right">
               <SecondaryButton
-                class="min-w-[7rem]"
-                @click="closeAddPackageModal"
+                  class="min-w-[7rem]"
+                  @click="closeAddPackageModal"
               >
                 Cancel
               </SecondaryButton>
               <PrimaryButton
-                class="min-w-[7rem]"
-                type="button"
-                @click="addPackageData"
+                  class="min-w-[7rem]"
+                  type="button"
+                  @click="addPackageData"
               >
                 {{ editMode ? "Edit" : "Add" }}
               </PrimaryButton>
@@ -1344,9 +1379,9 @@ const shipIcon = ref(`
     </div>
 
     <RemovePackageConfirmationModal
-      :show="showConfirmRemovePackageModal"
-      @close="closeModal"
-      @remove-package="handleRemovePackage"
+        :show="showConfirmRemovePackageModal"
+        @close="closeModal"
+        @remove-package="handleRemovePackage"
     />
   </AppLayout>
 </template>
