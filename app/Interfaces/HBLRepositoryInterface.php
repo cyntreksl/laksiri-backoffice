@@ -50,4 +50,6 @@ interface HBLRepositoryInterface
     public function export(array $filters);
 
     public function exportCancelled(array $filters);
+
+    public function getHBLByReference(string $reference): JsonResponse;
 }

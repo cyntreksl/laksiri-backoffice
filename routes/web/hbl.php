@@ -44,3 +44,5 @@ Route::get('get-hbl-status/{hbl}', [HBLController::class, 'getHBLStatus']);
 Route::get('hbls/list/export', [HBLController::class, 'export']);
 
 Route::get('hbls/cancelled/list/export', [HBLController::class, 'exportCancelled']);
+
+Route::get('/get-hbl-by-reference/{reference}', [HBLController::class, 'getHBLByReference']);

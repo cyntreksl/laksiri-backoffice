@@ -10,6 +10,7 @@ use App\Actions\HBL\DownloadHBLInvoicePDF;
 use App\Actions\HBL\DownloadHBLPDF;
 use App\Actions\HBL\GetHBLByCargoTypeWithDraftLoadedPackages;
 use App\Actions\HBL\GetHBLByCargoTypeWithUnloadedPackages;
+use App\Actions\HBL\GetHBLByReference;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLsWithPackages;
 use App\Actions\HBL\GetHBLsWithUnloadedPackagesByReference;
@@ -236,5 +237,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function exportCancelled(array $filters)
     {
         return Excel::download(new CancelledHBLExport($filters), 'hbls-cancelled.xlsx');
+    }
+
+    public function getHBLByReference(string $reference): JsonResponse
+    {
+        return GetHBLByReference::run($reference);
     }
 }

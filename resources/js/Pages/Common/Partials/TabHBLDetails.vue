@@ -3,19 +3,31 @@ import Tab from "@/Components/Tab.vue";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import AccordionPanel from "@/Components/AccordionPanel.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
+import PostSkeleton from "@/Components/PostSkeleton.vue";
 
 const props = defineProps({
     hbl: {
         type: Object,
         default: () => {
         },
+    },
+    pickup: {
+        type: Object,
+        default: () => {
+        },
+    },
+    isLoading: {
+        type: Boolean,
+        required: true,
     }
 });
 </script>
 
 <template>
-    <Tab label="HBL Details" name="tabHome">
-        <AccordionPanel show-panel title="HBL Basic Details">
+    <Tab label="Details" name="tabHome">
+        <PostSkeleton v-if="isLoading" />
+
+        <AccordionPanel v-else :title="hbl ? 'HBL Basic Details' : 'Pickup Details'" show-panel>
             <template #header-image>
                 <div
                     class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
@@ -35,8 +47,7 @@ const props = defineProps({
                 </div>
             </template>
             <div class="px-4 py-4 sm:px-5">
-                <div class="grid grid-cols-3 gap-x-4 gap-y-8">
-
+                <div v-if="hbl" class="grid grid-cols-3 gap-x-4 gap-y-8">
                     <InfoDisplay :value="hbl?.reference" label="Job Ref"/>
 
                     <InfoDisplay :value="hbl?.hbl" label="HBL"/>
@@ -61,10 +72,36 @@ const props = defineProps({
 
                     <InfoDisplay :value="hbl?.cargo_type" label="Cargo Mode"/>
                 </div>
+
+                <div v-else class="grid grid-cols-3 gap-x-4 gap-y-8">
+                    <InfoDisplay :value="pickup?.reference" label="Job Ref"/>
+
+                    <InfoDisplay :value="pickup?.name" label="Name"/>
+
+                    <InfoDisplay :value="pickup?.email" label="Email"/>
+
+                    <InfoDisplay :value="pickup?.contact_number" label="Contact"/>
+
+                    <InfoDisplay :value="pickup?.address" label="Address"/>
+
+                    <InfoDisplay :value="pickup?.notes" label="Notes"/>
+
+                    <InfoDisplay :value="pickup?.cargo_type" label="Cargo Mode"/>
+
+                    <InfoDisplay :value="pickup?.pickup_date" label="Pickup Date"/>
+
+                    <InfoDisplay :value="pickup?.pickup_time_start" label="Pickup Time Start"/>
+
+                    <InfoDisplay :value="pickup?.pickup_time_end" label="Pickup Time End"/>
+
+                    <InfoDisplay :value="pickup?.pickup_type" label="Pickup Type"/>
+                </div>
             </div>
         </AccordionPanel>
 
-        <AccordionPanel show-panel title="Consignee Details">
+        <PostSkeleton v-if="isLoading" />
+
+        <AccordionPanel v-else show-panel title="Consignee Details">
             <template #header-image>
                 <div
                     class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
@@ -99,7 +136,9 @@ const props = defineProps({
             </div>
         </AccordionPanel>
 
-        <AccordionPanel show-panel title="Package Details">
+        <PostSkeleton v-if="isLoading" />
+
+        <AccordionPanel v-else show-panel title="Package Details">
             <template #header-image>
                 <div
                     class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
@@ -231,12 +270,18 @@ const props = defineProps({
                             {{ item.remarks ?? '-' }}
                         </td>
                         <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
-                            <svg v-if="item.is_loaded" class="size-6 text-success" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path clip-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" fill-rule="evenodd" />
+                            <svg v-if="item.is_loaded" class="size-6 text-success" fill="currentColor"
+                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path clip-rule="evenodd"
+                                      d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                                      fill-rule="evenodd"/>
                             </svg>
 
-                            <svg v-else class="size-6 text-error" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path clip-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" fill-rule="evenodd" />
+                            <svg v-else class="size-6 text-error" fill="currentColor" viewBox="0 0 24 24"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path clip-rule="evenodd"
+                                      d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+                                      fill-rule="evenodd"/>
                             </svg>
                         </td>
                     </tr>
@@ -245,7 +290,9 @@ const props = defineProps({
             </div>
         </AccordionPanel>
 
-        <AccordionPanel show-panel title="Payment Details">
+        <PostSkeleton v-if="isLoading" />
+
+        <AccordionPanel v-else show-panel title="Payment Details">
             <template #header-image>
                 <div
                     class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">

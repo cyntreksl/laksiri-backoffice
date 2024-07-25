@@ -2,10 +2,10 @@
 import DialogModal from "@/Components/DialogModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Tabs from "@/Components/Tabs.vue";
+import {ref, watch} from "vue";
 import TabHBLDetails from "@/Pages/Common/Partials/TabHBLDetails.vue";
 import TabStatus from "@/Pages/Common/Partials/TabStatus.vue";
 import TabDocuments from "@/Pages/Common/Partials/TabDocuments.vue";
-import {ref, watch} from "vue";
 
 const props = defineProps({
     show: {
@@ -14,13 +14,21 @@ const props = defineProps({
     },
     hblId: {
         type: Number,
-        required: true,
+        default: null,
+    },
+    pickupId: {
+        type: Number,
+        default: null,
     }
 });
 
 const hbl = ref({});
+const pickup = ref({});
+const isLoading = ref(false);
 
 const fetchHBL = async () => {
+    isLoading.value = true;
+
     try {
         const response = await fetch(`/hbls/${props.hblId}`, {
             method: "GET",
@@ -39,12 +47,48 @@ const fetchHBL = async () => {
 
     } catch (error) {
         console.log(error);
+    } finally {
+        isLoading.value = false;
     }
 }
 
-watch(() => {
-    fetchHBL()
-})
+const fetchPickup = async () => {
+    isLoading.value = true;
+
+    try {
+        const response = await fetch(`/pickups/${props.pickupId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            pickup.value = data;
+        }
+
+    } catch (error) {
+        console.log(error);
+    } finally {
+        isLoading.value = false;
+    }
+}
+
+watch(() => props.hblId, (newVal) => {
+    if (newVal !== undefined) {
+        fetchHBL();
+    }
+}, { immediate: true }); // Immediate to trigger on mount
+
+watch(() => props.pickupId, (newVal) => {
+    if (newVal !== undefined) {
+        fetchPickup();
+    }
+}, { immediate: true }); // Immediate to trigger on mount
 
 const emit = defineEmits(['close']);
 </script>
@@ -97,11 +141,11 @@ const emit = defineEmits(['close']);
                     </svg>
                 </template>
 
-                <TabHBLDetails :hbl="hbl"/>
+                <TabHBLDetails :hbl="hbl" :is-loading="isLoading" :pickup="pickup"/>
 
-                <TabStatus :hbl-id="hbl?.id"/>
+                <TabStatus v-if="hbl" :hbl-id="hbl?.id"/>
 
-                <TabDocuments :hbl-id="hbl?.id"/>
+                <TabDocuments v-if="hbl" :hbl-id="hbl?.id"/>
             </Tabs>
         </template>
 
