@@ -14,6 +14,7 @@ use App\Http\Requests\StoreContainerRequest;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Models\Container;
+use App\Models\ContainerDocument;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -188,5 +189,24 @@ class ContainerController extends Controller
         $filters = $request->only(['fromDate', 'toDate', 'etdStartDate', 'etdEndDate', 'cargoType', 'containerType', 'status', 'branch']);
 
         return $this->containerRepository->exportShipmentArrivals($filters);
+    }
+
+    public function getContainerDocuments(Container $container)
+    {
+        return response()->json($container->containerDocuments);
+    }
+
+    public function uploadDocument(Request $request)
+    {
+        $this->authorize('container.upload documents');
+
+        return $this->containerRepository->uploadDocument($request->all());
+    }
+
+    public function destroyContainerDocument(ContainerDocument $containerDocument)
+    {
+        $this->authorize('container.delete documents');
+
+        $this->containerRepository->deleteDocument($containerDocument);
     }
 }

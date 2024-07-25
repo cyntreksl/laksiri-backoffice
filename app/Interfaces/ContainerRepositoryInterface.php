@@ -3,6 +3,7 @@
 namespace App\Interfaces;
 
 use App\Models\Container;
+use App\Models\ContainerDocument;
 
 interface ContainerRepositoryInterface
 {
@@ -31,4 +32,8 @@ interface ContainerRepositoryInterface
     public function exportLoadedShipments(array $filters);
 
     public function exportShipmentArrivals(array $filters);
+
+    public function uploadDocument(array $data);
+
+    public function deleteDocument(ContainerDocument $containerDocument);
 }

@@ -18,6 +18,14 @@ Route::name('loading.')->group(function () {
 
     Route::get('container-list', [ContainerController::class, 'list']);
 
+    Route::post('containers/uploads/document', [ContainerController::class, 'uploadDocument'])
+        ->name('containers.upload.document');
+
+    Route::get('containers/get-container-documents/{container}', [ContainerController::class, 'getContainerDocuments']);
+
+    Route::delete('containers-documents/{container_document}', [ContainerController::class, 'destroyContainerDocument'])
+        ->name('containers.destroy.document');
+
     // Loading Point
     Route::get('loading-points/{container}', [ContainerController::class, 'showLoadingPoint'])
         ->name('loading-points.index');

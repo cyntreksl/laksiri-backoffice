@@ -13,6 +13,8 @@ use App\Actions\Container\Unloading\UnloadHBL;
 use App\Actions\Container\Unloading\UnloadHBLPackages;
 use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
+use App\Actions\ContainerDocument\DeleteDocument;
+use App\Actions\ContainerDocument\UploadDocument;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
@@ -23,6 +25,7 @@ use App\Http\Resources\ContainerResource;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\Container;
+use App\Models\ContainerDocument;
 use App\Models\Scopes\BranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Filesystem\Filesystem;
@@ -250,5 +253,23 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function exportShipmentArrivals(array $filters)
     {
         return Excel::download(new ShipmentArrivalsExport($filters), 'shipment-arrivals.xlsx');
+    }
+
+    public function uploadDocument(array $data)
+    {
+        try {
+            UploadDocument::run($data);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to upload container document: '.$e->getMessage());
+        }
+    }
+
+    public function deleteDocument(ContainerDocument $containerDocument): void
+    {
+        try {
+            DeleteDocument::run($containerDocument);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to delete container document: '.$e->getMessage());
+        }
     }
 }
