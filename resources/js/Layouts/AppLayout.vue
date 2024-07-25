@@ -598,8 +598,10 @@
                                                         </template>
                                                     </template>
                                                     <template v-else>
-                                                        <template v-if="item.title === 'Shipments Arrivals' || item.title === 'Bonded Warehouse'">
-                                                            <template v-if="$page.props.currentBranch.name === 'Sri Lanka'">
+                                                        <template
+                                                            v-if="item.title === 'Shipments Arrivals' || item.title === 'Bonded Warehouse'">
+                                                            <template
+                                                                v-if="$page.props.currentBranch.name === 'Sri Lanka'">
                                                                 <Link
                                                                     :class="
                       route().current() === item.route
@@ -776,10 +778,11 @@
                                 class="btn space-x-1 ml-3 bg-slate-150 font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                                 @click="showBranchPopper = !showBranchPopper"
                             >
-                <span class="text-xs"
-                >{{ $page.props.auth.user.active_branch_name }}
+                <span class="text-xs">
+                    {{ $page.props.auth.user.active_branch_name }}
                 </span>
                                 <svg
+                                    v-if="userBranches.length > 0"
                                     :class="showBranchPopper && 'rotate-180'"
                                     class="size-4 transition-transform duration-200"
                                     fill="none"
@@ -795,7 +798,7 @@
                                     />
                                 </svg>
                             </button>
-                            <template #content>
+                            <template v-if="userBranches.length > 0" #content>
                                 <div
                                     :class="showBranchPopper ? 'show' : ''"
                                     class="popper-root"
@@ -834,7 +837,7 @@
     </div>
 </template>
 <script>
-import {computed, customRef, reactive, ref} from "vue";
+import {reactive, ref} from "vue";
 import {useMonochromeSelector} from "../composable/monochromeMode.js";
 import {useDarkModeSelector} from "../composable/darkMode.js";
 import {Head, router, usePage} from "@inertiajs/vue3";
@@ -871,7 +874,7 @@ export default {
         };
 
         const isSidebarExpanded = ref(
-            localStorage.getItem("sidebar-expanded") === "true"
+            localStorage.getItem("sidebar-expanded") === "false"
         );
 
         const toggleSideBar = () => {

@@ -11,4 +11,6 @@ interface WarehouseRepositoryInterface
     public function assignWarehouseZone(HBL $hbl, int $warehouse_zone_id);
 
     public function export(array $filters);
+
+    public function revertToCashSettlement(array $hblIds);
 }

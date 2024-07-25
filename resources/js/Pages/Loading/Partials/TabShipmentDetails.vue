@@ -125,7 +125,7 @@ const handleUpdateContainer = () => {
                         <InputError :message="form.errors.reference"/>
                     </div>
 
-                    <div>
+                    <div v-if="container.cargo_type === 'Sea Cargo'">
                         <InputLabel value="AWB No"/>
                         <TextInput v-model="form.awb_number" class="w-full"/>
                         <InputError :message="form.errors.awb_number"/>

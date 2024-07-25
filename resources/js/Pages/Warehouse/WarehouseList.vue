@@ -20,6 +20,7 @@ import {router, usePage} from "@inertiajs/vue3";
 import AssignZoneModal from "@/Pages/Warehouse/Partials/AssignZoneModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const props = defineProps({
     drivers: {
@@ -49,6 +50,7 @@ const fromDate = moment(new Date()).subtract(1, "month").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 const wrapperRef = ref(null);
 let grid = null;
+const selectedData = ref([]);
 
 const filters = reactive({
     fromDate: fromDate,
@@ -683,6 +685,33 @@ const exportURL = computed(() => {
     return '/warehouses/export' + "?" + params.toString();
 });
 
+const isDataEmpty = computed(() => selectedData.value.length === 0);
+
+const revertToCashSettlement = async () => {
+    const idList = selectedData.value.map((item) => item[0]);
+    try {
+        const response = await fetch("/revert-to-cash-settlement", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+            body: JSON.stringify({hbl_ids: idList}),
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok.");
+        } else {
+            window.location.reload();
+            push.success("Reverted to Cash Settlement successfully!");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
+
 const planeIcon = ref(`
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -860,6 +889,17 @@ const shipIcon = ref(`
                                 <i class="fa-solid fa-cloud-arrow-down"></i>
                             </button>
                         </a>
+                    </div>
+
+                    <div>
+                        <PrimaryButton
+                            v-if="$page.props.user.permissions.includes('warehouse.revert to cash settlement')"
+                            :disabled="isDataEmpty"
+                            @click="revertToCashSettlement"
+                        >
+                            <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-back-up mr-2"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" /></svg>
+                            Revert To Cash Settlement
+                        </PrimaryButton>
                     </div>
                 </div>
                 <div class="mt-3">
