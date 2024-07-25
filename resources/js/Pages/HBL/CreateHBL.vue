@@ -214,7 +214,7 @@ watch(
     // Convert dimensions from cm to meters
     hblTotal.value =
       parseFloat(form.bill_charge) +
-      parseFloat(form.freight_charge) +
+      parseFloat(form.freight_charge * grandTotalWeight.value.toFixed(3)) +
       parseFloat(form.other_charge) +
       parseFloat(vat.value) -
       form.discount;
