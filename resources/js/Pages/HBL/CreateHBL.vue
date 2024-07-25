@@ -62,6 +62,11 @@ const isMobile = () => {
     }
 };
 
+const countryCodes = ["+94", "+966", "+971", "+965"];
+const countryCode = ref(findCountryCodeByBranch.value);
+const contactNumber = ref("");
+const consignee_contact = ref("");
+
 const splitNumber = (fullNumber) => {
     for (let code of countryCodes) {
         if (fullNumber.startsWith(code)) {
@@ -72,10 +77,15 @@ const splitNumber = (fullNumber) => {
     }
 }
 
-const countryCodes = ["+94", "+966", "+971", "+965"];
-const countryCode = ref(findCountryCodeByBranch.value);
-const contactNumber = ref("");
-const consignee_contact = ref("");
+const splitNumberConsignee = (fullNumber) => {
+    for (let code of countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            countryCode.value = code;
+            consignee_contact.value = fullNumber.slice(code.length);
+            break;
+        }
+    }
+}
 
 const form = useForm({
   hbl: "",
@@ -443,20 +453,20 @@ const openEditModal = (index) => {
     Object.assign(packageItem, packageList.value[index]);
 };
 
-const copyFromHBLModalShow = ref(false);
+const copyFromHBLToShipperModalShow = ref(false);
 
 const reference = ref(null);
 
-const confirmShowingCopyFromHBLModal = () => {
-    copyFromHBLModalShow.value = true;
+const confirmShowingCopyFromHBLToShipperModal = () => {
+    copyFromHBLToShipperModalShow.value = true;
 }
 
-const closeCopyFromHBLModal = () => {
+const closeCopyFromHBLToShipperModal = () => {
     reference.value = null;
-    copyFromHBLModalShow.value = false;
+    copyFromHBLToShipperModalShow.value = false;
 }
 
-const handleCopyFromHBL = async () => {
+const handleCopyFromHBLToShipper = async () => {
     try {
         const response = await fetch(`/get-hbl-by-reference/${reference.value}`, {
             method: "GET",
@@ -467,12 +477,12 @@ const handleCopyFromHBL = async () => {
         });
 
         if (!response.ok) {
-            closeCopyFromHBLModal()
+            closeCopyFromHBLToShipperModal()
             push.error('HBL Missing or Invalid Reference Number');
             throw new Error('Network response was not ok.');
         } else {
             const data = await response.json();
-            closeCopyFromHBLModal()
+            closeCopyFromHBLToShipperModal()
 
             form.hbl_name = data.hbl_name;
             form.email = data.email;
@@ -481,6 +491,50 @@ const handleCopyFromHBL = async () => {
             form.address = data.address;
 
             splitNumber(data.contact_number);
+
+            push.success('Copied!');
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const copyFromHBLToConsigneeModalShow = ref(false);
+
+const confirmShowingCopyFromHBLToConsigneeModal = () => {
+    copyFromHBLToConsigneeModalShow.value = true;
+}
+
+const closeCopyFromHBLToConsigneeModal = () => {
+    reference.value = null;
+    copyFromHBLToConsigneeModalShow.value = false;
+}
+
+const handleCopyFromHBLToConsignee = async () => {
+    try {
+        const response = await fetch(`/get-hbl-by-reference/${reference.value}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            closeCopyFromHBLToConsigneeModal()
+            push.error('HBL Missing or Invalid Reference Number');
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            closeCopyFromHBLToConsigneeModal()
+
+            form.consignee_name = data.consignee_name;
+            form.consignee_nic = data.consignee_nic;
+            form.consignee_address = data.consignee_address;
+            form.consignee_note = data.consignee_note;
+
+            splitNumberConsignee(data.consignee_contact);
 
             push.success('Copied!');
         }
@@ -550,7 +604,7 @@ const shipIcon = ref(`
                             </h2>
 
                             <SoftPrimaryButton class="flex items-center" type="button"
-                                               @click.prevent="confirmShowingCopyFromHBLModal">
+                                               @click.prevent="confirmShowingCopyFromHBLToShipperModal">
                                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
                                      height="24" stroke="currentColor" stroke-linecap="round"
                                      stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
@@ -566,7 +620,7 @@ const shipIcon = ref(`
                             </SoftPrimaryButton>
                         </div>
 
-                        <DialogModal :maxWidth="'xl'" :show="copyFromHBLModalShow" @close="closeCopyFromHBLModal">
+                        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToShipperModalShow" @close="closeCopyFromHBLToShipperModal">
                             <template #title>
                                 Copy
                             </template>
@@ -584,12 +638,12 @@ const shipIcon = ref(`
                             </template>
 
                             <template #footer>
-                                <SecondaryButton @click="closeCopyFromHBLModal">
+                                <SecondaryButton @click="closeCopyFromHBLToShipperModal">
                                     Cancel
                                 </SecondaryButton>
                                 <PrimaryButton
                                     class="ms-3"
-                                    @click.prevent="handleCopyFromHBL"
+                                    @click.prevent="handleCopyFromHBLToShipper"
                                 >
                                     Copy From HBL
                                 </PrimaryButton>
@@ -742,7 +796,7 @@ const shipIcon = ref(`
                                 Consignee Details
                             </h2>
 
-                            <SoftPrimaryButton class="flex items-center" type="button">
+                            <SoftPrimaryButton class="flex items-center" type="button" @click.prevent="confirmShowingCopyFromHBLToConsigneeModal">
                                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
                                      height="24" stroke="currentColor" stroke-linecap="round"
                                      stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
@@ -756,6 +810,36 @@ const shipIcon = ref(`
 
                                 Copy From HBL
                             </SoftPrimaryButton>
+
+                            <DialogModal :maxWidth="'xl'" :show="copyFromHBLToConsigneeModalShow" @close="closeCopyFromHBLToConsigneeModal">
+                                <template #title>
+                                    Copy
+                                </template>
+
+                                <template #content>
+                                    <div class="mt-4">
+                                        <TextInput
+                                            v-model="reference"
+                                            class="w-full"
+                                            placeholder="Enter HBL Reference"
+                                            required
+                                            type="text"
+                                        />
+                                    </div>
+                                </template>
+
+                                <template #footer>
+                                    <SecondaryButton @click="closeCopyFromHBLToConsigneeModal">
+                                        Cancel
+                                    </SecondaryButton>
+                                    <PrimaryButton
+                                        class="ms-3"
+                                        @click.prevent="handleCopyFromHBLToConsignee"
+                                    >
+                                        Copy From HBL
+                                    </PrimaryButton>
+                                </template>
+                            </DialogModal>
                         </div>
                         <div class="grid grid-cols-2 gap-5 mt-3">
                             <div class="col-span-2">
