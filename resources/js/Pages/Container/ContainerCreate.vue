@@ -6,7 +6,7 @@
     <form @submit.prevent="handleCreate">
       <div class="grid grid-cols-1 sm:grid-cols-5 my-4 gap-4">
         <div class="sm:col-span-2 space-y-5">
-          <!--                    Cargo Type-->
+          <!--Cargo Type-->
           <div class="card px-4 py-4 sm:px-5">
             <div>
               <h2
@@ -94,26 +94,24 @@
                 </label>
                 <InputError :message="form.errors.reference" />
               </div>
-              <div class="col-span-2">
+              <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">
                 <span>Container Number</span>
                 <label class="block">
                   <input
                     v-model="form.container_number"
                     class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    min="0"
-                    type="number"
+                    type="text"
                   />
                 </label>
                 <InputError :message="form.errors.container_number" />
               </div>
-              <div class="col-span-2">
+              <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">
                 <span>Seal Number</span>
                 <label class="block">
                   <input
                     v-model="form.seal_number"
                     class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    min="0"
-                    type="number"
+                    type="text"
                   />
                 </label>
                 <InputError :message="form.errors.seal_number" />
@@ -125,21 +123,19 @@
                   <input
                     v-model="form.bl_number"
                     class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    min="0"
-                    type="number"
+                    type="text"
                   />
                 </label>
                 <InputError :message="form.errors.bl_number" />
               </div>
 
-              <div v-else class="col-span-3">
+              <div v-else class="col-span-2">
                 <span>AWB Number</span>
                 <label class="block">
                   <input
                     v-model="form.awb_number"
                     class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    min="0"
-                    type="number"
+                    type="text"
                   />
                 </label>
                 <InputError :message="form.errors.awb_number" />

@@ -127,7 +127,7 @@ const handleUpdateDriver = () => {
               v-model="form.working_hours_start"
               class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
               placeholder="Working Hours Start"
-              type="text"
+              type="date"
             />
           </label>
           <span class="text-tiny+ text-slate-400 dark:text-navy-300"
@@ -143,7 +143,7 @@ const handleUpdateDriver = () => {
               v-model="form.working_hours_end"
               class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
               placeholder="Working Hours End"
-              type="text"
+              type="date"
             />
           </label>
           <span class="text-tiny+ text-slate-400 dark:text-navy-300"

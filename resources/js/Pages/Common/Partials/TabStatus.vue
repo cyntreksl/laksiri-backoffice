@@ -63,7 +63,6 @@ watch(() => props.hblId, () => {
     fetchHBLStatus()
 })
 
-
 const pickupStatusColor = (status) => {
     switch (status) {
         case 'Pickup Created':
@@ -91,6 +90,8 @@ const hblStatusColor = (status) => {
             return 'bg-slate-500';
         case 'Blocked By RTF':
             return 'bg-red-500';
+        case 'Revert To Cash Settlement':
+            return 'bg-amber-400';
     }
 };
 </script>

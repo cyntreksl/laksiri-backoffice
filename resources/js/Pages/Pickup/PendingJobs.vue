@@ -19,6 +19,7 @@ import EditPickupModal from "@/Pages/Pickup/Partials/EditPickupModal.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import DeletePickupConfirmationModal from "@/Pages/Pickup/Partials/DeletePickupConfirmationModal.vue";
+import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 
 const props = defineProps({
     drivers: {
@@ -62,20 +63,17 @@ const data = reactive({
         email: false,
         address: true,
         contact_number: true,
-        cargo_type: true,
-        // is_urgent_pickup: false,
-        // is_from_important_customer: false,
-        driver: true,
         pickup_date: true,
-        // pickup_time_start: false,
-        // pickup_time_end: false,
+        cargo_type: true,
+        driver: true,
         pickup_type: true,
-        // pickup_note: false,
+        pickup_note: true,
         actions: true,
     },
 });
 
 const baseUrl = ref("/pickup-list");
+const totalPickups = ref(0);
 
 const toggleColumnVisibility = (columnName) => {
     data.columnVisibility[columnName] = !data.columnVisibility[columnName];
@@ -126,6 +124,7 @@ const initializeGrid = () => {
                 }),
             total: (response) => {
                 if (response && response.meta) {
+                    totalPickups.value = response.meta.total;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -166,21 +165,70 @@ const createColumns = () => [
             });
         },
     },
-    {name: "Reference", hidden: !data.columnVisibility.reference},
-    {name: "Name", hidden: !data.columnVisibility.name},
+    {
+        name: "Reference",
+        hidden: !data.columnVisibility.reference,
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        }
+    },
+    {
+        name: "Name",
+        hidden: !data.columnVisibility.name,
+        formatter: (cell) => {
+            if (!cell) return '';
+            let value = cell.toString();
+
+            if (value.length < 20) {
+                return value;
+            }
+            return value.substring(0, 20) + '...';
+        }
+    },
     {name: "Email", hidden: !data.columnVisibility.email},
-    {name: "Address", hidden: !data.columnVisibility.address, sort: false},
+    {
+        name: "Address",
+        hidden: !data.columnVisibility.address,
+        sort: false,
+        formatter: (cell) => {
+            if (!cell) return '';
+            let value = cell.toString();
+
+            if (value.length < 20) {
+                return value;
+            }
+            return value.substring(0, 20) + '...';
+        }
+    },
     {
         name: "Contact",
         hidden: !data.columnVisibility.contact_number,
-        sort: false,
+        sort: true,
+    },
+    {
+        name: "Pickup Date",
+        hidden: !data.columnVisibility.pickup_date,
+        sort: true,
     },
     {
         name: "Cargo Mode",
-        sort: false,
+        sort: true,
         hidden: !data.columnVisibility.cargo_type,
         formatter: (_, row) =>
-            row.cells[6].data == "Sea Cargo"
+            row.cells[7].data == "Sea Cargo"
                 ? h(
                     "span",
                     {className: "flex"},
@@ -219,9 +267,9 @@ const createColumns = () => [
                             }),
                         ]
                     ),
-                    row.cells[6].data
+                    row.cells[7].data
                 )
-                : row.cells[6].data == "Air Cargo"
+                : row.cells[7].data == "Air Cargo"
                     ? h("span", {className: "flex space-x-2"}, [
                         h(
                             "svg",
@@ -249,9 +297,9 @@ const createColumns = () => [
                                 }),
                             ]
                         ),
-                        row.cells[6].data,
+                        row.cells[7].data,
                     ])
-                    : row.cells[6].data,
+                    : row.cells[7].data,
     },
 
     {
@@ -265,14 +313,20 @@ const createColumns = () => [
                 : null;
         },
     },
-    {name: "Pickup Date", hidden: !data.columnVisibility.pickup_date},
-    //   {
-    //     name: "Pickup Time Start",
-    //     hidden: !data.columnVisibility.pickup_time_start,
-    //   },
-    //   { name: "Pickup Time End", hidden: !data.columnVisibility.pickup_time_end },
     {name: "Pickup Type", hidden: !data.columnVisibility.pickup_type},
-    //   { name: "Pickup Note", hidden: !data.columnVisibility.pickup_note },
+    {
+        name: "Package Description",
+        hidden: !data.columnVisibility.pickup_note,
+        formatter: (cell) => {
+            if (!cell) return '';
+            let value = cell.toString();
+
+            if (value.length < 20) {
+                return value;
+            }
+            return value.substring(0, 20) + '...';
+        }
+    },
     {
         name: "Actions",
         sort: false,
@@ -404,14 +458,17 @@ const applyFilters = () => {
         server: {
             url: newUrl,
             then: (data) =>
-                data.data.map((item) => {
+            {
+                totalPickups.value = data.meta.total;
+                return data.data.map((item) => {
                     const row = [];
                     row.push({id: item.id});
                     visibleColumns.forEach((column) => {
                         row.push(item[column]);
                     });
                     return row;
-                }),
+                })
+            }
         },
     });
 
@@ -529,6 +586,17 @@ const shipIcon = ref(`
         <template #header>Pending Pickups</template>
 
         <Breadcrumb/>
+
+        <div class="flex justify-end mt-4">
+            <SimpleOverviewWidget :count="totalPickups" class="bg-white" title="Total Pending Pickups">
+                <svg class="icon icon-tabler icons-tabler-filled icon-tabler-briefcase text-info" fill="currentColor" height="24" viewBox="0 0 24 24" width="24"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                    <path
+                        d="M22 13.478v4.522a3 3 0 0 1 -3 3h-14a3 3 0 0 1 -3 -3v-4.522l.553 .277a20.999 20.999 0 0 0 18.897 -.002l.55 -.275zm-8 -11.478a3 3 0 0 1 3 3v1h2a3 3 0 0 1 3 3v2.242l-1.447 .724a19.002 19.002 0 0 1 -16.726 .186l-.647 -.32l-1.18 -.59v-2.242a3 3 0 0 1 3 -3h2v-1a3 3 0 0 1 3 -3h4zm-2 8a1 1 0 0 0 -1 1a1 1 0 1 0 2 .01c0 -.562 -.448 -1.01 -1 -1.01zm2 -6h-4a1 1 0 0 0 -1 1v1h6v-1a1 1 0 0 0 -1 -1z"/>
+                </svg>
+            </SimpleOverviewWidget>
+        </div>
 
         <div class="card mt-4">
             <div>

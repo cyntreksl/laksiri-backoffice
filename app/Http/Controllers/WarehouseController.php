@@ -79,4 +79,13 @@ class WarehouseController extends Controller
 
         return $this->HBLRepository->downloadHBLBarcodePDF($hbl);
     }
+
+    public function revertToCashSettlement(Request $request)
+    {
+        $this->authorize('warehouse.revert to cash settlement');
+
+        $hblIds = $request->hbl_ids;
+
+        return $this->warehouseRepository->revertToCashSettlement($hblIds);
+    }
 }

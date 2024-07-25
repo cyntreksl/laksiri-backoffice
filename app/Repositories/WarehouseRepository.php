@@ -2,7 +2,9 @@
 
 namespace App\Repositories;
 
+use App\Actions\HBL\UpdateHBLSystemStatus;
 use App\Actions\HBL\Warehouse\AssignZone;
+use App\Actions\HBL\Warehouse\GetWarehouseByIds;
 use App\Exports\WarehouseExport;
 use App\Factory\Warehouse\FilterFactory;
 use App\Http\Resources\CashSettlementCollection;
@@ -88,5 +90,23 @@ class WarehouseRepository implements GridJsInterface, WarehouseRepositoryInterfa
     public function export(array $filters)
     {
         return Excel::download(new WarehouseExport($filters), 'warehouse.xlsx');
+    }
+
+    public function revertToCashSettlement(array $hblIds)
+    {
+        $hblList = GetWarehouseByIds::run($hblIds);
+
+        foreach ($hblList as $hbl) {
+            if ($hbl->pickup_id) {
+                UpdateHBLSystemStatus::run($hbl, HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER);
+            } else {
+                UpdateHBLSystemStatus::run($hbl, HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE);
+            }
+
+            $hbl = HBL::find($hbl->id);
+            $hbl->addStatus('Revert To Cash Settlement');
+        }
+
+        return $this->success('Revert to Cash Settlement', []);
     }
 }
