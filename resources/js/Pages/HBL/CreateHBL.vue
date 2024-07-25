@@ -135,11 +135,17 @@ const addPackageData = () => {
     packageItem.width <= 0 ||
     packageItem.height <= 0 ||
     packageItem.quantity <= 0 ||
-    packageItem.volume <= 0 ||
-    packageItem.totalWeight <= 0
+    packageItem.volume <= 0
   ) {
     push.error("Please fill all required data");
     return;
+  }
+
+  if (form.cargo_type === 'Air Cargo') {
+      if (packageItem.totalWeight <= 0) {
+          push.error("Please fill the total weight");
+          return;
+      }
   }
 
   if (editMode.value) {
@@ -191,7 +197,7 @@ watch(
 
     // Update reactive properties
     packageItem.volume = volumeCubicMeters;
-    packageItem.totalWeight = totalWeightKg;
+    // packageItem.totalWeight = totalWeightKg;
   }
 );
 
