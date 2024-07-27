@@ -144,4 +144,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Hbl::class);
     }
+
+    public function driverLocation(): HasMany
+    {
+        return $this->hasMany(DriverLocation::class, 'driver_id');
+    }
 }
