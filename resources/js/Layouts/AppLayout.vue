@@ -1088,6 +1088,10 @@ export default {
                         {
                             title: "Pricing",
                             route: "setting.prices.index",
+                        },
+                        {
+                            title: "Exceptions",
+                            route: "setting.exception-names.index",
                         }
                     );
                     changeSidePanelTitle("Setting");
