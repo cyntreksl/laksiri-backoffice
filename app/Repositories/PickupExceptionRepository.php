@@ -5,11 +5,13 @@ namespace App\Repositories;
 use App\Actions\PickUps\Exception\AssignDriver;
 use App\Actions\PickUps\Exception\DeleteException;
 use App\Actions\PickUps\Exception\GetExceptionsByIds;
+use App\Actions\PickUps\Exception\RetryException;
 use App\Exports\PickupExceptionsExport;
 use App\Factory\Pickup\FilterFactory;
 use App\Http\Resources\PickupExceptionResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
+use App\Models\PickUp;
 use App\Models\PickupException;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -70,5 +72,12 @@ class PickupExceptionRepository implements GridJsInterface, PickupExceptionRepos
     public function export(array $filters)
     {
         return Excel::download(new PickupExceptionsExport($filters), 'pickup-exception.xlsx');
+    }
+
+    public function retryException(PickUp $pickup): void
+    {
+        if ($pickup->has('pickupException')) {
+            RetryException::run($pickup);
+        }
     }
 }

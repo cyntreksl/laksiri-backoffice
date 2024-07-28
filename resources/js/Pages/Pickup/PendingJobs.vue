@@ -21,6 +21,7 @@ import {push} from "notivue";
 import DeletePickupConfirmationModal from "@/Pages/Pickup/Partials/DeletePickupConfirmationModal.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import RetryPickupConfirmationModal from "@/Pages/Pickup/Partials/RetryPickupConfirmationModal.vue";
 
 const props = defineProps({
     drivers: {
@@ -430,6 +431,38 @@ const createColumns = () => [
                         ]
                     )
                     : null,
+                usePage().props.user.permissions.includes('pickups.retry') ?
+                    row.cells[11].data ?
+                        h(
+                            "button",
+                            {
+                                className:
+                                    "btn size-8 p-0 text-secondary hover:bg-secondary/20 focus:bg-secondary/20 active:bg-secondary/25 mr-2",
+                                onClick: () => confirmRetry(row.cells[0].data?.id),
+                                "x-tooltip..placement.bottom.primary": "'Retry'",
+                            },
+                            [
+                                h(
+                                    "svg",
+                                    {
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        viewBox: "0 0 24 24",
+                                        class: "size-4.5",
+                                        fill: "none",
+                                        stroke: "currentColor",
+                                        strokeWidth: 1.5,
+                                    },
+                                    [
+                                        h("path", {
+                                            strokeLinecap: "round",
+                                            strokeLinejoin: "round",
+                                            d: "M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99",
+                                        }),
+                                    ]
+                                ),
+                            ]
+                        ) : null
+                    : null,
                 usePage().props.user.permissions.includes('pickups.delete') ?
                     h(
                         "button",
@@ -511,8 +544,7 @@ const applyFilters = () => {
     grid.updateConfig({
         server: {
             url: newUrl,
-            then: (data) =>
-            {
+            then: (data) => {
                 totalPickups.value = data.meta.total;
                 return data.data.map((item) => {
                     const row = [];
@@ -608,6 +640,33 @@ const closeViewModal = () => {
     pickupId.value = null;
 };
 
+const showConfirmRetryModal = ref(false);
+
+const confirmRetry = async (id) => {
+    pickupId.value = id;
+    showConfirmRetryModal.value = true;
+};
+
+const closeRetryModal = () => {
+    showConfirmRetryModal.value = false;
+    pickupId.value = null;
+};
+
+const handleRetryPickup = () => {
+    router.get(route("pickups.exceptions.retry", pickupId.value), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeRetryModal();
+            push.success("Added into Pending Jobs!");
+            router.visit(route("pickups.index"), {only: ["pickups"]});
+        },
+        onError: () => {
+            closeRetryModal();
+            push.error("Something went to wrong!");
+        },
+    });
+}
+
 const planeIcon = ref(`
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -655,7 +714,8 @@ const shipIcon = ref(`
 
         <div class="flex justify-end mt-4">
             <SimpleOverviewWidget :count="totalPickups" class="bg-white" title="Total Pending Pickups">
-                <svg class="icon icon-tabler icons-tabler-filled icon-tabler-briefcase text-info" fill="currentColor" height="24" viewBox="0 0 24 24" width="24"
+                <svg class="icon icon-tabler icons-tabler-filled icon-tabler-briefcase text-info" fill="currentColor"
+                     height="24" viewBox="0 0 24 24" width="24"
                      xmlns="http://www.w3.org/2000/svg">
                     <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                     <path
@@ -1036,6 +1096,12 @@ const shipIcon = ref(`
             :pickup-id="pickupId"
             :show="showConfirmViewPickupModal"
             @close="closeViewModal"
+        />
+
+        <RetryPickupConfirmationModal
+            :show="showConfirmRetryModal"
+            @close="closeRetryModal"
+            @retry-pickup="handleRetryPickup"
         />
     </AppLayout>
 </template>
