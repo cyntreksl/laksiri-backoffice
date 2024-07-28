@@ -20,7 +20,7 @@ class ExceptionNameController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Driver/DriverList', [
+        return Inertia::render('Setting/ExceptionNames/ExceptionNameList', [
             'exceptionNames' => $this->exceptionNameRepository->getExceptionNames(),
         ]);
     }
@@ -30,7 +30,7 @@ class ExceptionNameController extends Controller
      */
     public function store(StoreExceptionNameRequest $request)
     {
-        return $this->exceptionNameRepository->storeExceptionName($request->all());
+        $this->exceptionNameRepository->storeExceptionName($request->all());
     }
 
     /**
@@ -38,7 +38,17 @@ class ExceptionNameController extends Controller
      */
     public function update(UpdateExceptionNameRequest $request, ExceptionName $exceptionName)
     {
-        return $this->exceptionNameRepository->updateExceptionName($request->all(), $exceptionName);
+        $this->exceptionNameRepository->updateExceptionName($request->all(), $exceptionName);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(ExceptionName $exceptionName)
+    {
+        return Inertia::render('Setting/ExceptionNames/UpdateExceptionNameForm', [
+            'exceptionName' => $exceptionName,
+        ]);
     }
 
     /**
@@ -46,6 +56,6 @@ class ExceptionNameController extends Controller
      */
     public function destroy(ExceptionName $exceptionName)
     {
-        return $this->exceptionNameRepository->destroyExceptionName($exceptionName);
+        $this->exceptionNameRepository->destroyExceptionName($exceptionName);
     }
 }
