@@ -21,7 +21,7 @@ class CashSettlementCollection extends JsonResource
             'address' => $this->address ?? '-',
             'picked_date' => $this->pickup
                 ? $this->pickup->pickup_date
-                : ($this->created_at ? $this->created_at->format('Y-m-d') : '-'),
+                : $this->created_at,
             'weight' => '3',
             'volume' => '2',
             'grand_total' => $this->grand_total ?? '-',
