@@ -322,6 +322,18 @@ const calculatePayment = () => {
                 );
             });
 
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
+            }
+
             if (priceRule.value.price_mode === "volume") {
                 const trueAction = priceRule.value.true_action.trim();
                 const operator = trueAction[0];
@@ -364,6 +376,18 @@ const calculatePayment = () => {
                     (priceRule) => priceRule.cargo_mode === "Sea Cargo" && priceRule.hbl_type === "UBP"
                 );
             });
+
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
+            }
 
             if (priceRule.value.price_mode === "volume") {
                 const trueAction = priceRule.value.true_action.trim();
@@ -408,6 +432,18 @@ const calculatePayment = () => {
                 );
             });
 
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
+            }
+
             if (priceRule.value.price_mode === "volume") {
                 const trueAction = priceRule.value.true_action.trim();
                 const operator = trueAction[0];
@@ -450,6 +486,18 @@ const calculatePayment = () => {
                     (priceRule) => priceRule.cargo_mode === "Air Cargo" && priceRule.hbl_type === "Gift"
                 );
             });
+
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
+            }
 
             if (priceRule.value.price_mode === "weight") {
                 const trueAction = priceRule.value.true_action.trim();
@@ -494,6 +542,18 @@ const calculatePayment = () => {
                 );
             });
 
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
+            }
+
             if (priceRule.value.price_mode === "weight") {
                 const trueAction = priceRule.value.true_action.trim();
                 const operator = trueAction[0];
@@ -536,6 +596,18 @@ const calculatePayment = () => {
                     (priceRule) => priceRule.cargo_mode === "Air Cargo" && priceRule.hbl_type === "Door to Door"
                 );
             });
+
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
+            }
 
             if (priceRule.value.price_mode === "weight") {
                 const trueAction = priceRule.value.true_action.trim();
