@@ -233,4 +233,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->getHBLByReference($reference);
     }
+
+    public function getHBLPackagesByReference($reference = null)
+    {
+        return $this->HBLRepository->getHBLPackagesByReference($reference);
+    }
 }

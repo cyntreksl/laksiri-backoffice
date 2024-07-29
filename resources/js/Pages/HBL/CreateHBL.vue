@@ -795,6 +795,61 @@ const handleCopyFromHBLToConsignee = async () => {
     }
 }
 
+const copiedPackages = ref({});
+
+const copyFromHBLToPackageModalShow = ref(false);
+
+const confirmShowingCopyFromHBLToPackageModal = () => {
+    copyFromHBLToPackageModalShow.value = true;
+}
+
+const closeCopyFromHBLToPackageModal = () => {
+    reference.value = null;
+    copyFromHBLToPackageModalShow.value = false;
+}
+
+const handleCopyFromHBLToPackage = async () => {
+    try {
+        const response = await fetch(`/get-hbl-packages-by-reference/${reference.value}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            closeCopyFromHBLToPackageModal()
+            push.error('HBL Packages Missing or Invalid Reference Number');
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            closeCopyFromHBLToPackageModal()
+            copiedPackages.value = data;
+
+            const copiedTotalWeight =  copiedPackages.value.reduce((acc, curr) => acc + curr.weight, 0);
+            const copiedTotalVolume =  copiedPackages.value.reduce((acc, curr) => acc + curr.volume, 0);
+
+            grandTotalWeight.value += copiedTotalWeight;
+            grandTotalVolume.value += copiedTotalVolume;
+
+            calculatePayment();
+
+            push.success('Copied!');
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const handleRemoveCopiedPackages = () => {
+    copiedPackages.value = {};
+    grandTotalWeight.value = 0;
+    grandTotalVolume.value = 0;
+    calculatePayment();
+}
+
 const planeIcon = ref(`
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -1435,15 +1490,66 @@ const shipIcon = ref(`
 
             <div class="card col-span-5 px-4 py-4 sm:px-5 mb-10">
                 <div class="flex justify-between items-center">
-                    <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Package Details
-                    </h2>
-                    <PrimaryOutlineButton type="button" @click="showPackageDialog">
+                    <div class="flex items-center space-x-2">
+                        <h2
+                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                        >
+                            Package Details
+                        </h2>
+                        <SoftPrimaryButton v-if="Object.values(copiedPackages).length === 0" class="flex items-center" type="button"
+                                           @click.prevent="confirmShowingCopyFromHBLToPackageModal">
+                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
+                                 height="24" stroke="currentColor" stroke-linecap="round"
+                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                <path
+                                    d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
+                                <path
+                                    d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
+                            </svg>
+
+                            Copy From HBL
+                        </SoftPrimaryButton>
+                        <DangerOutlineButton v-if="Object.values(copiedPackages).length > 0" @click.prevent="handleRemoveCopiedPackages">
+                            Remove Copied Packages
+                        </DangerOutlineButton>
+                    </div>
+                    <PrimaryOutlineButton v-if="Object.values(copiedPackages).length === 0" type="button" @click="showPackageDialog">
                         New Package <i class="fas fa-plus fa-fw fa-fw"></i>
                     </PrimaryOutlineButton>
                 </div>
+
+                <DialogModal :maxWidth="'xl'" :show="copyFromHBLToPackageModalShow"
+                             @close="closeCopyFromHBLToPackageModal">
+                    <template #title>
+                        Copy
+                    </template>
+
+                    <template #content>
+                        <div class="mt-4">
+                            <TextInput
+                                v-model="reference"
+                                class="w-full"
+                                placeholder="Enter HBL Reference"
+                                required
+                                type="text"
+                            />
+                        </div>
+                    </template>
+
+                    <template #footer>
+                        <SecondaryButton @click="closeCopyFromHBLToPackageModal">
+                            Cancel
+                        </SecondaryButton>
+                        <PrimaryButton
+                            class="ms-3"
+                            @click.prevent="handleCopyFromHBLToPackage"
+                        >
+                            Copy From HBL
+                        </PrimaryButton>
+                    </template>
+                </DialogModal>
 
                 <div class="mt-5">
                     <div
@@ -1545,7 +1651,86 @@ const shipIcon = ref(`
                             </tbody>
                         </table>
                     </div>
-                    <div v-else class="text-center">
+                    <div
+                        v-if="Object.keys(copiedPackages).length > 0"
+                        class="is-scrollbar-hidden min-w-full overflow-x-auto"
+                    >
+                        <table class="is-zebra w-full text-left">
+                            <thead>
+                            <tr>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Type
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Length (CM)
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Width
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Height
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Quantity
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Weight
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Volume (M.CU)
+                                </th>
+                                <th
+                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                >
+                                    Remark
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="(item, index) in copiedPackages">
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                    {{ item.package_type }}
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                    {{ item.length }}
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                    {{ item.width }}
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                    {{ item.height }}
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                    {{ item.quantity }}
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                    {{ item.weight.toFixed(3) }}
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                    {{ item.volume.toFixed(3) }}
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                    {{ item.remarks }}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div v-if="packageList.length === 0 && Object.values(copiedPackages).length === 0" class="text-center">
                         <div class="text-center mb-8">
                             <svg
                                 class="w-24 h-24 mx-auto mb-4 text-gray-400"
