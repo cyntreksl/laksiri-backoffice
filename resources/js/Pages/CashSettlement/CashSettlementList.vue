@@ -685,7 +685,7 @@ const shipIcon = ref(`
 
         <Breadcrumb/>
 
-        <div class="grid sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 mt-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2 mt-3">
             <SimpleOverviewWidget :count="totalRecord" bg-color="white" title="HBL Count"/>
 
             <SimpleOverviewWidget :count="totalGrandAmount.toLocaleString()" bg-color="white" title="HBL Amount"/>

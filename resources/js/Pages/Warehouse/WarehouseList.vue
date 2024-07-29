@@ -757,16 +757,16 @@ const shipIcon = ref(`
 
         <Breadcrumb/>
 
-        <div class="grid grid-cols-6 gap-4 mt-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mt-4">
             <SimpleOverviewWidget :count="totalRecord" bg-color="white" title="HBL Count"/>
 
-            <SimpleOverviewWidget :count="totalGrandAmount.toLocaleString()" bg-color="white" title="HBL Amount"/>
+            <SimpleOverviewWidget :count="totalGrandAmount.toLocaleString('en-US')" bg-color="white" title="HBL Amount"/>
 
-            <SimpleOverviewWidget :count="totalPaidAmount.toLocaleString()" bg-color="white" title="HBL Paid Amount"/>
+            <SimpleOverviewWidget :count="totalPaidAmount.toLocaleString('en-US')" bg-color="white" title="HBL Paid Amount"/>
 
-            <SimpleOverviewWidget :count="totalWeight" bg-color="white" title="Total Weights"/>
+            <SimpleOverviewWidget :count="totalWeight.toFixed(3)" bg-color="white" title="Total Weights"/>
 
-            <SimpleOverviewWidget :count="totalVolume" bg-color="white" title="Total Volume"/>
+            <SimpleOverviewWidget :count="totalVolume.toFixed(3)" bg-color="white" title="Total Volume"/>
 
             <SimpleOverviewWidget :count="totalQuantity" bg-color="white" title="Total Quantity"/>
         </div>
