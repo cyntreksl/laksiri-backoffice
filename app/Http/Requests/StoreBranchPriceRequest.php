@@ -25,6 +25,7 @@ class StoreBranchPriceRequest extends FormRequest
         return [
             'destination_branch_id' => ['required', 'integer'],
             'cargo_mode' => ['required'],
+            'hbl_type' => ['required'],
             'price_mode' => ['required'],
             'condition' => ['required', 'string'],
             'true_action' => ['required', 'string'],
