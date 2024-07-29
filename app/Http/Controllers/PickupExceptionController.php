@@ -7,6 +7,7 @@ use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
+use App\Models\PickUp;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -66,5 +67,10 @@ class PickupExceptionController extends Controller
         $filters = $request->only(['fromDate', 'toDate', 'createdBy', 'zoneBy']);
 
         return $this->pickupExceptionRepository->export($filters);
+    }
+
+    public function retry(PickUp $pickup)
+    {
+        $this->pickupExceptionRepository->retryException($pickup);
     }
 }

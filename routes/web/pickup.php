@@ -34,3 +34,6 @@ Route::get('pickups/list/export', [PickupController::class, 'export'])
 
 Route::get('pickups/exceptions/list/export', [PickupExceptionController::class, 'export'])
     ->name('pickups.exceptions.export');
+
+Route::get('pickups/exceptions/retry/{pickup}', [PickupExceptionController::class, 'retry'])
+    ->name('pickups.exceptions.retry');
