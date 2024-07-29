@@ -20,7 +20,8 @@ class UpdatePriceRule
             'false_action' => $data['false_action'],
             'bill_price' => $data['bill_price'],
             'bill_vat' => $data['bill_vat'],
-            'destination_charges' => $data['destination_charges'],
+            'per_package_charges' => $data['per_package_charges'],
+            'volume_charges' => $data['volume_charges'],
             'is_editable' => (bool) $data['is_editable'],
         ]);
     }

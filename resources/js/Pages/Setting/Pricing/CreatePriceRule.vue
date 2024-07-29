@@ -30,7 +30,8 @@ const form = useForm({
     false_action: '',
     bill_price: null,
     bill_vat: null,
-    destination_charges: '',
+    volume_charges: '',
+    per_package_charges: '',
     is_editable: true,
 });
 
@@ -182,9 +183,15 @@ const handlePriceRuleCreate = () => {
                             </div>
 
                             <div>
-                                <InputLabel value="Destination Charges"/>
-                                <TextInput v-model="form.destination_charges" class="w-full" placeholder="Set Destination Charges"/>
-                                <InputError :message="form.errors.destination_charges"/>
+                                <InputLabel value="Volume Charges"/>
+                                <TextInput v-model="form.volume_charges" class="w-full" placeholder="Set Volume Charges"/>
+                                <InputError :message="form.errors.volume_charges"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Per Package Charges"/>
+                                <TextInput v-model="form.per_package_charges" class="w-full" placeholder="Set Per Package Charges"/>
+                                <InputError :message="form.errors.per_package_charges"/>
                             </div>
 
                             <div>

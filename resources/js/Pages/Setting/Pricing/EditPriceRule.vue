@@ -34,7 +34,8 @@ const form = useForm({
     false_action: props.priceRule.false_action || '',
     bill_price: props.priceRule.bill_price || null,
     bill_vat: props.priceRule.bill_vat || null,
-    destination_charges: props.priceRule.destination_charges || '',
+    volume_charges: props.priceRule.volume_charges || '',
+    per_package_charges: props.priceRule.per_package_charges || '',
     is_editable: Boolean(props.priceRule.is_editable),
 });
 
@@ -187,9 +188,15 @@ const handlePriceRuleUpdate = () => {
                             </div>
 
                             <div>
-                                <InputLabel value="Destination Charges"/>
-                                <TextInput v-model="form.destination_charges" class="w-full" placeholder="Set Destination Charges"/>
-                                <InputError :message="form.errors.destination_charges"/>
+                                <InputLabel value="Volume Charges"/>
+                                <TextInput v-model="form.volume_charges" class="w-full" placeholder="Set Volume Charges"/>
+                                <InputError :message="form.errors.volume_charges"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Per Package Charges"/>
+                                <TextInput v-model="form.per_package_charges" class="w-full" placeholder="Set Per Package Charges"/>
+                                <InputError :message="form.errors.per_package_charges"/>
                             </div>
 
                             <div>

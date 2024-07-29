@@ -150,7 +150,7 @@ const handleDeletePriceRule = () => {
               {{ priceRule.bill_vat }}
             </td>
             <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-              {{ priceRule.destination_charges }}
+              {{ priceRule.per_package_charges ? parseFloat(priceRule.per_package_charges) + parseFloat(priceRule.volume_charges) : null }}
             </td>
             <td class="whitespace-nowrap px-4 py-3 sm:px-5">
               <svg
