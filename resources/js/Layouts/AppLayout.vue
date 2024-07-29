@@ -58,7 +58,7 @@
               ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             x-tooltip.placement.right="'Pickup'"
-                            @mouseenter="
+                            @click="
                 setMenu('pickups');
                 openSideBar();
               "
@@ -91,7 +91,7 @@
               ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             x-tooltip.placement.right="'HBL'"
-                            @mouseenter="
+                            @click="
                 setMenu('hbls');
                 openSideBar();
               "
@@ -126,7 +126,7 @@
               ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             x-tooltip.placement.right="'Back Office'"
-                            @mouseenter="
+                            @click="
                 setMenu('back-office');
                 openSideBar();
               "
@@ -162,7 +162,7 @@
               ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             x-tooltip.placement.right="'Loading'"
-                            @mouseenter="
+                            @click="
                 setMenu('loading');
                 openSideBar();
               "
@@ -195,7 +195,7 @@
               ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             x-tooltip.placement.right="'Arrivals'"
-                            @mouseenter="
+                            @click="
                 setMenu('arrival');
                 openSideBar();
               "
@@ -227,7 +227,7 @@
               ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             x-tooltip.placement.right="'Delivery'"
-                            @mouseenter="
+                            @click="
                 setMenu('delivery');
                 openSideBar();
               "
@@ -262,7 +262,7 @@
               ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             x-tooltip.placement.right="'Report'"
-                            @mouseenter="
+                            @click="
                 setMenu('report');
                 openSideBar();
               "
@@ -298,7 +298,7 @@
               ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             x-tooltip.placement.right="'User Management'"
-                            @mouseenter="
+                            @click="
                 setMenu('users');
                 openSideBar();
               "
@@ -335,7 +335,7 @@
               ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             x-tooltip.placement.right="'Setting'"
-                            @mouseenter="
+                            @click="
                 setMenu('setting');
                 openSideBar();
               "
