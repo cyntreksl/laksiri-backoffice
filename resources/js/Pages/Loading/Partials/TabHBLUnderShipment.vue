@@ -5,6 +5,7 @@ import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import {ref} from "vue";
 import AddHBLModal from "@/Pages/Loading/Partials/AddHBLModal.vue";
 import TableHBLPackages from "@/Pages/Loading/Partials/TableHBLPackages.vue";
+import {usePage} from "@inertiajs/vue3";
 
 const props = defineProps({
     container: {
@@ -16,7 +17,7 @@ const props = defineProps({
 
 const showConfirmAddHBLModal = ref(false);
 
-const confirmViewLoadedShipment = () => {
+const confirmAddHBLModal = () => {
     showConfirmAddHBLModal.value = true;
 };
 
@@ -36,7 +37,7 @@ const closeModal = () => {
                 <p class="mt-1 hidden sm:block">{{ container.reference }}</p>
             </div>
             <div class="flex items-center space-x-2">
-                <PrimaryOutlineButton :disabled="container.status !== 'DRAFT'" @click="confirmViewLoadedShipment">
+                <PrimaryOutlineButton :disabled="usePage().props.user?.roles[0] !== 'admin'" @click.prevent="confirmAddHBLModal">
                     <svg class="size-5 mr-2" fill="none" stroke="currentColor"
                          stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke-linecap="round"

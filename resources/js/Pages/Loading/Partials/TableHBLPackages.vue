@@ -187,7 +187,7 @@ const closeShowHBLModal = () => {
     <DeleteHBLConfirmationModal :show="showConfirmDeleteHBLModal" @close="closeModal" @unload-hbl="handleRemoveHBLFromContainer"/>
 
     <HBLDetailModal
-        :hbl="hblRecord"
+        :hbl-id="hblRecord?.id"
         :show="showConfirmViewHBLModal"
         @close="closeShowHBLModal"
     />
