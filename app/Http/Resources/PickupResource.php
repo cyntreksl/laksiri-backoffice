@@ -31,10 +31,10 @@ class PickupResource extends JsonResource
             'pickup_time_start' => $this->pickup_time_start,
             'pickup_time_end' => $this->pickup_time_end,
             'pickup_order' => $this->pickup_order,
-            'driver' => $this->driver?->name,
-            'pickup_type' => $this->pickup_type,
-            'pickup_note' => $this->pickup_note,
-            'exception_note' => $this->latestPickupException ? $this->latestPickupException->picker_note : null,
+            'driver' => $this->driver?->name ?? '-',
+            'pickup_type' => $this->pickup_type ?? '-',
+            'pickup_note' => $this->pickup_note ?? '-',
+            'exception_note' => $this->latestPickupException ? $this->latestPickupException->picker_note : '-',
             'hbl' => $this->whenLoaded('hbl', function () {
                 return new HBLResource($this->hbl);
             }),
