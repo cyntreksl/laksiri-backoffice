@@ -15,6 +15,10 @@ const props = defineProps({
         type: Array,
         default: () => []
     },
+    hblTypes: {
+        type: Array,
+        default: () => []
+    },
     branches: {
         type: Object,
         default: () => {}
@@ -28,6 +32,7 @@ const props = defineProps({
 const form = useForm({
     destination_branch_id: props.priceRule.destination_branch_id || null,
     cargo_mode: props.priceRule.cargo_mode || '',
+    hbl_type: props.priceRule.hbl_type || '',
     price_mode: props.priceRule.price_mode || '',
     condition: props.priceRule.condition || '',
     true_action: props.priceRule.true_action || '',
@@ -137,6 +142,23 @@ const handlePriceRuleUpdate = () => {
                                     </select>
                                 </label>
                                 <InputError :message="form.errors.cargo_mode"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="HBL Type"/>
+                                <label for="">
+                                    <select
+                                        v-model="form.hbl_type"
+                                        autocomplete="off"
+                                        class="w-full"
+                                        placeholder="Select a HBL Type..."
+                                        x-init="$el._tom = new Tom($el)"
+                                    >
+                                        <option value="">Select a HBL Type...</option>
+                                        <option v-for="(hblType, index) in hblTypes" :key="index" :value="hblType">{{hblType}}</option>
+                                    </select>
+                                </label>
+                                <InputError :message="form.errors.hbl_type"/>
                             </div>
 
                             <div>
