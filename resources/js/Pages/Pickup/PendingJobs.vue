@@ -144,6 +144,22 @@ const selectedData = ref([]);
 const createColumns = () => [
     {
         name: "#",
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        },
         formatter: (_, row) => {
             return h("input", {
                 type: "checkbox",
@@ -173,7 +189,7 @@ const createColumns = () => [
         hidden: !data.columnVisibility.reference,
         attributes: (cell, row) => {
             // add these attributes to the td elements only
-            if (cell && row.cells[8].data) {
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
                 return {
                     'data-cell-content': cell,
                     'style': 'background-color: #e0f2fe',
@@ -191,6 +207,22 @@ const createColumns = () => [
     {
         name: "Name",
         hidden: !data.columnVisibility.name,
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        },
         formatter: (cell) => {
             if (!cell) return '';
             let value = cell.toString();
@@ -214,22 +246,86 @@ const createColumns = () => [
                 return value;
             }
             return value.substring(0, 20) + '...';
+        },
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
         }
     },
     {
         name: "Contact",
         hidden: !data.columnVisibility.contact_number,
         sort: true,
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        }
     },
     {
         name: "Pickup Date",
         hidden: !data.columnVisibility.pickup_date,
         sort: true,
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        }
     },
     {
         name: "Cargo Mode",
         sort: true,
         hidden: !data.columnVisibility.cargo_type,
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        },
         formatter: (_, row) =>
             row.cells[7].data == "Sea Cargo"
                 ? h(
@@ -308,19 +404,70 @@ const createColumns = () => [
     {
         name: "Driver",
         hidden: !data.columnVisibility.driver,
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        },
         formatter: (cell) => {
             return cell
-                ? html(
+                ? cell !== '-' && html(
                     `<div class="flex item-center"><svg xmlns="http://www.w3.org/2000/svg"  width="18"  height="18"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg> ${cell} </div>`
                 )
                 : null;
         },
     },
-    {name: "Pickup Type", hidden: !data.columnVisibility.pickup_type},
+    {
+        name: "Pickup Type",
+        hidden: !data.columnVisibility.pickup_type,
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        }
+    },
     {
         name: "Package Description",
         hidden: !data.columnVisibility.pickup_note,
         sort: false,
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        },
         formatter: (cell) => {
             if (!cell) return '';
             let value = cell.toString();
@@ -334,12 +481,28 @@ const createColumns = () => [
     {
         name: "Exception",
         hidden: !data.columnVisibility.exception_note,
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        },
         sort: false,
         formatter: (cell) => {
             return cell
-                ? html(
-                    `<div class="badge space-x-2.5 bg-red-100 text-red-500 dark:bg-red-100"> ${cell}</div>`
-                )
+                ? cell !== '-' && html(
+                `<div class="badge space-x-2.5 bg-red-100 text-red-500 dark:bg-red-100"> ${cell}</div>`
+            )
                 : null;
         }
     },
