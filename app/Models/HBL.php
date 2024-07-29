@@ -118,4 +118,9 @@ class HBL extends Model
     {
         return $this->hasMany(HBLDocument::class, 'hbl_id', 'id');
     }
+
+    public function pickup(): BelongsTo
+    {
+        return $this->belongsTo(Pickup::class);
+    }
 }

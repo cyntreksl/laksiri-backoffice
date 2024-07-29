@@ -14,6 +14,7 @@ use App\Actions\HBL\GetHBLByReference;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLsWithPackages;
 use App\Actions\HBL\GetHBLsWithUnloadedPackagesByReference;
+use App\Actions\HBL\HBLPackage\GetPackagesByReference;
 use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
@@ -242,5 +243,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function getHBLByReference(string $reference): JsonResponse
     {
         return GetHBLByReference::run($reference);
+    }
+
+    public function getHBLPackagesByReference(string $reference): JsonResponse
+    {
+        return GetPackagesByReference::run($reference);
     }
 }
