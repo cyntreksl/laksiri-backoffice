@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enum\CargoType;
+use App\Enum\HBLType;
 use App\Http\Requests\StoreBranchPriceRequest;
 use App\Http\Requests\UpdateBranchPriceRequest;
 use App\Interfaces\BranchRepositoryInterface;
@@ -35,6 +36,7 @@ class PriceController extends Controller
     {
         return Inertia::render('Setting/Pricing/CreatePriceRule', [
             'cargoModes' => CargoType::cases(),
+            'hblTypes' => HBLType::cases(),
             'branches' => $this->branchRepository->getDestinationBranches(),
         ]);
     }
@@ -56,6 +58,7 @@ class PriceController extends Controller
 
         return Inertia::render('Setting/Pricing/EditPriceRule', [
             'cargoModes' => CargoType::cases(),
+            'hblTypes' => HBLType::cases(),
             'branches' => $this->branchRepository->getBranches(),
             'priceRule' => $branchPrice,
         ]);

@@ -15,6 +15,10 @@ const props = defineProps({
         type: Array,
         default: () => []
     },
+    hblTypes: {
+        type: Array,
+        default: () => []
+    },
     branches: {
         type: Object,
         default: () => {}
@@ -28,13 +32,15 @@ const props = defineProps({
 const form = useForm({
     destination_branch_id: props.priceRule.destination_branch_id || null,
     cargo_mode: props.priceRule.cargo_mode || '',
+    hbl_type: props.priceRule.hbl_type || '',
     price_mode: props.priceRule.price_mode || '',
     condition: props.priceRule.condition || '',
     true_action: props.priceRule.true_action || '',
     false_action: props.priceRule.false_action || '',
     bill_price: props.priceRule.bill_price || null,
     bill_vat: props.priceRule.bill_vat || null,
-    destination_charges: props.priceRule.destination_charges || '',
+    volume_charges: props.priceRule.volume_charges || '',
+    per_package_charges: props.priceRule.per_package_charges || '',
     is_editable: Boolean(props.priceRule.is_editable),
 });
 
@@ -139,6 +145,23 @@ const handlePriceRuleUpdate = () => {
                             </div>
 
                             <div>
+                                <InputLabel value="HBL Type"/>
+                                <label for="">
+                                    <select
+                                        v-model="form.hbl_type"
+                                        autocomplete="off"
+                                        class="w-full"
+                                        placeholder="Select a HBL Type..."
+                                        x-init="$el._tom = new Tom($el)"
+                                    >
+                                        <option value="">Select a HBL Type...</option>
+                                        <option v-for="(hblType, index) in hblTypes" :key="index" :value="hblType">{{hblType}}</option>
+                                    </select>
+                                </label>
+                                <InputError :message="form.errors.hbl_type"/>
+                            </div>
+
+                            <div>
                                 <InputLabel value="Price Mode"/>
                                 <label for="">
                                     <select
@@ -187,9 +210,15 @@ const handlePriceRuleUpdate = () => {
                             </div>
 
                             <div>
-                                <InputLabel value="Destination Charges"/>
-                                <TextInput v-model="form.destination_charges" class="w-full" placeholder="Set Destination Charges"/>
-                                <InputError :message="form.errors.destination_charges"/>
+                                <InputLabel value="Volume Charges"/>
+                                <TextInput v-model="form.volume_charges" class="w-full" placeholder="Set Volume Charges"/>
+                                <InputError :message="form.errors.volume_charges"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Per Package Charges"/>
+                                <TextInput v-model="form.per_package_charges" class="w-full" placeholder="Set Per Package Charges"/>
+                                <InputError :message="form.errors.per_package_charges"/>
                             </div>
 
                             <div>

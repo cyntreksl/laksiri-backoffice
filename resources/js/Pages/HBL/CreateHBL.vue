@@ -88,30 +88,30 @@ const splitNumberConsignee = (fullNumber) => {
 }
 
 const form = useForm({
-  hbl: "",
-  hbl_name: "",
-  email: "",
-  contact_number: computed(() => countryCode.value + contactNumber.value),
-  nic: "",
-  iq_number: "",
-  address: "",
-  consignee_name: "",
-  consignee_nic: "",
-  consignee_contact: computed(
-      () => countryCode.value + consignee_contact.value
-  ),
-  consignee_address: "",
-  consignee_note: "",
-  cargo_type: "",
-  hbl_type: "",
-  warehouse: "",
-  freight_charge: 0,
-  bill_charge: 0,
-  other_charge: 0,
-  discount: 0,
-  paid_amount: 0,
-  grand_total: 0,
-  packages: {},
+    hbl: "",
+    hbl_name: "",
+    email: "",
+    contact_number: computed(() => countryCode.value + contactNumber.value),
+    nic: "",
+    iq_number: "",
+    address: "",
+    consignee_name: "",
+    consignee_nic: "",
+    consignee_contact: computed(
+        () => countryCode.value + consignee_contact.value
+    ),
+    consignee_address: "",
+    consignee_note: "",
+    cargo_type: "",
+    hbl_type: "",
+    warehouse: "",
+    freight_charge: 0,
+    bill_charge: 0,
+    other_charge: 0,
+    discount: 0,
+    paid_amount: 0,
+    grand_total: 0,
+    packages: {},
 });
 
 const handleHBLCreate = () => {
@@ -252,6 +252,10 @@ watch([() => form.cargo_type], ([newCargoType]) => {
     calculatePayment();
 });
 
+watch([() => form.hbl_type], ([newHBLType]) => {
+    calculatePayment();
+});
+
 const packageTypes = [
     "WOODEN BOX",
     "CARTON",
@@ -305,102 +309,349 @@ const currency = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 const isEditable = ref(false);
 
 const calculatePayment = () => {
-    const cargoType = form.cargo_type;
-    const freightCharge = ref(0);
-    const billCharge = ref(0);
-    const otherCharge = ref(0);
-    if (cargoType === "Sea Cargo") {
-        const priceRule = computed(() => {
-            return props.priceRules.find(
-                (priceRule) => priceRule.cargo_mode === "Sea Cargo"
-            );
-        });
+        const cargoType = form.cargo_type;
+        const hblType = form.hbl_type;
+        const freightCharge = ref(0);
+        const billCharge = ref(0);
+        const otherCharge = ref(0);
 
-        if (priceRule.value.price_mode === "volume") {
-            const trueAction = priceRule.value.true_action.trim();
-            const operator = trueAction[0];
-            const value = parseFloat(trueAction.slice(1).trim());
+        if (cargoType === "Sea Cargo" && hblType === "Gift") {
+            const priceRule = computed(() => {
+                return props.priceRules.find(
+                    (priceRule) => priceRule.cargo_mode === "Sea Cargo" && priceRule.hbl_type === "Gift"
+                );
+            });
 
-            switch (operator) {
-                case "*":
-                    freightCharge.value = grandTotalVolume.value * value;
-                    break;
-                case "+":
-                    freightCharge.value = grandTotalVolume.value + value;
-                    break;
-                case "-":
-                    freightCharge.value = grandTotalVolume.value - value;
-                    break;
-                case "/":
-                    if (value !== 0) {
-                        freightCharge.value = grandTotalVolume.value / value;
-                    } else {
-                        console.error("Division by zero error");
-                    }
-                    break;
-                default:
-                    console.error("Unsupported operation");
-                    break;
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
             }
+
+            if (priceRule.value.price_mode === "volume") {
+                const trueAction = priceRule.value.true_action.trim();
+                const operator = trueAction[0];
+                const value = parseFloat(trueAction.slice(1).trim());
+
+                switch (operator) {
+                    case "*":
+                        freightCharge.value = grandTotalVolume.value * value;
+                        break;
+                    case "+":
+                        freightCharge.value = grandTotalVolume.value + value;
+                        break;
+                    case "-":
+                        freightCharge.value = grandTotalVolume.value - value;
+                        break;
+                    case "/":
+                        if (value !== 0) {
+                            freightCharge.value = grandTotalVolume.value / value;
+                        } else {
+                            console.error("Division by zero error");
+                        }
+                        break;
+                    default:
+                        console.error("Unsupported operation");
+                        break;
+                }
+            }
+
+            billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
+            otherCharge.value =
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+            isEditable.value = Boolean(priceRule.value.is_editable);
+            vat.value =
+                priceRule.value.bill_vat !== 0
+                    ? parseFloat(priceRule.value.bill_vat) / 100
+                    : 0;
+        } else if (cargoType === "Sea Cargo" && hblType === "UBP") {
+            const priceRule = computed(() => {
+                return props.priceRules.find(
+                    (priceRule) => priceRule.cargo_mode === "Sea Cargo" && priceRule.hbl_type === "UBP"
+                );
+            });
+
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
+            }
+
+            if (priceRule.value.price_mode === "volume") {
+                const trueAction = priceRule.value.true_action.trim();
+                const operator = trueAction[0];
+                const value = parseFloat(trueAction.slice(1).trim());
+
+                switch (operator) {
+                    case "*":
+                        freightCharge.value = grandTotalVolume.value * value;
+                        break;
+                    case "+":
+                        freightCharge.value = grandTotalVolume.value + value;
+                        break;
+                    case "-":
+                        freightCharge.value = grandTotalVolume.value - value;
+                        break;
+                    case "/":
+                        if (value !== 0) {
+                            freightCharge.value = grandTotalVolume.value / value;
+                        } else {
+                            console.error("Division by zero error");
+                        }
+                        break;
+                    default:
+                        console.error("Unsupported operation");
+                        break;
+                }
+            }
+
+            billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
+            otherCharge.value =
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+            isEditable.value = Boolean(priceRule.value.is_editable);
+            vat.value =
+                priceRule.value.bill_vat !== 0
+                    ? parseFloat(priceRule.value.bill_vat) / 100
+                    : 0;
+        } else if (cargoType === "Sea Cargo" && hblType === "Door to Door") {
+            const priceRule = computed(() => {
+                return props.priceRules.find(
+                    (priceRule) => priceRule.cargo_mode === "Sea Cargo" && priceRule.hbl_type === "Door to Door"
+                );
+            });
+
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
+            }
+
+            if (priceRule.value.price_mode === "volume") {
+                const trueAction = priceRule.value.true_action.trim();
+                const operator = trueAction[0];
+                const value = parseFloat(trueAction.slice(1).trim());
+
+                switch (operator) {
+                    case "*":
+                        freightCharge.value = grandTotalVolume.value * value;
+                        break;
+                    case "+":
+                        freightCharge.value = grandTotalVolume.value + value;
+                        break;
+                    case "-":
+                        freightCharge.value = grandTotalVolume.value - value;
+                        break;
+                    case "/":
+                        if (value !== 0) {
+                            freightCharge.value = grandTotalVolume.value / value;
+                        } else {
+                            console.error("Division by zero error");
+                        }
+                        break;
+                    default:
+                        console.error("Unsupported operation");
+                        break;
+                }
+            }
+
+            billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
+            otherCharge.value =
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+            isEditable.value = Boolean(priceRule.value.is_editable);
+            vat.value =
+                priceRule.value.bill_vat !== 0
+                    ? parseFloat(priceRule.value.bill_vat) / 100
+                    : 0;
+        } else if (cargoType === "Air Cargo" && hblType === "Gift") {
+            const priceRule = computed(() => {
+                return props.priceRules.find(
+                    (priceRule) => priceRule.cargo_mode === "Air Cargo" && priceRule.hbl_type === "Gift"
+                );
+            });
+
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
+            }
+
+            if (priceRule.value.price_mode === "weight") {
+                const trueAction = priceRule.value.true_action.trim();
+                const operator = trueAction[0];
+                const value = parseFloat(trueAction.slice(1).trim());
+
+                switch (operator) {
+                    case "*":
+                        freightCharge.value = grandTotalVolume.value * value;
+                        break;
+                    case "+":
+                        freightCharge.value = grandTotalVolume.value + value;
+                        break;
+                    case "-":
+                        freightCharge.value = grandTotalVolume.value - value;
+                        break;
+                    case "/":
+                        if (value !== 0) {
+                            freightCharge.value = grandTotalVolume.value / value;
+                        } else {
+                            console.error("Division by zero error");
+                        }
+                        break;
+                    default:
+                        console.error("Unsupported operation");
+                        break;
+                }
+            }
+
+            billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
+            otherCharge.value =
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+            isEditable.value = Boolean(priceRule.value.is_editable);
+            vat.value =
+                priceRule.value.bill_vat !== 0
+                    ? parseFloat(priceRule.value.bill_vat) / 100
+                    : 0;
+        } else if (cargoType === "Air Cargo" && hblType === "UBP") {
+            const priceRule = computed(() => {
+                return props.priceRules.find(
+                    (priceRule) => priceRule.cargo_mode === "Air Cargo" && priceRule.hbl_type === "UBP"
+                );
+            });
+
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
+            }
+
+            if (priceRule.value.price_mode === "weight") {
+                const trueAction = priceRule.value.true_action.trim();
+                const operator = trueAction[0];
+                const value = parseFloat(trueAction.slice(1).trim());
+
+                switch (operator) {
+                    case "*":
+                        freightCharge.value = grandTotalVolume.value * value;
+                        break;
+                    case "+":
+                        freightCharge.value = grandTotalVolume.value + value;
+                        break;
+                    case "-":
+                        freightCharge.value = grandTotalVolume.value - value;
+                        break;
+                    case "/":
+                        if (value !== 0) {
+                            freightCharge.value = grandTotalVolume.value / value;
+                        } else {
+                            console.error("Division by zero error");
+                        }
+                        break;
+                    default:
+                        console.error("Unsupported operation");
+                        break;
+                }
+            }
+
+            billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
+            otherCharge.value =
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+            isEditable.value = Boolean(priceRule.value.is_editable);
+            vat.value =
+                priceRule.value.bill_vat !== 0
+                    ? parseFloat(priceRule.value.bill_vat) / 100
+                    : 0;
+        } else if (cargoType === "Air Cargo" && hblType === "Door to Door") {
+            const priceRule = computed(() => {
+                return props.priceRules.find(
+                    (priceRule) => priceRule.cargo_mode === "Air Cargo" && priceRule.hbl_type === "Door to Door"
+                );
+            });
+
+            if (!priceRule.value) {
+                billCharge.value = 0;
+                otherCharge.value = 0;
+                vat.value = 0;
+                isEditable.value = false;
+                form.bill_charge = 0;
+                form.other_charge = 0
+                form.discount = 0;
+                form.freight_charge = 0;
+                return push.error('Price Rule Not Found!')
+            }
+
+            if (priceRule.value.price_mode === "weight") {
+                const trueAction = priceRule.value.true_action.trim();
+                const operator = trueAction[0];
+                const value = parseFloat(trueAction.slice(1).trim());
+
+                switch (operator) {
+                    case "*":
+                        freightCharge.value = grandTotalVolume.value * value;
+                        break;
+                    case "+":
+                        freightCharge.value = grandTotalVolume.value + value;
+                        break;
+                    case "-":
+                        freightCharge.value = grandTotalVolume.value - value;
+                        break;
+                    case "/":
+                        if (value !== 0) {
+                            freightCharge.value = grandTotalVolume.value / value;
+                        } else {
+                            console.error("Division by zero error");
+                        }
+                        break;
+                    default:
+                        console.error("Unsupported operation");
+                        break;
+                }
+            }
+
+            billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
+            otherCharge.value =
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+            isEditable.value = Boolean(priceRule.value.is_editable);
+            vat.value =
+                priceRule.value.bill_vat !== 0
+                    ? parseFloat(priceRule.value.bill_vat) / 100
+                    : 0;
         }
 
-        billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
-        otherCharge.value =
-            parseFloat(priceRule.value.destination_charges).toFixed(3) || 0;
-        isEditable.value = Boolean(priceRule.value.is_editable);
-        vat.value =
-            priceRule.value.bill_vat !== 0
-                ? parseFloat(priceRule.value.bill_vat) / 100
-                : 0;
-    } else if (cargoType === "Air Cargo") {
-        const priceRule = computed(() => {
-            return props.priceRules.find(
-                (priceRule) => priceRule.cargo_mode === "Air Cargo"
-            );
-        });
-
-        if (priceRule.value.price_mode === "weight") {
-            const trueAction = priceRule.value.true_action.trim();
-            const operator = trueAction[0];
-            const value = parseFloat(trueAction.slice(1).trim());
-
-            switch (operator) {
-                case "*":
-                    freightCharge.value = grandTotalVolume.value * value;
-                    break;
-                case "+":
-                    freightCharge.value = grandTotalVolume.value + value;
-                    break;
-                case "-":
-                    freightCharge.value = grandTotalVolume.value - value;
-                    break;
-                case "/":
-                    if (value !== 0) {
-                        freightCharge.value = grandTotalVolume.value / value;
-                    } else {
-                        console.error("Division by zero error");
-                    }
-                    break;
-                default:
-                    console.error("Unsupported operation");
-                    break;
-            }
-        }
-
-        billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
-        otherCharge.value =
-            parseFloat(priceRule.value.destination_charges).toFixed(3) || 0;
-        isEditable.value = Boolean(priceRule.value.is_editable);
-        vat.value =
-            priceRule.value.bill_vat !== 0
-                ? parseFloat(priceRule.value.bill_vat) / 100
-                : 0;
+        form.freight_charge = freightCharge.value.toFixed(3);
+        form.bill_charge = billCharge.value;
+        form.other_charge = otherCharge.value;
     }
-
-    form.freight_charge = freightCharge.value.toFixed(3);
-    form.bill_charge = billCharge.value;
-    form.other_charge = otherCharge.value;
-};
+;
 const showConfirmRemovePackageModal = ref(false);
 const packageIndex = ref(null);
 
@@ -620,7 +871,8 @@ const shipIcon = ref(`
                             </SoftPrimaryButton>
                         </div>
 
-                        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToShipperModalShow" @close="closeCopyFromHBLToShipperModal">
+                        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToShipperModalShow"
+                                     @close="closeCopyFromHBLToShipperModal">
                             <template #title>
                                 Copy
                             </template>
@@ -796,7 +1048,8 @@ const shipIcon = ref(`
                                 Consignee Details
                             </h2>
 
-                            <SoftPrimaryButton class="flex items-center" type="button" @click.prevent="confirmShowingCopyFromHBLToConsigneeModal">
+                            <SoftPrimaryButton class="flex items-center" type="button"
+                                               @click.prevent="confirmShowingCopyFromHBLToConsigneeModal">
                                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
                                      height="24" stroke="currentColor" stroke-linecap="round"
                                      stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
@@ -811,7 +1064,8 @@ const shipIcon = ref(`
                                 Copy From HBL
                             </SoftPrimaryButton>
 
-                            <DialogModal :maxWidth="'xl'" :show="copyFromHBLToConsigneeModalShow" @close="closeCopyFromHBLToConsigneeModal">
+                            <DialogModal :maxWidth="'xl'" :show="copyFromHBLToConsigneeModalShow"
+                                         @close="closeCopyFromHBLToConsigneeModal">
                                 <template #title>
                                     Copy
                                 </template>
