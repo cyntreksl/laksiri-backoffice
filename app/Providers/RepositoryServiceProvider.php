@@ -9,6 +9,7 @@ use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\DashboardRepositoryInterface;
 use App\Interfaces\DriverAreasRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
+use App\Interfaces\ExceptionNameRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
@@ -27,6 +28,7 @@ use App\Repositories\ContainerRepositories;
 use App\Repositories\DashboardRepository;
 use App\Repositories\DriverAreasRepository;
 use App\Repositories\DriverRepository;
+use App\Repositories\ExceptionNameRepository;
 use App\Repositories\HBLRepository;
 use App\Repositories\LoadedContainerRepository;
 use App\Repositories\PickupExceptionRepository;
@@ -62,6 +64,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(BondedWarehouseRepositoryInterface::class, BondedWarehouseRepository::class);
         $this->app->bind(UnloadingIssuesRepositoryInterface::class, UnloadingIssuesRepository::class);
         $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
+        $this->app->bind(ExceptionNameRepositoryInterface::class, ExceptionNameRepository::class);
     }
 
     public function boot(): void

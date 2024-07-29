@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Branch;
+use App\Models\ExceptionName;
 use App\Models\User;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
@@ -239,4 +240,17 @@ Breadcrumbs::for('arrival.unloading-issues.index', function (BreadcrumbTrail $tr
     $trail->parent('dashboard');
     $trail->push('Arrivals');
     $trail->push('Unloading Issues', route('arrival.unloading-issues.index'));
+});
+
+// Settings -> Exception Name
+Breadcrumbs::for('setting.exception-names.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Exception Names', route('setting.exception-names.index'));
+});
+
+// Settings -> Exception Name
+Breadcrumbs::for('setting.exception-names.edit', function (BreadcrumbTrail $trail, ExceptionName $exceptionName) {
+    $trail->parent('setting.exception-names.index');
+    $trail->push('Edit Exception Name', route('setting.exception-names.edit', $exceptionName));
 });
