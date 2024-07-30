@@ -214,7 +214,7 @@ watch(
         const totalWeightKg = (volumeCubicMeters * newQuantity) / 1000; // 1 gram = 0.001 kilograms
 
         // Update reactive properties
-        packageItem.volume = volumeCubicMeters;
+        packageItem.volume = volumeCubicMeters.toFixed(2);
         // packageItem.totalWeight = totalWeightKg;
     }
 );
@@ -279,11 +279,11 @@ const addToConsigneeDetails = () => {
     }
 };
 
-watch([() => form.hbl_type], ([val]) => {
-    if (form.hbl_type !== "Door to Door") {
-        resetConsigneeDetails();
-    }
-});
+// watch([() => form.hbl_type], ([val]) => {
+//     if (form.hbl_type !== "Door to Door") {
+//         resetConsigneeDetails();
+//     }
+// });
 
 const resetConsigneeDetails = () => {
     form.consignee_name = "";
