@@ -11,6 +11,7 @@ use App\Enum\ContainerType;
 use App\Enum\HBLType;
 use App\Enum\WarehouseType;
 use App\Http\Requests\StoreContainerRequest;
+use App\Http\Requests\UpdateContainerRequest;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Models\Container;
@@ -80,7 +81,23 @@ class ContainerController extends Controller
         }
     }
 
-    public function update(Request $request, Container $container)
+    public function edit(Container $container)
+    {
+        $containerTypes = ContainerType::getDropdownOptions();
+        $seaContainerOptions = ContainerType::getSeaCargoOptions();
+        $airContainerOptions = ContainerType::getAirCargoOptions();
+        $cargoTypes = CargoType::getCargoTypeOptions();
+
+        return Inertia::render('Container/ContainerEdit', [
+            'container' => $container,
+            'containerTypes' => $containerTypes,
+            'seaContainerOptions' => $seaContainerOptions,
+            'airContainerOptions' => $airContainerOptions,
+            'cargoTypes' => $cargoTypes,
+        ]);
+    }
+
+    public function update(UpdateContainerRequest $request, Container $container)
     {
         return $this->containerRepository->update($request->all(), $container);
     }
