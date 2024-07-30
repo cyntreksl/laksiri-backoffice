@@ -68,6 +68,7 @@ const form = useForm({
     pickup_time_start: null,
     pickup_time_end: null,
     zone_id: null,
+    contact_number: null,
 });
 
 watch(pickup, (newPickup) => {
@@ -76,6 +77,7 @@ watch(pickup, (newPickup) => {
         form.pickup_time_start = formatTime(newPickup.pickup_time_start);
         form.pickup_time_end = formatTime(newPickup.pickup_time_end);
         form.zone_id = newPickup.zone_id;
+        form.contact_number = newPickup.contact_number;
     }
 });
 
@@ -138,6 +140,12 @@ const handleUpdatePickup = () => {
                     <InputLabel value="Pickup Date"/>
                     <TextInput v-model="form.pickup_date" class="w-full" type="date"/>
                     <InputError :message="form.errors.pickup_date"/>
+                </div>
+
+                <div>
+                    <InputLabel value="Contact Number"/>
+                    <TextInput v-model="form.contact_number" class="w-full" type="text"/>
+                    <InputError :message="form.errors.contact_number"/>
                 </div>
 
                 <div>

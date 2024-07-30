@@ -95,6 +95,12 @@ const props = defineProps({
                     <InfoDisplay :value="pickup?.pickup_time_end" label="Pickup Time End"/>
 
                     <InfoDisplay :value="pickup?.pickup_type" label="Pickup Type"/>
+
+                    <InfoDisplay :value="pickup?.notes" label="Packages"/>
+
+                    <InfoDisplay :value="pickup?.pickup_note" label="Pickup Note"/>
+
+                    <InfoDisplay :value="pickup?.retry_attempts" label="Retry Attempts"/>
                 </div>
             </div>
         </AccordionPanel>
