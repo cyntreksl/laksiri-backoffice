@@ -95,6 +95,12 @@ const props = defineProps({
                     <InfoDisplay :value="pickup?.pickup_time_end" label="Pickup Time End"/>
 
                     <InfoDisplay :value="pickup?.pickup_type" label="Pickup Type"/>
+
+                    <InfoDisplay :value="pickup?.notes" label="Packages"/>
+
+                    <InfoDisplay :value="pickup?.pickup_note" label="Pickup Note"/>
+
+                    <InfoDisplay :value="pickup?.retry_attempts" label="Retry Attempts"/>
                 </div>
             </div>
         </AccordionPanel>
@@ -172,7 +178,7 @@ const props = defineProps({
                     </svg>
                 </SimpleOverviewWidget>
 
-                <SimpleOverviewWidget :count="hbl?.packages_sum_volume.toFixed(2) ?? 0" title="Volume">
+                <SimpleOverviewWidget :count="hbl?.packages_sum_volume != null ? hbl.packages_sum_volume.toFixed(2) : '0.00'" title="Volume">
                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-scale text-info"
                          fill="none"
                          height="24" stroke="currentColor" stroke-linecap="round"
@@ -187,7 +193,7 @@ const props = defineProps({
                     </svg>
                 </SimpleOverviewWidget>
 
-                <SimpleOverviewWidget :count="hbl?.packages_sum_weight.toFixed(2) ?? 0" title="Weight">
+                <SimpleOverviewWidget :count="hbl?.packages_sum_weight != null ? hbl.packages_sum_volume.toFixed(2) : '0.00'" title="Weight">
                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-weight text-info"
                          fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                          stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"

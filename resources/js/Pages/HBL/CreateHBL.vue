@@ -54,14 +54,6 @@ const findCountryCodeByBranch = computed(() => {
     }
 });
 
-const isMobile = () => {
-    if (screen.width <= 760) {
-        return true;
-    } else {
-        return false;
-    }
-};
-
 const countryCodes = ["+94", "+966", "+971", "+965"];
 const countryCode = ref(findCountryCodeByBranch.value);
 const contactNumber = ref("");
@@ -222,7 +214,7 @@ watch(
         const totalWeightKg = (volumeCubicMeters * newQuantity) / 1000; // 1 gram = 0.001 kilograms
 
         // Update reactive properties
-        packageItem.volume = volumeCubicMeters;
+        packageItem.volume = volumeCubicMeters.toFixed(2);
         // packageItem.totalWeight = totalWeightKg;
     }
 );
@@ -287,11 +279,11 @@ const addToConsigneeDetails = () => {
     }
 };
 
-watch([() => form.hbl_type], ([val]) => {
-    if (form.hbl_type !== "Door to Door") {
-        resetConsigneeDetails();
-    }
-});
+// watch([() => form.hbl_type], ([val]) => {
+//     if (form.hbl_type !== "Door to Door") {
+//         resetConsigneeDetails();
+//     }
+// });
 
 const resetConsigneeDetails = () => {
     form.consignee_name = "";
@@ -1250,7 +1242,7 @@ const shipIcon = ref(`
                 </div>
                 <div class="sm:col-span-2 space-y-5">
                     <!-- Action Buttons -->
-                    <div v-if="!isMobile()" class="flex justify-end space-x-5">
+                    <div class="flex justify-end space-x-5">
                         <DangerOutlineButton @click="router.visit(route('hbls.index'))"
                         >Cancel
                         </DangerOutlineButton
@@ -1755,36 +1747,6 @@ const shipIcon = ref(`
                         </PrimaryOutlineButton>
                     </div>
                 </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div v-if="isMobile()" class="flex justify-end space-x-5">
-                <DangerOutlineButton @click="router.visit(route('hbls.index'))"
-                >Cancel
-                </DangerOutlineButton
-                >
-                <PrimaryButton
-                    :class="{ 'opacity-50': form.processing }"
-                    :disabled="form.processing"
-                    class="space-x-2"
-                    type="submit"
-                >
-                    <span>Create a HBL</span>
-                    <svg
-                        class="size-5"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                    </svg>
-                </PrimaryButton>
             </div>
         </form>
 

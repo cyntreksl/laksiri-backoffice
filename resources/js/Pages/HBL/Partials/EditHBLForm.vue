@@ -86,14 +86,6 @@ const resetModal = () => {
     packageItem.remarks = "";
 };
 
-const isMobile = () => {
-    if (screen.width <= 760) {
-        return true;
-    } else {
-        return false;
-    }
-};
-
 const showAddNewPackageDialog = ref(false);
 
 const showPackageDialog = () => {
@@ -878,7 +870,7 @@ const openEditModal = (index) => {
             </div>
             <div class="sm:col-span-2 space-y-5">
                 <!-- Action Buttons -->
-                <div v-if="!isMobile()" class="flex justify-end space-x-5">
+                <div class="flex justify-end space-x-5">
                     <DangerOutlineButton @click="router.visit(route('hbls.index'))"
                     >Cancel
                     </DangerOutlineButton
@@ -1241,488 +1233,11 @@ const openEditModal = (index) => {
                 </div>
             </div>
         </div>
-
-        <div v-if="!isMobile()" class="sm:col-span-2 space-y-5">
-            <!-- Action Buttons -->
-            <div class="flex justify-end space-x-5">
-                <DangerOutlineButton @click="router.visit(route('hbls.index'))"
-                >Cancel
-                </DangerOutlineButton
-                >
-                <PrimaryButton class="space-x-2" type="submit">
-                    <span>Update HBL</span>
-                    <svg
-                        class="size-5"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                    </svg>
-                </PrimaryButton>
-            </div>
-
-            <!-- Cargo Type -->
-            <div class="card px-4 py-4 sm:px-5">
-                <div>
-                    <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Cargo Type
-                    </h2>
-                </div>
-                <div class="my-5">
-                    <div class="space-x-5">
-                        <label
-                            v-for="cargoType in cargoTypes"
-                            class="inline-flex items-center space-x-2"
-                        >
-                            <input
-                                v-model="form.cargo_type"
-                                :value="cargoType"
-                                class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                name="cargo_type"
-                                type="radio"
-                            />
-                            <p>{{ cargoType }}</p>
-                        </label>
-                    </div>
-                    <InputError :message="form.errors.cargo_type"/>
-                </div>
-            </div>
-
-            <!-- Type -->
-            <div class="card px-4 py-4 sm:px-5">
-                <div>
-                    <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Type
-                    </h2>
-                </div>
-                <div class="my-5">
-                    <div class="space-x-5">
-                        <label
-                            v-for="hblType in hblTypes"
-                            class="inline-flex items-center space-x-2"
-                        >
-                            <input
-                                v-model="form.hbl_type"
-                                :value="hblType"
-                                class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                name="hbl_type"
-                                type="radio"
-                            />
-                            <p>{{ hblType }}</p>
-                        </label>
-                    </div>
-                    <InputError :message="form.errors.hbl_type"/>
-                </div>
-            </div>
-
-            <!-- Warehouse -->
-            <div class="card px-4 py-4 sm:px-5">
-                <div>
-                    <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Warehouse
-                    </h2>
-                </div>
-                <div class="my-5">
-                    <div class="space-x-5">
-                        <label
-                            v-for="warehouse in warehouses"
-                            class="inline-flex items-center space-x-2"
-                        >
-                            <input
-                                v-model="form.warehouse"
-                                :value="warehouse"
-                                class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                name="warehouse"
-                                type="radio"
-                            />
-                            <p>{{ warehouse }}</p>
-                        </label>
-                    </div>
-                    <InputError :message="form.errors.warehouse"/>
-                </div>
-            </div>
-
-            <!-- Price & Payment -->
-            <div class="card px-4 py-4 sm:px-5">
-                <div class="flex justify-between items-center">
-                    <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Price and Payment
-                    </h2>
-                    <button
-                        class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
-                        type="button"
-                        @click="calculatePayment"
-                    >
-                        Re Calculate Payment
-                    </button>
-                </div>
-                <div class="grid grid-cols-2 gap-5 mt-5">
-                    <div>
-                        <span>Freight Charge</span>
-                        <TextInput
-                            v-model="form.freight_charge"
-                            :disabled="!isEditable"
-                            class="w-full"
-                            min="0"
-                            step="any"
-                            type="number"
-                        />
-                        <InputError :message="form.errors.freight_charge"/>
-                    </div>
-
-                    <div>
-                        <span>Bill Charge</span>
-                        <TextInput
-                            v-model="form.bill_charge"
-                            :disabled="!isEditable"
-                            class="w-full"
-                            min="0"
-                            step="any"
-                            type="number"
-                        />
-                        <InputError :message="form.errors.bill_charge"/>
-                    </div>
-
-                    <div>
-                        <span>Destination Charge</span>
-                        <TextInput
-                            v-model="form.other_charge"
-                            :disabled="!isEditable"
-                            class="w-full"
-                            min="0"
-                            step="any"
-                            type="number"
-                        />
-                        <InputError :message="form.errors.other_charge"/>
-                    </div>
-
-                    <div>
-                        <span>Discount</span>
-                        <TextInput
-                            v-model="form.discount"
-                            :disabled="!isEditable"
-                            class="w-full"
-                            placeholder="0"
-                            step="any"
-                            type="number"
-                        />
-                        <InputError :message="form.errors.discount"/>
-                    </div>
-
-                    <div class="col-span-2">
-                        <span>Paid Amount</span>
-                        <TextInput
-                            v-model="form.paid_amount"
-                            :disabled="!isEditable"
-                            class="w-full"
-                            min="0"
-                            step="any"
-                            type="number"
-                        />
-                        <InputError :message="form.errors.paid_amount"/>
-                    </div>
-
-                    <div class="col-start-2 mt-2 space-y-2.5 font-bold">
-                        <div class="flex justify-between">
-                            <p class="line-clamp-1">Packages</p>
-                            <p class="text-slate-700 dark:text-navy-100">
-                                {{ packageList.length }}
-                            </p>
-                        </div>
-                        <div class="flex justify-between">
-                            <p class="line-clamp-1">Weight</p>
-                            <p class="text-slate-700 dark:text-navy-100">
-                                {{ grandTotalWeight }}
-                            </p>
-                        </div>
-                        <div class="flex justify-between">
-                            <p class="line-clamp-1">Volume</p>
-                            <p class="text-slate-700 dark:text-navy-100">
-                                {{ grandTotalVolume }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="col-span-2">
-                        <div class="flex justify-between text-2xl text-success font-bold">
-                            <p class="line-clamp-1">Grand Total</p>
-                            <p>{{ hblTotal }} {{ currency }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div v-if="!isMobile()" class="sm:col-span-2 space-y-5">
-            <!-- Action Buttons -->
-            <div class="flex justify-end space-x-5">
-                <DangerOutlineButton @click="router.visit(route('hbls.index'))"
-                >Cancel
-                </DangerOutlineButton
-                >
-                <PrimaryButton class="space-x-2" type="submit">
-                    <span>Update HBL</span>
-                    <svg
-                        class="size-5"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                    </svg>
-                </PrimaryButton>
-            </div>
-
-            <!-- Cargo Type -->
-            <div class="card px-4 py-4 sm:px-5">
-                <div>
-                    <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Cargo Type
-                    </h2>
-                </div>
-                <div class="my-5">
-                    <div class="space-x-5">
-                        <label
-                            v-for="cargoType in cargoTypes"
-                            class="inline-flex items-center space-x-2"
-                        >
-                            <input
-                                v-model="form.cargo_type"
-                                :value="cargoType"
-                                class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                name="cargo_type"
-                                type="radio"
-                            />
-                            <p>{{ cargoType }}</p>
-                        </label>
-                    </div>
-                    <InputError :message="form.errors.cargo_type"/>
-                </div>
-            </div>
-
-            <!-- Type -->
-            <div class="card px-4 py-4 sm:px-5">
-                <div>
-                    <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Type
-                    </h2>
-                </div>
-                <div class="my-5">
-                    <div class="space-x-5">
-                        <label
-                            v-for="hblType in hblTypes"
-                            class="inline-flex items-center space-x-2"
-                        >
-                            <input
-                                v-model="form.hbl_type"
-                                :value="hblType"
-                                class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                name="hbl_type"
-                                type="radio"
-                            />
-                            <p>{{ hblType }}</p>
-                        </label>
-                    </div>
-                    <InputError :message="form.errors.hbl_type"/>
-                </div>
-            </div>
-
-            <!-- Warehouse -->
-            <div class="card px-4 py-4 sm:px-5">
-                <div>
-                    <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Warehouse
-                    </h2>
-                </div>
-                <div class="my-5">
-                    <div class="space-x-5">
-                        <label
-                            v-for="warehouse in warehouses"
-                            class="inline-flex items-center space-x-2"
-                        >
-                            <input
-                                v-model="form.warehouse"
-                                :value="warehouse"
-                                class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                name="warehouse"
-                                type="radio"
-                            />
-                            <p>{{ warehouse }}</p>
-                        </label>
-                    </div>
-                    <InputError :message="form.errors.warehouse"/>
-                </div>
-            </div>
-
-            <!-- Price & Payment -->
-            <div class="card px-4 py-4 sm:px-5">
-                <div class="flex justify-between items-center">
-                    <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Price and Payment
-                    </h2>
-                    <button
-                        class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
-                        type="button"
-                        @click="calculatePayment"
-                    >
-                        Re Calculate Payment
-                    </button>
-                </div>
-                <div class="grid grid-cols-2 gap-5 mt-5">
-                    <div>
-                        <span>Freight Charge</span>
-                        <TextInput
-                            v-model="form.freight_charge"
-                            :disabled="!isEditable"
-                            class="w-full"
-                            min="0"
-                            step="any"
-                            type="number"
-                        />
-                        <InputError :message="form.errors.freight_charge"/>
-                    </div>
-
-                    <div>
-                        <span>Bill Charge</span>
-                        <TextInput
-                            v-model="form.bill_charge"
-                            :disabled="!isEditable"
-                            class="w-full"
-                            min="0"
-                            step="any"
-                            type="number"
-                        />
-                        <InputError :message="form.errors.bill_charge"/>
-                    </div>
-
-                    <div>
-                        <span>Destination Charge</span>
-                        <TextInput
-                            v-model="form.other_charge"
-                            :disabled="!isEditable"
-                            class="w-full"
-                            min="0"
-                            step="any"
-                            type="number"
-                        />
-                        <InputError :message="form.errors.other_charge"/>
-                    </div>
-
-                    <div>
-                        <span>Discount</span>
-                        <TextInput
-                            v-model="form.discount"
-                            :disabled="!isEditable"
-                            class="w-full"
-                            placeholder="0"
-                            step="any"
-                            type="number"
-                        />
-                        <InputError :message="form.errors.discount"/>
-                    </div>
-
-                    <div class="col-span-2">
-                        <span>Paid Amount</span>
-                        <TextInput
-                            v-model="form.paid_amount"
-                            :disabled="!isEditable"
-                            class="w-full"
-                            min="0"
-                            step="any"
-                            type="number"
-                        />
-                        <InputError :message="form.errors.paid_amount"/>
-                    </div>
-
-                    <div class="col-start-2 mt-2 space-y-2.5 font-bold">
-                        <div class="flex justify-between">
-                            <p class="line-clamp-1">Packages</p>
-                            <p class="text-slate-700 dark:text-navy-100">
-                                {{ packageList.length }}
-                            </p>
-                        </div>
-                        <div class="flex justify-between">
-                            <p class="line-clamp-1">Weight</p>
-                            <p class="text-slate-700 dark:text-navy-100">
-                                {{ grandTotalWeight }}
-                            </p>
-                        </div>
-                        <div class="flex justify-between">
-                            <p class="line-clamp-1">Volume</p>
-                            <p class="text-slate-700 dark:text-navy-100">
-                                {{ grandTotalVolume }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="col-span-2">
-                        <div class="flex justify-between text-2xl text-success font-bold">
-                            <p class="line-clamp-1">Grand Total</p>
-                            <p>{{ hblTotal }} {{ currency }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div v-if="isMobile()" class="flex justify-end space-x-5">
-            <DangerOutlineButton @click="router.visit(route('hbls.index'))"
-            >Cancel
-            </DangerOutlineButton
-            >
-            <PrimaryButton class="space-x-2" type="submit">
-                <span>Update HBL</span>
-                <svg
-                    class="size-5"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    />
-                </svg>
-            </PrimaryButton>
-        </div>
     </form>
 
     <div
         v-if="showAddNewPackageDialog"
-        class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden"
+        class="fixed px-2 inset-0 z-[100] flex flex-col items-center justify-center overflow-y-auto"
         role="dialog"
     >
         <div
@@ -1732,7 +1247,7 @@ const openEditModal = (index) => {
         ></div>
 
         <div
-            class="relative w-1/3 rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
+            class="relative w-auto sm:w-1/2 h-auto sm:h-1/5 md:h-fit lg:h-fit rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
         >
             <div
                 class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5"
@@ -1775,6 +1290,7 @@ const openEditModal = (index) => {
                                     class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     @change="updateTypeDescription"
                                 >
+                                    <option value="">Choose one</option>
                                     <option
                                         v-for="package_type in packageTypes"
                                         :key="package_type"
@@ -1802,7 +1318,8 @@ const openEditModal = (index) => {
                         <div>
                             <label class="block">
                 <span
-                >Length (cm) <span class="text-red-500 text-sm">*</span></span
+                >Length (cm) <br/>
+                    <span class="text-red-500 text-sm">*</span></span
                 >
                                 <input
                                     v-model="packageItem.length"
@@ -1815,7 +1332,9 @@ const openEditModal = (index) => {
                         </div>
                         <div>
                             <label class="block">
-                                <span>Width <span class="text-red-500 text-sm">*</span></span>
+                                 <span
+                                 >Width <br/><span class="text-red-500 text-sm">*</span>
+                  </span>
                                 <input
                                     v-model="packageItem.width"
                                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
@@ -1828,7 +1347,10 @@ const openEditModal = (index) => {
 
                         <div>
                             <label class="block">
-                                <span>Height <span class="text-red-500 text-sm">*</span></span>
+                                <span
+                                >Height <br/><span class="text-red-500 text-sm"
+                                >*<br/></span
+                                ></span>
                                 <input
                                     v-model="packageItem.height"
                                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
@@ -1841,8 +1363,9 @@ const openEditModal = (index) => {
                         <div>
                             <label class="block">
                 <span
-                >Quantity <span class="text-red-500 text-sm">*</span></span
-                >
+                >Quantity <br/><span class="text-red-500 text-sm"
+                >*<br/></span
+                ></span>
                                 <input
                                     v-model="packageItem.quantity"
                                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
