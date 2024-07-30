@@ -58,10 +58,8 @@ const fetchHBLStatus = async () => {
     }
 }
 
-watch(() => props.hblId, () => {
-    fetchPickupStatus()
-    fetchHBLStatus()
-})
+fetchPickupStatus()
+fetchHBLStatus()
 
 const pickupStatusColor = (status) => {
     switch (status) {
@@ -79,6 +77,8 @@ const pickupStatusColor = (status) => {
 const hblStatusColor = (status) => {
     switch (status) {
         case 'HBL Preparation by warehouse':
+            return 'bg-primary';
+        case 'HBL Preparation by driver':
             return 'bg-primary';
         case 'Cash Received by Accountant':
             return 'bg-secondary';
