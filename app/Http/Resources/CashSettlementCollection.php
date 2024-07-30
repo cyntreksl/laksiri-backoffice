@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Number;
 
 class CashSettlementCollection extends JsonResource
 {
@@ -23,10 +24,10 @@ class CashSettlementCollection extends JsonResource
             'hbl_name' => $this->hbl_name ?? '-',
             'address' => $this->address ?? '-',
             'picked_date' => $this->created_at->format('Y-m-d'),
-            'weight' => $totalWeight ?? '-',
-            'volume' => $totalVolume ?? '-',
-            'grand_total' => $this->grand_total ?? '-',
-            'paid_amount' => $this->paid_amount ?? '-',
+            'weight' => Number::format($totalWeight, 2) ?? '-',
+            'volume' => Number::format($totalVolume, 2) ?? '-',
+            'grand_total' => Number::format($this->grand_total, 2) ?? '-',
+            'paid_amount' => Number::format($this->paid_amount, 2) ?? '-',
             'cargo_type' => $this->cargo_type ?? '-',
             'hbl_type' => $this->hbl_type ?? '-',
             'officer' => $this->created_by ?? '-',
