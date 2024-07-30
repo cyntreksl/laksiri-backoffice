@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Branch;
+use App\Models\Container;
 use App\Models\ExceptionName;
 use App\Models\User;
 use Diglactic\Breadcrumbs\Breadcrumbs;
@@ -136,16 +137,23 @@ Breadcrumbs::for('setting.driver-zones.index', function (BreadcrumbTrail $trail)
 
 // Loading > Container Index
 Breadcrumbs::for('loading.loading-containers.index', function (BreadcrumbTrail $trail) {
-    $trail->parent('dashboard'); // replace with 'settings.index'
+    $trail->parent('dashboard');
     $trail->push('Loading');
     $trail->push('Containers List', route('loading.loading-containers.index'));
 });
 
 // Loading > Container Create
 Breadcrumbs::for('loading.loading-containers.create', function (BreadcrumbTrail $trail) {
-    $trail->parent('dashboard'); // replace with 'settings.index'
+    $trail->parent('dashboard');
     $trail->push('Loading', route('loading.loading-containers.index'));
     $trail->push('Containers Create', route('loading.loading-containers.create'));
+});
+
+// Loading > Container Edit
+Breadcrumbs::for('loading.loading-containers.edit', function (BreadcrumbTrail $trail, Container $container) {
+    $trail->parent('dashboard');
+    $trail->push('Loading', route('loading.loading-containers.index'));
+    $trail->push('Container Edit', route('loading.loading-containers.edit', $container->id));
 });
 
 // Branches

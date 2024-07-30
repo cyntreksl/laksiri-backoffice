@@ -127,6 +127,7 @@ class RolePermissionSeeder extends Seeder
                     'container.load to container',
                     'container.upload documents',
                     'container.delete documents',
+                    'container.edit',
                 ],
             ],
 

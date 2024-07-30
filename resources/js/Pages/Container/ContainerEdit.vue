@@ -1,7 +1,83 @@
+<script setup>
+import AppLayout from "@/Layouts/AppLayout.vue";
+import Breadcrumb from "@/Components/Breadcrumb.vue";
+import { useForm, router } from "@inertiajs/vue3";
+import PrimaryButton from "@/Components/PrimaryButton.vue"
+import InputError from "@/Components/InputError.vue";
+import { ref, watchEffect } from "vue";
+import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
+import {push} from "notivue";
+
+const props = defineProps({
+    cargoTypes: {
+        type: Array,
+        required: true,
+    },
+    seaContainerOptions: {
+        type: Array,
+        required: true,
+    },
+    airContainerOptions: {
+        type: Array,
+        required: true,
+    },
+    container: {
+        type: Array,
+        required: true,
+    },
+})
+
+const form = useForm({
+    cargo_type: props.container.cargo_type,
+    container_type:  props.container.container_type,
+    reference: props.container.reference,
+    bl_number: props.container.bl_number,
+    awb_number: props.container.awb_number,
+    estimated_time_of_departure: props.container.estimated_time_of_departure,
+    estimated_time_of_arrival: props.container.estimated_time_of_arrival,
+    container_number: props.container.container_number,
+    seal_number: props.container.seal_number,
+    vessel_name: props.container.vessel_name,
+    voyage_number: props.container.voyage_number,
+    shipping_line: props.container.shipping_line,
+    port_of_loading: props.container.port_of_loading,
+    port_of_discharge: props.container.port_of_discharge,
+    flight_number: props.container.flight_number,
+    airline_name: props.container.airline_name,
+    airport_of_departure: props.container.airport_of_departure,
+    airport_of_arrival: props.container.airport_of_arrival,
+    cargo_class: props.container.cargo_class,
+});
+
+const containerTypes = ref(props.seaContainerOptions);
+
+watchEffect(() => {
+    if (form.cargo_type === "Sea Cargo") {
+        containerTypes.value = props.seaContainerOptions;
+    } else {
+        containerTypes.value = props.airContainerOptions;
+    }
+});
+
+const handleCreate = () => {
+    form.put(route("loading.loading-containers.update", props.container.id), {
+        onSuccess: () => {
+            router.visit(route("loading.loading-containers.index"));
+            form.reset();
+            push.success('Container Updated Successfully!');
+        },
+        onError: () => push.error('Something went to wrong!'),
+        onFinish: () => console.log("finish"),
+        preserveScroll: true,
+        preserveState: true,
+    });
+};
+
+</script>
 <template>
-  <AppLayout title="Container Create">
-    <template #header>Container Create</template>
-    <Breadcrumb></Breadcrumb>
+  <AppLayout title="Container Edit">
+    <template #header>Container Edit</template>
+    <Breadcrumb :container="container"/>
 
     <form @submit.prevent="handleCreate">
       <div class="grid grid-cols-1 sm:grid-cols-5 my-4 gap-4">
@@ -35,7 +111,7 @@
             </div>
           </div>
 
-          <!--                    Container Type-->
+          <!-- Container Type-->
           <div class="card px-4 py-4 sm:px-5">
             <div>
               <h2
@@ -52,7 +128,6 @@
                 >
                   <input
                     v-model="form.container_type"
-                    :checked="containerType === 'Custom'"
                     :value="containerType"
                     class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                     name="container_type"
@@ -306,7 +381,7 @@
               class="space-x-2"
               type="submit"
             >
-              <span>Create Container</span>
+              <span>Update Container</span>
               <svg
                 class="size-5"
                 fill="none"
@@ -328,96 +403,3 @@
     </form>
   </AppLayout>
 </template>
-<script>
-import AppLayout from "@/Layouts/AppLayout.vue";
-import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { Link, useForm, router } from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import InputError from "@/Components/InputError.vue";
-import { ref, watchEffect } from "vue";
-import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
-
-export default {
-  components: {
-    DangerOutlineButton,
-    InputError,
-    PrimaryButton,
-    Link,
-    Breadcrumb,
-    AppLayout,
-  },
-  props: {
-    cargoTypes: {
-      type: Array,
-      required: true,
-    },
-    seaContainerOptions: {
-      type: Array,
-      required: true,
-    },
-    airContainerOptions: {
-      type: Array,
-      required: true,
-    },
-    referenceNum: {
-      type: Object,
-    },
-  },
-
-  setup(props) {
-    const form = useForm({
-      cargo_type: ref("Sea Cargo"),
-      container_type: ref(""),
-      reference: props.referenceNum,
-      bl_number: "",
-      awb_number: "",
-      estimated_time_of_departure: "",
-      estimated_time_of_arrival: "",
-      container_number: "",
-      seal_number: "",
-      vessel_name: "",
-      voyage_number: "",
-      shipping_line: "",
-      port_of_loading: "",
-      port_of_discharge: "",
-      flight_number: "",
-      airline_name: "",
-      airport_of_departure: "",
-      airport_of_arrival: "",
-      departure_time: "",
-      arrival_time: "",
-      cargo_class: "",
-    });
-
-    const containerTypes = ref(props.seaContainerOptions);
-
-    watchEffect(() => {
-      if (form.cargo_type === "Sea Cargo") {
-        containerTypes.value = props.seaContainerOptions;
-      } else {
-        containerTypes.value = props.airContainerOptions;
-      }
-    });
-
-    const handleCreate = () => {
-      form.post(route("loading.loading-containers.store"), {
-        onSuccess: () => {
-          router.visit(route("loading.loading-containers.index"));
-          form.reset();
-        },
-        onError: () => console.log("error"),
-        onFinish: () => console.log("finish"),
-        preserveScroll: true,
-        preserveState: true,
-      });
-    };
-
-    return {
-      form,
-      handleCreate,
-      containerTypes,
-      router,
-    };
-  },
-};
-</script>
