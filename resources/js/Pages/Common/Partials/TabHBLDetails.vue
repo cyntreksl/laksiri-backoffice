@@ -172,7 +172,7 @@ const props = defineProps({
                     </svg>
                 </SimpleOverviewWidget>
 
-                <SimpleOverviewWidget :count="hbl?.packages_sum_volume ?? 0" title="Volume">
+                <SimpleOverviewWidget :count="hbl?.packages_sum_volume.toFixed(2) ?? 0" title="Volume">
                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-scale text-info"
                          fill="none"
                          height="24" stroke="currentColor" stroke-linecap="round"
@@ -187,7 +187,7 @@ const props = defineProps({
                     </svg>
                 </SimpleOverviewWidget>
 
-                <SimpleOverviewWidget :count="hbl?.packages_sum_weight ?? 0" title="Weight">
+                <SimpleOverviewWidget :count="hbl?.packages_sum_weight.toFixed(2) ?? 0" title="Weight">
                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-weight text-info"
                          fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                          stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
@@ -264,8 +264,8 @@ const props = defineProps({
                         </td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.height ?? 0 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.quantity ?? 0 }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.weight ?? 0 }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume ?? 0 }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.weight.toFixed(2) ?? 0 }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume.toFixed(2) ?? 0 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                             {{ item.remarks ?? '-' }}
                         </td>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Enum\CargoType;
 use App\Enum\HBLPaymentStatus;
 use App\Enum\HBLType;
@@ -81,10 +82,8 @@ class HBLController extends Controller
 
     public function show($hbl_id)
     {
-        $hbl = HBL::withTrashed()->with('packages')->find($hbl_id);
-
         return response()->json([
-            'hbl' => $hbl,
+            'hbl' => GetHBLByIdWithPackages::run($hbl_id),
         ]);
     }
 
