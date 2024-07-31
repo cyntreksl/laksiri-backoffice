@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Observers;
+
+use App\Actions\User\CreateUser;
+use App\Actions\User\GetUserCurrentBranchID;
+use App\Models\PickUp;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
+
+class PickupObserver
+{
+    /**
+     * Handle the PickUp "created" event.
+     */
+    public function created(PickUp $pickup): void
+    {
+        Role::updateOrCreate(['name' => 'customer', 'guard_name' => 'web']);
+
+        $data = [
+            'role' => 'customer',
+            'name' => $pickup->name,
+            'email' => $pickup->email,
+            'username' => $pickup->contact_number,
+            'contact' => $pickup->contact_number,
+            'password' => bcrypt('password'),
+            'is_shipper' => true,
+            'primary_branch_id' => GetUserCurrentBranchID::run(),
+        ];
+
+        $userExists = User::where('username', $data['username'])
+            ->first();
+
+        if (! $userExists) {
+            $user = CreateUser::run($data);
+
+            $pickup->shipper_id = $user->id;
+            $pickup->save();
+        }
+    }
+}

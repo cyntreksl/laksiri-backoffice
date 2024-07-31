@@ -48,6 +48,8 @@ class User extends Authenticatable
         'preferred_zone',
         'created_by',
         'last_logged_branch_id',
+        'is_shipper',
+        'is_consignee',
     ];
 
     /**
@@ -148,5 +150,25 @@ class User extends Authenticatable
     public function driverLocation(): HasMany
     {
         return $this->hasMany(DriverLocation::class, 'driver_id');
+    }
+
+    public function hblsAsShipper(): HasMany
+    {
+        return $this->hasMany(HBL::class, 'shipper_id');
+    }
+
+    public function hblsAsConsignee(): HasMany
+    {
+        return $this->hasMany(HBL::class, 'consignee_id');
+    }
+
+    public function pickupsAsShipper(): HasMany
+    {
+        return $this->hasMany(Pickup::class, 'shipper_id');
+    }
+
+    public function pickupsAsConsignee(): HasMany
+    {
+        return $this->hasMany(Pickup::class, 'consignee_id');
     }
 }

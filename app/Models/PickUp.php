@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Models\Scopes\BranchScope;
+use App\Observers\PickupObserver;
 use App\Traits\HasStatusLogs;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +18,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ScopedBy(BranchScope::class)]
+#[ObservedBy([PickupObserver::class])]
 class PickUp extends Model
 {
     use HasFactory;
@@ -34,7 +37,7 @@ class PickUp extends Model
     public const SYSTEM_STATUS_CARGO_RETURNED = 1.5;
 
     protected $fillable = [
-        'reference', 'cargo_type', 'name', 'email', 'contact_number', 'address', 'location_name', 'location_longitude', 'location_latitude', 'zone_id', 'notes', 'driver_id', 'driver_assigned_at', 'hbl_id', 'created_by', 'deleted_at', 'branch_id', 'pickup_date', 'pickup_time_start', 'pickup_time_end', 'is_urgent_pickup', 'is_from_important_customer', 'pickup_order', 'system_status', 'status', 'pickup_type', 'pickup_note', 'retry_attempts',
+        'reference', 'cargo_type', 'name', 'email', 'contact_number', 'address', 'location_name', 'location_longitude', 'location_latitude', 'zone_id', 'notes', 'driver_id', 'driver_assigned_at', 'hbl_id', 'created_by', 'deleted_at', 'branch_id', 'pickup_date', 'pickup_time_start', 'pickup_time_end', 'is_urgent_pickup', 'is_from_important_customer', 'pickup_order', 'system_status', 'status', 'pickup_type', 'pickup_note', 'retry_attempts', 'shipper_id', 'consignee_id',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -73,8 +76,18 @@ class PickUp extends Model
         return $this->hasOne(PickupException::class, 'pickup_id')->latestOfMany();
     }
 
-    public function hbl()
+    public function hbl(): BelongsTo
     {
         return $this->belongsTo(HBL::class, 'hbl_id');
+    }
+
+    public function shipper(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'shipper_id');
+    }
+
+    public function consignee(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'consignee_id');
     }
 }

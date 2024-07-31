@@ -19,6 +19,7 @@ class RolePermissionSeeder extends Seeder
         Role::updateOrCreate(['name' => 'empty']);
         Role::updateOrCreate(['name' => 'viewer']);
         Role::updateOrCreate(['name' => 'driver']);
+        Role::updateOrCreate(['name' => 'customer']);
 
         $this->command->info('Default Roles added.');
 

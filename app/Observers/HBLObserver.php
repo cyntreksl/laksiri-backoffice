@@ -2,11 +2,64 @@
 
 namespace App\Observers;
 
+use App\Actions\User\CreateUser;
+use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\HBL;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class HBLObserver
 {
     protected static array $cascade_relations = ['packages', 'status', 'hblPayment'];
+
+    /**
+     * Handle the PickUp "created" event.
+     */
+    public function created(HBL $hbl): void
+    {
+        Role::updateOrCreate(['name' => 'customer', 'guard_name' => 'web']);
+
+        $shipperData = [
+            'role' => 'customer',
+            'name' => $hbl->hbl_name,
+            'email' => $hbl->email,
+            'username' => $hbl->contact_number,
+            'contact' => $hbl->contact_number,
+            'password' => bcrypt('password'),
+            'primary_branch_id' => GetUserCurrentBranchID::run(),
+            'is_shipper' => true,
+        ];
+
+        $consigneeData = [
+            'role' => 'customer',
+            'name' => $hbl->consignee_name,
+            'username' => $hbl->consignee_contact,
+            'contact' => $hbl->consignee_contact,
+            'password' => bcrypt('password'),
+            'primary_branch_id' => GetUserCurrentBranchID::run(),
+            'is_consignee' => true,
+        ];
+
+        $shipperUserExists = User::where('username', $shipperData['username'])
+            ->first();
+
+        if (! $shipperUserExists) {
+            $shipperUser = CreateUser::run($shipperData);
+
+            $hbl->shipper_id = $shipperUser->id;
+            $hbl->save();
+        }
+
+        $consigneeUserExists = User::where('username', $consigneeData['username'])
+            ->first();
+
+        if (! $consigneeUserExists) {
+            $consigneeUser = CreateUser::run($consigneeData);
+
+            $hbl->consignee_id = $consigneeUser->id;
+            $hbl->save();
+        }
+    }
 
     /**
      * Handle the HBL "deleted" event.

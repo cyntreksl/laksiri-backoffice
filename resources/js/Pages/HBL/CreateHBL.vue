@@ -1456,13 +1456,13 @@ const shipIcon = ref(`
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Weight</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        {{ grandTotalWeight.toFixed(3) }}
+                                        {{ grandTotalWeight.toFixed(2) }}
                                     </p>
                                 </div>
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Volume</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        {{ grandTotalVolume.toFixed(3) }}
+                                        {{ grandTotalVolume }}
                                     </p>
                                 </div>
                             </div>
@@ -1472,7 +1472,7 @@ const shipIcon = ref(`
                                     class="flex justify-between text-2xl text-success font-bold"
                                 >
                                     <p class="line-clamp-1">Grand Total</p>
-                                    <p>{{ hblTotal }} {{ currency }}</p>
+                                    <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
                                 </div>
                             </div>
                         </div>
@@ -1634,7 +1634,7 @@ const shipIcon = ref(`
                                     {{ item.totalWeight.toFixed(3) }}
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                    {{ item.volume.toFixed(3) }}
+                                    {{ item.volume }}
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                     {{ item.remarks }}
