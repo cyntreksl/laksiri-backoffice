@@ -183,9 +183,9 @@ const addPackageData = () => {
         packageList.value.push(newItem); // Add the new item to packageList
         form.packages = packageList.value;
 
-        grandTotalWeight.value += newItem.totalWeight;
-        grandTotalVolume.value += newItem.volume;
-
+        grandTotalWeight.value += parseFloat(newItem.totalWeight);
+        grandTotalVolume.value += parseFloat(newItem.volume);
+        console.log(grandTotalVolume.value)
         calculatePayment();
     }
     closeAddPackageModal();
@@ -1472,7 +1472,7 @@ const shipIcon = ref(`
                                     class="flex justify-between text-2xl text-success font-bold"
                                 >
                                     <p class="line-clamp-1">Grand Total</p>
-                                    <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
+                                    <p>{{ hblTotal }} {{ currency }}</p>
                                 </div>
                             </div>
                         </div>
