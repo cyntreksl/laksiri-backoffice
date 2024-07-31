@@ -2,6 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import DashboardCard from "@/Components/Widgets/DashboardCard.vue";
 import {computed} from "vue";
+import {usePage} from "@inertiajs/vue3";
 
 const props = defineProps({
     assignedJobs: {
@@ -119,7 +120,7 @@ const driverChartOptions = computed(() => {
     <AppLayout title="Home">
         <template #header>Dashboard</template>
 
-        <div class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5 lg:grid-cols-6 lg:gap-6">
+        <div v-if="usePage().props.auth.user.roles[0].name !== 'customer'" class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5 lg:grid-cols-6 lg:gap-6">
             <DashboardCard :count="assignedJobs" icon="briefcase" icon-color="secondary" title="Assigned Job"/>
             <DashboardCard :count="pickedJobs" icon="person-biking" icon-color="success" title="Picked"/>
             <DashboardCard :count="pendingJobs" icon="hourglass-half" icon-color="warning" title="Pending Job"/>
@@ -131,7 +132,7 @@ const driverChartOptions = computed(() => {
         </div>
 
 
-        <div class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5 lg:grid-cols-3 lg:gap-6 mt-10">
+        <div v-if="usePage().props.auth.user.roles[0].name !== 'customer'" class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5 lg:grid-cols-3 lg:gap-6 mt-10">
             <div class="card">
                 <div class="my-3 flex items-center justify-between px-4">
                     <h2 class="font-medium tracking-wide text-slate-700 dark:text-navy-100">

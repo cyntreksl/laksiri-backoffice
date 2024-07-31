@@ -50,313 +50,317 @@
                                 <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
                             </svg>
                         </a>
-                        <!-- Pickup -->
-                        <a
-                            v-if="! $page.props.user.roles.includes('viewer')"
-                            :class="[
+                        <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
+                            <!-- Pickup -->
+                            <a
+                                v-if="! $page.props.user.roles.includes('viewer')"
+                                :class="[
                 activeMenu === 'pickups' ? 'bg-primary/10 text-primary' : '',
               ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.right="'Pickup'"
-                            @click="
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Pickup'"
+                                @click="
                 setMenu('pickups');
                 openSideBar();
               "
-                        >
-                            <svg
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-truck"
-                                fill="none"
-                                height="24"
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                xmlns="http://www.w3.org/2000/svg"
                             >
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                <path
-                                    d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"
-                                />
-                            </svg>
-                        </a>
-                        <!-- HBL -->
-                        <a
-                            v-if="! $page.props.user.roles.includes('viewer')"
-                            :class="[
+                                <svg
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-truck"
+                                    fill="none"
+                                    height="24"
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                    <path
+                                        d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"
+                                    />
+                                </svg>
+                            </a>
+                            <!-- HBL -->
+                            <a
+                                v-if="! $page.props.user.roles.includes('viewer')"
+                                :class="[
                 activeMenu === 'hbls' ? 'bg-primary/10 text-primary' : '',
               ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.right="'HBL'"
-                            @click="
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'HBL'"
+                                @click="
                 setMenu('hbls');
                 openSideBar();
               "
-                        >
-                            <svg
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-app-window"
-                                fill="none"
-                                height="24"
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                xmlns="http://www.w3.org/2000/svg"
                             >
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path
-                                    d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"
-                                />
-                                <path d="M6 8h.01"/>
-                                <path d="M9 8h.01"/>
-                            </svg>
-                        </a>
-                        <!-- Back Office -->
-                        <a
-                            v-if="! $page.props.user.roles.includes('viewer')"
-                            :class="[
+                                <svg
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-app-window"
+                                    fill="none"
+                                    height="24"
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path
+                                        d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"
+                                    />
+                                    <path d="M6 8h.01"/>
+                                    <path d="M9 8h.01"/>
+                                </svg>
+                            </a>
+                            <!-- Back Office -->
+                            <a
+                                v-if="! $page.props.user.roles.includes('viewer')"
+                                :class="[
                 activeMenu === 'back-office'
                   ? 'bg-primary/10 text-primary'
                   : '',
               ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.right="'Back Office'"
-                            @click="
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Back Office'"
+                                @click="
                 setMenu('back-office');
                 openSideBar();
               "
-                        >
-                            <svg
-                                class="icon icon-tabler icon-tabler-building"
-                                fill="none"
-                                height="24"
-                                stroke="#2c3e50"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                xmlns="http://www.w3.org/2000/svg"
                             >
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path d="M3 21l18 0"/>
-                                <path d="M9 8l1 0"/>
-                                <path d="M9 12l1 0"/>
-                                <path d="M9 16l1 0"/>
-                                <path d="M14 8l1 0"/>
-                                <path d="M14 12l1 0"/>
-                                <path d="M14 16l1 0"/>
-                                <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16"/>
-                            </svg>
-                        </a>
-                        <!-- Loading -->
-                        <a
-                            v-if="! $page.props.user.roles.includes('viewer')"
-                            :class="[
+                                <svg
+                                    class="icon icon-tabler icon-tabler-building"
+                                    fill="none"
+                                    height="24"
+                                    stroke="#2c3e50"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M3 21l18 0"/>
+                                    <path d="M9 8l1 0"/>
+                                    <path d="M9 12l1 0"/>
+                                    <path d="M9 16l1 0"/>
+                                    <path d="M14 8l1 0"/>
+                                    <path d="M14 12l1 0"/>
+                                    <path d="M14 16l1 0"/>
+                                    <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16"/>
+                                </svg>
+                            </a>
+                            <!-- Loading -->
+                            <a
+                                v-if="! $page.props.user.roles.includes('viewer')"
+                                :class="[
                 activeMenu === 'loading' ? 'bg-primary/10 text-primary' : '',
               ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.right="'Loading'"
-                            @click="
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Loading'"
+                                @click="
                 setMenu('loading');
                 openSideBar();
               "
-                        >
-                            <svg
-                                class="icon icon-tabler icon-tabler-truck-loading"
-                                fill="none"
-                                height="24"
-                                stroke="#2c3e50"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                xmlns="http://www.w3.org/2000/svg"
                             >
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path d="M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15"/>
-                                <path
-                                    d="M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z"
-                                />
-                                <path d="M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                            </svg>
-                        </a>
-                        <!-- Arrivals -->
-                        <a
-                            :class="[
+                                <svg
+                                    class="icon icon-tabler icon-tabler-truck-loading"
+                                    fill="none"
+                                    height="24"
+                                    stroke="#2c3e50"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15"/>
+                                    <path
+                                        d="M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z"
+                                    />
+                                    <path d="M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                    <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                </svg>
+                            </a>
+                            <!-- Arrivals -->
+                            <a
+                                :class="[
                 activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
               ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.right="'Arrivals'"
-                            @click="
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Arrivals'"
+                                @click="
                 setMenu('arrival');
                 openSideBar();
               "
-                        >
-                            <svg
-                                class="icon icon-tabler icon-tabler-inbox"
-                                fill="none"
-                                height="24"
-                                stroke="#2c3e50"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                xmlns="http://www.w3.org/2000/svg"
                             >
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path
-                                    d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"
-                                />
-                                <path d="M4 13h3l3 3h4l3 -3h3"/>
-                            </svg>
-                        </a>
-                        <!-- Delivery -->
-                        <a
-                            v-if="! $page.props.user.roles.includes('viewer')"
-                            :class="[
+                                <svg
+                                    class="icon icon-tabler icon-tabler-inbox"
+                                    fill="none"
+                                    height="24"
+                                    stroke="#2c3e50"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path
+                                        d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"
+                                    />
+                                    <path d="M4 13h3l3 3h4l3 -3h3"/>
+                                </svg>
+                            </a>
+                            <!-- Delivery -->
+                            <a
+                                v-if="! $page.props.user.roles.includes('viewer')"
+                                :class="[
                 activeMenu === 'delivery' ? 'bg-primary/10 text-primary' : '',
               ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.right="'Delivery'"
-                            @click="
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Delivery'"
+                                @click="
                 setMenu('delivery');
                 openSideBar();
               "
-                        >
-                            <svg
-                                class="icon icon-tabler icon-tabler-trolley"
-                                fill="none"
-                                height="24"
-                                stroke="#2c3e50"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                xmlns="http://www.w3.org/2000/svg"
                             >
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path d="M11 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                <path d="M6 16l3 2"/>
-                                <path d="M12 17l8 -12"/>
-                                <path d="M17 10l2 1"/>
-                                <path
-                                    d="M9.592 4.695l3.306 2.104a1.3 1.3 0 0 1 .396 1.8l-3.094 4.811a1.3 1.3 0 0 1 -1.792 .394l-3.306 -2.104a1.3 1.3 0 0 1 -.396 -1.8l3.094 -4.81a1.3 1.3 0 0 1 1.792 -.394z"
-                                />
-                            </svg>
-                        </a>
-                        <!-- Reports -->
-                        <a
-                            v-if="! $page.props.user.roles.includes('viewer')"
-                            :class="[
+                                <svg
+                                    class="icon icon-tabler icon-tabler-trolley"
+                                    fill="none"
+                                    height="24"
+                                    stroke="#2c3e50"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M11 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                    <path d="M6 16l3 2"/>
+                                    <path d="M12 17l8 -12"/>
+                                    <path d="M17 10l2 1"/>
+                                    <path
+                                        d="M9.592 4.695l3.306 2.104a1.3 1.3 0 0 1 .396 1.8l-3.094 4.811a1.3 1.3 0 0 1 -1.792 .394l-3.306 -2.104a1.3 1.3 0 0 1 -.396 -1.8l3.094 -4.81a1.3 1.3 0 0 1 1.792 -.394z"
+                                    />
+                                </svg>
+                            </a>
+                            <!-- Reports -->
+                            <a
+                                v-if="! $page.props.user.roles.includes('viewer')"
+                                :class="[
                 activeMenu === 'report' ? 'bg-primary/10 text-primary' : '',
               ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.right="'Report'"
-                            @click="
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Report'"
+                                @click="
                 setMenu('report');
                 openSideBar();
               "
-                        >
-                            <svg
-                                class="icon icon-tabler icon-tabler-clipboard-text"
-                                fill="none"
-                                height="24"
-                                stroke="#2c3e50"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                xmlns="http://www.w3.org/2000/svg"
                             >
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path
-                                    d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"
-                                />
-                                <path
-                                    d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"
-                                />
-                                <path d="M9 12h6"/>
-                                <path d="M9 16h6"/>
-                            </svg>
-                        </a>
-                        <!-- User Management -->
-                        <a
-                            v-if="! $page.props.user.roles.includes('viewer')"
-                            :class="[
+                                <svg
+                                    class="icon icon-tabler icon-tabler-clipboard-text"
+                                    fill="none"
+                                    height="24"
+                                    stroke="#2c3e50"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path
+                                        d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"
+                                    />
+                                    <path
+                                        d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"
+                                    />
+                                    <path d="M9 12h6"/>
+                                    <path d="M9 16h6"/>
+                                </svg>
+                            </a>
+                            <!-- User Management -->
+                            <a
+                                v-if="! $page.props.user.roles.includes('viewer')"
+                                :class="[
                 activeMenu === 'users' ? 'bg-primary/10 text-primary' : '',
               ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.right="'User Management'"
-                            @click="
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'User Management'"
+                                @click="
                 setMenu('users');
                 openSideBar();
               "
-                        >
-                            <svg
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-users"
-                                fill="none"
-                                height="24"
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                xmlns="http://www.w3.org/2000/svg"
                             >
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
-                                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
-                            </svg>
-                        </a>
+                                <svg
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-users"
+                                    fill="none"
+                                    height="24"
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+                                    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
+                                </svg>
+                            </a>
+                        </template>
                     </div>
 
                     <!-- Bottom Links -->
                     <div class="flex flex-col items-center space-y-3 py-3">
                         <!-- Settings -->
 
-                        <a
-                            v-if="! $page.props.user.roles.includes('viewer')"
-                            :class="[
+                       <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
+                           <a
+                               v-if="! $page.props.user.roles.includes('viewer')"
+                               :class="[
                 activeMenu === 'setting' ? 'bg-primary/10 text-primary' : '',
               ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.right="'Setting'"
-                            @click="
+                               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                               x-tooltip.placement.right="'Setting'"
+                               @click="
                 setMenu('setting');
                 openSideBar();
               "
-                        >
-                            <svg
-                                class="size-7"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M2 12.947v-1.771c0-1.047.85-1.913 1.899-1.913 1.81 0 2.549-1.288 1.64-2.868a1.919 1.919 0 0 1 .699-2.607l1.729-.996c.79-.474 1.81-.192 2.279.603l.11.192c.9 1.58 2.379 1.58 3.288 0l.11-.192c.47-.795 1.49-1.077 2.279-.603l1.73.996a1.92 1.92 0 0 1 .699 2.607c-.91 1.58-.17 2.868 1.639 2.868 1.04 0 1.899.856 1.899 1.912v1.772c0 1.047-.85 1.912-1.9 1.912-1.808 0-2.548 1.288-1.638 2.869.52.915.21 2.083-.7 2.606l-1.729.997c-.79.473-1.81.191-2.279-.604l-.11-.191c-.9-1.58-2.379-1.58-3.288 0l-.11.19c-.47.796-1.49 1.078-2.279.605l-1.73-.997a1.919 1.919 0 0 1-.699-2.606c.91-1.58.17-2.869-1.639-2.869A1.911 1.911 0 0 1 2 12.947Z"
-                                    fill="currentColor"
-                                    fill-opacity="0.3"
-                                ></path>
-                                <path
-                                    d="M11.995 15.332c1.794 0 3.248-1.464 3.248-3.27 0-1.807-1.454-3.272-3.248-3.272-1.794 0-3.248 1.465-3.248 3.271 0 1.807 1.454 3.271 3.248 3.271Z"
-                                    fill="currentColor"
-                                ></path>
-                            </svg>
-                        </a>
+                           >
+                               <svg
+                                   class="size-7"
+                                   fill="none"
+                                   viewBox="0 0 24 24"
+                                   xmlns="http://www.w3.org/2000/svg"
+                               >
+                                   <path
+                                       d="M2 12.947v-1.771c0-1.047.85-1.913 1.899-1.913 1.81 0 2.549-1.288 1.64-2.868a1.919 1.919 0 0 1 .699-2.607l1.729-.996c.79-.474 1.81-.192 2.279.603l.11.192c.9 1.58 2.379 1.58 3.288 0l.11-.192c.47-.795 1.49-1.077 2.279-.603l1.73.996a1.92 1.92 0 0 1 .699 2.607c-.91 1.58-.17 2.868 1.639 2.868 1.04 0 1.899.856 1.899 1.912v1.772c0 1.047-.85 1.912-1.9 1.912-1.808 0-2.548 1.288-1.638 2.869.52.915.21 2.083-.7 2.606l-1.729.997c-.79.473-1.81.191-2.279-.604l-.11-.191c-.9-1.58-2.379-1.58-3.288 0l-.11.19c-.47.796-1.49 1.078-2.279.605l-1.73-.997a1.919 1.919 0 0 1-.699-2.606c.91-1.58.17-2.869-1.639-2.869A1.911 1.911 0 0 1 2 12.947Z"
+                                       fill="currentColor"
+                                       fill-opacity="0.3"
+                                   ></path>
+                                   <path
+                                       d="M11.995 15.332c1.794 0 3.248-1.464 3.248-3.27 0-1.807-1.454-3.272-3.248-3.272-1.794 0-3.248 1.465-3.248 3.271 0 1.807 1.454 3.271 3.248 3.271Z"
+                                       fill="currentColor"
+                                   ></path>
+                               </svg>
+                           </a>
+                       </template>
 
                         <!-- Profile -->
                         <div class="flex">
@@ -412,48 +416,50 @@
                                     </div>
 
                                     <div class="flex flex-col pt-2 pb-5">
-                                        <a
-                                            v-if="! $page.props.user.roles.includes('viewer')"
-                                            :href="
+                                        <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
+                                            <a
+                                                v-if="! $page.props.user.roles.includes('viewer')"
+                                                :href="
                         route(
                           'branches.edit',
                           $page.props.auth.user.active_branch_id
                         )
                       "
-                                            class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
-                                        >
-                                            <div
-                                                class="flex size-8 items-center justify-center rounded-lg bg-pink-500 text-white"
+                                                class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
                                             >
-                                                <svg
-                                                    class="size-4.5"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    stroke-width="1.5"
-                                                    viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path
-                                                        d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                    />
-                                                </svg>
-                                            </div>
-
-                                            <div>
-                                                <h2
-                                                    class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
-                                                >
-                                                    Business Profile
-                                                </h2>
                                                 <div
-                                                    class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
+                                                    class="flex size-8 items-center justify-center rounded-lg bg-pink-500 text-white"
                                                 >
-                                                    Branch Configurations
+                                                    <svg
+                                                        class="size-4.5"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.5"
+                                                        viewBox="0 0 24 24"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                        <path
+                                                            d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                        />
+                                                    </svg>
                                                 </div>
-                                            </div>
-                                        </a>
+
+                                                <div>
+                                                    <h2
+                                                        class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
+                                                    >
+                                                        Business Profile
+                                                    </h2>
+                                                    <div
+                                                        class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
+                                                    >
+                                                        Branch Configurations
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </template>
 
                                         <a
                                             :href="route('profile.show')"
@@ -848,6 +854,7 @@ import {Notification, Notivue} from "notivue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 
 export default {
+    methods: {usePage},
     components: {Notification, Breadcrumb, Notivue, Head, Link, Popper},
     props: {
         title: "",
