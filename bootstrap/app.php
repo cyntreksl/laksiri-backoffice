@@ -24,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Laravel\Passport\Http\Middleware\CreateFreshApiToken::class,
         ]);
 
-        //
+        $middleware->redirectGuestsTo('/login');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
