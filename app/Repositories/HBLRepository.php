@@ -12,6 +12,7 @@ use App\Actions\HBL\GetHBLByCargoTypeWithDraftLoadedPackages;
 use App\Actions\HBL\GetHBLByCargoTypeWithUnloadedPackages;
 use App\Actions\HBL\GetHBLByReference;
 use App\Actions\HBL\GetHBLs;
+use App\Actions\HBL\GetHBLStatusByReference;
 use App\Actions\HBL\GetHBLsWithPackages;
 use App\Actions\HBL\GetHBLsWithUnloadedPackagesByReference;
 use App\Actions\HBL\HBLPackage\GetPackagesByReference;
@@ -248,5 +249,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function getHBLPackagesByReference(string $reference): JsonResponse
     {
         return GetPackagesByReference::run($reference);
+    }
+
+    public function getHBLStatusByReference(string $reference): JsonResponse
+    {
+        return GetHBLStatusByReference::run($reference);
     }
 }
