@@ -69,7 +69,17 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         $query = HBL::query();
 
         if (! empty($search)) {
-            $query->whereAny(['reference', 'hbl_name', 'contact_number'], 'like', '%'.$search.'%');
+            $query->whereAny([
+                'reference',
+                'hbl_name',
+                'contact_number',
+                'consignee_name',
+                'consignee_nic',
+                'consignee_contact',
+                'iq_number',
+                'nic',
+                'email',
+            ], 'like', '%'.$search.'%');
         }
 
         //apply filters

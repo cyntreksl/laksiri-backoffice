@@ -53,7 +53,7 @@
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
                             <!-- Pickup -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer')"
+                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
                                 :class="[
                 activeMenu === 'pickups' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -119,7 +119,7 @@
                             </a>
                             <!-- Back Office -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer')"
+                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
                                 :class="[
                 activeMenu === 'back-office'
                   ? 'bg-primary/10 text-primary'
@@ -157,7 +157,7 @@
                             </a>
                             <!-- Loading -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer')"
+                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
                                 :class="[
                 activeMenu === 'loading' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -191,6 +191,7 @@
                             </a>
                             <!-- Arrivals -->
                             <a
+                                v-if="usePage().props.auth.user.roles[0].name !== 'call center'"
                                 :class="[
                 activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -222,7 +223,7 @@
                             </a>
                             <!-- Delivery -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer')"
+                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
                                 :class="[
                 activeMenu === 'delivery' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -257,7 +258,7 @@
                             </a>
                             <!-- Reports -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer')"
+                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
                                 :class="[
                 activeMenu === 'report' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -293,7 +294,7 @@
                             </a>
                             <!-- User Management -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer')"
+                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
                                 :class="[
                 activeMenu === 'users' ? 'bg-primary/10 text-primary' : '',
               ]"
