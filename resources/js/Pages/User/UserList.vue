@@ -29,6 +29,7 @@ const data = reactive({
     columnVisibility: {
         id: false,
         username: true,
+        role: true,
         primary_branch_name: true,
         created_at: true,
         status: true,
@@ -59,6 +60,7 @@ const initializeGrid = () => {
                     let colName = [
                         "id",
                         "username",
+                        "role",
                         "primary_branch_name",
                         "created_at",
                         "status",
@@ -84,6 +86,7 @@ const initializeGrid = () => {
                 data.data.map((item) => [
                     item.id,
                     item.username,
+                    item.role,
                     item.primary_branch_name,
                     item.created_at,
                     item.status,
@@ -101,6 +104,7 @@ const initializeGrid = () => {
 const createColumns = () => [
     {name: "ID", hidden: !data.columnVisibility.id},
     {name: "Username", hidden: !data.columnVisibility.username},
+    {name: "Role", hidden: !data.columnVisibility.role},
     {
         name: "Primary Branch Name",
         hidden: !data.columnVisibility.primary_branch_name,
