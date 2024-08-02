@@ -92,8 +92,7 @@ const closeModal = () => {
                     <path d="M16 5.25l-8 4.5"/>
                 </svg>
             </SimpleOverviewWidget>
-
-            <SimpleOverviewWidget :count="container?.hbl_packages_sum_weight || 0.00" title="Weight">
+            <SimpleOverviewWidget :count="container?.hbl_packages_sum_weight != null ? container?.hbl_packages_sum_weight.toFixed(2) : 0.00" title="Weight">
                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-weight text-info"
                      fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                      stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
@@ -105,7 +104,7 @@ const closeModal = () => {
                 </svg>
             </SimpleOverviewWidget>
 
-            <SimpleOverviewWidget :count="container?.hbl_packages_sum_volume || 0.00" title="Volume">
+            <SimpleOverviewWidget :count="container?.hbl_packages_sum_volume != null ? container?.hbl_packages_sum_volume.toFixed(2) : 0.00" title="Volume">
                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-scale text-info"
                      fill="none"
                      height="24" stroke="currentColor" stroke-linecap="round"

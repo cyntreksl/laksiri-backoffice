@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\v1\Auth\LoginController;
 use App\Http\Controllers\Api\v1\DriverController;
+use App\Http\Controllers\Api\v1\ExceptionNameController;
 use App\Http\Controllers\Api\v1\HBLController;
 use App\Http\Controllers\Api\v1\PickupController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,8 @@ Route::domain('api.'.config('app.url'))
         Route::post('/pickups/exceptions/{pickup}', [PickupController::class, 'storePickupException']);
 
         Route::get('/pickups/exceptions/list', [PickupController::class, 'getPickupExceptions']);
+
+        Route::get('/exception-names', [ExceptionNameController::class, 'index']);
 
         Route::post('/driver/update', [DriverController::class, 'store']);
 
