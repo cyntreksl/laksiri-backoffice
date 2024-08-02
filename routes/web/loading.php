@@ -26,6 +26,8 @@ Route::name('loading.')->group(function () {
     Route::delete('containers-documents/{container_document}', [ContainerController::class, 'destroyContainerDocument'])
         ->name('containers.destroy.document');
 
+    Route::get('/get-container/{hbl}', [ContainerController::class, 'getContainerByHBL']);
+
     // Loading Point
     Route::get('loading-points/{container}', [ContainerController::class, 'showLoadingPoint'])
         ->name('loading-points.index');

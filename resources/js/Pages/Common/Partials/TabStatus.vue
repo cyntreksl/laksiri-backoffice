@@ -3,12 +3,15 @@ import Tab from "@/Components/Tab.vue";
 import AccordionPanel from "@/Components/AccordionPanel.vue";
 import {ref, watch} from "vue";
 import moment from "moment";
+import NotFound from '@/../images/illustrations/empty-girl-box.svg';
+import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 
 const props = defineProps({
-    hblId: {
-        type: Number,
-        required: true,
-    }
+    hbl: {
+        type: Object,
+        default: () => {
+        },
+    },
 })
 
 const pickupStatus = ref([]);
@@ -16,7 +19,7 @@ const hblStatus = ref([]);
 
 const fetchPickupStatus = async () => {
     try {
-        const response = await fetch(`get-pickup-status/${props.hblId}`, {
+        const response = await fetch(`get-pickup-status/${props.hbl?.id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -38,7 +41,7 @@ const fetchPickupStatus = async () => {
 
 const fetchHBLStatus = async () => {
     try {
-        const response = await fetch(`get-hbl-status/${props.hblId}`, {
+        const response = await fetch(`get-hbl-status/${props.hbl?.id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -94,17 +97,125 @@ const hblStatusColor = (status) => {
             return 'bg-amber-400';
     }
 };
+
+const pickup = ref({});
+
+const fetchPickup = async () => {
+    try {
+        const response = await fetch(`/pickups/${props.hbl.pickup_id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            pickup.value = data;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+watch(() => props.hbl, (newVal) => {
+    if (newVal.pickup_id !== null) {
+        fetchPickup();
+    }
+}, { immediate: true }); // Immediate to trigger on mount
+
+const container = ref({});
+
+const fetchContainer = async () => {
+    try {
+        const response = await fetch(`/get-container/${props.hbl.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            container.value = data;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+fetchContainer();
+
+const unloadingIssues = ref({});
+
+const fetchUnloadingIssues = async () => {
+    try {
+        const response = await fetch(`/get-unloading-issues-by-hbl/${props.hbl.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            unloadingIssues.value = data;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+fetchUnloadingIssues();
+
+const logs = ref({});
+
+const fetchLogs = async () => {
+    try {
+        const response = await fetch(`/get-logs/${props.hbl.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            logs.value = data;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+fetchLogs();
 </script>
 
 <template>
     <Tab label="Status & Audit" name="tabStatus">
 
-        <div class="flex justify-end">
+        <div v-if="hbl.pickup_id" class="flex justify-end">
             <div class="badge space-x-2 bg-success text-white shadow-soft shadow-success/50 mb-2">
                 <i
                     class="fa-solid fa-person-biking text-sm text-white dark:text-text-white"
                 ></i>
-                <span>Driver Picked</span>
+                <span>Driver Picked at {{pickup.pickup_date}}</span>
             </div>
         </div>
 
@@ -127,59 +238,87 @@ const hblStatusColor = (status) => {
                 </div>
             </template>
             <div class="px-4 py-4 sm:px-5">
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8">
 
-                    <div v-if="pickupStatus">
-                        <ol class="timeline max-w-sm">
-                            <li v-for="(log, index) in pickupStatus" class="timeline-item">
-                                <div
-                                    :class="`${pickupStatusColor(log.status)} timeline-item-point rounded-full dark:bg-accent`"
-                                >
+                    <div>
+                        <div class="flex items-center space-x-4">
+                            <div
+                                class="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/20 dark:bg-accent">
+                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-truck text-primary"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" /></svg>
+                            </div>
+                            <span class="font-medium text-slate-700 dark:text-navy-100">Pickup Status</span>
+                        </div>
+
+                        <div v-if="pickupStatus.length > 0" class="mt-5">
+                            <ol class="timeline max-w-sm">
+                                <li v-for="(log, index) in pickupStatus" class="timeline-item">
+                                    <div
+                                        :class="`${pickupStatusColor(log.status)} timeline-item-point rounded-full dark:bg-accent`"
+                                    >
                                      <span
                                          v-if="index === Object.keys(pickupStatus).length - 1"
                                          :class="`inline-flex h-full w-full animate-ping rounded-full ${pickupStatusColor(log.status)} opacity-80`"
                                      ></span>
-                                </div>
-                                <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
-                                    <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
-                                        <p
-                                            class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
-                                        >
-                                            {{ log.status }}
-                                        </p>
                                     </div>
-                                    <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
-                                </div>
-                            </li>
-                        </ol>
+                                    <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
+                                        <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
+                                            <p
+                                                class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
+                                            >
+                                                {{ log.status }}
+                                            </p>
+                                        </div>
+                                        <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div v-if="pickupStatus.length === 0" class="w-full flex justify-center">
+                            <img :src="NotFound" alt="image"
+                                 class="w-1/4 mt-10" />
+                        </div>
                     </div>
 
-                    <div v-if="hblStatus">
-                        <ol class="timeline max-w-sm">
-                            <li v-for="(log, index) in hblStatus" class="timeline-item">
-                                <div
-                                    :class="`${hblStatusColor(log.status)} timeline-item-point rounded-full dark:bg-accent`"
-                                >
+                    <div>
+                        <div class="flex items-center space-x-4">
+                            <div
+                                class="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/20 dark:bg-accent">
+                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-app-window text-primary"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M6 8h.01" /><path d="M9 8h.01" /></svg>
+                            </div>
+                            <span class="font-medium text-slate-700 dark:text-navy-100">HBL Status</span>
+                        </div>
+
+                        <div v-if="hblStatus.length > 0" class="mt-5">
+                            <ol class="timeline max-w-sm">
+                                <li v-for="(log, index) in hblStatus" class="timeline-item">
+                                    <div
+                                        :class="`${hblStatusColor(log.status)} timeline-item-point rounded-full dark:bg-accent`"
+                                    >
                                      <span
                                          v-if="index === Object.keys(hblStatus).length - 1"
                                          :class="`inline-flex h-full w-full animate-ping rounded-full ${hblStatusColor(log.status)} opacity-80`"
                                      ></span>
-                                </div>
-                                <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
-                                    <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
-                                        <p
-                                            class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
-                                        >
-                                            {{ log.status }}
-                                        </p>
                                     </div>
-                                    <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
-                                </div>
-                            </li>
-                        </ol>
-                    </div>
+                                    <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
+                                        <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
+                                            <p
+                                                class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
+                                            >
+                                                {{ log.status }}
+                                            </p>
+                                        </div>
+                                        <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
 
+                        <div v-if="hblStatus.length === 0">
+                            <img :src="NotFound" alt="image"
+                                 class="w-1/4 mt-10" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </AccordionPanel>
@@ -205,8 +344,35 @@ const hblStatusColor = (status) => {
                 </div>
             </template>
             <div class="px-4 py-4 sm:px-5">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8">
-                    -
+                <div v-if="Object.values(container).length !== 0" class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-8">
+                    <InfoDisplay :value="container?.note" label="Name / Note"/>
+
+                    <InfoDisplay :value="container?.reference" label="Ref"/>
+
+                    <InfoDisplay :value="container?.loading_started_at" label="Created Date"/>
+
+                    <InfoDisplay :value="container?.estimated_time_of_departure" label="ETD"/>
+
+                    <InfoDisplay :value="container?.estimated_time_of_arrival" label="ETA"/>
+
+                    <InfoDisplay :value="container?.reached_date" label="Reached Date"/>
+
+                    <InfoDisplay :value="container?.cargo_type" label="Cargo Mode"/>
+
+                    <InfoDisplay :value="hbl?.hbl_type" label="Delivery Type"/>
+
+                    <InfoDisplay :value="container.awb_number || container.bl_number" label="AWB/BL"/>
+
+                    <InfoDisplay :value="'-'" label="MHBL"/>
+
+                    <InfoDisplay :value="container?.is_reached ? 'Yes' : 'No'" label="Has Reached Destination?"/>
+
+                    <InfoDisplay :value="'-'" label="Has Custom Cleared?"/>
+                </div>
+
+                <div v-if="Object.values(container).length === 0" class="w-full flex justify-center">
+                    <img :src="NotFound" alt="image"
+                         class="w-1/4 mt-10" />
                 </div>
             </div>
         </AccordionPanel>
@@ -230,8 +396,106 @@ const hblStatusColor = (status) => {
                 </div>
             </template>
             <div class="px-4 py-4 sm:px-5">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8">
-                    <p>NO COMPLAINTS FOR THIS HBL</p>
+                <div v-if="unloadingIssues.length > 0"
+                     class="is-scrollbar-hidden min-w-full overflow-x-auto">
+                    <table class="is-hoverable w-full text-left">
+                        <thead>
+                        <tr>
+                            <th
+                                class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Package
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Issue
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Type
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Is Damaged
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                RTF
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 rounded-r-lg px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Is Fixed
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="issue in unloadingIssues" :key="issue.id"
+                            class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                            <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
+                                {{ issue.hbl_package?.package_type ?? '-' }}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ issue.issue ?? '-' }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                {{ issue.type ?? '-' }}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                <svg v-if="issue.is_damaged" class="size-6 text-success" fill="currentColor"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+
+                                <svg v-else class="size-6 text-error" fill="currentColor" viewBox="0 0 24 24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                <svg v-if="issue.rtf" class="size-6 text-success" fill="currentColor"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+
+                                <svg v-else class="size-6 text-error" fill="currentColor" viewBox="0 0 24 24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+                            </td>
+                            <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
+                                <svg v-if="issue.is_fixed" class="size-6 text-success" fill="currentColor"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+
+                                <svg v-else class="size-6 text-error" fill="currentColor" viewBox="0 0 24 24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div v-else class="w-full flex justify-center">
+                    <img :src="NotFound" alt="image"
+                         class="w-1/4 mt-10" />
                 </div>
             </div>
         </AccordionPanel>
@@ -255,7 +519,7 @@ const hblStatusColor = (status) => {
                 </div>
             </template>
             <div class="px-4 py-4 sm:px-5">
-                <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
+                <div v-if="logs.length > 0" class="is-scrollbar-hidden min-w-full overflow-x-auto">
                     <table class="is-hoverable w-full text-left">
                         <thead>
                         <tr>
@@ -267,36 +531,34 @@ const hblStatusColor = (status) => {
                             <th
                                 class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                             >
-                                Date
+                                Date Time
                             </th>
                             <th
                                 class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                             >
-                                Time
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Auth
+                                Branch
                             </th>
                             <th
                                 class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                             >
-                                Branch
+                                Auth
                             </th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                        <tr v-for="activity in logs" class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                             <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
-                                -
+                                {{activity.description}}
                             </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                -
+                                {{moment(activity.created_at).format('YYYY-MM-DD H:mm:ss')}}
                             </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
-                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">-</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                {{hbl.branch_name}}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                {{activity.causer?.name}}
+                            </td>
                         </tr>
                         </tbody>
                     </table>

@@ -43,4 +43,6 @@ Route::name('arrival.')->group(function () {
         ->name('unloading-issues.index');
 
     Route::get('unloading-issues-list', [UnloadingIssueController::class, 'list']);
+
+    Route::get('/get-unloading-issues-by-hbl/{hbl}', [UnloadingIssueController::class, 'getUnloadingIssuesByHbl']);
 });

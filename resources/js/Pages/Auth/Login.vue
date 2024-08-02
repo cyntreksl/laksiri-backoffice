@@ -6,7 +6,7 @@ import DashboardMeetDark from "../../../images/illustrations/dashboard-meet-dark
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {ref} from "vue";
-import moment from "moment/moment.js";
+import moment from "moment";
 
 defineProps({
     canResetPassword: Boolean,

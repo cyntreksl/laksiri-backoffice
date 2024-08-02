@@ -6,8 +6,10 @@ use App\Factory\UnloadingIssue\FilterFactory;
 use App\Http\Resources\UnloadingIssueResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\UnloadingIssuesRepositoryInterface;
+use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
 use App\Models\UnloadingIssue;
+use Illuminate\Http\JsonResponse;
 
 class UnloadingIssuesRepository implements GridJsInterface, UnloadingIssuesRepositoryInterface
 {
@@ -46,5 +48,12 @@ class UnloadingIssuesRepository implements GridJsInterface, UnloadingIssuesRepos
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function getUnloadingIssuesByHbl(HBL $hbl): JsonResponse
+    {
+        $hbl = HBL::with('unloadingIssues.hblPackage')->findOrFail($hbl->id);
+
+        return response()->json($hbl->unloadingIssues()->with('hblPackage')->get());
     }
 }

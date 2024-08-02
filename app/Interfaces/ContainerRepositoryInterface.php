@@ -4,6 +4,7 @@ namespace App\Interfaces;
 
 use App\Models\Container;
 use App\Models\ContainerDocument;
+use App\Models\HBL;
 
 interface ContainerRepositoryInterface
 {
@@ -36,4 +37,6 @@ interface ContainerRepositoryInterface
     public function uploadDocument(array $data);
 
     public function deleteDocument(ContainerDocument $containerDocument);
+
+    public function getContainerByHBL(HBL $hbl);
 }

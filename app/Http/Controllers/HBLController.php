@@ -242,4 +242,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->getHBLStatusByReference($reference);
     }
+
+    public function getHBLLogs(HBL $hbl)
+    {
+        return response()->json($hbl->activities()->with('causer')->get());
+    }
 }

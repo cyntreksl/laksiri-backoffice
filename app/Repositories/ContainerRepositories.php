@@ -26,6 +26,7 @@ use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\Container;
 use App\Models\ContainerDocument;
+use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Filesystem\Filesystem;
@@ -271,5 +272,17 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         } catch (\Exception $e) {
             throw new \Exception('Failed to delete container document: '.$e->getMessage());
         }
+    }
+
+    public function getContainerByHBL(HBL $hbl)
+    {
+        $package = $hbl->packages()
+            ->whereHas('containers') // Ensures only packages with containers are included
+            ->with('containers') // Eager loads the containers
+            ->first();
+
+        $containerDetails = $package ? $package->containers->flatten()->first() : [];
+
+        return response()->json($containerDetails);
     }
 }
