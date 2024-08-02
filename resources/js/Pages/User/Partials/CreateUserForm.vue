@@ -227,7 +227,7 @@ const createUser = () => {
                     <InputError :message="form.errors.secondary_branches"/>
                 </div>
 
-                <div>
+                <div class="col-span-1 sm:col-span-2">
                     <InputLabel value="Select Role"/>
                     <div class="space-x-5 mt-1">
                         <label
