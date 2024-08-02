@@ -193,7 +193,7 @@ const props = defineProps({
                     </svg>
                 </SimpleOverviewWidget>
 
-                <SimpleOverviewWidget :count="hbl?.packages_sum_weight != null ? hbl.packages_sum_volume.toFixed(2) : '0.00'" title="Weight">
+                <SimpleOverviewWidget :count="hbl?.packages_sum_weight != null ? hbl.packages_sum_weight.toFixed(2) : '0.00'" title="Weight">
                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-weight text-info"
                          fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                          stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
