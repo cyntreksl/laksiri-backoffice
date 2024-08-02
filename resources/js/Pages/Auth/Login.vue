@@ -5,6 +5,8 @@ import DashboardMeet from "../../../images/illustrations/dashboard-meet.svg";
 import DashboardMeetDark from "../../../images/illustrations/dashboard-meet-dark.svg";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import {ref} from "vue";
+import moment from "moment/moment.js";
 
 defineProps({
     canResetPassword: Boolean,
@@ -27,6 +29,67 @@ const submit = () => {
             onFinish: () => form.reset("password"),
         });
 };
+
+const reference = ref(null);
+const errorMessage = ref('');
+const isLoading = ref(false);
+const hblStatus = ref([]);
+
+const handleSubmit = async () => {
+    errorMessage.value = '';
+
+    if (! reference.value) {
+        errorMessage.value = "Please enter the valid reference first!";
+    }
+
+    isLoading.value = true;
+
+    try {
+        const response = await fetch(`/get-hbl-status-by-reference/${reference.value}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                hblStatus.value = [];
+                errorMessage.value = 'Invalid reference!'
+            }
+            throw new Error('Network response was not ok.');
+        } else {
+            hblStatus.value = await response.json();
+        }
+
+    } catch (error) {
+        console.log(error);
+    } finally {
+        isLoading.value = false;
+    }
+}
+
+const hblStatusColor = (status) => {
+    switch (status) {
+        case 'HBL Preparation by warehouse':
+            return 'bg-primary';
+        case 'HBL Preparation by driver':
+            return 'bg-primary';
+        case 'Cash Received by Accountant':
+            return 'bg-secondary';
+        case 'Container Loading':
+            return 'bg-success';
+        case 'Container Shipped':
+            return 'bg-error';
+        case 'Container Arrival':
+            return 'bg-slate-500';
+        case 'Blocked By RTF':
+            return 'bg-red-500';
+        case 'Revert To Cash Settlement':
+            return 'bg-amber-400';
+    }
+};
 </script>
 
 <template>
@@ -47,122 +110,102 @@ const submit = () => {
                 <h1 class="text-3xl font-bold text-center mb-5 text-black">Track Your HBL Status</h1>
 
                 <div class="card mt-5 rounded-lg p-5 lg:p-7">
+
+                    <div
+                        v-if="errorMessage"
+                        class="mb-3 alert flex overflow-hidden rounded-lg bg-error/10 text-error dark:bg-error/15"
+                    >
+                        <div class="flex flex-1 items-center space-x-3 p-4">
+                            <svg
+                                class="size-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                />
+                            </svg>
+                            <div class="flex-1">{{errorMessage}}</div>
+                        </div>
+
+                        <div class="w-1.5 bg-error"></div>
+                    </div>
+
                     <div class="flex space-x-2">
-                        <input
-                            class="form-input peer rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent w-full"
-                            placeholder="Enter HBL Reference" type="text" />
-                        <PrimaryButton>
-                            <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-search mr-2"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
+                        <div class="w-full">
+                            <input
+                                v-model="reference"
+                                class="form-input peer rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent w-full"
+                                placeholder="Enter HBL Reference" type="text"/>
+                        </div>
+                        <PrimaryButton @click.prevent="handleSubmit">
+                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-search mr-2" fill="none"
+                                 height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                 stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/>
+                                <path d="M21 21l-6 -6"/>
+                            </svg>
                             Find
                         </PrimaryButton>
                     </div>
-
-                    <ol v-if="2 > 3" class="mt-10 timeline max-w-sm">
-                        <li class="timeline-item">
+                    <div
+                        v-if="isLoading"
+                        class="flex animate-pulse flex-col space-y-4 border border-slate-150 dark:border-navy-500 mt-10"
+                    >
+                        <div class="px-4 pt-4">
+                            <div class="h-8 w-10/12 rounded-full bg-slate-150 dark:bg-navy-500"></div>
+                        </div>
+                        <div class="h-48 w-full bg-slate-150 dark:bg-navy-500"></div>
+                        <div class="flex flex-1 flex-col justify-between space-y-4 p-4">
+                            <div class="h-4 w-9/12 rounded bg-slate-150 dark:bg-navy-500"></div>
+                            <div class="h-4 w-6/12 rounded bg-slate-150 dark:bg-navy-500"></div>
+                            <div class="h-4 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
+                        </div>
+                    </div>
+                    <ol v-if="hblStatus.length > 0 && ! isLoading" class="timeline max-w-sm mt-10">
+                        <li v-for="(log, index) in hblStatus" class="timeline-item">
                             <div
-                                class="timeline-item-point rounded-full bg-slate-300 dark:bg-navy-400"
-                            ></div>
-                            <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
-                                <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
-                                    <p
-                                        class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
-                                    >
-                                        User Photo Changed
-                                    </p>
-                                    <span class="text-xs text-slate-400 dark:text-navy-300"
-                                    >12 minute ago</span
-                                    >
-                                </div>
-                                <p class="py-1">John Doe changed his avatar photo</p>
-                            </div>
-                        </li>
-                        <li class="timeline-item">
-                            <div
-                                class="timeline-item-point rounded-full bg-primary dark:bg-accent"
-                            ></div>
-                            <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
-                                <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
-                                    <p
-                                        class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
-                                    >
-                                        Video Added
-                                    </p>
-                                    <span class="text-xs text-slate-400 dark:text-navy-300"
-                                    >1 hour ago</span
-                                    >
-                                </div>
-                                <p class="py-1">Mores Clarke added new video</p>
-                            </div>
-                        </li>
-                        <li class="timeline-item">
-                            <div class="timeline-item-point rounded-full bg-success">
-        <span
-            class="inline-flex h-full w-full animate-ping rounded-full bg-success opacity-80"
-        ></span>
+                                :class="`${hblStatusColor(log.status)} timeline-item-point rounded-full dark:bg-accent`"
+                            >
+                                     <span
+                                         v-if="index === Object.keys(hblStatus).length - 1"
+                                         :class="`inline-flex h-full w-full animate-ping rounded-full ${hblStatusColor(log.status)} opacity-80`"
+                                     ></span>
                             </div>
                             <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
                                 <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
                                     <p
                                         class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
                                     >
-                                        Design Completed
+                                        {{ log.status }}
                                     </p>
-                                    <span class="text-xs text-slate-400 dark:text-navy-300"
-                                    >3 hours ago</span
-                                    >
                                 </div>
-                                <p class="py-1">
-                                    Robert Nolan completed the design of the CRM application
-                                </p>
-                            </div>
-                        </li>
-                        <li class="timeline-item">
-                            <div class="timeline-item-point rounded-full bg-warning"></div>
-                            <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
-                                <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
-                                    <p
-                                        class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
-                                    >
-                                        ER Diagram
-                                    </p>
-                                    <span class="text-xs text-slate-400 dark:text-navy-300"
-                                    >a day ago</span
-                                    >
-                                </div>
-                                <p class="py-1">Team completed the ER diagram app</p>
-                            </div>
-                        </li>
-                        <li class="timeline-item">
-                            <div class="timeline-item-point rounded-full bg-error"></div>
-                            <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
-                                <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
-                                    <p
-                                        class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
-                                    >
-                                        Weekly Report
-                                    </p>
-                                    <span class="text-xs text-slate-400 dark:text-navy-300"
-                                    >a day ago</span
-                                    >
-                                </div>
-                                <p class="py-1">The weekly report was uploaded</p>
+                                <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
                             </div>
                         </li>
                     </ol>
                 </div>
 
-                <img
-                    :src="DashboardMeet"
-                    alt="image"
-                    class="w-full mt-10"
-                    x-show="!$store.global.isDarkModeEnabled "
-                />
-                <img
-                    :src="DashboardMeetDark"
-                    alt="image"
-                    class="w-full mt-10"
-                    x-show="$store.global.isDarkModeEnabled"
-                />
+                <template v-if="hblStatus.length === 0 && ! isLoading">
+                    <img
+                        :src="DashboardMeet"
+                        alt="image"
+                        class="w-full mt-10"
+                        x-show="!$store.global.isDarkModeEnabled "
+                    />
+                    <img
+                        :src="DashboardMeetDark"
+                        alt="image"
+                        class="w-full mt-10"
+                        x-show="$store.global.isDarkModeEnabled"
+                    />
+                </template>
             </div>
         </div>
         <main
