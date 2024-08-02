@@ -245,6 +245,6 @@ class HBLController extends Controller
 
     public function getHBLLogs(HBL $hbl)
     {
-        return response()->json($hbl->activities);
+        return response()->json($hbl->activities()->with('causer')->get());
     }
 }

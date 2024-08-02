@@ -534,6 +534,11 @@ fetchLogs();
                                 Date Time
                             </th>
                             <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Branch
+                            </th>
+                            <th
                                 class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                             >
                                 Auth
@@ -547,6 +552,9 @@ fetchLogs();
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                 {{moment(activity.created_at).format('YYYY-MM-DD H:mm:ss')}}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                {{hbl.branch_name}}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 {{activity.causer?.name}}
