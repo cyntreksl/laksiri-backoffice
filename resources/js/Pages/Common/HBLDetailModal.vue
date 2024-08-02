@@ -143,7 +143,7 @@ const emit = defineEmits(['close']);
 
                 <TabHBLDetails :hbl="hbl" :is-loading="isLoading" :pickup="pickup"/>
 
-                <TabStatus v-if="hbl" :hbl-id="hbl?.id"/>
+                <TabStatus v-if="hbl" :hbl="hbl" />
 
                 <TabDocuments v-if="hbl" :hbl-id="hbl?.id"/>
             </Tabs>

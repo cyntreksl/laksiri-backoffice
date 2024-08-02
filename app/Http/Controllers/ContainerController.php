@@ -16,6 +16,7 @@ use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Models\Container;
 use App\Models\ContainerDocument;
+use App\Models\HBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -225,5 +226,10 @@ class ContainerController extends Controller
         $this->authorize('container.delete documents');
 
         $this->containerRepository->deleteDocument($containerDocument);
+    }
+
+    public function getContainerByHBL(HBL $hbl)
+    {
+        return $this->containerRepository->getContainerByHBL($hbl);
     }
 }
