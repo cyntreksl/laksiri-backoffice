@@ -20,4 +20,9 @@ class UnloadingIssue extends Model
     {
         return $this->belongsTo(HblPackage::class);
     }
+
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(HblPackage::class);
+    }
 }

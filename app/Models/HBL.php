@@ -137,6 +137,6 @@ class HBL extends Model
 
     public function unloadingIssues(): HasManyThrough
     {
-        return $this->hasManyThrough(UnloadingIssue::class, HBLPackage::class);
+        return $this->hasManyThrough(UnloadingIssue::class, HBLPackage::class, 'hbl_id', 'hbl_package_id');
     }
 }

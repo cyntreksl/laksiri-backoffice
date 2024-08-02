@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ScopedBy(BranchScope::class)]
@@ -46,8 +45,8 @@ class HBLPackage extends Model
             ->withTimestamps();
     }
 
-    public function unloadingIssue(): HasOne
+    public function unloadingIssue()
     {
-        return $this->hasOne(UnloadingIssue::class, 'hbl_package_id', 'id');
+        return $this->hasMany(UnloadingIssue::class, 'hbl_package_id', 'id');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Interfaces\UnloadingIssuesRepositoryInterface;
+use App\Models\HBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -34,5 +35,10 @@ class UnloadingIssueController extends Controller
         $filters = $request->only(['fromDate', 'toDate']);
 
         return $this->unloadingIssuesRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function getUnloadingIssuesByHbl(HBL $hbl)
+    {
+        return $this->unloadingIssuesRepository->getUnloadingIssuesByHbl($hbl);
     }
 }

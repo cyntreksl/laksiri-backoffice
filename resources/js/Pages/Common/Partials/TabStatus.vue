@@ -177,6 +177,34 @@ const fetchUnloadingIssues = async () => {
         console.log(error);
     }
 }
+
+fetchUnloadingIssues();
+
+const logs = ref({});
+
+const fetchLogs = async () => {
+    try {
+        const response = await fetch(`/get-logs/${props.hbl.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            logs.value = data;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+fetchLogs();
 </script>
 
 <template>
@@ -368,8 +396,106 @@ const fetchUnloadingIssues = async () => {
                 </div>
             </template>
             <div class="px-4 py-4 sm:px-5">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8">
-                    <p>NO COMPLAINTS FOR THIS HBL</p>
+                <div v-if="unloadingIssues.length > 0"
+                     class="is-scrollbar-hidden min-w-full overflow-x-auto">
+                    <table class="is-hoverable w-full text-left">
+                        <thead>
+                        <tr>
+                            <th
+                                class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Package
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Issue
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Type
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Is Damaged
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                RTF
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 rounded-r-lg px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Is Fixed
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="issue in unloadingIssues" :key="issue.id"
+                            class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                            <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
+                                {{ issue.hbl_package?.package_type ?? '-' }}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ issue.issue ?? '-' }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                {{ issue.type ?? '-' }}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                <svg v-if="issue.is_damaged" class="size-6 text-success" fill="currentColor"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+
+                                <svg v-else class="size-6 text-error" fill="currentColor" viewBox="0 0 24 24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                <svg v-if="issue.rtf" class="size-6 text-success" fill="currentColor"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+
+                                <svg v-else class="size-6 text-error" fill="currentColor" viewBox="0 0 24 24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+                            </td>
+                            <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
+                                <svg v-if="issue.is_fixed" class="size-6 text-success" fill="currentColor"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+
+                                <svg v-else class="size-6 text-error" fill="currentColor" viewBox="0 0 24 24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+                                          fill-rule="evenodd"/>
+                                </svg>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div v-else class="w-full flex justify-center">
+                    <img :src="NotFound" alt="image"
+                         class="w-1/4 mt-10" />
                 </div>
             </div>
         </AccordionPanel>
@@ -393,7 +519,7 @@ const fetchUnloadingIssues = async () => {
                 </div>
             </template>
             <div class="px-4 py-4 sm:px-5">
-                <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
+                <div v-if="logs.length > 0" class="is-scrollbar-hidden min-w-full overflow-x-auto">
                     <table class="is-hoverable w-full text-left">
                         <thead>
                         <tr>
@@ -405,36 +531,26 @@ const fetchUnloadingIssues = async () => {
                             <th
                                 class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                             >
-                                Date
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Time
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Auth
+                                Date Time
                             </th>
                             <th
                                 class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                             >
-                                Branch
+                                Auth
                             </th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                        <tr v-for="activity in logs" class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                             <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
-                                -
+                                {{activity.description}}
                             </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                -
+                                {{moment(activity.created_at).format('YYYY-MM-DD H:mm:ss')}}
                             </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
-                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">-</td>
+                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                {{activity.causer?.name}}
+                            </td>
                         </tr>
                         </tbody>
                     </table>
