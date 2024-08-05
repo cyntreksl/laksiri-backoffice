@@ -247,4 +247,9 @@ class HBLController extends Controller
     {
         return response()->json($hbl->activities()->with('causer')->get());
     }
+
+    public function createToken(HBL $hbl)
+    {
+        return $this->HBLRepository->createAndIssueToken($hbl);
+    }
 }

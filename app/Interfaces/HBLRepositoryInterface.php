@@ -56,4 +56,6 @@ interface HBLRepositoryInterface
     public function getHBLPackagesByReference(string $reference): JsonResponse;
 
     public function getHBLStatusByReference(string $reference): JsonResponse;
+
+    public function createAndIssueToken(HBL $hbl);
 }

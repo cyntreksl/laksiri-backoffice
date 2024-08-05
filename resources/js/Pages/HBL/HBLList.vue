@@ -19,6 +19,7 @@ import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmati
 import {push} from "notivue";
 import HoldConfirmationModal from "@/Pages/HBL/Partials/HoldConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import PrintTokenConfirmationModal from "@/Pages/HBL/Partials/PrintTokenConfirmationModal.vue";
 
 const props = defineProps({
     users: {
@@ -261,6 +262,42 @@ const createColumns = () => [
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h("div", {className: "flex space-x-2"}, [
+                usePage().props.user.permissions.includes('hbls.issue token') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
+                            onClick: () => confirmPrintToken(row.cells[0].data),
+                            "x-tooltip..placement.bottom.primary": "'Issue Token'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-receipt",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2m4 -14h6m-6 4h6m-2 4h2",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
                 usePage().props.user.permissions.includes('hbls.edit') ?
                     h(
                         "button",
@@ -639,13 +676,6 @@ const confirmDeleteHBL = (id) => {
     showConfirmDeleteHBLModal.value = true;
 };
 
-const closeModal = () => {
-    showConfirmDeleteHBLModal.value = false;
-    showConfirmViewHBLModal.value = false;
-    hblId.value = null;
-    selectedHBL.value = null;
-};
-
 const handleDeleteHBL = () => {
     router.delete(route("hbls.destroy", hblId.value), {
         preserveScroll: true,
@@ -725,6 +755,36 @@ const exportURL = computed(() => {
     }
     return '/hbls/list/export' + "?" + params.toString();
 });
+
+const showConfirmTokenModal = ref(false);
+
+const confirmPrintToken = async (id) => {
+    showConfirmTokenModal.value = true;
+    hblId.value = id;
+};
+
+const handlePrintToken = () => {
+    router.post(route("hbls.create-token", hblId.value), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeModal();
+            // push.success("HBL record Deleted Successfully!");
+            // router.visit(route("hbls.index"), {only: ["hbls"]});
+        },
+        onError: () => {
+            closeModal();
+            push.error("Something went to wrong!");
+        },
+    });
+}
+
+const closeModal = () => {
+    showConfirmDeleteHBLModal.value = false;
+    showConfirmViewHBLModal.value = false;
+    showConfirmTokenModal.value = false;
+    hblId.value = null;
+    selectedHBL.value = null;
+};
 
 const planeIcon = ref(`
 <svg
@@ -1123,6 +1183,12 @@ const shipIcon = ref(`
             :show="showConfirmDeleteHBLModal"
             @close="closeModal"
             @delete-hbl="handleDeleteHBL"
+        />
+
+        <PrintTokenConfirmationModal
+            :show="showConfirmTokenModal"
+            @close="closeModal"
+            @print-token="handlePrintToken"
         />
 
         <HBLDetailModal

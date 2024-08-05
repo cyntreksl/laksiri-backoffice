@@ -95,6 +95,7 @@ class RolePermissionSeeder extends Seeder
                     'hbls.download barcode',
                     'hbls.upload documents',
                     'hbls.delete documents',
+                    'hbls.issue token',
                 ],
             ],
 
