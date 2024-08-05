@@ -330,202 +330,37 @@
                     <!-- Bottom Links -->
                     <div class="flex flex-col items-center space-y-3 py-3">
                         <!-- Settings -->
-
-                       <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
-                           <a
-                               v-if="! $page.props.user.roles.includes('viewer')"
-                               :class="[
+                        <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
+                            <a
+                                v-if="! $page.props.user.roles.includes('viewer')"
+                                :class="[
                 activeMenu === 'setting' ? 'bg-primary/10 text-primary' : '',
               ]"
-                               class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                               x-tooltip.placement.right="'Setting'"
-                               @click="
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Setting'"
+                                @click="
                 setMenu('setting');
                 openSideBar();
               "
-                           >
-                               <svg
-                                   class="size-7"
-                                   fill="none"
-                                   viewBox="0 0 24 24"
-                                   xmlns="http://www.w3.org/2000/svg"
-                               >
-                                   <path
-                                       d="M2 12.947v-1.771c0-1.047.85-1.913 1.899-1.913 1.81 0 2.549-1.288 1.64-2.868a1.919 1.919 0 0 1 .699-2.607l1.729-.996c.79-.474 1.81-.192 2.279.603l.11.192c.9 1.58 2.379 1.58 3.288 0l.11-.192c.47-.795 1.49-1.077 2.279-.603l1.73.996a1.92 1.92 0 0 1 .699 2.607c-.91 1.58-.17 2.868 1.639 2.868 1.04 0 1.899.856 1.899 1.912v1.772c0 1.047-.85 1.912-1.9 1.912-1.808 0-2.548 1.288-1.638 2.869.52.915.21 2.083-.7 2.606l-1.729.997c-.79.473-1.81.191-2.279-.604l-.11-.191c-.9-1.58-2.379-1.58-3.288 0l-.11.19c-.47.796-1.49 1.078-2.279.605l-1.73-.997a1.919 1.919 0 0 1-.699-2.606c.91-1.58.17-2.869-1.639-2.869A1.911 1.911 0 0 1 2 12.947Z"
-                                       fill="currentColor"
-                                       fill-opacity="0.3"
-                                   ></path>
-                                   <path
-                                       d="M11.995 15.332c1.794 0 3.248-1.464 3.248-3.27 0-1.807-1.454-3.272-3.248-3.272-1.794 0-3.248 1.465-3.248 3.271 0 1.807 1.454 3.271 3.248 3.271Z"
-                                       fill="currentColor"
-                                   ></path>
-                               </svg>
-                           </a>
-                       </template>
-
-                        <!-- Profile -->
-                        <div class="flex">
-                            <button
-                                class="avatar size-12"
-                                @click="toggleProfileBar = !toggleProfileBar"
                             >
-                                <img
-                                    :src="$page.props.auth.user.profile_photo_url"
-                                    alt="avatar"
-                                    class="rounded-full"
-                                />
-                                <span
-                                    class="absolute right-0 size-3.5 rounded-full border-2 border-white bg-success dark:border-navy-700"
-                                ></span>
-                            </button>
-
-                            <div
-                                :class="[toggleProfileBar ? 'show' : '']"
-                                class="popper-root fixed"
-                                data-popper-placement="right-end"
-                                style="
-                  position: fixed;
-                  inset: auto auto 0px 0px;
-                  margin: 0px;
-                  transform: translate(76px, -10px);
-                "
-                            >
-                                <div
-                                    class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700"
+                                <svg
+                                    class="size-7"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
                                 >
-                                    <div
-                                        class="flex items-center space-x-4 rounded-t-lg bg-slate-100 py-5 px-4 dark:bg-navy-800"
-                                    >
-                                        <div class="avatar size-14">
-                                            <img
-                                                :src="$page.props.auth.user.profile_photo_url"
-                                                alt="avatar"
-                                                class="rounded-full"
-                                            />
-                                        </div>
-                                        <div>
-                                            <a
-                                                class="text-base font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light"
-                                                href="#"
-                                            >
-                                                {{ $page.props.auth.user.name }}
-                                            </a>
-                                            <p class="text-xs text-slate-400 dark:text-navy-300">
-                                                {{ $page.props.auth.user.email }}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex flex-col pt-2 pb-5">
-                                        <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
-                                            <a
-                                                v-if="! $page.props.user.roles.includes('viewer')"
-                                                :href="
-                        route(
-                          'branches.edit',
-                          $page.props.auth.user.active_branch_id
-                        )
-                      "
-                                                class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
-                                            >
-                                                <div
-                                                    class="flex size-8 items-center justify-center rounded-lg bg-pink-500 text-white"
-                                                >
-                                                    <svg
-                                                        class="size-4.5"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        stroke-width="1.5"
-                                                        viewBox="0 0 24 24"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path
-                                                            d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                        />
-                                                    </svg>
-                                                </div>
-
-                                                <div>
-                                                    <h2
-                                                        class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
-                                                    >
-                                                        Business Profile
-                                                    </h2>
-                                                    <div
-                                                        class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
-                                                    >
-                                                        Branch Configurations
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </template>
-
-                                        <a
-                                            :href="route('profile.show')"
-                                            class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
-                                        >
-                                            <div
-                                                class="flex size-8 items-center justify-center rounded-lg bg-warning text-white"
-                                            >
-                                                <svg
-                                                    class="size-4.5"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    stroke-width="2"
-                                                    viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                    ></path>
-                                                </svg>
-                                            </div>
-
-                                            <div>
-                                                <h2
-                                                    class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
-                                                >
-                                                    Profile
-                                                </h2>
-                                                <div
-                                                    class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
-                                                >
-                                                    Your profile setting
-                                                </div>
-                                            </div>
-                                        </a>
-
-                                        <div class="mt-3 px-4">
-                                            <form @submit.prevent="logout">
-                                                <button
-                                                    class="btn h-9 w-full space-x-2 bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                                >
-                                                    <svg
-                                                        class="size-5"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path
-                                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="1.5"
-                                                        ></path>
-                                                    </svg>
-                                                    <span>Logout</span>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                    <path
+                                        d="M2 12.947v-1.771c0-1.047.85-1.913 1.899-1.913 1.81 0 2.549-1.288 1.64-2.868a1.919 1.919 0 0 1 .699-2.607l1.729-.996c.79-.474 1.81-.192 2.279.603l.11.192c.9 1.58 2.379 1.58 3.288 0l.11-.192c.47-.795 1.49-1.077 2.279-.603l1.73.996a1.92 1.92 0 0 1 .699 2.607c-.91 1.58-.17 2.868 1.639 2.868 1.04 0 1.899.856 1.899 1.912v1.772c0 1.047-.85 1.912-1.9 1.912-1.808 0-2.548 1.288-1.638 2.869.52.915.21 2.083-.7 2.606l-1.729.997c-.79.473-1.81.191-2.279-.604l-.11-.191c-.9-1.58-2.379-1.58-3.288 0l-.11.19c-.47.796-1.49 1.078-2.279.605l-1.73-.997a1.919 1.919 0 0 1-.699-2.606c.91-1.58.17-2.869-1.639-2.869A1.911 1.911 0 0 1 2 12.947Z"
+                                        fill="currentColor"
+                                        fill-opacity="0.3"
+                                    ></path>
+                                    <path
+                                        d="M11.995 15.332c1.794 0 3.248-1.464 3.248-3.27 0-1.807-1.454-3.272-3.248-3.272-1.794 0-3.248 1.465-3.248 3.271 0 1.807 1.454 3.271 3.248 3.271Z"
+                                        fill="currentColor"
+                                    ></path>
+                                </svg>
+                            </a>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -826,6 +661,169 @@
                                 </div>
                             </template>
                         </Popper>
+
+                        <!-- Profile -->
+                        <div class="flex">
+                            <button
+                                class="avatar size-12"
+                                @click="toggleProfileBar = !toggleProfileBar"
+                            >
+                                <img
+                                    :src="$page.props.auth.user.profile_photo_url"
+                                    alt="avatar"
+                                    class="rounded-full"
+                                />
+                                <span
+                                    class="absolute right-0 size-3.5 rounded-full border-2 border-white bg-success dark:border-navy-700"
+                                ></span>
+                            </button>
+
+                            <div
+                                :class="[toggleProfileBar ? 'show' : '']"
+                                class="popper-root fixed"
+                                data-popper-placement="left-top"
+                                style="position: fixed;
+                  inset: 0px 0px 0px auto;
+                  margin: 0px;
+                  transform: translate(-30px, 70px);
+                "
+                            >
+                                <div
+                                    class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700"
+                                >
+                                    <div
+                                        class="flex items-center space-x-4 rounded-t-lg bg-slate-100 py-5 px-4 dark:bg-navy-800"
+                                    >
+                                        <div class="avatar size-14">
+                                            <img
+                                                :src="$page.props.auth.user.profile_photo_url"
+                                                alt="avatar"
+                                                class="rounded-full"
+                                            />
+                                        </div>
+                                        <div>
+                                            <a
+                                                class="text-base font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light"
+                                                href="#"
+                                            >
+                                                {{ $page.props.auth.user.name }}
+                                            </a>
+                                            <p class="text-xs text-slate-400 dark:text-navy-300">
+                                                {{ $page.props.auth.user.email }}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-col pt-2 pb-5">
+                                        <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
+                                            <a
+                                                v-if="! $page.props.user.roles.includes('viewer')"
+                                                :href="
+                        route(
+                          'branches.edit',
+                          $page.props.auth.user.active_branch_id
+                        )
+                      "
+                                                class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
+                                            >
+                                                <div
+                                                    class="flex size-8 items-center justify-center rounded-lg bg-pink-500 text-white"
+                                                >
+                                                    <svg
+                                                        class="size-4.5"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.5"
+                                                        viewBox="0 0 24 24"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                        <path
+                                                            d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                        />
+                                                    </svg>
+                                                </div>
+
+                                                <div>
+                                                    <h2
+                                                        class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
+                                                    >
+                                                        Business Profile
+                                                    </h2>
+                                                    <div
+                                                        class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
+                                                    >
+                                                        Branch Configurations
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </template>
+
+                                        <a
+                                            :href="route('profile.show')"
+                                            class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
+                                        >
+                                            <div
+                                                class="flex size-8 items-center justify-center rounded-lg bg-warning text-white"
+                                            >
+                                                <svg
+                                                    class="size-4.5"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                    ></path>
+                                                </svg>
+                                            </div>
+
+                                            <div>
+                                                <h2
+                                                    class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
+                                                >
+                                                    Profile
+                                                </h2>
+                                                <div
+                                                    class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
+                                                >
+                                                    Your profile setting
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        <div class="mt-3 px-4">
+                                            <form @submit.prevent="logout">
+                                                <button
+                                                    class="btn h-9 w-full space-x-2 bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                                                >
+                                                    <svg
+                                                        class="size-5"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                        <path
+                                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            stroke-width="1.5"
+                                                        ></path>
+                                                    </svg>
+                                                    <span>Logout</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
