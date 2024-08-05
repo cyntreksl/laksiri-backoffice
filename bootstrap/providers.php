@@ -7,4 +7,5 @@ return [
     App\Providers\RepositoryServiceProvider::class,
     App\Providers\ApiRepositoryServiceProvider::class,
     Maatwebsite\Excel\ExcelServiceProvider::class,
+    Milon\Barcode\BarcodeServiceProvider::class,
 ];

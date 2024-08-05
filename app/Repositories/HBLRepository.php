@@ -290,9 +290,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 'token' => $tokenValue,
             ]);
 
-            // generate barcode
-
-            // generate qr code
+            // set customer queue
+            $token->customerQueue()->create([
+                'arrived_at' => now(),
+            ]);
 
             // print token pdf
             $customPaper = [0, 0, 283.80, 567.00];
@@ -303,9 +304,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
             $filename = 'sample'.'.pdf';
 
-            $pdf->save($filename);
-
-            // set customer queue
+            return $pdf->stream($filename);
         }
     }
 }

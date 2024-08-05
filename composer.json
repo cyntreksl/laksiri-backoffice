@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.9",
         "lorisleiva/laravel-actions": "^2.8",
         "maatwebsite/excel": "^3.1",
+        "milon/barcode": "^11.0",
         "picqer/php-barcode-generator": "^2.4",
         "propaganistas/laravel-phone": "^5.3",
         "robertboes/inertia-breadcrumbs": "^0.6.0",

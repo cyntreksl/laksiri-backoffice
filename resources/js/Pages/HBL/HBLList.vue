@@ -264,12 +264,13 @@ const createColumns = () => [
             return h("div", {className: "flex space-x-2"}, [
                 usePage().props.user.permissions.includes('hbls.issue token') ?
                     h(
-                        "button",
+                        "a",
                         {
                             className:
                                 "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
-                            onClick: () => confirmPrintToken(row.cells[0].data),
+                            href: route("hbls.create-token", row.cells[0].data),
                             "x-tooltip..placement.bottom.primary": "'Issue Token'",
+                            target: "_blank"
                         },
                         [
                             h(
@@ -756,32 +757,32 @@ const exportURL = computed(() => {
     return '/hbls/list/export' + "?" + params.toString();
 });
 
-const showConfirmTokenModal = ref(false);
+// const showConfirmTokenModal = ref(false);
+//
+// const confirmPrintToken = async (id) => {
+//     showConfirmTokenModal.value = true;
+//     hblId.value = id;
+// };
 
-const confirmPrintToken = async (id) => {
-    showConfirmTokenModal.value = true;
-    hblId.value = id;
-};
-
-const handlePrintToken = () => {
-    router.post(route("hbls.create-token", hblId.value), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            // push.success("HBL record Deleted Successfully!");
-            // router.visit(route("hbls.index"), {only: ["hbls"]});
-        },
-        onError: () => {
-            closeModal();
-            push.error("Something went to wrong!");
-        },
-    });
-}
+// const handlePrintToken = () => {
+//     router.post(), {
+//         preserveScroll: true,
+//         onSuccess: () => {
+//             closeModal();
+//             // push.success("HBL record Deleted Successfully!");
+//             // router.visit(route("hbls.index"), {only: ["hbls"]});
+//         },
+//         onError: () => {
+//             closeModal();
+//             push.error("Something went to wrong!");
+//         },
+//     });
+// }
 
 const closeModal = () => {
     showConfirmDeleteHBLModal.value = false;
     showConfirmViewHBLModal.value = false;
-    showConfirmTokenModal.value = false;
+    // showConfirmTokenModal.value = false;
     hblId.value = null;
     selectedHBL.value = null;
 };
