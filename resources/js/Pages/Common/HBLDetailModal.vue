@@ -145,7 +145,7 @@ const emit = defineEmits(['close']);
 
                 <TabStatus v-if="hbl" :hbl="hbl" />
 
-                <TabDocuments v-if="hbl" :hbl-id="hbl?.id"/>
+                <TabDocuments v-if="hbl" :hbl-id="hbl.id"/>
             </Tabs>
         </template>
 
