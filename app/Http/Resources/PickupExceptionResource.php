@@ -19,7 +19,7 @@ class PickupExceptionResource extends JsonResource
             'reference' => $this?->reference,
             'name' => $this?->name,
             'zone' => $this->zone?->name,
-            'picker_note' => $this->picker_note,
+            'picker_note' => $this->exceptionType ? $this->exceptionType->name : '-',
             'address' => $this->address,
             'pickup_date' => $this->pickup_date,
             'created_date' => $this->created_at->format('Y-m-d'),

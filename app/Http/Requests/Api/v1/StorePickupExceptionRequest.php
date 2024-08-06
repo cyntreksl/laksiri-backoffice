@@ -14,7 +14,7 @@ class StorePickupExceptionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'picker_note' => ['required', 'string'],
+            'exception_name_id' => ['required'],
         ];
     }
 
@@ -27,6 +27,7 @@ class StorePickupExceptionRequest extends FormRequest
     {
         return [
             'driver_id' => 'driver',
+            'exception_name_id' => 'exception type',
         ];
     }
 

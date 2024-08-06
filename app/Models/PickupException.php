@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -23,10 +24,10 @@ class PickupException extends Model
         'pickup_id',
         'branch_id',
         'driver_id',
+        'exception_name_id',
         'zone_id',
         'reference',
         'name',
-        'picker_note',
         'address',
         'pickup_date',
         'auth',
@@ -57,5 +58,10 @@ class PickupException extends Model
     {
         $query->where('system_status', PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED)
             ->where('driver_id', auth()->id());
+    }
+
+    public function exceptionType(): HasOne
+    {
+        return $this->hasOne(ExceptionName::class, 'id', 'exception_name_id');
     }
 }
