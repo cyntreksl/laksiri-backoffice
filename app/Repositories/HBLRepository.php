@@ -34,9 +34,6 @@ use App\Models\HBLDocument;
 use App\Models\HBLPackage;
 use App\Models\PickUp;
 use App\Models\Scopes\BranchScope;
-use App\Models\Token;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -267,44 +264,5 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function getHBLStatusByReference(string $reference): JsonResponse
     {
         return GetHBLStatusByReference::run($reference);
-    }
-
-    public function createAndIssueToken(HBL $hbl)
-    {
-        // create token
-        if ($hbl->consignee_id) {
-            // Get the current date
-            $today = Carbon::today();
-
-            // Get the last token created today
-            $lastToken = Token::whereDate('created_at', $today)->orderBy('id', 'desc')->first();
-
-            // Determine the token value
-            $tokenValue = $lastToken ? $lastToken->token + 1 : 1;
-
-            $token = Token::create([
-                'customer_id' => $hbl->consignee_id,
-                'receptionist_id' => auth()->id(),
-                'reference' => $hbl->reference,
-                'package_count' => $hbl->packages->count(),
-                'token' => $tokenValue,
-            ]);
-
-            // set customer queue
-            $token->customerQueue()->create([
-                'arrived_at' => now(),
-            ]);
-
-            // print token pdf
-            $customPaper = [0, 0, 283.80, 567.00];
-
-            $pdf = Pdf::loadView('pdf.customer.token', [
-                'token' => $token,
-            ])->setPaper($customPaper);
-
-            $filename = 'sample'.'.pdf';
-
-            return $pdf->stream($filename);
-        }
     }
 }
