@@ -2,23 +2,16 @@
 import {computed, onMounted, reactive, ref} from "vue";
 import {Link, router, usePage} from "@inertiajs/vue3";
 import {Grid, h, html} from "gridjs";
-import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
-import FilterDrawer from "@/Components/FilterDrawer.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import DatePicker from "@/Components/DatePicker.vue";
-import FilterBorder from "@/Components/FilterBorder.vue";
-import moment from "moment";
 import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
-import FilterHeader from "@/Components/FilterHeader.vue";
-import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
-import {push} from "notivue";
-import HoldConfirmationModal from "@/Pages/HBL/Partials/HoldConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 
 const props = defineProps({
     users: {
@@ -42,16 +35,14 @@ const wrapperRef = ref(null);
 let grid = null;
 
 const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(1, "month").format("YYYY-MM-DD");
-const toDate = moment(new Date()).format("YYYY-MM-DD");
 
 const filters = reactive({
-    fromDate: fromDate,
-    toDate: toDate,
-    cargoMode: ["Air Cargo", "Sea Cargo"],
-    hblType: ["UBP", "Gift", "Door to Door"],
+    fromDate: '',
+    toDate: '',
+    cargoMode: [],
+    hblType: [],
     isHold: false,
-    warehouse: ["COLOMBO", "NINTAVUR"],
+    warehouse: [],
     createdBy: "",
     paymentStatus: [],
 });
@@ -77,7 +68,7 @@ const data = reactive({
     },
 });
 
-const baseUrl = ref("/hbl-list");
+const baseUrl = ref("/call-center/hbl-list");
 
 const toggleColumnVisibility = (columnName) => {
     data.columnVisibility[columnName] = !data.columnVisibility[columnName];
@@ -261,6 +252,43 @@ const createColumns = () => [
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h("div", {className: "flex space-x-2"}, [
+                usePage().props.user.permissions.includes('hbls.issue token') ?
+                    h(
+                        "a",
+                        {
+                            className:
+                                "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
+                            href: route("call-center.hbls.create-token", row.cells[0].data),
+                            "x-tooltip..placement.bottom.primary": "'Issue Token'",
+                            target: "_blank"
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-receipt",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2m4 -14h6m-6 4h6m-2 4h2",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
                 usePage().props.user.permissions.includes('hbls.edit') ?
                     h(
                         "button",
@@ -630,29 +658,8 @@ const applyFilters = () => {
     grid.forceRender();
 };
 
-const showConfirmDeleteHBLModal = ref(false);
 const hblId = ref(null);
 const selectedHBL = ref({});
-
-const confirmDeleteHBL = (id) => {
-    hblId.value = id;
-    showConfirmDeleteHBLModal.value = true;
-};
-
-const handleDeleteHBL = () => {
-    router.delete(route("hbls.destroy", hblId.value), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            push.success("HBL record Deleted Successfully!");
-            router.visit(route("hbls.index"), {only: ["hbls"]});
-        },
-        onError: () => {
-            closeModal();
-            push.error("Something went to wrong!");
-        },
-    });
-};
 
 const showConfirmViewHBLModal = ref(false);
 
@@ -661,49 +668,13 @@ const confirmViewHBL = async (id) => {
     showConfirmViewHBLModal.value = true;
 };
 
-const hblData = ref({});
-
-const showConfirmHoldModal = ref(false);
-
-const confirmIsHold = (row) => {
-    hblData.value = row;
-    showConfirmHoldModal.value = true;
-};
-
-const closeHoldModal = () => {
-    showConfirmHoldModal.value = false;
-};
-
-const toggleHold = () => {
-    router.put(
-        route("hbls.toggle-hold", hblData.value[0].data),
-        {},
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                closeHoldModal();
-                push.success(
-                    hblData.value[14].data
-                        ? "Released " + hblData.value[1].data
-                        : "Hold " + hblData.value[1].data
-                );
-                router.visit(route("hbls.index"));
-                hblData.value = {};
-            },
-            onError: () => {
-                push.error("Something went to wrong!");
-            },
-        }
-    );
-};
-
 const resetFilter = () => {
-    filters.fromDate = fromDate;
-    filters.toDate = toDate;
-    filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
-    filters.hblType = ["UBP", "Gift", "Door to Door"];
+    filters.fromDate = "";
+    filters.toDate = "";
+    filters.cargoMode = [];
+    filters.hblType = [];
     filters.isHold = false;
-    filters.warehouse = ["COLOMBO", "NINTAVUR"];
+    filters.warehouse = [];
     filters.createdBy = "";
     filters.paymentStatus = [];
     applyFilters();
@@ -720,7 +691,6 @@ const exportURL = computed(() => {
 });
 
 const closeModal = () => {
-    showConfirmDeleteHBLModal.value = false;
     showConfirmViewHBLModal.value = false;
     hblId.value = null;
     selectedHBL.value = null;
@@ -767,7 +737,7 @@ const shipIcon = ref(`
 </script>
 
 <template>
-    <AppLayout title="HBL List">
+    <DestinationAppLayout title="HBL List">
         <template #header>HBL List</template>
 
         <Breadcrumb/>
@@ -776,6 +746,158 @@ const shipIcon = ref(`
                 <PrimaryButton> Create New HBL</PrimaryButton>
             </Link>
         </div>
+
+        <div class="card border">
+            <h2
+                class="mt-3 ml-5 text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+            >
+                HBL Filters
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-7 gap-5 p-5">
+                <div class="space-y-2">
+                    <InputLabel value="From"/>
+                    <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
+
+                    <InputLabel value="To"/>
+                    <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
+                </div>
+
+                <div>
+                    <h2
+                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                    >
+                        Cargo Mode
+                    </h2>
+
+                    <label class="inline-flex items-center space-x-2 mt-2">
+                        <Switch
+                            v-model="filters.cargoMode"
+                            label="Air Cargo"
+                            value="Air Cargo"
+                        />
+                        <div v-html="planeIcon"></div>
+                    </label>
+
+                    <label class="inline-flex items-center space-x-2 mt-2">
+                        <Switch
+                            v-model="filters.cargoMode"
+                            label="Sea Cargo"
+                            value="Sea Cargo"
+                        />
+                        <div v-html="shipIcon"></div>
+                    </label>
+                </div>
+
+                <div>
+                    <h2
+                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                    >
+                        Delivery Type
+                    </h2>
+
+                    <label class="block items-center space-x-2 mt-2">
+                        <Switch v-model="filters.hblType" label="UBP" value="UBP"/>
+                    </label>
+
+                    <label class="block items-center space-x-2 mt-2">
+                        <Switch v-model="filters.hblType" label="Gift" value="Gift"/>
+                    </label>
+
+                    <label class="block items-center space-x-2 mt-2">
+                        <Switch
+                            v-model="filters.hblType"
+                            label="Door to Door"
+                            value="Door to Door"
+                        />
+                    </label>
+                </div>
+
+                <div>
+                    <h2
+                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                    >
+                        Payment Status
+                    </h2>
+
+                    <label
+                        v-for="item in paymentStatus"
+                        :key="item"
+                        class="block items-center space-x-2 mt-2"
+                    >
+                        <Switch v-model="filters.paymentStatus" :label="item" :value="item"/>
+                    </label>
+                </div>
+
+                <div>
+                    <h2
+                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                    >
+                        Is Hold
+                    </h2>
+
+                    <label class="block items-center space-x-2 mt-2">
+                        <Switch v-model="filters.isHold" label="Is Hold" value="true"/>
+                    </label>
+                </div>
+
+                <div>
+                    <h2
+                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                    >
+                        Warehouse
+                    </h2>
+
+                    <label class="block items-center space-x-2 mt-2">
+                        <Switch v-model="filters.warehouse" label="COLOMBO" value="COLOMBO"/>
+                    </label>
+
+                    <label class="inline-flex items-center space-x-2 mt-2">
+                        <Switch
+                            v-model="filters.warehouse"
+                            label="NINTAVUR"
+                            value="NINTAVUR"
+                        />
+                    </label>
+                </div>
+
+                <div>
+                    <h2
+                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                    >
+                        Created By
+                    </h2>
+
+                    <select
+                        v-model="filters.createdBy"
+                        autocomplete="off"
+                        class="w-full"
+                        multiple
+                        placeholder="Select a User..."
+                        x-init="$el._tom = new Tom($el,{
+            plugins: ['remove_button'],
+            create: true,
+          })"
+                    >
+                        <option v-for="user in users" :value="user.id">
+                            {{ user.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-slate-100 p-5 space-x-4 text-right">
+                <SoftPrimaryButton class="space-x-2" @click="applyFilters">
+                    <i class="fa-solid fa-filter"></i>
+                    <span>Apply Filters</span>
+                </SoftPrimaryButton>
+                <!--Filter Rest Button-->
+                <SoftPrimaryButton class="space-x-2" @click="resetFilter">
+                    <i class="fa-solid fa-refresh"></i>
+                    <span>Clear Filters</span>
+                </SoftPrimaryButton>
+            </div>
+        </div>
+
         <div class="card mt-4">
             <div>
                 <div class="flex items-center justify-between p-2">
@@ -786,78 +908,6 @@ const shipIcon = ref(`
                             >
                                 HBL List
                             </h2>
-                        </div>
-
-                        <div
-                            class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
-                        >
-                            <div
-                                class="mr-4 cursor-pointer"
-                                x-tooltip.info.placement.bottom="'Applied Filters'"
-                            >
-                                Filter Options:
-                            </div>
-                            <div class="flex">
-                                <div>
-                                    <div
-                                        class="mb-1 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        From Date
-                                    </div>
-                                    <div
-                                        class="mb-1 tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.fromDate }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div
-                                        class="mb-1 ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        To Date
-                                    </div>
-                                    <div
-                                        class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.toDate }}
-                                    </div>
-                                </div>
-                                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-                                    <div
-                                        v-for="(mode, index) in filters.cargoMode"
-                                        v-if="filters.cargoMode"
-                                        :key="index"
-                                        class="mb-1 badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
-                                    >
-                    <span v-if="mode == 'Sea Cargo'">
-                      <div v-html="shipIcon"></div>
-                    </span>
-                                        <span v-if="mode == 'Air Cargo'">
-                      <div v-html="planeIcon"></div>
-                    </span>
-
-                                        {{ mode }}
-                                    </div>
-
-                                    <div
-                                        v-for="(type, index) in filters.hblType"
-                                        v-if="filters.hblType"
-                                        :key="index"
-                                        class="mb-1 badge bg-fuchsia-600 text-white dark:bg-fuchsia-600 ml-2"
-                                    >
-                                        {{ type }}
-                                    </div>
-
-                                    <div
-                                        v-for="(item, index) in filters.warehouse"
-                                        v-if="filters.warehouse"
-                                        :key="index"
-                                        class="mb-1 badge bg-pink-600 text-white dark:bg-pink-600 ml-2"
-                                    >
-                                        {{ item }}
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -967,13 +1017,6 @@ const shipIcon = ref(`
                                 <span class="hover:cursor-pointer">Status</span>
                             </label>
                         </ColumnVisibilityPopover>
-                        <button
-                            class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.top="'Filters'"
-                            @click="showFilters = true"
-                        >
-                            <i class="fa-solid fa-filter"></i>
-                        </button>
 
                         <a :href="exportURL">
                             <button
@@ -994,148 +1037,10 @@ const shipIcon = ref(`
             </div>
         </div>
 
-        <FilterDrawer :show="showFilters" @close="showFilters = false">
-            <template #title> Filter HBL</template>
-
-            <template #content>
-                <div>
-                    <InputLabel value="From"/>
-                    <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
-                </div>
-
-                <div>
-                    <InputLabel value="To"/>
-                    <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
-                </div>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Cargo Mode"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.cargoMode"
-                        label="Air Cargo"
-                        value="Air Cargo"
-                    />
-                    <div v-html="planeIcon"></div>
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.cargoMode"
-                        label="Sea Cargo"
-                        value="Sea Cargo"
-                    />
-                    <div v-html="shipIcon"></div>
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="HBL Type"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.hblType" label="UBP" value="UBP"/>
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.hblType" label="Gift" value="Gift"/>
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.hblType"
-                        label="Door to Door"
-                        value="Door to Door"
-                    />
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Payment Status"/>
-
-                <label
-                    v-for="item in paymentStatus"
-                    :key="item"
-                    class="inline-flex items-center space-x-2 mt-2"
-                >
-                    <Switch v-model="filters.paymentStatus" :label="item" :value="item"/>
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Is Hold"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.isHold" label="Is Hold" value="true"/>
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Warehouse"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.warehouse" label="COLOMBO" value="COLOMBO"/>
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.warehouse"
-                        label="NINTAVUR"
-                        value="NINTAVUR"
-                    />
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Created By"/>
-
-                <select
-                    v-model="filters.createdBy"
-                    autocomplete="off"
-                    class="w-full"
-                    multiple
-                    placeholder="Select a User..."
-                    x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                >
-                    <option v-for="user in users" :value="user.id">
-                        {{ user.name }}
-                    </option>
-                </select>
-
-                <!--Filter Now Action Button-->
-                <SoftPrimaryButton class="space-x-2" @click="applyFilters">
-                    <i class="fa-solid fa-filter"></i>
-                    <span>Apply Filters</span>
-                </SoftPrimaryButton>
-                <!--Filter Rest Button-->
-                <SoftPrimaryButton class="space-x-2" @click="resetFilter">
-                    <i class="fa-solid fa-refresh"></i>
-                    <span>Reset Filters</span>
-                </SoftPrimaryButton>
-            </template>
-        </FilterDrawer>
-
-        <DeleteHBLConfirmationModal
-            :show="showConfirmDeleteHBLModal"
-            @close="closeModal"
-            @delete-hbl="handleDeleteHBL"
-        />
-
         <HBLDetailModal
             :hbl-id="hblId"
             :show="showConfirmViewHBLModal"
             @close="closeModal"
         />
-
-        <HoldConfirmationModal
-            :hbl-data="hblData"
-            :show="showConfirmHoldModal"
-            @close="closeHoldModal"
-            @toggle-hold="toggleHold"
-        />
-    </AppLayout>
+    </DestinationAppLayout>
 </template>

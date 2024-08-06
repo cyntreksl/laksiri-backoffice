@@ -20,7 +20,11 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+
+    Route::get('/call-center/dashboard', [\App\Http\Controllers\CallCenter\DashboardController::class, 'index'])
+        ->name('call-center.dashboard');
 
     require_once __DIR__.'/web/arrival.php';
     require_once __DIR__.'/web/back-office.php';
@@ -32,6 +36,9 @@ Route::middleware([
     require_once __DIR__.'/web/report.php';
     require_once __DIR__.'/web/setting.php';
     require_once __DIR__.'/web/user.php';
+
+    // call center routes
+    require_once __DIR__.'/web/call-center/hbl.php';
 });
 
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);

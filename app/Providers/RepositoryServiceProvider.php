@@ -65,6 +65,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(UnloadingIssuesRepositoryInterface::class, UnloadingIssuesRepository::class);
         $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
         $this->app->bind(ExceptionNameRepositoryInterface::class, ExceptionNameRepository::class);
+
+        // call center repositories
+        $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);
     }
 
     public function boot(): void
