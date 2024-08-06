@@ -262,3 +262,5 @@ Breadcrumbs::for('setting.exception-names.edit', function (BreadcrumbTrail $trai
     $trail->parent('setting.exception-names.index');
     $trail->push('Edit Exception Name', route('setting.exception-names.edit', $exceptionName));
 });
+
+require_once __DIR__.'/call-center-breadcrumbs.php';
