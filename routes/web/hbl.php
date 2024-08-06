@@ -50,3 +50,6 @@ Route::get('/get-hbl-by-reference/{reference}', [HBLController::class, 'getHBLBy
 Route::get('/get-hbl-packages-by-reference/{reference}', [HBLController::class, 'getHBLPackagesByReference']);
 
 Route::get('/get-logs/{hbl}', [HBLController::class, 'getHBLLogs']);
+
+Route::get('/create-token/{hbl}', [HBLController::class, 'createToken'])
+    ->name('hbls.create-token');
