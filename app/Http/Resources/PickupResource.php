@@ -35,7 +35,7 @@ class PickupResource extends JsonResource
             'pickup_type' => $this->pickup_type ?? '-',
             'pickup_note' => $this->pickup_note ?? '-',
             'packages' => $this->notes ?? '-',
-            'exception_note' => $this->latestPickupException ? $this->latestPickupException->picker_note : '-',
+            'exception_note' => $this->latestPickupException ? $this->latestPickupException->exceptionType->name : '-',
             'hbl' => $this->whenLoaded('hbl', function () {
                 return new HBLResource($this->hbl);
             }),

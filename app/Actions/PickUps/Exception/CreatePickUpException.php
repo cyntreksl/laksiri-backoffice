@@ -17,13 +17,14 @@ class CreatePickUpException
             'driver_id' => auth()->id() ?? $pickup->driver_id,
             'zone_id' => $pickup->zone_id,
             'branch_id' => GetUserCurrentBranchID::run(),
+            'exception_name_id' => $data['exception_name_id'],
             'reference' => $pickup->reference,
             'name' => $pickup->name,
-            'picker_note' => $data['picker_note'],
             'address' => $pickup->address,
             'pickup_date' => $pickup->pickup_date,
             'auth' => $pickup->auth ?? null,
             'created_by' => auth()->id(),
+            'system_status' => $pickup->system_status,
         ]);
     }
 }
