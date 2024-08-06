@@ -35,8 +35,8 @@ class StorePickupRequest extends FormRequest
             'address' => ['required', 'max:255'],
             'location' => ['nullable'],
             'zone_id' => ['nullable', 'integer'],
-            'notes' => ['required', 'max:150'],
-            'pickup_date' => ['required', 'date'],
+            'notes' => ['nullable', 'max:150'],
+            'pickup_date' => ['nullable', 'date'],
             'pickup_time_start' => ['nullable', 'date_format:H:i'],
             'pickup_time_end' => ['nullable', 'date_format:H:i'],
         ];
