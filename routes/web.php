@@ -38,7 +38,10 @@ Route::middleware([
     require_once __DIR__.'/web/user.php';
 
     // call center routes
-    require_once __DIR__.'/web/call-center/hbl.php';
+    Route::name('call-center.')->prefix('call-center')->group(function () {
+        require_once __DIR__.'/web/call-center/hbl.php';
+        require_once __DIR__.'/web/call-center/queue.php';
+    });
 });
 
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);
