@@ -68,6 +68,7 @@ class RepositoryServiceProvider extends ServiceProvider
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);
+        $this->app->bind(\App\Interfaces\CallCenter\QueueRepositoryInterface::class, \App\Repositories\CallCenter\QueueRepository::class);
     }
 
     public function boot(): void
