@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CustomerQueue;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
@@ -13,4 +14,11 @@ Breadcrumbs::for('call-center.hbls.index', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
     $trail->push('HBL');
     $trail->push('HBL List', route('call-center.hbls.index'));
+});
+
+// HBLs
+Breadcrumbs::for('call-center.verification.create', function (BreadcrumbTrail $trail, CustomerQueue $customerQueue) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Queue');
+    $trail->push('Document Verification', route('call-center.verification.create', $customerQueue));
 });
