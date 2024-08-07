@@ -84,6 +84,19 @@
                                     <path d="M9 8h.01"/>
                                 </svg>
                             </a>
+                            <!-- Queue -->
+                            <Link :class="[
+                activeMenu === 'queue' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                :href="route('call-center.queue.index')"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Queue'"
+                                @click="
+                setMenu('queue');
+              "
+                            >
+                                   <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-route-square"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M3 17h4v4h-4z" /><path d="M17 3h4v4h-4z" /><path d="M11 19h5.5a3.5 3.5 0 0 0 0 -7h-8a3.5 3.5 0 0 1 0 -7h4.5" /></svg>
+                            </Link>
                             <!-- Arrivals -->
                             <a
                                 v-if="usePage().props.auth.user.roles[0].name !== 'call center'"
@@ -743,7 +756,7 @@ export default {
         setSidebarState();
 
         const current = route().current();
-        const mainRoute = current.split(".")[0];
+        const mainRoute = current.split(".")[1];
         const activeMenu = ref(mainRoute);
 
         const childMenuList = reactive([]);
