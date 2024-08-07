@@ -8,10 +8,12 @@ use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\CallCenter\HBLRepositoryInterface;
 use App\Interfaces\GridJsInterface;
+use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\Token;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 {
@@ -68,6 +70,15 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             // Get the current date
             $today = Carbon::today();
 
+            // Check if any tokens exist for today
+            $tokensExistToday = Token::whereDate('created_at', $today)->exists();
+
+            if (! $tokensExistToday) {
+                DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+                Token::truncate();
+                DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+            }
+
             // Get the last token created today
             $lastToken = Token::whereDate('created_at', $today)->orderBy('id', 'desc')->first();
 
@@ -85,6 +96,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             // set customer queue
             $token->customerQueue()->create([
                 'arrived_at' => now(),
+                'type' => CustomerQueue::DOCUMENT_VERIFICATION_QUEUE,
             ]);
 
             // print token pdf
