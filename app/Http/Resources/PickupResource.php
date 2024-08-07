@@ -25,7 +25,7 @@ class PickupResource extends JsonResource
             'location_name' => $this->location_name,
             'location_longitude' => $this->location_longitude,
             'location_latitude' => $this->location_latitude,
-            'zone_id' => $this->zone_id,
+            'zone' => $this->zone ? $this->zone->name : '-',
             'driver_assigned_at' => $this->driver_assigned_at,
             'pickup_date' => $this->pickup_date,
             'pickup_time_start' => $this->pickup_time_start,
@@ -39,6 +39,8 @@ class PickupResource extends JsonResource
             'hbl' => $this->whenLoaded('hbl', function () {
                 return new HBLResource($this->hbl);
             }),
+            'retry_attempts' => $this->retry_attempts,
+            'created_by' => $this->createdBy->name,
         ];
     }
 }

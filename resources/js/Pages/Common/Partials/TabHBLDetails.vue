@@ -88,6 +88,10 @@ const props = defineProps({
 
                     <InfoDisplay :value="pickup?.cargo_type" label="Cargo Mode"/>
 
+                    <InfoDisplay :value="pickup?.driver" label="Driver"/>
+
+                    <InfoDisplay :value="pickup?.zone" label="Zone"/>
+
                     <InfoDisplay :value="pickup?.pickup_date" label="Pickup Date"/>
 
                     <InfoDisplay :value="pickup?.pickup_time_start" label="Pickup Time Start"/>
@@ -96,11 +100,11 @@ const props = defineProps({
 
                     <InfoDisplay :value="pickup?.pickup_type" label="Pickup Type"/>
 
-                    <InfoDisplay :value="pickup?.notes" label="Packages"/>
-
                     <InfoDisplay :value="pickup?.pickup_note" label="Pickup Note"/>
 
                     <InfoDisplay :value="pickup?.retry_attempts" label="Retry Attempts"/>
+
+                    <InfoDisplay :value="pickup?.created_by" label="Auth"/>
                 </div>
             </div>
         </AccordionPanel>

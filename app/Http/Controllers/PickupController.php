@@ -8,6 +8,7 @@ use App\Enum\PickupType;
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\UpdatePickupRequest;
+use App\Http\Resources\PickupResource;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
@@ -74,7 +75,9 @@ class PickupController extends Controller
     {
         $this->authorize('pickups.show');
 
-        return response()->json($pickup);
+        $pickupResource = new PickupResource($pickup);
+
+        return response()->json($pickupResource);
     }
 
     public function update(UpdatePickupRequest $request, PickUp $pickup)

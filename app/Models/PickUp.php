@@ -90,4 +90,9 @@ class PickUp extends Model
     {
         return $this->belongsTo(User::class, 'consignee_id');
     }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }
