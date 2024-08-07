@@ -24,13 +24,12 @@
                         class="is-scrollbar-hidden flex grow flex-col space-y-4 overflow-y-auto pt-6"
                     >
                         <!-- Dashboard -->
-                        <a
+                        <Link :href="route('call-center.dashboard')"
                             :class="[
                 activeMenu === 'call-center.dashboard' ? 'bg-primary/10 text-primary' : '',
               ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-navy-600 dark:text-accent-light dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                             x-tooltip.placement.right="'Dashboard'"
-                            @click="setMenu('call-center.dashboard')"
                         >
                             <svg
                                 class="icon icon-tabler icons-tabler-outline icon-tabler-home"
@@ -49,7 +48,7 @@
                                 <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/>
                                 <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
                             </svg>
-                        </a>
+                        </Link>
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
                             <!-- HBL -->
                             <a
