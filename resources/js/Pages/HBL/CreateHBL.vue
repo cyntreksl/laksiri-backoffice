@@ -498,17 +498,17 @@ const calculatePayment = () => {
 
                 switch (operator) {
                     case "*":
-                        freightCharge.value = grandTotalVolume.value * value;
+                        freightCharge.value = grandTotalWeight.value * value;
                         break;
                     case "+":
-                        freightCharge.value = grandTotalVolume.value + value;
+                        freightCharge.value = grandTotalWeight.value + value;
                         break;
                     case "-":
-                        freightCharge.value = grandTotalVolume.value - value;
+                        freightCharge.value = grandTotalWeight.value - value;
                         break;
                     case "/":
                         if (value !== 0) {
-                            freightCharge.value = grandTotalVolume.value / value;
+                            freightCharge.value = grandTotalWeight.value / value;
                         } else {
                             console.error("Division by zero error");
                         }
@@ -553,17 +553,17 @@ const calculatePayment = () => {
 
                 switch (operator) {
                     case "*":
-                        freightCharge.value = grandTotalVolume.value * value;
+                        freightCharge.value = grandTotalWeight.value * value;
                         break;
                     case "+":
-                        freightCharge.value = grandTotalVolume.value + value;
+                        freightCharge.value = grandTotalWeight.value + value;
                         break;
                     case "-":
-                        freightCharge.value = grandTotalVolume.value - value;
+                        freightCharge.value = grandTotalWeight.value - value;
                         break;
                     case "/":
                         if (value !== 0) {
-                            freightCharge.value = grandTotalVolume.value / value;
+                            freightCharge.value = grandTotalWeight.value / value;
                         } else {
                             console.error("Division by zero error");
                         }
@@ -608,17 +608,17 @@ const calculatePayment = () => {
 
                 switch (operator) {
                     case "*":
-                        freightCharge.value = grandTotalVolume.value * value;
+                        freightCharge.value = grandTotalWeight.value * value;
                         break;
                     case "+":
-                        freightCharge.value = grandTotalVolume.value + value;
+                        freightCharge.value = grandTotalWeight.value + value;
                         break;
                     case "-":
-                        freightCharge.value = grandTotalVolume.value - value;
+                        freightCharge.value = grandTotalWeight.value - value;
                         break;
                     case "/":
                         if (value !== 0) {
-                            freightCharge.value = grandTotalVolume.value / value;
+                            freightCharge.value = grandTotalWeight.value / value;
                         } else {
                             console.error("Division by zero error");
                         }

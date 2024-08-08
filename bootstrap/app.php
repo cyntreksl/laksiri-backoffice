@@ -22,6 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
             \Laravel\Passport\Http\Middleware\CreateFreshApiToken::class,
+            \App\Http\Middleware\SetTimezone::class,
+        ]);
+
+        $middleware->api(append: [
+            \App\Http\Middleware\SetTimezone::class,
         ]);
 
         $middleware->redirectGuestsTo('/login');
