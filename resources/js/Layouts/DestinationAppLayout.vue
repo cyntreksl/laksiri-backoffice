@@ -108,6 +108,20 @@
                                     <path d="M16 9l5 -5"/>
                                 </svg>
                             </a>
+                            <!-- Document Verifications -->
+                            <a
+                                :class="[
+                activeMenu === 'verifications' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Document Verifications'"
+                                @click="
+                setMenu('verifications');
+                openSideBar();
+              "
+                            >
+                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-certificate"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M15 15m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M13 17.5v4.5l2 -1.5l2 1.5v-4.5" /><path d="M10 19h-5a2 2 0 0 1 -2 -2v-10c0 -1.1 .9 -2 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -1 1.73" /><path d="M6 9l12 0" /><path d="M6 12l3 0" /><path d="M6 15l2 0" /></svg>
+                            </a>
                             <!-- Arrivals -->
                             <a
                                 v-if="usePage().props.auth.user.roles[0].name !== 'call center'"
@@ -816,6 +830,21 @@ export default {
                         }
                     );
                     changeSidePanelTitle("Queue Screens");
+                    break;
+                case "verifications":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Document Verification Queue",
+                            route: "call-center.queue.screens.document-verification",
+                        },
+                        {
+                            title: "Verified List",
+                            route: "call-center.queue.screens.cashier",
+                        },
+                    );
+                    changeSidePanelTitle("Document Verifications");
                     break;
                 case "delivery":
                     childMenuList.splice(
