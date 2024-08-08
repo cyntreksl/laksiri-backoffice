@@ -815,7 +815,7 @@ export default {
                             route: "call-center.queue.screens.examination",
                         }
                     );
-                    changeSidePanelTitle("Delivery");
+                    changeSidePanelTitle("Queue Screens");
                     break;
                 case "delivery":
                     childMenuList.splice(
