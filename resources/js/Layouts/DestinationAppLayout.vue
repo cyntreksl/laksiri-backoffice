@@ -24,13 +24,12 @@
                         class="is-scrollbar-hidden flex grow flex-col space-y-4 overflow-y-auto pt-6"
                     >
                         <!-- Dashboard -->
-                        <a
+                        <Link :href="route('call-center.dashboard')"
                             :class="[
                 activeMenu === 'call-center.dashboard' ? 'bg-primary/10 text-primary' : '',
               ]"
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-navy-600 dark:text-accent-light dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                             x-tooltip.placement.right="'Dashboard'"
-                            @click="setMenu('call-center.dashboard')"
                         >
                             <svg
                                 class="icon icon-tabler icons-tabler-outline icon-tabler-home"
@@ -49,7 +48,7 @@
                                 <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/>
                                 <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
                             </svg>
-                        </a>
+                        </Link>
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
                             <!-- HBL -->
                             <a
@@ -84,6 +83,19 @@
                                     <path d="M9 8h.01"/>
                                 </svg>
                             </a>
+                            <!-- Queue -->
+                            <Link :class="[
+                activeMenu === 'queue' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                :href="route('call-center.queue.index')"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Queue'"
+                                @click="
+                setMenu('queue');
+              "
+                            >
+                                   <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-route-square"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M3 17h4v4h-4z" /><path d="M17 3h4v4h-4z" /><path d="M11 19h5.5a3.5 3.5 0 0 0 0 -7h-8a3.5 3.5 0 0 1 0 -7h4.5" /></svg>
+                            </Link>
                             <!-- Arrivals -->
                             <a
                                 v-if="usePage().props.auth.user.roles[0].name !== 'call center'"
@@ -743,7 +755,7 @@ export default {
         setSidebarState();
 
         const current = route().current();
-        const mainRoute = current.split(".")[0];
+        const mainRoute = current.split(".")[1];
         const activeMenu = ref(mainRoute);
 
         const childMenuList = reactive([]);

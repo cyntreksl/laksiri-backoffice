@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
@@ -27,5 +28,15 @@ class Token extends Model
     public function customerQueue(): HasOne
     {
         return $this->hasOne(CustomerQueue::class, 'token_id');
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function reception(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'receptionist_id');
     }
 }
