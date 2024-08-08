@@ -13,9 +13,19 @@ class QueueController extends Controller
     ) {
     }
 
-    public function index()
+    public function showDocumentVerificationScreen()
     {
-        return Inertia::render('CallCenter/Queue/QueueList');
+        return Inertia::render('CallCenter/Queue/VerificationScreen');
+    }
+
+    public function showDocumentCashierScreen()
+    {
+        return Inertia::render('CallCenter/Queue/CashierScreen');
+    }
+
+    public function showExaminationScreen()
+    {
+        return Inertia::render('CallCenter/Queue/ExaminationScreen');
     }
 
     public function getDocumentVerificationQueue()
@@ -25,11 +35,11 @@ class QueueController extends Controller
 
     public function getCashierQueue()
     {
-
+        return response()->json([]);
     }
 
     public function getExaminationQueue()
     {
-
+        return response()->json([]);
     }
 }
