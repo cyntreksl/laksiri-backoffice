@@ -101,7 +101,7 @@ const form = useForm({
     bill_charge: 0,
     other_charge: 0,
     discount: 0,
-    paid_amount: 0,
+    paid_amount: '',
     grand_total: 0,
     packages: {},
 });
