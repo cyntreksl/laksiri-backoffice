@@ -15,7 +15,7 @@ import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import RadioButton from "@/Components/RadioButton.vue";
 import LoadedShipmentDetailModal from "@/Pages/Loading/Partials/LoadedShipmentDetailModal.vue";
-import {usePage} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 
 const props = defineProps({
     cargoTypes: {
@@ -322,6 +322,48 @@ const createColumns = () => [
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h("div", {}, [
+                usePage().props.user.permissions.includes('container.edit') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
+                            onClick: () => router.visit(route("loading.loading-containers.edit", row.cells[0].data)),
+                            "x-tooltip..placement.bottom.primary": "'Edit Loaded Shipment'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-edit",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1",
+                                    }),
+                                    h("path", {
+                                        d: "M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z",
+                                    }),
+                                    h("path", {
+                                        d: "M16 5l3 3",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
                 usePage().props.user.permissions.includes('shipment.download manifest') ?
                     h(
                         "a",

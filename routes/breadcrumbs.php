@@ -3,6 +3,7 @@
 use App\Models\Branch;
 use App\Models\Container;
 use App\Models\ExceptionName;
+use App\Models\PickUp;
 use App\Models\User;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
@@ -23,15 +24,22 @@ Breadcrumbs::for('pickups.index', function (BreadcrumbTrail $trail) {
 // pickups > pickup ordering
 Breadcrumbs::for('pickups.ordering', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Pickup');
+    $trail->push('Pickup', route('pickups.index'));
     $trail->push('Pickup Ordering', route('pickups.ordering'));
 });
 
 // pickups > create
 Breadcrumbs::for('pickups.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Pickup');
+    $trail->push('Pickup', route('pickups.index'));
     $trail->push('Create Pickup', route('pickups.create'));
+});
+
+// pickups > edit
+Breadcrumbs::for('pickups.edit', function (BreadcrumbTrail $trail, PickUp $pickup) {
+    $trail->parent('dashboard');
+    $trail->push('Pickup', route('pickups.index'));
+    $trail->push('Edit Pickup', route('pickups.edit', $pickup));
 });
 
 // pickups > exceptions

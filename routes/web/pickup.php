@@ -4,8 +4,7 @@ use App\Http\Controllers\PickupController;
 use App\Http\Controllers\PickupExceptionController;
 use Illuminate\Support\Facades\Route;
 
-Route::resource('pickups', PickupController::class)
-    ->except('edit');
+Route::resource('pickups', PickupController::class);
 
 Route::get('pickup-list', [PickupController::class, 'list']);
 

@@ -16,6 +16,9 @@ class CreateContainer
     public function handle(array $data): Container
     {
         try {
+            if (! $data['container_type']) {
+                $data['container_type'] = 'Custom';
+            }
             $data['created_by'] = auth()->id();
             $data['branch_id'] = GetUserCurrentBranchID::run();
             $data['system_status'] = Container::SYSTEM_STATUS_BOOK_CONTAINER;

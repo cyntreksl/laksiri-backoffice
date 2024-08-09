@@ -101,7 +101,7 @@ const form = useForm({
     bill_charge: 0,
     other_charge: 0,
     discount: 0,
-    paid_amount: 0,
+    paid_amount: '',
     grand_total: 0,
     packages: {},
 });
@@ -185,7 +185,6 @@ const addPackageData = () => {
 
         grandTotalWeight.value += parseFloat(newItem.totalWeight);
         grandTotalVolume.value += parseFloat(newItem.volume);
-        console.log(grandTotalVolume.value)
         calculatePayment();
     }
     closeAddPackageModal();
@@ -231,6 +230,7 @@ watch(
     ([newOtherCharge, newDiscount, newFreightCharge]) => {
         // Convert dimensions from cm to meters
         hblTotal.value =
+            parseFloat(form.freight_charge) +
             parseFloat(form.bill_charge) +
             parseFloat(form.freight_charge * grandTotalWeight.value.toFixed(3)) +
             parseFloat(form.other_charge) +
@@ -279,12 +279,6 @@ const addToConsigneeDetails = () => {
     }
 };
 
-// watch([() => form.hbl_type], ([val]) => {
-//     if (form.hbl_type !== "Door to Door") {
-//         resetConsigneeDetails();
-//     }
-// });
-
 const resetConsigneeDetails = () => {
     form.consignee_name = "";
     consignee_contact.value = "";
@@ -293,7 +287,7 @@ const resetConsigneeDetails = () => {
 };
 
 const updateTypeDescription = () => {
-    packageItem.type += (packageItem.type ? " " : "") + selectedType.value;
+    packageItem.type = (packageItem.type ? " " : "") + selectedType.value;
 };
 
 const hblTotal = ref(0);
@@ -842,6 +836,13 @@ const handleRemoveCopiedPackages = () => {
     calculatePayment();
 }
 
+const handleCopyShipper = () => {
+    form.consignee_name = form.hbl_name;
+    consignee_contact.value = contactNumber.value;
+    form.consignee_nic = form.nic;
+    form.consignee_address = form.address;
+}
+
 const planeIcon = ref(`
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -1095,21 +1096,39 @@ const shipIcon = ref(`
                                 Consignee Details
                             </h2>
 
-                            <SoftPrimaryButton class="flex items-center" type="button"
-                                               @click.prevent="confirmShowingCopyFromHBLToConsigneeModal">
-                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
-                                     height="24" stroke="currentColor" stroke-linecap="round"
-                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path
-                                        d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
-                                    <path
-                                        d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
-                                </svg>
+                            <div class="flex space-x-4">
+                                <SoftPrimaryButton :disabled="form.hbl_name ===''" class="flex items-center" type="button"
+                                                   @click.prevent="handleCopyShipper">
+                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
+                                         height="24" stroke="currentColor" stroke-linecap="round"
+                                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path
+                                            d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
+                                        <path
+                                            d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
+                                    </svg>
 
-                                Copy From HBL
-                            </SoftPrimaryButton>
+                                    Copy Shipper
+                                </SoftPrimaryButton>
+
+                                <SoftPrimaryButton class="flex items-center" type="button"
+                                                   @click.prevent="confirmShowingCopyFromHBLToConsigneeModal">
+                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
+                                         height="24" stroke="currentColor" stroke-linecap="round"
+                                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path
+                                            d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
+                                        <path
+                                            d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
+                                    </svg>
+
+                                    Copy From HBL
+                                </SoftPrimaryButton>
+                            </div>
 
                             <DialogModal :maxWidth="'xl'" :show="copyFromHBLToConsigneeModalShow"
                                          @close="closeCopyFromHBLToConsigneeModal">
@@ -1472,7 +1491,7 @@ const shipIcon = ref(`
                                     class="flex justify-between text-2xl text-success font-bold"
                                 >
                                     <p class="line-clamp-1">Grand Total</p>
-                                    <p>{{ hblTotal }} {{ currency }}</p>
+                                    <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
                                 </div>
                             </div>
                         </div>

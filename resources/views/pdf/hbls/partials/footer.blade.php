@@ -11,7 +11,7 @@
     <table style="margin-top: 5px">
         <tr>
             <td style="border: 1px solid black; border-collapse: collapse; width: 60%">
-                23423
+
             </td>
             <td style="vertical-align:bottom; text-align: center; width: 40%">
                 SIGNATURE OF SHIPPER

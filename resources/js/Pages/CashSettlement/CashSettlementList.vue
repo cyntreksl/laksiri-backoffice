@@ -120,10 +120,26 @@ const createColumns = () => [
     {name: "Name", hidden: !data.columnVisibility.hbl_name},
     {name: "Address", hidden: !data.columnVisibility.address},
     {name: "Picked Date", hidden: !data.columnVisibility.picked_date},
-    {name: "Weight", hidden: !data.columnVisibility.weight},
-    {name: "Volume", hidden: !data.columnVisibility.volume},
-    {name: "Amount", hidden: !data.columnVisibility.grand_total},
-    {name: "Paid", hidden: !data.columnVisibility.paid_amount},
+    {
+        name: "Weight",
+        hidden: !data.columnVisibility.weight,
+        formatter: (cell) => cell.toFixed(2),
+    },
+    {
+        name: "Volume",
+        hidden: !data.columnVisibility.volume,
+        formatter: (cell) => cell.toFixed(3),
+    },
+    {
+        name: "Amount",
+        hidden: !data.columnVisibility.grand_total,
+        formatter: (cell) => cell.toFixed(2),
+    },
+    {
+        name: "Paid",
+        hidden: !data.columnVisibility.paid_amount,
+        formatter: (cell) => cell.toFixed(2),
+    },
     {
         name: "Cargo Mode",
         sort: false,

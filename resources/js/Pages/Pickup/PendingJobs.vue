@@ -15,7 +15,6 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import EditPickupModal from "@/Pages/Pickup/Partials/EditPickupModal.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import DeletePickupConfirmationModal from "@/Pages/Pickup/Partials/DeletePickupConfirmationModal.vue";
@@ -52,8 +51,6 @@ const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo"],
-    isUrgent: false,
-    isImportant: false,
     createdBy: "",
     zoneBy: "",
 });
@@ -308,7 +305,7 @@ const createColumns = () => [
     },
     {
         name: "Cargo Mode",
-        sort: true,
+        sort: false,
         hidden: !data.columnVisibility.cargo_type,
         attributes: (cell, row) => {
             // add these attributes to the td elements only
@@ -557,7 +554,7 @@ const createColumns = () => [
                         {
                             className:
                                 "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
-                            onClick: () => confirmEditPickup(row.cells[0].data?.id),
+                            onClick: () => router.visit(route("pickups.edit", row.cells[0].data?.id)),
                             "x-tooltip..placement.bottom.primary": "'Edit Pending Job'",
                         },
                         [
@@ -734,18 +731,11 @@ const confirmAssignDriver = () => {
     showConfirmAssignDriverModal.value = true;
 };
 
-const showConfirmEditPickupModal = ref(false);
 const pickupId = ref(null);
 const showConfirmDeletePickupModal = ref(false);
 
-const confirmEditPickup = (id) => {
-    pickupId.value = id;
-    showConfirmEditPickupModal.value = true;
-};
-
 const closeModal = () => {
     showConfirmAssignDriverModal.value = false;
-    showConfirmEditPickupModal.value = false;
     pickupId.value = null;
     idList.value = [];
 };
@@ -774,8 +764,6 @@ const resetFilter = () => {
     filters.fromDate = fromDate;
     filters.toDate = toDate;
     filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
-    filters.isUrgent = false;
-    filters.isImportant = false;
     filters.createdBy = "";
     filters.zoneBy = "";
     applyFilters();
@@ -952,20 +940,6 @@ const shipIcon = ref(`
 
                                         {{ mode }}
                                     </div>
-
-                                    <div
-                                        v-if="filters.isUrgent"
-                                        class="mb-1 badge bg-success text-white ml-2"
-                                    >
-                                        Is Urgent
-                                    </div>
-
-                                    <div
-                                        v-if="filters.isImportant"
-                                        class="mb-1 badge bg-cyan-500 text-white ml-2"
-                                    >
-                                        VIP Customer
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1028,27 +1002,6 @@ const shipIcon = ref(`
                                         @change="toggleColumnVisibility('pickup_date', $event)"
                                     />
                                     <span class="hover:cursor-pointer">Pickup Date</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.is_urgent_pickup"
-                                        @change="toggleColumnVisibility('is_urgent_pickup', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Urgent Pickup</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.is_from_important_customer"
-                                        @change="
-                      toggleColumnVisibility(
-                        'is_from_important_customer',
-                        $event
-                      )
-                    "
-                                    />
-                                    <span class="hover:cursor-pointer">VIP Customer</span>
                                 </label>
 
                                 <label class="inline-flex items-center space-x-2">
@@ -1171,26 +1124,6 @@ const shipIcon = ref(`
 
                 <FilterBorder/>
 
-                <FilterHeader value="Is Urgent"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.isUrgent" label="Is Urgent" value="true"/>
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Is Important to Customer"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.isImportant"
-                        label="Is Important"
-                        value="true"
-                    />
-                </label>
-
-                <FilterBorder/>
-
                 <FilterHeader value="Created By"/>
 
                 <select
@@ -1241,13 +1174,6 @@ const shipIcon = ref(`
                 </SoftPrimaryButton>
             </template>
         </FilterDrawer>
-
-        <EditPickupModal
-            :pickup-id="pickupId"
-            :show="showConfirmEditPickupModal"
-            :zones="zones"
-            @close="closeModal"
-        />
 
         <DeletePickupConfirmationModal
             :show="showConfirmDeletePickupModal"

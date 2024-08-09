@@ -157,8 +157,8 @@ echo '<img src="data:image/png;base64,' . base64_encode($generator->getBarcode($
                 <td>{{$package?->package_type}}</td>
                 <td>{{$package?->length }} X {{$package?->width }} X {{$package?->height }}</td>
                 <td>{{$package?->quantity}}</td>
-                <td>{{$package?->weight}}</td>
-                <td>{{$package?->volume}}</td>
+                <td>{{round($package?->weight, 2)}}</td>
+                <td>{{round($package?->volume, 3)}}</td>
                 <td>{{$package?->remarks ?? '-'}}</td>
             </tr>
         @empty
@@ -181,7 +181,7 @@ echo '<img src="data:image/png;base64,' . base64_encode($generator->getBarcode($
         </tr>
         <tr>
             <td>TOTAL VOLUME</td>
-            <td>{{$hbl?->packages->sum('volume')}}</td>
+            <td>{{round($hbl?->packages->sum('volume'), 3)}}</td>
 
             <td>HBL CHARGE</td>
             <td>{{number_format($hbl?->bill_charge, 2)}}</td>
@@ -191,7 +191,7 @@ echo '<img src="data:image/png;base64,' . base64_encode($generator->getBarcode($
         </tr>
         <tr>
             <td>TOTAL WEIGHT</td>
-            <td>{{$hbl?->packages->sum('weight')}}</td>
+            <td>{{round($hbl?->packages->sum('weight'), 2)}}</td>
 
             <td>HBL VAT CHARGE</td>
             <td>-</td>

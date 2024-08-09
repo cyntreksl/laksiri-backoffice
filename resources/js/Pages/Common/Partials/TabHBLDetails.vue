@@ -84,7 +84,7 @@ const props = defineProps({
 
                     <InfoDisplay :value="pickup?.address" label="Address"/>
 
-                    <InfoDisplay :value="pickup?.notes" label="Notes"/>
+                    <InfoDisplay :value="pickup?.packages" label="Packages"/>
 
                     <InfoDisplay :value="pickup?.cargo_type" label="Cargo Mode"/>
 

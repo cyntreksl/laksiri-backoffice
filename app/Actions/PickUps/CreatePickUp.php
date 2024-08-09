@@ -13,10 +13,6 @@ class CreatePickUp
 
     public function handle(array $data): PickUp
     {
-        $is_from_important_customer = isset($data['is_from_important_customer']) && (bool) $data['is_from_important_customer'];
-
-        $is_urgent_pickup = isset($data['is_urgent_pickup']) && (bool) $data['is_urgent_pickup'];
-
         $pickup_note = isset($data['pickup_note']) ? Str::title($data['pickup_note']) : null;
 
         $pickup = PickUp::create([
@@ -33,8 +29,6 @@ class CreatePickUp
             'pickup_date' => $data['pickup_date'],
             'pickup_time_start' => $data['pickup_time_start'],
             'pickup_time_end' => $data['pickup_time_end'],
-            'is_from_important_customer' => $is_from_important_customer,
-            'is_urgent_pickup' => $is_urgent_pickup,
             'pickup_type' => $data['pickup_type'] ?? null,
             'pickup_note' => $pickup_note,
             'created_by' => auth()->id(),
