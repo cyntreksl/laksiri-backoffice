@@ -948,20 +948,6 @@ const shipIcon = ref(`
 
                                         {{ mode }}
                                     </div>
-
-                                    <div
-                                        v-if="filters.isUrgent"
-                                        class="mb-1 badge bg-success text-white ml-2"
-                                    >
-                                        Is Urgent
-                                    </div>
-
-                                    <div
-                                        v-if="filters.isImportant"
-                                        class="mb-1 badge bg-cyan-500 text-white ml-2"
-                                    >
-                                        VIP Customer
-                                    </div>
                                 </div>
                             </div>
                         </div>
