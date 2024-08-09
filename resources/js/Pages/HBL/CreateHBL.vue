@@ -279,12 +279,6 @@ const addToConsigneeDetails = () => {
     }
 };
 
-// watch([() => form.hbl_type], ([val]) => {
-//     if (form.hbl_type !== "Door to Door") {
-//         resetConsigneeDetails();
-//     }
-// });
-
 const resetConsigneeDetails = () => {
     form.consignee_name = "";
     consignee_contact.value = "";
@@ -842,6 +836,13 @@ const handleRemoveCopiedPackages = () => {
     calculatePayment();
 }
 
+const handleCopyShipper = () => {
+    form.consignee_name = form.hbl_name;
+    consignee_contact.value = contactNumber.value;
+    form.consignee_nic = form.nic;
+    form.consignee_address = form.address;
+}
+
 const planeIcon = ref(`
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -1095,21 +1096,39 @@ const shipIcon = ref(`
                                 Consignee Details
                             </h2>
 
-                            <SoftPrimaryButton class="flex items-center" type="button"
-                                               @click.prevent="confirmShowingCopyFromHBLToConsigneeModal">
-                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
-                                     height="24" stroke="currentColor" stroke-linecap="round"
-                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path
-                                        d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
-                                    <path
-                                        d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
-                                </svg>
+                            <div class="flex space-x-4">
+                                <SoftPrimaryButton :disabled="form.hbl_name ===''" class="flex items-center" type="button"
+                                                   @click.prevent="handleCopyShipper">
+                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
+                                         height="24" stroke="currentColor" stroke-linecap="round"
+                                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path
+                                            d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
+                                        <path
+                                            d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
+                                    </svg>
 
-                                Copy From HBL
-                            </SoftPrimaryButton>
+                                    Copy Shipper
+                                </SoftPrimaryButton>
+
+                                <SoftPrimaryButton class="flex items-center" type="button"
+                                                   @click.prevent="confirmShowingCopyFromHBLToConsigneeModal">
+                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
+                                         height="24" stroke="currentColor" stroke-linecap="round"
+                                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path
+                                            d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
+                                        <path
+                                            d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
+                                    </svg>
+
+                                    Copy From HBL
+                                </SoftPrimaryButton>
+                            </div>
 
                             <DialogModal :maxWidth="'xl'" :show="copyFromHBLToConsigneeModalShow"
                                          @close="closeCopyFromHBLToConsigneeModal">
