@@ -68,7 +68,7 @@ class LoadedContainerManifestExport implements FromQuery, ShouldAutoSize, WithHe
                     $isFirst ? $hbl->reference : '',
                     $isFirst ? $hbl->hbl_name : '',
                     $isFirst ? $hbl->consignee_name : '',
-                    $hbl_package->package_type.' ('.$hbl_package->quantity.')',
+                    $hbl_package->package_type,
                     $isFirst ? $totalQuantity : '',
                     $hbl_package->volume,
                     $hbl_package->weight,
