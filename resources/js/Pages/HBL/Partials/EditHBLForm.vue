@@ -198,6 +198,7 @@ watch(
     ([newOtherCharge, newDiscount, newFreightCharge]) => {
         // Convert dimensions from cm to meters
         hblTotal.value =
+            parseFloat(form.freight_charge) +
             parseFloat(form.bill_charge) +
             parseFloat(form.freight_charge) +
             parseFloat(form.other_charge) +
@@ -1087,7 +1088,7 @@ const openEditModal = (index) => {
                         <div class="col-span-2">
                             <div class="flex justify-between text-2xl text-success font-bold">
                                 <p class="line-clamp-1">Grand Total</p>
-                                <p>{{ hblTotal }} {{ currency }}</p>
+                                <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
                             </div>
                         </div>
                     </div>
