@@ -231,7 +231,7 @@ const packageTypes = [
 const selectedType = ref("");
 
 const updateTypeDescription = () => {
-    packageItem.package_type +=
+    packageItem.package_type =
         (packageItem.package_type ? " " : "") + selectedType.value;
 };
 

@@ -288,7 +288,7 @@ const resetConsigneeDetails = () => {
 };
 
 const updateTypeDescription = () => {
-    packageItem.type += (packageItem.type ? " " : "") + selectedType.value;
+    packageItem.type = (packageItem.type ? " " : "") + selectedType.value;
 };
 
 const hblTotal = ref(0);
