@@ -52,8 +52,6 @@ const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo"],
-    isUrgent: false,
-    isImportant: false,
     createdBy: "",
     zoneBy: "",
 });
@@ -774,8 +772,6 @@ const resetFilter = () => {
     filters.fromDate = fromDate;
     filters.toDate = toDate;
     filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
-    filters.isUrgent = false;
-    filters.isImportant = false;
     filters.createdBy = "";
     filters.zoneBy = "";
     applyFilters();
@@ -1032,27 +1028,6 @@ const shipIcon = ref(`
 
                                 <label class="inline-flex items-center space-x-2">
                                     <Checkbox
-                                        :checked="data.columnVisibility.is_urgent_pickup"
-                                        @change="toggleColumnVisibility('is_urgent_pickup', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Urgent Pickup</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.is_from_important_customer"
-                                        @change="
-                      toggleColumnVisibility(
-                        'is_from_important_customer',
-                        $event
-                      )
-                    "
-                                    />
-                                    <span class="hover:cursor-pointer">VIP Customer</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
                                         :checked="data.columnVisibility.pickup_time_start"
                                         @change="
                       toggleColumnVisibility('pickup_time_start', $event)
@@ -1167,26 +1142,6 @@ const shipIcon = ref(`
                         value="Sea Cargo"
                     />
                     <div v-html="shipIcon"></div>
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Is Urgent"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.isUrgent" label="Is Urgent" value="true"/>
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Is Important to Customer"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.isImportant"
-                        label="Is Important"
-                        value="true"
-                    />
                 </label>
 
                 <FilterBorder/>
