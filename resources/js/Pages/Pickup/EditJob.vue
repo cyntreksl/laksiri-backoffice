@@ -150,8 +150,8 @@ const shipIcon = ref(`
 </script>
 
 <template>
-    <AppLayout title="Pick Up Job">
-        <template #header>Pick Up Job - Create</template>
+    <AppLayout title="Pick Up Job - Edit">
+        <template #header>Pick Up Job - Edit</template>
 
         <!-- Breadcrumb -->
         <Breadcrumb/>
