@@ -15,7 +15,6 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import EditPickupModal from "@/Pages/Pickup/Partials/EditPickupModal.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import DeletePickupConfirmationModal from "@/Pages/Pickup/Partials/DeletePickupConfirmationModal.vue";
@@ -306,7 +305,7 @@ const createColumns = () => [
     },
     {
         name: "Cargo Mode",
-        sort: true,
+        sort: false,
         hidden: !data.columnVisibility.cargo_type,
         attributes: (cell, row) => {
             // add these attributes to the td elements only
@@ -555,7 +554,7 @@ const createColumns = () => [
                         {
                             className:
                                 "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
-                            onClick: () => confirmEditPickup(row.cells[0].data?.id),
+                            onClick: () => router.visit(route("pickups.edit", row.cells[0].data?.id)),
                             "x-tooltip..placement.bottom.primary": "'Edit Pending Job'",
                         },
                         [
@@ -732,18 +731,11 @@ const confirmAssignDriver = () => {
     showConfirmAssignDriverModal.value = true;
 };
 
-const showConfirmEditPickupModal = ref(false);
 const pickupId = ref(null);
 const showConfirmDeletePickupModal = ref(false);
 
-const confirmEditPickup = (id) => {
-    pickupId.value = id;
-    showConfirmEditPickupModal.value = true;
-};
-
 const closeModal = () => {
     showConfirmAssignDriverModal.value = false;
-    showConfirmEditPickupModal.value = false;
     pickupId.value = null;
     idList.value = [];
 };
@@ -1182,13 +1174,6 @@ const shipIcon = ref(`
                 </SoftPrimaryButton>
             </template>
         </FilterDrawer>
-
-        <EditPickupModal
-            :pickup-id="pickupId"
-            :show="showConfirmEditPickupModal"
-            :zones="zones"
-            @close="closeModal"
-        />
 
         <DeletePickupConfirmationModal
             :show="showConfirmDeletePickupModal"

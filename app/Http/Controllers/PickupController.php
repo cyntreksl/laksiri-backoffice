@@ -80,6 +80,19 @@ class PickupController extends Controller
         return response()->json($pickupResource);
     }
 
+    public function edit(PickUp $pickup)
+    {
+        $this->authorize('pickups.edit');
+
+        return Inertia::render('Pickup/EditJob', [
+            'pickupTypes' => PickupType::cases(),
+            'cargoTypes' => CargoType::cases(),
+            'noteTypes' => $this->pickupRepository->getNoteTypes(),
+            'zones' => GetZones::run(),
+            'pickup' => $pickup,
+        ]);
+    }
+
     public function update(UpdatePickupRequest $request, PickUp $pickup)
     {
         $this->authorize('pickups.edit');

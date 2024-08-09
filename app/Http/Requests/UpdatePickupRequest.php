@@ -24,8 +24,8 @@ class UpdatePickupRequest extends FormRequest
     {
         return [
             'pickup_date' => ['required', 'date'],
-            'pickup_time_start' => ['nullable', 'date_format:H:i'],
-            'pickup_time_end' => ['nullable', 'date_format:H:i'],
+            'pickup_time_start' => ['nullable'],
+            'pickup_time_end' => ['nullable'],
             'zone_id' => ['nullable', 'integer'],
             'contact_number' => ['required', 'phone:INTERNATIONAL'],
         ];
