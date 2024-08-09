@@ -185,7 +185,6 @@ const addPackageData = () => {
 
         grandTotalWeight.value += parseFloat(newItem.totalWeight);
         grandTotalVolume.value += parseFloat(newItem.volume);
-        console.log(grandTotalVolume.value)
         calculatePayment();
     }
     closeAddPackageModal();
