@@ -26,6 +26,8 @@ use App\Exports\CancelledHBLExport;
 use App\Exports\HBLExport;
 use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\HBLResource;
+use App\Http\Resources\HBLStatusResource;
+use App\Http\Resources\PickupStatusResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Models\Container;
@@ -224,9 +226,11 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         if ($hbl->pickup_id) {
             $pickup = PickUp::find($hbl->pickup_id);
 
-            return response()->json([
-                'status' => $pickup->statusLogs,
-            ]);
+            if ($pickup) {
+                return response()->json([
+                    'status' => PickupStatusResource::collection($pickup->statusLogs),
+                ]);
+            }
         }
 
         return response()->json([
@@ -237,7 +241,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function getHBLStatus(HBL $hbl): JsonResponse
     {
         return response()->json([
-            'status' => $hbl->statusLogs,
+            'status' => HBLStatusResource::collection($hbl->statusLogs),
         ]);
     }
 

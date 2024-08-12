@@ -267,8 +267,11 @@ fetchLogs();
                                             >
                                                 {{ log.status }}
                                             </p>
+                                            <span class="text-xs text-slate-400 dark:text-navy-300"
+                                            >{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</span
+                                            >
                                         </div>
-                                        <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
+                                        <p class="py-1">{{ log?.created_by }}</p>
                                     </div>
                                 </li>
                             </ol>
@@ -307,8 +310,11 @@ fetchLogs();
                                             >
                                                 {{ log.status }}
                                             </p>
+                                            <span class="text-xs text-slate-400 dark:text-navy-300"
+                                            >{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</span
+                                            >
                                         </div>
-                                        <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
+                                        <p class="py-1">{{ log?.created_by }}</p>
                                     </div>
                                 </li>
                             </ol>
