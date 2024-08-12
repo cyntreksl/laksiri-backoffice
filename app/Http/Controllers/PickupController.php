@@ -49,7 +49,7 @@ class PickupController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'zoneBy']);
+        $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'zoneBy']);
 
         return $this->pickupRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
@@ -139,5 +139,17 @@ class PickupController extends Controller
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'zoneBy']);
 
         return $this->pickupRepository->export($filters);
+    }
+
+    public function getPendingJobsByUser(string $user)
+    {
+        $this->authorize('pickups.pending pickups');
+
+        return Inertia::render('Pickup/PendingJobsByUser', [
+            'drivers' => $this->driverRepository->getAllDrivers(),
+            'users' => $this->userRepository->getUsers(),
+            'zones' => $this->zoneRepository->getZones(),
+            'userData' => $user,
+        ]);
     }
 }

@@ -2,7 +2,6 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h, html} from "gridjs";
-import {Link} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
 import moment from "moment";
@@ -39,6 +38,10 @@ const props = defineProps({
         default: () => {
         },
     },
+    userData: {
+        type: String,
+        default: ''
+    },
 });
 
 const wrapperRef = ref(null);
@@ -49,6 +52,7 @@ const fromDate = moment(new Date()).subtract(7, "days").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 
 const filters = reactive({
+    userData: props.userData,
     fromDate: fromDate,
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo"],
@@ -73,7 +77,7 @@ const data = reactive({
     },
 });
 
-const baseUrl = ref("/pickup-list");
+const baseUrl = ref(`/pickup-list`);
 const totalPickups = ref(0);
 
 const toggleColumnVisibility = (columnName) => {
@@ -226,10 +230,9 @@ const createColumns = () => [
             let value = cell.toString();
 
             if (value.length < 20) {
-                return html(`<a style="text-decoration: underline; color: blue" href="pickups/get-pending-jobs-by-user/${cell}">${value}</a>`);
+                return value;
             }
-
-            return html(`<a style="text-decoration: underline; color: blue" href="pickups/get-pending-jobs-by-user/${cell}">${value.substring(0, 20) + '...'}</a>`);
+            return value.substring(0, 20) + '...';
         }
     },
     {name: "Email", hidden: !data.columnVisibility.email},
@@ -261,7 +264,7 @@ const createColumns = () => [
                     'style': 'background-color: #ffe4e6',
                 };
             }
-        },
+        }
     },
     {
         name: "Contact",
@@ -282,11 +285,6 @@ const createColumns = () => [
                     'style': 'background-color: #ffe4e6',
                 };
             }
-        },
-        formatter: (cell) => {
-            if (!cell) return '';
-
-            return html(`<a style="text-decoration: underline; color: blue" href="pickups/get-pending-jobs-by-user/${cell}">${cell}</a>`);
         }
     },
     {
@@ -890,7 +888,7 @@ const shipIcon = ref(`
                             <h2
                                 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                Pending Pickups
+                                {{userData}}'s Pending Pickups
                             </h2>
                         </div>
                         <br/>
