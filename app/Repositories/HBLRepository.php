@@ -68,7 +68,13 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = HBL::query();
+        if (isset($filters['userData'])) {
+            $query = HBL::query()
+                ->where('hbl_name', $filters['userData'])
+                ->orWhere('contact_number', $filters['userData']);
+        } else {
+            $query = HBL::query();
+        }
 
         if (! empty($search)) {
             $query->whereAny([

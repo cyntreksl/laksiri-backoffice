@@ -62,6 +62,12 @@ Breadcrumbs::for('hbls.index', function (BreadcrumbTrail $trail) {
     $trail->push('HBL List', route('hbls.index'));
 });
 
+Breadcrumbs::for('hbls.get-hbls-by-user', function (BreadcrumbTrail $trail, string $userData) {
+    $trail->parent('dashboard');
+    $trail->push('HBLs', route('hbls.index'));
+    $trail->push('HBL List', route('hbls.get-hbls-by-user', $userData));
+});
+
 // HBL > create
 Breadcrumbs::for('hbls.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
