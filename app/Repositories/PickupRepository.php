@@ -50,7 +50,17 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = PickUp::query()->with('pickupException')->whereIn('system_status', [PickUp::SYSTEM_STATUS_PICKUP_CREATED, PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED]);
+        if (isset($filters['userData'])) {
+            $query = PickUp::query()
+                ->where('name', $filters['userData'])
+                ->orWhere('contact_number', $filters['userData'])
+                ->with('pickupException')
+                ->whereIn('system_status', [PickUp::SYSTEM_STATUS_PICKUP_CREATED, PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED]);
+        } else {
+            $query = PickUp::query()
+                ->with('pickupException')
+                ->whereIn('system_status', [PickUp::SYSTEM_STATUS_PICKUP_CREATED, PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED]);
+        }
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {

@@ -5,6 +5,7 @@ import {ref, watch} from "vue";
 import moment from "moment";
 import NotFound from '@/../images/illustrations/empty-girl-box.svg';
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
+import AuditDetails from "@/Pages/Common/Components/AuditDetails.vue";
 
 const props = defineProps({
     hbl: {
@@ -267,8 +268,11 @@ fetchLogs();
                                             >
                                                 {{ log.status }}
                                             </p>
+                                            <span class="text-xs text-slate-400 dark:text-navy-300"
+                                            >{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</span
+                                            >
                                         </div>
-                                        <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
+                                        <p class="py-1">{{ log?.created_by }}</p>
                                     </div>
                                 </li>
                             </ol>
@@ -307,8 +311,11 @@ fetchLogs();
                                             >
                                                 {{ log.status }}
                                             </p>
+                                            <span class="text-xs text-slate-400 dark:text-navy-300"
+                                            >{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</span
+                                            >
                                         </div>
-                                        <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
+                                        <p class="py-1">{{ log?.created_by }}</p>
                                     </div>
                                 </li>
                             </ol>
@@ -539,9 +546,14 @@ fetchLogs();
                                 Branch
                             </th>
                             <th
-                                class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                             >
                                 Auth
+                            </th>
+                            <th
+                                class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Inspect
                             </th>
                         </tr>
                         </thead>
@@ -556,8 +568,11 @@ fetchLogs();
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                 {{hbl.branch_name}}
                             </td>
-                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                 {{activity.causer?.name}}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                <AuditDetails :properties="activity.properties?.attributes" />
                             </td>
                         </tr>
                         </tbody>

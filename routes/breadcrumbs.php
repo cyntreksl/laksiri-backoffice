@@ -21,6 +21,12 @@ Breadcrumbs::for('pickups.index', function (BreadcrumbTrail $trail) {
     $trail->push('Pending Jobs', route('pickups.index'));
 });
 
+Breadcrumbs::for('pickups.get-pending-jobs-by-user', function (BreadcrumbTrail $trail, string $userData) {
+    $trail->parent('dashboard');
+    $trail->push('Pickup', route('pickups.index'));
+    $trail->push('Pending Jobs', route('pickups.get-pending-jobs-by-user', $userData));
+});
+
 // pickups > pickup ordering
 Breadcrumbs::for('pickups.ordering', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
@@ -54,6 +60,12 @@ Breadcrumbs::for('hbls.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('HBL');
     $trail->push('HBL List', route('hbls.index'));
+});
+
+Breadcrumbs::for('hbls.get-hbls-by-user', function (BreadcrumbTrail $trail, string $userData) {
+    $trail->parent('dashboard');
+    $trail->push('HBLs', route('hbls.index'));
+    $trail->push('HBL List', route('hbls.get-hbls-by-user', $userData));
 });
 
 // HBL > create

@@ -36,6 +36,10 @@ const props = defineProps({
         default: () => {
         },
     },
+    userData: {
+        type: String,
+        default: '',
+    }
 });
 
 const wrapperRef = ref(null);
@@ -46,6 +50,7 @@ const fromDate = moment(new Date()).subtract(1, "month").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 
 const filters = reactive({
+    userData: props.userData,
     fromDate: fromDate,
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo"],
@@ -143,20 +148,7 @@ const createColumns = () => [
     {name: "ID", hidden: !data.columnVisibility.id},
     {name: "Reference", hidden: !data.columnVisibility.reference},
     {name: "HBL", hidden: !data.columnVisibility.hbl},
-    {
-        name: "HBL Name",
-        hidden: !data.columnVisibility.hbl_name,
-        formatter: (cell) => {
-            if (!cell) return '';
-            let value = cell.toString();
-
-            if (value.length < 20) {
-                return html(`<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">${value}</a>`);
-            }
-
-            return html(`<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">${value.substring(0, 20) + '...'}</a>`);
-        }
-    },
+    {name: "HBL Name", hidden: !data.columnVisibility.hbl_name},
     {name: "Consignee Name", hidden: !data.columnVisibility.consignee_name},
     {
         name: "Consignee Address",
@@ -174,11 +166,6 @@ const createColumns = () => [
         name: "Contact",
         hidden: !data.columnVisibility.contact_number,
         sort: false,
-        formatter: (cell) => {
-            if (!cell) return '';
-
-            return html(`<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">${cell}</a>`);
-        }
     },
     {
         name: "Cargo Mode",
@@ -802,7 +789,7 @@ const shipIcon = ref(`
                             <h2
                                 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                HBL List
+                                {{userData}}'s HBL List
                             </h2>
                         </div>
 

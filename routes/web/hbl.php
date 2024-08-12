@@ -53,3 +53,6 @@ Route::get('/get-logs/{hbl}', [HBLController::class, 'getHBLLogs']);
 
 Route::get('/create-token/{hbl}', [HBLController::class, 'createToken'])
     ->name('hbls.create-token');
+
+Route::get('hbls/get-hbls-by-user/{user}', [HBLController::class, 'getHBLsByUser'])
+    ->name('hbls.get-hbls-by-user');

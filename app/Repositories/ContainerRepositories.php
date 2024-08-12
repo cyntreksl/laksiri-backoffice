@@ -29,11 +29,14 @@ use App\Models\ContainerDocument;
 use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use ZipArchive;
 
 class ContainerRepositories implements ContainerRepositoryInterface, GridJsInterface
@@ -104,11 +107,65 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         }
     }
 
-    public function batchHBLDownload(Container $container)
+    //    public function abandonedBatchHBLDownload(Container $container)
+    //    {
+    //        // Define the PDF and ZIP directories
+    //        $pdfDirectory = public_path('pdf/');
+    //        $zipDirectory = public_path('zip/');
+    //
+    //        // Ensure the PDF directory exists and clean it
+    //        if (! File::exists($pdfDirectory)) {
+    //            File::makeDirectory($pdfDirectory, 0755, true);
+    //        } else {
+    //            $pdfFile = new Filesystem();
+    //            $pdfFile->cleanDirectory($pdfDirectory);
+    //        }
+    //
+    //        // Ensure the ZIP directory exists
+    //        if (! File::exists($zipDirectory)) {
+    //            File::makeDirectory($zipDirectory, 0755, true);
+    //        }
+    //
+    //        $container = GetLoadedContainerById::run($container);
+    //
+    //        foreach ($container->hbls as $hbl) {
+    //            // create random filename for pdfs
+    //            $filename = $container->reference.'_'.date('Y_m_d_h_i_s').'_'.Str::random(10);
+    //            // save pdfs
+    //            PDF::loadView('pdf.hbls.hbl', [
+    //                'hbl' => $hbl,
+    //            ])->save($pdfDirectory.$filename.'.pdf');
+    //        }
+    //
+    //        // create new ZipArchive instance
+    //        $zip = new ZipArchive;
+    //        // creating file name for zip archive file
+    //        $zip_filename = $container->reference.'_'.date('Y_m_d_h_i_s').'.zip';
+    //        $zipPath = $zipDirectory.$zip_filename;
+    //
+    //        if (File::exists($zipPath)) {
+    //            File::delete($zipPath);
+    //        }
+    //
+    //        if ($zip->open($zipPath, ZipArchive::CREATE) === true) {
+    //
+    //            $files = File::files($pdfDirectory);
+    //
+    //            foreach ($files as $value) {
+    //                $relativeNameInZipFile = basename($value);
+    //                $zip->addFile($value, $relativeNameInZipFile);
+    //            }
+    //
+    //            $zip->close();
+    //        }
+    //
+    //        return response()->download($zipPath);
+    //    }
+
+    public function batchHBLDownload(Container $container): BinaryFileResponse
     {
-        // Define the PDF and ZIP directories
+        // Define the PDF directory
         $pdfDirectory = public_path('pdf/');
-        $zipDirectory = public_path('zip/');
 
         // Ensure the PDF directory exists and clean it
         if (! File::exists($pdfDirectory)) {
@@ -118,45 +175,39 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             $pdfFile->cleanDirectory($pdfDirectory);
         }
 
-        // Ensure the ZIP directory exists
-        if (! File::exists($zipDirectory)) {
-            File::makeDirectory($zipDirectory, 0755, true);
-        }
-
         $container = GetLoadedContainerById::run($container);
 
+        // Initialize a new Dompdf instance with custom options
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        // Create an empty string to store the combined HTML
+        $combinedHtml = '';
+
         foreach ($container->hbls as $hbl) {
-            // create random filename for pdfs
-            $filename = $container->reference.'_'.date('Y_m_d_h_i_s').'_'.Str::random(10);
-            // save pdfs
-            PDF::loadView('pdf.hbls.hbl', [
-                'hbl' => $hbl,
-            ])->save($pdfDirectory.$filename.'.pdf');
+            // Render each HBL as HTML and append to combinedHtml
+            $combinedHtml .= view('pdf.hbls.hbl', ['hbl' => $hbl])->render();
+            //            $combinedHtml .= '<div style="page-break-after: always;"></div>'; // Add page break after each HBL
         }
 
-        // create new ZipArchive instance
-        $zip = new ZipArchive;
-        // creating file name for zip archive file
-        $zip_filename = $container->reference.'_'.date('Y_m_d_h_i_s').'.zip';
-        $zipPath = $zipDirectory.$zip_filename;
+        // Load the combined HTML into Dompdf
+        $dompdf->loadHtml($combinedHtml);
 
-        if (File::exists($zipPath)) {
-            File::delete($zipPath);
-        }
+        // Set paper size and orientation if needed
+        $dompdf->setPaper('A4', 'portrait');
 
-        if ($zip->open($zipPath, ZipArchive::CREATE) === true) {
+        // Render the PDF
+        $dompdf->render();
 
-            $files = File::files($pdfDirectory);
+        // Define the final PDF file path
+        $finalPdfPath = $pdfDirectory.$container->reference.'_combined_'.date('Y_m_d_h_i_s').'.pdf';
 
-            foreach ($files as $value) {
-                $relativeNameInZipFile = basename($value);
-                $zip->addFile($value, $relativeNameInZipFile);
-            }
+        // Save the generated PDF to a file
+        file_put_contents($finalPdfPath, $dompdf->output());
 
-            $zip->close();
-        }
-
-        return response()->download($zipPath);
+        // Return the combined PDF as a download response
+        return response()->download($finalPdfPath)->deleteFileAfterSend(true);
     }
 
     public function deleteLoading(Container $container)
