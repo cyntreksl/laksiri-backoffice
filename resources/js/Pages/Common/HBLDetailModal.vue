@@ -2,7 +2,7 @@
 import DialogModal from "@/Components/DialogModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Tabs from "@/Components/Tabs.vue";
-import {ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import TabHBLDetails from "@/Pages/Common/Partials/TabHBLDetails.vue";
 import TabStatus from "@/Pages/Common/Partials/TabStatus.vue";
 import TabDocuments from "@/Pages/Common/Partials/TabDocuments.vue";
@@ -78,17 +78,29 @@ const fetchPickup = async () => {
     }
 }
 
+// Watchers for prop changes
 watch(() => props.hblId, (newVal) => {
     if (newVal !== undefined) {
         fetchHBL();
     }
-}, { immediate: true }); // Immediate to trigger on mount
+});
 
 watch(() => props.pickupId, (newVal) => {
     if (newVal !== undefined) {
         fetchPickup();
     }
-}, { immediate: true }); // Immediate to trigger on mount
+});
+
+// Run after component is mounted
+onMounted(() => {
+    if (props.hblId !== null) {
+        fetchHBL();
+    }
+
+    if (props.pickupId !== null) {
+        fetchPickup();
+    }
+});
 
 const emit = defineEmits(['close']);
 </script>
