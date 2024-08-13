@@ -183,8 +183,9 @@ const addPackageData = () => {
         packageList.value.push(newItem); // Add the new item to packageList
         form.packages = packageList.value;
 
+        const volume = parseFloat(newItem.volume) || 0;
         grandTotalWeight.value += parseFloat(newItem.totalWeight);
-        grandTotalVolume.value += parseFloat(newItem.volume);
+        grandTotalVolume.value += parseFloat(volume.toFixed(3));
         calculatePayment();
     }
     closeAddPackageModal();
@@ -213,7 +214,7 @@ watch(
         const totalWeightKg = (volumeCubicMeters * newQuantity) / 1000; // 1 gram = 0.001 kilograms
 
         // Update reactive properties
-        packageItem.volume = volumeCubicMeters.toFixed(2);
+        packageItem.volume = volumeCubicMeters.toFixed(3);
         // packageItem.totalWeight = totalWeightKg;
     }
 );
@@ -1481,7 +1482,7 @@ const shipIcon = ref(`
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Volume</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        {{ grandTotalVolume }}
+                                        {{ grandTotalVolume.toFixed(2) }}
                                     </p>
                                 </div>
                             </div>
@@ -1922,7 +1923,7 @@ const shipIcon = ref(`
                                         v-model="packageItem.volume"
                                         class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         placeholder="1.00"
-                                        step="0.01"
+                                        step="0.001"
                                         type="number"
                                     />
                                 </label>
