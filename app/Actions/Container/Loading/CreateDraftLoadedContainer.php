@@ -37,7 +37,7 @@ class CreateDraftLoadedContainer
 
                 $hbl->addStatus('Container Loading');
 
-                UpdateHBLSystemStatus::run($hbl, 4.1);
+                UpdateHBLSystemStatus::run($hbl, 4.2);
 
                 MarkAsLoaded::run($package['id']);
             }
