@@ -148,6 +148,10 @@ const handleDeleteDoc = () => {
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload">
 
+                                    <a  v-if="containerDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')" :href="route('loading.containers-documents.download', containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').id)">
+                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    </a>
+
                                     <input ref="blDocumentInput" hidden type="file"
                                            @input="handleFileInput($event, 'blDocument')"/>
 
@@ -219,6 +223,10 @@ const handleDeleteDoc = () => {
                                 <form v-if="$page.props.user.permissions.includes('container.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
+
+                                    <a  v-if="containerDocumentsRecords.some(doc => doc.document_name === 'Manifest')" :href="route('loading.containers-documents.download', containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').id)">
+                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    </a>
 
                                     <input ref="manifestDocumentInput" hidden type="file"
                                            @input="handleFileInput($event, 'manifestDocument')"/>
@@ -292,6 +300,10 @@ const handleDeleteDoc = () => {
                                 <form v-if="$page.props.user.permissions.includes('container.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
+
+                                    <a  v-if="containerDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')" :href="route('loading.containers-documents.download', containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id)">
+                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    </a>
 
                                     <input ref="receiptDocumentInput" hidden type="file"
                                            @input="handleFileInput($event, 'receiptDocument')"/>

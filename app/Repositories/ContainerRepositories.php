@@ -14,6 +14,7 @@ use App\Actions\Container\Unloading\UnloadHBLPackages;
 use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\ContainerDocument\DeleteDocument;
+use App\Actions\ContainerDocument\DownloadDocument;
 use App\Actions\ContainerDocument\UploadDocument;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
 use App\Enum\ContainerStatus;
@@ -335,5 +336,10 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         $containerDetails = $package ? $package->containers->flatten()->first() : [];
 
         return response()->json($containerDetails);
+    }
+
+    public function downloadDocument(ContainerDocument $container_document)
+    {
+        return DownloadDocument::run($container_document);
     }
 }

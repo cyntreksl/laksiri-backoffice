@@ -1,7 +1,7 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
 import {router, useForm} from "@inertiajs/vue3";
-import {onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {push} from "notivue";
 import DeleteDocConfirmationModal from "@/Pages/Common/Partials/DeleteDocConfirmationModal.vue";
 
@@ -187,6 +187,10 @@ onMounted(() => {
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
 
+                                    <a  v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Copy of Passport')" :href="route('hbls.download.document-hbl-document', hblDocumentsRecords.find(doc => doc.document_name === 'Copy of Passport').id)">
+                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    </a>
+
                                     <input ref="passportInput" hidden type="file"
                                            @input="handleFileInput($event, 'passport')"/>
 
@@ -258,6 +262,10 @@ onMounted(() => {
                                 <form v-if="$page.props.user.permissions.includes('hbls.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
+
+                                    <a  v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Copy of NIC')" :href="route('hbls.download.document-hbl-document', hblDocumentsRecords.find(doc => doc.document_name === 'Copy of NIC').id)">
+                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    </a>
 
                                     <input ref="nicInput" hidden type="file"
                                            @input="handleFileInput($event, 'nic')"/>
@@ -331,6 +339,10 @@ onMounted(() => {
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
 
+                                    <a  v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Packing List')" :href="route('hbls.download.document-hbl-document', hblDocumentsRecords.find(doc => doc.document_name === 'Packing List').id)">
+                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    </a>
+
                                     <input ref="packingListInput" hidden type="file"
                                            @input="handleFileInput($event, 'packing')"/>
 
@@ -403,6 +415,10 @@ onMounted(() => {
                                 <form v-if="$page.props.user.permissions.includes('hbls.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
+
+                                    <a  v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Special Note')" :href="route('hbls.download.document-hbl-document', hblDocumentsRecords.find(doc => doc.document_name === 'Special Note').id)">
+                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    </a>
 
                                     <input ref="specialNoteInput" hidden type="file"
                                            @input="handleFileInput($event, 'specialNote')"/>

@@ -28,6 +28,9 @@ Route::name('loading.')->group(function () {
 
     Route::get('/get-container/{hbl}', [ContainerController::class, 'getContainerByHBL']);
 
+    Route::get('containers-documents/{container_document}', [ContainerController::class, 'downloadDocument'])
+        ->name('containers-documents.download');
+
     // Loading Point
     Route::get('loading-points/{container}', [ContainerController::class, 'showLoadingPoint'])
         ->name('loading-points.index');

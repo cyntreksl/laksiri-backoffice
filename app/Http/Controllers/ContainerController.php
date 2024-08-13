@@ -232,4 +232,11 @@ class ContainerController extends Controller
     {
         return $this->containerRepository->getContainerByHBL($hbl);
     }
+
+    public function downloadDocument(ContainerDocument $container_document)
+    {
+        $this->authorize('container.download documents');
+
+        return $this->containerRepository->downloadDocument($container_document);
+    }
 }
