@@ -56,3 +56,6 @@ Route::get('/create-token/{hbl}', [HBLController::class, 'createToken'])
 
 Route::get('hbls/get-hbls-by-user/{user}', [HBLController::class, 'getHBLsByUser'])
     ->name('hbls.get-hbls-by-user');
+
+Route::get('hbls/download/document/{hbl_document}', [HBLController::class, 'downloadDocument'])
+    ->name('hbls.download.document-hbl-document');

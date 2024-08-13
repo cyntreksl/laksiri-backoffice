@@ -259,4 +259,11 @@ class HBLController extends Controller
             'userData' => $user,
         ]);
     }
+
+    public function downloadDocument(HBLDocument $hbl_document)
+    {
+        $this->authorize('hbls.download pdf');
+
+        return $this->HBLRepository->downloadDocument($hbl_document);
+    }
 }

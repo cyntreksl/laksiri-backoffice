@@ -21,6 +21,7 @@ use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
 use App\Actions\HBL\UpdateHBLPackages;
 use App\Actions\HBLDocument\DeleteDocument;
+use App\Actions\HBLDocument\DownloadDocument;
 use App\Actions\HBLDocument\UploadDocument;
 use App\Exports\CancelledHBLExport;
 use App\Exports\HBLExport;
@@ -274,5 +275,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function getHBLStatusByReference(string $reference): JsonResponse
     {
         return GetHBLStatusByReference::run($reference);
+    }
+
+    public function downloadDocument(HBLDocument $hbl_document)
+    {
+        return DownloadDocument::run($hbl_document);
     }
 }
