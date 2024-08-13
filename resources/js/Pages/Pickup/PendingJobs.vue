@@ -2,7 +2,6 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h, html} from "gridjs";
-import {Link} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
 import moment from "moment";
@@ -232,7 +231,26 @@ const createColumns = () => [
             return html(`<a style="text-decoration: underline; color: blue" href="pickups/get-pending-jobs-by-user/${cell}">${value.substring(0, 20) + '...'}</a>`);
         }
     },
-    {name: "Email", hidden: !data.columnVisibility.email},
+    {
+        name: "Email",
+        hidden: !data.columnVisibility.email,
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        },
+    },
     {
         name: "Address",
         hidden: !data.columnVisibility.address,
