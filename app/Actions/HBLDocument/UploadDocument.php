@@ -15,10 +15,10 @@ class UploadDocument
             $hbl_document = HBLDocument::firstOrNew(
                 [
                     'document_name' => $data['document_name'],
+                    'hbl_id' => $data['hbl_id'],
                 ],
                 [
                     'uploaded_by' => auth()->id(),
-                    'hbl_id' => $data['hbl_id'],
                 ]
             );
 
