@@ -25,11 +25,11 @@
                     >
                         <!-- Dashboard -->
                         <Link :href="route('call-center.dashboard')"
-                            :class="[
+                              :class="[
                 activeMenu === 'call-center.dashboard' ? 'bg-primary/10 text-primary' : '',
               ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-navy-600 dark:text-accent-light dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                            x-tooltip.placement.right="'Dashboard'"
+                              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-navy-600 dark:text-accent-light dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                              x-tooltip.placement.right="'Dashboard'"
                         >
                             <svg
                                 class="icon icon-tabler icons-tabler-outline icon-tabler-home"
@@ -83,19 +83,45 @@
                                     <path d="M9 8h.01"/>
                                 </svg>
                             </a>
-                            <!-- Queue -->
-                            <Link :class="[
-                activeMenu === 'queue' ? 'bg-primary/10 text-primary' : '',
+                            <!-- Queue Screen -->
+                            <a
+                                :class="[
+                activeMenu === 'screens' ? 'bg-primary/10 text-primary' : '',
               ]"
-                                :href="route('call-center.queue.index')"
                                 class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.right="'Queue'"
+                                x-tooltip.placement.right="'Queue Screens'"
                                 @click="
-                setMenu('queue');
+                setMenu('screens');
+                openSideBar();
               "
                             >
-                                   <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-route-square"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M3 17h4v4h-4z" /><path d="M17 3h4v4h-4z" /><path d="M11 19h5.5a3.5 3.5 0 0 0 0 -7h-8a3.5 3.5 0 0 1 0 -7h4.5" /></svg>
-                            </Link>
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-screen-share" fill="none" height="24" stroke="currentColor"
+                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                     width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M21 12v3a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1h9"/>
+                                    <path d="M7 20l10 0"/>
+                                    <path d="M9 16l0 4"/>
+                                    <path d="M15 16l0 4"/>
+                                    <path d="M17 4h4v4"/>
+                                    <path d="M16 9l5 -5"/>
+                                </svg>
+                            </a>
+                            <!-- Document Verifications -->
+                            <a
+                                :class="[
+                activeMenu === 'verifications' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Document Verifications'"
+                                @click="
+                setMenu('verifications');
+                openSideBar();
+              "
+                            >
+                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-certificate"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M15 15m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M13 17.5v4.5l2 -1.5l2 1.5v-4.5" /><path d="M10 19h-5a2 2 0 0 1 -2 -2v-10c0 -1.1 .9 -2 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -1 1.73" /><path d="M6 9l12 0" /><path d="M6 12l3 0" /><path d="M6 15l2 0" /></svg>
+                            </a>
                             <!-- Arrivals -->
                             <a
                                 v-if="usePage().props.auth.user.roles[0].name !== 'call center'"
@@ -686,7 +712,7 @@
     </div>
 </template>
 <script>
-import {reactive, ref} from "vue";
+import {reactive, ref, watch} from "vue";
 import {useMonochromeSelector} from "../composable/monochromeMode.js";
 import {useDarkModeSelector} from "../composable/darkMode.js";
 import {Head, router, usePage} from "@inertiajs/vue3";
@@ -724,7 +750,7 @@ export default {
         };
 
         const isSidebarExpanded = ref(
-            localStorage.getItem("sidebar-expanded") === "false"
+            localStorage.getItem("sidebar-expanded") === true
         );
 
         const toggleSideBar = () => {
@@ -785,6 +811,40 @@ export default {
                         },
                     );
                     changeSidePanelTitle("HBL");
+                    break;
+                case "screens":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Document Verification Queue",
+                            route: "call-center.queue.screens.document-verification",
+                        },
+                        {
+                            title: "Cashier Queue",
+                            route: "call-center.queue.screens.cashier",
+                        },
+                        {
+                            title: "Examination Queue",
+                            route: "call-center.queue.screens.examination",
+                        }
+                    );
+                    changeSidePanelTitle("Queue Screens");
+                    break;
+                case "verifications":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Document Verification Queue",
+                            route: "call-center.queue.screens.document-verification",
+                        },
+                        {
+                            title: "Verified List",
+                            route: "call-center.queue.screens.cashier",
+                        },
+                    );
+                    changeSidePanelTitle("Document Verifications");
                     break;
                 case "delivery":
                     childMenuList.splice(

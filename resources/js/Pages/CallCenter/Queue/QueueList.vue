@@ -71,7 +71,7 @@ setInterval(getDocumentVerificationQueue, 3000);
                                 </h3>
                             </div>
                         </div>
-                        <div class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
+                        <div class="is-scrollbar-hidden relative space-y-5 overflow-y-auto p-0.5 mx-auto"
                              x-init="Sortable.create($el, {
                             animation: 200,
                             group: 'board-cards',
@@ -81,7 +81,7 @@ setInterval(getDocumentVerificationQueue, 3000);
                             delayOnTouchOnly: true,
                         })">
                             <template v-for="queue in documentVerificationQueue">
-                                <Link :href="route('call-center.verification.create', queue.id)" class="card grow cursor-pointer hover:bg-info/20 items-center p-4 text-center sm:p-5">
+                                <Link :href="route('call-center.verification.create', queue.id)" class="card grow cursor-pointer hover:bg-info/20 items-center p-4 text-center sm:p-5 border w-80 rounded-lg">
                                     <div class="my-5">
                                         <h1 class="text-8xl text-black font-bold">{{ queue.token }}</h1>
                                     </div>
