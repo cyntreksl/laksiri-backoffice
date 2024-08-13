@@ -31,11 +31,12 @@ class PickupObserver
         $userExists = User::where('username', $data['username'])
             ->first();
 
-        if (! $userExists) {
+        if ($userExists) {
+            $pickup->shipper_id = $userExists->id;
+        } else {
             $user = CreateUser::run($data);
-
             $pickup->shipper_id = $user->id;
-            $pickup->save();
         }
+        $pickup->save();
     }
 }

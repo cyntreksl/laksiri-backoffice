@@ -16,8 +16,6 @@ import persist from "@alpinejs/persist"; // @see https://alpinejs.dev/plugins/pe
 import collapse from "@alpinejs/collapse"; // @see https://alpinejs.dev/plugins/collapse
 import intersect from "@alpinejs/intersect"; // @see https://alpinejs.dev/plugins/intersect
 import SimpleBar from "simplebar";
-import hljs from "highlight.js/lib/core";
-import xml from "highlight.js/lib/languages/xml";
 import dayjs from "dayjs";
 import Swiper from "swiper/bundle";
 import Sortable from "sortablejs";
@@ -39,10 +37,7 @@ import tooltip from "./directives/tooltip";
 import inputMask from "./directives/inputMask";
 import notification from "./magics/notification";
 import clipboard from "./magics/clipboard";
-hljs.registerLanguage("xml", xml);
-hljs.configure({ ignoreUnescapedHTML: true });
 FilePond.registerPlugin(FilePondPluginImagePreview);
-window.hljs = hljs;
 window.dayjs = dayjs;
 window.SimpleBar = SimpleBar;
 window.Swiper = Swiper;

@@ -43,22 +43,25 @@ class HBLObserver
         $shipperUserExists = User::where('username', $shipperData['username'])
             ->first();
 
-        if (! $shipperUserExists) {
+        if ($shipperUserExists) {
+            $hbl->shipper_id = $shipperUserExists->id;
+        } else {
             $shipperUser = CreateUser::run($shipperData);
-
             $hbl->shipper_id = $shipperUser->id;
-            $hbl->save();
         }
+
+        $hbl->save();
 
         $consigneeUserExists = User::where('username', $consigneeData['username'])
             ->first();
 
-        if (! $consigneeUserExists) {
+        if ($consigneeUserExists) {
+            $hbl->consignee_id = $consigneeUserExists->id;
+        } else {
             $consigneeUser = CreateUser::run($consigneeData);
-
             $hbl->consignee_id = $consigneeUser->id;
-            $hbl->save();
         }
+        $hbl->save();
     }
 
     /**
