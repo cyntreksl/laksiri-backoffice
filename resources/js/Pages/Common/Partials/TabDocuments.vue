@@ -1,7 +1,7 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
 import {router, useForm} from "@inertiajs/vue3";
-import {ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {push} from "notivue";
 import DeleteDocConfirmationModal from "@/Pages/Common/Partials/DeleteDocConfirmationModal.vue";
 
@@ -115,7 +115,17 @@ const handleDeleteDoc = () => {
     });
 };
 
-fetchHBLDocuments()
+watch(() => props.hblId, (newVal) => {
+    if (newVal !== undefined) {
+        fetchHBLDocuments();
+    }
+});
+
+onMounted(() => {
+    if (props.hblId !== null && props.hblId !== undefined) {
+        fetchHBLDocuments();
+    }
+});
 </script>
 
 <template>

@@ -1,11 +1,12 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
 import AccordionPanel from "@/Components/AccordionPanel.vue";
-import {ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import moment from "moment";
 import NotFound from '@/../images/illustrations/empty-girl-box.svg';
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import AuditDetails from "@/Pages/Common/Components/AuditDetails.vue";
+import PostSkeleton from "@/Components/PostSkeleton.vue";
 
 const props = defineProps({
     hbl: {
@@ -17,8 +18,11 @@ const props = defineProps({
 
 const pickupStatus = ref([]);
 const hblStatus = ref([]);
+const isLoadingPickupStatus = ref(false);
 
 const fetchPickupStatus = async () => {
+    isLoadingPickupStatus.value = true;
+
     try {
         const response = await fetch(`get-pickup-status/${props.hbl?.id}`, {
             method: "GET",
@@ -37,10 +41,16 @@ const fetchPickupStatus = async () => {
 
     } catch (error) {
         console.log(error);
+    } finally {
+        isLoadingPickupStatus.value = false;
     }
 }
 
+const isLoadingHBLStatus = ref(false);
+
 const fetchHBLStatus = async () => {
+    isLoadingHBLStatus.value = true;
+
     try {
         const response = await fetch(`get-hbl-status/${props.hbl?.id}`, {
             method: "GET",
@@ -59,11 +69,10 @@ const fetchHBLStatus = async () => {
 
     } catch (error) {
         console.log(error);
+    } finally {
+        isLoadingHBLStatus.value = false;
     }
 }
-
-fetchPickupStatus()
-fetchHBLStatus()
 
 const pickupStatusColor = (status) => {
     switch (status) {
@@ -100,8 +109,11 @@ const hblStatusColor = (status) => {
 };
 
 const pickup = ref({});
+const isLoadingPickup = ref(false);
 
 const fetchPickup = async () => {
+    isLoadingPickup.value = true;
+
     try {
         const response = await fetch(`/pickups/${props.hbl.pickup_id}`, {
             method: "GET",
@@ -120,18 +132,17 @@ const fetchPickup = async () => {
 
     } catch (error) {
         console.log(error);
+    } finally {
+        isLoadingPickup.value = false;
     }
 }
 
-watch(() => props.hbl, (newVal) => {
-    if (newVal.pickup_id !== null) {
-        fetchPickup();
-    }
-}, { immediate: true }); // Immediate to trigger on mount
-
 const container = ref({});
+const isLoadingContainer = ref(false);
 
 const fetchContainer = async () => {
+    isLoadingContainer.value = true;
+
     try {
         const response = await fetch(`/get-container/${props.hbl.id}`, {
             method: "GET",
@@ -150,14 +161,17 @@ const fetchContainer = async () => {
 
     } catch (error) {
         console.log(error);
+    } finally {
+        isLoadingContainer.value = false;
     }
 }
 
-fetchContainer();
-
 const unloadingIssues = ref({});
+const isLoadingUnloadingIssues = ref(false);
 
 const fetchUnloadingIssues = async () => {
+    isLoadingUnloadingIssues.value = true;
+
     try {
         const response = await fetch(`/get-unloading-issues-by-hbl/${props.hbl.id}`, {
             method: "GET",
@@ -176,14 +190,17 @@ const fetchUnloadingIssues = async () => {
 
     } catch (error) {
         console.log(error);
+    } finally {
+        isLoadingUnloadingIssues.value = false;
     }
 }
 
-fetchUnloadingIssues();
-
 const logs = ref({});
+const isLoadingLogs = ref(false);
 
 const fetchLogs = async () => {
+    isLoadingLogs.value = true;
+
     try {
         const response = await fetch(`/get-logs/${props.hbl.id}`, {
             method: "GET",
@@ -202,10 +219,32 @@ const fetchLogs = async () => {
 
     } catch (error) {
         console.log(error);
+    } finally {
+        isLoadingLogs.value = false;
     }
 }
 
-fetchLogs();
+watch(() => props.hbl, (newVal) => {
+    if (newVal !== undefined) {
+        fetchPickupStatus();
+        fetchHBLStatus();
+        fetchPickup();
+        fetchLogs();
+        fetchUnloadingIssues();
+        fetchContainer();
+    }
+});
+
+onMounted(() => {
+    if (props.hbl !== null && props.hbl.id !== undefined) {
+        fetchPickupStatus();
+        fetchHBLStatus();
+        fetchPickup();
+        fetchLogs();
+        fetchUnloadingIssues();
+        fetchContainer();
+    }
+});
 </script>
 
 <template>
@@ -220,7 +259,9 @@ fetchLogs();
             </div>
         </div>
 
-        <AccordionPanel show-panel title="Cargo Status">
+        <PostSkeleton v-if="isLoadingPickupStatus && isLoadingHBLStatus" />
+
+        <AccordionPanel v-else show-panel title="Cargo Status">
             <template #header-image>
                 <div
                     class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
@@ -330,7 +371,9 @@ fetchLogs();
             </div>
         </AccordionPanel>
 
-        <AccordionPanel show-panel title="Shipment Details">
+        <PostSkeleton v-if="isLoadingContainer" />
+
+        <AccordionPanel v-else show-panel title="Shipment Details">
             <template #header-image>
                 <div
                     class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
@@ -384,7 +427,9 @@ fetchLogs();
             </div>
         </AccordionPanel>
 
-        <AccordionPanel show-panel title="Complaint Details">
+        <PostSkeleton v-if="isLoadingUnloadingIssues" />
+
+        <AccordionPanel v-else show-panel title="Complaint Details">
             <template #header-image>
                 <div
                     class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
@@ -507,7 +552,9 @@ fetchLogs();
             </div>
         </AccordionPanel>
 
-        <AccordionPanel show-panel title="Audit Details">
+        <PostSkeleton v-if="isLoadingLogs" />
+
+        <AccordionPanel v-else show-panel title="Audit Details">
             <template #header-image>
                 <div
                     class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
