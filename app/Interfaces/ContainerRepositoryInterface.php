@@ -39,4 +39,6 @@ interface ContainerRepositoryInterface
     public function deleteDocument(ContainerDocument $containerDocument);
 
     public function getContainerByHBL(HBL $hbl);
+
+    public function downloadDocument(ContainerDocument $container_document);
 }
