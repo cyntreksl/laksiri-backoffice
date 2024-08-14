@@ -19,10 +19,10 @@ class PickupRepository implements PickupRepositoryInterface
 {
     use ResponseAPI;
 
-    public function getPendingPickupsForDriver(): JsonResponse
+    public function getPendingPickupsForDriver(array $data): JsonResponse
     {
         try {
-            $pickups = GetPickupsByDriver::run();
+            $pickups = GetPickupsByDriver::run($data);
 
             // Transform pickups into resource format
             $pendingPickupsResource = PickupResource::collection($pickups);
@@ -78,10 +78,18 @@ class PickupRepository implements PickupRepositoryInterface
         }
     }
 
-    public function completedPickupWithHBL(): JsonResponse
+    public function completedPickupWithHBL(array $data): JsonResponse
     {
         try {
-            $pickups = PickUp::where('status', PickupStatus::COLLECTED)->where('driver_id', auth()->id())->with('hbl')->get();
+            $query = PickUp::query()->where('status', PickupStatus::COLLECTED);
+
+            if (isset($data['start_date']) && isset($data['end_date'])) {
+                $query->whereBetween('pickup_date', [$data['start_date'], $data['end_date']]);
+            }
+
+            $pickups = $query->where('driver_id', auth()->id())
+                ->with('hbl')
+                ->get();
 
             // Transform pickups into resource format
             $completedPickupsResource = PickupResource::collection($pickups);
@@ -92,10 +100,10 @@ class PickupRepository implements PickupRepositoryInterface
         }
     }
 
-    public function getPickupExceptionsForDriver(): JsonResponse
+    public function getPickupExceptionsForDriver(array $data): JsonResponse
     {
         try {
-            $pickupExceptions = GetPickupExceptionsByDriver::run();
+            $pickupExceptions = GetPickupExceptionsByDriver::run($data);
 
             // Transform pickup exception into resource format
             $pickupExceptionResource = PickupExceptionResource::collection($pickupExceptions);

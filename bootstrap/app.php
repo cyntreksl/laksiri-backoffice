@@ -25,10 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetTimezone::class,
         ]);
 
-        $middleware->api(append: [
-            \App\Http\Middleware\SetTimezone::class,
-        ]);
-
         $middleware->redirectGuestsTo('/login');
         $middleware->alias([
             'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,

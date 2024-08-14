@@ -9,9 +9,14 @@ class GetPickupExceptionsByDriver
 {
     use AsAction;
 
-    public function handle()
+    public function handle(array $data)
     {
-        return PickupException::assignedToDriver()
-            ->get();
+        $query = PickupException::query()->assignedToDriver();
+
+        if (isset($data['start_date']) && isset($data['end_date'])) {
+            $query->whereBetween('pickup_date', [$data['start_date'], $data['end_date']]);
+        }
+
+        return $query->get();
     }
 }
