@@ -8,6 +8,7 @@ use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\StorePickupToHBLRequest;
 use App\Interfaces\Api\PickupRepositoryInterface;
 use App\Models\PickUp;
+use Illuminate\Http\Request;
 
 class PickupController extends Controller
 {
@@ -23,9 +24,10 @@ class PickupController extends Controller
      *
      * @group Pickups
      */
-    public function index()
+    public function index(Request $request)
     {
-        return $this->pickupRepository->getPendingPickupsForDriver();
+        return $this->pickupRepository
+            ->getPendingPickupsForDriver($request->only('start_date', 'end_date'));
     }
 
     /**
@@ -83,9 +85,9 @@ class PickupController extends Controller
      *
      * @group Pickups
      */
-    public function completedPickupWithHBL()
+    public function completedPickupWithHBL(Request $request)
     {
-        return $this->pickupRepository->completedPickupWithHBL();
+        return $this->pickupRepository->completedPickupWithHBL($request->only('start_date', 'end_date'));
     }
 
     /**
@@ -95,8 +97,9 @@ class PickupController extends Controller
      *
      * @group Pickups
      */
-    public function getPickupExceptions()
+    public function getPickupExceptions(Request $request)
     {
-        return $this->pickupRepository->getPickupExceptionsForDriver();
+        return $this->pickupRepository
+            ->getPickupExceptionsForDriver($request->only('start_date', 'end_date'));
     }
 }

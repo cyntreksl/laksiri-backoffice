@@ -10,9 +10,9 @@ interface PickupRepositoryInterface
     /**
      * Retrieve pending pickups assigned to the authenticated driver.
      *
-     * @method  GET api/v1/pending-pickup-list
+     * @method  GET api.laksiri.world/v1/pending-pickup-list?start_date={pickup_date}&end_date={pickup_date}
      */
-    public function getPendingPickupsForDriver();
+    public function getPendingPickupsForDriver(array $data);
 
     /**
      * Retrieve details of a pending pickup assigned to the authenticated driver.
@@ -21,14 +21,14 @@ interface PickupRepositoryInterface
      *
      * @param  PickUp  $pickup  The pending pickup to retrieve details for.
      *
-     * @method GET api/v1/pickups/{id}
+     * @method GET api.laksiri.world/v1/pickups/{id}
      */
     public function showPickup(PickUp $pickup): JsonResponse;
 
     /**
      * Convert a pickup to HBL.
      *
-     * @method  POST api/v1/pickup-to-hbl/{pickUp}
+     * @method  POST api.laksiri.world/v1/pickup-to-hbl/{pickUp}
      */
     public function pickupToHbl($pickUp, $request);
 
@@ -62,14 +62,14 @@ interface PickupRepositoryInterface
      *
      * This method retrieves a list of completed pickups along with their corresponding HBLs.
      *
-     * @method GET api.laksiri.world/v1/pickups/completed/list
+     * @method GET api.laksiri.world/v1/pickups/completed/list?start_date={pickup_date}&end_date={pickup_date}
      */
-    public function completedPickupWithHBL(): JsonResponse;
+    public function completedPickupWithHBL(array $data): JsonResponse;
 
     /**
      * Retrieve pickup exceptions to the authenticated driver.
      *
-     * @method  GET api.laksiri.world/v1/pickups/exceptions/list
+     * @method  GET api.laksiri.world/v1/pickups/exceptions/list?start_date={pickup_date}&end_date={pickup_date}
      */
-    public function getPickupExceptionsForDriver(): JsonResponse;
+    public function getPickupExceptionsForDriver(array $data): JsonResponse;
 }
