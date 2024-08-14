@@ -16,7 +16,12 @@ Breadcrumbs::for('call-center.hbls.index', function (BreadcrumbTrail $trail) {
     $trail->push('HBL List', route('call-center.hbls.index'));
 });
 
-// HBLs
+Breadcrumbs::for('call-center.verification.queue.list', function (BreadcrumbTrail $trail) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Document Verification');
+    $trail->push('Queue', route('call-center.verification.queue.list'));
+});
+
 Breadcrumbs::for('call-center.verification.create', function (BreadcrumbTrail $trail, CustomerQueue $customerQueue) {
     $trail->parent('call-center.dashboard');
     $trail->push('Queue');

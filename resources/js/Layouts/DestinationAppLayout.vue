@@ -837,7 +837,7 @@ export default {
                         childMenuList.length,
                         {
                             title: "Document Verification Queue",
-                            route: "call-center.queue.screens.document-verification",
+                            route: "call-center.verification.queue.list",
                         },
                         {
                             title: "Verified List",
