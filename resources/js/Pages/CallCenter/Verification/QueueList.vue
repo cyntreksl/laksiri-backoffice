@@ -17,7 +17,7 @@ defineProps({
 
         <Breadcrumb />
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-5">
+        <div v-if="Object.keys(verificationQueue).length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-5">
             <Link v-for="queue in verificationQueue" :key="queue.id" :href="route('call-center.verification.create', queue.id)" class="card grow cursor-pointer hover:bg-green-300 items-center p-4 text-center sm:p-5 border w-60 rounded-lg">
                 <div class="my-5">
                     <h1 class="text-7xl text-black font-bold">{{ queue.token }}</h1>
@@ -34,6 +34,10 @@ defineProps({
                     </button>
                 </div>
             </Link>
+        </div>
+
+        <div v-else class="flex justify-center mt-20 w-full">
+            <p class="text-xl">No Tokens Available</p>
         </div>
     </DestinationAppLayout>
 </template>

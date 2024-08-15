@@ -27,6 +27,21 @@ class VerificationController extends Controller
 
     public function create(CustomerQueue $customerQueue)
     {
+        if (! $customerQueue->arrived_at) {
+            $customerQueue->update([
+                'arrived_at' => now(),
+            ]);
+
+            // set queue status log
+            $customerQueue->addQueueStatus(
+                CustomerQueue::DOCUMENT_VERIFICATION_QUEUE,
+                $customerQueue->token->customer_id,
+                $customerQueue->token_id,
+                now(),
+                null,
+            );
+        }
+
         return Inertia::render('CallCenter/Verification/VerificationForm', [
             'customerQueue' => $customerQueue,
             'verificationDocuments' => Verification::verification_documents(),

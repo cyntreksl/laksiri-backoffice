@@ -96,9 +96,17 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
             // set customer queue
             $token->customerQueue()->create([
-                'arrived_at' => now(),
                 'type' => CustomerQueue::DOCUMENT_VERIFICATION_QUEUE,
             ]);
+
+            // set queue status log
+            $hbl->addQueueStatus(
+                CustomerQueue::TOKEN_ISSUED,
+                $hbl->consignee_id,
+                $token->id,
+                date('Y-m-d H:i:s', (time() - 60)),
+                now(),
+            );
 
             // print token pdf
             $customPaper = [0, 0, 283.80, 567.00];
