@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\HasQueueLogs;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Verification extends Model
 {
@@ -25,5 +26,10 @@ class Verification extends Model
             'Passport',
             'HBL Receipt',
         ];
+    }
+
+    public function token(): BelongsTo
+    {
+        return $this->belongsTo(Token::class, 'token_id');
     }
 }

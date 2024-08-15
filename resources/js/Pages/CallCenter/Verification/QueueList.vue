@@ -2,12 +2,17 @@
 import {Link} from "@inertiajs/vue3";
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import {computed} from "vue";
 
-defineProps({
+const props = defineProps({
     verificationQueue: {
         type: Object,
         default: () => {}
     }
+})
+
+const filteredVerificationQueue = computed(() => {
+    return props.verificationQueue.filter(q => q.is_verified === false);
 })
 </script>
 
@@ -17,8 +22,8 @@ defineProps({
 
         <Breadcrumb />
 
-        <div v-if="Object.keys(verificationQueue).length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-5">
-            <Link v-for="queue in verificationQueue" :key="queue.id" :href="route('call-center.verification.create', queue.id)" class="card grow cursor-pointer hover:bg-green-300 items-center p-4 text-center sm:p-5 border w-60 rounded-lg">
+        <div v-if="Object.keys(filteredVerificationQueue).length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-5">
+            <Link v-for="queue in filteredVerificationQueue" :key="queue.id" :href="route('call-center.verification.create', queue.id)" class="card grow cursor-pointer hover:bg-green-300 items-center p-4 text-center sm:p-5 border w-60 rounded-lg">
                 <div class="my-5">
                     <h1 class="text-7xl text-black font-bold">{{ queue.token }}</h1>
                 </div>
