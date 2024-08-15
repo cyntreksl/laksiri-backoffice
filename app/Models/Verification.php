@@ -10,6 +10,18 @@ class Verification extends Model
     use HasFactory;
 
     protected $fillable = [
-        'is_checked'
+        'is_checked', 'verified_by', 'customer_queue_id', 'token_id', 'note',
     ];
+
+    protected $casts = [
+        'is_checked' => 'array',
+    ];
+
+    public static function verification_documents(): array
+    {
+        return [
+            'Passport',
+            'HBL Receipt',
+        ];
+    }
 }

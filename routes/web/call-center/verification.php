@@ -7,3 +7,6 @@ Route::get('/verification/queue/list', [VerificationController::class, 'getVerif
 
 Route::get('/verification/{customer_queue}', [VerificationController::class, 'create'])
     ->name('verification.create');
+
+Route::post('/verification', [VerificationController::class, 'store'])
+    ->name('verification.store');

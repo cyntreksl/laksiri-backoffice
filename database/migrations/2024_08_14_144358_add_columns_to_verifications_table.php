@@ -12,9 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('verifications', function (Blueprint $table) {
-            $table->json('is_checked')
-                ->nullable()
-                ->after('id');
+            $table->after('id', function (Blueprint $table) {
+                $table->json('is_checked')
+                    ->nullable();
+                $table->unsignedBigInteger('verified_by');
+                $table->unsignedBigInteger('customer_queue_id');
+                $table->unsignedBigInteger('token_id');
+                $table->text('note')->nullable();
+            });
         });
     }
 
@@ -24,7 +29,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('verifications', function (Blueprint $table) {
-            $table->dropColumn('is_checked');
+            $table->dropColumn(['is_checked', 'verified_by', 'note', 'customer_queue_id', 'token_id']);
         });
     }
 };
