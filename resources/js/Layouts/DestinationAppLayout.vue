@@ -841,7 +841,7 @@ export default {
                         },
                         {
                             title: "Verified List",
-                            route: "call-center.queue.screens.cashier",
+                            route: "call-center.verification.verified.list",
                         },
                     );
                     changeSidePanelTitle("Document Verifications");

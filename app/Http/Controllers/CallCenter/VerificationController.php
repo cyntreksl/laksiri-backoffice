@@ -52,4 +52,11 @@ class VerificationController extends Controller
     {
         $this->verificationRepository->storeVerification($request->all());
     }
+
+    public function getVerifiedList()
+    {
+        return Inertia::render('CallCenter/Verification/VerifiedList', [
+            'verifiedQueue' => $this->queueRepository->getDocumentVerificationQueue()->getData(),
+        ]);
+    }
 }
