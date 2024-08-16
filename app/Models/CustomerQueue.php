@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasQueueLogs;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CustomerQueue extends Model
 {
     use HasFactory;
+    use HasQueueLogs;
+
+    const TOKEN_ISSUED = 'TOKEN_ISSUED';
 
     const DOCUMENT_VERIFICATION_QUEUE = 'DOCUMENT_VERIFICATION_QUEUE';
 

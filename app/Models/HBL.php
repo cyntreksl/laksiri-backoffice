@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Scopes\BranchScope;
 use App\Observers\HBLObserver;
+use App\Traits\HasQueueLogs;
 use App\Traits\HasStatusLogs;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -23,6 +24,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class HBL extends Model
 {
     use HasFactory;
+    use HasQueueLogs;
     use HasStatusLogs;
     use LogsActivity;
     use SoftDeletes;
