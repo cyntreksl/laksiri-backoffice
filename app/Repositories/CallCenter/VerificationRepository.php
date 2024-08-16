@@ -3,10 +3,12 @@
 namespace App\Repositories\CallCenter;
 
 use App\Actions\Verification\CreateVerification;
+use App\Http\Resources\CallCenter\CustomerQueueResource;
 use App\Interfaces\CallCenter\VerificationRepositoryInterface;
+use App\Interfaces\GridJsInterface;
 use App\Models\CustomerQueue;
 
-class VerificationRepository implements VerificationRepositoryInterface
+class VerificationRepository implements GridJsInterface, VerificationRepositoryInterface
 {
     public function storeVerification(array $data): void
     {
@@ -32,5 +34,29 @@ class VerificationRepository implements VerificationRepositoryInterface
         } catch (\Exception $e) {
             throw new \Exception('Failed to verified: '.$e->getMessage());
         }
+    }
+
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        $query = CustomerQueue::query()
+            ->documentVerificationQueue()
+            ->has('token.verification');
+
+        $records = $query->orderBy($order, $direction)
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        $totalRecords = $query->count();
+
+        return response()->json([
+            'data' => CustomerQueueResource::collection($records),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
     }
 }

@@ -19,7 +19,7 @@ class CustomerQueueResource extends JsonResource
             'token' => $this->token->token,
             'package_count' => $this->token->package_count,
             'reference' => $this->token->reference,
-            'created_at' => $this->token->created_at,
+            'created_at' => $this->token->created_at->format('Y-m-d H:i:s'),
             'customer' => $this->token->customer->name,
             'reception' => $this->token->reception->name,
             'is_verified' => $this->token->isVerified(),

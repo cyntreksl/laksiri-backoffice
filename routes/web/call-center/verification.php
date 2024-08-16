@@ -11,5 +11,7 @@ Route::get('/verification/{customer_queue}', [VerificationController::class, 'cr
 Route::post('/verification', [VerificationController::class, 'store'])
     ->name('verification.store');
 
-Route::get('/verification/verified/list', [VerificationController::class, 'getVerifiedList'])
-    ->name('verification.verified.list');
+Route::get('/verification/show/verified', [VerificationController::class, 'showVerifiedList'])
+    ->name('verification.show.verified');
+
+Route::get('/verification/verified/list', [VerificationController::class, 'getVerifiedList']);
