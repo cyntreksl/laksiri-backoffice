@@ -27,3 +27,9 @@ Breadcrumbs::for('call-center.verification.create', function (BreadcrumbTrail $t
     $trail->push('Queue');
     $trail->push('Document Verification', route('call-center.verification.create', $customerQueue));
 });
+
+Breadcrumbs::for('call-center.verification.show.verified', function (BreadcrumbTrail $trail) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Document Verification');
+    $trail->push('Verified', route('call-center.verification.show.verified'));
+});
