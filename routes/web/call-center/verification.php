@@ -15,3 +15,5 @@ Route::get('/verification/show/verified', [VerificationController::class, 'showV
     ->name('verification.show.verified');
 
 Route::get('/verification/verified/list', [VerificationController::class, 'getVerifiedList']);
+
+Route::get('/get-hbl-pricing/{token}', [VerificationController::class, 'getHblPricing']);
