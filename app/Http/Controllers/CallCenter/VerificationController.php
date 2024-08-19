@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
 use App\Interfaces\CallCenter\VerificationRepositoryInterface;
 use App\Models\CustomerQueue;
+use App\Models\Token;
 use App\Models\Verification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -66,5 +67,10 @@ class VerificationController extends Controller
         $dir = $request->input('dir', 'asc');
 
         return $this->verificationRepository->dataset($limit, $page, $order, $dir);
+    }
+
+    public function getHblPricing(Token $token)
+    {
+        return $this->verificationRepository->getHBLPaymentsDetails($token);
     }
 }

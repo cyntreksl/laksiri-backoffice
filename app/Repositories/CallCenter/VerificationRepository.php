@@ -2,11 +2,14 @@
 
 namespace App\Repositories\CallCenter;
 
+use App\Actions\HBL\HBLPayment\GetPaymentByReference;
 use App\Actions\Verification\CreateVerification;
 use App\Http\Resources\CallCenter\CustomerQueueResource;
 use App\Interfaces\CallCenter\VerificationRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\CustomerQueue;
+use App\Models\Token;
+use Illuminate\Http\JsonResponse;
 
 class VerificationRepository implements GridJsInterface, VerificationRepositoryInterface
 {
@@ -58,5 +61,10 @@ class VerificationRepository implements GridJsInterface, VerificationRepositoryI
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function getHBLPaymentsDetails(Token $token): JsonResponse
+    {
+        return GetPaymentByReference::run($token->reference);
     }
 }
