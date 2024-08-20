@@ -62,6 +62,7 @@ setInterval(getDocumentVerificationQueue, 3000);
         <div v-else class="grid grid-cols-2 grid-rows-2 h-full">
             <div class="bg-gray-200 h-full p-5">
                 <div
+                    v-if="firstToken.token"
                     class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-lime-300">
                     <h1 class="text-5xl text-black">NOW</h1>
                     <h1 class="text-9xl xl:text-[200px] text-black font-bold">{{ firstToken.token }}</h1>
@@ -101,6 +102,7 @@ setInterval(getDocumentVerificationQueue, 3000);
 
             <div class="bg-gray-200 h-full p-5">
                 <div
+                    v-if="nextToken.token"
                     class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-yellow-300">
                     <h1 class="text-5xl text-black">NEXT</h1>
                     <h1 class="text-9xl xl:text-[200px] text-black font-bold">{{ nextToken.token }}</h1>

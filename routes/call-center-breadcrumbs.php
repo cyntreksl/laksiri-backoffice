@@ -39,3 +39,9 @@ Breadcrumbs::for('call-center.cashier.queue.list', function (BreadcrumbTrail $tr
     $trail->push('Cashier');
     $trail->push('Queue', route('call-center.cashier.queue.list'));
 });
+
+Breadcrumbs::for('call-center.cashier.create', function (BreadcrumbTrail $trail, CustomerQueue $customerQueue) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Cashier');
+    $trail->push('Settle Payment', route('call-center.cashier.create', $customerQueue));
+});

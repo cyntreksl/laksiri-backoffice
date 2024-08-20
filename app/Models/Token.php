@@ -49,4 +49,14 @@ class Token extends Model
     {
         return $this->verification()->exists();
     }
+
+    public function cashierPayment(): HasOne
+    {
+        return $this->hasOne(CashierHBLPayment::class, 'token_id');
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->cashierPayment()->exists();
+    }
 }
