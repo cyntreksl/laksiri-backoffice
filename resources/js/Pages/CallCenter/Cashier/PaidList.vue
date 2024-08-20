@@ -19,7 +19,7 @@ const data = reactive({
     },
 });
 
-const baseUrl = ref("/call-center/verification/verified/list");
+const baseUrl = ref("/call-center/cashier/paid/list");
 
 const initializeGrid = () => {
     const visibleColumns = Object.keys(data.columnVisibility);
@@ -91,8 +91,8 @@ const constructUrl = () => {
 </script>
 
 <template>
-    <DestinationAppLayout title="Verified Queue List">
-        <template #header>Verified Queue List</template>
+    <DestinationAppLayout title="Paid Queue List">
+        <template #header>Paid Queue List</template>
 
         <Breadcrumb />
 
@@ -104,7 +104,7 @@ const constructUrl = () => {
                             <h2
                                 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                Verified Queue List
+                                Paid Queue List
                             </h2>
                         </div>
                     </div>

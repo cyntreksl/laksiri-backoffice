@@ -5,12 +5,14 @@ namespace App\Repositories\CallCenter;
 use App\Actions\Cashier\UpdateCashierHBLPayments;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\HBLPayment\GetPaymentByReference;
+use App\Http\Resources\CallCenter\CustomerQueueResource;
 use App\Interfaces\CallCenter\CashierRepositoryInterface;
+use App\Interfaces\GridJsInterface;
 use App\Models\CustomerQueue;
 use App\Models\HBL;
 use Illuminate\Support\Facades\DB;
 
-class CashierRepository implements CashierRepositoryInterface
+class CashierRepository implements CashierRepositoryInterface, GridJsInterface
 {
     public function updatePayment(array $data): void
     {
@@ -104,5 +106,29 @@ class CashierRepository implements CashierRepositoryInterface
             DB::rollBack();
             throw new \Exception('Failed to update payments: '.$e->getMessage());
         }
+    }
+
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        $query = CustomerQueue::query()
+            ->cashierQueue()
+            ->has('token.cashierPayment');
+
+        $records = $query->orderBy($order, $direction)
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        $totalRecords = $query->count();
+
+        return response()->json([
+            'data' => CustomerQueueResource::collection($records),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
     }
 }
