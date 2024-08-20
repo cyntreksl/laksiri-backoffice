@@ -12,7 +12,9 @@ const props = defineProps({
 })
 
 const filteredCashierQueue = computed(() => {
-    return props.cashierQueue.filter(q => q.is_verified === true);
+    return props.cashierQueue.filter(q => {
+        return q.is_verified === true && q.is_paid === false
+    });
 })
 </script>
 

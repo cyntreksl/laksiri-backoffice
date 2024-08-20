@@ -23,6 +23,7 @@ class CustomerQueueResource extends JsonResource
             'customer' => $this->token->customer->name,
             'reception' => $this->token->reception->name,
             'is_verified' => $this->token->isVerified(),
+            'is_paid' => $this->token->isPaid(),
         ];
     }
 }
