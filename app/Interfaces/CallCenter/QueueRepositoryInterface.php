@@ -7,4 +7,6 @@ use Illuminate\Http\JsonResponse;
 interface QueueRepositoryInterface
 {
     public function getDocumentVerificationQueue(): JsonResponse;
+
+    public function getCashierQueue(): JsonResponse;
 }

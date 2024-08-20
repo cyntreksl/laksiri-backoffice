@@ -35,7 +35,7 @@ class QueueController extends Controller
 
     public function getCashierQueue()
     {
-        return response()->json([]);
+        return $this->queueRepository->getCashierQueue();
     }
 
     public function getExaminationQueue()
