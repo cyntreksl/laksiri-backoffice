@@ -122,11 +122,7 @@ getHBLPayments();
                         <p class="text-indigo-100">Total</p>
                         <div class="mt-1 flex items-center space-x-2">
                             <div class="flex size-7 items-center justify-center rounded-full bg-black/20">
-                                <svg class="size-4" fill="none" stroke="currentColor"
-                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M7 11l5-5m0 0l5 5m-5-5v12" stroke-linecap="round" stroke-linejoin="round"
-                                          stroke-width="2"/>
-                                </svg>
+                                <svg  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-cash"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M7 9m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" /><path d="M14 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 9v-2a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h2" /></svg>
                             </div>
                             <p class="text-base font-medium">{{parseFloat(paymentRecord.grand_total).toFixed(2)}}</p>
                         </div>
@@ -136,11 +132,7 @@ getHBLPayments();
                         <p class="text-indigo-100">Paid Amount</p>
                         <div class="mt-1 flex items-center space-x-2">
                             <div class="flex size-7 items-center justify-center rounded-full bg-black/20">
-                                <svg class="size-4" fill="none" stroke="currentColor"
-                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M7 11l5-5m0 0l5 5m-5-5v12" stroke-linecap="round" stroke-linejoin="round"
-                                          stroke-width="2"/>
-                                </svg>
+                                <svg  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-cash"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M7 9m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" /><path d="M14 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 9v-2a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h2" /></svg>
                             </div>
                             <p class="text-base font-medium">{{parseFloat(paymentRecord.paid_amount).toFixed(2)}}</p>
                         </div>
@@ -150,7 +142,7 @@ getHBLPayments();
                         <p class="text-indigo-100">Status</p>
                         <div class="mt-1 flex items-center space-x-2">
                             <div class="flex size-7 items-center justify-center rounded-full bg-black/20">
-                                <svg  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-check"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                <svg  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hierarchy-2"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M10 3h4v4h-4z" /><path d="M3 17h4v4h-4z" /><path d="M17 17h4v4h-4z" /><path d="M7 17l5 -4l5 4" /><path d="M12 7l0 6" /></svg>
                             </div>
                             <p class="text-base font-medium">{{paymentRecord.status}}</p>
                         </div>
@@ -160,7 +152,7 @@ getHBLPayments();
                         <p class="text-indigo-100">Paid At</p>
                         <div class="mt-1 flex items-center space-x-2">
                             <div class="flex size-7 items-center justify-center rounded-full bg-black/20">
-                                <svg  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-check"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                <svg  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-calendar-month"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M7 14h.013" /><path d="M10.01 14h.005" /><path d="M13.01 14h.005" /><path d="M16.015 14h.005" /><path d="M13.015 17h.005" /><path d="M7.01 17h.005" /><path d="M10.01 17h.005" /></svg>
                             </div>
                             <p class="text-base font-medium">{{moment(paymentRecord.updated_at).format('dddd, MMMM Do YYYY, h:mm:ss a')}}</p>
                         </div>
