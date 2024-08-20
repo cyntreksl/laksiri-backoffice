@@ -20,4 +20,9 @@ class CashierHBLPayment extends Model
     {
         return $this->belongsTo(Token::class, 'token_id');
     }
+
+    public function verifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
 }

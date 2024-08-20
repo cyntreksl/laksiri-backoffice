@@ -15,7 +15,10 @@ const data = reactive({
         customer: true,
         reception: true,
         package_count: true,
-        created_at: true,
+        verified_at: true,
+        verified_by: true,
+        is_checked: true,
+        note: true,
     },
 });
 
@@ -77,7 +80,28 @@ const createColumns = () => [
     {name: "Customer", hidden: !data.columnVisibility.customer, sort: false},
     {name: "Reception", hidden: !data.columnVisibility.reception, sort: false},
     {name: "Packages", hidden: !data.columnVisibility.package_count, sort: false},
-    {name: "Created At", hidden: !data.columnVisibility.created_at},
+    {name: "Verified At", hidden: !data.columnVisibility.verified_at},
+    {name: "Verified By", hidden: !data.columnVisibility.verified_by},
+    {
+        name: "Is Checked",
+        hidden: !data.columnVisibility.is_checked,
+        formatter: (cell) => {
+            if (typeof cell === 'object' && cell !== null) {
+                // Convert the object into a readable string format, e.g., "Passport: true, HBL Receipt: true"
+                return Object.entries(cell)
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join(', ');
+            }
+
+            // If the value is not an object, just return it directly
+            return cell;
+        },
+    },
+    {
+        name: "Note",
+        hidden: !data.columnVisibility.note,
+        formatter: (cell) => cell ? cell : '-',
+    },
 ];
 
 onMounted(() => {

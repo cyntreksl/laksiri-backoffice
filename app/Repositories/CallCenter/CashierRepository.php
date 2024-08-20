@@ -5,7 +5,7 @@ namespace App\Repositories\CallCenter;
 use App\Actions\Cashier\UpdateCashierHBLPayments;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\HBLPayment\GetPaymentByReference;
-use App\Http\Resources\CallCenter\CustomerQueueResource;
+use App\Http\Resources\CallCenter\PaidCollection;
 use App\Interfaces\CallCenter\CashierRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\CustomerQueue;
@@ -122,7 +122,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         $totalRecords = $query->count();
 
         return response()->json([
-            'data' => CustomerQueueResource::collection($records),
+            'data' => PaidCollection::collection($records),
             'meta' => [
                 'total' => $totalRecords,
                 'page' => $offset,

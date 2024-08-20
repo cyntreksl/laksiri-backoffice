@@ -4,7 +4,7 @@ namespace App\Repositories\CallCenter;
 
 use App\Actions\HBL\HBLPayment\GetPaymentByReference;
 use App\Actions\Verification\CreateVerification;
-use App\Http\Resources\CallCenter\CustomerQueueResource;
+use App\Http\Resources\CallCenter\VerifiedCollection;
 use App\Interfaces\CallCenter\VerificationRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\CustomerQueue;
@@ -108,7 +108,7 @@ class VerificationRepository implements GridJsInterface, VerificationRepositoryI
         $totalRecords = $query->count();
 
         return response()->json([
-            'data' => CustomerQueueResource::collection($records),
+            'data' => VerifiedCollection::collection($records),
             'meta' => [
                 'total' => $totalRecords,
                 'page' => $offset,

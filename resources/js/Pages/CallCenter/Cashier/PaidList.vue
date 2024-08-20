@@ -15,7 +15,10 @@ const data = reactive({
         customer: true,
         reception: true,
         package_count: true,
-        created_at: true,
+        paid_at: true,
+        paid_amount: true,
+        verified_by: true,
+        note: true,
     },
 });
 
@@ -77,7 +80,18 @@ const createColumns = () => [
     {name: "Customer", hidden: !data.columnVisibility.customer, sort: false},
     {name: "Reception", hidden: !data.columnVisibility.reception, sort: false},
     {name: "Packages", hidden: !data.columnVisibility.package_count, sort: false},
-    {name: "Created At", hidden: !data.columnVisibility.created_at},
+    {name: "Paid At", hidden: !data.columnVisibility.paid_at},
+    {
+        name: "Paid Amount",
+        hidden: !data.columnVisibility.paid_amount,
+        formatter: (cell) => cell.toFixed(2),
+    },
+    {name: "Auth", hidden: !data.columnVisibility.verified_by},
+    {
+        name: "Note",
+        hidden: !data.columnVisibility.note,
+        formatter: (cell) => cell ? cell : '-',
+    },
 ];
 
 onMounted(() => {
