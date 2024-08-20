@@ -23,20 +23,22 @@ const getDocumentVerificationQueue = async () => {
         } else {
             const data = await response.json();
 
-            if (data.length === 0) {
+            const filteredData = data.filter((item) => item.is_verified === false)
+
+            if (filteredData.length === 0) {
                 waitingScreen.value = true;
             }
 
-            if (data.length > 0) {
-                firstToken.value = data[0];
+            if (filteredData.length > 0) {
+                firstToken.value = filteredData[0];
             }
 
-            if (data.length > 1) {
-                nextToken.value = data[1];
+            if (filteredData.length > 1) {
+                nextToken.value = filteredData[1];
             }
 
             // Store the rest of the array (starting from the third element)
-            documentVerificationQueue.value = data.slice(2);
+            documentVerificationQueue.value = filteredData.slice(2);
         }
 
     } catch (error) {
@@ -74,10 +76,10 @@ setInterval(getDocumentVerificationQueue, 3000);
             </div>
 
             <div class="col-start-2 row-span-2 bg-gray-200 h-full">
-                <div class="grid grid-cols-3 gap-5 p-5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 p-5">
                     <template v-for="queue in documentVerificationQueue">
                         <div
-                            class="card grow cursor-pointer hover:bg-info/20 items-center p-4 text-center sm:p-5 border w-80 rounded-lg">
+                            class="card grow cursor-pointer hover:bg-info/20 items-center p-4 text-center sm:p-5 border w-50 rounded-lg">
                             <div class="my-5">
                                 <h1 class="text-8xl text-black font-bold">{{ queue.token }}</h1>
                             </div>

@@ -23,20 +23,22 @@ const getCashierQueue = async () => {
         } else {
             const data = await response.json();
 
-            if (data.length === 0) {
+            const filteredData = data.filter((item) => item.is_verified === true)
+
+            if (filteredData.length === 0) {
                 waitingScreen.value = true;
             }
 
-            if (data.length > 0) {
-                firstToken.value = data[0];
+            if (filteredData.length > 0) {
+                firstToken.value = filteredData[0];
             }
 
-            if (data.length > 1) {
-                nextToken.value = data[1];
+            if (filteredData.length > 1) {
+                nextToken.value = filteredData[1];
             }
 
             // Store the rest of the array (starting from the third element)
-            cashierQueue.value = data.slice(2);
+            cashierQueue.value = filteredData.slice(2);
         }
 
     } catch (error) {
@@ -51,7 +53,7 @@ setInterval(getCashierQueue, 3000);
 </script>
 
 <template>
-    <ScreenLayout title="Document Verification Queue">
+    <ScreenLayout title="Cashier Queue">
         <div v-if="waitingScreen" class="flex h-full w-full justify-center items-center">
             <p class="text-9xl uppercase">
                 Waiting...
@@ -60,7 +62,8 @@ setInterval(getCashierQueue, 3000);
         <div v-else class="grid grid-cols-2 grid-rows-2 h-full">
             <div class="bg-gray-200 h-full p-5">
                 <div
-                    class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg">
+                    class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-lime-300">
+                    <h1 class="text-5xl text-black">NOW</h1>
                     <h1 class="text-9xl xl:text-[200px] text-black font-bold">{{ firstToken.token }}</h1>
                     <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
                         {{ firstToken.reference }}
@@ -73,10 +76,10 @@ setInterval(getCashierQueue, 3000);
             </div>
 
             <div class="col-start-2 row-span-2 bg-gray-200 h-full">
-                <div class="grid grid-cols-3 gap-5 p-5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 p-5">
                     <template v-for="queue in cashierQueue">
                         <div
-                            class="card grow cursor-pointer hover:bg-info/20 items-center p-4 text-center sm:p-5 border w-80 rounded-lg">
+                            class="card grow cursor-pointer hover:bg-info/20 items-center p-4 text-center sm:p-5 border w-50 rounded-lg">
                             <div class="my-5">
                                 <h1 class="text-8xl text-black font-bold">{{ queue.token }}</h1>
                             </div>
@@ -98,7 +101,8 @@ setInterval(getCashierQueue, 3000);
 
             <div class="bg-gray-200 h-full p-5">
                 <div
-                    class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg">
+                    class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-yellow-300">
+                    <h1 class="text-5xl text-black">NEXT</h1>
                     <h1 class="text-9xl xl:text-[200px] text-black font-bold">{{ nextToken.token }}</h1>
                     <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
                         {{ nextToken.reference }}

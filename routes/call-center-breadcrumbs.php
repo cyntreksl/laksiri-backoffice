@@ -33,3 +33,9 @@ Breadcrumbs::for('call-center.verification.show.verified', function (BreadcrumbT
     $trail->push('Document Verification');
     $trail->push('Verified', route('call-center.verification.show.verified'));
 });
+
+Breadcrumbs::for('call-center.cashier.queue.list', function (BreadcrumbTrail $trail) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Cashier');
+    $trail->push('Queue', route('call-center.cashier.queue.list'));
+});

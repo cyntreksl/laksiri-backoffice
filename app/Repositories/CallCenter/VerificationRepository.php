@@ -33,6 +33,61 @@ class VerificationRepository implements GridJsInterface, VerificationRepositoryI
                     null,
                     now(),
                 );
+
+                // check payment status
+                $payment = GetPaymentByReference::run($customerQueue->token->reference);
+
+                // If $data is an object, convert it to an array
+                $paymentArray = (array) $payment->getData();
+
+                if (! empty($paymentArray)) {
+                    if ($payment->getData()->paid_amount >= $payment->getData()->grand_total) {
+                        // send examination queue
+                        $customerQueue->create([
+                            'type' => CustomerQueue::EXAMINATION_QUEUE,
+                            'token_id' => $customerQueue->token_id,
+                        ]);
+
+                        // set queue status log
+                        $customerQueue->addQueueStatus(
+                            CustomerQueue::EXAMINATION_QUEUE,
+                            $customerQueue->token->customer_id,
+                            $customerQueue->token_id,
+                            now(),
+                            null,
+                        );
+                    } else {
+                        // send to cashier queue
+                        $customerQueue->create([
+                            'type' => CustomerQueue::CASHIER_QUEUE,
+                            'token_id' => $customerQueue->token_id,
+                        ]);
+
+                        // set queue status log
+                        $customerQueue->addQueueStatus(
+                            CustomerQueue::CASHIER_QUEUE,
+                            $customerQueue->token->customer_id,
+                            $customerQueue->token_id,
+                            now(),
+                            null,
+                        );
+                    }
+                } else {
+                    // send to cashier queue
+                    $customerQueue->create([
+                        'type' => CustomerQueue::CASHIER_QUEUE,
+                        'token_id' => $customerQueue->token_id,
+                    ]);
+
+                    // set queue status log
+                    $customerQueue->addQueueStatus(
+                        CustomerQueue::CASHIER_QUEUE,
+                        $customerQueue->token->customer_id,
+                        $customerQueue->token_id,
+                        now(),
+                        null,
+                    );
+                }
             }
         } catch (\Exception $e) {
             throw new \Exception('Failed to verified: '.$e->getMessage());
