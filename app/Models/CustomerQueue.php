@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class CustomerQueue extends Model
 {
@@ -43,5 +44,15 @@ class CustomerQueue extends Model
     public function scopeExaminationQueue(Builder $query): void
     {
         $query->where('type', self::EXAMINATION_QUEUE);
+    }
+
+    public function cashierHBLPayment(): HasOne
+    {
+        return $this->hasOne(CashierHBLPayment::class, 'customer_queue_id');
+    }
+
+    public function verification(): HasOne
+    {
+        return $this->hasOne(Verification::class, 'customer_queue_id');
     }
 }

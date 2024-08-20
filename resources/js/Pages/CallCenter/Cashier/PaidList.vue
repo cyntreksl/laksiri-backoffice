@@ -15,14 +15,14 @@ const data = reactive({
         customer: true,
         reception: true,
         package_count: true,
-        verified_at: true,
+        paid_at: true,
+        paid_amount: true,
         verified_by: true,
-        is_checked: true,
         note: true,
     },
 });
 
-const baseUrl = ref("/call-center/verification/verified/list");
+const baseUrl = ref("/call-center/cashier/paid/list");
 
 const initializeGrid = () => {
     const visibleColumns = Object.keys(data.columnVisibility);
@@ -80,23 +80,13 @@ const createColumns = () => [
     {name: "Customer", hidden: !data.columnVisibility.customer, sort: false},
     {name: "Reception", hidden: !data.columnVisibility.reception, sort: false},
     {name: "Packages", hidden: !data.columnVisibility.package_count, sort: false},
-    {name: "Verified At", hidden: !data.columnVisibility.verified_at},
-    {name: "Verified By", hidden: !data.columnVisibility.verified_by},
+    {name: "Paid At", hidden: !data.columnVisibility.paid_at},
     {
-        name: "Is Checked",
-        hidden: !data.columnVisibility.is_checked,
-        formatter: (cell) => {
-            if (typeof cell === 'object' && cell !== null) {
-                // Convert the object into a readable string format, e.g., "Passport: true, HBL Receipt: true"
-                return Object.entries(cell)
-                    .map(([key, value]) => `${key}: ${value}`)
-                    .join(', ');
-            }
-
-            // If the value is not an object, just return it directly
-            return cell;
-        },
+        name: "Paid Amount",
+        hidden: !data.columnVisibility.paid_amount,
+        formatter: (cell) => cell.toFixed(2),
     },
+    {name: "Auth", hidden: !data.columnVisibility.verified_by},
     {
         name: "Note",
         hidden: !data.columnVisibility.note,
@@ -115,8 +105,8 @@ const constructUrl = () => {
 </script>
 
 <template>
-    <DestinationAppLayout title="Verified Queue List">
-        <template #header>Verified Queue List</template>
+    <DestinationAppLayout title="Paid Queue List">
+        <template #header>Paid Queue List</template>
 
         <Breadcrumb />
 
@@ -128,7 +118,7 @@ const constructUrl = () => {
                             <h2
                                 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                Verified Queue List
+                                Paid Queue List
                             </h2>
                         </div>
                     </div>

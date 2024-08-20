@@ -50,4 +50,19 @@ class CashierController extends Controller
     {
         $this->cashierRepository->updatePayment($request->all());
     }
+
+    public function showPaidList()
+    {
+        return Inertia::render('CallCenter/Cashier/PaidList');
+    }
+
+    public function getPaidList(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+
+        return $this->cashierRepository->dataset($limit, $page, $order, $dir);
+    }
 }
