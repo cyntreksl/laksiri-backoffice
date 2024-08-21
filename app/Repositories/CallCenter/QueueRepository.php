@@ -26,4 +26,13 @@ class QueueRepository implements QueueRepositoryInterface
 
         return response()->json($customerQueues, 200);
     }
+
+    public function getExaminationQueue(): JsonResponse
+    {
+        $queue = CustomerQueue::examinationQueue()->get();
+
+        $customerQueues = CustomerQueueResource::collection($queue);
+
+        return response()->json($customerQueues, 200);
+    }
 }
