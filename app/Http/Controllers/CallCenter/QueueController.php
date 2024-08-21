@@ -40,6 +40,6 @@ class QueueController extends Controller
 
     public function getExaminationQueue()
     {
-        return response()->json([]);
+        return $this->queueRepository->getExaminationQueue();
     }
 }

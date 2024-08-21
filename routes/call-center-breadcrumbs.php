@@ -16,6 +16,7 @@ Breadcrumbs::for('call-center.hbls.index', function (BreadcrumbTrail $trail) {
     $trail->push('HBL List', route('call-center.hbls.index'));
 });
 
+// Verification
 Breadcrumbs::for('call-center.verification.queue.list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
     $trail->push('Document Verification');
@@ -34,6 +35,7 @@ Breadcrumbs::for('call-center.verification.show.verified', function (BreadcrumbT
     $trail->push('Verified', route('call-center.verification.show.verified'));
 });
 
+// Cashier
 Breadcrumbs::for('call-center.cashier.queue.list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
     $trail->push('Cashier');
@@ -44,4 +46,11 @@ Breadcrumbs::for('call-center.cashier.create', function (BreadcrumbTrail $trail,
     $trail->parent('call-center.dashboard');
     $trail->push('Cashier');
     $trail->push('Settle Payment', route('call-center.cashier.create', $customerQueue));
+});
+
+// Examination
+Breadcrumbs::for('call-center.examination.queue.list', function (BreadcrumbTrail $trail) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Examination');
+    $trail->push('Queue', route('call-center.examination.queue.list'));
 });

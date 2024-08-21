@@ -46,8 +46,6 @@ const getDocumentVerificationQueue = async () => {
     }
 }
 
-getDocumentVerificationQueue()
-
 setInterval(getDocumentVerificationQueue, 3000);
 
 </script>
