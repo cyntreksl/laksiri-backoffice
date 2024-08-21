@@ -49,7 +49,7 @@
                                 <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
                             </svg>
                         </Link>
-                        <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
+                        <template v-if="usePage().props.auth.user.roles[0].name !== 'boned area'">
                             <!-- HBL -->
                             <a
                                 v-if="! $page.props.user.roles.includes('viewer')"
@@ -251,6 +251,33 @@
                                     />
                                     <path d="M9 12h6"/>
                                     <path d="M9 16h6"/>
+                                </svg>
+                            </a>
+                        </template>
+                        <template v-if="usePage().props.auth.user.roles[0].name === 'boned area'">
+                            <!-- Boned Area Screens -->
+                            <a
+                                :class="[
+                activeMenu === 'boned-screens' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Queue Screens'"
+                                @click="
+                setMenu('boned-screens');
+                openSideBar();
+              "
+                            >
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-screen-share" fill="none" height="24" stroke="currentColor"
+                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                     width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M21 12v3a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1h9"/>
+                                    <path d="M7 20l10 0"/>
+                                    <path d="M9 16l0 4"/>
+                                    <path d="M15 16l0 4"/>
+                                    <path d="M17 4h4v4"/>
+                                    <path d="M16 9l5 -5"/>
                                 </svg>
                             </a>
                         </template>
@@ -903,6 +930,21 @@ export default {
                         },
                     );
                     changeSidePanelTitle("Examination");
+                    break;
+                case "boned-screens":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Package Calling Queue",
+                            route: "call-center.examination.queue.list",
+                        },
+                        {
+                            title: "Released List",
+                            route: "call-center.examination.show.gate-pass",
+                        },
+                    );
+                    changeSidePanelTitle("Queue Screens");
                     break;
                 case "delivery":
                     childMenuList.splice(

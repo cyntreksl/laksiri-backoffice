@@ -174,7 +174,7 @@ class User extends Authenticatable
 
     public function getRedirectRoute(): string
     {
-        if ($this->hasRole('call center')) {
+        if ($this->hasRole(['call center', 'boned area'])) {
             return 'call-center/dashboard';
         }
 
