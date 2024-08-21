@@ -233,7 +233,6 @@ watch(
         hblTotal.value =
             parseFloat(form.freight_charge) +
             parseFloat(form.bill_charge) +
-            parseFloat(form.freight_charge * grandTotalWeight.value.toFixed(3)) +
             parseFloat(form.other_charge) +
             parseFloat(vat.value) -
             form.discount;
@@ -1493,6 +1492,11 @@ const shipIcon = ref(`
                                 >
                                     <p class="line-clamp-1">Grand Total</p>
                                     <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
+                                </div>
+                                <div class="p-2 bg-slate-100 rounded-lg mt-2">
+                                    <p class="italic">
+                                        Grand Total = Freight Charges + Bill Charges + Destination Charges + VAT - Discount
+                                    </p>
                                 </div>
                             </div>
                         </div>
