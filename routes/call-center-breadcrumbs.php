@@ -60,3 +60,10 @@ Breadcrumbs::for('call-center.examination.queue.list', function (BreadcrumbTrail
     $trail->push('Examination');
     $trail->push('Queue', route('call-center.examination.queue.list'));
 });
+
+// Boned Area
+Breadcrumbs::for('call-center.package.queue.list', function (BreadcrumbTrail $trail) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Package');
+    $trail->push('Queue', route('call-center.package.queue.list'));
+});

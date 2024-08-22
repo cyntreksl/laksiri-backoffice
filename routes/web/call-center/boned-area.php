@@ -1,17 +1,17 @@
 <?php
 
-use App\Http\Controllers\CallCenter\VerificationController;
+use App\Http\Controllers\CallCenter\BonedAreaController;
 
-Route::get('/package/queue/list', [VerificationController::class, 'getPackageQueueList'])
+Route::get('/package/queue/list', [BonedAreaController::class, 'getPackageQueueList'])
     ->name('package.queue.list');
 
-Route::get('/package/{package_queue}', [VerificationController::class, 'create'])
+Route::get('/package/{package_queue}', [BonedAreaController::class, 'create'])
     ->name('package.create');
 
-Route::post('/package', [VerificationController::class, 'store'])
+Route::post('/package', [BonedAreaController::class, 'store'])
     ->name('package.store');
 
-Route::get('/package/show/gate-pass', [VerificationController::class, 'showGatePassList'])
+Route::get('/package/show/gate-pass', [BonedAreaController::class, 'showGatePassList'])
     ->name('package.show.gate-pass');
 
-Route::get('/package/gate-pass/list', [VerificationController::class, 'getGatePassList']);
+Route::get('/package/gate-pass/list', [BonedAreaController::class, 'getGatePassList']);
