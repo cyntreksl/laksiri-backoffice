@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\CustomerQueue;
+use App\Models\PackageQueue;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
@@ -64,6 +65,12 @@ Breadcrumbs::for('call-center.examination.queue.list', function (BreadcrumbTrail
 // Boned Area
 Breadcrumbs::for('call-center.package.queue.list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
-    $trail->push('Package');
-    $trail->push('Queue', route('call-center.package.queue.list'));
+    $trail->push('Boned Area');
+    $trail->push('Package Queue', route('call-center.package.queue.list'));
+});
+
+Breadcrumbs::for('call-center.package.create', function (BreadcrumbTrail $trail, PackageQueue $packageQueue) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Boned Area');
+    $trail->push('Package Release', route('call-center.package.create', $packageQueue));
 });
