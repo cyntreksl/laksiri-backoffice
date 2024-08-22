@@ -945,7 +945,7 @@ export default {
                         },
                         {
                             title: "Released List",
-                            route: "call-center.package.show.gate-pass",
+                            route: "call-center.package.show.released.list",
                         },
                     );
                     changeSidePanelTitle("Package Queue");

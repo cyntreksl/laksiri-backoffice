@@ -35,4 +35,19 @@ class BonedAreaController extends Controller
     {
         $this->bonedAreaRepository->releasePackage($request->all());
     }
+
+    public function showReleasedList()
+    {
+        return Inertia::render('CallCenter/BonedArea/ReleasedList');
+    }
+
+    public function getReleasedList(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+
+        return $this->bonedAreaRepository->dataset($limit, $page, $order, $dir);
+    }
 }
