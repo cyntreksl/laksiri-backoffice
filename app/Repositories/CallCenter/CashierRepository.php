@@ -10,6 +10,7 @@ use App\Interfaces\CallCenter\CashierRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\CustomerQueue;
 use App\Models\HBL;
+use App\Models\PackageQueue;
 use Illuminate\Support\Facades\DB;
 
 class CashierRepository implements CashierRepositoryInterface, GridJsInterface
@@ -57,6 +58,15 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
                         $customerQueue->create([
                             'type' => CustomerQueue::EXAMINATION_QUEUE,
                             'token_id' => $customerQueue->token_id,
+                        ]);
+
+                        // create package queue
+                        PackageQueue::create([
+                            'token_id' => $customerQueue->token_id,
+                            'hbl_id' => $hbl->id,
+                            'auth_id' => auth()->id(),
+                            'reference' => $data['customer_queue']['token']['reference'],
+                            'package_count' => $data['customer_queue']['token']['package_count'],
                         ]);
 
                         // set queue status log

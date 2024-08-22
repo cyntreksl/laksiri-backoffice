@@ -258,12 +258,12 @@
                             <!-- Boned Area Screens -->
                             <a
                                 :class="[
-                activeMenu === 'boned-screens' ? 'bg-primary/10 text-primary' : '',
+                activeMenu === 'package' ? 'bg-primary/10 text-primary' : '',
               ]"
                                 class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.right="'Queue Screens'"
+                                x-tooltip.placement.right="'Package Queue'"
                                 @click="
-                setMenu('boned-screens');
+                setMenu('package');
                 openSideBar();
               "
                             >
@@ -931,20 +931,24 @@ export default {
                     );
                     changeSidePanelTitle("Examination");
                     break;
-                case "boned-screens":
+                case "package":
                     childMenuList.splice(
                         0,
                         childMenuList.length,
                         {
+                            title: "Package Calling Screen",
+                            route: "call-center.queue.screens.package",
+                        },
+                        {
                             title: "Package Calling Queue",
-                            route: "call-center.examination.queue.list",
+                            route: "call-center.package.queue.list",
                         },
                         {
                             title: "Released List",
-                            route: "call-center.examination.show.gate-pass",
+                            route: "call-center.package.show.gate-pass",
                         },
                     );
-                    changeSidePanelTitle("Queue Screens");
+                    changeSidePanelTitle("Package Queue");
                     break;
                 case "delivery":
                     childMenuList.splice(

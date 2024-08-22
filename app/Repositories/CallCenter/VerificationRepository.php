@@ -8,6 +8,8 @@ use App\Http\Resources\CallCenter\VerifiedCollection;
 use App\Interfaces\CallCenter\VerificationRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\CustomerQueue;
+use App\Models\HBL;
+use App\Models\PackageQueue;
 use App\Models\Token;
 use Illuminate\Http\JsonResponse;
 
@@ -46,6 +48,18 @@ class VerificationRepository implements GridJsInterface, VerificationRepositoryI
                         $customerQueue->create([
                             'type' => CustomerQueue::EXAMINATION_QUEUE,
                             'token_id' => $customerQueue->token_id,
+                        ]);
+
+                        // find hbl
+                        $hbl = HBL::where('reference', $data['customer_queue']['token']['reference'])->firstOrFail();
+
+                        // create package queue
+                        PackageQueue::create([
+                            'token_id' => $customerQueue->token_id,
+                            'hbl_id' => $hbl->id,
+                            'auth_id' => auth()->id(),
+                            'reference' => $data['customer_queue']['token']['reference'],
+                            'package_count' => $data['customer_queue']['token']['package_count'],
                         ]);
 
                         // set queue status log
