@@ -62,6 +62,12 @@ Breadcrumbs::for('call-center.examination.queue.list', function (BreadcrumbTrail
     $trail->push('Queue', route('call-center.examination.queue.list'));
 });
 
+Breadcrumbs::for('call-center.examination.create', function (BreadcrumbTrail $trail, CustomerQueue $customerQueue) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Examination');
+    $trail->push('Release HBL Packages', route('call-center.examination.create', $customerQueue));
+});
+
 // Boned Area
 Breadcrumbs::for('call-center.package.queue.list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');

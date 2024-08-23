@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\CallCenter;
 
+use App\Models\PackageQueue;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,6 +15,8 @@ class CustomerQueueResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $is_released_from_boned_area = PackageQueue::where('token_id', $this->token_id)->value('is_released');
+
         return [
             'id' => $this->id,
             'token' => $this->token->token,
@@ -24,6 +27,7 @@ class CustomerQueueResource extends JsonResource
             'reception' => $this->token->reception->name,
             'is_verified' => $this->token->isVerified(),
             'is_paid' => $this->token->isPaid(),
+            'is_released' => $is_released_from_boned_area,
         ];
     }
 }

@@ -9,9 +9,13 @@ import InputLabel from "@/Components/InputLabel.vue";
 import {ref} from "vue";
 
 const props = defineProps({
-    packageQueue: {
+    customerQueue: {
         type: Object,
         default: () => {}
+    },
+    reference: {
+        type: String,
+        required: true,
     }
 })
 
@@ -21,7 +25,7 @@ const isLoading = ref(false);
 const getHBLPackagesByReference = async () => {
     isLoading.value = true;
     try {
-        const response = await fetch(`/get-hbl-packages-by-reference/${props.packageQueue.reference}`, {
+        const response = await fetch(`/get-hbl-packages-by-reference/${props.reference}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -49,17 +53,17 @@ const updateChecked = (pType, isChecked) => {
 };
 
 const form = useForm({
-    package_queue: props.packageQueue,
+    customer_queue: props.customerQueue,
+    note: '',
     released_packages: {},
-    note: ''
 });
 
-const handleUpdateReleasePackages = () => {
-    form.post(route("call-center.package.store"), {
+const handleUpdateReleaseHBLPackages = () => {
+    form.post(route("call-center.examination.store"), {
         onSuccess: () => {
-            router.visit(route("call-center.package.queue.list"));
+            router.visit(route("call-center.examination.queue.list"));
             form.reset();
-            push.success('Package Released!');
+            push.success('HBL Packages Released Successfully!');
         },
         onError: () => {
             push.error('Something went to wrong!');
@@ -71,8 +75,8 @@ const handleUpdateReleasePackages = () => {
 </script>
 
 <template>
-    <DestinationAppLayout title="Package Release">
-        <template #header>Package Release</template>
+    <DestinationAppLayout title="Release HBL Package">
+        <template #header>Release HBL Package</template>
 
         <!-- Breadcrumb -->
         <Breadcrumb />
@@ -94,7 +98,7 @@ const handleUpdateReleasePackages = () => {
                         <h2
                             class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                         >
-                            Release
+                            Release HBL Packages
                         </h2>
 
                         <div class="mt-4 space-y-4">
@@ -127,9 +131,9 @@ const handleUpdateReleasePackages = () => {
                             :class="{ 'opacity-25': form.processing }"
                             :disabled="form.processing"
                             class="mt-3 float-right"
-                            @click="handleUpdateReleasePackages"
+                            @click="handleUpdateReleaseHBLPackages"
                         >
-                            Release
+                            Release & Create Gate Pass
                         </PrimaryButton>
                     </div>
                 </div>
