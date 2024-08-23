@@ -11,7 +11,7 @@ Route::get('/package/{package_queue}', [BonedAreaController::class, 'create'])
 Route::post('/package', [BonedAreaController::class, 'store'])
     ->name('package.store');
 
-Route::get('/package/show/gate-pass', [BonedAreaController::class, 'showGatePassList'])
-    ->name('package.show.gate-pass');
+Route::get('/package/show/released/list', [BonedAreaController::class, 'showReleasedList'])
+    ->name('package.show.released.list');
 
-Route::get('/package/gate-pass/list', [BonedAreaController::class, 'getGatePassList']);
+Route::get('/package/released/list', [BonedAreaController::class, 'getReleasedList']);

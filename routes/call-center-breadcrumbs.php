@@ -74,3 +74,9 @@ Breadcrumbs::for('call-center.package.create', function (BreadcrumbTrail $trail,
     $trail->push('Boned Area');
     $trail->push('Package Release', route('call-center.package.create', $packageQueue));
 });
+
+Breadcrumbs::for('call-center.package.show.released.list', function (BreadcrumbTrail $trail) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Boned Area');
+    $trail->push('Released Packages', route('call-center.package.show.released.list'));
+});
