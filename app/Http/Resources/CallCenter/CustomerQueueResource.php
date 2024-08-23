@@ -27,7 +27,8 @@ class CustomerQueueResource extends JsonResource
             'reception' => $this->token->reception->name,
             'is_verified' => $this->token->isVerified(),
             'is_paid' => $this->token->isPaid(),
-            'is_released' => $is_released_from_boned_area,
+            'is_released_from_boned_area' => $is_released_from_boned_area,
+            'is_force_released' => $this->examination()->exists(),
         ];
     }
 }
