@@ -4,6 +4,10 @@ namespace App\Providers;
 
 use App\Interfaces\BondedWarehouseRepositoryInterface;
 use App\Interfaces\BranchRepositoryInterface;
+use App\Interfaces\CallCenter\BonedAreaRepositoryInterface;
+use App\Interfaces\CallCenter\CashierRepositoryInterface;
+use App\Interfaces\CallCenter\QueueRepositoryInterface;
+use App\Interfaces\CallCenter\VerificationRepositoryInterface;
 use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\DashboardRepositoryInterface;
@@ -23,6 +27,10 @@ use App\Interfaces\WarehousezoneRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Repositories\BondedWarehouseRepository;
 use App\Repositories\BranchRepository;
+use App\Repositories\CallCenter\BonedAreaRepository;
+use App\Repositories\CallCenter\CashierRepository;
+use App\Repositories\CallCenter\QueueRepository;
+use App\Repositories\CallCenter\VerificationRepository;
 use App\Repositories\CashSettlementRepository;
 use App\Repositories\ContainerRepositories;
 use App\Repositories\DashboardRepository;
@@ -68,9 +76,10 @@ class RepositoryServiceProvider extends ServiceProvider
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);
-        $this->app->bind(\App\Interfaces\CallCenter\QueueRepositoryInterface::class, \App\Repositories\CallCenter\QueueRepository::class);
-        $this->app->bind(\App\Interfaces\CallCenter\VerificationRepositoryInterface::class, \App\Repositories\CallCenter\VerificationRepository::class);
-        $this->app->bind(\App\Interfaces\CallCenter\CashierRepositoryInterface::class, \App\Repositories\CallCenter\CashierRepository::class);
+        $this->app->bind(QueueRepositoryInterface::class, QueueRepository::class);
+        $this->app->bind(VerificationRepositoryInterface::class, VerificationRepository::class);
+        $this->app->bind(CashierRepositoryInterface::class, CashierRepository::class);
+        $this->app->bind(BonedAreaRepositoryInterface::class, BonedAreaRepository::class);
     }
 
     public function boot(): void

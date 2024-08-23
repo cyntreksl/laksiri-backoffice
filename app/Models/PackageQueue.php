@@ -11,7 +11,7 @@ class PackageQueue extends Model
     use HasFactory;
 
     protected $fillable = [
-        'token_id', 'hbl_id', 'auth_id', 'reference', 'package_count', 'is_released',
+        'token_id', 'hbl_id', 'auth_id', 'reference', 'package_count', 'is_released', 'released_at', 'note', 'released_packages',
     ];
 
     public function token(): BelongsTo
