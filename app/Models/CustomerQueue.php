@@ -55,4 +55,9 @@ class CustomerQueue extends Model
     {
         return $this->hasOne(Verification::class, 'customer_queue_id');
     }
+
+    public function examination(): HasOne
+    {
+        return $this->hasOne(Examination::class, 'customer_queue_id');
+    }
 }
