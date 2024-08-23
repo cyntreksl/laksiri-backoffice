@@ -44,6 +44,7 @@ Route::middleware([
         require_once __DIR__.'/web/call-center/verification.php';
         require_once __DIR__.'/web/call-center/cashier.php';
         require_once __DIR__.'/web/call-center/examination.php';
+        require_once __DIR__.'/web/call-center/boned-area.php';
     });
 });
 

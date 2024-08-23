@@ -11,4 +11,6 @@ interface QueueRepositoryInterface
     public function getCashierQueue(): JsonResponse;
 
     public function getExaminationQueue(): JsonResponse;
+
+    public function getPackageQueue(): JsonResponse;
 }

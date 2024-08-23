@@ -57,6 +57,18 @@ class Token extends Model
 
     public function isPaid(): bool
     {
-        return $this->cashierPayment()->exists();
+        $hbl = HBL::where('reference', $this->reference)->firstOrFail();
+
+        if ($this->cashierPayment()->exists()) {
+            return true;
+        }
+
+        if ($hbl->hblPayment()->exists()) {
+            if ($hbl->hblPayment->paid_amount >= $hbl->hblPayment->grand_total) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

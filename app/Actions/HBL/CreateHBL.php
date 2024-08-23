@@ -44,7 +44,7 @@ class CreateHBL
             'system_status' => $data['system_status'] ?? HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE,
         ]);
 
-        if (! empty($data['paid_amount'])) {
+        if (isset($data['paid_amount'])) {
             UpdateHBLPayments::run($data['paid_amount'], $hbl);
         }
 

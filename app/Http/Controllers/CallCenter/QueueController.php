@@ -28,6 +28,11 @@ class QueueController extends Controller
         return Inertia::render('CallCenter/Queue/ExaminationScreen');
     }
 
+    public function showPackageScreen()
+    {
+        return Inertia::render('CallCenter/Queue/PackageScreen');
+    }
+
     public function getDocumentVerificationQueue()
     {
         return $this->queueRepository->getDocumentVerificationQueue();
@@ -41,5 +46,10 @@ class QueueController extends Controller
     public function getExaminationQueue()
     {
         return $this->queueRepository->getExaminationQueue();
+    }
+
+    public function getPackageQueue()
+    {
+        return $this->queueRepository->getPackageQueue();
     }
 }
