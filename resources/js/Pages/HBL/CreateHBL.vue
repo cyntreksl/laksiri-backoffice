@@ -350,7 +350,7 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             otherCharge.value =
-                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges) * grandTotalVolume.value).toFixed(3) || 0;
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
                 priceRule.value.bill_vat !== 0
@@ -379,7 +379,6 @@ const calculatePayment = () => {
                 const trueAction = priceRule.value.true_action.trim();
                 const operator = trueAction[0];
                 const value = parseFloat(trueAction.slice(1).trim());
-
                 switch (operator) {
                     case "*":
                         freightCharge.value = grandTotalVolume.value * value;
@@ -405,7 +404,7 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             otherCharge.value =
-                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges) * grandTotalVolume.value).toFixed(3) || 0;
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
                 priceRule.value.bill_vat !== 0
@@ -460,7 +459,7 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             otherCharge.value =
-                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges) * grandTotalVolume.value).toFixed(3) || 0;
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
                 priceRule.value.bill_vat !== 0
@@ -515,7 +514,7 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             otherCharge.value =
-                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges) * grandTotalVolume.value).toFixed(3) || 0;
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
                 priceRule.value.bill_vat !== 0
@@ -570,7 +569,7 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             otherCharge.value =
-                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges) * grandTotalVolume.value).toFixed(3) || 0;
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
                 priceRule.value.bill_vat !== 0
@@ -625,7 +624,7 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             otherCharge.value =
-                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(3) || 0;
+                (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges) * grandTotalVolume.value).toFixed(3) || 0;
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
                 priceRule.value.bill_vat !== 0
