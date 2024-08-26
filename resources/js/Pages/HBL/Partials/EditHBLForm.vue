@@ -134,11 +134,11 @@ const addPackageData = () => {
     if (editMode.value) {
         packageList.value.splice(editIndex.value, 1, {...packageItem});
         grandTotalWeight.value = packageList.value.reduce(
-            (accumulator, currentValue) => accumulator + currentValue.totalWeight,
+            (accumulator, currentValue) => accumulator + parseFloat(currentValue.totalWeight),
             0
         );
         grandTotalVolume.value = packageList.value.reduce(
-            (accumulator, currentValue) => accumulator + currentValue.volume,
+            (accumulator, currentValue) => accumulator + parseFloat(currentValue.volume),
             0
         );
 
