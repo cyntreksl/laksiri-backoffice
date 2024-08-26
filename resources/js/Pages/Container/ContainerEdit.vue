@@ -239,7 +239,7 @@ const handleCreate = () => {
             </div>
           </div>
 
-          <!--                    ship/flight details-->
+          <!-- ship/flight details-->
           <div
             v-if="form.cargo_type === 'Sea Cargo'"
             class="sm:col-span-3 space-y-5"

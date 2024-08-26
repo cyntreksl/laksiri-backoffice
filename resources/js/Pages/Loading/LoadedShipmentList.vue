@@ -37,6 +37,14 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    seaContainerOptions: {
+        type: Array,
+        required: true,
+    },
+    airContainerOptions: {
+        type: Array,
+        required: true,
+    },
 });
 
 const wrapperRef = ref(null);
@@ -1051,6 +1059,8 @@ const shipIcon = ref(`
             :container="selectedContainer"
             :container-status="containerStatus"
             :show="showConfirmLoadedShipmentModal"
+            :air-container-options="airContainerOptions"
+            :sea-container-options="seaContainerOptions"
             @close="closeModal"
         />
     </AppLayout>

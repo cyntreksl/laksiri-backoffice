@@ -29,11 +29,16 @@ class LoadedContainerController extends Controller
     {
         $this->authorize('shipment.index');
 
+        $seaContainerOptions = ContainerType::getSeaCargoOptions();
+        $airContainerOptions = ContainerType::getAirCargoOptions();
+
         return Inertia::render('Loading/LoadedShipmentList', [
             'cargoTypes' => CargoType::cases(),
             'containers' => $this->containerRepository->getLoadedContainers(),
             'containerTypes' => ContainerType::cases(),
             'containerStatus' => ContainerStatus::cases(),
+            'seaContainerOptions' => $seaContainerOptions,
+            'airContainerOptions' => $airContainerOptions,
         ]);
     }
 
