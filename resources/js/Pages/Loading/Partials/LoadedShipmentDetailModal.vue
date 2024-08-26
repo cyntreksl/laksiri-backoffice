@@ -19,6 +19,14 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    seaContainerOptions: {
+        type: Array,
+        required: true,
+    },
+    airContainerOptions: {
+        type: Array,
+        required: true,
+    },
 });
 const emit = defineEmits(['close']);
 </script>
@@ -73,7 +81,7 @@ const emit = defineEmits(['close']);
 
                 <TabHBLUnderShipment :container="container" @close="emit('close')"/>
 
-                <TabShipmentDetails :container="container" :container-status="containerStatus"/>
+                <TabShipmentDetails :air-container-options="airContainerOptions" :container="container" :container-status="containerStatus" :sea-container-options="seaContainerOptions"/>
 
                 <TabDocuments :container-id="container?.id"/>
             </Tabs>

@@ -7,7 +7,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import AccordionPanel from "@/Components/AccordionPanel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import DeleteLoadingConfirmationModal from "@/Pages/Loading/Partials/DeleteLoadingConfirmationModal.vue";
-import {ref} from "vue";
+import {ref, watchEffect} from "vue";
 import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
 import Checkbox from "@/Components/Checkbox.vue";
@@ -21,6 +21,14 @@ const props = defineProps({
     containerStatus: {
         type: Array,
         default: () => [],
+    },
+    seaContainerOptions: {
+        type: Array,
+        required: true,
+    },
+    airContainerOptions: {
+        type: Array,
+        required: true,
     },
 });
 
@@ -62,6 +70,20 @@ const form = useForm({
     note: props.container.note,
     is_reached: Boolean(props.container.is_reached),
     reached_date: props.container.reached_date,
+    container_type:  props.container.container_type,
+    bl_number: props.container.bl_number,
+    container_number: props.container.container_number,
+    seal_number: props.container.seal_number,
+    vessel_name: props.container.vessel_name,
+    voyage_number: props.container.voyage_number,
+    shipping_line: props.container.shipping_line,
+    port_of_loading: props.container.port_of_loading,
+    port_of_discharge: props.container.port_of_discharge,
+    flight_number: props.container.flight_number,
+    airline_name: props.container.airline_name,
+    airport_of_departure: props.container.airport_of_departure,
+    airport_of_arrival: props.container.airport_of_arrival,
+    cargo_class: props.container.cargo_class,
 });
 
 const handleUpdateContainer = () => {
@@ -76,6 +98,16 @@ const handleUpdateContainer = () => {
         }
     });
 }
+
+const containerTypes = ref(props.seaContainerOptions);
+
+watchEffect(() => {
+    if (form.cargo_type === "Sea Cargo") {
+        containerTypes.value = props.seaContainerOptions;
+    } else {
+        containerTypes.value = props.airContainerOptions;
+    }
+});
 </script>
 
 <template>
@@ -119,16 +151,48 @@ const handleUpdateContainer = () => {
                         </label>
                     </div>
 
+                    <div v-if="form.cargo_type === 'Sea Cargo'">
+                        <label class="block">
+                            <InputLabel value="Container Type"/>
+                            <select
+                                v-model="form.container_type"
+                                class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                            >
+                                <option v-for="containerType in containerTypes">
+                                    {{ containerType }}
+                                </option>
+                            </select>
+                        </label>
+                        <InputError :message="form.errors.container_type"/>
+                    </div>
+
                     <div>
                         <InputLabel value="Reference"/>
                         <TextInput v-model="form.reference" class="w-full" placeholder="Reference"/>
                         <InputError :message="form.errors.reference"/>
                     </div>
 
-                    <div v-if="container.cargo_type === 'Sea Cargo'">
-                        <InputLabel value="AWB No"/>
+                    <div v-if="form.cargo_type === 'Sea Cargo'">
+                        <InputLabel value="Container Number"/>
+                        <TextInput v-model="form.container_number" class="w-full" placeholder="Container Number"/>
+                        <InputError :message="form.errors.container_number" />
+                    </div>
+                    <div v-if="form.cargo_type === 'Sea Cargo'">
+                        <InputLabel value="Seal Number"/>
+                        <TextInput v-model="form.seal_number" class="w-full" placeholder="Seal Number"/>
+                        <InputError :message="form.errors.seal_number" />
+                    </div>
+
+                    <div v-if="form.cargo_type === 'Sea Cargo'">
+                        <InputLabel value="BL Number"/>
+                        <TextInput v-model="form.bl_number" class="w-full"/>
+                        <InputError :message="form.errors.bl_number" />
+                    </div>
+
+                    <div v-else>
+                        <InputLabel value="AWB Number"/>
                         <TextInput v-model="form.awb_number" class="w-full"/>
-                        <InputError :message="form.errors.awb_number"/>
+                        <InputError :message="form.errors.awb_number" />
                     </div>
 
                     <div>
@@ -142,6 +206,55 @@ const handleUpdateContainer = () => {
                         <TextInput v-model="form.estimated_time_of_arrival" class="w-full" type="date"/>
                         <InputError :message="form.errors.estimated_time_of_arrival"/>
                     </div>
+
+                    <div>
+                        <InputLabel value="Vessel Name"/>
+                        <TextInput v-model="form.vessel_name" class="w-full"/>
+                        <InputError :message="form.errors.vessel_name" />
+                    </div>
+                    <div>
+                        <InputLabel value="Voyage Number"/>
+                        <TextInput v-model="form.voyage_number" class="w-full"/>
+                        <InputError :message="form.errors.voyage_number" />
+                    </div>
+                    <div>
+                        <InputLabel value="Shipping Line"/>
+                        <TextInput v-model="form.shipping_line" class="w-full"/>
+                        <InputError :message="form.errors.shipping_line" />
+                    </div>
+                    <div>
+                        <InputLabel value="Port of Loading"/>
+                        <TextInput v-model="form.port_of_loading" class="w-full"/>
+                        <InputError :message="form.errors.port_of_loading" />
+                    </div>
+                    <div>
+                        <InputLabel value="Port of Discharge"/>
+                        <TextInput v-model="form.port_of_discharge" class="w-full"/>
+                        <InputError :message="form.errors.port_of_discharge" />
+                    </div>
+
+                    <template v-if="form.cargo_type === 'Air Cargo'">
+                        <div>
+                            <InputLabel value="Flight Number"/>
+                            <TextInput v-model="form.flight_number" class="w-full"/>
+                            <InputError :message="form.errors.flight_number" />
+                        </div>
+                        <div>
+                            <InputLabel value="Airline Name"/>
+                            <TextInput v-model="form.airline_name" class="w-full"/>
+                            <InputError :message="form.errors.airline_name" />
+                        </div>
+                        <div>
+                            <InputLabel value="Airport of Departure"/>
+                            <TextInput v-model="form.airport_of_departure" class="w-full"/>
+                            <InputError :message="form.errors.airport_of_departure" />
+                        </div>
+                        <div>
+                            <InputLabel value="Airport of Arrival"/>
+                            <TextInput v-model="form.airport_of_arrival" class="w-full"/>
+                            <InputError :message="form.errors.airport_of_arrival" />
+                        </div>
+                    </template>
                 </div>
 
             </div>
