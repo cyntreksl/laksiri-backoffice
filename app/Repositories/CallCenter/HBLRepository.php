@@ -75,8 +75,8 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
             if (! $tokensExistToday) {
                 DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-                Token::truncate();
-                CustomerQueue::truncate();
+                DB::table('tokens')->delete();
+                DB::table('customer_queues')->delete();
                 DB::statement('SET FOREIGN_KEY_CHECKS=1;');
             }
 
