@@ -305,7 +305,7 @@ const calculatePayment = () => {
 
         billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
         if (grandTotalVolume.value) {
-                (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
             } else {
                 otherCharge.value =
                     (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
@@ -352,7 +352,7 @@ const calculatePayment = () => {
 
         billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
         if (grandTotalVolume.value) {
-                (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
             } else {
                 otherCharge.value =
                     (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
@@ -399,7 +399,7 @@ const calculatePayment = () => {
 
         billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
         if (grandTotalVolume.value) {
-                (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
             } else {
                 otherCharge.value =
                     (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
@@ -446,7 +446,7 @@ const calculatePayment = () => {
 
         billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
         if (grandTotalVolume.value) {
-                (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
             } else {
                 otherCharge.value =
                     (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
@@ -493,7 +493,7 @@ const calculatePayment = () => {
 
         billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
         if (grandTotalVolume.value) {
-                (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
             } else {
                 otherCharge.value =
                     (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
@@ -540,7 +540,7 @@ const calculatePayment = () => {
 
         billCharge.value = priceRule.value.bill_price.toFixed(2) || 0;
         if (grandTotalVolume.value) {
-                (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
             } else {
                 otherCharge.value =
                     (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
