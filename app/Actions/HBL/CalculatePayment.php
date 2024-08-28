@@ -102,11 +102,11 @@ class CalculatePayment
         $otherCharge = $destinationCharges + $packageCharges;
 
         return [
-            'freight_charge' => number_format($freight_charge, 3),
-            'bill_charge' => number_format($billCharge, 3),
-            'other_charge' => number_format($otherCharge, 2),
-            'package_charges' => number_format($packageCharges, 2),
-            'destination_charges' => number_format($destinationCharges, 2),
+            'freight_charge' => number_format((float) $freight_charge, 3, '.', ''),
+            'bill_charge' => number_format((float) $billCharge, 3, '.', ''),
+            'other_charge' => number_format((float) $otherCharge, 2, '.', ''),
+            'package_charges' => number_format((float) $packageCharges, 2, '.', ''),
+            'destination_charges' => number_format((float) $destinationCharges, 2, '.', ''),
             'is_editable' => $isEditable,
             'vat' => $vat,
         ];
