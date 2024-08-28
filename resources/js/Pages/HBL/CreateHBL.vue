@@ -100,6 +100,8 @@ const form = useForm({
     freight_charge: 0,
     bill_charge: 0,
     other_charge: 0,
+    destination_charges: 0,
+    package_charges: 0,
     discount: 0,
     paid_amount: '',
     grand_total: 0,
@@ -299,7 +301,8 @@ const calculatePayment = () => {
         const hblType = form.hbl_type;
         const freightCharge = ref(0);
         const billCharge = ref(0);
-        const otherCharge = ref(0);
+        const destinationCharges = ref(0);
+        const packageCharges = ref(0);
 
         if (cargoType === "Sea Cargo" && hblType === "Gift") {
             const priceRule = computed(() => {
@@ -310,10 +313,13 @@ const calculatePayment = () => {
 
             if (!priceRule.value) {
                 billCharge.value = 0;
-                otherCharge.value = 0;
+                destinationCharges.value = 0;
+                packageCharges.value = 0;
                 vat.value = 0;
                 isEditable.value = false;
                 form.bill_charge = 0;
+                form.other_charge = 0
+                form.destination_charges = 0
                 form.other_charge = 0
                 form.discount = 0;
                 form.freight_charge = 0;
@@ -350,10 +356,13 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             if (grandTotalVolume.value) {
-                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2)) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length) || 0;
             } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges).toFixed(2) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges).toFixed(2) || 0;
             }
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
@@ -369,10 +378,12 @@ const calculatePayment = () => {
 
             if (!priceRule.value) {
                 billCharge.value = 0;
-                otherCharge.value = 0;
+                destinationCharges.value = 0;
                 vat.value = 0;
                 isEditable.value = false;
                 form.bill_charge = 0;
+                form.other_charge = 0
+                form.destination_charges = 0
                 form.other_charge = 0
                 form.discount = 0;
                 form.freight_charge = 0;
@@ -408,10 +419,13 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             if (grandTotalVolume.value) {
-                otherCharge.value= (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2)) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length) || 0;
             } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges).toFixed(2) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges).toFixed(2) || 0;
             }
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
@@ -427,11 +441,13 @@ const calculatePayment = () => {
 
             if (!priceRule.value) {
                 billCharge.value = 0;
-                otherCharge.value = 0;
+                destinationCharges.value = 0;
                 vat.value = 0;
                 isEditable.value = false;
                 form.bill_charge = 0;
-                form.other_charge = 0
+                form.other_charge = 0;
+                form.destination_charges = 0;
+                form.other_charge = 0;
                 form.discount = 0;
                 form.freight_charge = 0;
                 return push.error('Price Rule Not Found!')
@@ -467,10 +483,13 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             if (grandTotalVolume.value) {
-                otherCharge.value= (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2)) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length) || 0;
             } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges).toFixed(2) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges).toFixed(2) || 0;
             }
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
@@ -486,10 +505,12 @@ const calculatePayment = () => {
 
             if (!priceRule.value) {
                 billCharge.value = 0;
-                otherCharge.value = 0;
+                destinationCharges.value = 0;
                 vat.value = 0;
                 isEditable.value = false;
                 form.bill_charge = 0;
+                form.other_charge = 0;
+                form.destination_charges = 0
                 form.other_charge = 0
                 form.discount = 0;
                 form.freight_charge = 0;
@@ -526,10 +547,13 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             if (grandTotalVolume.value) {
-                otherCharge.value= (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2)) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length) || 0;
             } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges).toFixed(2) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges).toFixed(2) || 0;
             }
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
@@ -545,11 +569,13 @@ const calculatePayment = () => {
 
             if (!priceRule.value) {
                 billCharge.value = 0;
-                otherCharge.value = 0;
+                destinationCharges.value = 0;
                 vat.value = 0;
                 isEditable.value = false;
                 form.bill_charge = 0;
-                form.other_charge = 0
+                form.other_charge = 0;
+                form.destination_charges = 0;
+                form.other_charge = 0;
                 form.discount = 0;
                 form.freight_charge = 0;
                 return push.error('Price Rule Not Found!')
@@ -585,10 +611,13 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             if (grandTotalVolume.value) {
-                otherCharge.value= (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2)) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length) || 0;
             } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges).toFixed(2) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges).toFixed(2) || 0;
             }
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
@@ -604,11 +633,13 @@ const calculatePayment = () => {
 
             if (!priceRule.value) {
                 billCharge.value = 0;
-                otherCharge.value = 0;
+                destinationCharges.value = 0;
                 vat.value = 0;
                 isEditable.value = false;
                 form.bill_charge = 0;
-                form.other_charge = 0
+                form.other_charge = 0;
+                form.destination_charges = 0;
+                form.other_charge = 0;
                 form.discount = 0;
                 form.freight_charge = 0;
                 return push.error('Price Rule Not Found!')
@@ -644,10 +675,13 @@ const calculatePayment = () => {
 
             billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
             if (grandTotalVolume.value) {
-                otherCharge.value= (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2)) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length) || 0;
             } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
+                destinationCharges.value = parseFloat(priceRule.value.volume_charges).toFixed(2) || 0;
+
+                packageCharges.value = parseFloat(priceRule.value.per_package_charges).toFixed(2) || 0;
             }
             isEditable.value = Boolean(priceRule.value.is_editable);
             vat.value =
@@ -658,7 +692,9 @@ const calculatePayment = () => {
 
         form.freight_charge = freightCharge.value.toFixed(3);
         form.bill_charge = billCharge.value;
-        form.other_charge = parseFloat(otherCharge.value).toFixed(2);
+        form.other_charge = (parseFloat(destinationCharges.value) + parseFloat(packageCharges.value)).toFixed(2);
+        form.package_charges = parseFloat(packageCharges.value).toFixed(2);
+        form.destination_charges = parseFloat(destinationCharges.value).toFixed(2);
     }
 ;
 const showConfirmRemovePackageModal = ref(false);
@@ -1450,16 +1486,27 @@ const shipIcon = ref(`
                             </div>
 
                             <div>
-                                <span>Destination Charge</span>
+                                <span>Destination Charges</span>
                                 <TextInput
-                                    v-model="form.other_charge"
+                                    v-model="form.destination_charges"
                                     :disabled="!isEditable"
                                     class="w-full"
                                     min="0"
                                     step="any"
                                     type="number"
                                 />
-                                <InputError :message="form.errors.other_charge"/>
+                            </div>
+
+                            <div>
+                                <span>Package Charges</span>
+                                <TextInput
+                                    v-model="form.package_charges"
+                                    :disabled="!isEditable"
+                                    class="w-full"
+                                    min="0"
+                                    step="any"
+                                    type="number"
+                                />
                             </div>
 
                             <div>
@@ -1475,11 +1522,10 @@ const shipIcon = ref(`
                                 <InputError :message="form.errors.discount"/>
                             </div>
 
-                            <div class="col-span-2">
+                            <div>
                                 <span>Paid Amount</span>
                                 <TextInput
                                     v-model="form.paid_amount"
-                                    :disabled="!isEditable"
                                     class="w-full"
                                     min="0"
                                     step="any"
