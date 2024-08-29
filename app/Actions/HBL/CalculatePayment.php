@@ -109,6 +109,11 @@ class CalculatePayment
             'destination_charges' => number_format((float) $destinationCharges, 2, '.', ''),
             'is_editable' => $isEditable,
             'vat' => $vat,
+            'per_package_charge' => floatval($priceRule->per_package_charges),
+            'per_volume_charge' => floatval($priceRule->volume_charges),
+            'per_freight_charge' => (float) $value,
+            'freight_operator' => $operator,
+            'price_mode' => $priceRule->price_mode,
         ];
     }
 }

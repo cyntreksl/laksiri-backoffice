@@ -295,6 +295,11 @@ const updateTypeDescription = () => {
 const hblTotal = ref(0);
 const currency = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 const isEditable = ref(false);
+const perPackageCharge = ref(0);
+const perVolumeCharge = ref(0);
+const perFreightCharge = ref(0);
+const freightOperator = ref('');
+const priceMode = ref('');
 
 const calculatePayment = async () => {
     try {
@@ -308,7 +313,7 @@ const calculatePayment = async () => {
                 cargo_type: form.cargo_type,
                 hbl_type: form.hbl_type,
                 grand_total_volume: grandTotalVolume.value,
-                grand_total_weight:grandTotalWeight.value,
+                grand_total_weight: grandTotalWeight.value,
                 package_list_length: packageList.value.length
             })
         });
@@ -325,6 +330,11 @@ const calculatePayment = async () => {
             form.destination_charges = data.destination_charges;
             isEditable.value = data.is_editable;
             vat.value = data.vat;
+            perPackageCharge.value = data.per_package_charge;
+            perVolumeCharge.value = data.per_volume_charge;
+            perFreightCharge.value = data.per_freight_charge;
+            freightOperator.value = data.freight_operator;
+            priceMode.value = data.price_mode;
         }
 
     } catch (error) {
@@ -507,8 +517,8 @@ const handleCopyFromHBLToPackage = async () => {
             closeCopyFromHBLToPackageModal()
             copiedPackages.value = data;
 
-            const copiedTotalWeight =  copiedPackages.value.reduce((acc, curr) => acc + curr.weight, 0);
-            const copiedTotalVolume =  copiedPackages.value.reduce((acc, curr) => acc + curr.volume, 0);
+            const copiedTotalWeight = copiedPackages.value.reduce((acc, curr) => acc + curr.weight, 0);
+            const copiedTotalVolume = copiedPackages.value.reduce((acc, curr) => acc + curr.volume, 0);
 
             grandTotalWeight.value += copiedTotalWeight;
             grandTotalVolume.value += copiedTotalVolume;
@@ -536,6 +546,8 @@ const handleCopyShipper = () => {
     form.consignee_nic = form.nic;
     form.consignee_address = form.address;
 }
+
+const isShowedPaymentSummery = ref(false);
 
 const planeIcon = ref(`
 <svg
@@ -791,7 +803,8 @@ const shipIcon = ref(`
                             </h2>
 
                             <div class="flex space-x-4">
-                                <SoftPrimaryButton :disabled="form.hbl_name ===''" class="flex items-center" type="button"
+                                <SoftPrimaryButton :disabled="form.hbl_name ===''" class="flex items-center"
+                                                   type="button"
                                                    @click.prevent="handleCopyShipper">
                                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
                                          height="24" stroke="currentColor" stroke-linecap="round"
@@ -1195,13 +1208,59 @@ const shipIcon = ref(`
                                     class="flex justify-between text-2xl text-success font-bold"
                                 >
                                     <p class="line-clamp-1">Grand Total</p>
-                                    <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
+                                    <div class="flex items-center">
+                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle mr-3 text-info hover:cursor-pointer" fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"  @click="isShowedPaymentSummery = !isShowedPaymentSummery"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>
+                                        <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
+                                    </div>
                                 </div>
-                                <div class="p-2 bg-slate-100 rounded-lg mt-2">
-                                    <p class="italic">
-                                        Grand Total = Freight Charges + Bill Charges + Destination Charges + VAT - Discount
-                                    </p>
-                                </div>
+                                <template v-if="isShowedPaymentSummery">
+                                    <div v-if="packageList.length > 0" class="p-2 bg-slate-100 rounded-lg mt-2">
+                                        <table class="italic w-full">
+                                            <thead>
+                                            <tr class="font-bold">
+                                                <td>Type</td>
+                                                <td>Package Charge</td>
+                                                <td>Destination Charge</td>
+                                                <td>Freight Charge</td>
+                                                <td class="text-right">Total</td>
+                                            </tr>
+                                            </thead>
+                                            <tr v-for="packageItem in packageList">
+                                                <td>
+                                                    {{packageItem.type}}
+                                                </td>
+                                                <td>
+                                                    {{ perPackageCharge.toFixed(2) }}
+                                                </td>
+                                                <td>
+                                                    {{ perVolumeCharge.toFixed(2) + ' x ' + packageItem.volume }}
+                                                </td>
+                                                <td>
+                                                    {{ perFreightCharge.toFixed(2) + ' x ' + (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)  }}
+                                                </td>
+                                                <td class="text-right">
+                                                    {{
+                                                        ( perPackageCharge +
+                                                            (perVolumeCharge * parseFloat(packageItem.volume).toFixed(3))
+                                                            + (perFreightCharge * (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume))).toFixed(2)
+                                                    }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4">Bill Charges</td>
+                                                <td class="text-right">{{parseFloat(form.bill_charge).toFixed(2)}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4">Discount</td>
+                                                <td class="text-right">- {{parseFloat(form.discount).toFixed(2)}}</td>
+                                            </tr>
+                                            <tr class="font-bold">
+                                                <td colspan="4">Total</td>
+                                                <td class="text-right">{{hblTotal.toFixed(2)}}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -1216,7 +1275,8 @@ const shipIcon = ref(`
                         >
                             Package Details
                         </h2>
-                        <SoftPrimaryButton v-if="Object.values(copiedPackages).length === 0" class="flex items-center" type="button"
+                        <SoftPrimaryButton v-if="Object.values(copiedPackages).length === 0" class="flex items-center"
+                                           type="button"
                                            @click.prevent="confirmShowingCopyFromHBLToPackageModal">
                             <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
                                  height="24" stroke="currentColor" stroke-linecap="round"
@@ -1231,11 +1291,13 @@ const shipIcon = ref(`
 
                             Copy From HBL
                         </SoftPrimaryButton>
-                        <DangerOutlineButton v-if="Object.values(copiedPackages).length > 0" @click.prevent="handleRemoveCopiedPackages">
+                        <DangerOutlineButton v-if="Object.values(copiedPackages).length > 0"
+                                             @click.prevent="handleRemoveCopiedPackages">
                             Remove Copied Packages
                         </DangerOutlineButton>
                     </div>
-                    <PrimaryOutlineButton v-if="Object.values(copiedPackages).length === 0" type="button" @click="showPackageDialog">
+                    <PrimaryOutlineButton v-if="Object.values(copiedPackages).length === 0" type="button"
+                                          @click="showPackageDialog">
                         New Package <i class="fas fa-plus fa-fw fa-fw"></i>
                     </PrimaryOutlineButton>
                 </div>
@@ -1450,7 +1512,8 @@ const shipIcon = ref(`
                             </tbody>
                         </table>
                     </div>
-                    <div v-if="packageList.length === 0 && Object.values(copiedPackages).length === 0" class="text-center">
+                    <div v-if="packageList.length === 0 && Object.values(copiedPackages).length === 0"
+                         class="text-center">
                         <div class="text-center mb-8">
                             <svg
                                 class="w-24 h-24 mx-auto mb-4 text-gray-400"
