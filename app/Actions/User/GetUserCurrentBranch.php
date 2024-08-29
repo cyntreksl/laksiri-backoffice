@@ -14,17 +14,20 @@ class GetUserCurrentBranch
     {
         $branchName = session('current_branch_name');
         $branchId = session('current_branch_id');
+        $branchType = session('current_branch_type');
 
         //      For API
         if (empty($branchId)) {
             $primaryBranch = Branch::find(Auth::user()->primary_branch_id);
             $branchId = $primaryBranch->id;
             $branchName = $primaryBranch->name;
+            $branchType = $primaryBranch->type;
         }
 
         return [
             'branchName' => $branchName,
             'branchId' => $branchId,
+            'branchType' => $branchType,
         ];
     }
 }

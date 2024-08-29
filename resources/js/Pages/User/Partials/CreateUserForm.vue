@@ -2,7 +2,7 @@
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import DialogModal from "@/Components/DialogModal.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import {ref} from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
@@ -230,19 +230,21 @@ const createUser = () => {
                 <div class="col-span-1 sm:col-span-2">
                     <InputLabel value="Select Role"/>
                     <div class="space-x-5 mt-1">
-                        <label
-                            v-for="role in roles"
-                            class="inline-flex items-center space-x-2"
-                        >
-                            <input
-                                v-model="form.role"
-                                class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                name="role"
-                                :value="role.name"
-                                type="radio"
-                            />
-                            <p class="capitalize">{{ role.name }}</p>
-                        </label>
+                        <template v-for="role in roles">
+                            <label
+                                v-if="usePage().props?.auth.user.active_branch_type !== 'destination' || (role.name !== 'call center' && role.name !== 'boned area')"
+                                class="inline-flex items-center space-x-2"
+                            >
+                                <input
+                                    v-model="form.role"
+                                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                                    name="role"
+                                    :value="role.name"
+                                    type="radio"
+                                />
+                                <p class="capitalize">{{ role.name }}</p>
+                            </label>
+                        </template>
                     </div>
                     <InputError :message="form.errors.role"/>
                 </div>

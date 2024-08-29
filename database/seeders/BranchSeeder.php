@@ -10,10 +10,10 @@ class BranchSeeder extends Seeder
     public function run(): void
     {
         $data = [
-            ['name' => 'Riyadh', 'slug' => 'riyadh'],
-            ['name' => 'Sri Lanka', 'slug' => 'sri-lanka'],
-            ['name' => 'Dubai', 'slug' => 'dubai'],
-            ['name' => 'Kuwait', 'slug' => 'kuwait'],
+            ['name' => 'Riyadh', 'slug' => 'riyadh', 'type' => 'departure'],
+            ['name' => 'Sri Lanka', 'slug' => 'sri-lanka', 'type' => 'destination'],
+            ['name' => 'Dubai', 'slug' => 'dubai', 'type' => 'departure'],
+            ['name' => 'Kuwait', 'slug' => 'kuwait', 'type' => 'departure'],
         ];
 
         if (Branch::count() === 0) {
