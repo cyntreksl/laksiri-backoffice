@@ -58,4 +58,6 @@ interface HBLRepositoryInterface
     public function getHBLStatusByReference(string $reference): JsonResponse;
 
     public function downloadDocument(HBLDocument $hbl_document);
+
+    public function calculatePayment(array $data): JsonResponse;
 }

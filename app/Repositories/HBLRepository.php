@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\DeleteHBL;
@@ -280,5 +281,18 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function downloadDocument(HBLDocument $hbl_document)
     {
         return DownloadDocument::run($hbl_document);
+    }
+
+    public function calculatePayment(array $data): JsonResponse
+    {
+        $result = CalculatePayment::run(
+            $data['cargo_type'],
+            $data['hbl_type'],
+            $data['grand_total_volume'],
+            $data['grand_total_weight'],
+            $data['package_list_length']
+        );
+
+        return response()->json($result);
     }
 }

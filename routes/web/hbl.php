@@ -59,3 +59,5 @@ Route::get('hbls/get-hbls-by-user/{user}', [HBLController::class, 'getHBLsByUser
 
 Route::get('hbls/download/document/{hbl_document}', [HBLController::class, 'downloadDocument'])
     ->name('hbls.download.document-hbl-document');
+
+Route::post('hbls/calculate-payment', [HBLController::class, 'calculatePayment']);

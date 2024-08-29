@@ -266,4 +266,9 @@ class HBLController extends Controller
 
         return $this->HBLRepository->downloadDocument($hbl_document);
     }
+
+    public function calculatePayment(Request $request)
+    {
+        return $this->HBLRepository->calculatePayment($request->all());
+    }
 }
