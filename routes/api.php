@@ -7,8 +7,7 @@ use App\Http\Controllers\Api\v1\HBLController;
 use App\Http\Controllers\Api\v1\PickupController;
 use Illuminate\Support\Facades\Route;
 
-Route::domain('api.'.config('app.url'))
-    ->middleware(['auth:sanctum'])
+Route::middleware(['auth:sanctum'])
     ->prefix('/v1/')->group(function () {
         Route::get('/pending-pickup-list', [PickupController::class, 'index']);
 
@@ -22,6 +21,8 @@ Route::domain('api.'.config('app.url'))
 
         Route::apiResource('hbls', HBLController::class)->only(['store', 'show']);
 
+        Route::post('hbls/calculate-payment', [HBLController::class, 'calculatePayment']);
+
         Route::post('/pickups/exceptions/{pickup}', [PickupController::class, 'storePickupException']);
 
         Route::get('/pickups/exceptions/list', [PickupController::class, 'getPickupExceptions']);
@@ -33,4 +34,4 @@ Route::domain('api.'.config('app.url'))
         Route::put('/driver/location/update/{user}', [DriverController::class, 'createDriverLocation']);
     });
 
-Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
+Route::prefix('/v1/')->post('/login', [LoginController::class, 'login']);

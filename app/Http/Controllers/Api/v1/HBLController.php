@@ -7,6 +7,7 @@ use App\Http\Requests\StoreHBLRequest;
 use App\Interfaces\Api\HBLRepositoryInterface;
 use App\Models\HBL;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class HBLController extends Controller
 {
@@ -37,5 +38,17 @@ class HBLController extends Controller
     public function store(StoreHBLRequest $request)
     {
         return $this->HBLRepository->storeHBL($request->all());
+    }
+
+    /**
+     * Calculate Payments
+     *
+     * Calculate HBL Package Payments.
+     *
+     * @group HBL
+     */
+    public function calculatePayment(Request $request)
+    {
+        return $this->HBLRepository->calculatePayment($request->all());
     }
 }

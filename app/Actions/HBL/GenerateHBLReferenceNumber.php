@@ -11,8 +11,7 @@ class GenerateHBLReferenceNumber
 
     public function handle(): string
     {
-
-        $last_hbl = HBL::latest()->first();
+        $last_hbl = HBL::whereNotNull('reference')->latest()->first();
 
         $next_reference = $last_hbl ? ((int) substr($last_hbl->reference, 6) + 1) : 000001;
 

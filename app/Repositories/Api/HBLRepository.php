@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Api;
 
+use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Http\Resources\HBLResource;
@@ -41,5 +42,18 @@ class HBLRepository implements HBLRepositoryInterface
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());
         }
+    }
+
+    public function calculatePayment(array $data): JsonResponse
+    {
+        $result = CalculatePayment::run(
+            $data['cargo_type'],
+            $data['hbl_type'],
+            $data['grand_total_volume'],
+            $data['grand_total_weight'],
+            $data['package_list_length']
+        );
+
+        return response()->json($result);
     }
 }
