@@ -1,5 +1,5 @@
 <script setup>
-import {Head, Link, useForm} from "@inertiajs/vue3";
+import {Head, Link, useForm, router} from "@inertiajs/vue3";
 import logo from "../../../images/logo_main.png";
 import DashboardMeet from "../../../images/illustrations/dashboard-meet.svg";
 import DashboardMeetDark from "../../../images/illustrations/dashboard-meet-dark.svg";
@@ -27,13 +27,18 @@ const submit = () => {
         }))
         .post(route("login"), {
             onFinish: () => form.reset("password"),
-        });
+        })
 };
 
 const reference = ref(null);
 const errorMessage = ref('');
 const isLoading = ref(false);
 const hblStatus = ref([]);
+
+const logout = () => {
+    router.post(route('logout'));
+
+};
 
 const handleSubmit = async () => {
     errorMessage.value = '';
@@ -90,11 +95,35 @@ const hblStatusColor = (status) => {
             return 'bg-amber-400';
     }
 };
+
 </script>
 
 <template>
     <Head title="Log in"/>
     <div class="min-h-100vh flex grow bg-slate-50 dark:bg-navy-900">
+        <div v-if="$page.props.auth.user" class="absolute top-0 right-0 p-6 lg:p-12 flex space-x-2">
+            <Link :href="route('dashboard')">
+                Dashboard
+            </Link>
+            <span> | </span>
+            <button @click="logout" class="btn-link flex items-center space-x-2">
+                <svg
+                    class="size-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                    ></path>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
         <div class="fixed top-0 hidden p-6 lg:block lg:px-12">
             <a class="flex items-center space-x-2" href="#">
                 <img :src="logo" alt="logo" class="size-12"/>
@@ -209,8 +238,10 @@ const hblStatusColor = (status) => {
             </div>
         </div>
         <main
+            v-if="!$page.props.auth.user"
             class="flex w-full flex-col items-center bg-white dark:bg-navy-700 lg:max-w-md"
         >
+            <!-- Start of login -->
             <div class="flex w-full max-w-sm grow flex-col justify-center p-5">
                 <div class="text-center">
                     <img :src="logo" alt="logo" class="mx-auto size-16"/>
@@ -314,6 +345,7 @@ const hblStatusColor = (status) => {
                     </button>
                 </form>
             </div>
+            <!-- End of login -->
             <div
                 class="my-5 flex justify-center text-xs text-slate-400 dark:text-navy-300"
             >
