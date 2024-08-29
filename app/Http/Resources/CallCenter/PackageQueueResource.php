@@ -16,11 +16,11 @@ class PackageQueueResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'token' => $this->token->token,
+            'token' => $this->token()->exists() ?? $this->token->token,
             'reference' => $this->reference,
             'package_count' => $this->package_count,
             'is_released' => $this->is_released,
-            'created_at' => $this->token->created_at->format('Y-m-d H:i:s'),
+            'created_at' => $this->token()->exists() ?? $this->token->created_at->format('Y-m-d H:i:s'),
         ];
     }
 }
