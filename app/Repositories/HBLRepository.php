@@ -72,10 +72,12 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         if (isset($filters['userData'])) {
             $query = HBL::query()
+                ->whereNot('status', 'draft')
                 ->where('hbl_name', $filters['userData'])
                 ->orWhere('contact_number', $filters['userData']);
         } else {
-            $query = HBL::query();
+            $query = HBL::query()
+                ->whereNot('status', 'draft');
         }
 
         if (! empty($search)) {
@@ -294,5 +296,51 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         );
 
         return response()->json($result);
+    }
+
+    public function getDraftList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
+    {
+        if (isset($filters['userData'])) {
+            $query = HBL::query()
+                ->where('status', 'draft')
+                ->where('hbl_name', $filters['userData'])
+                ->orWhere('contact_number', $filters['userData']);
+        } else {
+            $query = HBL::query()
+                ->where('status', 'draft');
+        }
+
+        if (! empty($search)) {
+            $query->whereAny([
+                'reference',
+                'hbl_name',
+                'contact_number',
+                'consignee_name',
+                'consignee_nic',
+                'consignee_contact',
+                'iq_number',
+                'nic',
+                'email',
+            ], 'like', '%'.$search.'%');
+        }
+
+        $countQuery = $query;
+
+        $hbls = $query->orderBy($order, $direction)
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        $totalRecords = $countQuery->count();
+
+        return response()->json([
+            'data' => HBLResource::collection($hbls),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
     }
 }
