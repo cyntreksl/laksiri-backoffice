@@ -261,301 +261,42 @@ onBeforeMount(() => {
     }
 });
 
-const calculatePayment = () => {
-    const cargoType = form.cargo_type;
-    const hblType = form.hbl_type;
-    const freightCharge = ref(props.hbl.freight_charge);
-    const billCharge = ref(props.hbl.bill_charge);
-    const otherCharge = ref(props.hbl.other_charge);
-
-    if (cargoType === "Sea Cargo" && hblType === "Gift") {
-        const priceRule = computed(() => {
-            return props.priceRules.find(
-                (priceRule) => priceRule.cargo_mode === "Sea Cargo" && priceRule.hbl_type === "Gift"
-            );
+const calculatePayment = async () => {
+    try {
+        const response = await fetch(`/hbls/calculate-payment`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify({
+                cargo_type: form.cargo_type,
+                hbl_type: form.hbl_type,
+                grand_total_volume: grandTotalVolume.value,
+                grand_total_weight:grandTotalWeight.value,
+                package_list_length: packageList.value.length
+            })
         });
 
-        if (priceRule.value.price_mode === "volume") {
-            const trueAction = priceRule.value.true_action.trim();
-            const operator = trueAction[0];
-            const value = parseFloat(trueAction.slice(1).trim());
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
 
-            switch (operator) {
-                case "*":
-                    freightCharge.value = grandTotalVolume.value * value;
-                    break;
-                case "+":
-                    freightCharge.value = grandTotalVolume.value + value;
-                    break;
-                case "-":
-                    freightCharge.value = grandTotalVolume.value - value;
-                    break;
-                case "/":
-                    if (value !== 0) {
-                        freightCharge.value = grandTotalVolume.value / value;
-                    } else {
-                        console.error("Division by zero error");
-                    }
-                    break;
-                default:
-                    console.error("Unsupported operation");
-                    break;
-            }
+            form.freight_charge = data.freight_charge;
+            form.bill_charge = data.bill_charge;
+            form.other_charge = data.other_charge;
+            form.package_charges = data.package_charges;
+            form.destination_charges = data.destination_charges;
+            isEditable.value = data.is_editable;
+            vat.value = data.vat;
         }
 
-        billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
-        if (grandTotalVolume.value) {
-                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
-            } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
-            }
-        isEditable.value = Boolean(priceRule.value.is_editable);
-        vat.value =
-            priceRule.value.bill_vat !== 0
-                ? parseFloat(priceRule.value.bill_vat) / 100
-                : 0;
-    } else if (cargoType === "Sea Cargo" && hblType === "UBP") {
-        const priceRule = computed(() => {
-            return props.priceRules.find(
-                (priceRule) => priceRule.cargo_mode === "Sea Cargo" && priceRule.hbl_type === "UBP"
-            );
-        });
-
-        if (priceRule.value.price_mode === "volume") {
-            const trueAction = priceRule.value.true_action.trim();
-            const operator = trueAction[0];
-            const value = parseFloat(trueAction.slice(1).trim());
-
-            switch (operator) {
-                case "*":
-                    freightCharge.value = grandTotalVolume.value * value;
-                    break;
-                case "+":
-                    freightCharge.value = grandTotalVolume.value + value;
-                    break;
-                case "-":
-                    freightCharge.value = grandTotalVolume.value - value;
-                    break;
-                case "/":
-                    if (value !== 0) {
-                        freightCharge.value = grandTotalVolume.value / value;
-                    } else {
-                        console.error("Division by zero error");
-                    }
-                    break;
-                default:
-                    console.error("Unsupported operation");
-                    break;
-            }
-        }
-
-        billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
-        if (grandTotalVolume.value) {
-                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
-            } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
-            }
-        isEditable.value = Boolean(priceRule.value.is_editable);
-        vat.value =
-            priceRule.value.bill_vat !== 0
-                ? parseFloat(priceRule.value.bill_vat) / 100
-                : 0;
-    } else if (cargoType === "Sea Cargo" && hblType === "Door to Door") {
-        const priceRule = computed(() => {
-            return props.priceRules.find(
-                (priceRule) => priceRule.cargo_mode === "Sea Cargo" && priceRule.hbl_type === "Door to Door"
-            );
-        });
-
-        if (priceRule.value.price_mode === "volume") {
-            const trueAction = priceRule.value.true_action.trim();
-            const operator = trueAction[0];
-            const value = parseFloat(trueAction.slice(1).trim());
-
-            switch (operator) {
-                case "*":
-                    freightCharge.value = grandTotalVolume.value * value;
-                    break;
-                case "+":
-                    freightCharge.value = grandTotalVolume.value + value;
-                    break;
-                case "-":
-                    freightCharge.value = grandTotalVolume.value - value;
-                    break;
-                case "/":
-                    if (value !== 0) {
-                        freightCharge.value = grandTotalVolume.value / value;
-                    } else {
-                        console.error("Division by zero error");
-                    }
-                    break;
-                default:
-                    console.error("Unsupported operation");
-                    break;
-            }
-        }
-
-        billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
-        if (grandTotalVolume.value) {
-                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
-            } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
-            }
-        isEditable.value = Boolean(priceRule.value.is_editable);
-        vat.value =
-            priceRule.value.bill_vat !== 0
-                ? parseFloat(priceRule.value.bill_vat) / 100
-                : 0;
-    } else if (cargoType === "Air Cargo" && hblType === "Gift") {
-        const priceRule = computed(() => {
-            return props.priceRules.find(
-                (priceRule) => priceRule.cargo_mode === "Air Cargo" && priceRule.hbl_type === "Gift"
-            );
-        });
-
-        if (priceRule.value.price_mode === "weight") {
-            const trueAction = priceRule.value.true_action.trim();
-            const operator = trueAction[0];
-            const value = parseFloat(trueAction.slice(1).trim());
-
-            switch (operator) {
-                case "*":
-                    freightCharge.value = grandTotalWeight.value * value;
-                    break;
-                case "+":
-                    freightCharge.value = grandTotalWeight.value + value;
-                    break;
-                case "-":
-                    freightCharge.value = grandTotalWeight.value - value;
-                    break;
-                case "/":
-                    if (value !== 0) {
-                        freightCharge.value = grandTotalWeight.value / value;
-                    } else {
-                        console.error("Division by zero error");
-                    }
-                    break;
-                default:
-                    console.error("Unsupported operation");
-                    break;
-            }
-        }
-
-        billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
-        if (grandTotalVolume.value) {
-                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
-            } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
-            }
-        isEditable.value = Boolean(priceRule.value.is_editable);
-        vat.value =
-            priceRule.value.bill_vat !== 0
-                ? parseFloat(priceRule.value.bill_vat) / 100
-                : 0;
-    } else if (cargoType === "Air Cargo" && hblType === "UBP") {
-        const priceRule = computed(() => {
-            return props.priceRules.find(
-                (priceRule) => priceRule.cargo_mode === "Air Cargo" && priceRule.hbl_type === "UBP"
-            );
-        });
-
-        if (priceRule.value.price_mode === "weight") {
-            const trueAction = priceRule.value.true_action.trim();
-            const operator = trueAction[0];
-            const value = parseFloat(trueAction.slice(1).trim());
-
-            switch (operator) {
-                case "*":
-                    freightCharge.value = grandTotalWeight.value * value;
-                    break;
-                case "+":
-                    freightCharge.value = grandTotalWeight.value + value;
-                    break;
-                case "-":
-                    freightCharge.value = grandTotalWeight.value - value;
-                    break;
-                case "/":
-                    if (value !== 0) {
-                        freightCharge.value = grandTotalWeight.value / value;
-                    } else {
-                        console.error("Division by zero error");
-                    }
-                    break;
-                default:
-                    console.error("Unsupported operation");
-                    break;
-            }
-        }
-
-        billCharge.value = priceRule.value.bill_price.toFixed(3) || 0;
-        if (grandTotalVolume.value) {
-                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
-            } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
-            }
-        isEditable.value = Boolean(priceRule.value.is_editable);
-        vat.value =
-            priceRule.value.bill_vat !== 0
-                ? parseFloat(priceRule.value.bill_vat) / 100
-                : 0;
-    } else if (cargoType === "Air Cargo" && hblType === "Door to Door") {
-        const priceRule = computed(() => {
-            return props.priceRules.find(
-                (priceRule) => priceRule.cargo_mode === "Air Cargo" && priceRule.hbl_type === "Door to Door"
-            );
-        });
-
-        if (priceRule.value.price_mode === "weight") {
-            const trueAction = priceRule.value.true_action.trim();
-            const operator = trueAction[0];
-            const value = parseFloat(trueAction.slice(1).trim());
-
-            switch (operator) {
-                case "*":
-                    freightCharge.value = grandTotalWeight.value * value;
-                    break;
-                case "+":
-                    freightCharge.value = grandTotalWeight.value + value;
-                    break;
-                case "-":
-                    freightCharge.value = grandTotalWeight.value - value;
-                    break;
-                case "/":
-                    if (value !== 0) {
-                        freightCharge.value = grandTotalWeight.value / value;
-                    } else {
-                        console.error("Division by zero error");
-                    }
-                    break;
-                default:
-                    console.error("Unsupported operation");
-                    break;
-            }
-        }
-
-        billCharge.value = priceRule.value.bill_price.toFixed(2) || 0;
-        if (grandTotalVolume.value) {
-                otherCharge.value = (parseFloat(priceRule.value.volume_charges) * parseFloat(grandTotalVolume.value.toFixed(2))) + (parseFloat(priceRule.value.per_package_charges) * parseInt(packageList.value.length)) || 0;
-            } else {
-                otherCharge.value =
-                    (parseFloat(priceRule.value.per_package_charges) + parseFloat(priceRule.value.volume_charges)).toFixed(2) || 0;
-            }
-        isEditable.value = Boolean(priceRule.value.is_editable);
-        vat.value =
-            priceRule.value.bill_vat !== 0
-                ? parseFloat(priceRule.value.bill_vat) / 100
-                : 0;
+    } catch (error) {
+        console.log(error);
     }
+}
 
-    form.freight_charge = freightCharge.value.toFixed(2);
-    form.bill_charge = billCharge.value;
-    form.other_charge = parseFloat(otherCharge.value).toFixed(2);
-};
 const showConfirmRemovePackageModal = ref(false);
 const packageIndex = ref(null);
 
