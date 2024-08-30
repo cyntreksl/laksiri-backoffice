@@ -2,7 +2,8 @@
 
 namespace App\Actions\PickUps;
 
-use App\Actions\HBL\CreateHBL;
+use App\Actions\HBL\CreateHBLPackages;
+use App\Actions\HBL\UpdateOrCreateHBL;
 use App\Enum\PickupStatus;
 use App\Models\HBL;
 use App\Models\PickUp;
@@ -38,11 +39,20 @@ class ConvertPickupToHBL
             'grand_total' => $request->grand_total,
             'pickup_id' => $pickup->id,
             'system_status' => HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
+            'packages' => $request->packages,
+            'is_completed' => $request->is_completed,
         ];
 
         try {
             DB::beginTransaction();
-            $hbl = CreateHBL::run($data);
+
+            $hbl = UpdateOrCreateHBL::run($data);
+
+            if (isset($data['is_completed'])) {
+                $packagesData = $data['packages'];
+
+                CreateHBLPackages::run($hbl, $packagesData);
+            }
 
             $hbl->addStatus('HBL Preparation by driver');
 
