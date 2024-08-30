@@ -60,4 +60,6 @@ interface HBLRepositoryInterface
     public function downloadDocument(HBLDocument $hbl_document);
 
     public function calculatePayment(array $data): JsonResponse;
+
+    public function getDraftList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse;
 }

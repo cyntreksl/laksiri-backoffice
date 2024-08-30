@@ -271,4 +271,26 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->calculatePayment($request->all());
     }
+
+    public function showDraftList()
+    {
+        $this->authorize('hbls.index');
+
+        return Inertia::render('HBL/HBLDraftList', [
+            'users' => $this->userRepository->getUsers(),
+            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
+            'paymentStatus' => HBLPaymentStatus::cases(),
+        ]);
+    }
+
+    public function getDraftList(Request $request): JsonResponse
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+        $search = $request->input('search', null);
+
+        return $this->HBLRepository->getDraftList($limit, $page, $order, $dir, $search);
+    }
 }
