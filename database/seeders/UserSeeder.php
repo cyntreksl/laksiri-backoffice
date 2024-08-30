@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Branch;
 use App\Models\BranchUser;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -34,6 +34,7 @@ class UserSeeder extends Seeder
 
         }
     }
+
     protected function assignBranchToSuperAdmin(User $user): void
     {
         $branchIds = Branch::pluck('id')->toArray();
