@@ -72,12 +72,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         if (isset($filters['userData'])) {
             $query = HBL::query()
-                ->whereNot('status', 'draft')
                 ->where('hbl_name', $filters['userData'])
                 ->orWhere('contact_number', $filters['userData']);
         } else {
-            $query = HBL::query()
-                ->whereNot('status', 'draft');
+            $query = HBL::query();
         }
 
         if (! empty($search)) {
