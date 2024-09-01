@@ -74,6 +74,7 @@ class User extends Authenticatable
         'primary_branch_name',
         'active_branch_name',
         'active_branch_id',
+        'active_branch_type',
     ];
 
     public function scopeCurrentBranch(Builder $builder)
@@ -179,5 +180,12 @@ class User extends Authenticatable
         }
 
         return 'dashboard';
+    }
+
+    public function getActiveBranchTypeAttribute()
+    {
+        $data = GetUserCurrentBranch::run();
+
+        return $data['branchType'];
     }
 }
