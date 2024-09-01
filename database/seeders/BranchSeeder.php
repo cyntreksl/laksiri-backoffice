@@ -11,10 +11,10 @@ class BranchSeeder extends Seeder
     {
         $data = [
             ['name' => 'Riyadh', 'slug' => 'riyadh', 'type' => 'Departure'],
-            ['name' => 'Colombo', 'slug' => 'sri-lanka', 'type' => 'Destination'],
+            ['name' => 'Colombo', 'slug' => 'colombo', 'type' => 'Destination'],
             ['name' => 'Dubai', 'slug' => 'dubai', 'type' => 'Departure'],
             ['name' => 'Kuwait', 'slug' => 'kuwait', 'type' => 'Departure'],
-            ['name' => 'Nintaur', 'slug' => 'Nintaur', 'type' => 'Destination'],
+            ['name' => 'Nintaur', 'slug' => 'nintaur', 'type' => 'Destination'],
         ];
 
         if (Branch::count() === 0) {
