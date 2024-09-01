@@ -7,6 +7,11 @@ Route::resource('hbls', HBLController::class);
 
 Route::get('hbl-list', [HBLController::class, 'list']);
 
+Route::get('hbls/show/draft-list', [HBLController::class, 'showDraftList'])
+    ->name('hbls.draft-list');
+
+Route::get('hbl-draft-list', [HBLController::class, 'getDraftList']);
+
 Route::put('hbls/toggle-hold/{hbl}', [HBLController::class, 'toggleHold'])
     ->name('hbls.toggle-hold');
 

@@ -23,20 +23,20 @@ class StorePickupToHBLRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'hbl_type' => ['required'],
+            'hbl_type' => ['nullable'],
             'nic' => ['nullable'],
             'iq_number' => ['nullable'],
-            'consignee_name' => ['required'],
-            'consignee_nic' => ['required'],
-            'consignee_contact' => ['required'],
-            'consignee_address' => ['required'],
+            'consignee_name' => ['nullable'],
+            'consignee_nic' => ['nullable'],
+            'consignee_contact' => ['nullable'],
+            'consignee_address' => ['nullable'],
             'consignee_note' => ['nullable'],
-            'warehouse' => ['required'],
-            'freight_charge' => ['required', 'numeric'],
-            'bill_charge' => ['required', 'numeric'],
-            'other_charge' => ['required', 'numeric'],
-            'discount' => ['required', 'numeric'],
-            'paid_amount' => ['required', 'numeric'],
+            'warehouse' => ['nullable'],
+            'freight_charge' => ['nullable', 'numeric'],
+            'bill_charge' => ['nullable', 'numeric'],
+            'other_charge' => ['nullable', 'numeric'],
+            'discount' => ['nullable', 'numeric'],
+            'paid_amount' => ['nullable', 'numeric'],
         ];
     }
 }

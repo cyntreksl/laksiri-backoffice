@@ -969,6 +969,10 @@ export default {
                         {
                             title: "Cancelled HBL",
                             route: "hbls.cancelled-hbls",
+                        },
+                        {
+                            title: "Draft HBL",
+                            route: "hbls.draft-list",
                         }
                     );
                     changeSidePanelTitle("HBL");

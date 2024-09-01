@@ -100,6 +100,7 @@ class CalculatePayment
         $isEditable = boolval($priceRule->is_editable);
         $vat = $priceRule->bill_vat ? $priceRule->bill_vat / 100 : 0;
         $otherCharge = $destinationCharges + $packageCharges;
+        $grand_total = $freight_charge + $billCharge + $otherCharge + $vat;
 
         return [
             'freight_charge' => number_format((float) $freight_charge, 3, '.', ''),
@@ -114,6 +115,7 @@ class CalculatePayment
             'per_freight_charge' => (float) $value,
             'freight_operator' => $operator,
             'price_mode' => $priceRule->price_mode,
+            'grand_total_without_discount' => number_format((float) $grand_total, 2, '.', ''),
         ];
     }
 }
