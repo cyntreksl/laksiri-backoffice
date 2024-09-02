@@ -15,6 +15,8 @@ Route::get('/', function () {
     ]);
 });
 
+require_once __DIR__.'/web/feedback.php';
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

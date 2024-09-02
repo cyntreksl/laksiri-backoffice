@@ -2,6 +2,7 @@
 
 namespace App\Repositories\CallCenter;
 
+use App\Actions\CustomerFeedback\SendFeedbackMail;
 use App\Actions\Examination\CreateExamination;
 use App\Interfaces\CallCenter\ExaminationRepositoryInterface;
 use App\Models\CustomerQueue;
@@ -49,6 +50,15 @@ class ExaminationRepository implements ExaminationRepositoryInterface
             // generate gate pass with QR
 
             // update examinations table as an is_issued_gate_pass is true
+
+            //send mail after 30min
+            $emailData = [
+                'customerId' => $data['customer_queue']['token']['customer_id'],
+                'hblId' => $hbl->id,
+                'tokenId' => $data['customer_queue']['token_id'],
+            ];
+            SendFeedbackMail::run($emailData);
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();

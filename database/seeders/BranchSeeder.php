@@ -14,7 +14,7 @@ class BranchSeeder extends Seeder
             ['name' => 'Colombo', 'slug' => 'colombo', 'type' => 'Destination'],
             ['name' => 'Dubai', 'slug' => 'dubai', 'type' => 'Departure'],
             ['name' => 'Kuwait', 'slug' => 'kuwait', 'type' => 'Departure'],
-            ['name' => 'Nintaur', 'slug' => 'nintaur', 'type' => 'Destination'],
+            ['name' => 'Nintavur', 'slug' => 'nintavur', 'type' => 'Destination'],
         ];
 
         if (Branch::count() === 0) {

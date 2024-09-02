@@ -8,6 +8,7 @@ use App\Interfaces\CallCenter\BonedAreaRepositoryInterface;
 use App\Interfaces\CallCenter\CashierRepositoryInterface;
 use App\Interfaces\CallCenter\ExaminationRepositoryInterface;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
+use App\Interfaces\CallCenter\UserFeedbackRepositoryInterface;
 use App\Interfaces\CallCenter\VerificationRepositoryInterface;
 use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\ContainerRepositoryInterface;
@@ -32,6 +33,7 @@ use App\Repositories\CallCenter\BonedAreaRepository;
 use App\Repositories\CallCenter\CashierRepository;
 use App\Repositories\CallCenter\ExaminationRepository;
 use App\Repositories\CallCenter\QueueRepository;
+use App\Repositories\CallCenter\UserFeedbackRepository;
 use App\Repositories\CallCenter\VerificationRepository;
 use App\Repositories\CashSettlementRepository;
 use App\Repositories\ContainerRepositories;
@@ -83,6 +85,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CashierRepositoryInterface::class, CashierRepository::class);
         $this->app->bind(BonedAreaRepositoryInterface::class, BonedAreaRepository::class);
         $this->app->bind(ExaminationRepositoryInterface::class, ExaminationRepository::class);
+        $this->app->bind(UserFeedbackRepositoryInterface::class, UserFeedbackRepository::class);
     }
 
     public function boot(): void
