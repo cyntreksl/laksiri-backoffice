@@ -2,13 +2,12 @@
 
 namespace App\Repositories\CallCenter;
 
+use App\Actions\CustomerFeedback\SendFeedbackMail;
 use App\Actions\Examination\CreateExamination;
 use App\Interfaces\CallCenter\ExaminationRepositoryInterface;
 use App\Models\CustomerQueue;
 use App\Models\HBL;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use App\Actions\CustomerFeedback\SendFeedbackMail;
 
 class ExaminationRepository implements ExaminationRepositoryInterface
 {
@@ -41,7 +40,7 @@ class ExaminationRepository implements ExaminationRepositoryInterface
 
             // mark as released HBL
 
-            $countReleasedPackages = count(array_filter($examination->released_packages, fn($value) => $value === true));
+            $countReleasedPackages = count(array_filter($examination->released_packages, fn ($value) => $value === true));
             $countHBLPackages = $hbl->packages->count();
 
             if ($countHBLPackages === $countReleasedPackages) {
@@ -63,7 +62,7 @@ class ExaminationRepository implements ExaminationRepositoryInterface
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            throw new \Exception('Failed to create examination record when releasing hbl packages: ' . $e->getMessage());
+            throw new \Exception('Failed to create examination record when releasing hbl packages: '.$e->getMessage());
         }
     }
 }
