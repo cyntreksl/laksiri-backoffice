@@ -34,8 +34,7 @@ class UserFeedbackController extends Controller
 
     public function testSendEmail($userId, $hblId, $token)
     {
-        $feedbackURL = 'http://127.0.0.1:8000/your-feedback?user='.$userId.'&hbl='.$hblId.'&token='.$token;
-        $customerName = 'John';
-        Mail::to('imalshaweerakkodi@gmail.com')->send(new GetFeedback($customerName, $feedbackURL));
+        $feedbackURL = 'http://127.0.0.1:8000/your-feedback?user=' . $userId . '&hbl=' . $hblId . '&token=' . $token;
+        Mail::to('imalshaweerakkodi@gmail.com')->send(new GetFeedback($feedbackURL));
     }
 }

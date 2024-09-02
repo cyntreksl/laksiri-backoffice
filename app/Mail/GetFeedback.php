@@ -12,16 +12,13 @@ class GetFeedback extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $customerName;
-
     public $feedbackURL;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($customerName, $feedbackURL)
+    public function __construct($feedbackURL)
     {
-        $this->customerName = $customerName;
         $this->feedbackURL = $feedbackURL;
     }
 
@@ -43,7 +40,6 @@ class GetFeedback extends Mailable
         return new Content(
             view: 'emails.get-feedback',
             with: [
-                'customerName' => $this->customerName,
                 'feedbackURL' => $this->feedbackURL,
             ],
         );
