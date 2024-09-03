@@ -150,4 +150,9 @@ class HBL extends Model
     {
         return $this->branch->name;
     }
+
+    public function tokens(): HasMany
+    {
+        return $this->hasMany(Token::class, 'reference', 'reference')->latest();
+    }
 }

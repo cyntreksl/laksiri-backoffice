@@ -24,7 +24,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = HBL::query();
+        $query = HBL::query()->with('tokens.customerQueue');
 
         if (! empty($search)) {
             $query->whereAny([
