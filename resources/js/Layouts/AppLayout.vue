@@ -711,6 +711,9 @@
                                             <p class="text-xs text-slate-400 dark:text-navy-300">
                                                 {{ $page.props.auth.user.email }}
                                             </p>
+                                            <p class="text-xs text-slate-400 dark:text-navy-300">
+                                                {{$page.props.auth.user.active_branch_name}}
+                                            </p>
                                         </div>
                                     </div>
 
