@@ -64,6 +64,7 @@ const data = reactive({
         warehouse: true,
         status: false,
         is_hold: true,
+        tokens: true,
         actions: true,
     },
 });
@@ -246,13 +247,14 @@ const createColumns = () => [
         },
         sort: false,
     },
+    {name: "Issued Token", hidden: !data.columnVisibility.tokens, sort: false},
     {
         name: "Actions",
         sort: false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
             return h("div", {className: "flex space-x-2"}, [
-                usePage().props.user.permissions.includes('hbls.issue token') ?
+                usePage().props.user.permissions.includes('hbls.issue token')  && !row.cells[15].data ?
                     h(
                         "a",
                         {
