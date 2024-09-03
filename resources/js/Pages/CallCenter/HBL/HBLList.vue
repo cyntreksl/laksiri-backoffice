@@ -655,7 +655,7 @@ const applyFilters = () => {
                     });
                     return row;
                 }),
-                total: (response) => {
+            total: (response) => {
                 if (response && response.meta) {
                     return response.meta.total;
                 } else {
