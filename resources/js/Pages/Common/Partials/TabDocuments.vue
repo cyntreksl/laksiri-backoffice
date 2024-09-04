@@ -9,7 +9,11 @@ const props = defineProps({
     hblId: {
         type: Number,
         required: true,
-    }
+    },
+    editPermission: {
+        type: Boolean,
+        default: true,
+    }, 
 });
 
 const isLoading = ref(false);
@@ -183,7 +187,7 @@ onMounted(() => {
                                 Copy of Passport
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <form v-if="$page.props.user.permissions.includes('hbls.upload documents')"
+                                <form v-if="props.editPermission && $page.props.user.permissions.includes('hbls.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
 
@@ -214,7 +218,7 @@ onMounted(() => {
                                         Save
                                     </button>
 
-                                    <template v-if="$page.props.user.permissions.includes('hbls.delete documents')">
+                                    <template v-if="props.editPermission && $page.props.user.permissions.includes('hbls.delete documents')">
                                         <button
                                             v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Copy of Passport')"
                                             class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
@@ -259,7 +263,7 @@ onMounted(() => {
                                 Copy of NIC
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <form v-if="$page.props.user.permissions.includes('hbls.upload documents')"
+                                <form v-if="props.editPermission && $page.props.user.permissions.includes('hbls.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
 
@@ -290,7 +294,7 @@ onMounted(() => {
                                         Save
                                     </button>
 
-                                    <template v-if="$page.props.user.permissions.includes('hbls.delete documents')">
+                                    <template v-if="props.editPermission && $page.props.user.permissions.includes('hbls.delete documents')">
                                         <button
                                             v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Copy of NIC')"
                                             class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
@@ -335,7 +339,7 @@ onMounted(() => {
                                 Packing List
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <form v-if="$page.props.user.permissions.includes('hbls.upload documents')"
+                                <form v-if="props.editPermission && $page.props.user.permissions.includes('hbls.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
 
@@ -366,7 +370,7 @@ onMounted(() => {
                                         Save
                                     </button>
 
-                                    <template v-if="$page.props.user.permissions.includes('hbls.delete documents')">
+                                    <template v-if="props.editPermission && $page.props.user.permissions.includes('hbls.delete documents')">
                                         <button
                                             v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Packing List')"
                                             class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
@@ -412,7 +416,7 @@ onMounted(() => {
                                 Special Note
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <form v-if="$page.props.user.permissions.includes('hbls.upload documents')"
+                                <form v-if="props.editPermission && $page.props.user.permissions.includes('hbls.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
 
@@ -443,7 +447,7 @@ onMounted(() => {
                                         Save
                                     </button>
 
-                                    <template v-if="$page.props.user.permissions.includes('hbls.delete documents')">
+                                    <template v-if="props.editPermission && $page.props.user.permissions.includes('hbls.delete documents')">
                                         <button
                                             v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Special Note')"
                                             class="btn size-6 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
