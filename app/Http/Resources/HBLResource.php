@@ -40,6 +40,7 @@ class HBLResource extends JsonResource
             'grand_total' => $this->grand_total,
             'status' => $this->status,
             'is_hold' => $this->is_hold,
+            'packages' => $this->packages ? HBLPackageResource::collection($this->packages) : '-',
             'created_by' => $this->user?->name,
         ];
     }
