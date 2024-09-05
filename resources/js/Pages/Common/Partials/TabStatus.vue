@@ -14,6 +14,10 @@ const props = defineProps({
         default: () => {
         },
     },
+    showAuditDetails: {
+        type: Boolean,
+        default: true,
+    },
 })
 
 const pickupStatus = ref([]);
@@ -554,7 +558,7 @@ onMounted(() => {
 
         <PostSkeleton v-if="isLoadingLogs" />
 
-        <AccordionPanel v-else show-panel title="Audit Details">
+        <AccordionPanel v-else show-panel title="Audit Details" v-if="props.showAuditDetails">
             <template #header-image>
                 <div
                     class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
