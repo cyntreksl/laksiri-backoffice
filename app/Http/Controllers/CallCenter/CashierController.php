@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\CallCenter\CashierRepositoryInterface;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
 use App\Models\CustomerQueue;
+use App\Models\HBL;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -43,6 +44,7 @@ class CashierController extends Controller
 
         return Inertia::render('CallCenter/Cashier/CashierForm', [
             'customerQueue' => $customerQueue,
+            'hblId' => HBL::where('reference', $customerQueue->token->reference)->first()->id,
         ]);
     }
 
