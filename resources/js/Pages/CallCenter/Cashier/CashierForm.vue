@@ -18,6 +18,10 @@ const props = defineProps({
     hblId: {
         type: Number,
         default: null
+    },
+    pickupId: {
+        type: Number,
+        default: null
     }
 })
 
@@ -142,9 +146,8 @@ const handleUpdatePayment = () => {
         <!-- Breadcrumb -->
         <Breadcrumb />
 
-        <div class="flex flex-wrap gap-4">
-
-            <div class="hbl-details w-full lg:w-7/12">
+        <div class="grid-container">
+            <div class="left-section w-full">
                 <div class="grid grid-cols-1 mt-4 gap-4">
                     <div class="sm:col-span-3 space-y-5">
                         <div class="card px-4 py-4 sm:px-5">
@@ -153,8 +156,7 @@ const handleUpdatePayment = () => {
                     </div>
                 </div>
             </div>
-
-            <div class="payment-details w-full lg:w-4/12">
+            <div class="right-section w-full">
                 <div v-if="isLoading" class="flex animate-pulse flex-col my-2">
                     <div class="h-48 w-full rounded-lg bg-slate-150 dark:bg-navy-500"></div>
                     <div class="flex space-x-5 py-4">
@@ -279,6 +281,29 @@ const handleUpdatePayment = () => {
                 </div>
             </div>
         </div>
-
     </DestinationAppLayout>
 </template>
+
+<style>
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 2/3 for the left, 1/3 for the right */
+    gap: 10px; /* Optional: Adds some space between the two sections */
+    height: 100vh; /* Optional: Full viewport height */
+}
+.left-section {
+    padding: 8px;
+}
+.right-section {
+    padding: 8px;
+}
+
+@media (max-width: 768px) {
+        .grid-container {
+            grid-template-columns: 1fr; /* Stacks sections one by one */
+            height: auto; /* Adjust height for mobile */
+        }
+    }
+
+</style>

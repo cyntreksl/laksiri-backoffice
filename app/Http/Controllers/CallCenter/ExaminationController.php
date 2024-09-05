@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\CallCenter\ExaminationRepositoryInterface;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
 use App\Models\CustomerQueue;
+use App\Models\HBL;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -44,6 +45,7 @@ class ExaminationController extends Controller
         return Inertia::render('CallCenter/Examination/ExaminationForm', [
             'customerQueue' => $customerQueue,
             'reference' => $customerQueue->token->reference,
+            'hblId' => HBL::where('reference', $customerQueue->token->reference)->first()->id,
         ]);
     }
 
