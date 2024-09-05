@@ -71,13 +71,12 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
+        $totalRecords = $countQuery->count();
 
         $containers = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
-
-        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => ContainerResource::collection($containers),
@@ -273,11 +272,15 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         $container = Container::query()
             ->withoutGlobalScope(BranchScope::class)
             ->where('id', $containerId)
-            ->with(['hbl_packages' => function ($query) {
-                $query->withoutGlobalScope(BranchScope::class)->with(['hbl' => function ($query) {
-                    $query->withoutGlobalScope(BranchScope::class);
-                }]);
-            }])
+            ->with([
+                'hbl_packages' => function ($query) {
+                    $query->withoutGlobalScope(BranchScope::class)->with([
+                        'hbl' => function ($query) {
+                            $query->withoutGlobalScope(BranchScope::class);
+                        },
+                    ]);
+                },
+            ])
             ->first();
 
         $hbls = $container->hbl_packages->pluck('hbl');

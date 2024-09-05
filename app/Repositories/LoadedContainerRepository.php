@@ -63,13 +63,12 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
+        $totalRecords = $countQuery->count();
 
         $loaded_containers = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
-
-        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => ContainerResource::collection($loaded_containers),
