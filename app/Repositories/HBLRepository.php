@@ -96,13 +96,12 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
+        $totalRecords = $countQuery->count();
 
         $hbls = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
-
-        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => HBLResource::collection($hbls),
@@ -176,13 +175,12 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
+        $totalRecords = $countQuery->count();
 
         $hbls = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
-
-        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => HBLResource::collection($hbls),
@@ -323,13 +321,12 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         }
 
         $countQuery = $query;
+        $totalRecords = $countQuery->count();
 
         $hbls = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
-
-        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => HBLResource::collection($hbls),

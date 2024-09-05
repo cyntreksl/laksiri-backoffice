@@ -49,13 +49,12 @@ class DriverRepository implements DriverRepositoryInterface, GridJsInterface
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
+        $totalRecords = $countQuery->count();
 
         $users = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
-
-        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => DriverCollection::collection($users),

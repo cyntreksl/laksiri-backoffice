@@ -30,13 +30,12 @@ class BondedWarehouseRepository implements BondedWarehouseRepositoryInterface, G
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
+        $totalRecords = $countQuery->count();
 
         $records = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
-
-        $totalRecords = $countQuery->count();
 
         return response()->json([
             'data' => BondedWarehouseCollection::collection($records),
