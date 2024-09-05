@@ -22,6 +22,7 @@ class CashierController extends Controller
     {
         return Inertia::render('CallCenter/Cashier/QueueList', [
             'cashierQueue' => $this->queueRepository->getCashierQueue()->getData(),
+            'cashierQueueCounts' => $this->queueRepository->getCashierQueueCounts()->getData(),
         ]);
     }
 

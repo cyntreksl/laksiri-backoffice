@@ -23,6 +23,7 @@ class VerificationController extends Controller
     {
         return Inertia::render('CallCenter/Verification/QueueList', [
             'verificationQueue' => $this->queueRepository->getDocumentVerificationQueue()->getData(),
+            'verificationQueueCounts' => $this->queueRepository->getDocumentVerificationQueueCounts()->getData(),
         ]);
     }
 
