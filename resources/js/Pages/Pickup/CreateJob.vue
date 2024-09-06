@@ -34,18 +34,26 @@ const currentBranch = usePage().props?.auth.user.active_branch_name;
 
 const findCountryCodeByBranch = computed(() => {
   switch (currentBranch) {
-    case "Riyadh":
-      return "+966";
-    case "Sri Lanka":
-      return "+94";
-    case "Dubai":
-      return "+971";
-    case "Kuwait":
-      return "+965";
+      case "Riyadh":
+          return "+966";
+      case "Colombo":
+          return "+94";
+      case "Nintavur":
+          return "+94";
+      case "Dubai":
+          return "+971";
+      case "Kuwait":
+          return "+965";
+      case "Qatar":
+          return "+974";
+      case "Malaysia":
+          return "+60";
+      case "London":
+          return "+44";
   }
 });
 
-const countryCodes = ["+94", "+966", "+971", "+965"];
+const countryCodes = ["+94", "+966", "+971", "+965", "+974", "+60", "+44"];
 
 const countryCode = ref(findCountryCodeByBranch.value);
 const contactNumber = ref("");
