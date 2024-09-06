@@ -33,6 +33,8 @@ class CreatePickUp
             'pickup_note' => $pickup_note,
             'created_by' => auth()->id(),
             'system_status' => PickUp::SYSTEM_STATUS_PICKUP_CREATED,
+            'hbl_number' => $data['hbl_number'],
+            'cr_number' => $data['cr_number'],
         ]);
 
         $pickup->addStatus('Pickup Created');

@@ -9,6 +9,7 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import {push} from "notivue";
 import TextInput from "@/Components/TextInput.vue";
+import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
     hbl: {
@@ -60,6 +61,8 @@ const form = useForm({
     paid_amount: props.hbl.paid_amount.toFixed(2),
     grand_total: props.hbl.grand_total.toFixed(2),
     packages: props.hbl.packages,
+    hbl_number: props.hbl.hbl_number,
+    cr_number: props.hbl.cr_number,
 });
 
 const handleHBLUpdate = () => {
@@ -658,6 +661,30 @@ const openEditModal = (index) => {
                             />
                         </svg>
                     </PrimaryButton>
+                </div>
+
+                <!-- Basic Details -->
+                <div class="card px-4 py-4 sm:px-5">
+                    <div>
+                        <h2
+                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                        >
+                            Basic Details
+                        </h2>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                        <div>
+                            <InputLabel class="font-normal" value="HBL Number"/>
+                            <TextInput v-model="form.hbl_number" class="w-full" placeholder="Enter HBL Number"/>
+                            <InputError :message="form.errors.hbl_number"/>
+                        </div>
+
+                        <div>
+                            <InputLabel class="font-normal" value="CR Number"/>
+                            <TextInput v-model="form.cr_number" class="w-full" placeholder="Enter CR Number"/>
+                            <InputError :message="form.errors.cr_number"/>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Cargo Type -->

@@ -71,6 +71,10 @@ const props = defineProps({
                     <InfoDisplay :value="hbl?.hbl_type" label="Delivery Type"/>
 
                     <InfoDisplay :value="hbl?.cargo_type" label="Cargo Mode"/>
+
+                    <InfoDisplay :value="hbl?.hbl_number" label="HBL Number"/>
+
+                    <InfoDisplay :value="hbl?.cr_number" label="CR Number"/>
                 </div>
 
                 <div v-else class="grid grid-cols-3 gap-x-4 gap-y-8">
@@ -105,6 +109,10 @@ const props = defineProps({
                     <InfoDisplay :value="pickup?.retry_attempts" label="Retry Attempts"/>
 
                     <InfoDisplay :value="pickup?.created_by" label="Auth"/>
+
+                    <InfoDisplay :value="pickup?.hbl_number" label="HBL Number"/>
+
+                    <InfoDisplay :value="pickup?.cr_number" label="CR Number"/>
                 </div>
             </div>
         </AccordionPanel>
