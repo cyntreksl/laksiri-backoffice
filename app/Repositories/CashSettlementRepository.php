@@ -22,7 +22,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
     {
         $query = HBL::query();
 
-        $query->cashSettlement();
+        $query->cashSettlement()->whereHas('packages');
 
         if (! empty($search)) {
             $query->where('hbl', 'like', "%$search%");
