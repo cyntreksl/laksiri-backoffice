@@ -13,4 +13,13 @@ interface QueueRepositoryInterface
     public function getExaminationQueue(): JsonResponse;
 
     public function getPackageQueue(): JsonResponse;
+
+    public function getDocumentVerificationQueueCounts(): JsonResponse;
+
+    public function getCashierQueueCounts(): JsonResponse;
+
+    public function getExaminationQueueCounts(): JsonResponse;
+
+    // public function getPackageQueueCounts(): JsonResponse;
+
 }

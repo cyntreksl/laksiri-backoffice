@@ -2,10 +2,15 @@
 import {Link} from "@inertiajs/vue3";
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {computed} from "vue";
+import { computed } from "vue";
+import DashboardCard from "@/Components/Widgets/DashboardCard.vue";
 
 const props = defineProps({
     examinationQueue: {
+        type: Object,
+        default: () => {}
+    },
+    examinationQueueCounts: {
         type: Object,
         default: () => {}
     }
@@ -23,6 +28,13 @@ const filteredExaminationQueue = computed(() => {
         <template #header>Queue List</template>
 
         <Breadcrumb />
+
+        <div class="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2 md:grid-cols-3">
+            <DashboardCard :count="props.examinationQueueCounts.total" icon="briefcase" icon-color="secondary" title="Total"/>
+            <DashboardCard :count="props.examinationQueueCounts.pending" icon="hourglass-half" icon-color="warning" title="Pending Job"/>
+            <DashboardCard :count="props.examinationQueueCounts.completed" icon="thumbs-up" icon-color="success" title="Completed"/>
+        </div>
+
 
         <div v-if="Object.keys(filteredExaminationQueue).length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-5">
             <template v-for="queue in filteredExaminationQueue" :key="queue.id">

@@ -21,6 +21,7 @@ class ExaminationController extends Controller
     {
         return Inertia::render('CallCenter/Examination/QueueList', [
             'examinationQueue' => $this->queueRepository->getExaminationQueue()->getData(),
+            'examinationQueueCounts' => $this->queueRepository->getExaminationQueueCounts()->getData(),
         ]);
     }
 
