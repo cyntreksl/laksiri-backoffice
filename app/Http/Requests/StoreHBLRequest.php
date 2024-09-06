@@ -43,6 +43,8 @@ class StoreHBLRequest extends FormRequest
             'other_charge' => ['required', 'numeric'],
             'discount' => ['required', 'numeric'],
             'paid_amount' => ['required', 'numeric', 'min:0'],
+            'hbl_number' => ['required', 'string', 'max:20'],
+            'cr_number' => ['required', 'string', 'max:20'],
         ];
     }
 }

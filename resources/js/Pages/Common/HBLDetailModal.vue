@@ -91,6 +91,10 @@ watch(() => props.pickupId, (newVal) => {
     }
 });
 
+fetchHBL();
+
+fetchPickup();
+
 // Run after component is mounted
 onMounted(() => {
     if (props.hblId !== null) {

@@ -39,6 +39,8 @@ class StorePickupRequest extends FormRequest
             'pickup_date' => ['nullable', 'date'],
             'pickup_time_start' => ['nullable', 'date_format:H:i'],
             'pickup_time_end' => ['nullable', 'date_format:H:i'],
+            'hbl_number' => ['required', 'string', 'max:20'],
+            'cr_number' => ['required', 'string', 'max:20'],
         ];
     }
 
