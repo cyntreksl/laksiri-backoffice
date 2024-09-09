@@ -249,6 +249,7 @@ watch(
             parseFloat(form.other_charge) +
             parseFloat(vat.value) -
             form.discount;
+        hblTotal.value = Number(hblTotal.value.toFixed(2))
         form.grand_total = hblTotal.value;
     }
 );
