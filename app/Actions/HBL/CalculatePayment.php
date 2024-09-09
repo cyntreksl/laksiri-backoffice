@@ -14,7 +14,8 @@ class CalculatePayment
         string $hbl_type,
         float $grand_total_volume,
         float $grand_total_weight,
-        int $package_list_length
+        int $package_list_length,
+        int $destination_branch
     ) {
         $freight_charge = 0;
         $bill_charge = 0;
@@ -23,7 +24,7 @@ class CalculatePayment
         $vat = 0;
         $is_editable = false;
 
-        $priceRule = GetPriceRulesByCargoModeAndHBLType::run($cargo_type, $hbl_type);
+        $priceRule = GetPriceRulesByCargoModeAndHBLType::run($cargo_type, $hbl_type, $destination_branch);
 
         if (! $priceRule) {
             return [

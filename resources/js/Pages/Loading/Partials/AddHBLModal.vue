@@ -34,7 +34,7 @@ const getHBLWithPackages = async () => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
             body: JSON.stringify({'reference': hblRef.value, 'cargo_type': props.container.cargo_type})
         });

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\HBL\GenerateHBLNumber;
 use App\Actions\HBL\GetHBLByIdWithPackages;
+use App\Actions\User\GetUserCurrentBranch;
 use App\Enum\CargoType;
 use App\Enum\HBLPaymentStatus;
 use App\Enum\HBLType;
@@ -63,12 +65,15 @@ class HBLController extends Controller
     public function create()
     {
         $this->authorize('hbls.create');
+        $currentBranch = GetUserCurrentBranch::run();
+        $hbl_number = GenerateHBLNumber::run($currentBranch['branchName']);
 
         return Inertia::render('HBL/CreateHBL', [
             'cargoTypes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
             'warehouses' => WarehouseType::cases(),
             'priceRules' => $this->priceRepository->getPriceRules(),
+            'hblNumber' => $hbl_number,
         ]);
     }
 
