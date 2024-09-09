@@ -28,6 +28,8 @@ class UpdatePickupRequest extends FormRequest
             'pickup_time_end' => ['nullable'],
             'zone_id' => ['nullable', 'integer'],
             'contact_number' => ['required', 'phone:INTERNATIONAL'],
+            'hbl_number' => ['required', 'string', 'max:20'],
+            'cr_number' => ['required', 'string', 'max:20'],
         ];
     }
 

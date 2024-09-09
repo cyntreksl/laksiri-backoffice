@@ -45,6 +45,8 @@ class HBLResource extends JsonResource
             'tokens' => isset($this->tokens[0]) && $this->tokens[0]->created_at->isToday()
                 ? 'Token number: '.$this->tokens[0]->id.' '.ucwords(strtolower(str_replace('_', ' ', $this->tokens[0]->customerQueue->type)))
                 : '',
+            'hbl_number' => $this->hbl_number,
+            'cr_number' => $this->cr_number,
         ];
     }
 }

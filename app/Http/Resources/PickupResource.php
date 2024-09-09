@@ -41,6 +41,8 @@ class PickupResource extends JsonResource
             }),
             'retry_attempts' => $this->retry_attempts,
             'created_by' => $this->createdBy->name,
+            'hbl_number' => $this->hbl_number,
+            'cr_number' => $this->cr_number,
         ];
     }
 }

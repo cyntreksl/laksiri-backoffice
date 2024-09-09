@@ -14,6 +14,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import {push} from "notivue";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import DialogModal from "@/Components/DialogModal.vue";
+import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
     hblTypes: {
@@ -45,16 +46,24 @@ const findCountryCodeByBranch = computed(() => {
     switch (currentBranch) {
         case "Riyadh":
             return "+966";
-        case "Sri Lanka":
+        case "Colombo":
+            return "+94";
+        case "Nintavur":
             return "+94";
         case "Dubai":
             return "+971";
         case "Kuwait":
             return "+965";
+        case "Qatar":
+            return "+974";
+        case "Malaysia":
+            return "+60";
+        case "London":
+            return "+44";
     }
 });
 
-const countryCodes = ["+94", "+966", "+971", "+965"];
+const countryCodes = ["+94", "+966", "+971", "+965", "+974", "+60", "+44"];
 const countryCode = ref(findCountryCodeByBranch.value);
 const contactNumber = ref("");
 const consignee_contact = ref("");
@@ -106,6 +115,8 @@ const form = useForm({
     paid_amount: '',
     grand_total: 0,
     packages: {},
+    hbl_number: '',
+    cr_number: '',
 });
 
 const handleHBLCreate = () => {
@@ -995,6 +1006,30 @@ const shipIcon = ref(`
                                 />
                             </svg>
                         </PrimaryButton>
+                    </div>
+
+                    <!-- Basic Details -->
+                    <div class="card px-4 py-4 sm:px-5">
+                        <div>
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Basic Details
+                            </h2>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                            <div>
+                                <InputLabel class="font-normal" value="HBL Number"/>
+                                <TextInput v-model="form.hbl_number" class="w-full" placeholder="Enter HBL Number"/>
+                                <InputError :message="form.errors.hbl_number"/>
+                            </div>
+
+                            <div>
+                                <InputLabel class="font-normal" value="CR Number"/>
+                                <TextInput v-model="form.cr_number" class="w-full" placeholder="Enter CR Number"/>
+                                <InputError :message="form.errors.cr_number"/>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Cargo Type -->

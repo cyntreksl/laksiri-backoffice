@@ -39,7 +39,7 @@ const props = defineProps({
 
 const wrapperRef = ref(null);
 let grid = null;
-
+const perPage = ref(10);
 const showFilters = ref(false);
 const fromDate = moment(new Date()).subtract(7, "days").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
@@ -109,7 +109,7 @@ const initializeGrid = () => {
             },
         },
         pagination: {
-            limit: 10,
+            limit: perPage.value,
             server: {
                 url: (prev, page, limit) =>
                     `${prev}&limit=${limit}&offset=${page * limit}`,
@@ -509,6 +509,22 @@ const exportURL = computed(() => {
     return '/hbls/cancelled/list/export' + "?" + params.toString();
 });
 
+const handlePerPageChange = (event) => {
+    perPage.value = parseInt(event.target.value);
+
+    grid.updateConfig({
+        pagination: {
+            limit: perPage.value,
+            server: {
+                url: (prev, page, limit) =>
+                    `${prev}&limit=${limit}&offset=${page * limit}`,
+            },
+        },
+    });
+
+    grid.forceRender()
+};
+
 const planeIcon = ref(`
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -563,12 +579,20 @@ const shipIcon = ref(`
             <div>
                 <div class="flex items-center justify-between p-2">
                     <div class="">
-                        <div class="flex">
+                        <div class="flex items-center">
                             <h2
                                 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
                                 Cancelled HBL List
                             </h2>
+                            <div class="flex m-3">
+                                <select class="form-select mt-1.5 w-full rounded-full border border-slate-300 bg-white px-8 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" @change="handlePerPageChange">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
                         </div>
                         <br/>
                         <div

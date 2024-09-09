@@ -49,6 +49,8 @@ class UpdateOrCreateHBL
             'paid_amount' => $data['paid_amount'],
             'grand_total' => $data['grand_total'],
             'created_by' => auth()->id(),
+            'hbl_number' => $data['hbl_number'],
+            'cr_number' => $data['cr_number'],
             'pickup_id' => $data['pickup_id'] ?? null,
             'system_status' => $data['system_status'] ?? HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE,
             'status' => $status,

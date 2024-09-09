@@ -1,51 +1,63 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { router, useForm, usePage } from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { computed, ref, watch } from "vue";
+import {computed, ref, watch} from "vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import DatePicker from "@/Components/DatePicker.vue";
-import { push } from "notivue";
+import {push} from "notivue";
 import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
-  noteTypes: {
-    type: Object,
-    default: () => {},
-  },
-  cargoTypes: {
-    type: Object,
-    default: () => {},
-  },
-  zones: {
-    type: Object,
-    default: () => {},
-  },
-  pickupTypes: {
-    type: Object,
-    default: () => {},
-  },
+    noteTypes: {
+        type: Object,
+        default: () => {
+        },
+    },
+    cargoTypes: {
+        type: Object,
+        default: () => {
+        },
+    },
+    zones: {
+        type: Object,
+        default: () => {
+        },
+    },
+    pickupTypes: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const currentBranch = usePage().props?.auth.user.active_branch_name;
 
 const findCountryCodeByBranch = computed(() => {
-  switch (currentBranch) {
-    case "Riyadh":
-      return "+966";
-    case "Sri Lanka":
-      return "+94";
-    case "Dubai":
-      return "+971";
-    case "Kuwait":
-      return "+965";
-  }
+    switch (currentBranch) {
+        case "Riyadh":
+            return "+966";
+        case "Colombo":
+            return "+94";
+        case "Nintavur":
+            return "+94";
+        case "Dubai":
+            return "+971";
+        case "Kuwait":
+            return "+965";
+        case "Qatar":
+            return "+974";
+        case "Malaysia":
+            return "+60";
+        case "London":
+            return "+44";
+    }
 });
 
-const countryCodes = ["+94", "+966", "+971", "+965"];
+const countryCodes = ["+94", "+966", "+971", "+965", "+974", "+60", "+44"];
 
 const countryCode = ref(findCountryCodeByBranch.value);
 const contactNumber = ref("");
@@ -55,73 +67,75 @@ const today = new Date();
 const formattedToday = today.toISOString().split("T")[0];
 
 const form = useForm({
-  name: "",
-  email: "",
-  contact_number: computed(() => countryCode.value + contactNumber.value),
-  address: "",
-  note_type: null,
-  notes: "",
-  pickup_type: "",
-  pickup_note: "",
-  cargo_type: "",
-  location: "",
-  zone_id: null,
-  pickup_date: formattedToday,
-  pickup_time_start: "",
-  pickup_time_end: "",
+    name: "",
+    email: "",
+    contact_number: computed(() => countryCode.value + contactNumber.value),
+    address: "",
+    note_type: null,
+    notes: "",
+    pickup_type: "",
+    pickup_note: "",
+    cargo_type: "",
+    location: "",
+    zone_id: null,
+    pickup_date: formattedToday,
+    pickup_time_start: "",
+    pickup_time_end: "",
+    hbl_number: '',
+    cr_number: '',
 });
 
 // Method to find zone ID based on address
 const findZoneIdByAddress = (address) => {
-  for (const zone of props.zones) {
-    for (const area of zone.areas) {
-      if (address.includes(area.name)) {
-        return zone.id;
-      }
+    for (const zone of props.zones) {
+        for (const area of zone.areas) {
+            if (address.includes(area.name)) {
+                return zone.id;
+            }
+        }
     }
-  }
-  return null;
+    return null;
 };
 
 // Watcher to update zone_id based on address
 watch(
-  () => form.address,
-  (newAddress) => {
-    form.zone_id = findZoneIdByAddress(newAddress);
-  }
+    () => form.address,
+    (newAddress) => {
+        form.zone_id = findZoneIdByAddress(newAddress);
+    }
 );
 
 const handlePickupCreate = () => {
-  form.post(route("pickups.store"), {
-    onSuccess: () => {
-      form.reset();
-      router.visit(route("pickups.index"));
-      push.success("Pickup added successfully!");
-    },
-    onError: () => {
-      push.error("Something went to wrong!");
-    },
-    preserveScroll: true,
-    preserveState: true,
-  });
+    form.post(route("pickups.store"), {
+        onSuccess: () => {
+            form.reset();
+            router.visit(route("pickups.index"));
+            push.success("Pickup added successfully!");
+        },
+        onError: () => {
+            push.error("Something went to wrong!");
+        },
+        preserveScroll: true,
+        preserveState: true,
+    });
 };
 
 watch(
-  () => form.note_type,
-  (newValue) => {
-    form.notes += newValue;
-  }
+    () => form.note_type,
+    (newValue) => {
+        form.notes += newValue;
+    }
 );
 
 const isImportant = ref(false);
 const isUrgentPickup = ref(false);
 
 watch(isImportant, (newValue) => {
-  form.is_from_important_customer = newValue;
+    form.is_from_important_customer = newValue;
 });
 
 watch(isUrgentPickup, (newValue) => {
-  form.is_urgent_pickup = newValue;
+    form.is_urgent_pickup = newValue;
 });
 
 const planeIcon = ref(`
@@ -165,377 +179,391 @@ const shipIcon = ref(`
 </script>
 
 <template>
-  <AppLayout title="Pick Up Job - Create">
-    <template #header>Pick Up Job - Create</template>
+    <AppLayout title="Pick Up Job - Create">
+        <template #header>Pick Up Job - Create</template>
 
-    <!-- Breadcrumb -->
-    <Breadcrumb />
+        <!-- Breadcrumb -->
+        <Breadcrumb/>
 
-    <!-- Create Pickup Form -->
-    <form @submit.prevent="handlePickupCreate">
-      <div class="grid grid-cols-1 sm:grid-cols-5 mt-4 gap-4">
-        <div class="sm:col-span-3 space-y-5">
-          <div class="card px-4 py-4 sm:px-5">
-            <div class="grid grid-cols-2">
-              <h2
-                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-              >
-                Basic Details
-              </h2>
-            </div>
-            <div class="grid grid-cols-2 gap-5 mt-3">
-              <div class="col-span-2">
-                <InputLabel value="Name" />
-                <label class="relative flex">
-                  <input
-                    v-model="form.name"
-                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="Name"
-                    type="text"
-                  />
-                  <div
-                    class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="size-4.5 transition-colors duration-200"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                      />
-                    </svg>
-                  </div>
-                </label>
-                <InputError :message="form.errors.name" />
-              </div>
+        <!-- Create Pickup Form -->
+        <form @submit.prevent="handlePickupCreate">
+            <div class="grid grid-cols-1 sm:grid-cols-5 mt-4 gap-4">
+                <div class="sm:col-span-3 space-y-5">
+                    <div class="card px-4 py-4 sm:px-5">
+                        <div class="grid grid-cols-2">
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Basic Details
+                            </h2>
+                        </div>
+                        <div class="grid grid-cols-2 gap-5 mt-3">
+                            <div class="col-span-2">
+                                <InputLabel value="Name"/>
+                                <label class="relative flex">
+                                    <input
+                                        v-model="form.name"
+                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="Name"
+                                        type="text"
+                                    />
+                                    <div
+                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                                    >
+                                        <svg
+                                            class="size-4.5 transition-colors duration-200"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.5"
+                                            viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                </label>
+                                <InputError :message="form.errors.name"/>
+                            </div>
 
-              <div>
-                <InputLabel value="Email" />
-                <label class="relative flex">
-                  <input
-                    v-model="form.email"
-                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="Email"
-                    type="email"
-                  />
-                  <div
-                    class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="size-4.5 transition-colors duration-200"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-                      />
-                    </svg>
-                  </div>
-                </label>
-                <InputError :message="form.errors.email" />
-              </div>
+                            <div>
+                                <InputLabel value="Email"/>
+                                <label class="relative flex">
+                                    <input
+                                        v-model="form.email"
+                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="Email"
+                                        type="email"
+                                    />
+                                    <div
+                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                                    >
+                                        <svg
+                                            class="size-4.5 transition-colors duration-200"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.5"
+                                            viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                </label>
+                                <InputError :message="form.errors.email"/>
+                            </div>
 
-              <div>
-                <InputLabel value="Mobile Number" />
-                <div class="flex -space-x-px">
-                  <select
-                    v-model="countryCode"
-                    class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                  >
-                    <option
-                      v-for="(countryCode, index) in countryCodes"
-                      :key="index"
-                    >
-                      {{ countryCode }}
-                    </option>
-                  </select>
+                            <div>
+                                <InputLabel value="Mobile Number"/>
+                                <div class="flex -space-x-px">
+                                    <select
+                                        v-model="countryCode"
+                                        class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    >
+                                        <option
+                                            v-for="(countryCode, index) in countryCodes"
+                                            :key="index"
+                                        >
+                                            {{ countryCode }}
+                                        </option>
+                                    </select>
 
-                  <input
-                    id="telephone"
-                    v-model="contactNumber"
-                    class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                    placeholder="123 4567 890"
-                    type="text"
-                  />
+                                    <input
+                                        id="telephone"
+                                        v-model="contactNumber"
+                                        class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        placeholder="123 4567 890"
+                                        type="text"
+                                    />
+                                </div>
+                                <InputError :message="form.errors.contact_number"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="HBL Number"/>
+                                <TextInput v-model="form.hbl_number" class="w-full" placeholder="Enter HBL Number"/>
+                                <InputError :message="form.errors.hbl_number"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="CR Number"/>
+                                <TextInput v-model="form.cr_number" class="w-full" placeholder="Enter CR Number"/>
+                                <InputError :message="form.errors.cr_number"/>
+                            </div>
+
+                            <div class="col-span-2">
+                                <InputLabel value="Address"/>
+                                <label class="block">
+                  <textarea
+                      v-model="form.address"
+                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Type address here..."
+                      rows="4"
+                  ></textarea>
+                                </label>
+                                <InputError :message="form.errors.address"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card px-4 py-4 sm:px-5">
+                        <div>
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Packages
+                            </h2>
+                        </div>
+                        <div class="grid grid-cols-2 gap-5 mt-3">
+                            <div class="col-span-2">
+                                <label class="block">
+                                    <InputLabel value="Package Type"/>
+                                    <select
+                                        v-model="form.note_type"
+                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    >
+                                        <option :value="null" disabled>Select One</option>
+                                        <option
+                                            v-for="noteType in noteTypes"
+                                            :key="noteType"
+                                            :value="noteType.note_type"
+                                        >
+                                            {{ noteType.note_type }}
+                                        </option>
+                                    </select>
+                                </label>
+                                <InputError :message="form.errors.note_type"/>
+                            </div>
+
+                            <div class="col-span-2">
+                                <InputLabel value="Packages"/>
+                                <label class="block">
+                  <textarea
+                      v-model="form.notes"
+                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Type Packages here..."
+                      rows="4"
+                  ></textarea>
+                                </label>
+                                <InputError :message="form.errors.notes"/>
+                            </div>
+
+                            <div class="col-span-2">
+                                <label class="block">
+                                    <InputLabel value="Pickup Type"/>
+                                    <select
+                                        v-model="form.pickup_type"
+                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    >
+                                        <option disabled value="">Select One</option>
+                                        <option v-for="pickupType in pickupTypes" :key="pickupType">
+                                            {{ pickupType }}
+                                        </option>
+                                    </select>
+                                </label>
+                                <InputError :message="form.errors.pickup_type"/>
+                            </div>
+
+                            <div class="col-span-2">
+                                <InputLabel value="Pickup Note"/>
+                                <label class="block">
+                  <textarea
+                      v-model="form.pickup_note"
+                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Type Pickup Note here..."
+                      rows="4"
+                  ></textarea>
+                                </label>
+                                <InputError :message="form.errors.pickup_note"/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <InputError :message="form.errors.contact_number" />
-              </div>
+                <div class="sm:col-span-2 space-y-5">
 
-              <div class="col-span-2">
-                <InputLabel value="Address" />
-                <label class="block">
-                  <textarea
-                    v-model="form.address"
-                    rows="4"
-                    placeholder="Type address here..."
-                    class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                  ></textarea>
-                </label>
-                <InputError :message="form.errors.address" />
-              </div>
-            </div>
-          </div>
-
-          <div class="card px-4 py-4 sm:px-5">
-            <div>
-              <h2
-                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-              >
-                Packages
-              </h2>
-            </div>
-            <div class="grid grid-cols-2 gap-5 mt-3">
-              <div class="col-span-2">
-                <label class="block">
-                  <InputLabel value="Package Type" />
-                  <select
-                    v-model="form.note_type"
-                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                  >
-                    <option :value="null" disabled>Select One</option>
-                    <option
-                      v-for="noteType in noteTypes"
-                      :key="noteType"
-                      :value="noteType.note_type"
-                    >
-                      {{ noteType.note_type }}
-                    </option>
-                  </select>
-                </label>
-                <InputError :message="form.errors.note_type" />
-              </div>
-
-              <div class="col-span-2">
-                <InputLabel value="Packages" />
-                <label class="block">
-                  <textarea
-                    v-model="form.notes"
-                    rows="4"
-                    placeholder="Type Packages here..."
-                    class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                  ></textarea>
-                </label>
-                <InputError :message="form.errors.notes" />
-              </div>
-
-              <div class="col-span-2">
-                <label class="block">
-                  <InputLabel value="Pickup Type" />
-                  <select
-                    v-model="form.pickup_type"
-                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                  >
-                    <option disabled value="">Select One</option>
-                    <option v-for="pickupType in pickupTypes" :key="pickupType">
-                      {{ pickupType }}
-                    </option>
-                  </select>
-                </label>
-                <InputError :message="form.errors.pickup_type" />
-              </div>
-
-              <div class="col-span-2">
-                <InputLabel value="Pickup Note" />
-                <label class="block">
-                  <textarea
-                    v-model="form.pickup_note"
-                    class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="Type Pickup Note here..."
-                    rows="4"
-                  ></textarea>
-                </label>
-                <InputError :message="form.errors.pickup_note" />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="sm:col-span-2 space-y-5">
-          <div class="card px-4 py-4 sm:px-5">
-            <div class="grid grid-cols-2">
-              <h2
-                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-              >
-                Cargo Type
-              </h2>
-            </div>
-            <div class="my-5">
-              <div class="my-5">
-                <div class="space-x-5">
-                  <label
-                    v-for="cargoType in cargoTypes"
-                    class="inline-flex items-center space-x-2"
-                  >
-                    <input
-                      v-model="form.cargo_type"
-                      :value="cargoType"
-                      class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                      name="cargo_type"
-                      type="radio"
-                    />
-                    <p>{{ cargoType }}</p>
-                    <span v-if="cargoType == 'Sea Cargo'">
+                    <div class="card px-4 py-4 sm:px-5">
+                        <div class="grid grid-cols-2">
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Cargo Type
+                            </h2>
+                        </div>
+                        <div class="my-5">
+                            <div class="my-5">
+                                <div class="space-x-5">
+                                    <label
+                                        v-for="cargoType in cargoTypes"
+                                        class="inline-flex items-center space-x-2"
+                                    >
+                                        <input
+                                            v-model="form.cargo_type"
+                                            :value="cargoType"
+                                            class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                                            name="cargo_type"
+                                            type="radio"
+                                        />
+                                        <p>{{ cargoType }}</p>
+                                        <span v-if="cargoType == 'Sea Cargo'">
                       <div v-html="shipIcon"></div>
                     </span>
-                    <span v-if="cargoType == 'Air Cargo'">
+                                        <span v-if="cargoType == 'Air Cargo'">
                       <div v-html="planeIcon"></div>
                     </span>
-                  </label>
+                                    </label>
+                                </div>
+                                <InputError :message="form.errors.cargo_type"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card px-4 py-4 sm:px-5">
+                        <div>
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Additional Details
+                            </h2>
+                        </div>
+                        <div class="my-5 space-y-5">
+                            <!--                            <div-->
+                            <!--                                class="flex justify-between items-center space-y-5 space-x-5"-->
+                            <!--                            >-->
+                            <!--                                <div class="w-full">-->
+                            <!--                                    <label class="block">-->
+                            <!--                                        <span>Location</span>-->
+                            <!--                                        <input-->
+                            <!--                                            v-model="form.location"-->
+                            <!--                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
+                            <!--                                            placeholder="Location"-->
+                            <!--                                            type="text"-->
+                            <!--                                        />-->
+                            <!--                                    </label>-->
+                            <!--                                    <div-->
+                            <!--                                        v-if="form.errors.location"-->
+                            <!--                                        class="text-tiny+ text-error"-->
+                            <!--                                    >{{ form.errors.location }}-->
+                            <!--                                    </div>-->
+                            <!--                                </div>-->
+
+                            <!--                                <div>-->
+                            <!--                                    <button-->
+                            <!--                                        class="btn size-9 rounded-full bg-success p-0 font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90"-->
+                            <!--                                    >-->
+                            <!--                                        <svg-->
+                            <!--                                            xmlns="http://www.w3.org/2000/svg"-->
+                            <!--                                            fill="none"-->
+                            <!--                                            viewBox="0 0 24 24"-->
+                            <!--                                            stroke-width="1.5"-->
+                            <!--                                            stroke="currentColor"-->
+                            <!--                                            class="size-5"-->
+                            <!--                                        >-->
+                            <!--                                            <path-->
+                            <!--                                                stroke-linecap="round"-->
+                            <!--                                                stroke-linejoin="round"-->
+                            <!--                                                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"-->
+                            <!--                                            />-->
+                            <!--                                            <path-->
+                            <!--                                                stroke-linecap="round"-->
+                            <!--                                                stroke-linejoin="round"-->
+                            <!--                                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"-->
+                            <!--                                            />-->
+                            <!--                                        </svg>-->
+                            <!--                                    </button>-->
+                            <!--                                </div>-->
+                            <!--                            </div>-->
+
+                            <div>
+                                <label class="block">
+                                    <InputLabel value="Zone"/>
+                                    <select
+                                        v-model="form.zone_id"
+                                        class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    >
+                                        <option :value="null" disabled>Select Zone</option>
+                                        <option
+                                            v-for="zone in zones"
+                                            :key="zone.id"
+                                            :value="zone.id"
+                                        >
+                                            {{ zone.name }}
+                                        </option>
+                                    </select>
+                                </label>
+                                <InputError :message="form.errors.zone_id"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Pickup Date"/>
+                                <DatePicker v-model="form.pickup_date"/>
+                                <InputError :message="form.errors.pickup_date"/>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <InputLabel value="Start Pickup Time"/>
+                                    <TextInput
+                                        v-model="form.pickup_time_start"
+                                        class="w-full"
+                                        placeholder="Choose Time"
+                                        type="time"
+                                    />
+                                    <InputError :message="form.errors.pickup_time_start"/>
+                                </div>
+
+                                <div>
+                                    <InputLabel value="End Pickup Time"/>
+                                    <TextInput
+                                        v-model="form.pickup_time_end"
+                                        class="w-full"
+                                        placeholder="Choose Time"
+                                        type="time"
+                                    />
+                                    <InputError :message="form.errors.pickup_time_end"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end bottom-0 space-x-5">
+                        <DangerOutlineButton @click="router.visit(route('pickups.index'))"
+                        >Cancel
+                        </DangerOutlineButton
+                        >
+                        <PrimaryButton
+                            :class="{ 'opacity-50': form.processing }"
+                            :disabled="form.processing"
+                            class="space-x-2"
+                            type="submit"
+                        >
+                            <span>Create a Job</span>
+                            <svg
+                                class="size-5"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+                        </PrimaryButton>
+                    </div>
                 </div>
-                <InputError :message="form.errors.cargo_type" />
-              </div>
             </div>
-          </div>
-
-          <div class="card px-4 py-4 sm:px-5">
-            <div>
-              <h2
-                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-              >
-                Additional Details
-              </h2>
-            </div>
-            <div class="my-5 space-y-5">
-              <!--                            <div-->
-              <!--                                class="flex justify-between items-center space-y-5 space-x-5"-->
-              <!--                            >-->
-              <!--                                <div class="w-full">-->
-              <!--                                    <label class="block">-->
-              <!--                                        <span>Location</span>-->
-              <!--                                        <input-->
-              <!--                                            v-model="form.location"-->
-              <!--                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
-              <!--                                            placeholder="Location"-->
-              <!--                                            type="text"-->
-              <!--                                        />-->
-              <!--                                    </label>-->
-              <!--                                    <div-->
-              <!--                                        v-if="form.errors.location"-->
-              <!--                                        class="text-tiny+ text-error"-->
-              <!--                                    >{{ form.errors.location }}-->
-              <!--                                    </div>-->
-              <!--                                </div>-->
-
-              <!--                                <div>-->
-              <!--                                    <button-->
-              <!--                                        class="btn size-9 rounded-full bg-success p-0 font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90"-->
-              <!--                                    >-->
-              <!--                                        <svg-->
-              <!--                                            xmlns="http://www.w3.org/2000/svg"-->
-              <!--                                            fill="none"-->
-              <!--                                            viewBox="0 0 24 24"-->
-              <!--                                            stroke-width="1.5"-->
-              <!--                                            stroke="currentColor"-->
-              <!--                                            class="size-5"-->
-              <!--                                        >-->
-              <!--                                            <path-->
-              <!--                                                stroke-linecap="round"-->
-              <!--                                                stroke-linejoin="round"-->
-              <!--                                                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"-->
-              <!--                                            />-->
-              <!--                                            <path-->
-              <!--                                                stroke-linecap="round"-->
-              <!--                                                stroke-linejoin="round"-->
-              <!--                                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"-->
-              <!--                                            />-->
-              <!--                                        </svg>-->
-              <!--                                    </button>-->
-              <!--                                </div>-->
-              <!--                            </div>-->
-
-              <div>
-                <label class="block">
-                  <InputLabel value="Zone" />
-                  <select
-                    v-model="form.zone_id"
-                    class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                  >
-                    <option :value="null" disabled>Select Zone</option>
-                    <option
-                      v-for="zone in zones"
-                      :key="zone.id"
-                      :value="zone.id"
-                    >
-                      {{ zone.name }}
-                    </option>
-                  </select>
-                </label>
-                <InputError :message="form.errors.zone_id" />
-              </div>
-
-              <div>
-                <InputLabel value="Pickup Date" />
-                <DatePicker v-model="form.pickup_date" />
-                <InputError :message="form.errors.pickup_date" />
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <InputLabel value="Start Pickup Time" />
-                  <TextInput
-                    v-model="form.pickup_time_start"
-                    class="w-full"
-                    placeholder="Choose Time"
-                    type="time"
-                  />
-                  <InputError :message="form.errors.pickup_time_start" />
-                </div>
-
-                <div>
-                  <InputLabel value="End Pickup Time" />
-                  <TextInput
-                    v-model="form.pickup_time_end"
-                    class="w-full"
-                    placeholder="Choose Time"
-                    type="time"
-                  />
-                  <InputError :message="form.errors.pickup_time_end" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex justify-end bottom-0 space-x-5">
-            <DangerOutlineButton @click="router.visit(route('pickups.index'))"
-              >Cancel</DangerOutlineButton
-            >
-            <PrimaryButton
-              :class="{ 'opacity-50': form.processing }"
-              :disabled="form.processing"
-              class="space-x-2"
-              type="submit"
-            >
-              <span>Create a Job</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                />
-              </svg>
-            </PrimaryButton>
-          </div>
-        </div>
-      </div>
-    </form>
-  </AppLayout>
+        </form>
+    </AppLayout>
 </template>
 
 <style scoped></style>
