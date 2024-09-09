@@ -37,13 +37,18 @@ const props = defineProps({
         default: () => {
         },
     },
+    hblNumber: {
+      type: Object,
+    },
 });
 
 //branch set
 const currentBranch = usePage().props?.auth.user.active_branch_name;
 
-const findCountryCodeByBranch = computed(() => {
-    switch (currentBranch) {
+const findCountryCodeByBranch = (country) => {
+    switch (country) {
+        case "Sri Lanka":
+            return "+94";
         case "Riyadh":
             return "+966";
         case "Colombo":
@@ -60,11 +65,13 @@ const findCountryCodeByBranch = computed(() => {
             return "+60";
         case "London":
             return "+44";
-    }
-});
+        }
+};
+
 
 const countryCodes = ["+94", "+966", "+971", "+965", "+974", "+60", "+44"];
-const countryCode = ref(findCountryCodeByBranch.value);
+const countryCode = ref(findCountryCodeByBranch(currentBranch));
+const consignee_countryCode = ref(findCountryCodeByBranch("Sri Lanka"));
 const contactNumber = ref("");
 const consignee_contact = ref("");
 
@@ -113,10 +120,11 @@ const form = useForm({
     package_charges: 0,
     discount: 0,
     paid_amount: '',
+    additional_charge: 0,
     grand_total: 0,
     packages: {},
-    hbl_number: '',
-    cr_number: '',
+    hbl_number: props.hblNumber,
+    cr_number: props.hblNumber,
 });
 
 const handleHBLCreate = () => {
@@ -240,15 +248,22 @@ watch(
         () => form.discount,
         () => form.freight_charge,
         () => vat,
+        () => form.additional_charge,
+        () => form.bill_charge,
+        () => form.destination_charges,
+        () => form.package_charges,
     ],
     ([newOtherCharge, newDiscount, newFreightCharge]) => {
         // Convert dimensions from cm to meters
         hblTotal.value =
             parseFloat(form.freight_charge) +
             parseFloat(form.bill_charge) +
-            parseFloat(form.other_charge) +
+            parseFloat(form.package_charges) +
+            parseFloat(form.destination_charges) +
+            // parseFloat(form.other_charge) +
             parseFloat(vat.value) -
-            form.discount;
+            form.discount +
+            parseFloat(form.additional_charge);
         form.grand_total = hblTotal.value;
     }
 );
@@ -258,6 +273,10 @@ watch([() => form.cargo_type], ([newCargoType]) => {
 });
 
 watch([() => form.hbl_type], ([newHBLType]) => {
+    calculatePayment();
+});
+
+watch([() => form.warehouse], ([newHBLType]) => {
     calculatePayment();
 });
 
@@ -318,11 +337,13 @@ const calculatePayment = async () => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf,
+                // "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             },
             body: JSON.stringify({
                 cargo_type: form.cargo_type,
                 hbl_type: form.hbl_type,
+                warehouse: form.warehouse,
                 grand_total_volume: grandTotalVolume.value,
                 grand_total_weight: grandTotalWeight.value,
                 package_list_length: packageList.value.length
@@ -424,7 +445,7 @@ const handleCopyFromHBLToShipper = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
         });
 
@@ -469,7 +490,7 @@ const handleCopyFromHBLToConsignee = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
         });
 
@@ -515,7 +536,7 @@ const handleCopyFromHBLToPackage = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
         });
 
@@ -553,6 +574,7 @@ const handleRemoveCopiedPackages = () => {
 
 const handleCopyShipper = () => {
     form.consignee_name = form.hbl_name;
+    consignee_countryCode.value = countryCode.value;
     consignee_contact.value = contactNumber.value;
     form.consignee_nic = form.nic;
     form.consignee_address = form.address;
@@ -925,10 +947,10 @@ const shipIcon = ref(`
                             </div>
 
                             <div>
-                                <span>Mobile Number</span>
+                                <span>Mobile Number123</span>
                                 <div class="flex -space-x-px">
                                     <select
-                                        v-model="countryCode"
+                                        v-model="consignee_countryCode"
                                         class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
                                         <option
@@ -1217,7 +1239,20 @@ const shipIcon = ref(`
                                 <InputError :message="form.errors.paid_amount"/>
                             </div>
 
-                            <div class="col-start-2 mt-2 space-y-2.5 font-bold">
+                            <div>
+                                <span>Additional Charges</span>
+                                <TextInput
+                                    v-model="form.additional_charge"
+                                    :disabled="!isEditable"
+                                    class="w-full"
+                                    placeholder="0"
+                                    step="any"
+                                    type="number"
+                                />
+                                <InputError :message="form.errors.additional_charges"/>
+                            </div>
+
+                            <div class="col-start-2 mt-20 space-y-2.5 font-bold">
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Packages</p>
                                     <p class="text-slate-700 dark:text-navy-100">
@@ -1244,7 +1279,7 @@ const shipIcon = ref(`
                                 >
                                     <p class="line-clamp-1">Grand Total</p>
                                     <div class="flex items-center">
-                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle mr-3 text-info hover:cursor-pointer" fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"  @click="isShowedPaymentSummery = !isShowedPaymentSummery"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>
+                                        <svg v-if="packageList.length > 0" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle mr-3 text-info hover:cursor-pointer" fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"  @click="isShowedPaymentSummery = !isShowedPaymentSummery"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>
                                         <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
                                     </div>
                                 </div>
@@ -1265,13 +1300,18 @@ const shipIcon = ref(`
                                                     {{packageItem.type}}
                                                 </td>
                                                 <td>
-                                                    {{ perPackageCharge.toFixed(2) }}
+                                                    {{ parseFloat(form.package_charges).toFixed(2) }}
                                                 </td>
                                                 <td>
-                                                    {{ perVolumeCharge.toFixed(2) + ' x ' + packageItem.volume }}
+                                                    {{ parseFloat(perVolumeCharge.toFixed(2) * packageItem.volume).toFixed(2) === parseFloat(form.destination_charges).toFixed(2)
+                                                        ? perVolumeCharge.toFixed(2) + ' x ' + packageItem.volume
+                                                    : parseFloat(form.destination_charges).toFixed(2)}}
                                                 </td>
                                                 <td>
-                                                    {{ perFreightCharge.toFixed(2) + ' x ' + (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)  }}
+                                                    {{ parseFloat(perFreightCharge.toFixed(2) * (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)).toFixed(2) === parseFloat(form.freight_charge).toFixed(2)
+                                                        ? perFreightCharge.toFixed(2) + ' x ' + (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)
+                                                    : parseFloat(form.freight_charge).toFixed(2)}}
+                                                    <!-- {{ perFreightCharge.toFixed(2) + ' x ' + (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)  }} -->
                                                 </td>
                                                 <td class="text-right">
                                                     {{
@@ -1289,6 +1329,10 @@ const shipIcon = ref(`
                                                 <td colspan="4">Discount</td>
                                                 <td class="text-right">- {{parseFloat(form.discount).toFixed(2)}}</td>
                                             </tr>
+                                            <tr>
+                                                <td colspan="4">Additional Charge</td>
+                                                <td class="text-right">+ {{parseFloat(form.additional_charge).toFixed(2)}}</td>
+                                            </tr>
                                             <tr class="font-bold">
                                                 <td colspan="4">Total</td>
                                                 <td class="text-right">{{hblTotal.toFixed(2)}}</td>
@@ -1297,6 +1341,7 @@ const shipIcon = ref(`
                                     </div>
                                 </template>
                             </div>
+                            <!-- -->
                         </div>
                     </div>
                 </div>

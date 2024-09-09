@@ -54,7 +54,42 @@ class HBL extends Model
     ];
 
     protected $fillable = [
-        'reference', 'warehouse_zone_id', 'cargo_type', 'hbl_type', 'hbl', 'hbl_name', 'email', 'contact_number', 'nic', 'iq_number', 'address', 'consignee_name', 'consignee_nic', 'consignee_contact', 'consignee_address', 'consignee_note', 'warehouse', 'freight_charge', 'bill_charge', 'other_charge', 'discount', 'paid_amount', 'grand_total', 'status', 'created_by', 'branch_id', 'system_status', 'pickup_id', 'is_hold', 'is_short_loading', 'shipper_id', 'consignee_id', 'is_released', 'hbl_number', 'cr_number',
+        'reference',
+        'warehouse_zone_id',
+        'cargo_type',
+        'hbl_type',
+        'hbl',
+        'hbl_name',
+        'email',
+        'contact_number',
+        'nic',
+        'iq_number',
+        'address',
+        'consignee_name',
+        'consignee_nic',
+        'consignee_contact',
+        'consignee_address',
+        'consignee_note',
+        'warehouse',
+        'freight_charge',
+        'bill_charge',
+        'other_charge',
+        'discount',
+        'additional_charge',
+        'paid_amount',
+        'grand_total',
+        'status',
+        'created_by',
+        'branch_id',
+        'system_status',
+        'pickup_id',
+        'is_hold',
+        'is_short_loading',
+        'shipper_id',
+        'consignee_id',
+        'is_released',
+        'hbl_number',
+        'cr_number',
     ];
 
     protected $appends = [
@@ -107,7 +142,8 @@ class HBL extends Model
     public function scopeWarehouse(Builder $query): void
     {
         $query->whereIn('system_status', [
-            self::SYSTEM_STATUS_CASH_RECEIVED, 4.1,
+            self::SYSTEM_STATUS_CASH_RECEIVED,
+            4.1,
         ]);
     }
 

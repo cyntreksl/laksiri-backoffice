@@ -37,6 +37,7 @@ class CreateHBL
             'bill_charge' => $data['bill_charge'],
             'other_charge' => $data['other_charge'],
             'discount' => $data['discount'],
+            'additional_charge' => $data['additional_charge'],
             'paid_amount' => $data['paid_amount'],
             'grand_total' => $data['grand_total'],
             'created_by' => auth()->id(),

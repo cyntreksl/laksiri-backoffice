@@ -32,7 +32,7 @@ const fetchPickupStatus = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
         });
 
@@ -60,7 +60,7 @@ const fetchHBLStatus = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
         });
 
@@ -123,7 +123,7 @@ const fetchPickup = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
         });
 
@@ -152,7 +152,7 @@ const fetchContainer = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
         });
 
@@ -181,7 +181,7 @@ const fetchUnloadingIssues = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
         });
 
@@ -210,7 +210,7 @@ const fetchLogs = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
         });
 

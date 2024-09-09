@@ -32,6 +32,7 @@ use App\Http\Resources\HBLStatusResource;
 use App\Http\Resources\PickupStatusResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\HBLRepositoryInterface;
+use App\Models\Branch;
 use App\Models\Container;
 use App\Models\HBL;
 use App\Models\HBLDocument;
@@ -283,12 +284,14 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function calculatePayment(array $data): JsonResponse
     {
+        $destination_branch = Branch::where('name', '=', $data['warehouse'])->get();
         $result = CalculatePayment::run(
             $data['cargo_type'],
             $data['hbl_type'],
             $data['grand_total_volume'],
             $data['grand_total_weight'],
-            $data['package_list_length']
+            $data['package_list_length'],
+            $destination_branch[0]['id']
         );
 
         return response()->json($result);
