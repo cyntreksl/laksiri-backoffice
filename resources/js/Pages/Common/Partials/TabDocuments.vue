@@ -1,6 +1,6 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import {computed, onMounted, ref, watch} from "vue";
 import {push} from "notivue";
 import DeleteDocConfirmationModal from "@/Pages/Common/Partials/DeleteDocConfirmationModal.vue";
@@ -13,7 +13,7 @@ const props = defineProps({
     editPermission: {
         type: Boolean,
         default: true,
-    }, 
+    },
 });
 
 const isLoading = ref(false);

@@ -106,7 +106,7 @@ const form = useForm({
     consignee_name: "",
     consignee_nic: "",
     consignee_contact: computed(
-        () => countryCode.value + consignee_contact.value
+        () => consignee_countryCode.value + consignee_contact.value
     ),
     consignee_address: "",
     consignee_note: "",
@@ -948,7 +948,7 @@ const shipIcon = ref(`
                             </div>
 
                             <div>
-                                <span>Mobile Number123</span>
+                                <span>Mobile Number</span>
                                 <div class="flex -space-x-px">
                                     <select
                                         v-model="consignee_countryCode"

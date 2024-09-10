@@ -5,7 +5,7 @@ import {ref} from "vue";
 import moment from "moment";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {push} from "notivue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -37,7 +37,7 @@ const fetchHBL = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf
             },
         });
 
@@ -63,7 +63,7 @@ const fetchPickup = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf
             },
         });
 

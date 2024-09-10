@@ -1,7 +1,7 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
 import {ref, watch} from "vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import DeleteDocConfirmationModal from "@/Pages/Loading/Partials/DeleteDocConfirmationModal.vue";
 

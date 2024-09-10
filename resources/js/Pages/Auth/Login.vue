@@ -1,5 +1,5 @@
 <script setup>
-import {Head, Link, useForm, router} from "@inertiajs/vue3";
+import {Head, Link, useForm, router, usePage} from "@inertiajs/vue3";
 import logo from "../../../images/logo_main.png";
 import DashboardMeet from "../../../images/illustrations/dashboard-meet.svg";
 import DashboardMeetDark from "../../../images/illustrations/dashboard-meet-dark.svg";

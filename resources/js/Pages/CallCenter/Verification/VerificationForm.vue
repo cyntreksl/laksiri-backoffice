@@ -1,6 +1,6 @@
 <script setup>
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
@@ -42,7 +42,7 @@ const fetchHBL = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf
             },
         });
 
@@ -68,7 +68,7 @@ const fetchPickup = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                "X-CSRF-TOKEN": usePage().props.csrf
             },
         });
 
@@ -294,7 +294,7 @@ getHBLPayments();
             </div>
         </div>
 
-        
+
 
         <VerifyConfirmationModal :show="showConfirmVerifyModal" @close="closeModal" @verify-customer="handleVerifyDocuments"/>
     </DestinationAppLayout>

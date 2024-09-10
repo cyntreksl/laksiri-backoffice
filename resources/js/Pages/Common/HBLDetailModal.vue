@@ -6,6 +6,7 @@ import {onMounted, ref, watch} from "vue";
 import TabHBLDetails from "@/Pages/Common/Partials/TabHBLDetails.vue";
 import TabStatus from "@/Pages/Common/Partials/TabStatus.vue";
 import TabDocuments from "@/Pages/Common/Partials/TabDocuments.vue";
+import { usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
     show: {

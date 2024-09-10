@@ -1,6 +1,7 @@
 <script setup>
 import {ref} from "vue";
 import ScreenLayout from "@/Layouts/ScreenLayout.vue";
+import { usePage } from '@inertiajs/vue3';
 
 const examinationQueue = ref([]);
 const firstToken = ref({});
