@@ -5,7 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {computed, reactive, ref, watch} from "vue";
 import draggable from 'vuedraggable'
 import ReviewModal from "@/Pages/Loading/Partials/ReviewModal.vue";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import ActionMessage from "@/Components/ActionMessage.vue";
 import RadioButton from "@/Components/RadioButton.vue";
 

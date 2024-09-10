@@ -2,7 +2,7 @@
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import InputError from "@/Components/InputError.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {push} from "notivue";
 import InputLabel from "@/Components/InputLabel.vue";

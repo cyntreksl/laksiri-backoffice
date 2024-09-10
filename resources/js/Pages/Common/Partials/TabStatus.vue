@@ -7,6 +7,7 @@ import NotFound from '@/../images/illustrations/empty-girl-box.svg';
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import AuditDetails from "@/Pages/Common/Components/AuditDetails.vue";
 import PostSkeleton from "@/Components/PostSkeleton.vue";
+import { usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
     hbl: {

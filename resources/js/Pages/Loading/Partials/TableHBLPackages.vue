@@ -1,5 +1,5 @@
 <script setup>
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import {ref, watchEffect} from "vue";
 import DeleteHBLConfirmationModal from "@/Pages/Loading/Partials/DeleteHBLConfirmationModal.vue";
