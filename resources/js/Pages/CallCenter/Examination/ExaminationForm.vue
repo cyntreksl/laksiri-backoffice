@@ -36,7 +36,7 @@ const fetchHBL = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             },
         });
 
@@ -62,7 +62,7 @@ const fetchPickup = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             },
         });
 
@@ -94,7 +94,7 @@ const getHBLPackagesByReference = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             },
         });
 
