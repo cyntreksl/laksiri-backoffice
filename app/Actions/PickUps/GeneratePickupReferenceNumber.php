@@ -18,14 +18,26 @@ class GeneratePickupReferenceNumber
                 case 'Riyadh':
                     $branch_code = 'RY';
                     break;
-                case 'Sri Lanka':
-                    $branch_code = 'SL';
+                case 'Colombo':
+                    $branch_code = 'CL';
                     break;
                 case 'Dubai':
                     $branch_code = 'DB';
                     break;
                 case 'Kuwait':
                     $branch_code = 'KW';
+                    break;
+                case 'Qatar':
+                    $branch_code = 'QT';
+                    break;
+                case 'Malaysia':
+                    $branch_code = 'ML';
+                    break;
+                case 'Nintavur':
+                    $branch_code = 'NT';
+                    break;
+                case 'London':
+                    $branch_code = 'LD';
                     break;
             }
         }

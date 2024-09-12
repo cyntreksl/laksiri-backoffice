@@ -109,10 +109,6 @@ const props = defineProps({
                     <InfoDisplay :value="pickup?.retry_attempts" label="Retry Attempts"/>
 
                     <InfoDisplay :value="pickup?.created_by" label="Auth"/>
-
-                    <InfoDisplay :value="pickup?.hbl_number" label="HBL Number"/>
-
-                    <InfoDisplay :value="pickup?.cr_number" label="CR Number"/>
                 </div>
             </div>
         </AccordionPanel>
