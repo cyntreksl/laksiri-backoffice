@@ -81,8 +81,6 @@ const form = useForm({
     pickup_date: formattedToday,
     pickup_time_start: "",
     pickup_time_end: "",
-    hbl_number: '',
-    cr_number: '',
 });
 
 // Method to find zone ID based on address
@@ -284,18 +282,6 @@ const shipIcon = ref(`
                                     />
                                 </div>
                                 <InputError :message="form.errors.contact_number"/>
-                            </div>
-
-                            <div>
-                                <InputLabel value="HBL Number"/>
-                                <TextInput v-model="form.hbl_number" class="w-full" placeholder="Enter HBL Number"/>
-                                <InputError :message="form.errors.hbl_number"/>
-                            </div>
-
-                            <div>
-                                <InputLabel value="CR Number"/>
-                                <TextInput v-model="form.cr_number" class="w-full" placeholder="Enter CR Number"/>
-                                <InputError :message="form.errors.cr_number"/>
                             </div>
 
                             <div class="col-span-2">
@@ -565,5 +551,3 @@ const shipIcon = ref(`
         </form>
     </AppLayout>
 </template>
-
-<style scoped></style>

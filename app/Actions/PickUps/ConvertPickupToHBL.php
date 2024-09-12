@@ -3,7 +3,9 @@
 namespace App\Actions\PickUps;
 
 use App\Actions\HBL\CreateHBLPackages;
+use App\Actions\HBL\GenerateHBLNumber;
 use App\Actions\HBL\UpdateOrCreateHBL;
+use App\Actions\User\GetUserCurrentBranch;
 use App\Enum\PickupStatus;
 use App\Models\HBL;
 use App\Models\PickUp;
@@ -16,6 +18,8 @@ class ConvertPickupToHBL
 
     public function handle($pickup, $request): HBL
     {
+        $currentBranch = GetUserCurrentBranch::run();
+
         $data = [
             'cargo_type' => $pickup->cargo_type,
             'hbl_type' => $request->hbl_type,
@@ -41,6 +45,8 @@ class ConvertPickupToHBL
             'system_status' => HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
             'packages' => $request->packages,
             'is_completed' => $request->is_completed,
+            'hbl_number' => GenerateHBLNumber::run($currentBranch['branchName']),
+            'cr_number' => GenerateHBLNumber::run($currentBranch['branchName']),
         ];
 
         try {

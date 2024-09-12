@@ -15,7 +15,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {router, usePage} from "@inertiajs/vue3";
+import {Link, router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import DeletePickupConfirmationModal from "@/Pages/Pickup/Partials/DeletePickupConfirmationModal.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
@@ -911,6 +911,12 @@ const shipIcon = ref(`
         <template #header>Pending Pickups</template>
 
         <Breadcrumb/>
+
+        <div class="flex justify-end mt-5">
+            <Link v-if="$page.props.user.permissions.includes('pickups.create')" :href="route('pickups.create')">
+                <PrimaryButton>Create New Pending Job</PrimaryButton>
+            </Link>
+        </div>
 
         <div class="flex justify-end mt-4">
             <SimpleOverviewWidget :count="totalPickups" class="bg-white" title="Total Pending Pickups">
