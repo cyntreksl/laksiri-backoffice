@@ -42,8 +42,6 @@ class UpdateHBLRequest extends FormRequest
             'discount' => ['required', 'numeric'],
             'paid_amount' => ['required', 'numeric', 'min:0'],
             'packages' => ['sometimes', 'required', 'array'],
-            'hbl_number' => ['required', 'string', 'max:20'],
-            'cr_number' => ['required', 'string', 'max:20'],
         ];
     }
 }

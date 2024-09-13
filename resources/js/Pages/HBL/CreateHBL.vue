@@ -37,9 +37,6 @@ const props = defineProps({
         default: () => {
         },
     },
-    hblNumber: {
-      type: Object,
-    },
 });
 
 //branch set
@@ -123,8 +120,6 @@ const form = useForm({
     additional_charge: 0,
     grand_total: 0,
     packages: {},
-    hbl_number: props.hblNumber,
-    cr_number: props.hblNumber,
 });
 
 const handleHBLCreate = () => {
@@ -1029,30 +1024,6 @@ const shipIcon = ref(`
                                 />
                             </svg>
                         </PrimaryButton>
-                    </div>
-
-                    <!-- Basic Details -->
-                    <div class="card px-4 py-4 sm:px-5">
-                        <div>
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Basic Details
-                            </h2>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                            <div>
-                                <InputLabel class="font-normal" value="HBL Number"/>
-                                <TextInput v-model="form.hbl_number" class="w-full" placeholder="Enter HBL Number"/>
-                                <InputError :message="form.errors.hbl_number"/>
-                            </div>
-
-                            <div>
-                                <InputLabel class="font-normal" value="CR Number"/>
-                                <TextInput v-model="form.cr_number" class="w-full" placeholder="Enter CR Number"/>
-                                <InputError :message="form.errors.cr_number"/>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Cargo Type -->
