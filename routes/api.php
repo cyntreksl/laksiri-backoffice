@@ -22,7 +22,7 @@ Route::domain('api.'.config('app.url'))
 
         Route::apiResource('hbls', HBLController::class)->only(['store', 'show']);
 
-        Route::post('hbls/calculate-payment', [HBLController::class, 'calculatePayment']);
+        Route::post('/hbls/calculate/payment', [HBLController::class, 'calculatePayment']);
 
         Route::post('/pickups/exceptions/{pickup}', [PickupController::class, 'storePickupException']);
 
