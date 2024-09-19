@@ -4,7 +4,9 @@ namespace App\Actions\HBL;
 
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\PickupStatus;
 use App\Models\HBL;
+use App\Models\PickUp;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class UpdateOrCreateHBL
@@ -19,6 +21,17 @@ class UpdateOrCreateHBL
         if (isset($data['is_completed'])) {
             $reference = GenerateHBLReferenceNumber::run();
             $status = 'completed';
+
+            if (isset($data['pickup_id'])) {
+                $pickup = Pickup::find($data['pickup_id']);
+
+                if ($pickup) {
+                    $pickup->update([
+                        'status' => PickupStatus::COLLECTED->value,
+                        'system_status' => PickUp::SYSTEM_STATUS_CARGO_COLLECTED,
+                    ]);
+                }
+            }
         }
 
         $hbl = HBL::updateOrCreate([

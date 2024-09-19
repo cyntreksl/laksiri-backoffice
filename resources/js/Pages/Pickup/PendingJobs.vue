@@ -69,6 +69,7 @@ const data = reactive({
         pickup_type: true,
         packages: true,
         exception_note: true,
+        status: false,
         actions: true,
     },
 });
@@ -200,6 +201,9 @@ const createColumns = () => [
                     'style': 'background-color: #ffe4e6',
                 };
             }
+        },
+        formatter: (cell, row) => {
+            return html(`<span>${cell}</span> <br> <span style="color: dodgerblue">${row.cells[12].data}</span>`)
         }
     },
     {

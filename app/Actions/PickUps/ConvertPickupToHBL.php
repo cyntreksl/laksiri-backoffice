@@ -8,7 +8,6 @@ use App\Actions\HBL\UpdateOrCreateHBL;
 use App\Actions\User\GetUserCurrentBranch;
 use App\Enum\PickupStatus;
 use App\Models\HBL;
-use App\Models\PickUp;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -63,9 +62,8 @@ class ConvertPickupToHBL
             $hbl->addStatus('HBL Preparation by driver');
 
             $pickup->update([
-                'status' => PickupStatus::COLLECTED->value,
+                'status' => PickupStatus::PROCESSING->value,
                 'hbl_id' => $hbl->id,
-                'system_status' => PickUp::SYSTEM_STATUS_CARGO_COLLECTED,
             ]);
 
             $pickup->addStatus('Cargo collected by driver');

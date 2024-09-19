@@ -55,11 +55,17 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
                 ->where('name', $filters['userData'])
                 ->orWhere('contact_number', $filters['userData'])
                 ->with('pickupException')
-                ->whereIn('system_status', [PickUp::SYSTEM_STATUS_PICKUP_CREATED, PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED]);
+                ->whereIn('system_status', [
+                    PickUp::SYSTEM_STATUS_PICKUP_CREATED,
+                    PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
+                ]);
         } else {
             $query = PickUp::query()
                 ->with('pickupException')
-                ->whereIn('system_status', [PickUp::SYSTEM_STATUS_PICKUP_CREATED, PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED]);
+                ->whereIn('system_status', [
+                    PickUp::SYSTEM_STATUS_PICKUP_CREATED,
+                    PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
+                ]);
         }
 
         if (! empty($search)) {
