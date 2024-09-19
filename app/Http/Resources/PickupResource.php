@@ -43,6 +43,7 @@ class PickupResource extends JsonResource
             'created_by' => $this->createdBy->name,
             'hbl_number' => $this->hbl_number,
             'cr_number' => $this->cr_number,
+            'status' => $this->status,
         ];
     }
 }
