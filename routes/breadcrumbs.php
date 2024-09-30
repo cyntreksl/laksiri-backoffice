@@ -147,6 +147,12 @@ Breadcrumbs::for('users.drivers.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->push('Driver Edit', route('users.drivers.edit', $id));
 });
 
+Breadcrumbs::for('users.customers.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('User Management', route('users.customers.index'));
+    $trail->push('Customers', route('users.customers.index'));
+});
+
 //Cash settlement
 Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
