@@ -50,7 +50,7 @@ class UserController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        $query = User::withoutRole('driver')
+        $query = User::withoutRole(['customer', 'driver'])
             ->currentBranch()
             ->with('branches');
 

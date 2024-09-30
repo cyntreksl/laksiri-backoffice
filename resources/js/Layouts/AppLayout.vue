@@ -1072,6 +1072,10 @@ export default {
                             route: "users.drivers.index",
                         },
                         {
+                            title: "Customers",
+                            route: "users.customers.index",
+                        },
+                        {
                             title: "Driver Tracking",
                             route: "users.driver-tracings.index",
                         },
