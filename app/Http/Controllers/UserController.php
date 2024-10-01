@@ -58,12 +58,12 @@ class UserController extends Controller
             $query->where('username', 'like', '%'.$search.'%');
         }
 
+        $totalUsers = $query->count();
+
         $users = $query->orderBy($order, $dir)
             ->skip($page)
             ->take($limit)
             ->get();
-
-        $totalUsers = User::currentBranch()->count();
 
         return response()->json([
             'data' => UserCollection::collection($users),
