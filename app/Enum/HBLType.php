@@ -12,7 +12,7 @@ enum HBLType: string
 
     public static function getHBLTypeOptions(): array
     {
-        return array_filter(self::cases(), fn($case) => in_array($case, [
+        return array_filter(self::cases(), fn ($case) => in_array($case, [
             self::UBP,
             self::GIFT,
             self::DOOR_TO_DOOR,
