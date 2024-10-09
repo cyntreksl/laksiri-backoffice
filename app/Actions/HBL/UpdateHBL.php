@@ -16,7 +16,7 @@ class UpdateHBL
             'cargo_type' => $data['cargo_type'],
             'hbl_type' => $data['hbl_type'],
             'hbl_name' => $data['hbl_name'],
-            'email' => $data['email'],
+            'email' => $data['email'], null,
             'contact_number' => $data['contact_number'],
             'nic' => $data['nic'],
             'iq_number' => $data['iq_number'],
