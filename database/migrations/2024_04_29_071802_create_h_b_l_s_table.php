@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('reference', 20);
             $table->integer('agent_id');
             $table->enum('cargo_type', [CargoType::SEA_CARGO->value, CargoType::AIR_CARGO->value])->nullable();
-            $table->enum('hbl_type', [HBLType::UBP->value, HBLType::GIFT->value, HBLType::DOOR_TO_DOOR->value])->nullable();
+            $table->enum('hbl_type', [HBLType::UPB->value, HBLType::GIFT->value, HBLType::DOOR_TO_DOOR->value])->nullable();
             $table->string('hbl', 256);
             $table->string('hbl_name', 256);
             $table->string('email')->nullable();
