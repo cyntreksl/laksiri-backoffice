@@ -1,7 +1,7 @@
 <script setup>
-import {computed, onMounted, reactive, ref} from "vue";
-import {Link, router, usePage} from "@inertiajs/vue3";
-import {Grid, h, html} from "gridjs";
+import { computed, onMounted, reactive, ref } from "vue";
+import { Link, router, usePage } from "@inertiajs/vue3";
+import { Grid, h, html } from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -15,25 +15,22 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
-import {push} from "notivue";
+import { push } from "notivue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import RestoreHBLConfirmationModal from "@/Pages/HBL/Partials/RestoreHBLConfirmationModal.vue";
 
 const props = defineProps({
     users: {
         type: Object,
-        default: () => {
-        },
+        default: () => {},
     },
     hbls: {
         type: Object,
-        default: () => {
-        },
+        default: () => {},
     },
     paymentStatus: {
         type: Object,
-        default: () => {
-        },
+        default: () => {},
     },
 });
 
@@ -48,7 +45,7 @@ const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo"],
-    hblType: ["UBP", "Gift", "Door to Door"],
+    hblType: ["UPB", "Gift", "Door to Door"],
     isHold: false,
     warehouse: ["COLOMBO", "NINTAVUR"],
     createdBy: "",
@@ -140,11 +137,11 @@ const initializeGrid = () => {
 };
 
 const createColumns = () => [
-    {name: "ID", hidden: !data.columnVisibility.id},
-    {name: "Reference", hidden: !data.columnVisibility.reference},
-    {name: "HBL", hidden: !data.columnVisibility.hbl},
-    {name: "HBL Name", hidden: !data.columnVisibility.hbl_name},
-    {name: "Consignee Name", hidden: !data.columnVisibility.consignee_name},
+    { name: "ID", hidden: !data.columnVisibility.id },
+    { name: "Reference", hidden: !data.columnVisibility.reference },
+    { name: "HBL", hidden: !data.columnVisibility.hbl },
+    { name: "HBL Name", hidden: !data.columnVisibility.hbl_name },
+    { name: "Consignee Name", hidden: !data.columnVisibility.consignee_name },
     {
         name: "Consignee Address",
         hidden: !data.columnVisibility.consignee_address,
@@ -155,8 +152,8 @@ const createColumns = () => [
         hidden: !data.columnVisibility.consignee_contact,
         sort: false,
     },
-    {name: "Email", hidden: !data.columnVisibility.email, sort: false},
-    {name: "Address", hidden: !data.columnVisibility.address, sort: false},
+    { name: "Email", hidden: !data.columnVisibility.email, sort: false },
+    { name: "Address", hidden: !data.columnVisibility.address, sort: false },
     {
         name: "Contact",
         hidden: !data.columnVisibility.contact_number,
@@ -169,80 +166,78 @@ const createColumns = () => [
         formatter: (_, row) =>
             row.cells[10].data == "Sea Cargo"
                 ? h(
-                    "span",
-                    {className: "flex"},
-                    h(
-                        "svg",
-                        {
-                            xmlns: "http://www.w3.org/2000/svg",
-                            viewBox: "0 0 24 24",
-                            class:
-                                "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
-                            fill: "none",
-                            height: 24,
-                            width: 24,
-                            stroke: "currentColor",
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                            strokeWidth: 2,
-                        },
-                        [
-                            h("path", {
-                                stroke: "none",
-                                d: "M0 0h24v24H0z",
-                                fill: "none",
-                            }),
-                            h("path", {
-                                d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
-                            }),
-                            h("path", {
-                                d: "M4 18l-1 -5h18l-2 4",
-                            }),
-                            h("path", {
-                                d: "M5 13v-6h8l4 6",
-                            }),
-                            h("path", {
-                                d: "M7 7v-4h-1",
-                            }),
-                        ]
-                    ),
-                    row.cells[10].data
-                )
+                      "span",
+                      { className: "flex" },
+                      h(
+                          "svg",
+                          {
+                              xmlns: "http://www.w3.org/2000/svg",
+                              viewBox: "0 0 24 24",
+                              class: "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
+                              fill: "none",
+                              height: 24,
+                              width: 24,
+                              stroke: "currentColor",
+                              strokeLinecap: "round",
+                              strokeLinejoin: "round",
+                              strokeWidth: 2,
+                          },
+                          [
+                              h("path", {
+                                  stroke: "none",
+                                  d: "M0 0h24v24H0z",
+                                  fill: "none",
+                              }),
+                              h("path", {
+                                  d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
+                              }),
+                              h("path", {
+                                  d: "M4 18l-1 -5h18l-2 4",
+                              }),
+                              h("path", {
+                                  d: "M5 13v-6h8l4 6",
+                              }),
+                              h("path", {
+                                  d: "M7 7v-4h-1",
+                              }),
+                          ]
+                      ),
+                      row.cells[10].data
+                  )
                 : row.cells[10].data == "Air Cargo"
-                    ? h("span", {className: "flex space-x-2"}, [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                                strokeWidth: 2,
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
-                                }),
-                            ]
-                        ),
-                        row.cells[10].data,
-                    ])
-                    : row.cells[10].data,
+                ? h("span", { className: "flex space-x-2" }, [
+                      h(
+                          "svg",
+                          {
+                              xmlns: "http://www.w3.org/2000/svg",
+                              viewBox: "0 0 24 24",
+                              class: "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
+                              fill: "none",
+                              height: 24,
+                              width: 24,
+                              stroke: "currentColor",
+                              strokeLinecap: "round",
+                              strokeLinejoin: "round",
+                              strokeWidth: 2,
+                          },
+                          [
+                              h("path", {
+                                  stroke: "none",
+                                  d: "M0 0h24v24H0z",
+                                  fill: "none",
+                              }),
+                              h("path", {
+                                  d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
+                              }),
+                          ]
+                      ),
+                      row.cells[10].data,
+                  ])
+                : row.cells[10].data,
     },
-    {name: "HBL Type", hidden: !data.columnVisibility.hbl_type},
-    {name: "Warehouse", hidden: !data.columnVisibility.warehouse},
-    {name: "Status", hidden: !data.columnVisibility.status},
+    { name: "HBL Type", hidden: !data.columnVisibility.hbl_type },
+    { name: "Warehouse", hidden: !data.columnVisibility.warehouse },
+    { name: "Status", hidden: !data.columnVisibility.status },
     {
         name: "Is Hold",
         hidden: !data.columnVisibility.is_hold,
@@ -260,144 +255,149 @@ const createColumns = () => [
         sort: false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
-            return h("div", {className: "flex space-x-2"}, [
-                usePage().props.user.permissions.includes('hbls.show') ?
-                    h(
-                        "a",
-                        {
-                            className:
-                                "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                            onClick: () => confirmViewHBL(row.cells[0].data),
-                            "x-tooltip..placement.bottom.primary": "'View HBL'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                    }),
-                                    h("path", {
-                                        d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
-                usePage().props.user.permissions.includes('hbls.download pdf') ?
-                    h(
-                        "a",
-                        {
-                            className:
-                                "btn size-8 p-0 text-pink-500 hover:bg-pink-500/20 focus:bg-pink-500/20 active:bg-pink-500/25",
-                            href: route("hbls.download", row.cells[0].data),
-                            "x-tooltip..placement.bottom.primary": "'Download HBL'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class:
-                                        "icon icon-tabler icons-tabler-outline icon-tabler-download",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2",
-                                    }),
-                                    h("path", {
-                                        d: "M7 11l5 5l5 -5",
-                                    }),
-                                    h("path", {
-                                        d: "M12 4l0 12",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
-                usePage().props.user.permissions.includes('hbls.restore') ?
-                    h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                            onClick: () => confirmRestoreHBL(row.cells[0].data),
-                            "x-tooltip..placement.bottom.error": "'Restore HBL'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class:
-                                        "icon icon-tabler icons-tabler-outline icon-tabler-trash-off",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M3 3l18 18",
-                                    }),
-                                    h("path", {
-                                        d: "M4 7h3m4 0h9",
-                                    }),
-                                    h("path", {
-                                        d: "M10 11l0 6",
-                                    }),
-                                    h("path", {
-                                        d: "M14 14l0 3",
-                                    }),
-                                    h("path", {
-                                        d: "M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l.077 -.923",
-                                    }),
-                                    h("path", {
-                                        d: "M18.384 14.373l.616 -7.373",
-                                    }),
-                                    h("path", {
-                                        d: "M9 5v-1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
+            return h("div", { className: "flex space-x-2" }, [
+                usePage().props.user.permissions.includes("hbls.show")
+                    ? h(
+                          "a",
+                          {
+                              className:
+                                  "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
+                              onClick: () => confirmViewHBL(row.cells[0].data),
+                              "x-tooltip..placement.bottom.primary":
+                                  "'View HBL'",
+                          },
+                          [
+                              h(
+                                  "svg",
+                                  {
+                                      xmlns: "http://www.w3.org/2000/svg",
+                                      viewBox: "0 0 24 24",
+                                      class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
+                                      fill: "none",
+                                      height: 24,
+                                      width: 24,
+                                      stroke: "currentColor",
+                                      strokeLinecap: "round",
+                                      strokeLinejoin: "round",
+                                  },
+                                  [
+                                      h("path", {
+                                          d: "M0 0h24v24H0z",
+                                          fill: "none",
+                                          stroke: "none",
+                                      }),
+                                      h("path", {
+                                          d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                                      }),
+                                      h("path", {
+                                          d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                                      }),
+                                  ]
+                              ),
+                          ]
+                      )
+                    : null,
+                usePage().props.user.permissions.includes("hbls.download pdf")
+                    ? h(
+                          "a",
+                          {
+                              className:
+                                  "btn size-8 p-0 text-pink-500 hover:bg-pink-500/20 focus:bg-pink-500/20 active:bg-pink-500/25",
+                              href: route("hbls.download", row.cells[0].data),
+                              "x-tooltip..placement.bottom.primary":
+                                  "'Download HBL'",
+                          },
+                          [
+                              h(
+                                  "svg",
+                                  {
+                                      xmlns: "http://www.w3.org/2000/svg",
+                                      viewBox: "0 0 24 24",
+                                      class: "icon icon-tabler icons-tabler-outline icon-tabler-download",
+                                      fill: "none",
+                                      height: 24,
+                                      width: 24,
+                                      stroke: "currentColor",
+                                      strokeLinecap: "round",
+                                      strokeLinejoin: "round",
+                                  },
+                                  [
+                                      h("path", {
+                                          d: "M0 0h24v24H0z",
+                                          fill: "none",
+                                          stroke: "none",
+                                      }),
+                                      h("path", {
+                                          d: "M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2",
+                                      }),
+                                      h("path", {
+                                          d: "M7 11l5 5l5 -5",
+                                      }),
+                                      h("path", {
+                                          d: "M12 4l0 12",
+                                      }),
+                                  ]
+                              ),
+                          ]
+                      )
+                    : null,
+                usePage().props.user.permissions.includes("hbls.restore")
+                    ? h(
+                          "button",
+                          {
+                              className:
+                                  "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
+                              onClick: () =>
+                                  confirmRestoreHBL(row.cells[0].data),
+                              "x-tooltip..placement.bottom.error":
+                                  "'Restore HBL'",
+                          },
+                          [
+                              h(
+                                  "svg",
+                                  {
+                                      xmlns: "http://www.w3.org/2000/svg",
+                                      viewBox: "0 0 24 24",
+                                      class: "icon icon-tabler icons-tabler-outline icon-tabler-trash-off",
+                                      fill: "none",
+                                      height: 24,
+                                      width: 24,
+                                      stroke: "currentColor",
+                                      strokeLinecap: "round",
+                                      strokeLinejoin: "round",
+                                  },
+                                  [
+                                      h("path", {
+                                          d: "M0 0h24v24H0z",
+                                          fill: "none",
+                                          stroke: "none",
+                                      }),
+                                      h("path", {
+                                          d: "M3 3l18 18",
+                                      }),
+                                      h("path", {
+                                          d: "M4 7h3m4 0h9",
+                                      }),
+                                      h("path", {
+                                          d: "M10 11l0 6",
+                                      }),
+                                      h("path", {
+                                          d: "M14 14l0 3",
+                                      }),
+                                      h("path", {
+                                          d: "M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l.077 -.923",
+                                      }),
+                                      h("path", {
+                                          d: "M18.384 14.373l.616 -7.373",
+                                      }),
+                                      h("path", {
+                                          d: "M9 5v-1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3",
+                                      }),
+                                  ]
+                              ),
+                          ]
+                      )
+                    : null,
             ]);
         },
     },
@@ -478,7 +478,7 @@ const handleRestoreHBL = () => {
         onSuccess: () => {
             closeModal();
             push.success("HBL record restored successfully!");
-            router.visit(route("hbls.cancelled-hbls"), {only: ["hbls"]});
+            router.visit(route("hbls.cancelled-hbls"), { only: ["hbls"] });
         },
         onError: () => {
             closeModal();
@@ -491,7 +491,7 @@ const resetFilter = () => {
     filters.fromDate = fromDate;
     filters.toDate = toDate;
     filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
-    filters.hblType = ["UBP", "Gift", "Door to Door"];
+    filters.hblType = ["UPB", "Gift", "Door to Door"];
     filters.isHold = false;
     filters.warehouse = ["COLOMBO", "NINTAVUR"];
     filters.createdBy = "";
@@ -506,7 +506,7 @@ const exportURL = computed(() => {
             params.append(key, filters[key].toString());
         }
     }
-    return '/hbls/cancelled/list/export' + "?" + params.toString();
+    return "/hbls/cancelled/list/export" + "?" + params.toString();
 });
 
 const handlePerPageChange = (event) => {
@@ -522,7 +522,7 @@ const handlePerPageChange = (event) => {
         },
     });
 
-    grid.forceRender()
+    grid.forceRender();
 };
 
 const planeIcon = ref(`
@@ -569,9 +569,12 @@ const shipIcon = ref(`
     <AppLayout title="Cancelled HBL List">
         <template #header>Cancelled HBL List</template>
 
-        <Breadcrumb/>
+        <Breadcrumb />
         <div class="flex justify-end mt-5">
-            <Link v-if="$page.props.user.permissions.includes('hbls.create')" :href="route('hbls.create')">
+            <Link
+                v-if="$page.props.user.permissions.includes('hbls.create')"
+                :href="route('hbls.create')"
+            >
                 <PrimaryButton> Create New HBL</PrimaryButton>
             </Link>
         </div>
@@ -586,7 +589,10 @@ const shipIcon = ref(`
                                 Cancelled HBL List
                             </h2>
                             <div class="flex m-3">
-                                <select class="form-select mt-1.5 w-full rounded-full border border-slate-300 bg-white px-8 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" @change="handlePerPageChange">
+                                <select
+                                    class="form-select mt-1.5 w-full rounded-full border border-slate-300 bg-white px-8 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    @change="handlePerPageChange"
+                                >
                                     <option value="10">10</option>
                                     <option value="25">25</option>
                                     <option value="50">50</option>
@@ -594,7 +600,7 @@ const shipIcon = ref(`
                                 </select>
                             </div>
                         </div>
-                        <br/>
+                        <br />
                         <div
                             class="mr-4 cursor-pointer"
                             x-tooltip.info.placement.bottom="'Applied Filters'"
@@ -632,19 +638,23 @@ const shipIcon = ref(`
                                         {{ filters.toDate }}
                                     </div>
                                 </div>
-                                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+                                <div
+                                    class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
+                                >
                                     <div
-                                        v-for="(mode, index) in filters.cargoMode"
+                                        v-for="(
+                                            mode, index
+                                        ) in filters.cargoMode"
                                         v-if="filters.cargoMode"
                                         :key="index"
                                         class="mb-1 badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
                                     >
-                    <span v-if="mode == 'Sea Cargo'">
-                      <div v-html="shipIcon"></div>
-                    </span>
+                                        <span v-if="mode == 'Sea Cargo'">
+                                            <div v-html="shipIcon"></div>
+                                        </span>
                                         <span v-if="mode == 'Air Cargo'">
-                      <div v-html="planeIcon"></div>
-                    </span>
+                                            <div v-html="planeIcon"></div>
+                                        </span>
                                         {{ mode }}
                                     </div>
 
@@ -658,7 +668,9 @@ const shipIcon = ref(`
                                     </div>
 
                                     <div
-                                        v-for="(item, index) in filters.warehouse"
+                                        v-for="(
+                                            item, index
+                                        ) in filters.warehouse"
                                         v-if="filters.warehouse"
                                         :key="index"
                                         class="mb-1 badge bg-pink-600 text-white dark:bg-pink-600 ml-2"
@@ -675,15 +687,24 @@ const shipIcon = ref(`
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
                                     :checked="data.columnVisibility.reference"
-                                    @change="toggleColumnVisibility('reference', $event)"
+                                    @change="
+                                        toggleColumnVisibility(
+                                            'reference',
+                                            $event
+                                        )
+                                    "
                                 />
-                                <span class="hover:cursor-pointer">Reference</span>
+                                <span class="hover:cursor-pointer"
+                                    >Reference</span
+                                >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
                                     :checked="data.columnVisibility.hbl"
-                                    @change="toggleColumnVisibility('hbl', $event)"
+                                    @change="
+                                        toggleColumnVisibility('hbl', $event)
+                                    "
                                 />
                                 <span class="hover:cursor-pointer">HBL</span>
                             </label>
@@ -691,39 +712,75 @@ const shipIcon = ref(`
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
                                     :checked="data.columnVisibility.hbl_name"
-                                    @change="toggleColumnVisibility('hbl_name', $event)"
+                                    @change="
+                                        toggleColumnVisibility(
+                                            'hbl_name',
+                                            $event
+                                        )
+                                    "
                                 />
-                                <span class="hover:cursor-pointer">HBL Name</span>
+                                <span class="hover:cursor-pointer"
+                                    >HBL Name</span
+                                >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
-                                    :checked="data.columnVisibility.consignee_name"
-                                    @change="toggleColumnVisibility('consignee_name', $event)"
+                                    :checked="
+                                        data.columnVisibility.consignee_name
+                                    "
+                                    @change="
+                                        toggleColumnVisibility(
+                                            'consignee_name',
+                                            $event
+                                        )
+                                    "
                                 />
-                                <span class="hover:cursor-pointer">Consignee Name</span>
+                                <span class="hover:cursor-pointer"
+                                    >Consignee Name</span
+                                >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
-                                    :checked="data.columnVisibility.consignee_address"
-                                    @change="toggleColumnVisibility('consignee_address', $event)"
+                                    :checked="
+                                        data.columnVisibility.consignee_address
+                                    "
+                                    @change="
+                                        toggleColumnVisibility(
+                                            'consignee_address',
+                                            $event
+                                        )
+                                    "
                                 />
-                                <span class="hover:cursor-pointer">Consignee Address</span>
+                                <span class="hover:cursor-pointer"
+                                    >Consignee Address</span
+                                >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
-                                    :checked="data.columnVisibility.consignee_contact"
-                                    @change="toggleColumnVisibility('consignee_contact', $event)"
+                                    :checked="
+                                        data.columnVisibility.consignee_contact
+                                    "
+                                    @change="
+                                        toggleColumnVisibility(
+                                            'consignee_contact',
+                                            $event
+                                        )
+                                    "
                                 />
-                                <span class="hover:cursor-pointer">Consignee Contact</span>
+                                <span class="hover:cursor-pointer"
+                                    >Consignee Contact</span
+                                >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
                                     :checked="data.columnVisibility.email"
-                                    @change="toggleColumnVisibility('email', $event)"
+                                    @change="
+                                        toggleColumnVisibility('email', $event)
+                                    "
                                 />
                                 <span class="hover:cursor-pointer">Email</span>
                             </label>
@@ -731,47 +788,86 @@ const shipIcon = ref(`
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
                                     :checked="data.columnVisibility.address"
-                                    @change="toggleColumnVisibility('address', $event)"
+                                    @change="
+                                        toggleColumnVisibility(
+                                            'address',
+                                            $event
+                                        )
+                                    "
                                 />
-                                <span class="hover:cursor-pointer">Address</span>
+                                <span class="hover:cursor-pointer"
+                                    >Address</span
+                                >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
-                                    :checked="data.columnVisibility.contact_number"
-                                    @change="toggleColumnVisibility('contact_number', $event)"
+                                    :checked="
+                                        data.columnVisibility.contact_number
+                                    "
+                                    @change="
+                                        toggleColumnVisibility(
+                                            'contact_number',
+                                            $event
+                                        )
+                                    "
                                 />
-                                <span class="hover:cursor-pointer">Contact</span>
+                                <span class="hover:cursor-pointer"
+                                    >Contact</span
+                                >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
                                     :checked="data.columnVisibility.cargo_type"
-                                    @change="toggleColumnVisibility('cargo_type', $event)"
+                                    @change="
+                                        toggleColumnVisibility(
+                                            'cargo_type',
+                                            $event
+                                        )
+                                    "
                                 />
-                                <span class="hover:cursor-pointer">Cargo Mode</span>
+                                <span class="hover:cursor-pointer"
+                                    >Cargo Mode</span
+                                >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
                                     :checked="data.columnVisibility.hbl_type"
-                                    @change="toggleColumnVisibility('hbl_type', $event)"
+                                    @change="
+                                        toggleColumnVisibility(
+                                            'hbl_type',
+                                            $event
+                                        )
+                                    "
                                 />
-                                <span class="hover:cursor-pointer">HBL Type</span>
+                                <span class="hover:cursor-pointer"
+                                    >HBL Type</span
+                                >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
                                     :checked="data.columnVisibility.warehouse"
-                                    @change="toggleColumnVisibility('warehouse', $event)"
+                                    @change="
+                                        toggleColumnVisibility(
+                                            'warehouse',
+                                            $event
+                                        )
+                                    "
                                 />
-                                <span class="hover:cursor-pointer">Warehouse</span>
+                                <span class="hover:cursor-pointer"
+                                    >Warehouse</span
+                                >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
                                     :checked="data.columnVisibility.status"
-                                    @change="toggleColumnVisibility('status', $event)"
+                                    @change="
+                                        toggleColumnVisibility('status', $event)
+                                    "
                                 />
                                 <span class="hover:cursor-pointer">Status</span>
                             </label>
@@ -808,18 +904,24 @@ const shipIcon = ref(`
 
             <template #content>
                 <div>
-                    <InputLabel value="From"/>
-                    <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
+                    <InputLabel value="From" />
+                    <DatePicker
+                        v-model="filters.fromDate"
+                        placeholder="Choose date..."
+                    />
                 </div>
 
                 <div>
-                    <InputLabel value="To"/>
-                    <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
+                    <InputLabel value="To" />
+                    <DatePicker
+                        v-model="filters.toDate"
+                        placeholder="Choose date..."
+                    />
                 </div>
 
-                <FilterBorder/>
+                <FilterBorder />
 
-                <FilterHeader value="Cargo Mode"/>
+                <FilterHeader value="Cargo Mode" />
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch
@@ -839,16 +941,20 @@ const shipIcon = ref(`
                     <div v-html="shipIcon"></div>
                 </label>
 
-                <FilterBorder/>
+                <FilterBorder />
 
-                <FilterHeader value="HBL Type"/>
+                <FilterHeader value="HBL Type" />
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.hblType" label="UBP" value="UBP"/>
+                    <Switch v-model="filters.hblType" label="UPB" value="UPB" />
                 </label>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.hblType" label="Gift" value="Gift"/>
+                    <Switch
+                        v-model="filters.hblType"
+                        label="Gift"
+                        value="Gift"
+                    />
                 </label>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
@@ -859,32 +965,44 @@ const shipIcon = ref(`
                     />
                 </label>
 
-                <FilterBorder/>
+                <FilterBorder />
 
-                <FilterHeader value="Payment Status"/>
+                <FilterHeader value="Payment Status" />
 
                 <label
                     v-for="item in paymentStatus"
                     :key="item"
                     class="inline-flex items-center space-x-2 mt-2"
                 >
-                    <Switch v-model="filters.paymentStatus" :label="item" :value="item"/>
+                    <Switch
+                        v-model="filters.paymentStatus"
+                        :label="item"
+                        :value="item"
+                    />
                 </label>
 
-                <FilterBorder/>
+                <FilterBorder />
 
-                <FilterHeader value="Is Hold"/>
+                <FilterHeader value="Is Hold" />
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.isHold" label="Is Hold" value="true"/>
+                    <Switch
+                        v-model="filters.isHold"
+                        label="Is Hold"
+                        value="true"
+                    />
                 </label>
 
-                <FilterBorder/>
+                <FilterBorder />
 
-                <FilterHeader value="Warehouse"/>
+                <FilterHeader value="Warehouse" />
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.warehouse" label="COLOMBO" value="COLOMBO"/>
+                    <Switch
+                        v-model="filters.warehouse"
+                        label="COLOMBO"
+                        value="COLOMBO"
+                    />
                 </label>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
@@ -895,9 +1013,9 @@ const shipIcon = ref(`
                     />
                 </label>
 
-                <FilterBorder/>
+                <FilterBorder />
 
-                <FilterHeader value="Created By"/>
+                <FilterHeader value="Created By" />
 
                 <select
                     v-model="filters.createdBy"
