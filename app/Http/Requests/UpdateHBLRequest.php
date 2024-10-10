@@ -25,7 +25,7 @@ class UpdateHBLRequest extends FormRequest
             'cargo_type' => ['required'],
             'hbl_type' => ['required'],
             'hbl_name' => ['required'],
-            'email' => ['email', 'max:254','nullable'],
+            'email' => ['email', 'max:254', 'nullable'],
             'contact_number' => ['nullable'],
             'nic' => ['nullable'],
             'iq_number' => ['nullable'],
