@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Actions\CallFlag\CreateCallFlag;
 use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
@@ -346,5 +347,14 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function createCallFlag($hbl, array $data): void
+    {
+        try {
+            CreateCallFlag::run($hbl, $data);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to create call flag: '.$e->getMessage());
+        }
     }
 }
