@@ -21,15 +21,21 @@ class CallFlag extends Model
         'date',
         'notes',
         'followup_date',
+        'created_by',
     ];
 
     public function hbl(): BelongsTo
     {
-        return $this->belongsTo(Hbl::class);
+        return $this->belongsTo(HBL::class, 'hbl_id');
     }
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->logOnlyDirty();
+    }
+
+    public function causer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

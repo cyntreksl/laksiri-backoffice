@@ -299,4 +299,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->createCallFlag($hbl, $request->all());
     }
+
+    public function getHBLCallFlags(HBL $hbl)
+    {
+        return response()->json($hbl->callFlags()->with('causer')->get());
+    }
 }

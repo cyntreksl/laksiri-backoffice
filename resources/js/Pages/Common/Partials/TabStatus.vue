@@ -7,7 +7,7 @@ import NotFound from '@/../images/illustrations/empty-girl-box.svg';
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import AuditDetails from "@/Pages/Common/Components/AuditDetails.vue";
 import PostSkeleton from "@/Components/PostSkeleton.vue";
-import { usePage } from '@inertiajs/vue3';
+import {usePage} from '@inertiajs/vue3';
 
 const props = defineProps({
     hbl: {
@@ -16,6 +16,10 @@ const props = defineProps({
         },
     },
     showAuditDetails: {
+        type: Boolean,
+        default: true,
+    },
+    showCallFlags: {
         type: Boolean,
         default: true,
     },
@@ -229,12 +233,42 @@ const fetchLogs = async () => {
     }
 }
 
+const callFlags = ref({});
+const isLoadingCallFlags = ref(false);
+
+const fetchCallFlags = async () => {
+    isLoadingCallFlags.value = true;
+
+    try {
+        const response = await fetch(`/get-call-flags/${props.hbl.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            callFlags.value = data;
+        }
+
+    } catch (error) {
+        console.log(error);
+    } finally {
+        isLoadingCallFlags.value = false;
+    }
+}
+
 watch(() => props.hbl, (newVal) => {
     if (newVal !== undefined) {
         fetchPickupStatus();
         fetchHBLStatus();
         fetchPickup();
         fetchLogs();
+        fetchCallFlags();
         fetchUnloadingIssues();
         fetchContainer();
     }
@@ -246,6 +280,7 @@ onMounted(() => {
         fetchHBLStatus();
         fetchPickup();
         fetchLogs();
+        fetchCallFlags();
         fetchUnloadingIssues();
         fetchContainer();
     }
@@ -260,11 +295,11 @@ onMounted(() => {
                 <i
                     class="fa-solid fa-person-biking text-sm text-white dark:text-text-white"
                 ></i>
-                <span>Driver Picked at {{pickup.pickup_date}}</span>
+                <span>Driver Picked at {{ pickup.pickup_date }}</span>
             </div>
         </div>
 
-        <PostSkeleton v-if="isLoadingPickupStatus && isLoadingHBLStatus" />
+        <PostSkeleton v-if="isLoadingPickupStatus && isLoadingHBLStatus"/>
 
         <AccordionPanel v-else show-panel title="Cargo Status">
             <template #header-image>
@@ -291,7 +326,15 @@ onMounted(() => {
                         <div class="flex items-center space-x-4">
                             <div
                                 class="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/20 dark:bg-accent">
-                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-truck text-primary"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" /></svg>
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-truck text-primary"
+                                     fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                    <path d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/>
+                                </svg>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-navy-100">Pickup Status</span>
                         </div>
@@ -326,7 +369,7 @@ onMounted(() => {
 
                         <div v-if="pickupStatus.length === 0" class="w-full flex justify-center">
                             <img :src="NotFound" alt="image"
-                                 class="w-1/4 mt-10" />
+                                 class="w-1/4 mt-10"/>
                         </div>
                     </div>
 
@@ -334,7 +377,16 @@ onMounted(() => {
                         <div class="flex items-center space-x-4">
                             <div
                                 class="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/20 dark:bg-accent">
-                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-app-window text-primary"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M6 8h.01" /><path d="M9 8h.01" /></svg>
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-app-window text-primary"
+                                     fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path
+                                        d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/>
+                                    <path d="M6 8h.01"/>
+                                    <path d="M9 8h.01"/>
+                                </svg>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-navy-100">HBL Status</span>
                         </div>
@@ -369,14 +421,14 @@ onMounted(() => {
 
                         <div v-if="hblStatus.length === 0">
                             <img :src="NotFound" alt="image"
-                                 class="w-1/4 mt-10" />
+                                 class="w-1/4 mt-10"/>
                         </div>
                     </div>
                 </div>
             </div>
         </AccordionPanel>
 
-        <PostSkeleton v-if="isLoadingContainer" />
+        <PostSkeleton v-if="isLoadingContainer"/>
 
         <AccordionPanel v-else show-panel title="Shipment Details">
             <template #header-image>
@@ -399,7 +451,8 @@ onMounted(() => {
                 </div>
             </template>
             <div class="px-4 py-4 sm:px-5">
-                <div v-if="Object.values(container).length !== 0" class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-8">
+                <div v-if="Object.values(container).length !== 0"
+                     class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-8">
                     <InfoDisplay :value="container?.note" label="Name / Note"/>
 
                     <InfoDisplay :value="container?.reference" label="Ref"/>
@@ -427,12 +480,12 @@ onMounted(() => {
 
                 <div v-if="Object.values(container).length === 0" class="w-full flex justify-center">
                     <img :src="NotFound" alt="image"
-                         class="w-1/4 mt-10" />
+                         class="w-1/4 mt-10"/>
                 </div>
             </div>
         </AccordionPanel>
 
-        <PostSkeleton v-if="isLoadingUnloadingIssues" />
+        <PostSkeleton v-if="isLoadingUnloadingIssues"/>
 
         <AccordionPanel v-else show-panel title="Complaint Details">
             <template #header-image>
@@ -552,12 +605,12 @@ onMounted(() => {
 
                 <div v-else class="w-full flex justify-center">
                     <img :src="NotFound" alt="image"
-                         class="w-1/4 mt-10" />
+                         class="w-1/4 mt-10"/>
                 </div>
             </div>
         </AccordionPanel>
 
-        <PostSkeleton v-if="isLoadingLogs" />
+        <PostSkeleton v-if="isLoadingLogs"/>
 
         <AccordionPanel v-else show-panel title="Audit Details" v-if="props.showAuditDetails">
             <template #header-image>
@@ -610,21 +663,104 @@ onMounted(() => {
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="activity in logs" class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                        <tr v-for="activity in logs"
+                            class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                             <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
-                                {{activity.description}}
+                                {{ activity.description }}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                {{moment(activity.created_at).format('YYYY-MM-DD H:mm:ss')}}
+                                {{ moment(activity.created_at).format('YYYY-MM-DD H:mm:ss') }}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                {{hbl.branch_name}}
+                                {{ hbl.branch_name }}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                {{activity.causer?.name}}
+                                {{ activity.causer?.name }}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <AuditDetails :properties="activity.properties?.attributes" />
+                                <AuditDetails :properties="activity.properties?.attributes"/>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </AccordionPanel>
+
+        <PostSkeleton v-if="isLoadingCallFlags"/>
+
+        <AccordionPanel v-else v-if="props.showCallFlags" show-panel title="Call Flags">
+            <template #header-image>
+                <div
+                    class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
+                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-phone-spark" fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                        <path
+                            d="M11.584 19.225a16 16 0 0 1 -8.584 -13.225a2 2 0 0 1 2 -2h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l.65 .26"/>
+                        <path
+                            d="M19 22.5a4.75 4.75 0 0 1 3.5 -3.5a4.75 4.75 0 0 1 -3.5 -3.5a4.75 4.75 0 0 1 -3.5 3.5a4.75 4.75 0 0 1 3.5 3.5"/>
+                    </svg>
+                </div>
+            </template>
+            <div class="px-4 py-4 sm:px-5">
+                <div v-if="callFlags.length > 0" class="is-scrollbar-hidden min-w-full overflow-x-auto">
+                    <table class="is-hoverable w-full text-left">
+                        <thead>
+                        <tr>
+                            <th
+                                class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Caller Name
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Date
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Notes
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Followup Date
+                            </th>
+                            <th
+                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Created At
+                            </th>
+                            <th
+                                class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            >
+                                Auth
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="flag in callFlags"
+                            class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                            <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
+                                {{ flag.caller }}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                {{ flag.date }}
+                            </td>
+                            <td class="px-4 py-3 sm:px-5">
+                                {{ flag.notes }}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                {{ flag.followup_date }}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                {{ moment(flag.created_at).format('YYYY-MM-DD H:mm:ss') }}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                {{ flag.causer?.name }}
                             </td>
                         </tr>
                         </tbody>

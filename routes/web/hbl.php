@@ -69,3 +69,5 @@ Route::post('hbls/calculate-payment', [HBLController::class, 'calculatePayment']
 
 Route::post('hbls/create-call-flag/{hbl}', [HBLController::class, 'createCallFlag'])
     ->name('hbls.create-call-flag');
+
+Route::get('/get-call-flags/{hbl}', [HBLController::class, 'getHBLCallFlags']);

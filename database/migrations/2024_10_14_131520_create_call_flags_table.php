@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('date');
             $table->text('notes')->nullable();
             $table->date('followup_date')->nullable();
+            $table->unsignedBigInteger('created_by');
             $table->timestamps();
             $table->softDeletes();
         });

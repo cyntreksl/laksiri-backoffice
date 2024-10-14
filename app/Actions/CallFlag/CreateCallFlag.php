@@ -11,6 +11,8 @@ class CreateCallFlag
 
     public function handle(HBL $hbl, array $data)
     {
+        $data['created_by'] = auth()->id();
+
         $hbl->callFlags()->create($data);
     }
 }
