@@ -191,4 +191,9 @@ class HBL extends Model
     {
         return $this->hasMany(Token::class, 'reference', 'reference')->latest();
     }
+
+    public function callFlags(): HasMany
+    {
+        return $this->hasMany(CallFlag::class, 'hbl_id');
+    }
 }
