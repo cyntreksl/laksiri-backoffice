@@ -35,8 +35,6 @@ class UpdateHBL
             'grand_total' => $data['grand_total'],
             'created_by' => auth()->id(),
             'pickup_id' => $data['pickup_id'] ?? null,
-            'hbl_number' => $data['hbl_number'],
-            'cr_number' => $data['cr_number'],
         ]);
 
         if (! empty($data['paid_amount'])) {
