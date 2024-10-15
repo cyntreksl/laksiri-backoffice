@@ -17,6 +17,7 @@ use App\Interfaces\DashboardRepositoryInterface;
 use App\Interfaces\DriverAreasRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\ExceptionNameRepositoryInterface;
+use App\Interfaces\FileManagerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
@@ -43,6 +44,7 @@ use App\Repositories\DashboardRepository;
 use App\Repositories\DriverAreasRepository;
 use App\Repositories\DriverRepository;
 use App\Repositories\ExceptionNameRepository;
+use App\Repositories\FileManagerRepository;
 use App\Repositories\HBLRepository;
 use App\Repositories\LoadedContainerRepository;
 use App\Repositories\PickupExceptionRepository;
@@ -80,6 +82,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
         $this->app->bind(ExceptionNameRepositoryInterface::class, ExceptionNameRepository::class);
         $this->app->bind(CustomerRepositoryInterface::class, CustomerRepository::class);
+        $this->app->bind(FileManagerRepositoryInterface::class, FileManagerRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);
