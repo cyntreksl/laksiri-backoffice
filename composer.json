@@ -21,6 +21,7 @@
         "propaganistas/laravel-phone": "^5.3",
         "robertboes/inertia-breadcrumbs": "^0.6.0",
         "spatie/laravel-activitylog": "^4.8",
+        "spatie/laravel-medialibrary": "^11.9",
         "spatie/laravel-permission": "^6.4",
         "tightenco/ziggy": "^2.0"
     },
