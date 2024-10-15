@@ -39,6 +39,8 @@ const props = defineProps({
     },
 });
 
+const errors = ref([]);
+
 const form = useForm({
     hbl_name: props.hbl.hbl_name,
     email: props.hbl.email,
@@ -69,7 +71,10 @@ const handleHBLUpdate = () => {
             push.success("HBL Updated Successfully!");
             router.visit(route("hbls.index"));
         },
-        onError: () => console.log("error"),
+        onError: () => {
+            console.log("error");
+            errors.value = usePage().props.errors
+        },
         onFinish: () => console.log("finish"),
         preserveScroll: true,
         preserveState: true,
@@ -864,11 +869,14 @@ const openEditModal = (index) => {
 
         <div class="card col-span-5 px-4 py-4 sm:px-5 mb-10">
             <div class="flex justify-between items-center">
-                <h2
-                    class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                >
-                    Package Details
-                </h2>
+                <div>
+                    <h2
+                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                    >
+                        Package Details
+                    </h2>
+                    <InputError :message="errors.packages" />
+                </div>
                 <PrimaryOutlineButton type="button" @click="showPackageDialog">
                     New Package <i class="fas fa-plus fa-fw fa-fw"></i>
                 </PrimaryOutlineButton>

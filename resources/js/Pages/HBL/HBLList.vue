@@ -1,7 +1,7 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
-import { Link, router, usePage } from "@inertiajs/vue3";
-import { Grid, h, html } from "gridjs";
+import {computed, onMounted, reactive, ref} from "vue";
+import {Link, router, usePage} from "@inertiajs/vue3";
+import {Grid, h, html} from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -16,22 +16,26 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
-import { push } from "notivue";
+import {push} from "notivue";
 import HoldConfirmationModal from "@/Pages/HBL/Partials/HoldConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 
 const props = defineProps({
     users: {
         type: Object,
-        default: () => {},
+        default: () => {
+        },
     },
     hbls: {
         type: Object,
-        default: () => {},
+        default: () => {
+        },
     },
     paymentStatus: {
         type: Object,
-        default: () => {},
+        default: () => {
+        },
     },
 });
 
@@ -137,9 +141,9 @@ const initializeGrid = () => {
 };
 
 const createColumns = () => [
-    { name: "ID", hidden: !data.columnVisibility.id },
-    { name: "Reference", hidden: !data.columnVisibility.reference },
-    { name: "HBL", hidden: !data.columnVisibility.hbl },
+    {name: "ID", hidden: !data.columnVisibility.id},
+    {name: "Reference", hidden: !data.columnVisibility.reference},
+    {name: "HBL", hidden: !data.columnVisibility.hbl},
     {
         name: "HBL Name",
         hidden: !data.columnVisibility.hbl_name,
@@ -160,7 +164,7 @@ const createColumns = () => [
             );
         },
     },
-    { name: "Consignee Name", hidden: !data.columnVisibility.consignee_name },
+    {name: "Consignee Name", hidden: !data.columnVisibility.consignee_name},
     {
         name: "Consignee Address",
         hidden: !data.columnVisibility.consignee_address,
@@ -171,8 +175,8 @@ const createColumns = () => [
         hidden: !data.columnVisibility.consignee_contact,
         sort: false,
     },
-    { name: "Email", hidden: !data.columnVisibility.email, sort: false },
-    { name: "Address", hidden: !data.columnVisibility.address, sort: false },
+    {name: "Email", hidden: !data.columnVisibility.email, sort: false},
+    {name: "Address", hidden: !data.columnVisibility.address, sort: false},
     {
         name: "Contact",
         hidden: !data.columnVisibility.contact_number,
@@ -192,78 +196,78 @@ const createColumns = () => [
         formatter: (_, row) =>
             row.cells[10].data == "Sea Cargo"
                 ? h(
-                      "span",
-                      { className: "flex" },
-                      h(
-                          "svg",
-                          {
-                              xmlns: "http://www.w3.org/2000/svg",
-                              viewBox: "0 0 24 24",
-                              class: "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
-                              fill: "none",
-                              height: 24,
-                              width: 24,
-                              stroke: "currentColor",
-                              strokeLinecap: "round",
-                              strokeLinejoin: "round",
-                              strokeWidth: 2,
-                          },
-                          [
-                              h("path", {
-                                  stroke: "none",
-                                  d: "M0 0h24v24H0z",
-                                  fill: "none",
-                              }),
-                              h("path", {
-                                  d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
-                              }),
-                              h("path", {
-                                  d: "M4 18l-1 -5h18l-2 4",
-                              }),
-                              h("path", {
-                                  d: "M5 13v-6h8l4 6",
-                              }),
-                              h("path", {
-                                  d: "M7 7v-4h-1",
-                              }),
-                          ]
-                      ),
-                      row.cells[10].data
-                  )
+                    "span",
+                    {className: "flex"},
+                    h(
+                        "svg",
+                        {
+                            xmlns: "http://www.w3.org/2000/svg",
+                            viewBox: "0 0 24 24",
+                            class: "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
+                            fill: "none",
+                            height: 24,
+                            width: 24,
+                            stroke: "currentColor",
+                            strokeLinecap: "round",
+                            strokeLinejoin: "round",
+                            strokeWidth: 2,
+                        },
+                        [
+                            h("path", {
+                                stroke: "none",
+                                d: "M0 0h24v24H0z",
+                                fill: "none",
+                            }),
+                            h("path", {
+                                d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
+                            }),
+                            h("path", {
+                                d: "M4 18l-1 -5h18l-2 4",
+                            }),
+                            h("path", {
+                                d: "M5 13v-6h8l4 6",
+                            }),
+                            h("path", {
+                                d: "M7 7v-4h-1",
+                            }),
+                        ]
+                    ),
+                    row.cells[10].data
+                )
                 : row.cells[10].data == "Air Cargo"
-                ? h("span", { className: "flex space-x-2" }, [
-                      h(
-                          "svg",
-                          {
-                              xmlns: "http://www.w3.org/2000/svg",
-                              viewBox: "0 0 24 24",
-                              class: "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
-                              fill: "none",
-                              height: 24,
-                              width: 24,
-                              stroke: "currentColor",
-                              strokeLinecap: "round",
-                              strokeLinejoin: "round",
-                              strokeWidth: 2,
-                          },
-                          [
-                              h("path", {
-                                  stroke: "none",
-                                  d: "M0 0h24v24H0z",
-                                  fill: "none",
-                              }),
-                              h("path", {
-                                  d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
-                              }),
-                          ]
-                      ),
-                      row.cells[10].data,
-                  ])
-                : row.cells[10].data,
+                    ? h("span", {className: "flex space-x-2"}, [
+                        h(
+                            "svg",
+                            {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                viewBox: "0 0 24 24",
+                                class: "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
+                                fill: "none",
+                                height: 24,
+                                width: 24,
+                                stroke: "currentColor",
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                                strokeWidth: 2,
+                            },
+                            [
+                                h("path", {
+                                    stroke: "none",
+                                    d: "M0 0h24v24H0z",
+                                    fill: "none",
+                                }),
+                                h("path", {
+                                    d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
+                                }),
+                            ]
+                        ),
+                        row.cells[10].data,
+                    ])
+                    : row.cells[10].data,
     },
-    { name: "HBL Type", hidden: !data.columnVisibility.hbl_type },
-    { name: "Warehouse", hidden: !data.columnVisibility.warehouse },
-    { name: "Status", hidden: !data.columnVisibility.status },
+    {name: "HBL Type", hidden: !data.columnVisibility.hbl_type},
+    {name: "Warehouse", hidden: !data.columnVisibility.warehouse},
+    {name: "Status", hidden: !data.columnVisibility.status},
     {
         name: "Is Hold",
         hidden: !data.columnVisibility.is_hold,
@@ -281,354 +285,395 @@ const createColumns = () => [
         sort: false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
-            return h("div", { className: "flex space-x-2" }, [
+            return h("div", {className: "flex space-x-2"}, [
                 usePage().props.user.permissions.includes("hbls.edit")
                     ? h(
-                          "button",
-                          {
-                              className:
-                                  "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
-                              onClick: () =>
-                                  router.visit(
-                                      route("hbls.edit", row.cells[0].data)
-                                  ),
-                              "x-tooltip..placement.bottom.primary":
-                                  "'Edit HBL'",
-                          },
-                          [
-                              h(
-                                  "svg",
-                                  {
-                                      xmlns: "http://www.w3.org/2000/svg",
-                                      viewBox: "0 0 24 24",
-                                      class: "icon icon-tabler icons-tabler-outline icon-tabler-edit",
-                                      fill: "none",
-                                      height: 24,
-                                      width: 24,
-                                      stroke: "currentColor",
-                                      strokeLinecap: "round",
-                                      strokeLinejoin: "round",
-                                  },
-                                  [
-                                      h("path", {
-                                          d: "M0 0h24v24H0z",
-                                          fill: "none",
-                                          stroke: "none",
-                                      }),
-                                      h("path", {
-                                          d: "M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1",
-                                      }),
-                                      h("path", {
-                                          d: "M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z",
-                                      }),
-                                      h("path", {
-                                          d: "M16 5l3 3",
-                                      }),
-                                  ]
-                              ),
-                          ]
-                      )
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25 mr-2",
+                            onClick: () => confirmViewCallFlagModal(row.cells),
+                            "x-tooltip..placement.bottom.primary":
+                                "'Call Flag'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-phone-spark",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M11.584 19.225a16 16 0 0 1 -8.584 -13.225a2 2 0 0 1 2 -2h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l.65 .26",
+                                    }),
+                                    h("path", {
+                                        d: "M19 22.5a4.75 4.75 0 0 1 3.5 -3.5a4.75 4.75 0 0 1 -3.5 -3.5a4.75 4.75 0 0 1 -3.5 3.5a4.75 4.75 0 0 1 3.5 3.5",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    )
+                    : null,
+                usePage().props.user.permissions.includes("hbls.edit")
+                    ? h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
+                            onClick: () =>
+                                router.visit(
+                                    route("hbls.edit", row.cells[0].data)
+                                ),
+                            "x-tooltip..placement.bottom.primary":
+                                "'Edit HBL'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-edit",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1",
+                                    }),
+                                    h("path", {
+                                        d: "M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z",
+                                    }),
+                                    h("path", {
+                                        d: "M16 5l3 3",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    )
                     : null,
                 usePage().props.user.permissions.includes("hbls.show")
                     ? h(
-                          "a",
-                          {
-                              className:
-                                  "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                              onClick: () => confirmViewHBL(row.cells[0].data),
-                              "x-tooltip..placement.bottom.primary":
-                                  "'View HBL'",
-                          },
-                          [
-                              h(
-                                  "svg",
-                                  {
-                                      xmlns: "http://www.w3.org/2000/svg",
-                                      viewBox: "0 0 24 24",
-                                      class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                      fill: "none",
-                                      height: 24,
-                                      width: 24,
-                                      stroke: "currentColor",
-                                      strokeLinecap: "round",
-                                      strokeLinejoin: "round",
-                                  },
-                                  [
-                                      h("path", {
-                                          d: "M0 0h24v24H0z",
-                                          fill: "none",
-                                          stroke: "none",
-                                      }),
-                                      h("path", {
-                                          d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                      }),
-                                      h("path", {
-                                          d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                      }),
-                                  ]
-                              ),
-                          ]
-                      )
+                        "a",
+                        {
+                            className:
+                                "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
+                            onClick: () => confirmViewHBL(row.cells[0].data),
+                            "x-tooltip..placement.bottom.primary":
+                                "'View HBL'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                                    }),
+                                    h("path", {
+                                        d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    )
                     : null,
                 usePage().props.user.permissions.includes(
                     "hbls.hold and release"
                 )
                     ? h(
-                          "button",
-                          {
-                              className:
-                                  "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                              onClick: () => confirmIsHold(row.cells),
-                              "x-tooltip..placement.bottom.primary": row
-                                  .cells[14].data
-                                  ? "'Release HBL'"
-                                  : "'Hold HBL'",
-                          },
-                          [
-                              row.cells[14].data
-                                  ? h(
-                                        "svg",
-                                        {
-                                            xmlns: "http://www.w3.org/2000/svg",
-                                            viewBox: "0 0 24 24",
-                                            class: "icon icon-tabler icons-tabler-outline icon-tabler-player-play",
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+                            onClick: () => confirmIsHold(row.cells),
+                            "x-tooltip..placement.bottom.primary": row
+                                .cells[14].data
+                                ? "'Release HBL'"
+                                : "'Hold HBL'",
+                        },
+                        [
+                            row.cells[14].data
+                                ? h(
+                                    "svg",
+                                    {
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        viewBox: "0 0 24 24",
+                                        class: "icon icon-tabler icons-tabler-outline icon-tabler-player-play",
+                                        fill: "none",
+                                        height: 24,
+                                        width: 24,
+                                        stroke: "currentColor",
+                                        strokeLinecap: "round",
+                                        strokeLinejoin: "round",
+                                    },
+                                    [
+                                        h("path", {
+                                            d: "M0 0h24v24H0z",
                                             fill: "none",
-                                            height: 24,
-                                            width: 24,
-                                            stroke: "currentColor",
-                                            strokeLinecap: "round",
-                                            strokeLinejoin: "round",
-                                        },
-                                        [
-                                            h("path", {
-                                                d: "M0 0h24v24H0z",
-                                                fill: "none",
-                                                stroke: "none",
-                                            }),
-                                            h("path", {
-                                                d: "M7 4v16l13 -8z",
-                                            }),
-                                        ]
-                                    )
-                                  : h(
-                                        "svg",
-                                        {
-                                            xmlns: "http://www.w3.org/2000/svg",
-                                            viewBox: "0 0 24 24",
-                                            class: "icon icon-tabler icons-tabler-outline icon-tabler-player-pause",
+                                            stroke: "none",
+                                        }),
+                                        h("path", {
+                                            d: "M7 4v16l13 -8z",
+                                        }),
+                                    ]
+                                )
+                                : h(
+                                    "svg",
+                                    {
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        viewBox: "0 0 24 24",
+                                        class: "icon icon-tabler icons-tabler-outline icon-tabler-player-pause",
+                                        fill: "none",
+                                        height: 24,
+                                        width: 24,
+                                        stroke: "currentColor",
+                                        strokeLinecap: "round",
+                                        strokeLinejoin: "round",
+                                    },
+                                    [
+                                        h("path", {
+                                            d: "M0 0h24v24H0z",
                                             fill: "none",
-                                            height: 24,
-                                            width: 24,
-                                            stroke: "currentColor",
-                                            strokeLinecap: "round",
-                                            strokeLinejoin: "round",
-                                        },
-                                        [
-                                            h("path", {
-                                                d: "M0 0h24v24H0z",
-                                                fill: "none",
-                                                stroke: "none",
-                                            }),
-                                            h("path", {
-                                                d: "M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
-                                            }),
-                                            h("path", {
-                                                d: "M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
-                                            }),
-                                        ]
-                                    ),
-                          ]
-                      )
+                                            stroke: "none",
+                                        }),
+                                        h("path", {
+                                            d: "M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
+                                        }),
+                                        h("path", {
+                                            d: "M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
+                                        }),
+                                    ]
+                                ),
+                        ]
+                    )
                     : null,
                 usePage().props.user.permissions.includes("hbls.download pdf")
                     ? h(
-                          "a",
-                          {
-                              className:
-                                  "btn size-8 p-0 text-pink-500 hover:bg-pink-500/20 focus:bg-pink-500/20 active:bg-pink-500/25",
-                              href: route("hbls.download", row.cells[0].data),
-                              "x-tooltip..placement.bottom.primary":
-                                  "'Download HBL'",
-                          },
-                          [
-                              h(
-                                  "svg",
-                                  {
-                                      xmlns: "http://www.w3.org/2000/svg",
-                                      viewBox: "0 0 24 24",
-                                      class: "icon icon-tabler icons-tabler-outline icon-tabler-download",
-                                      fill: "none",
-                                      height: 24,
-                                      width: 24,
-                                      stroke: "currentColor",
-                                      strokeLinecap: "round",
-                                      strokeLinejoin: "round",
-                                  },
-                                  [
-                                      h("path", {
-                                          d: "M0 0h24v24H0z",
-                                          fill: "none",
-                                          stroke: "none",
-                                      }),
-                                      h("path", {
-                                          d: "M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2",
-                                      }),
-                                      h("path", {
-                                          d: "M7 11l5 5l5 -5",
-                                      }),
-                                      h("path", {
-                                          d: "M12 4l0 12",
-                                      }),
-                                  ]
-                              ),
-                          ]
-                      )
+                        "a",
+                        {
+                            className:
+                                "btn size-8 p-0 text-pink-500 hover:bg-pink-500/20 focus:bg-pink-500/20 active:bg-pink-500/25",
+                            href: route("hbls.download", row.cells[0].data),
+                            "x-tooltip..placement.bottom.primary":
+                                "'Download HBL'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-download",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2",
+                                    }),
+                                    h("path", {
+                                        d: "M7 11l5 5l5 -5",
+                                    }),
+                                    h("path", {
+                                        d: "M12 4l0 12",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    )
                     : null,
                 usePage().props.user.permissions.includes("hbls.delete")
                     ? h(
-                          "button",
-                          {
-                              className:
-                                  "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                              onClick: () =>
-                                  confirmDeleteHBL(row.cells[0].data),
-                              "x-tooltip..placement.bottom.error":
-                                  "'Delete HBL'",
-                          },
-                          [
-                              h(
-                                  "svg",
-                                  {
-                                      xmlns: "http://www.w3.org/2000/svg",
-                                      viewBox: "0 0 24 24",
-                                      class: "icon icon-tabler icons-tabler-outline icon-tabler-trash",
-                                      fill: "none",
-                                      height: 24,
-                                      width: 24,
-                                      stroke: "currentColor",
-                                      strokeLinecap: "round",
-                                      strokeLinejoin: "round",
-                                  },
-                                  [
-                                      h("path", {
-                                          d: "M0 0h24v24H0z",
-                                          fill: "none",
-                                          stroke: "none",
-                                      }),
-                                      h("path", {
-                                          d: "M4 7l16 0",
-                                      }),
-                                      h("path", {
-                                          d: "M10 11l0 6",
-                                      }),
-                                      h("path", {
-                                          d: "M14 11l0 6",
-                                      }),
-                                      h("path", {
-                                          d: "M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12",
-                                      }),
-                                      h("path", {
-                                          d: "M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3",
-                                      }),
-                                  ]
-                              ),
-                          ]
-                      )
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
+                            onClick: () =>
+                                confirmDeleteHBL(row.cells[0].data),
+                            "x-tooltip..placement.bottom.error":
+                                "'Delete HBL'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-trash",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M4 7l16 0",
+                                    }),
+                                    h("path", {
+                                        d: "M10 11l0 6",
+                                    }),
+                                    h("path", {
+                                        d: "M14 11l0 6",
+                                    }),
+                                    h("path", {
+                                        d: "M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12",
+                                    }),
+                                    h("path", {
+                                        d: "M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    )
                     : null,
                 usePage().props.user.permissions.includes(
                     "hbls.download invoice"
                 )
                     ? h(
-                          "a",
-                          {
-                              className:
-                                  "btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25",
-                              href: route(
-                                  "hbls.download.invoice",
-                                  row.cells[0].data
-                              ),
-                              "x-tooltip..placement.bottom.primary":
-                                  "'Invoice'",
-                          },
-                          [
-                              h(
-                                  "svg",
-                                  {
-                                      xmlns: "http://www.w3.org/2000/svg",
-                                      viewBox: "0 0 24 24",
-                                      class: "size-5",
-                                      fill: "none",
-                                      height: 24,
-                                      width: 24,
-                                      stroke: "currentColor",
-                                      "stroke-width": 2,
-                                      strokeLinecap: "round",
-                                      strokeLinejoin: "round",
-                                  },
-                                  [
-                                      h("path", {
-                                          d: "M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z",
-                                      }),
-                                  ]
-                              ),
-                          ]
-                      )
+                        "a",
+                        {
+                            className:
+                                "btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25",
+                            href: route(
+                                "hbls.download.invoice",
+                                row.cells[0].data
+                            ),
+                            "x-tooltip..placement.bottom.primary":
+                                "'Invoice'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "size-5",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    "stroke-width": 2,
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    )
                     : null,
                 usePage().props.user.permissions.includes(
                     "hbls.download barcode"
                 )
                     ? h(
-                          "a",
-                          {
-                              className:
-                                  "btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25",
-                              href: route(
-                                  "hbls.download.barcode",
-                                  row.cells[0].data
-                              ),
-                              "x-tooltip..placement.bottom.primary":
-                                  "'Download Barcode'",
-                          },
-                          [
-                              h(
-                                  "svg",
-                                  {
-                                      xmlns: "http://www.w3.org/2000/svg",
-                                      viewBox: "0 0 24 24",
-                                      class: "icon icon-tabler icons-tabler-outline icon-tabler-file-barcode",
-                                      fill: "none",
-                                      height: 24,
-                                      width: 24,
-                                      stroke: "currentColor",
-                                      strokeLinecap: "round",
-                                      strokeLinejoin: "round",
-                                      strokeWidth: 2,
-                                  },
-                                  [
-                                      h("path", {
-                                          d: "M0 0h24v24H0z",
-                                          fill: "none",
-                                          stroke: "none",
-                                      }),
-                                      h("path", {
-                                          d: "M14 3v4a1 1 0 0 0 1 1h4",
-                                      }),
-                                      h("path", {
-                                          d: "M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z",
-                                      }),
-                                      h("path", {
-                                          d: "M8 13h1v3h-1z",
-                                      }),
-                                      h("path", {
-                                          d: "M12 13v3",
-                                      }),
-                                      h("path", {
-                                          d: "M15 13h1v3h-1z",
-                                      }),
-                                  ]
-                              ),
-                          ]
-                      )
+                        "a",
+                        {
+                            className:
+                                "btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25",
+                            href: route(
+                                "hbls.download.barcode",
+                                row.cells[0].data
+                            ),
+                            "x-tooltip..placement.bottom.primary":
+                                "'Download Barcode'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-file-barcode",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                    strokeWidth: 2,
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M14 3v4a1 1 0 0 0 1 1h4",
+                                    }),
+                                    h("path", {
+                                        d: "M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z",
+                                    }),
+                                    h("path", {
+                                        d: "M8 13h1v3h-1z",
+                                    }),
+                                    h("path", {
+                                        d: "M12 13v3",
+                                    }),
+                                    h("path", {
+                                        d: "M15 13h1v3h-1z",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    )
                     : null,
             ]);
         },
@@ -698,7 +743,7 @@ const handleDeleteHBL = () => {
         onSuccess: () => {
             closeModal();
             push.success("HBL record Deleted Successfully!");
-            router.visit(route("hbls.index"), { only: ["hbls"] });
+            router.visit(route("hbls.index"), {only: ["hbls"]});
         },
         onError: () => {
             closeModal();
@@ -795,6 +840,21 @@ const handlePerPageChange = (event) => {
     grid.forceRender();
 };
 
+const showConfirmViewCallFlagModal = ref(false);
+const hblName = ref("");
+
+const confirmViewCallFlagModal = async (row) => {
+    hblId.value = row[0].data;
+    hblName.value = row[3].data;
+    showConfirmViewCallFlagModal.value = true;
+};
+
+const closeCallFlagModal = () => {
+    showConfirmViewCallFlagModal.value = false;
+    hblId.value = null;
+    hblName.value = "";
+};
+
 const planeIcon = ref(`
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -839,7 +899,7 @@ const shipIcon = ref(`
     <AppLayout title="HBL List">
         <template #header>HBL List</template>
 
-        <Breadcrumb />
+        <Breadcrumb/>
         <div class="flex justify-end mt-5">
             <Link
                 v-if="$page.props.user.permissions.includes('hbls.create')"
@@ -963,7 +1023,7 @@ const shipIcon = ref(`
                                     "
                                 />
                                 <span class="hover:cursor-pointer"
-                                    >Reference</span
+                                >Reference</span
                                 >
                             </label>
 
@@ -988,7 +1048,7 @@ const shipIcon = ref(`
                                     "
                                 />
                                 <span class="hover:cursor-pointer"
-                                    >HBL Name</span
+                                >HBL Name</span
                                 >
                             </label>
 
@@ -1005,7 +1065,7 @@ const shipIcon = ref(`
                                     "
                                 />
                                 <span class="hover:cursor-pointer"
-                                    >Consignee Name</span
+                                >Consignee Name</span
                                 >
                             </label>
 
@@ -1022,7 +1082,7 @@ const shipIcon = ref(`
                                     "
                                 />
                                 <span class="hover:cursor-pointer"
-                                    >Consignee Address</span
+                                >Consignee Address</span
                                 >
                             </label>
 
@@ -1039,7 +1099,7 @@ const shipIcon = ref(`
                                     "
                                 />
                                 <span class="hover:cursor-pointer"
-                                    >Consignee Contact</span
+                                >Consignee Contact</span
                                 >
                             </label>
 
@@ -1064,7 +1124,7 @@ const shipIcon = ref(`
                                     "
                                 />
                                 <span class="hover:cursor-pointer"
-                                    >Address</span
+                                >Address</span
                                 >
                             </label>
 
@@ -1081,7 +1141,7 @@ const shipIcon = ref(`
                                     "
                                 />
                                 <span class="hover:cursor-pointer"
-                                    >Contact</span
+                                >Contact</span
                                 >
                             </label>
 
@@ -1096,7 +1156,7 @@ const shipIcon = ref(`
                                     "
                                 />
                                 <span class="hover:cursor-pointer"
-                                    >Cargo Mode</span
+                                >Cargo Mode</span
                                 >
                             </label>
 
@@ -1111,7 +1171,7 @@ const shipIcon = ref(`
                                     "
                                 />
                                 <span class="hover:cursor-pointer"
-                                    >HBL Type</span
+                                >HBL Type</span
                                 >
                             </label>
 
@@ -1126,7 +1186,7 @@ const shipIcon = ref(`
                                     "
                                 />
                                 <span class="hover:cursor-pointer"
-                                    >Warehouse</span
+                                >Warehouse</span
                                 >
                             </label>
 
@@ -1185,7 +1245,7 @@ const shipIcon = ref(`
                     </SoftPrimaryButton>
                 </div>
                 <div>
-                    <InputLabel value="From" />
+                    <InputLabel value="From"/>
                     <DatePicker
                         v-model="filters.fromDate"
                         placeholder="Choose date..."
@@ -1193,16 +1253,16 @@ const shipIcon = ref(`
                 </div>
 
                 <div>
-                    <InputLabel value="To" />
+                    <InputLabel value="To"/>
                     <DatePicker
                         v-model="filters.toDate"
                         placeholder="Choose date..."
                     />
                 </div>
 
-                <FilterBorder />
+                <FilterBorder/>
 
-                <FilterHeader value="Cargo Mode" />
+                <FilterHeader value="Cargo Mode"/>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch
@@ -1222,12 +1282,12 @@ const shipIcon = ref(`
                     <div v-html="shipIcon"></div>
                 </label>
 
-                <FilterBorder />
+                <FilterBorder/>
 
-                <FilterHeader value="HBL Type" />
+                <FilterHeader value="HBL Type"/>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.hblType" label="UPB" value="UPB" />
+                    <Switch v-model="filters.hblType" label="UPB" value="UPB"/>
                 </label>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
@@ -1246,9 +1306,9 @@ const shipIcon = ref(`
                     />
                 </label>
 
-                <FilterBorder />
+                <FilterBorder/>
 
-                <FilterHeader value="Payment Status" />
+                <FilterHeader value="Payment Status"/>
 
                 <label
                     v-for="item in paymentStatus"
@@ -1262,9 +1322,9 @@ const shipIcon = ref(`
                     />
                 </label>
 
-                <FilterBorder />
+                <FilterBorder/>
 
-                <FilterHeader value="Is Hold" />
+                <FilterHeader value="Is Hold"/>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch
@@ -1274,9 +1334,9 @@ const shipIcon = ref(`
                     />
                 </label>
 
-                <FilterBorder />
+                <FilterBorder/>
 
-                <FilterHeader value="Warehouse" />
+                <FilterHeader value="Warehouse"/>
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch
@@ -1294,9 +1354,9 @@ const shipIcon = ref(`
                     />
                 </label>
 
-                <FilterBorder />
+                <FilterBorder/>
 
-                <FilterHeader value="Created By" />
+                <FilterHeader value="Created By"/>
 
                 <select
                     v-model="filters.createdBy"
@@ -1336,5 +1396,11 @@ const shipIcon = ref(`
             @close="closeHoldModal"
             @toggle-hold="toggleHold"
         />
+
+        <CallFlagModal
+            :caller-name="hblName"
+            :hbl-id="hblId"
+            :show="showConfirmViewCallFlagModal"
+            @close="closeCallFlagModal"/>
     </AppLayout>
 </template>

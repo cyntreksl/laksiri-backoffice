@@ -7,6 +7,7 @@ use App\Enum\CargoType;
 use App\Enum\HBLPaymentStatus;
 use App\Enum\HBLType;
 use App\Enum\WarehouseType;
+use App\Http\Requests\StoreCallFlagRequest;
 use App\Http\Requests\StoreHBLRequest;
 use App\Http\Requests\UpdateHBLRequest;
 use App\Interfaces\HBLRepositoryInterface;
@@ -292,5 +293,15 @@ class HBLController extends Controller
         $search = $request->input('search', null);
 
         return $this->HBLRepository->getDraftList($limit, $page, $order, $dir, $search);
+    }
+
+    public function createCallFlag(StoreCallFlagRequest $request, HBL $hbl)
+    {
+        return $this->HBLRepository->createCallFlag($hbl, $request->all());
+    }
+
+    public function getHBLCallFlags(HBL $hbl)
+    {
+        return response()->json($hbl->callFlags()->with('causer')->get());
     }
 }
