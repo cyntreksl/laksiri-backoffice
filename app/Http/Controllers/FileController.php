@@ -14,7 +14,7 @@ class FileController extends Controller
 
     public function index()
     {
-        return Inertia::render('FileManager/Layout', [
+        return Inertia::render('FileManager/Index', [
             'files' => $this->fileManagerRepository->getAllFilesWithProperties(),
         ]);
     }
