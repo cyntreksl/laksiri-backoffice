@@ -329,6 +329,22 @@
 
                     <!-- Bottom Links -->
                     <div class="flex flex-col items-center space-y-3 py-3">
+                        <Link
+                            :class="[
+                activeMenu === 'driver' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                            :href="route('file-manager.index')"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                            x-tooltip.placement.right="'File Manager'"
+                        >
+                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-brand-onedrive size-7" fill="none" stroke="currentColor"
+                                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                <path
+                                    d="M18.456 10.45a6.45 6.45 0 0 0 -12 -2.151a4.857 4.857 0 0 0 -4.44 5.241a4.856 4.856 0 0 0 5.236 4.444h10.751a3.771 3.771 0 0 0 3.99 -3.54a3.772 3.772 0 0 0 -3.538 -3.992z"/>
+                            </svg>
+                        </Link>
                         <!-- Settings -->
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
                             <a
@@ -712,7 +728,7 @@
                                                 {{ $page.props.auth.user.email }}
                                             </p>
                                             <p class="text-xs text-slate-400 dark:text-navy-300">
-                                                {{$page.props.auth.user.active_branch_name}}
+                                                {{ $page.props.auth.user.active_branch_name }}
                                             </p>
                                         </div>
                                     </div>
