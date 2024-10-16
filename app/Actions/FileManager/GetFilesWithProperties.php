@@ -11,7 +11,7 @@ class GetFilesWithProperties
 
     public function handle()
     {
-        return LaksiriFile::all()->map(function ($file) {
+        return LaksiriFile::orderBy('id', 'desc')->get()->map(function ($file) {
             return [
                 'id' => $file->id,
                 'name' => $file->getFirstMedia()->name,

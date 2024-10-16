@@ -23,4 +23,14 @@ class FileController extends Controller
     {
         $this->fileManagerRepository->uploadFiles($request->all());
     }
+
+    public function download($id)
+    {
+        return $this->fileManagerRepository->downloadSingleFile($id);
+    }
+
+    public function destroy($id)
+    {
+        $this->fileManagerRepository->deleteFile($id);
+    }
 }

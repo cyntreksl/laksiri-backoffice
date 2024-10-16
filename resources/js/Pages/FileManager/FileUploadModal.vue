@@ -2,7 +2,7 @@
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import DialogModal from "@/Components/DialogModal.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
 import {ref} from "vue";
 import InputError from "@/Components/InputError.vue";
@@ -29,7 +29,9 @@ const handleUploadFiles = () => {
 
     form.post(route('file-manager.upload'), {
         onSuccess: () => {
-            console.log('done');
+            push.success('File Uploaded Successfully!');
+            clearFileInput();
+            emit('close');
         },
         onError: () => {
             console.log('wrong')
