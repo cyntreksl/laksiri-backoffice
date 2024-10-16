@@ -1,6 +1,5 @@
 <?php
 
-use App\Enum\HBLType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -13,19 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Step 1: Temporarily convert the `hbl_type` to a string so we can update data
         Schema::table('hbl', function (Blueprint $table) {
             $table->string('hbl_type', 50)->nullable()->change();
         });
 
+        // Step 2: Fix the incorrect data in the column
         DB::table('hbl')
             ->where('hbl_type', 'UBP')
             ->update(['hbl_type' => 'UPB']);
-
-        Schema::table('hbl', function (Blueprint $table) {
-            $table->enum('hbl_type', [HBLType::UPB->value, HBLType::GIFT->value, HBLType::DOOR_TO_DOOR->value])
-                ->nullable()
-                ->change();
-        });
     }
 
     /**
@@ -33,8 +28,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('hbl', function (Blueprint $table) {
-            //
-        });
+        // Step 2: Revert the data back to its original value, if needed
+        DB::table('hbl')
+            ->where('hbl_type', 'UPB')
+            ->update(['hbl_type' => 'UBP']);
     }
 };
