@@ -25,6 +25,7 @@
         "@alpinejs/persist": "^3.13.5",
         "@caneara/iodine": "^8.5.0",
         "@fortawesome/fontawesome-free": "^6.5.1",
+        "@headlessui/vue": "^1.7.23",
         "@popperjs/core": "^2.11.8",
         "alpinejs": "^3.13.5",
         "apexcharts": "^3.51.0",
