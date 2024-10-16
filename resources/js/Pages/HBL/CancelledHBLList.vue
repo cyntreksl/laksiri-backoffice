@@ -903,6 +903,19 @@ const shipIcon = ref(`
             <template #title> Filter HBL</template>
 
             <template #content>
+
+                <div class="flex justify-between space-x-2">
+                    <!--Filter Now Action Button-->
+                    <SoftPrimaryButton class="space-x-2" @click="applyFilters">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Apply Filters</span>
+                    </SoftPrimaryButton>
+                    <!--Reset Filter Action Button-->
+                    <SoftPrimaryButton class="space-x-2" @click="resetFilter">
+                        <i class="fa-solid fa-refresh"></i>
+                        <span>Reset Filters</span>
+                    </SoftPrimaryButton>
+                </div>
                 <div>
                     <InputLabel value="From" />
                     <DatePicker
@@ -1033,16 +1046,7 @@ const shipIcon = ref(`
                     </option>
                 </select>
 
-                <!--Filter Now Action Button-->
-                <SoftPrimaryButton class="space-x-2" @click="applyFilters">
-                    <i class="fa-solid fa-filter"></i>
-                    <span>Apply Filters</span>
-                </SoftPrimaryButton>
 
-                <SoftPrimaryButton class="space-x-2" @click="resetFilter">
-                    <i class="fa-solid fa-refresh"></i>
-                    <span>Reset Filters</span>
-                </SoftPrimaryButton>
             </template>
         </FilterDrawer>
 
