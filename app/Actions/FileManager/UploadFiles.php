@@ -12,7 +12,7 @@ class UploadFiles
 
     public function handle(array $data)
     {
-        foreach ($data as $file) {
+        foreach ($data['files'] as $file) {
             $laksiriFile = new LaksiriFile();
             $laksiriFile->branch_id = GetUserCurrentBranchID::run();
             $laksiriFile->name = $file->getClientOriginalName();
