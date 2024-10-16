@@ -3,8 +3,6 @@
 namespace App\Actions\PackagePrice;
 
 use App\Models\PackagePrice;
-use App\Models\Scopes\BranchScope;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Collection;
 use Lorisleiva\Actions\Concerns\AsAction;
 

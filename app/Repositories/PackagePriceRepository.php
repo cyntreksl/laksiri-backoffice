@@ -11,11 +11,11 @@ use App\Models\PackagePrice;
 
 class PackagePriceRepository implements PackagePriceRepositoryInterface
 {
-
     public function getPackagePriceRules()
     {
         return GetPackagePriceRules::run();
     }
+
     public function createPackagePriceRule(array $data)
     {
         return CreatePackagePrice::run($data);

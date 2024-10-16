@@ -14,9 +14,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class PackagePrice extends Model
 {
     use HasFactory;
-    use SoftDeletes;
-
     use LogsActivity;
+    use SoftDeletes;
 
     protected $table = 'branch_package_prices';
 

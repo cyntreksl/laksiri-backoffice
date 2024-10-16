@@ -27,9 +27,9 @@ class StorePackagePriceRequest extends FormRequest
             'cargo_mode' => ['required'],
             'hbl_type' => ['required'],
             'rule_title' => ['required'],
-            'length' => ['required','numeric','min:0'],
-            'width' => ['required','numeric','min:0'],
-            'height' => ['required','numeric','min:0'],
+            'length' => ['required', 'numeric', 'min:0'],
+            'width' => ['required', 'numeric', 'min:0'],
+            'height' => ['required', 'numeric', 'min:0'],
         ];
     }
 

@@ -17,7 +17,9 @@ class PackagePriceController extends Controller
         private readonly PackagePriceRepositoryInterface $packagePriceRepository,
     ) {
     }
-    public function index(){
+
+    public function index()
+    {
         return Inertia::render('Setting/PackagePricing/PriceList', [
             'packageRules' => $this->packagePriceRepository->getPackagePriceRules(),
         ]);

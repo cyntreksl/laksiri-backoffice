@@ -2,7 +2,6 @@
 
 namespace App\Actions\PackagePrice;
 
-use App\Models\BranchPrice;
 use App\Models\PackagePrice;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -13,6 +12,7 @@ class UpdatePackagePriceRule
     public function handle(PackagePrice $packagePrice, array $data): PackagePrice
     {
         $packagePrice->update($data);
+
         return $packagePrice;
     }
 }

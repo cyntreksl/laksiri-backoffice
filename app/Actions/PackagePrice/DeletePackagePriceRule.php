@@ -15,7 +15,6 @@ class DeletePackagePriceRule
      * This method deletes the specified `PackagePrice` from the database.
      *
      * @param  PackagePrice  $packagePrice  The package price rule to be deleted.
-     * @return void
      */
     public function handle(PackagePrice $packagePrice): void
     {
