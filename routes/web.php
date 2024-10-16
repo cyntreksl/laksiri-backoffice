@@ -38,6 +38,7 @@ Route::middleware([
     require_once __DIR__.'/web/report.php';
     require_once __DIR__.'/web/setting.php';
     require_once __DIR__.'/web/user.php';
+    require_once __DIR__.'/web/file-manager.php';
 
     // call center routes
     Route::name('call-center.')->prefix('call-center')->group(function () {
