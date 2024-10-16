@@ -16,7 +16,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
-const fileInput = ref([]);
+const fileInput = ref(null);
 
 const form = useForm({
     files: []
@@ -24,7 +24,7 @@ const form = useForm({
 
 const handleUploadFiles = () => {
     if (fileInput.value.files.length) {
-        form.files = [...fileInput.value.files]; // Convert FileList to Array
+        form.files = [...fileInput.value.files];
     }
 
     form.post(route('file-manager.upload'), {
@@ -39,7 +39,7 @@ const handleUploadFiles = () => {
 
 const clearFileInput = () => {
     if (fileInput.value) {
-        fileInput.value = [];
+        fileInput.value = null;
     }
 };
 </script>

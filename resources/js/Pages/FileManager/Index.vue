@@ -3,6 +3,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import {ref} from "vue";
 import FileUploadModal from "@/Pages/FileManager/FileUploadModal.vue";
 import FileCard from "@/Pages/FileManager/FileCard.vue";
+import uploadCloud from "../../../images/illustrations/upload-cloud.svg"
 
 const props = defineProps({
     files: {
@@ -81,9 +82,16 @@ const closeFileUploadModal = () => {
 
         <div class="flex flex-col">
             <div
-                class="swiper px-[var(--margin-x)] pt-4 transition-all duration-[.25s]">
+                v-if="Object.keys(files).length > 0"
+                class="px-[var(--margin-x)] pt-4 transition-all duration-[.25s]">
                 <div class="swiper-wrapper space-x-6">
                     <FileCard v-for="file in files" :key="file.id" :file="file"/>
+                </div>
+            </div>
+
+            <div v-else class="flex justify-center py-10">
+                <div class="text-center">
+                    <img :src="uploadCloud" alt="upload-cloud">
                 </div>
             </div>
         </div>
@@ -93,7 +101,7 @@ const closeFileUploadModal = () => {
             <div class="col-span-12">
                 <div class="flex items-center justify-between">
                     <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                        Folders
+                        All Files
                     </h2>
                 </div>
                 <div class="card mt-3">
@@ -162,8 +170,10 @@ const closeFileUploadModal = () => {
                                         class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                                         <svg class="size-5" fill="none" stroke="currentColor"
                                              stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" stroke-linecap="round"
-                                                  stroke-linejoin="round"/>
+                                            <path
+                                                d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"/>
                                         </svg>
                                     </button>
                                 </td>
@@ -206,8 +216,10 @@ const closeFileUploadModal = () => {
                                         class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                                         <svg class="size-5" fill="none" stroke="currentColor"
                                              stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" stroke-linecap="round"
-                                                  stroke-linejoin="round"/>
+                                            <path
+                                                d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"/>
                                         </svg>
                                     </button>
                                 </td>
