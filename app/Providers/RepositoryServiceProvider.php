@@ -28,6 +28,7 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Interfaces\WarehousezoneRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
+use App\Interfaces\PackagePriceRepositoryInterface;
 use App\Repositories\BondedWarehouseRepository;
 use App\Repositories\BranchRepository;
 use App\Repositories\CallCenter\BonedAreaRepository;
@@ -53,6 +54,7 @@ use App\Repositories\UnloadingIssuesRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WareahouseZoneRepository;
 use App\Repositories\WarehouseRepository;
+use App\Repositories\PackagePriceRepository;
 use App\Repositories\ZoneRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -80,6 +82,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
         $this->app->bind(ExceptionNameRepositoryInterface::class, ExceptionNameRepository::class);
         $this->app->bind(CustomerRepositoryInterface::class, CustomerRepository::class);
+        $this->app->bind(PackagePriceRepositoryInterface::class, PackagePriceRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);
