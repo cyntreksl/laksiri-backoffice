@@ -85,7 +85,7 @@ const closeFileUploadModal = () => {
                     </h2>
                 </div>
                 <div class="card my-3">
-                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
+                    <div class="is-scrollbar-hidden min-w-full">
                         <FileList :files="files"/>
                     </div>
                 </div>
