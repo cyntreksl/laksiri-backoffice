@@ -98,6 +98,11 @@ const handleDeletePackagePriceRule = () => {
                         Height
                     </th>
                     <th
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                    >
+                        Package Price
+                    </th>
+                    <th
                         class="whitespace-nowrap rounded-tr-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
                         Action
@@ -131,6 +136,9 @@ const handleDeletePackagePriceRule = () => {
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                         {{ packageRule.height }}
+                    </td>
+                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                        {{ packageRule.per_package_charge }}
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                         <div class="flex space-x-2">

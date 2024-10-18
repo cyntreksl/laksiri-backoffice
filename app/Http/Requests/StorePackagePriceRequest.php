@@ -30,6 +30,10 @@ class StorePackagePriceRequest extends FormRequest
             'length' => ['required', 'numeric', 'min:0'],
             'width' => ['required', 'numeric', 'min:0'],
             'height' => ['required', 'numeric', 'min:0'],
+            'per_package_charge' => ['required', 'numeric'],
+            'bill_price' => ['numeric'],
+            'volume_charges' => ['numeric'],
+            'bill_vat' => ['numeric'],
         ];
     }
 
@@ -48,6 +52,7 @@ class StorePackagePriceRequest extends FormRequest
             'length.required' => 'Length is required.',
             'width.required' => 'Width is required.',
             'height.required' => 'Height is required.',
+            'per_package_charge.required' => 'Package charge is required.',
         ];
     }
 }

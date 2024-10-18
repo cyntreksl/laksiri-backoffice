@@ -36,6 +36,10 @@ const form = useForm({
     length: props.packageRule.length || '',
     width: props.packageRule.width || '',
     height: props.packageRule.height || '',
+    per_package_charge: props.packageRule.per_package_charge || 0,
+    bill_price: props.packageRule.bill_price || 0,
+    volume_charges: props.packageRule.volume_charges || 0,
+    bill_vat: props.packageRule.bill_vat || 0,
 });
 
 const handlePackagePriceRuleUpdate = () => {
@@ -176,6 +180,30 @@ const handlePackagePriceRuleUpdate = () => {
                                 <InputLabel value="Package Height"/>
                                 <TextInput v-model="form.height" class="w-full" min="0" placeholder="0.00" type="number"/>
                                 <InputError :message="form.errors.height"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Package Charge"/>
+                                <TextInput v-model="form.per_package_charge" class="w-full" placeholder="0.00" type="number" step="0.01"/>
+                                <InputError :message="form.errors.per_package_charge"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Bill Price"/>
+                                <TextInput v-model="form.bill_price" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <InputError :message="form.errors.bill_price"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Volume Charge"/>
+                                <TextInput v-model="form.volume_charges" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <InputError :message="form.errors.volume_charges"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Bill Vat"/>
+                                <TextInput v-model="form.bill_vat" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <InputError :message="form.errors.bill_vat"/>
                             </div>
 
                         </div>

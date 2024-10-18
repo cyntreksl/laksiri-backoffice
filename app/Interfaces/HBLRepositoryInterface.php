@@ -64,4 +64,6 @@ interface HBLRepositoryInterface
     public function getDraftList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse;
 
     public function createCallFlag(HBL $hbl, array $data);
+
+    public function getHBLPackageRules(array $data);
 }

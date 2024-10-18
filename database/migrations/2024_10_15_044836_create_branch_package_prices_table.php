@@ -21,6 +21,14 @@ return new class extends Migration
             $table->float('length')->nullable();
             $table->float('width')->nullable();
             $table->float('height')->nullable();
+            $table->float('per_package_charge');
+            $table->float('bill_price')
+                ->default(0);
+            $table->float('volume_charges')
+                ->default(0);
+            $table->float('bill_vat')
+                ->comment('must be percentage value')
+                ->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

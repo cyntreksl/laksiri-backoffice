@@ -14,7 +14,6 @@ import Checkbox from "@/Components/Checkbox.vue";
 import {push} from "notivue";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import DialogModal from "@/Components/DialogModal.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
     hblTypes: {
@@ -120,6 +119,7 @@ const form = useForm({
     additional_charge: 0,
     grand_total: 0,
     packages: {},
+    is_active_package: false,
 });
 
 const handleHBLCreate = () => {
@@ -138,7 +138,6 @@ const handleHBLCreate = () => {
 
 const showAddNewPackageDialog = ref(false);
 const editMode = ref(false);
-
 const showPackageDialog = () => {
     showAddNewPackageDialog.value = true;
     if (!editMode.value) {
@@ -157,6 +156,7 @@ const packageItem = reactive({
     volume: 0,
     totalWeight: 0,
     remarks: "",
+    packageRule: 0,
 });
 
 const grandTotalWeight = ref(0);
@@ -169,7 +169,8 @@ const addPackageData = () => {
         packageItem.width <= 0 ||
         packageItem.height <= 0 ||
         packageItem.quantity <= 0 ||
-        packageItem.volume <= 0
+        packageItem.volume <= 0 ||
+        (form.is_active_package && !packageItem.packageRule)
     ) {
         push.error("Please fill all required data");
         return;
@@ -266,14 +267,17 @@ watch(
 
 watch([() => form.cargo_type], ([newCargoType]) => {
     calculatePayment();
+    packageRules();
 });
 
 watch([() => form.hbl_type], ([newHBLType]) => {
     calculatePayment();
+    packageRules();
 });
 
 watch([() => form.warehouse], ([newHBLType]) => {
     calculatePayment();
+    packageRules();
 });
 
 const packageTypes = [
@@ -329,6 +333,12 @@ const priceMode = ref('');
 
 const calculatePayment = async () => {
     try {
+        for (let pkg of packageList.value) {
+            if (pkg.packageRule > 0) {
+                form.is_active_package = true;
+                break;
+            } else form.is_active_package = false;
+        }
         const response = await fetch(`/hbls/calculate-payment`, {
             method: "POST",
             headers: {
@@ -342,7 +352,9 @@ const calculatePayment = async () => {
                 warehouse: form.warehouse,
                 grand_total_volume: grandTotalVolume.value,
                 grand_total_weight: grandTotalWeight.value,
-                package_list_length: packageList.value.length
+                package_list_length: packageList.value.length,
+                package_list: packageList.value,
+                is_active_package: form.is_active_package,
             })
         });
 
@@ -410,6 +422,7 @@ const restModalFields = () => {
     packageItem.volume = 0;
     packageItem.totalWeight = 0;
     packageItem.remarks = "";
+    packageItem.packageRule = 0;
 };
 
 const editIndex = ref(null);
@@ -616,6 +629,48 @@ const shipIcon = ref(`
   <path d="M7 7v-4h-1" />
 </svg>
 `);
+
+const isPackageRule = ref(false);
+const packageRulesData = ref([]);
+const selectedPackage = ref("");
+const updateIsPackageRule = () => {
+    isPackageRule(true);
+};
+
+const packageRules = async() =>{
+    try {
+        const response = await fetch(`/get-hbl-packages`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+                // "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify({
+                cargo_type: form.cargo_type,
+                hbl_type: form.hbl_type,
+                warehouse: form.warehouse,
+            })
+        });
+        const data = await response.json();
+        if (data.packages) {
+            packageRulesData.value = data.packages;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const getSelectedPackage = () => {
+    // Find the selected package from the packages array based on the selected ID
+    const selectedRule = packageRulesData.value.find(pkg => pkg.id === packageItem.packageRule);
+    if(selectedRule){
+        packageItem.length = selectedRule.length;
+        packageItem.width = selectedRule.width;
+        packageItem.height = selectedRule.height;
+    }
+};
 </script>
 
 <template>
@@ -1640,6 +1695,29 @@ const shipIcon = ref(`
 
                     <div class="mt-4 space-y-4">
                         <div class="grid grid-cols-4 gap-4">
+                            <div class="col-span-4">
+                                <label class="block">
+                                    <span>
+                                        Package
+                                        <span v-if="form.is_active_package" class="text-red-500 text-sm">*</span>
+                                    </span>
+                                    <select
+                                        v-model="packageItem.packageRule"
+                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        @change="getSelectedPackage"
+                                        :required="form.is_active_package"
+                                    >
+                                        <option value="0">Choose Package</option>
+                                        <option
+                                            v-for="pkg in packageRulesData"
+                                            :key="pkg.id"
+                                            :value="pkg.id"
+                                        >
+                                            {{ pkg.rule_title + ' ('+pkg.length+'*'+pkg.width+'*'+pkg.height+')'}}
+                                        </option>
+                                    </select>
+                                </label>
+                            </div>
                             <div class="col-span-2">
                                 <label class="block">
                                     <span>Type </span>
@@ -1657,10 +1735,10 @@ const shipIcon = ref(`
                             </div>
                             <div class="col-span-2">
                                 <label class="block">
-                  <span
-                  >Type Description
-                    <span class="text-red-500 text-sm">*</span></span
-                  >
+                                  <span
+                                  >Type Description
+                                    <span class="text-red-500 text-sm">*</span></span
+                                  >
                                     <input
                                         v-model="packageItem.type"
                                         class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
@@ -1672,10 +1750,10 @@ const shipIcon = ref(`
 
                             <div class="col-span-4 md:col-span-1">
                                 <label class="block">
-                  <span
-                  >Length (cm) <br/>
-                    <span class="text-red-500 text-sm">*</span></span
-                  >
+                                  <span
+                                  >Length (cm) <br/>
+                                    <span class="text-red-500 text-sm">*</span></span
+                                  >
                                     <input
                                         v-model="packageItem.length"
                                         class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
@@ -1688,9 +1766,9 @@ const shipIcon = ref(`
                             </div>
                             <div class="col-span-4 md:col-span-1">
                                 <label class="block">
-                  <span
-                  >Width <br/><span class="text-red-500 text-sm">*</span>
-                  </span>
+                                  <span
+                                  >Width <br/><span class="text-red-500 text-sm">*</span>
+                                  </span>
 
                                     <input
                                         v-model="packageItem.width"
