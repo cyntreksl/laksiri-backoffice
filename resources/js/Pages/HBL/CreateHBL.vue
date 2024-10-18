@@ -630,12 +630,9 @@ const shipIcon = ref(`
 </svg>
 `);
 
-const isPackageRule = ref(false);
+const isPackageRuleSelected = ref(false);
 const packageRulesData = ref([]);
 const selectedPackage = ref("");
-const updateIsPackageRule = () => {
-    isPackageRule(true);
-};
 
 const packageRules = async() =>{
     try {
@@ -665,6 +662,7 @@ const packageRules = async() =>{
 const getSelectedPackage = () => {
     // Find the selected package from the packages array based on the selected ID
     const selectedRule = packageRulesData.value.find(pkg => pkg.id === packageItem.packageRule);
+    isPackageRuleSelected.value = true;
     if(selectedRule){
         packageItem.length = selectedRule.length;
         packageItem.width = selectedRule.width;
@@ -1761,6 +1759,7 @@ const getSelectedPackage = () => {
                                         placeholder="1.00"
                                         step="0.01"
                                         type="number"
+                                        :disabled="isPackageRuleSelected"
                                     />
                                 </label>
                             </div>
@@ -1777,6 +1776,7 @@ const getSelectedPackage = () => {
                                         placeholder="1.00"
                                         step="0.01"
                                         type="number"
+                                        :disabled="isPackageRuleSelected"
                                     />
                                 </label>
                             </div>
@@ -1794,6 +1794,7 @@ const getSelectedPackage = () => {
                                         placeholder="1.00"
                                         step="0.01"
                                         type="number"
+                                        :disabled="isPackageRuleSelected"
                                     />
                                 </label>
                             </div>
