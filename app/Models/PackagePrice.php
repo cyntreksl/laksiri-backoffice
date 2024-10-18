@@ -20,7 +20,7 @@ class PackagePrice extends Model
     protected $table = 'branch_package_prices';
 
     protected $fillable = [
-        'branch_id', 'destination_branch_id', 'cargo_mode', 'hbl_type', 'rule_title', 'length', 'width', 'height', 'per_package_charge', 'bill_price', 'bill_vat', 'volume_charges'
+        'branch_id', 'destination_branch_id', 'cargo_mode', 'hbl_type', 'rule_title', 'length', 'width', 'height', 'per_package_charge', 'bill_price', 'bill_vat', 'volume_charges',
     ];
 
     public function getActivitylogOptions(): LogOptions

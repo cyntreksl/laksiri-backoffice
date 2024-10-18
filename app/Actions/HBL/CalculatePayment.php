@@ -28,11 +28,11 @@ class CalculatePayment
         $vat = 0;
         $is_editable = false;
 
-        if($is_active_package){
+        if ($is_active_package) {
             foreach ($package_list as $packageItem) {
                 $package_Price_Rule = GetPackagePriceRule::run($packageItem['packageRule']);
-                $package_charges += ($package_Price_Rule->per_package_charge)*$packageItem['quantity'];
-            };
+                $package_charges += ($package_Price_Rule->per_package_charge) * $packageItem['quantity'];
+            }
             if ($cargo_type === 'Sea Cargo') {
                 $destinationCharges = $package_Price_Rule->volume_charges * $grand_total_volume;
             } else {
@@ -40,6 +40,7 @@ class CalculatePayment
             }
             $otherCharge = $destinationCharges;
             $vat = $package_Price_Rule->bill_vat ? $package_Price_Rule->bill_vat / 100 : 0;
+
             return [
                 'freight_charge' => 0,
                 'bill_charge' => number_format((float) $package_Price_Rule->bill_price, 3, '.', ''),
@@ -56,7 +57,7 @@ class CalculatePayment
                 'grand_total_without_discount' => 0.0,
             ];
 
-        }else{
+        } else {
             $priceRules = GetPriceRulesByCargoModeAndHBLType::run($cargo_type, $hbl_type, $destination_branch);
 
             $groupedPriceRules = $priceRules->groupBy('condition');
@@ -81,13 +82,15 @@ class CalculatePayment
             usort($operations, function ($a, $b) {
                 $numA = (int) filter_var($a, FILTER_SANITIZE_NUMBER_INT);
                 $numB = (int) filter_var($b, FILTER_SANITIZE_NUMBER_INT);
+
                 return $numB <=> $numA;
             });
 
-            $grand_total_quantity = $cargo_type === "Sea Cargo" ? $grand_total_volume : $grand_total_weight;
-            $operations = array_values(array_filter($operations, function($operation) use ($grand_total_quantity) {
+            $grand_total_quantity = $cargo_type === 'Sea Cargo' ? $grand_total_volume : $grand_total_weight;
+            $operations = array_values(array_filter($operations, function ($operation) use ($grand_total_quantity) {
                 // Extract the number part from the operation
                 $number = intval(substr($operation, 1)); // Remove the ">" and convert to int
+
                 return $number < $grand_total_quantity;
             }));
 
@@ -135,7 +138,7 @@ class CalculatePayment
             $otherCharge = $destinationCharges + $packageCharges;
             $grand_total = $freight_charge + $billCharge + $otherCharge + $vat;
 
-            if($grand_total_volume === 0.0 && $grand_total_weight === 0.0) {
+            if ($grand_total_volume === 0.0 && $grand_total_weight === 0.0) {
                 return [
                     'freight_charge' => 0.0,
                     'bill_charge' => 0.0,
