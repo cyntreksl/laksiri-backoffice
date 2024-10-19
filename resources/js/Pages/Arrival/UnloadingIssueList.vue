@@ -395,6 +395,19 @@ const handlePerPageChange = (event) => {
             <template #title> Filter Containers</template>
 
             <template #content>
+
+                <div class="flex justify-between space-x-2">
+                    <!--Filter Now Action Button-->
+                    <SoftPrimaryButton class="space-x-2" @click="applyFilters">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Apply Filters</span>
+                    </SoftPrimaryButton>
+                    <!--Filter Rest Button-->
+                    <SoftPrimaryButton class="space-x-2" @click="resetFilter">
+                        <i class="fa-solid fa-refresh"></i>
+                        <span>Reset Filters</span>
+                    </SoftPrimaryButton>
+                </div>
                 <div>
                     <InputLabel value="From"/>
                     <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
@@ -407,16 +420,7 @@ const handlePerPageChange = (event) => {
 
                 <FilterBorder/>
 
-                <!--Filter Now Action Button-->
-                <SoftPrimaryButton class="space-x-2" @click="applyFilters">
-                    <i class="fa-solid fa-filter"></i>
-                    <span>Apply Filters</span>
-                </SoftPrimaryButton>
-                <!--Filter Rest Button-->
-                <SoftPrimaryButton class="space-x-2" @click="resetFilter">
-                    <i class="fa-solid fa-refresh"></i>
-                    <span>Reset Filters</span>
-                </SoftPrimaryButton>
+
             </template>
         </FilterDrawer>
     </AppLayout>

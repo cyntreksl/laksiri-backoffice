@@ -23,8 +23,6 @@ import ApexCharts from "apexcharts";
 import * as Gridjs from "gridjs";
 import store from "./store";
 import "@caneara/iodine"; // @see https://github.com/caneara/iodine
-import * as FilePond from "filepond"; // @see https://pqina.nl/filepond/
-import FilePondPluginImagePreview from "filepond-plugin-image-preview"; // @see https://pqina.nl/filepond/docs/api/plugins/image-preview/
 import Quill from "quill/dist/quill.min"; // @see https://quilljs.com/
 import flatpickr from "flatpickr"; // @see https://flatpickr.js.org/
 import Tom from "tom-select/dist/js/tom-select.complete.min"; // @see https://tom-select.js.org/
@@ -37,14 +35,12 @@ import tooltip from "./directives/tooltip";
 import inputMask from "./directives/inputMask";
 import notification from "./magics/notification";
 import clipboard from "./magics/clipboard";
-FilePond.registerPlugin(FilePondPluginImagePreview);
 window.dayjs = dayjs;
 window.SimpleBar = SimpleBar;
 window.Swiper = Swiper;
 window.Sortable = Sortable;
 window.ApexCharts = ApexCharts;
 window.Gridjs = Gridjs;
-window.FilePond = FilePond;
 window.flatpickr = flatpickr;
 window.Quill = Quill;
 window.Tom = Tom;
