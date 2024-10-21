@@ -9,6 +9,7 @@ use App\Enum\PackageType;
 use App\Http\Requests\StoreBranchRequest;
 use App\Http\Requests\UpdateBranchRequest;
 use App\Interfaces\BranchRepositoryInterface;
+use App\Interfaces\SettingRepositoryInterface;
 use App\Models\Branch;
 use Inertia\Inertia;
 
@@ -16,6 +17,7 @@ class BranchController extends Controller
 {
     public function __construct(
         private readonly BranchRepositoryInterface $branchRepository,
+        private readonly SettingRepositoryInterface $settingRepository,
     ) {
     }
 
@@ -61,6 +63,7 @@ class BranchController extends Controller
             'packageTypes' => PackageType::cases(),
             'branchTypes' => BranchType::cases(),
             'branch' => $branch,
+            'settings' => $this->settingRepository->getSettings(),
         ]);
     }
 

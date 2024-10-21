@@ -1,9 +1,11 @@
-<div class="header">
-    <h3>LAKSIRI CARGO SERVICE</h3>
-    <h4>BAB AL TAWASUL TRADING EST.</h4>
-    <h6>P.O.Box: 245452 - Riyadh: 11312 - K.S.A.</h6>
-    <h5>Tel. Office: +966 55 304 4684 / 50 926 5586 / 55 611 2199 / 54 076 9814</h5>
-</div>
+@if($settings)
+    <div class="header">
+        <h3>{{$settings->invoice_header_title ?: 'LAKSIRI CARGO SERVICE'}}</h3>
+        <h4>{{$settings->invoice_header_subtitle ?: 'BAB AL TAWASUL TRADING EST.'}}</h4>
+        <h6>{{$settings->invoice_header_address ?: 'P.O.Box: 245452 - Riyadh: 11312 - K.S.A.'}}</h6>
+        <h5>{{$settings->invoice_header_telephone ?: 'Tel. Office: +966 55 304 4684 / 50 926 5586 / 55 611 2199 / 54 076 9814'}}</h5>
+    </div>
+@endif
 
 <style>
     .header {
@@ -13,7 +15,7 @@
         text-align: center;
     }
 
-    .header>h2,
+    .header > h2,
     h3,
     h6,
     h5 {
@@ -24,11 +26,11 @@
         font-family: "Roboto", sans-serif;
     }
 
-    .header>h3 {
+    .header > h3 {
         margin-bottom: -2px;
     }
 
-    .header>h4 {
+    .header > h4 {
         margin-top: -4px;
         margin-bottom: -5px;
     }
