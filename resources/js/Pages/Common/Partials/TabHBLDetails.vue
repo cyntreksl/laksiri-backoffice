@@ -50,9 +50,9 @@ const props = defineProps({
                 <div v-if="hbl" class="grid grid-cols-3 gap-x-4 gap-y-8">
                     <InfoDisplay :value="hbl?.reference" label="Job Ref"/>
 
-                    <InfoDisplay :value="hbl?.hbl" label="HBL"/>
+                    <InfoDisplay :value="hbl?.hbl_number" label="HBL Number"/>
 
-                    <InfoDisplay :value="hbl?.cr" label="CR"/>
+                    <InfoDisplay :value="hbl?.cr_number" label="CR Number"/>
 
                     <InfoDisplay :value="hbl?.hbl_name" label="Name"/>
 
@@ -72,9 +72,9 @@ const props = defineProps({
 
                     <InfoDisplay :value="hbl?.cargo_type" label="Cargo Mode"/>
 
-                    <InfoDisplay :value="hbl?.hbl_number" label="HBL Number"/>
 
-                    <InfoDisplay :value="hbl?.cr_number" label="CR Number"/>
+
+
                 </div>
 
                 <div v-else class="grid grid-cols-3 gap-x-4 gap-y-8">
