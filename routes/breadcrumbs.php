@@ -295,4 +295,27 @@ Breadcrumbs::for('setting.exception-names.edit', function (BreadcrumbTrail $trai
     $trail->push('Edit Exception Name', route('setting.exception-names.edit', $exceptionName));
 });
 
+// Package Pricing
+Breadcrumbs::for('setting.package-prices.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Package Price Rule List', route('setting.package-prices.index'));
+});
+
+// Package Rule > create
+Breadcrumbs::for('setting.package-prices.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Package Price Rule List', route('setting.package-prices.index'));
+    $trail->push('Create Package Rule', route('setting.package-prices.create'));
+});
+
+// Package Rule > Edit
+Breadcrumbs::for('setting.package-prices.edit', function (BreadcrumbTrail $trail, $id) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Package Price Rule List', route('setting.package-prices.index', $id));
+    $trail->push('Edit', route('setting.package-prices.edit', $id));
+});
+
 require_once __DIR__.'/call-center-breadcrumbs.php';

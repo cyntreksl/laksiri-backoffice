@@ -304,4 +304,9 @@ class HBLController extends Controller
     {
         return response()->json($hbl->callFlags()->with('causer')->get());
     }
+
+    public function getHBLPackageRules(Request $request)
+    {
+        return $this->HBLRepository->getHBLPackageRules($request->all());
+    }
 }

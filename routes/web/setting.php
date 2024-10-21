@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DriverAreasController;
 use App\Http\Controllers\ExceptionNameController;
+use App\Http\Controllers\PackagePriceController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\WarehouseZoneController;
 use App\Http\Controllers\ZoneController;
@@ -43,6 +44,8 @@ Route::name('setting.')->group(function () {
 
     //Pricing
     Route::resource('prices', PriceController::class)->except('show');
+
+    Route::resource('package-prices', PackagePriceController::class)->except('show');
 
     Route::resource('exception-names', ExceptionNameController::class);
 });

@@ -1123,6 +1123,10 @@ export default {
                             route: "setting.prices.index",
                         },
                         {
+                            title: "Package Pricing",
+                            route: "setting.package-prices.index",
+                        },
+                        {
                             title: "Exceptions",
                             route: "setting.exception-names.index",
                         }

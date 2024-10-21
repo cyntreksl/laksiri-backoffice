@@ -20,6 +20,7 @@ use App\Interfaces\ExceptionNameRepositoryInterface;
 use App\Interfaces\FileManagerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
+use App\Interfaces\PackagePriceRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
@@ -47,6 +48,7 @@ use App\Repositories\ExceptionNameRepository;
 use App\Repositories\FileManagerRepository;
 use App\Repositories\HBLRepository;
 use App\Repositories\LoadedContainerRepository;
+use App\Repositories\PackagePriceRepository;
 use App\Repositories\PickupExceptionRepository;
 use App\Repositories\PickupRepository;
 use App\Repositories\PriceRepository;
@@ -83,6 +85,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ExceptionNameRepositoryInterface::class, ExceptionNameRepository::class);
         $this->app->bind(CustomerRepositoryInterface::class, CustomerRepository::class);
         $this->app->bind(FileManagerRepositoryInterface::class, FileManagerRepository::class);
+        $this->app->bind(PackagePriceRepositoryInterface::class, PackagePriceRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);
