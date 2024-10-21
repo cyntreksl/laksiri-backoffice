@@ -13,6 +13,7 @@ use App\Actions\HBL\DownloadHBLPDF;
 use App\Actions\HBL\GetHBLByCargoTypeWithDraftLoadedPackages;
 use App\Actions\HBL\GetHBLByCargoTypeWithUnloadedPackages;
 use App\Actions\HBL\GetHBLByReference;
+use App\Actions\HBL\GetHBLPackageRules;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLStatusByReference;
 use App\Actions\HBL\GetHBLsWithPackages;
@@ -298,7 +299,9 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             $data['grand_total_volume'],
             $data['grand_total_weight'],
             $data['package_list_length'],
-            $destination_branch[0]['id']
+            $destination_branch[0]['id'],
+            $data['is_active_package'],
+            $data['package_list'],
         );
 
         return response()->json($result);
@@ -355,6 +358,18 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             CreateCallFlag::run($hbl, $data);
         } catch (\Exception $e) {
             throw new \Exception('Failed to create call flag: '.$e->getMessage());
+        }
+    }
+
+    public function getHBLPackageRules($data): JsonResponse
+    {
+        try {
+            $destination_branch = Branch::where('name', '=', $data['warehouse'])->get();
+            $packages = GetHBLPackageRules::run($data['cargo_type'], $data['hbl_type'], $destination_branch[0]['id']);
+
+            return response()->json(['packages' => $packages]);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to get package rules '.$e->getMessage());
         }
     }
 }
