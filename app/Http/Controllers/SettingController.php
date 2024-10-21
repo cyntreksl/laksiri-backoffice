@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateSettingRequest;
 use App\Interfaces\SettingRepositoryInterface;
-use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
@@ -12,7 +12,7 @@ class SettingController extends Controller
     ) {
     }
 
-    public function updateInvoiceSettings(Request $request)
+    public function updateInvoiceSettings(UpdateSettingRequest $request)
     {
         $this->settingRepository->updateSetting($request->all());
     }

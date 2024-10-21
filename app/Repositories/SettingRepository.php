@@ -10,7 +10,12 @@ class SettingRepository implements SettingRepositoryInterface
 {
     public function updateSetting(array $data)
     {
-        UpdateSetting::run($data);
+        $settings = UpdateSetting::run($data);
+
+        if (isset($data['logo'])) {
+            $settings->updateFile($data['logo'], 'logo', 'settings/invoice/logos/');
+        }
+
     }
 
     public function getSettings()

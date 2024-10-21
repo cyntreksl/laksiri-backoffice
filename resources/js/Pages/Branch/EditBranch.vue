@@ -9,6 +9,8 @@ import TextInput from "@/Components/TextInput.vue";
 import {push} from "notivue";
 import {QuillEditor} from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import {ref} from "vue";
 
 const props = defineProps({
     cargoModes: {
@@ -63,6 +65,9 @@ const handleBranchUpdate = () => {
     });
 }
 
+const photoPreview = ref(null);
+const photoInput = ref(null);
+
 const settingForm = useForm({
     invoice_header_title: props.settings ? props.settings.invoice_header_title : '',
     invoice_header_subtitle: props.settings ? props.settings.invoice_header_subtitle : '',
@@ -70,13 +75,18 @@ const settingForm = useForm({
     invoice_header_telephone: props.settings ? props.settings.invoice_header_telephone : '',
     invoice_footer_title: props.settings ? props.settings.invoice_footer_title : '',
     invoice_footer_text: props.settings ? props.settings.invoice_footer_text : '',
-    logo: '',
+    logo: null,
 });
 
 const handleSettingUpdate = () => {
+    if (photoInput.value) {
+        settingForm.logo = photoInput.value.files[0];
+    }
+
     settingForm.post(route("setting.invoice.update"), {
         onSuccess: () => {
             router.visit(route("branches.edit", props.branch.id));
+            clearPhotoFileInput();
             push.success('Invoice Settings updated successfully!');
         },
         onError: () => {
@@ -86,6 +96,30 @@ const handleSettingUpdate = () => {
         preserveState: true,
     });
 }
+
+const selectNewPhoto = () => {
+    photoInput.value.click();
+};
+
+const updatePhotoPreview = () => {
+    const photo = photoInput.value.files[0];
+
+    if (! photo) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        photoPreview.value = e.target.result;
+    };
+
+    reader.readAsDataURL(photo);
+};
+
+const clearPhotoFileInput = () => {
+    if (photoInput.value?.value) {
+        photoInput.value.value = null;
+    }
+};
 
 </script>
 
@@ -303,6 +337,46 @@ const handleSettingUpdate = () => {
                 <div class="card px-4 py-4 sm:px-5">
                     <div class="grid grid-cols-2">
                         <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
+                            Invoice Logo (Max: 600px x 600px)
+                        </h2>
+                    </div>
+                    <div class="grid sm:grid-cols-4 gap-5 mt-3">
+                        <div class="sm:col-span-4">
+                            <div>
+                                <input
+                                    id="photo"
+                                    ref="photoInput"
+                                    class="hidden"
+                                    type="file"
+                                    @change="updatePhotoPreview"
+                                >
+
+                                <!-- Current Profile Photo -->
+                                <div v-show="! photoPreview" class="mt-2">
+                                    <img :src="settings.logo_url" alt="logo" class="rounded-full h-20 w-20 object-cover">
+                                </div>
+
+                                <!-- New Profile Photo Preview -->
+                                <div v-show="photoPreview" class="mt-2">
+                    <span
+                        :style="'background-image: url(\'' + photoPreview + '\');'"
+                        class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"
+                    />
+                                </div>
+
+                                <SecondaryButton class="mt-2 me-2" type="button" @click.prevent="selectNewPhoto">
+                                    Select A New Logo
+                                </SecondaryButton>
+
+                                <InputError :message="settingForm.errors.logo" class="mt-2" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card px-4 py-4 sm:px-5">
+                    <div class="grid grid-cols-2">
+                        <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
                             Invoice Header
                         </h2>
                     </div>
@@ -361,6 +435,7 @@ const handleSettingUpdate = () => {
                             <label class="block">
                                 <QuillEditor v-model:content="settingForm.invoice_footer_text"
                                              content-type="html" placeholder="Enter Footer Text"/>
+                                <InputError :message="settingForm.errors.invoice_footer_text"/>
                             </label>
                         </div>
                     </div>

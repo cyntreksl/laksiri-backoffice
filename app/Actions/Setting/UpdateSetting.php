@@ -14,6 +14,6 @@ class UpdateSetting
     {
         $data['branch_id'] = GetUserCurrentBranchID::run();
 
-        Setting::updateOrCreate(['branch_id' => $data['branch_id']], $data);
+        return Setting::updateOrCreate(['branch_id' => $data['branch_id']], $data);
     }
 }

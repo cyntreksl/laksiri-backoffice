@@ -71,9 +71,15 @@
                     </td>
                     <td style="vertical-align: top; width: 60%">
                         <div>
-                            <img style="width: 30%; margin-right: -80px; float: left; margin-top: -30px"
-                                src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/app-logo.png'))) }}"
-                                alt="app_logo">
+                            @if($settings->logo)
+                                <img style="width: 25%; margin-right: -15px; float: left; margin-top: -30px"
+                                     src="{{ $logoPath }}"
+                                     alt="app_logo">
+                            @else
+                                <img style="width: 30%; margin-right: -80px; float: left; margin-top: -30px"
+                                     src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/app-logo.png'))) }}"
+                                     alt="app_logo">
+                            @endif
                             <div style="text-align: center; line-height: 1">
                                 <h4 style="text-decoration: underline; margin: 0; padding: 0">DELIVERY AGENT SRI LANKA</h4>
                                 <h4 style="font-weight: bold; margin: 2px 0 0;padding: 0">LAKSIRI SEVA (PVT) LTD</h4>
