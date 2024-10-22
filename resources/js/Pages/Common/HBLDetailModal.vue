@@ -87,14 +87,10 @@ watch(() => props.hblId, (newVal) => {
 });
 
 watch(() => props.pickupId, (newVal) => {
-    if (newVal !== undefined) {
+    if (newVal !== null && newVal !== undefined) {
         fetchPickup();
     }
 });
-
-fetchHBL();
-
-fetchPickup();
 
 // Run after component is mounted
 onMounted(() => {
