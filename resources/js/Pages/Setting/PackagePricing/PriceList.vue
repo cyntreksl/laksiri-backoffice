@@ -181,7 +181,7 @@ const handleDeletePackagePriceRule = () => {
                     v-else
                     class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500 last:border-0 bg-white"
                 >
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5" colspan="8">
+                    <td class="whitespace-nowrap px-4 py-3 sm:px-5" colspan="9">
                         No Price Rules.
                     </td>
                 </tr>
