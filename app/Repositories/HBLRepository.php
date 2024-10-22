@@ -293,18 +293,23 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function calculatePayment(array $data): JsonResponse
     {
         $destination_branch = Branch::where('name', '=', $data['warehouse'])->get();
-        $result = CalculatePayment::run(
-            $data['cargo_type'],
-            $data['hbl_type'],
-            $data['grand_total_volume'],
-            $data['grand_total_weight'],
-            $data['package_list_length'],
-            $destination_branch[0]['id'],
-            $data['is_active_package'],
-            $data['package_list'],
-        );
 
-        return response()->json($result);
+        if ($destination_branch->count() > 0) {
+            $result = CalculatePayment::run(
+                $data['cargo_type'],
+                $data['hbl_type'],
+                $data['grand_total_volume'],
+                $data['grand_total_weight'],
+                $data['package_list_length'],
+                $destination_branch[0]['id'],
+                $data['is_active_package'],
+                $data['package_list'],
+            );
+
+            return response()->json($result);
+        }
+
+        return response()->json([]);
     }
 
     public function getDraftList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
