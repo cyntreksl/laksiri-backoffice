@@ -52,7 +52,9 @@ class HBLRepository implements HBLRepositoryInterface
             $data['grand_total_volume'],
             $data['grand_total_weight'],
             $data['package_list_length'],
-            $data['destination_branch']
+            $data['destination_branch'],
+            $data['is_active_package'],
+            $data['package_list'],
         );
 
         return response()->json($result);
