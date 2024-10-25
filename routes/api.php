@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\v1\DriverController;
 use App\Http\Controllers\Api\v1\ExceptionNameController;
 use App\Http\Controllers\Api\v1\HBLController;
 use App\Http\Controllers\Api\v1\PickupController;
+use App\Http\Controllers\Api\v1\PickupExceptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::domain('api.'.config('app.url'))
@@ -33,6 +34,15 @@ Route::domain('api.'.config('app.url'))
         Route::post('/driver/update', [DriverController::class, 'store']);
 
         Route::put('/driver/location/update/{user}', [DriverController::class, 'createDriverLocation']);
+
+        Route::get('/pickup-exceptions', [PickupExceptionController::class, 'index']);
+
+        Route::get('/pickup-exceptions/list', [PickupExceptionController::class, 'list']);
+
+        Route::get('/pickup-exceptions/export', [PickupExceptionController::class, 'export']);
+
+        Route::post('/pickup-exceptions/{pickup}/retry', [PickupExceptionController::class, 'retry']);
+
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
