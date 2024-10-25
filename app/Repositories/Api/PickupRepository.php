@@ -12,6 +12,7 @@ use App\Http\Resources\PickupExceptionResource;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\Api\PickupRepositoryInterface;
 use App\Models\PickUp;
+use App\Models\PickupException;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 
@@ -112,5 +113,9 @@ class PickupRepository implements PickupRepositoryInterface
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());
         }
+    }
+    public function showPickupException(int $exceptionId): JsonResponse
+    {
+        return PickUpException::findOrFail($exceptionId);
     }
 }

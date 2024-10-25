@@ -6,6 +6,7 @@ use App\Actions\NoteType\GetNoteTypes;
 use App\Actions\PickUps\AssignDriver;
 use App\Actions\PickUps\CreatePickUp;
 use App\Actions\PickUps\DeletePickup;
+use App\Actions\PickUps\Exception\GetPickupExceptionsByDriver;
 use App\Actions\PickUps\GetPickupByIds;
 use App\Actions\PickUps\GetPickups;
 use App\Actions\PickUps\SavePickUpOrder;
@@ -16,6 +17,8 @@ use App\Http\Resources\PickupResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Models\PickUp;
+use App\Models\PickupException;
+
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -136,4 +139,6 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     {
         return Excel::download(new PickupsExport($filters), 'pickups.xlsx');
     }
+
+
 }

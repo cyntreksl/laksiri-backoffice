@@ -28,11 +28,15 @@ Route::domain('api.'.config('app.url'))
 
         Route::get('/pickups/exceptions/list', [PickupController::class, 'getPickupExceptions']);
 
+        Route::get('/pickups/exceptions/{exceptionId}', [PickupController::class, 'showPickupException']);
+
         Route::get('/exception-names', [ExceptionNameController::class, 'index']);
 
         Route::post('/driver/update', [DriverController::class, 'store']);
 
         Route::put('/driver/location/update/{user}', [DriverController::class, 'createDriverLocation']);
+
+
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
