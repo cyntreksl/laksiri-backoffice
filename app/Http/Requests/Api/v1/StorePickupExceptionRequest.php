@@ -15,7 +15,7 @@ class StorePickupExceptionRequest extends FormRequest
     {
         return [
             'exception_name_id' => ['required'],
-            'remarks' => 'required|string|max:255',
+            'remarks' => 'nullable|string|max:255',
         ];
     }
 
