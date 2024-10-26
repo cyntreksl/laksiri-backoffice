@@ -114,8 +114,15 @@ class PickupRepository implements PickupRepositoryInterface
             return $this->error($e->getMessage(), $e->getCode());
         }
     }
+
     public function showPickupException(int $exceptionId): JsonResponse
     {
-        return PickUpException::findOrFail($exceptionId);
+        try {
+            $data = PickUpException::findOrFail($exceptionId);
+            $resourceData = new PickupExceptionResource($data);
+            return $this->success('Pickup exception details received successfully!', $resourceData);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), $e->getCode());
+        }
     }
 }
