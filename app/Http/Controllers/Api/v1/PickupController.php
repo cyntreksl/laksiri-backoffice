@@ -77,7 +77,7 @@ class PickupController extends Controller
     {
         $data = $request->all();
 
-        $data['description'] = $data['remarks'];
+        $data['remarks'] = $data['remarks'] ?? null;
 
         return $this->pickupRepository->savePickupException($data, $pickup);
     }

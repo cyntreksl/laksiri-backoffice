@@ -24,8 +24,9 @@ class CreatePickUpException
             'pickup_date' => $pickup->pickup_date,
             'auth' => $pickup->auth ?? null,
             'created_by' => auth()->id(),
-            'remarks' => $data['remarks'],
+            'remarks' => $data['remarks'] ?? null,
             'system_status' => $pickup->system_status,
+
         ]);
     }
 }
