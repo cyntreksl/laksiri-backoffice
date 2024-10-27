@@ -77,6 +77,7 @@ class PickupController extends Controller
     {
         return $this->pickupRepository->savePickupException($request->all(), $pickup);
     }
+
     /**
      * Show Pickup Exception
      *
@@ -88,7 +89,6 @@ class PickupController extends Controller
     {
         return $this->pickupRepository->showPickupException($exceptionId);
     }
-
 
     /**
      * Completed Pickup with HBL

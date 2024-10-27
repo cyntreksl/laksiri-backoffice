@@ -120,6 +120,7 @@ class PickupRepository implements PickupRepositoryInterface
         try {
             $data = PickUpException::findOrFail($exceptionId);
             $resourceData = new PickupExceptionResource($data);
+
             return $this->success('Pickup exception details received successfully!', $resourceData);
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());

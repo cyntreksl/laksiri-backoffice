@@ -5,7 +5,6 @@ namespace App\Interfaces\Api;
 use App\Models\PickUp;
 use Illuminate\Http\JsonResponse;
 
-
 interface PickupRepositoryInterface
 {
     /**
@@ -80,6 +79,4 @@ interface PickupRepositoryInterface
      * @method  GET api.laksiri.world/v1/pickups/exceptions/{id}
      */
     public function showPickupException(int $exceptionId): JsonResponse;
-
-
 }

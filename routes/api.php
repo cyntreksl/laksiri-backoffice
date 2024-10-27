@@ -36,7 +36,6 @@ Route::domain('api.'.config('app.url'))
 
         Route::put('/driver/location/update/{user}', [DriverController::class, 'createDriverLocation']);
 
-
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
