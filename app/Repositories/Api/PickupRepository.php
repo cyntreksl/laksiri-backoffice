@@ -24,7 +24,6 @@ class PickupRepository implements PickupRepositoryInterface
         try {
             $query = GetPickupsByDriver::run($data);
 
-
             if (isset($data['reference_number'])) {
                 $query->where('reference_number', $data['reference_number']);
             }
@@ -34,11 +33,10 @@ class PickupRepository implements PickupRepositoryInterface
             }
 
             if (isset($data['name'])) {
-                $query->where('name', 'like', '%' . $data['name'] . '%');
+                $query->where('name', 'like', '%'.$data['name'].'%');
             }
 
             $pickups = $query->get();
-
 
             $pendingPickupsResource = PickupResource::collection($pickups);
 

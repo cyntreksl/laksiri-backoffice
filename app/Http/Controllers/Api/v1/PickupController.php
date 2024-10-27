@@ -27,6 +27,7 @@ class PickupController extends Controller
     public function index(Request $request)
     {
         $data = $request->only('start_date', 'end_date', 'reference_number', 'mobile_number', 'name');
+
         return $this->pickupRepository->getPendingPickupsForDriver($data);
     }
 
