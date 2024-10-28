@@ -76,7 +76,11 @@ class PickupController extends Controller
      */
     public function storePickupException(StorePickupExceptionRequest $request, PickUp $pickup)
     {
-        return $this->pickupRepository->savePickupException($request->all(), $pickup);
+        $data = $request->all();
+
+        $data['remarks'] = $data['remarks'] ?? null;
+
+        return $this->pickupRepository->savePickupException($data, $pickup);
     }
 
     /**
