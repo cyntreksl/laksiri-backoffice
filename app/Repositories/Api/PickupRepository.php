@@ -23,8 +23,8 @@ class PickupRepository implements PickupRepositoryInterface
     public function getPendingPickupsForDriver(array $data): JsonResponse
     {
         try {
-//            $query = GetPickupsByDriver::run($data);
-//            TODO Proper fix
+            //            $query = GetPickupsByDriver::run($data);
+            //            TODO Proper fix
             $query = PickUp::query()->assignedToDriver();
 
             if (isset($data['start_date']) && isset($data['end_date'])) {
