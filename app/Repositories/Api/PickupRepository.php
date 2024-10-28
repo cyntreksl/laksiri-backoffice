@@ -22,9 +22,22 @@ class PickupRepository implements PickupRepositoryInterface
     public function getPendingPickupsForDriver(array $data): JsonResponse
     {
         try {
-            $pickups = GetPickupsByDriver::run($data);
+            $query = GetPickupsByDriver::run($data);
 
-            // Transform pickups into resource format
+            if (isset($data['reference_number'])) {
+                $query->where('reference_number', $data['reference_number']);
+            }
+
+            if (isset($data['mobile_number'])) {
+                $query->where('mobile_number', $data['mobile_number']);
+            }
+
+            if (isset($data['name'])) {
+                $query->where('name', 'like', '%'.$data['name'].'%');
+            }
+
+            $pickups = $query->get();
+
             $pendingPickupsResource = PickupResource::collection($pickups);
 
             return $this->success('Pending pickup list received successfully!', $pendingPickupsResource);
