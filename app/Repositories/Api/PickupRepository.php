@@ -23,7 +23,15 @@ class PickupRepository implements PickupRepositoryInterface
     public function getPendingPickupsForDriver(array $data): JsonResponse
     {
         try {
-            $query = GetPickupsByDriver::run($data);
+//            $query = GetPickupsByDriver::run($data);
+//            TODO Proper fix
+            $query = PickUp::query()->assignedToDriver();
+
+            if (isset($data['start_date']) && isset($data['end_date'])) {
+                $query->whereBetween('pickup_date', [$data['start_date'], $data['end_date']]);
+            }
+
+            $query->where('status', PickupStatus::PENDING);
 
             if (isset($data['reference_number'])) {
                 $query->where('reference_number', $data['reference_number']);
@@ -37,7 +45,7 @@ class PickupRepository implements PickupRepositoryInterface
                 $query->where('name', 'like', '%'.$data['name'].'%');
             }
 
-            $pickups = $query->get();
+            $pickups = $query->orderBy('pickup_order')->get();
 
             $pendingPickupsResource = PickupResource::collection($pickups);
 
