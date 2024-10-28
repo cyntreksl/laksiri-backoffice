@@ -352,8 +352,8 @@ const clearPhotoFileInput = () => {
                                 >
 
                                 <!-- Current Profile Photo -->
-                                <div v-show="! photoPreview" class="mt-2">
-                                    <img :src="settings.logo_url" alt="logo" class="rounded-full h-20 w-20 object-cover">
+                                <div v-show="!photoPreview" class="mt-2">
+                                    <img v-if="settings && settings.logo_url" :src="settings.logo_url" alt="logo" class="rounded-full h-20 w-20 object-cover">
                                 </div>
 
                                 <!-- New Profile Photo Preview -->
