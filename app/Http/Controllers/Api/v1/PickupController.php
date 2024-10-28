@@ -80,6 +80,18 @@ class PickupController extends Controller
     }
 
     /**
+     * Show Pickup Exception
+     *
+     * Display the specified Pickup Exception.
+     *
+     * @group Pickups
+     */
+    public function showPickupException(int $exceptionId)
+    {
+        return $this->pickupRepository->showPickupException($exceptionId);
+    }
+
+    /**
      * Completed Pickup with HBL
      *
      * Display the list of completed pickups with HBL.

@@ -72,4 +72,11 @@ interface PickupRepositoryInterface
      * @method  GET api.laksiri.world/v1/pickups/exceptions/list?start_date={pickup_date}&end_date={pickup_date}
      */
     public function getPickupExceptionsForDriver(array $data): JsonResponse;
+
+    /**
+     * Retrieve details of a pickup exception to the authenticated driver.
+     *
+     * @method  GET api.laksiri.world/v1/pickups/exceptions/{id}
+     */
+    public function showPickupException(int $exceptionId): JsonResponse;
 }
