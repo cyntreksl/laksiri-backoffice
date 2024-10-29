@@ -3,6 +3,7 @@
 use App\Http\Controllers\DriverAreasController;
 use App\Http\Controllers\ExceptionNameController;
 use App\Http\Controllers\PackagePriceController;
+use App\Http\Controllers\PackageTypeController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\WarehouseZoneController;
@@ -49,6 +50,9 @@ Route::name('setting.')->group(function () {
     Route::resource('package-prices', PackagePriceController::class)->except('show');
 
     Route::resource('exception-names', ExceptionNameController::class);
+
+    Route::resource('package-types', PackageTypeController::class)
+        ->except(['show', 'create']);
 
     // Invoice Settings
     Route::post('invoice/settings', [SettingController::class, 'updateInvoiceSettings'])

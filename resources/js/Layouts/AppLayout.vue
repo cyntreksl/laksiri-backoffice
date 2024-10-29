@@ -1129,6 +1129,10 @@ export default {
                         {
                             title: "Exceptions",
                             route: "setting.exception-names.index",
+                        },
+                        {
+                            title: "Package Types",
+                            route: "setting.package-types.index",
                         }
                     );
                     changeSidePanelTitle("Setting");
