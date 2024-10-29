@@ -3,6 +3,7 @@
 use App\Models\Branch;
 use App\Models\Container;
 use App\Models\ExceptionName;
+use App\Models\PackageType;
 use App\Models\PickUp;
 use App\Models\User;
 use Diglactic\Breadcrumbs\Breadcrumbs;
@@ -316,6 +317,19 @@ Breadcrumbs::for('setting.package-prices.edit', function (BreadcrumbTrail $trail
     $trail->push('Settings');
     $trail->push('Package Price Rule List', route('setting.package-prices.index', $id));
     $trail->push('Edit', route('setting.package-prices.edit', $id));
+});
+
+// Settings -> Package Type
+Breadcrumbs::for('setting.package-types.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Package Types', route('setting.package-types.index'));
+});
+
+// Settings -> Package Type Edit
+Breadcrumbs::for('setting.package-types.edit', function (BreadcrumbTrail $trail, PackageType $packageType) {
+    $trail->parent('setting.exception-names.index');
+    $trail->push('Edit Package Type', route('setting.package-types.edit', $packageType));
 });
 
 require_once __DIR__.'/call-center-breadcrumbs.php';
