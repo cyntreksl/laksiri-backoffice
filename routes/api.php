@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\v1\Auth\LoginController;
 use App\Http\Controllers\Api\v1\DriverController;
 use App\Http\Controllers\Api\v1\ExceptionNameController;
 use App\Http\Controllers\Api\v1\HBLController;
+use App\Http\Controllers\Api\v1\PackageTypeController;
 use App\Http\Controllers\Api\v1\PickupController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,7 @@ Route::domain('api.'.config('app.url'))
 
         Route::put('/driver/location/update/{user}', [DriverController::class, 'createDriverLocation']);
 
+        Route::get('/package-type-list', [PackageTypeController::class, 'index']);
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
