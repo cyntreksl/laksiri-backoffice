@@ -11,6 +11,7 @@ use App\Http\Requests\StoreCallFlagRequest;
 use App\Http\Requests\StoreHBLRequest;
 use App\Http\Requests\UpdateHBLRequest;
 use App\Interfaces\HBLRepositoryInterface;
+use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
@@ -28,6 +29,7 @@ class HBLController extends Controller
         private readonly HBLRepositoryInterface $HBLRepository,
         private readonly UserRepositoryInterface $userRepository,
         private readonly PriceRepositoryInterface $priceRepository,
+        private readonly PackageTypeRepositoryInterface $packageTypeRepository,
     ) {
     }
 
@@ -70,6 +72,7 @@ class HBLController extends Controller
             'hblTypes' => HBLType::cases(),
             'warehouses' => WarehouseType::cases(),
             'priceRules' => $this->priceRepository->getPriceRules(),
+            'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
         ]);
     }
 
@@ -101,6 +104,7 @@ class HBLController extends Controller
             'hblTypes' => HBLType::cases(),
             'warehouses' => WarehouseType::cases(),
             'priceRules' => $this->priceRepository->getPriceRules(),
+            'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
         ]);
     }
 

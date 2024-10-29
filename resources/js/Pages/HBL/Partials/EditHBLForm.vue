@@ -37,6 +37,10 @@ const props = defineProps({
         default: () => {
         },
     },
+    packageTypes: {
+        type: Array,
+        default: () => [],
+    }
 });
 
 const errors = ref([]);
@@ -218,22 +222,6 @@ watch([() => form.cargo_type], ([newCargoType]) => {
     calculatePayment();
 });
 
-const packageTypes = [
-    "WOODEN BOX",
-    "CARTON",
-    "FRIDGE",
-    "TV CARTON",
-    "COOKER",
-    "W/MACHINE",
-    "MATT/BED BDL",
-    "TRUNK STEEL BOX",
-    "TRAVELING BOX",
-    "IRON TABLE/LADDER",
-    "SOFA SET/BNDL",
-    "BNDL",
-    "BICYCLE",
-];
-
 const selectedType = ref("");
 
 const updateTypeDescription = () => {
@@ -279,7 +267,7 @@ const calculatePayment = async () => {
                 cargo_type: form.cargo_type,
                 hbl_type: form.hbl_type,
                 grand_total_volume: grandTotalVolume.value,
-                grand_total_weight:grandTotalWeight.value,
+                grand_total_weight: grandTotalWeight.value,
                 package_list_length: packageList.value.length
             })
         });
@@ -875,7 +863,7 @@ const openEditModal = (index) => {
                     >
                         Package Details
                     </h2>
-                    <InputError :message="errors.packages" />
+                    <InputError :message="errors.packages"/>
                 </div>
                 <PrimaryOutlineButton type="button" @click="showPackageDialog">
                     New Package <i class="fas fa-plus fa-fw fa-fw"></i>
@@ -1070,7 +1058,7 @@ const openEditModal = (index) => {
                                         v-for="package_type in packageTypes"
                                         :key="package_type"
                                     >
-                                        {{ package_type }}
+                                        {{ package_type.name }}
                                     </option>
                                 </select>
                             </label>

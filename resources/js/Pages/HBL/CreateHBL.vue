@@ -36,6 +36,10 @@ const props = defineProps({
         default: () => {
         },
     },
+    packageTypes: {
+        type: Array,
+        default: () => [],
+    }
 });
 
 //branch set
@@ -61,7 +65,7 @@ const findCountryCodeByBranch = (country) => {
             return "+60";
         case "London":
             return "+44";
-        }
+    }
 };
 
 
@@ -279,22 +283,6 @@ watch([() => form.warehouse], ([newHBLType]) => {
     calculatePayment();
     packageRules();
 });
-
-const packageTypes = [
-    "WOODEN BOX",
-    "CARTON",
-    "FRIDGE",
-    "TV CARTON",
-    "COOKER",
-    "W/MACHINE",
-    "MATT/BED BDL",
-    "TRUNK STEEL BOX",
-    "TRAVELING BOX",
-    "IRON TABLE/LADDER",
-    "SOFA SET/BNDL",
-    "BNDL",
-    "BICYCLE",
-];
 
 const selectedType = ref("");
 
@@ -634,7 +622,7 @@ const isPackageRuleSelected = ref(false);
 const packageRulesData = ref([]);
 const selectedPackage = ref("");
 
-const packageRules = async() =>{
+const packageRules = async () => {
     try {
         const response = await fetch(`/get-hbl-packages`, {
             method: "POST",
@@ -663,7 +651,7 @@ const getSelectedPackage = () => {
     // Find the selected package from the packages array based on the selected ID
     const selectedRule = packageRulesData.value.find(pkg => pkg.id === packageItem.packageRule);
     isPackageRuleSelected.value = true;
-    if(selectedRule){
+    if (selectedRule) {
         packageItem.length = selectedRule.length;
         packageItem.width = selectedRule.width;
         packageItem.height = selectedRule.height;
@@ -1304,7 +1292,17 @@ const getSelectedPackage = () => {
                                 >
                                     <p class="line-clamp-1">Grand Total</p>
                                     <div class="flex items-center">
-                                        <svg v-if="packageList.length > 0" class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle mr-3 text-info hover:cursor-pointer" fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"  @click="isShowedPaymentSummery = !isShowedPaymentSummery"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>
+                                        <svg v-if="packageList.length > 0"
+                                             class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle mr-3 text-info hover:cursor-pointer"
+                                             fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                             stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                             xmlns="http://www.w3.org/2000/svg"
+                                             @click="isShowedPaymentSummery = !isShowedPaymentSummery">
+                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+                                            <path d="M12 9h.01"/>
+                                            <path d="M11 12h1v4h1"/>
+                                        </svg>
                                         <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
                                     </div>
                                 </div>
@@ -1322,25 +1320,29 @@ const getSelectedPackage = () => {
                                             </thead>
                                             <tr v-for="packageItem in packageList">
                                                 <td>
-                                                    {{packageItem.type}}
+                                                    {{ packageItem.type }}
                                                 </td>
                                                 <td>
                                                     {{ parseFloat(form.package_charges).toFixed(2) }}
                                                 </td>
                                                 <td>
-                                                    {{ parseFloat(perVolumeCharge.toFixed(2) * packageItem.volume).toFixed(2) === parseFloat(form.destination_charges).toFixed(2)
-                                                        ? perVolumeCharge.toFixed(2) + ' x ' + packageItem.volume
-                                                    : parseFloat(form.destination_charges).toFixed(2)}}
+                                                    {{
+                                                        parseFloat(perVolumeCharge.toFixed(2) * packageItem.volume).toFixed(2) === parseFloat(form.destination_charges).toFixed(2)
+                                                            ? perVolumeCharge.toFixed(2) + ' x ' + packageItem.volume
+                                                            : parseFloat(form.destination_charges).toFixed(2)
+                                                    }}
                                                 </td>
                                                 <td>
-                                                    {{ parseFloat(perFreightCharge.toFixed(2) * (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)).toFixed(2) === parseFloat(form.freight_charge).toFixed(2)
-                                                        ? perFreightCharge.toFixed(2) + ' x ' + (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)
-                                                    : parseFloat(form.freight_charge).toFixed(2)}}
+                                                    {{
+                                                        parseFloat(perFreightCharge.toFixed(2) * (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)).toFixed(2) === parseFloat(form.freight_charge).toFixed(2)
+                                                            ? perFreightCharge.toFixed(2) + ' x ' + (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)
+                                                            : parseFloat(form.freight_charge).toFixed(2)
+                                                    }}
                                                     <!-- {{ perFreightCharge.toFixed(2) + ' x ' + (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)  }} -->
                                                 </td>
                                                 <td class="text-right">
                                                     {{
-                                                        ( perPackageCharge +
+                                                        (perPackageCharge +
                                                             (perVolumeCharge * parseFloat(packageItem.volume).toFixed(3))
                                                             + (perFreightCharge * (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume))).toFixed(2)
                                                     }}
@@ -1348,19 +1350,22 @@ const getSelectedPackage = () => {
                                             </tr>
                                             <tr>
                                                 <td colspan="4">Bill Charges</td>
-                                                <td class="text-right">{{parseFloat(form.bill_charge).toFixed(2)}}</td>
+                                                <td class="text-right">{{ parseFloat(form.bill_charge).toFixed(2) }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="4">Discount</td>
-                                                <td class="text-right">- {{parseFloat(form.discount).toFixed(2)}}</td>
+                                                <td class="text-right">- {{ parseFloat(form.discount).toFixed(2) }}</td>
                                             </tr>
                                             <tr>
                                                 <td colspan="4">Additional Charge</td>
-                                                <td class="text-right">+ {{parseFloat(form.additional_charge).toFixed(2)}}</td>
+                                                <td class="text-right">+
+                                                    {{ parseFloat(form.additional_charge).toFixed(2) }}
+                                                </td>
                                             </tr>
                                             <tr class="font-bold">
                                                 <td colspan="4">Total</td>
-                                                <td class="text-right">{{hblTotal.toFixed(2)}}</td>
+                                                <td class="text-right">{{ hblTotal.toFixed(2) }}</td>
                                             </tr>
                                         </table>
                                     </div>
@@ -1711,7 +1716,7 @@ const getSelectedPackage = () => {
                                             :key="pkg.id"
                                             :value="pkg.id"
                                         >
-                                            {{ pkg.rule_title + ' ('+pkg.length+'*'+pkg.width+'*'+pkg.height+')'}}
+                                            {{ pkg.rule_title + ' (' + pkg.length + '*' + pkg.width + '*' + pkg.height + ')' }}
                                         </option>
                                     </select>
                                 </label>
@@ -1726,7 +1731,7 @@ const getSelectedPackage = () => {
                                     >
                                         <option value="">Choose one</option>
                                         <option v-for="type in packageTypes" :key="type">
-                                            {{ type }}
+                                            {{ type.name }}
                                         </option>
                                     </select>
                                 </label>
