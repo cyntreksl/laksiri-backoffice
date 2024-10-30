@@ -29,6 +29,24 @@ class CalculatePayment
         $is_editable = false;
 
         if ($is_active_package) {
+            if (count($package_list) === 0) {
+                return [
+                    'error' => 'Please add at least one package',
+                    'freight_charge' => 0,
+                    'bill_charge' => 0,
+                    'other_charge' => 0,
+                    'package_charges' => 0,
+                    'destination_charges' => 0,
+                    'is_editable' => 'true',
+                    'vat' => $vat,
+                    'per_package_charge' => 0.0,
+                    'per_volume_charge' => 0.0,
+                    'per_freight_charge' => 0.0,
+                    'freight_operator' => '',
+                    'price_mode' => 'Package',
+                    'grand_total_without_discount' => 0.0,
+                ];
+            }
             foreach ($package_list as $packageItem) {
                 $package_Price_Rule = GetPackagePriceRule::run($packageItem['packageRule']);
                 $package_charges += ($package_Price_Rule->per_package_charge) * $packageItem['quantity'];
@@ -94,6 +112,8 @@ class CalculatePayment
                 return $number < $grand_total_quantity;
             }));
 
+            $freight_charge_operations = [];
+
             foreach ($operations as $operation) {
                 $operation_quantity = (int) filter_var($operation, FILTER_SANITIZE_NUMBER_INT);
                 $trueAction = trim($latestPriceRules[$operation]->true_action);
@@ -120,6 +140,7 @@ class CalculatePayment
                     default:
                         return ['error' => 'Unsupported operation'];
                 }
+                $freight_charge_operations[] = "{$quantity_after_operation} {$operator} ".number_format((float) $value, 2);
                 $grand_total_quantity = $operation_quantity;
             }
 
@@ -153,6 +174,7 @@ class CalculatePayment
                     'freight_operator' => '',
                     'price_mode' => '',
                     'grand_total_without_discount' => 0.0,
+                    'freight_charge_operations' => [],
                 ];
             }
 
@@ -170,6 +192,7 @@ class CalculatePayment
                 'freight_operator' => $operator,
                 'price_mode' => $billing_rule->price_mode,
                 'grand_total_without_discount' => number_format((float) $grand_total, 2, '.', ''),
+                'freight_charge_operations' => $freight_charge_operations,
             ];
         }
     }

@@ -319,6 +319,8 @@ const perFreightCharge = ref(0);
 const freightOperator = ref('');
 const priceMode = ref('');
 
+const freight_charge_operations = ref([]);
+
 const calculatePayment = async () => {
     try {
         for (let pkg of packageList.value) {
@@ -363,6 +365,7 @@ const calculatePayment = async () => {
             perFreightCharge.value = data.per_freight_charge;
             freightOperator.value = data.freight_operator;
             priceMode.value = data.price_mode;
+            freight_charge_operations.value = data.freight_charge_operations;
         }
 
     } catch (error) {
@@ -1310,7 +1313,12 @@ const getSelectedPackage = () => {
                                     <div v-if="packageList.length > 0" class="p-2 bg-slate-100 rounded-lg mt-2">
                                         <table class="italic w-full">
                                             <tr v-if="!form.is_active_package">
-                                                <td colspan="4">Freight Charges</td>
+                                                <td colspan="2">Freight Charges</td>
+                                                <td colspan="2">
+                                                    <span v-for="(charge, index) in freight_charge_operations" :key="index">
+                                                        {{ charge }} <br>
+                                                    </span>
+                                                </td>
                                                 <td class="text-right">{{ parseFloat(form.freight_charge).toFixed(2) }}
                                                 </td>
                                             </tr>
