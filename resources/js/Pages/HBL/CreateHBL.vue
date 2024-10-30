@@ -1309,24 +1309,6 @@ const getSelectedPackage = () => {
                                 <template v-if="isShowedPaymentSummery">
                                     <div v-if="packageList.length > 0" class="p-2 bg-slate-100 rounded-lg mt-2">
                                         <table class="italic w-full">
-<!--                                            <thead>-->
-<!--                                            <tr v-if="form.is_active_package" class="font-bold">-->
-<!--                                                <td colspan="2">Type</td>-->
-<!--                                                <td colspan="2">Package Charge</td>-->
-<!--                                                <td class="text-right">Total</td>-->
-<!--                                            </tr>-->
-<!--                                            </thead>-->
-<!--                                            <tr v-if="form.is_active_package" v-for="packageItem in packageList">-->
-<!--                                                <td colspan="2">-->
-<!--                                                    {{ packageItem.type }}-->
-<!--                                                </td>-->
-<!--                                                <td colspan="2">-->
-<!--                                                    {{ parseFloat(form.package_charges).toFixed(2) }}-->
-<!--                                                </td>-->
-<!--                                                <td class="text-right">-->
-<!--                                                    {{ parseFloat(form.package_charges).toFixed(2) }}-->
-<!--                                                </td>-->
-<!--                                            </tr>-->
                                             <tr v-if="!form.is_active_package">
                                                 <td colspan="4">Freight Charges</td>
                                                 <td class="text-right">{{ parseFloat(form.freight_charge).toFixed(2) }}
