@@ -7,6 +7,7 @@ use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\Api\HBLRepositoryInterface;
+use App\Models\Branch;
 use App\Models\HBL;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
@@ -46,13 +47,14 @@ class HBLRepository implements HBLRepositoryInterface
 
     public function calculatePayment(array $data): JsonResponse
     {
+        $destination_branch = Branch::where('name', '=', $data['warehouse'])->get();
         $result = CalculatePayment::run(
             $data['cargo_type'],
             $data['hbl_type'],
             $data['grand_total_volume'],
             $data['grand_total_weight'],
             $data['package_list_length'],
-            $data['destination_branch'],
+            $destination_branch[0]['id'],
             $data['is_active_package'],
             $data['package_list'],
         );
