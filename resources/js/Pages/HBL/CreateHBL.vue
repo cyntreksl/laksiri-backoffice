@@ -1303,49 +1303,43 @@ const getSelectedPackage = () => {
                                             <path d="M12 9h.01"/>
                                             <path d="M11 12h1v4h1"/>
                                         </svg>
-                                        <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
+                                        <p>{{ hblTotal ? hblTotal.toFixed(2) : 0.00 }} {{ currency }}</p>
                                     </div>
                                 </div>
                                 <template v-if="isShowedPaymentSummery">
                                     <div v-if="packageList.length > 0" class="p-2 bg-slate-100 rounded-lg mt-2">
                                         <table class="italic w-full">
-                                            <thead>
-                                            <tr class="font-bold">
-                                                <td>Type</td>
-                                                <td>Package Charge</td>
-                                                <td>Destination Charge</td>
-                                                <td>Freight Charge</td>
-                                                <td class="text-right">Total</td>
+<!--                                            <thead>-->
+<!--                                            <tr v-if="form.is_active_package" class="font-bold">-->
+<!--                                                <td colspan="2">Type</td>-->
+<!--                                                <td colspan="2">Package Charge</td>-->
+<!--                                                <td class="text-right">Total</td>-->
+<!--                                            </tr>-->
+<!--                                            </thead>-->
+<!--                                            <tr v-if="form.is_active_package" v-for="packageItem in packageList">-->
+<!--                                                <td colspan="2">-->
+<!--                                                    {{ packageItem.type }}-->
+<!--                                                </td>-->
+<!--                                                <td colspan="2">-->
+<!--                                                    {{ parseFloat(form.package_charges).toFixed(2) }}-->
+<!--                                                </td>-->
+<!--                                                <td class="text-right">-->
+<!--                                                    {{ parseFloat(form.package_charges).toFixed(2) }}-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+                                            <tr v-if="!form.is_active_package">
+                                                <td colspan="4">Freight Charges</td>
+                                                <td class="text-right">{{ parseFloat(form.freight_charge).toFixed(2) }}
+                                                </td>
                                             </tr>
-                                            </thead>
-                                            <tr v-for="packageItem in packageList">
-                                                <td>
-                                                    {{ packageItem.type }}
+                                            <tr>
+                                                <td colspan="4">Destination Charge</td>
+                                                <td class="text-right">{{ parseFloat(form.destination_charges).toFixed(2) }}
                                                 </td>
-                                                <td>
-                                                    {{ parseFloat(form.package_charges).toFixed(2) }}
-                                                </td>
-                                                <td>
-                                                    {{
-                                                        parseFloat(perVolumeCharge.toFixed(2) * packageItem.volume).toFixed(2) === parseFloat(form.destination_charges).toFixed(2)
-                                                            ? perVolumeCharge.toFixed(2) + ' x ' + packageItem.volume
-                                                            : parseFloat(form.destination_charges).toFixed(2)
-                                                    }}
-                                                </td>
-                                                <td>
-                                                    {{
-                                                        parseFloat(perFreightCharge.toFixed(2) * (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)).toFixed(2) === parseFloat(form.freight_charge).toFixed(2)
-                                                            ? perFreightCharge.toFixed(2) + ' x ' + (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)
-                                                            : parseFloat(form.freight_charge).toFixed(2)
-                                                    }}
-                                                    <!-- {{ perFreightCharge.toFixed(2) + ' x ' + (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume)  }} -->
-                                                </td>
-                                                <td class="text-right">
-                                                    {{
-                                                        (perPackageCharge +
-                                                            (perVolumeCharge * parseFloat(packageItem.volume).toFixed(3))
-                                                            + (perFreightCharge * (priceMode === 'weight' ? parseFloat(packageItem.totalWeight).toFixed(3) : packageItem.volume))).toFixed(2)
-                                                    }}
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4">Package Charge</td>
+                                                <td class="text-right">{{ parseFloat(form.package_charges).toFixed(2) }}
                                                 </td>
                                             </tr>
                                             <tr>
@@ -1361,6 +1355,12 @@ const getSelectedPackage = () => {
                                                 <td colspan="4">Additional Charge</td>
                                                 <td class="text-right">+
                                                     {{ parseFloat(form.additional_charge).toFixed(2) }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4">Vat</td>
+                                                <td class="text-right">+
+                                                    {{ parseFloat(vat).toFixed(2) }}
                                                 </td>
                                             </tr>
                                             <tr class="font-bold">
