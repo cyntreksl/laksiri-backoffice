@@ -935,7 +935,7 @@ const shipIcon = ref(`
                             class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
                         >
                             <div
-                                class="mr-4 cursor-pointer"
+                                class="mr-4 cursor-pointer self-start"
                                 x-tooltip.info.placement.bottom="'Applied Filters'"
                             >
                                 Filter Options:
