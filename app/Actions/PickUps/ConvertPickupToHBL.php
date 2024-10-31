@@ -3,9 +3,11 @@
 namespace App\Actions\PickUps;
 
 use App\Actions\HBL\CreateHBLPackages;
+use App\Actions\HBL\GenerateCRNumber;
 use App\Actions\HBL\GenerateHBLNumber;
 use App\Actions\HBL\UpdateOrCreateHBL;
 use App\Actions\User\GetUserCurrentBranch;
+use App\Actions\User\GetUserCurrentBranchID;
 use App\Enum\PickupStatus;
 use App\Models\HBL;
 use Illuminate\Support\Facades\DB;
@@ -44,8 +46,8 @@ class ConvertPickupToHBL
             'system_status' => HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
             'packages' => $request->packages,
             'is_completed' => $request->is_completed,
-            'hbl_number' => GenerateHBLNumber::run($currentBranch['branchName']),
-            'cr_number' => GenerateHBLNumber::run($currentBranch['branchName']),
+            'hbl_number' => GenerateHBLNumber::run(GetUserCurrentBranchID::run()),
+            'cr_number' => GenerateCRNumber::run(),
         ];
 
         try {

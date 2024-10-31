@@ -18,7 +18,7 @@ class UpdateOrCreateHBL
         $status = 'draft';
         $reference = null;
 
-        if (isset($data['is_completed'])) {
+        if (isset($data['is_completed']) && $data['is_completed']) {
             $reference = GenerateHBLReferenceNumber::run();
             $status = 'completed';
 
