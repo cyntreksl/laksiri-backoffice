@@ -752,7 +752,7 @@ const shipIcon = ref(`
                             </h2>
 
                             <div class="flex m-3">
-                                <select class="form-select mt-1.5 w-full rounded-full border border-slate-300 bg-white px-8 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" @change="handlePerPageChange">
+                                <select class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" @change="handlePerPageChange">
                                     <option value="10">10</option>
                                     <option value="25">25</option>
                                     <option value="50">50</option>
