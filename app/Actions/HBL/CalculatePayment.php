@@ -105,7 +105,7 @@ class CalculatePayment
             });
 
             $grand_total_quantity = $cargo_type === 'Sea Cargo' ? $grand_total_volume : $grand_total_weight;
-            if ($grand_total_quantity == 0 ) {
+            if ($grand_total_quantity == 0) {
                 return [
                     'error' => 'Please add at least one package',
                     'freight_charge' => $freight_charge,
