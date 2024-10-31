@@ -63,11 +63,6 @@ const handleDeletePriceRule = () => {
                 <thead>
                 <tr>
                     <th
-                        class="whitespace-nowrap rounded-tl-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Destination
-                    </th>
-                    <th
                         class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
                         Cargo Mode
@@ -76,6 +71,11 @@ const handleDeletePriceRule = () => {
                         class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
                         HBL Type
+                    </th>
+                    <th
+                        class="whitespace-nowrap rounded-tl-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                    >
+                        Destination
                     </th>
                     <th
                         class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
@@ -132,13 +132,13 @@ const handleDeletePriceRule = () => {
                     class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500"
                 >
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                        {{ priceRule.destination_branch_name }}
-                    </td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                         {{ priceRule.cargo_mode }}
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                         {{ priceRule.hbl_type }}
+                    </td>
+                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                        {{ priceRule.destination_branch_name }}
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                         {{ priceRule.price_mode }}
