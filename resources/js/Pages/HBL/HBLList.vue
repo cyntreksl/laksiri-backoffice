@@ -43,7 +43,7 @@ const wrapperRef = ref(null);
 let grid = null;
 const perPage = ref(10);
 const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(1, "month").format("YYYY-MM-DD");
+const fromDate = moment("2023-01-01").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 
 const filters = reactive({
@@ -920,7 +920,7 @@ const shipIcon = ref(`
                             </h2>
                             <div class="flex m-3">
                                 <select
-                                    class="form-select mt-1.5 w-full rounded-full border border-slate-300 bg-white px-8 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     @change="handlePerPageChange"
                                 >
                                     <option value="10">10</option>
@@ -1232,17 +1232,17 @@ const shipIcon = ref(`
 
             <template #content>
 
-                <div class="flex justify-between space-x-2">
-                    <!--Filter Now Action Button-->
-                    <SoftPrimaryButton class="space-x-2" @click="applyFilters">
-                        <i class="fa-solid fa-filter"></i>
-                        <span>Apply Filters</span>
-                    </SoftPrimaryButton>
+                <div class="grid grid-cols-2  space-x-2">
                     <!--Filter Rest Button-->
                     <SoftPrimaryButton class="space-x-2" @click="resetFilter">
                         <i class="fa-solid fa-refresh"></i>
-                        <span>Reset Filters</span>
+                        <span>Reset</span>
                     </SoftPrimaryButton>
+                    <!--Filter Now Action Button-->
+                    <button class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90 dark:border-accent dark:text-accent-light dark:hover:bg-accent dark:hover:text-white dark:focus:bg-accent dark:focus:text-white dark:active:bg-accent/90" @click="applyFilters">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Apply</span>
+                    </button>
                 </div>
                 <div>
                     <InputLabel value="From"/>

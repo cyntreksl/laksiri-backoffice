@@ -965,17 +965,17 @@ const shipIcon = ref(`
 
             <template #content>
 
-                <div class="flex justify-between space-x-2">
-                    <!--Filter Now Action Button-->
-                    <SoftPrimaryButton class="space-x-2" @click="applyFilters">
-                        <i class="fa-solid fa-filter"></i>
-                        <span>Apply Filters</span>
-                    </SoftPrimaryButton>
+                <div class="grid grid-cols-2  space-x-2">
                     <!--Filter Rest Button-->
                     <SoftPrimaryButton class="space-x-2" @click="resetFilter">
                         <i class="fa-solid fa-refresh"></i>
-                        <span>Reset Filters</span>
+                        <span>Reset</span>
                     </SoftPrimaryButton>
+                    <!--Filter Now Action Button-->
+                    <button class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90 dark:border-accent dark:text-accent-light dark:hover:bg-accent dark:hover:text-white dark:focus:bg-accent dark:focus:text-white dark:active:bg-accent/90" @click="applyFilters">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Apply</span>
+                    </button>
                 </div>
                 <div>
                     <InputLabel value="From"/>
