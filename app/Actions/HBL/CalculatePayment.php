@@ -105,6 +105,18 @@ class CalculatePayment
             });
 
             $grand_total_quantity = $cargo_type === 'Sea Cargo' ? $grand_total_volume : $grand_total_weight;
+            if ($grand_total_quantity == 0 ) {
+                return [
+                    'error' => 'Please add at least one package',
+                    'freight_charge' => $freight_charge,
+                    'bill_charge' => $bill_charge,
+                    'other_charge' => 0,
+                    'package_charges' => $package_charges,
+                    'destination_charges' => $destination_charges,
+                    'is_editable' => $is_editable,
+                    'vat' => $vat,
+                ];
+            }
             $operations = array_values(array_filter($operations, function ($operation) use ($grand_total_quantity) {
                 // Extract the number part from the operation
                 $number = intval(substr($operation, 1)); // Remove the ">" and convert to int
