@@ -53,7 +53,7 @@ class ConvertPickupToHBL
 
             $hbl = UpdateOrCreateHBL::run($data);
 
-            if (isset($data['is_completed'])) {
+            if (! empty($data['is_completed']) && $data['is_completed']) {
                 $packagesData = $data['packages'];
 
                 CreateHBLPackages::run($hbl, $packagesData);
