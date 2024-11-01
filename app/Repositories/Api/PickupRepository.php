@@ -31,7 +31,10 @@ class PickupRepository implements PickupRepositoryInterface
                 $query->whereBetween('pickup_date', [$data['start_date'], $data['end_date']]);
             }
 
-            $query->where('status', PickupStatus::PENDING);
+            $query->whereIn('system_status', [
+                PickUp::SYSTEM_STATUS_PICKUP_CREATED,
+                PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
+            ]);
 
             if (isset($data['reference_number'])) {
                 $query->where('reference_number', $data['reference_number']);
