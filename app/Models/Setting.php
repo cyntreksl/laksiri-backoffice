@@ -32,7 +32,7 @@ class Setting extends Model
     public function logoUrl(): Attribute
     {
         return Attribute::get(function (): string {
-            return Storage::disk('s3')->url($this->logo);
+            return Storage::disk('public')->url($this->logo);
         });
     }
 }

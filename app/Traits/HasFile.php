@@ -20,13 +20,13 @@ trait HasFile
         tap($column, function ($previous) use ($file, $column, $path) {
             $this->forceFill([
                 $column => $file->storePublicly(
-                    $path, ['disk' => 's3']
+                    $path, ['disk' => 'public']
                 ),
             ])->save();
 
             // delete the previous file from storage
             if ($previous) {
-                Storage::disk('s3')->delete($previous);
+                Storage::disk('public')->delete($previous);
             }
         });
     }
@@ -39,8 +39,8 @@ trait HasFile
      */
     public function deleteFile(string $path, string $column): void
     {
-        if (Storage::disk('s3')->exists($path)) {
-            if (Storage::disk('s3')->delete($path)) {
+        if (Storage::disk('public')->exists($path)) {
+            if (Storage::disk('public')->delete($path)) {
                 Log::info("File deleted successfully: {$path}");
             } else {
                 Log::error("Failed to delete file: {$path}");
