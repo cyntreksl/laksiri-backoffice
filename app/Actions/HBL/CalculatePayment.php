@@ -156,6 +156,19 @@ class CalculatePayment
                 $grand_total_quantity = $operation_quantity;
             }
 
+            if (empty($operations)) {
+                return [
+                    'error' => "Please required price rule's condition like > 0 ",
+                    'freight_charge' => $freight_charge,
+                    'bill_charge' => $bill_charge,
+                    'other_charge' => 0,
+                    'package_charges' => $package_charges,
+                    'destination_charges' => $destination_charges,
+                    'is_editable' => $is_editable,
+                    'vat' => $vat,
+                ];
+            }
+
             $billing_rule = $latestPriceRules[$operations[0]];
 
             $billCharge = $billing_rule->bill_price;
