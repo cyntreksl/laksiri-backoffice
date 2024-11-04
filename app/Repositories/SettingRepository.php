@@ -13,7 +13,7 @@ class SettingRepository implements SettingRepositoryInterface
         $settings = UpdateSetting::run($data);
 
         if (isset($data['logo'])) {
-            $settings->updateFile($data['logo'], 'logo', 'settings/invoice/logos/');
+            $settings->updateFile($data['logo'], 'logo', 'settings/invoice/logos');
         }
 
     }
