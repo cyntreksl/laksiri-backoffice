@@ -74,6 +74,7 @@ const data = reactive({
         warehouse: false,
         status: false,
         is_hold: false,
+        view: true,
         actions: true,
     },
 });
@@ -351,6 +352,53 @@ const createColumns = () => [
     //         ]);
     //     },
     // },
+    {
+        name: "",
+        sort: false,
+        formatter: (_, row) => {
+            return usePage().props.user.permissions.includes("hbls.show")
+                ? h(
+                    "a",
+                    {
+                        className:
+                            "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
+                        onClick: () => confirmViewHBL(row.cells[0].data),
+                        "x-tooltip..placement.bottom.primary":
+                            "'View HBL'",
+                    },
+                    [
+                        h(
+                            "svg",
+                            {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                viewBox: "0 0 24 24",
+                                class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
+                                fill: "none",
+                                height: 24,
+                                width: 24,
+                                stroke: "currentColor",
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                            },
+                            [
+                                h("path", {
+                                    d: "M0 0h24v24H0z",
+                                    fill: "none",
+                                    stroke: "none",
+                                }),
+                                h("path", {
+                                    d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                                }),
+                                h("path", {
+                                    d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                                }),
+                            ]
+                        ),
+                    ]
+                )
+                : null
+        }
+    },
     {
         name: "",
         sort: false,
