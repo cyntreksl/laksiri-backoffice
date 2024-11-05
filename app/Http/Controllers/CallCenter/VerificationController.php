@@ -17,8 +17,7 @@ class VerificationController extends Controller
     public function __construct(
         private readonly QueueRepositoryInterface $queueRepository,
         private readonly VerificationRepositoryInterface $verificationRepository,
-    ) {
-    }
+    ) {}
 
     public function getVerificationQueueList()
     {

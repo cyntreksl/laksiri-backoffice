@@ -17,8 +17,7 @@ class CashSettlementController extends Controller
     public function __construct(
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly CashSettlementRepository $cashSettlementRepository,
-    ) {
-    }
+    ) {}
 
     public function index()
     {

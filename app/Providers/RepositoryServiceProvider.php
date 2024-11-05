@@ -103,7 +103,5 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(UserFeedbackRepositoryInterface::class, UserFeedbackRepository::class);
     }
 
-    public function boot(): void
-    {
-    }
+    public function boot(): void {}
 }

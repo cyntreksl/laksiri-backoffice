@@ -18,8 +18,7 @@ class BranchController extends Controller
     public function __construct(
         private readonly BranchRepositoryInterface $branchRepository,
         private readonly SettingRepositoryInterface $settingRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.

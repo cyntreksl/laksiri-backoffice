@@ -137,8 +137,5 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
         return Excel::download(new PickupsExport($filters), 'pickups.xlsx');
     }
 
-    public function showPickupException(int $exceptionId)
-    {
-
-    }
+    public function showPickupException(int $exceptionId) {}
 }
