@@ -21,7 +21,8 @@ class WarehouseController extends Controller
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly WarehouseRepositoryInterface $warehouseRepository,
         private readonly HBLRepositoryInterface $HBLRepository,
-    ) {}
+    ) {
+    }
 
     public function index()
     {

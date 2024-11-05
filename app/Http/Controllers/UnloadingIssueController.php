@@ -14,7 +14,8 @@ class UnloadingIssueController extends Controller
 
     public function __construct(
         private readonly UnloadingIssuesRepositoryInterface $unloadingIssuesRepository,
-    ) {}
+    ) {
+    }
 
     public function index()
     {

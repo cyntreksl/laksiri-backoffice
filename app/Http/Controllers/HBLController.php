@@ -30,7 +30,8 @@ class HBLController extends Controller
         private readonly UserRepositoryInterface $userRepository,
         private readonly PriceRepositoryInterface $priceRepository,
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of the resource.

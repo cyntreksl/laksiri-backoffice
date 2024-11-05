@@ -10,7 +10,8 @@ class QueueController extends Controller
 {
     public function __construct(
         private readonly QueueRepositoryInterface $queueRepository,
-    ) {}
+    ) {
+    }
 
     public function showDocumentVerificationScreen()
     {

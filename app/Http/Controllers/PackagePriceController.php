@@ -15,7 +15,8 @@ class PackagePriceController extends Controller
     public function __construct(
         private readonly BranchRepositoryInterface $branchRepository,
         private readonly PackagePriceRepositoryInterface $packagePriceRepository,
-    ) {}
+    ) {
+    }
 
     public function index()
     {

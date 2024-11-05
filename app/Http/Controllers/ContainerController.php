@@ -28,7 +28,8 @@ class ContainerController extends Controller
     public function __construct(
         private readonly ContainerRepositoryInterface $containerRepository,
         private readonly HBLRepositoryInterface $HBLRepository,
-    ) {}
+    ) {
+    }
 
     public function index()
     {

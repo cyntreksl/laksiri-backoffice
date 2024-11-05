@@ -19,7 +19,8 @@ class LoadedContainerController extends Controller
     public function __construct(
         private readonly LoadedContainerRepositoryInterface $loadedContainerRepository,
         private readonly ContainerRepositoryInterface $containerRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of the resource.

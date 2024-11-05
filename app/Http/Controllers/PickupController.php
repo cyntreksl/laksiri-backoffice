@@ -27,7 +27,8 @@ class PickupController extends Controller
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly UserRepositoryInterface $userRepository,
         private readonly ZoneRepositoryInterface $zoneRepository,
-    ) {}
+    ) {
+    }
 
     public function index()
     {

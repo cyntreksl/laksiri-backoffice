@@ -15,7 +15,8 @@ class RoleController extends Controller
 
     public function __construct(
         private readonly RoleRepositoryInterface $roleRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of the resource.

@@ -12,7 +12,8 @@ class UserFeedbackController extends Controller
 {
     public function __construct(
         private readonly UserFeedbackRepositoryInterface $UserFeedbackRepository,
-    ) {}
+    ) {
+    }
 
     public function viewFeedbackForm()
     {

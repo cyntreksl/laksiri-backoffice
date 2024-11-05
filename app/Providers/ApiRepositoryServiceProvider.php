@@ -28,5 +28,7 @@ class ApiRepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PackageTypeRepositoryInterface::class, PackageTypeRepository::class);
     }
 
-    public function boot(): void {}
+    public function boot(): void
+    {
+    }
 }
