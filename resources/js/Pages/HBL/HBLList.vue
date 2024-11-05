@@ -59,7 +59,7 @@ const filters = reactive({
 
 const data = reactive({
     columnVisibility: {
-        id: true,
+        id: false,
         reference: false,
         hbl: true,
         hbl_name: true,
