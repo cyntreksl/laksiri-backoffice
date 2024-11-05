@@ -171,14 +171,14 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         if (! File::exists($pdfDirectory)) {
             File::makeDirectory($pdfDirectory, 0755, true);
         } else {
-            $pdfFile = new Filesystem();
+            $pdfFile = new Filesystem;
             $pdfFile->cleanDirectory($pdfDirectory);
         }
 
         $container = GetLoadedContainerById::run($container);
 
         // Initialize a new Dompdf instance with custom options
-        $options = new Options();
+        $options = new Options;
         $options->set('isHtml5ParserEnabled', true);
         $dompdf = new Dompdf($options);
 
