@@ -191,7 +191,7 @@ const handlePriceRuleUpdate = () => {
                                 <InputError :message="form.errors.true_action"/>
                             </div>
 
-                            <div>
+                            <div class="hidden">
                                 <InputLabel value="False Action"/>
                                 <TextInput v-model="form.false_action" class="w-full" placeholder="Set False Action"/>
                                 <InputError :message="form.errors.false_action"/>
