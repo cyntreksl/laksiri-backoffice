@@ -12,7 +12,8 @@ class DriverController extends Controller
 {
     public function __construct(
         private readonly DriverRepositoryInterface $driverRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Update Driver

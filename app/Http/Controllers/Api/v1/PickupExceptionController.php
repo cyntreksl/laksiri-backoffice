@@ -20,7 +20,8 @@ class PickupExceptionController extends Controller
         private readonly UserRepositoryInterface $userRepository,
         private readonly ZoneRepositoryInterface $zoneRepository,
         private readonly PickupExceptionRepositoryInterface $pickupExceptionRepository,
-    ) {}
+    ) {
+    }
 
     public function index()
     {

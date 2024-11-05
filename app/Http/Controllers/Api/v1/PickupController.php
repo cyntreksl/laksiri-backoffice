@@ -14,7 +14,8 @@ class PickupController extends Controller
 {
     public function __construct(
         private readonly PickupRepositoryInterface $pickupRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Get pending pickups for driver
