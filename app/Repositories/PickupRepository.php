@@ -139,5 +139,6 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
 
     public function showPickupException(int $exceptionId)
     {
+
     }
 }

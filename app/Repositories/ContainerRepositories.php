@@ -171,7 +171,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         if (! File::exists($pdfDirectory)) {
             File::makeDirectory($pdfDirectory, 0755, true);
         } else {
-            $pdfFile = new Filesystem;
+            $pdfFile = new Filesystem();
             $pdfFile->cleanDirectory($pdfDirectory);
         }
 
