@@ -48,6 +48,8 @@ class PickupRepository implements PickupRepositoryInterface
                 $query->where('name', 'like', '%'.$data['name'].'%');
             }
 
+            $query->whereDoesntHave('pickupException');
+
             $pickups = $query->orderBy('pickup_order')->get();
 
             $pendingPickupsResource = PickupResource::collection($pickups);

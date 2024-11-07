@@ -58,14 +58,14 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
                 ->whereIn('system_status', [
                     PickUp::SYSTEM_STATUS_PICKUP_CREATED,
                     PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
-                ]);
+                ])->whereDoesntHave('pickupException');
         } else {
             $query = PickUp::query()
                 ->with('pickupException')
                 ->whereIn('system_status', [
                     PickUp::SYSTEM_STATUS_PICKUP_CREATED,
                     PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
-                ]);
+                ])->whereDoesntHave('pickupException');
         }
 
         if (! empty($search)) {
@@ -139,6 +139,5 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
 
     public function showPickupException(int $exceptionId)
     {
-
     }
 }
