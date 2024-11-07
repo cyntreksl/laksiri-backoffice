@@ -125,12 +125,11 @@ class CalculatePayment
             }));
 
             $freight_charge_operations = [];
-
             foreach ($operations as $operation) {
                 $operation_quantity = (int) filter_var($operation, FILTER_SANITIZE_NUMBER_INT);
-                $trueAction = trim($latestPriceRules[$operation]->true_action);
-                $operator = $trueAction[0];
-                $value = floatval(trim(substr($trueAction, 1)));
+                preg_match('/^([*+\-\/]?)(\d+(?:\.\d+)?)/', trim($latestPriceRules[$operation]->true_action), $matches);
+                $operator = $matches[1] ?? '';
+                $value = floatval($matches[2] ?? 0);
                 $quantity_after_operation = $grand_total_quantity - $operation_quantity;
                 switch ($operator) {
                     case '*':
@@ -149,10 +148,13 @@ class CalculatePayment
                             return ['error' => 'Division by zero error'];
                         }
                         break;
+                    case '':
+                        $freight_charge += $value;
+                        break;
                     default:
                         return ['error' => 'Unsupported operation'];
                 }
-                $freight_charge_operations[] = "{$quantity_after_operation} {$operator} ".number_format((float) $value, 2);
+                $freight_charge_operations[] = "{$quantity_after_operation} ".($operator !== '' ? $operator : '=>').' '.number_format((float) $value, 2);
                 $grand_total_quantity = $operation_quantity;
             }
 
