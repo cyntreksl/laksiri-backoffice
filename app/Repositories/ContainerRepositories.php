@@ -178,7 +178,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         $container = GetLoadedContainerById::run($container);
 
         // Initialize a new Dompdf instance with custom options
-        $options = new Options;
+        $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $dompdf = new Dompdf($options);
 
