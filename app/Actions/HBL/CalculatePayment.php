@@ -117,6 +117,7 @@ class CalculatePayment
                     'vat' => $vat,
                 ];
             }
+
             $operations = array_values(array_filter($operations, function ($operation) use ($grand_total_quantity) {
                 // Extract the number part from the operation
                 $number = intval(substr($operation, 1)); // Remove the ">" and convert to int
@@ -125,8 +126,9 @@ class CalculatePayment
             }));
 
             $freight_charge_operations = [];
+
             foreach ($operations as $operation) {
-                $operation_quantity = (int) filter_var($operation, FILTER_SANITIZE_NUMBER_INT);
+                $operation_quantity = (float) filter_var($operation, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
                 preg_match('/^([*+\-\/]?)(\d+(?:\.\d+)?)/', trim($latestPriceRules[$operation]->true_action), $matches);
                 $operator = $matches[1] ?? '';
                 $value = floatval($matches[2] ?? 0);
