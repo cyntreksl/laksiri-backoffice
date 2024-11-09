@@ -1,9 +1,11 @@
 @if($settings)
-    <div>
-        <img style="max-width: 100px; max-height: 50px; margin-right: -15px; float: left; margin-top: 10px"
-                                       src="{{ $logoPath }}"
-                                        alt="app_logo">
-    </div>
+    @if($logoPath)
+        <div>
+            <img style="max-width: 100px; max-height: 50px; margin-right: -15px; float: left; margin-top: 10px"
+                 src="{{ $logoPath }}"
+                 alt="app_logo">
+        </div>
+    @endif
     <div class="header">
         <h3>{{$settings->invoice_header_title ?: 'LAKSIRI CARGO SERVICE'}}</h3>
         <h4>{{$settings->invoice_header_subtitle ?: 'BAB AL TAWASUL TRADING EST.'}}</h4>
