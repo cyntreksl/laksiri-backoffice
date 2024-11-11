@@ -91,6 +91,7 @@ const handleUpdateContainer = () => {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
+            emit('close');
             push.success('Container Updated Successfully!');
         },
         onError: () => {

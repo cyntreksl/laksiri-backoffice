@@ -416,7 +416,7 @@ watch(unloadedHBLs, (newVal) => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ hbl.hbl_number || hbl.hbl }}</span>
+                                        <span>{{ hbl?.hbl_number || hbl.hbl }}</span>
                                     </div>
                                     <ul v-show="hbl.expanded" class="pl-4">
                                         <draggable v-model="hbl.packages"
@@ -431,7 +431,7 @@ watch(unloadedHBLs, (newVal) => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ findHblByPackageId(element.id).hbl_number || findHblByPackageId(element.id).hbl }}
+                                                                        {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -580,7 +580,7 @@ watch(unloadedHBLs, (newVal) => {
                                                 <div>
                                                     <div class="flex justify-between">
                                                         <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
-                                                            {{ findHblByPackageId(element.id).hbl_number || findHblByPackageId(element.id)?.hbl }}
+                                                            {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id)?.hbl }}
                                                         </p>
                                                     </div>
                                                 </div>

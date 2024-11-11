@@ -81,7 +81,7 @@ const emit = defineEmits(['close']);
 
                 <TabHBLUnderShipment :container="container" @close="emit('close')"/>
 
-                <TabShipmentDetails :air-container-options="airContainerOptions" :container="container" :container-status="containerStatus" :sea-container-options="seaContainerOptions"/>
+                <TabShipmentDetails :air-container-options="airContainerOptions" :container="container" :container-status="containerStatus" :sea-container-options="seaContainerOptions" @close="emit('close')"/>
 
                 <TabDocuments :container-id="container?.id"/>
             </Tabs>

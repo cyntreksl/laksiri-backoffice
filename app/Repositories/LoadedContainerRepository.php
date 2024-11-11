@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\Container\Loading\CreateDraftLoadedContainer;
 use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
+use App\Enum\ContainerStatus;
 use App\Exports\LoadedContainerManifestExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
@@ -45,9 +46,17 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
         if (request()->header('referer') === route('arrival.shipments-arrivals.index')) {
-            $query = Container::query()->loadedContainers()->withoutGlobalScope(BranchScope::class);
+            $query = Container::query()->whereIn('status', [
+                ContainerStatus::IN_TRANSIT->value,
+                ContainerStatus::REACHED_DESTINATION->value,
+                ContainerStatus::LOADED->value,
+            ])->withoutGlobalScope(BranchScope::class);
         } else {
-            $query = Container::query()->loadedContainers();
+            $query = Container::query()->whereIn('status', [
+                ContainerStatus::IN_TRANSIT->value,
+                ContainerStatus::REACHED_DESTINATION->value,
+                ContainerStatus::LOADED->value,
+            ]);
         }
 
         if (! empty($search)) {
