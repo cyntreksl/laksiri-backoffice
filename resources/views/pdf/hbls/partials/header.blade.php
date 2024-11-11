@@ -1,7 +1,7 @@
 @if($settings)
     @if($logoPath)
         <div>
-            <img style="max-width: 100px; max-height: 50px; margin-right: -15px; float: left; margin-top: 10px"
+            <img style="max-width: 120px; max-height: 60px; margin-right: -15px; float: left; margin-top: 10px"
                  src="{{ $logoPath }}"
                  alt="app_logo">
         </div>

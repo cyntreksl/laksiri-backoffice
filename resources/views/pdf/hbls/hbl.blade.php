@@ -64,7 +64,7 @@
                                 </tr>
                                 <tr>
                                     <td class="hbl-title">HBL:</td>
-                                    <td>{{ $hbl?->hbl }}</td>
+                                    <td>{{ $hbl?->hbl_number}}</td>
                                 </tr>
                             </tbody>
                         </table>
