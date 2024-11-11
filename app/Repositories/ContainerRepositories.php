@@ -56,11 +56,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = Container::query()->whereNotIn('status', [
-            ContainerStatus::IN_TRANSIT->value,
-            ContainerStatus::REACHED_DESTINATION->value,
-            ContainerStatus::LOADED->value,
-        ]);
+        $query = Container::query()->where('status', '<>', ContainerStatus::LOADED->value);
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {
