@@ -6,7 +6,6 @@ use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\GenerateCRNumber;
 use App\Actions\HBL\GenerateHBLNumber;
 use App\Actions\HBL\UpdateOrCreateHBL;
-use App\Actions\User\GetUserCurrentBranch;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Enum\PickupStatus;
 use App\Models\HBL;
@@ -19,17 +18,15 @@ class ConvertPickupToHBL
 
     public function handle($pickup, $request): HBL
     {
-        $currentBranch = GetUserCurrentBranch::run();
-
         $data = [
-            'cargo_type' => $pickup->cargo_type,
-            'hbl_type' => $request->hbl_type,
-            'hbl_name' => $pickup->name,
-            'email' => $pickup->email,
-            'contact_number' => $pickup->contact_number,
+            'cargo_type' => $request->cargo_type ?: $pickup->cargo_type,
+            'hbl_type' => $request->hbl_type ?: $pickup->hbl_type,
+            'hbl_name' => $request->name ?: $pickup->name,
+            'email' => $request->email ?: $pickup->email,
+            'contact_number' => $request->contact_number ?: $pickup->contact_number,
             'nic' => $request->nic,
             'iq_number' => $request->iq_number,
-            'address' => $pickup->address,
+            'address' => $request->address ?: $pickup->address,
             'consignee_name' => $request->consignee_name,
             'consignee_nic' => $request->consignee_nic,
             'consignee_contact' => $request->consignee_contact,

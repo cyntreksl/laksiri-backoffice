@@ -65,7 +65,7 @@ class PickupRepository implements PickupRepositoryInterface
         try {
             $hbl = ConvertPickupToHBL::run($pickUp, $request);
 
-            return $this->success('Pickup converted to HBL successfully!', []);
+            return $this->success('Pickup converted to HBL successfully!', $hbl);
 
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());

@@ -727,16 +727,16 @@ const shipIcon = ref(`
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2 mt-3">
             <SimpleOverviewWidget :count="totalRecord" bg-color="white" title="HBL Count"/>
 
-            <SimpleOverviewWidget :count="totalGrandAmount.toLocaleString()" bg-color="white" title="HBL Amount"/>
+            <SimpleOverviewWidget :count="totalGrandAmount.toFixed(2)" bg-color="white" title="HBL Amount"/>
 
-            <SimpleOverviewWidget :count="totalPaidAmount.toLocaleString()" bg-color="white" title="HBL Paid Amount"/>
+            <SimpleOverviewWidget :count="totalPaidAmount.toFixed(2)" bg-color="white" title="HBL Paid Amount"/>
 
             <SimpleOverviewWidget :count="countOfSelectedData" bg-color="white" title="Selected HBL Count"/>
 
-            <SimpleOverviewWidget :count="valueOfSelectedData.toLocaleString()" bg-color="white"
+            <SimpleOverviewWidget :count="valueOfSelectedData.toFixed(2)" bg-color="white"
                                   title="Selected HBL Amount"/>
 
-            <SimpleOverviewWidget :count="paidValueOfSelectedData.toLocaleString()" bg-color="white"
+            <SimpleOverviewWidget :count="paidValueOfSelectedData.toFixed(2)" bg-color="white"
                                   title="Selected HBL Paid Amount"/>
         </div>
 

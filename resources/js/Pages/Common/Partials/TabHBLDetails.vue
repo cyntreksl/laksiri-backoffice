@@ -4,23 +4,30 @@ import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import AccordionPanel from "@/Components/AccordionPanel.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import PostSkeleton from "@/Components/PostSkeleton.vue";
+import {watch} from "vue";
 
 const props = defineProps({
     hbl: {
         type: Object,
-        default: () => {
-        },
+        default: () => ({}),
     },
     pickup: {
         type: Object,
-        default: () => {
-        },
+        default: () => ({}),
     },
     isLoading: {
         type: Boolean,
         required: true,
     }
 });
+
+watch(
+    () => props.pickup,
+    (newVal) => {
+        console.log("Pickup data updated in child:", newVal);
+    },
+    { immediate: true }
+);
 </script>
 
 <template>
@@ -47,7 +54,7 @@ const props = defineProps({
                 </div>
             </template>
             <div class="px-4 py-4 sm:px-5">
-                <div v-if="hbl" class="grid grid-cols-3 gap-x-4 gap-y-8">
+                <div v-if="hbl && Object.keys(hbl).length > 0" class="grid grid-cols-3 gap-x-4 gap-y-8">
                     <InfoDisplay :value="hbl?.reference" label="Job Ref"/>
 
                     <InfoDisplay :value="hbl?.hbl_number" label="HBL Number"/>
@@ -71,10 +78,6 @@ const props = defineProps({
                     <InfoDisplay :value="hbl?.hbl_type" label="Delivery Type"/>
 
                     <InfoDisplay :value="hbl?.cargo_type" label="Cargo Mode"/>
-
-
-
-
                 </div>
 
                 <div v-else class="grid grid-cols-3 gap-x-4 gap-y-8">
@@ -214,7 +217,7 @@ const props = defineProps({
                 </SimpleOverviewWidget>
             </div>
 
-            <div v-if="hbl?.packages.length > 0"
+            <div v-if="hbl && hbl.packages && hbl.packages.length > 0"
                  class="is-scrollbar-hidden min-w-full overflow-x-auto my-10">
                 <table class="is-hoverable w-full text-left">
                     <thead>
@@ -322,9 +325,9 @@ const props = defineProps({
             <div class="px-4 py-4 sm:px-5">
                 <div class="grid grid-cols-3 gap-x-4 gap-y-8">
 
-                    <InfoDisplay :value="hbl?.grand_total.toFixed(2) ?? 0.00" label="Grand Total"/>
+                    <InfoDisplay :value="(hbl?.grand_total ?? 0).toFixed(2)" label="Grand Total"/>
 
-                    <InfoDisplay :value="hbl?.paid_amount.toFixed(2) ?? 0.00" label="Paid Amount"/>
+                    <InfoDisplay :value="(hbl?.paid_amount ?? 0).toFixed(2)" label="Paid Amount"/>
 
                 </div>
             </div>

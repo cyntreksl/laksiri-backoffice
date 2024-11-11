@@ -89,7 +89,7 @@ const splitNumber = (fullNumber) => {
 const splitNumberConsignee = (fullNumber) => {
     for (let code of countryCodes) {
         if (fullNumber.startsWith(code)) {
-            countryCode.value = code;
+            consignee_countryCode.value = code;
             consignee_contact.value = fullNumber.slice(code.length);
             break;
         }
