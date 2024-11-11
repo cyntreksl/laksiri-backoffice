@@ -28,7 +28,7 @@ class UpdateSettingRequest extends FormRequest
             'invoice_header_telephone' => ['required', 'string'],
             'invoice_footer_title' => ['required', 'string'],
             'invoice_footer_text' => ['required', 'string'],
-            'logo' => ['nullable', 'dimensions:max_width=600,max_height=600'],
+            'logo' => ['nullable', 'dimensions:max_width=600,max_height=600', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
 }

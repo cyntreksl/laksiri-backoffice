@@ -53,7 +53,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
     public function getSummery(array $filters = [])
     {
         $query = HBL::query();
-        $query->cashSettlement();
+        $query->cashSettlement()->whereHas('packages');
 
         //apply filters
         FilterFactory::apply($query, $filters);
