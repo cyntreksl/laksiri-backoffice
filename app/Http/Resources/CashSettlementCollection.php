@@ -19,7 +19,7 @@ class CashSettlementCollection extends JsonResource
 
         return [
             'id' => $this->id ?? '-',
-            'hbl' => $this->reference ?? '-',
+            'hbl' => $this->hbl_number ?? '-',
             'hbl_name' => $this->hbl_name ?? '-',
             'address' => $this->address ?? '-',
             'picked_date' => $this->created_at->format('Y-m-d'),

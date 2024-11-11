@@ -16,7 +16,7 @@ class UnloadingIssueResource extends JsonResource
     {
         return [
             'id' => $this->id ?? '-',
-            'hbl' => $this->hblPackage->hbl->hbl ?? '-',
+            'hbl' => $this->hblPackage->hbl->hbl_number ?? '-',
             'branch' => $this->hblPackage->hbl->branch->name ?? '-',
             'hbl_name' => $this->hblPackage->hbl->hbl_name ?? '-',
             'consignee_name' => $this->hblPackage->hbl->consignee_name ?? '-',
