@@ -10,6 +10,7 @@ use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\UpdatePickupRequest;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\DriverRepositoryInterface;
+use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
@@ -27,6 +28,7 @@ class PickupController extends Controller
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly UserRepositoryInterface $userRepository,
         private readonly ZoneRepositoryInterface $zoneRepository,
+        private readonly PackageTypeRepositoryInterface $packageTypeRepository,
     ) {
     }
 
@@ -61,7 +63,8 @@ class PickupController extends Controller
         return Inertia::render('Pickup/CreateJob', [
             'pickupTypes' => PickupType::cases(),
             'cargoTypes' => CargoType::cases(),
-            'noteTypes' => $this->pickupRepository->getNoteTypes(),
+            //            'noteTypes' => $this->pickupRepository->getNoteTypes(),
+            'noteTypes' => $this->packageTypeRepository->getPackageTypes(),
             'zones' => GetZones::run(),
         ]);
     }

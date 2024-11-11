@@ -321,7 +321,7 @@ const shipIcon = ref(`
                                             :key="noteType"
                                             :value="noteType.note_type"
                                         >
-                                            {{ noteType.note_type }}
+                                            {{ noteType.name }}
                                         </option>
                                     </select>
                                 </label>
