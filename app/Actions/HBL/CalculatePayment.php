@@ -119,8 +119,7 @@ class CalculatePayment
             }
 
             $operations = array_values(array_filter($operations, function ($operation) use ($grand_total_quantity) {
-                // Extract the number part from the operation
-                $number = intval(substr($operation, 1)); // Remove the ">" and convert to int
+                $number = floatval(substr($operation, 1));
 
                 return $number < $grand_total_quantity;
             }));
@@ -129,6 +128,7 @@ class CalculatePayment
 
             foreach ($operations as $operation) {
                 $operation_quantity = (float) filter_var($operation, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+
                 preg_match('/^([*+\-\/]?)(\d+(?:\.\d+)?)/', trim($latestPriceRules[$operation]->true_action), $matches);
                 $operator = $matches[1] ?? '';
                 $value = floatval($matches[2] ?? 0);
