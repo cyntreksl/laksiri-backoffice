@@ -284,7 +284,29 @@ const createColumns = () => [
         hidden: !data.columnVisibility.airport_of_arrival,
     },
     {name: "Cargo Class", hidden: !data.columnVisibility.cargo_class},
-    {name: "Status", hidden: !data.columnVisibility.status},
+    {
+        name: "Status",
+        hidden: !data.columnVisibility.status,
+        formatter: (_, row) => {
+            const status = row.cells[26].data;
+
+            const badgeClasses = {
+                "LOADED": "bg-yellow-200 text-yellow-800",
+                "Container Ordered": "bg-gray-200 text-gray-800",
+                "IN TRANSIT": "bg-blue-200 text-blue-800",
+                "UNLOADED": "bg-red-200 text-red-800",
+                "REACHED DESTINATION": "bg-green-200 text-green-800",
+            };
+
+            return h(
+                "span",
+                {
+                    class: `badge px-2 py-1 rounded-full text-sm font-semibold ${badgeClasses[status] || "bg-gray-200 text-gray-800"}`,
+                },
+                status.charAt(0).toUpperCase() + status.slice(1) // Capitalize the first letter
+            );
+        },
+    },
     {
         name: "Loading Started At",
         hidden: !data.columnVisibility.loading_started_at,
