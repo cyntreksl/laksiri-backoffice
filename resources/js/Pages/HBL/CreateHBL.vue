@@ -654,11 +654,16 @@ const packageRules = async () => {
 const getSelectedPackage = () => {
     // Find the selected package from the packages array based on the selected ID
     const selectedRule = packageRulesData.value.find(pkg => pkg.id === packageItem.packageRule);
-    isPackageRuleSelected.value = true;
     if (selectedRule) {
+        isPackageRuleSelected.value = true;
         packageItem.length = selectedRule.length;
         packageItem.width = selectedRule.width;
         packageItem.height = selectedRule.height;
+    }else {
+        isPackageRuleSelected.value = false;
+        packageItem.length = 0;
+        packageItem.width = 0;
+        packageItem.height = 0;
     }
 };
 </script>
