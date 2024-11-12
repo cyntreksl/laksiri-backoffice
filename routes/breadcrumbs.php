@@ -328,7 +328,9 @@ Breadcrumbs::for('setting.package-types.index', function (BreadcrumbTrail $trail
 
 // Settings -> Package Type Edit
 Breadcrumbs::for('setting.package-types.edit', function (BreadcrumbTrail $trail, PackageType $packageType) {
-    $trail->parent('setting.exception-names.index');
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Package Types', route('setting.package-types.index'));
     $trail->push('Edit Package Type', route('setting.package-types.edit', $packageType));
 });
 
