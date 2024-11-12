@@ -341,7 +341,8 @@ const createColumns = () => [
                             ),
                         ]
                     ) : null,
-                usePage().props.user.permissions.includes('container.load to container') ?
+                (usePage().props.user.permissions.includes('container.load to container') &&
+                    ["pending", "DRAFT", "LOADING"].includes(status)) ?
                     h(
                         "button",
                         {
