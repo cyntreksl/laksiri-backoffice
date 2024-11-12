@@ -32,7 +32,7 @@ class UpdatePackageTypeRequest extends FormRequest
                 'max:250',
                 Rule::unique('package_types')->where(function ($query) use ($branchId) {
                     return $query->where('branch_id', $branchId);
-                })->ignore($this->packageType->id),
+                })->ignore($this->package_type->id),
             ],
             'description' => [
                 'nullable',
