@@ -65,7 +65,7 @@ class LoadedContainerManifestExport implements FromQuery, ShouldAutoSize, WithHe
 
             foreach ($loadedHBLPackages as $hbl_package) {
                 $data[] = [
-                    $isFirst ? $hbl->reference : '',
+                    $isFirst ? $hbl->hbl_number ?: $hbl->reference : '',
                     $isFirst ? $hbl->hbl_name : '',
                     $isFirst ? $hbl->consignee_name : '',
                     $hbl_package->package_type,
