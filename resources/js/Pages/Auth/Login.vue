@@ -170,7 +170,7 @@ const hblStatusColor = (status) => {
                             <input
                                 v-model="reference"
                                 class="form-input peer rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent w-full"
-                                placeholder="Enter HBL Reference" type="text"/>
+                                placeholder="Enter HBL Reference / Number" type="text"/>
                         </div>
                         <PrimaryButton @click.prevent="handleSubmit">
                             <svg class="icon icon-tabler icons-tabler-outline icon-tabler-search mr-2" fill="none"

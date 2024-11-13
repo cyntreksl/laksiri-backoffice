@@ -3,7 +3,6 @@
 namespace App\Actions\HBL;
 
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
-use App\Actions\User\GetUserCurrentBranch;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -15,7 +14,6 @@ class CreateHBL
     public function handle(array $data): HBL
     {
         $reference = GenerateHBLReferenceNumber::run();
-        $currentBranch = GetUserCurrentBranch::run();
 
         $hbl = HBL::create([
             'reference' => $reference,

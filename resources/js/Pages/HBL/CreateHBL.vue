@@ -1807,7 +1807,6 @@ const getSelectedPackage = () => {
                                         placeholder="1.00"
                                         step="0.01"
                                         type="number"
-                                        :disabled="isPackageRuleSelected"
                                     />
                                 </label>
                             </div>
@@ -1824,7 +1823,6 @@ const getSelectedPackage = () => {
                                         placeholder="1.00"
                                         step="0.01"
                                         type="number"
-                                        :disabled="isPackageRuleSelected"
                                     />
                                 </label>
                             </div>
@@ -1842,7 +1840,6 @@ const getSelectedPackage = () => {
                                         placeholder="1.00"
                                         step="0.01"
                                         type="number"
-                                        :disabled="isPackageRuleSelected"
                                     />
                                 </label>
                             </div>
