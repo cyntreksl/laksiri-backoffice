@@ -14,6 +14,7 @@ class GetHBLStatusByReference
     {
         $hbl = HBL::withoutGlobalScope(BranchScope::class)
             ->where('reference', $reference)
+            ->orWhere('hbl_number', $reference)
             ->firstOrFail();
 
         return response()->json($hbl->statusLogs);
