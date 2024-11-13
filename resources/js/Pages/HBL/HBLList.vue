@@ -74,6 +74,7 @@ const data = reactive({
         warehouse: false,
         status: false,
         is_hold: false,
+        hbl_number: false,
         view: true,
         actions: true,
     },
@@ -144,7 +145,13 @@ const initializeGrid = () => {
 const createColumns = () => [
     {name: "ID", hidden: !data.columnVisibility.id},
     {name: "Reference", hidden: !data.columnVisibility.reference},
-    {name: "HBL", hidden: !data.columnVisibility.hbl},
+    {
+        name: "HBL",
+        hidden: !data.columnVisibility.hbl,
+        formatter: (_, row) => {
+            return row.cells[15].data || row.cells[1].data
+        },
+    },
     {
         name: "HBL Name",
         hidden: !data.columnVisibility.hbl_name,
