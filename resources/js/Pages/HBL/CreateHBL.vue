@@ -128,7 +128,6 @@ const form = useForm({
 });
 
 const handleHBLCreate = () => {
-    // console.log(form.data());
     form.post(route("hbls.store"), {
         onSuccess: () => {
             router.visit(route("hbls.create"));
