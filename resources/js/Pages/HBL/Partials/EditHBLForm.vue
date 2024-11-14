@@ -169,8 +169,9 @@ const addPackageData = () => {
 
         calculatePayment();
     } else {
-        const newItem = {...packageItem}; // Create a copy of packageItem
-        packageList.value.push(newItem); // Add the new item to packageList
+        const newItem = {...packageItem};
+        newItem['package_type']=newItem.type;
+        packageList.value.push(newItem);
         form.packages = packageList.value;
 
         const volume = parseFloat(newItem.volume) || 0;
