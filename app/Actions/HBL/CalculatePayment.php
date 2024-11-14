@@ -48,7 +48,7 @@ class CalculatePayment
                 ];
             }
             foreach ($package_list as $packageItem) {
-                $package_Price_Rule = GetPackagePriceRule::run($packageItem['packageRule']);
+                $package_Price_Rule = GetPackagePriceRule::run($packageItem['packageRule'] ?? $packageItem['package_rule']);
                 $package_charges += ($package_Price_Rule->per_package_charge) * $packageItem['quantity'];
             }
             if ($cargo_type === 'Sea Cargo') {

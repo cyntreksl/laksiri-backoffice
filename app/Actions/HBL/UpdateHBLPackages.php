@@ -21,6 +21,7 @@ class UpdateHBLPackages
                     $package = HBLPackage::find($packageData['id']);
                     $package->update([
                         'package_type' => $packageData['package_type'],
+                        'package_rule' => $packageData['package_rule'],
                         'length' => $packageData['length'],
                         'width' => $packageData['width'],
                         'height' => $packageData['height'],

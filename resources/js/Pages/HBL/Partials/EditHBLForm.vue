@@ -1,6 +1,6 @@
 <script setup>
 import {router, useForm, usePage} from "@inertiajs/vue3";
-import {computed, onBeforeMount, reactive, ref, watch} from "vue";
+import {computed, onBeforeMount, reactive, ref, watch, onMounted} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
@@ -70,6 +70,14 @@ const form = useForm({
     paid_amount: props.hbl.paid_amount.toFixed(2),
     grand_total: props.hbl.grand_total.toFixed(2),
     packages: props.hbl.packages,
+    is_active_package: !!props. hbl. packages?.[0]?.package_rule,
+    additional_charge: props.hbl.additional_charge.toFixed(2),
+    vat: 0,
+});
+
+onMounted(() => {
+    calculatePayment();
+    packageRules();
 });
 
 const handleHBLUpdate = () => {
@@ -108,7 +116,8 @@ const showPackageDialog = () => {
 const packageList = ref(form.packages ?? []);
 
 const packageItem = reactive({
-    package_type: "",
+    package_rule: "",
+    type: "",
     length: 0,
     width: 0,
     height: 0,
@@ -118,11 +127,7 @@ const packageItem = reactive({
     remarks: "",
 });
 
-const grandTotalVolume = computed(() => {
-    return form.packages.reduce((acc, pack) => {
-        return acc + pack.volume;
-    }, 0);
-});
+const grandTotalVolume = ref(0);
 
 const grandTotalWeight = computed(() => {
     return form.packages.reduce((acc, pack) => {
@@ -132,16 +137,23 @@ const grandTotalWeight = computed(() => {
 
 const addPackageData = () => {
     if (
-        !packageItem.package_type ||
+        !packageItem.type ||
         packageItem.length <= 0 ||
         packageItem.width <= 0 ||
         packageItem.height <= 0 ||
         packageItem.quantity <= 0 ||
         packageItem.volume <= 0 ||
-        packageItem.weight <= 0
+        (form.is_active_package && !packageItem.package_rule)
     ) {
         push.error("Please fill all required data");
         return;
+    }
+
+    if (form.cargo_type === 'Air Cargo') {
+        if (packageItem.totalWeight <= 0) {
+            push.error("Please fill the total weight");
+            return;
+        }
     }
 
     if (editMode.value) {
@@ -161,12 +173,10 @@ const addPackageData = () => {
         packageList.value.push(newItem); // Add the new item to packageList
         form.packages = packageList.value;
 
-        grandTotalWeight.value += newItem.weight;
-        grandTotalVolume.value += newItem.volume;
-
+        const volume = parseFloat(newItem.volume) || 0;
+        grandTotalWeight.value += parseFloat(newItem.totalWeight);
+        grandTotalVolume.value += parseFloat(volume.toFixed(3));
         calculatePayment();
-
-        resetModal();
     }
     closeAddPackageModal();
 };
@@ -194,8 +204,8 @@ watch(
         const totalWeightKg = (volumeCubicMeters * newQuantity) / 1000; // 1 gram = 0.001 kilograms
 
         // Update reactive properties
-        packageItem.volume = volumeCubicMeters;
-        packageItem.weight = totalWeightKg;
+        packageItem.volume = volumeCubicMeters.toFixed(3);
+        // packageItem.totalWeight = totalWeightKg;
     }
 );
 
@@ -206,17 +216,24 @@ watch(
         () => form.other_charge,
         () => form.discount,
         () => form.freight_charge,
-        () => vat,
+        () => form.vat,
+        () => form.additional_charge,
+        () => form.bill_charge,
+        () => form.destination_charges,
+        () => form.package_charges,
     ],
     ([newOtherCharge, newDiscount, newFreightCharge]) => {
         // Convert dimensions from cm to meters
         hblTotal.value =
             parseFloat(form.freight_charge) +
             parseFloat(form.bill_charge) +
-            parseFloat(form.freight_charge) +
-            parseFloat(form.other_charge) +
-            parseFloat(vat.value) -
-            form.discount;
+            parseFloat(form.package_charges) +
+            parseFloat(form.destination_charges) +
+            // parseFloat(form.other_charge) +
+            parseFloat(form.vat) -
+            form.discount +
+            parseFloat(form.additional_charge);
+        hblTotal.value = Number(hblTotal.value.toFixed(2))
         form.grand_total = hblTotal.value;
     }
 );
@@ -228,10 +245,8 @@ watch([() => form.cargo_type], ([newCargoType]) => {
 const selectedType = ref("");
 
 const updateTypeDescription = () => {
-    packageItem.package_type =
-        (packageItem.package_type ? " " : "") + selectedType.value;
+    packageItem.type = (packageItem.type ? " " : "") + selectedType.value;
 };
-
 const hblTotal = ref(0);
 const currency = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 const isEditable = ref(false);
@@ -274,6 +289,7 @@ const calculatePayment = async () => {
                 grand_total_weight: grandTotalWeight.value,
                 package_list_length: packageList.value.length,
                 package_list: packageList.value,
+                is_active_package: form.is_active_package,
             })
         });
 
@@ -334,8 +350,55 @@ const openEditModal = (index) => {
     editMode.value = true;
     editIndex.value = index;
     showAddNewPackageDialog.value = true;
+
+    selectedType.value = packageList.value[index].package_type;
     // populate packageItem with existing data for editing
     Object.assign(packageItem, packageList.value[index]);
+    packageItem.type = packageList.value[index].package_type;
+};
+const isPackageRuleSelected = ref(form.is_active_package);
+const packageRulesData = ref([]);
+const selectedPackage = ref("");
+
+const packageRules = async () => {
+    try {
+        const response = await fetch(`/get-hbl-packages`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+                // "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify({
+                cargo_type: form.cargo_type,
+                hbl_type: form.hbl_type,
+                warehouse: form.warehouse,
+            })
+        });
+        const data = await response.json();
+        if (data.packages) {
+            packageRulesData.value = data.packages;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+const getSelectedPackage = () => {
+    // Find the selected package from the packages array based on the selected ID
+    const selectedRule = packageRulesData.value.find(pkg => pkg.id === packageItem.package_rule);
+    // console.log(packageItem, selectedRule);
+    if (selectedRule) {
+        isPackageRuleSelected.value = true;
+        packageItem.length = selectedRule.length;
+        packageItem.width = selectedRule.width;
+        packageItem.height = selectedRule.height;
+    }else {
+        isPackageRuleSelected.value = false;
+        packageItem.length = 0;
+        packageItem.width = 0;
+        packageItem.height = 0;
+    }
 };
 </script>
 
@@ -1020,6 +1083,18 @@ const openEditModal = (index) => {
                             </div>
 
                             <div>
+                                <span>Package Charges</span>
+                                <TextInput
+                                    v-model="form.package_charges"
+                                    :disabled="!isEditable"
+                                    class="w-full"
+                                    min="0"
+                                    step="any"
+                                    type="number"
+                                />
+                            </div>
+
+                            <div>
                                 <span>Discount</span>
                                 <TextInput
                                     v-model="form.discount"
@@ -1032,7 +1107,7 @@ const openEditModal = (index) => {
                                 <InputError :message="form.errors.discount"/>
                             </div>
 
-                            <div class="col-span-2">
+                            <div>
                                 <span>Paid Amount</span>
                                 <TextInput
                                     v-model="form.paid_amount"
@@ -1045,6 +1120,19 @@ const openEditModal = (index) => {
                                 <InputError :message="form.errors.paid_amount"/>
                             </div>
 
+                            <div>
+                                <span>Additional Charges</span>
+                                <TextInput
+                                    v-model="form.additional_charge"
+                                    :disabled="!isEditable"
+                                    class="w-full"
+                                    placeholder="0"
+                                    step="any"
+                                    type="number"
+                                />
+                                <InputError :message="form.errors.additional_charges"/>
+                            </div>
+
                             <div class="col-start-2 mt-2 space-y-2.5 font-bold">
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Packages</p>
@@ -1055,13 +1143,13 @@ const openEditModal = (index) => {
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Weight</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        {{ grandTotalWeight }}
+                                        {{ grandTotalWeight.toFixed(2) }}
                                     </p>
                                 </div>
                                 <div class="flex justify-between">
                                     <p class="line-clamp-1">Volume</p>
                                     <p class="text-slate-700 dark:text-navy-100">
-                                        {{ grandTotalVolume }}
+                                        {{ grandTotalVolume.toFixed(2) }}
                                     </p>
                                 </div>
                             </div>
@@ -1069,7 +1157,7 @@ const openEditModal = (index) => {
                             <div class="col-span-2">
                                 <div class="flex justify-between text-2xl text-success font-bold">
                                     <p class="line-clamp-1">Grand Total</p>
-                                    <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
+                                    <p>{{ hblTotal ? hblTotal.toFixed(2) : 0.00 }} {{ currency }}</p>
                                 </div>
                             </div>
                         </div>
@@ -1157,6 +1245,32 @@ const openEditModal = (index) => {
 
                 <div class="mt-4 space-y-4">
                     <div class="grid grid-cols-4 gap-4">
+                        <div class="col-span-4">
+                            <label class="block">
+                                    <span>
+                                        Package
+                                        <span v-if="form.is_active_package" class="text-red-500 text-sm">*</span>
+                                    </span>
+                                <select
+                                    v-model="packageItem.package_rule"
+                                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    @change="getSelectedPackage"
+                                    :required="form.is_active_package"
+                                    :disabled="!form.is_active_package && packageList.length > 0"
+                                >
+                                    <option value="0">Choose Package</option>
+                                    <option
+                                        v-for="pkg in packageRulesData"
+                                        :key="pkg.id"
+                                        :value="pkg.id"
+                                    >
+                                        {{
+                                            pkg.rule_title + ' (' + pkg.length + '*' + pkg.width + '*' + pkg.height + ')'
+                                        }}
+                                    </option>
+                                </select>
+                            </label>
+                        </div>
                         <div class="col-span-2">
                             <label class="block">
                                 <span>Type </span>
@@ -1182,7 +1296,7 @@ const openEditModal = (index) => {
                   <span class="text-red-500 text-sm">*</span></span
                 >
                                 <input
-                                    v-model="packageItem.package_type"
+                                    v-model="packageItem.type"
                                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     placeholder="Sofa set"
                                     type="text"
@@ -1261,7 +1375,7 @@ const openEditModal = (index) => {
                                     v-model="packageItem.volume"
                                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     placeholder="1.00"
-                                    step="0.01"
+                                    step="0.001"
                                     type="number"
                                 />
                             </label>
