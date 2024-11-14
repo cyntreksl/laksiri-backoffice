@@ -19,6 +19,14 @@ const props = defineProps({
         default: () => {
         }
     },
+    userRole: {
+        type: String,
+        required: false
+    },
+    userBranch: {
+        type: Number,
+        required: false
+    },
 })
 
 const confirmingUserCreation = ref(false);
@@ -33,8 +41,8 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
-    primary_branch_id: '',
-    secondary_branches: [],
+    primary_branch_id: props.userRole === 'admin' ? '' : props.userBranch,
+    secondary_branches: props.userRole === 'admin' ? [] : [props.userBranch],
     role: '',
 });
 
@@ -191,7 +199,7 @@ const createUser = () => {
                     <InputError :message="form.errors.password_confirmation"/>
                 </div>
 
-                <div>
+                <div v-if="userRole === 'admin'">
                     <label class="block z-50">
                         <InputLabel value="Select Primary Branch"/>
                         <select
@@ -207,7 +215,7 @@ const createUser = () => {
                     <InputError :message="form.errors.primary_branch_id"/>
                 </div>
 
-                <div>
+                <div v-if="userRole === 'admin'">
                     <label class="block z-50">
                         <InputLabel value="Select Secondary Branch"/>
                         <select
