@@ -1,6 +1,6 @@
 <script setup>
 import {router, useForm, usePage} from "@inertiajs/vue3";
-import {computed, onBeforeMount, reactive, ref, watch} from "vue";
+import {computed, onBeforeMount, reactive, ref, watch, onMounted} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
@@ -10,6 +10,9 @@ import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageCo
 import {push} from "notivue";
 import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
+import hblImage from "../../../../images/illustrations/hblimage.png";
+import DialogModal from "@/Components/DialogModal.vue";
+import Checkbox from "@/Components/Checkbox.vue";
 
 const props = defineProps({
     hbl: {
@@ -67,6 +70,14 @@ const form = useForm({
     paid_amount: props.hbl.paid_amount.toFixed(2),
     grand_total: props.hbl.grand_total.toFixed(2),
     packages: props.hbl.packages,
+    is_active_package: !!props. hbl. packages?.[0]?.package_rule,
+    additional_charge: props.hbl.additional_charge.toFixed(2),
+    vat: 0,
+});
+
+onMounted(() => {
+    calculatePayment();
+    packageRules();
 });
 
 const handleHBLUpdate = () => {
@@ -105,7 +116,8 @@ const showPackageDialog = () => {
 const packageList = ref(form.packages ?? []);
 
 const packageItem = reactive({
-    package_type: "",
+    package_rule: "",
+    type: "",
     length: 0,
     width: 0,
     height: 0,
@@ -115,11 +127,7 @@ const packageItem = reactive({
     remarks: "",
 });
 
-const grandTotalVolume = computed(() => {
-    return form.packages.reduce((acc, pack) => {
-        return acc + pack.volume;
-    }, 0);
-});
+const grandTotalVolume = ref(0);
 
 const grandTotalWeight = computed(() => {
     return form.packages.reduce((acc, pack) => {
@@ -129,16 +137,23 @@ const grandTotalWeight = computed(() => {
 
 const addPackageData = () => {
     if (
-        !packageItem.package_type ||
+        !packageItem.type ||
         packageItem.length <= 0 ||
         packageItem.width <= 0 ||
         packageItem.height <= 0 ||
         packageItem.quantity <= 0 ||
         packageItem.volume <= 0 ||
-        packageItem.weight <= 0
+        (form.is_active_package && !packageItem.package_rule)
     ) {
         push.error("Please fill all required data");
         return;
+    }
+
+    if (form.cargo_type === 'Air Cargo') {
+        if (packageItem.totalWeight <= 0) {
+            push.error("Please fill the total weight");
+            return;
+        }
     }
 
     if (editMode.value) {
@@ -154,16 +169,15 @@ const addPackageData = () => {
 
         calculatePayment();
     } else {
-        const newItem = {...packageItem}; // Create a copy of packageItem
-        packageList.value.push(newItem); // Add the new item to packageList
+        const newItem = {...packageItem};
+        newItem['package_type']=newItem.type;
+        packageList.value.push(newItem);
         form.packages = packageList.value;
 
-        grandTotalWeight.value += newItem.weight;
-        grandTotalVolume.value += newItem.volume;
-
+        const volume = parseFloat(newItem.volume) || 0;
+        grandTotalWeight.value += parseFloat(newItem.totalWeight);
+        grandTotalVolume.value += parseFloat(volume.toFixed(3));
         calculatePayment();
-
-        resetModal();
     }
     closeAddPackageModal();
 };
@@ -191,8 +205,8 @@ watch(
         const totalWeightKg = (volumeCubicMeters * newQuantity) / 1000; // 1 gram = 0.001 kilograms
 
         // Update reactive properties
-        packageItem.volume = volumeCubicMeters;
-        packageItem.weight = totalWeightKg;
+        packageItem.volume = volumeCubicMeters.toFixed(3);
+        // packageItem.totalWeight = totalWeightKg;
     }
 );
 
@@ -203,17 +217,24 @@ watch(
         () => form.other_charge,
         () => form.discount,
         () => form.freight_charge,
-        () => vat,
+        () => form.vat,
+        () => form.additional_charge,
+        () => form.bill_charge,
+        () => form.destination_charges,
+        () => form.package_charges,
     ],
     ([newOtherCharge, newDiscount, newFreightCharge]) => {
         // Convert dimensions from cm to meters
         hblTotal.value =
             parseFloat(form.freight_charge) +
             parseFloat(form.bill_charge) +
-            parseFloat(form.freight_charge) +
-            parseFloat(form.other_charge) +
-            parseFloat(vat.value) -
-            form.discount;
+            parseFloat(form.package_charges) +
+            parseFloat(form.destination_charges) +
+            // parseFloat(form.other_charge) +
+            parseFloat(form.vat) -
+            form.discount +
+            parseFloat(form.additional_charge);
+        hblTotal.value = Number(hblTotal.value.toFixed(2))
         form.grand_total = hblTotal.value;
     }
 );
@@ -225,10 +246,8 @@ watch([() => form.cargo_type], ([newCargoType]) => {
 const selectedType = ref("");
 
 const updateTypeDescription = () => {
-    packageItem.package_type =
-        (packageItem.package_type ? " " : "") + selectedType.value;
+    packageItem.type = (packageItem.type ? " " : "") + selectedType.value;
 };
-
 const hblTotal = ref(0);
 const currency = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 const isEditable = ref(false);
@@ -266,9 +285,12 @@ const calculatePayment = async () => {
             body: JSON.stringify({
                 cargo_type: form.cargo_type,
                 hbl_type: form.hbl_type,
+                warehouse: form.warehouse,
                 grand_total_volume: grandTotalVolume.value,
                 grand_total_weight: grandTotalWeight.value,
-                package_list_length: packageList.value.length
+                package_list_length: packageList.value.length,
+                package_list: packageList.value,
+                is_active_package: form.is_active_package,
             })
         });
 
@@ -329,23 +351,222 @@ const openEditModal = (index) => {
     editMode.value = true;
     editIndex.value = index;
     showAddNewPackageDialog.value = true;
+
+    selectedType.value = packageList.value[index].package_type;
     // populate packageItem with existing data for editing
     Object.assign(packageItem, packageList.value[index]);
+    packageItem.type = packageList.value[index].package_type;
+};
+const isPackageRuleSelected = ref(form.is_active_package);
+const packageRulesData = ref([]);
+const selectedPackage = ref("");
+
+const packageRules = async () => {
+    try {
+        const response = await fetch(`/get-hbl-packages`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+                // "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify({
+                cargo_type: form.cargo_type,
+                hbl_type: form.hbl_type,
+                warehouse: form.warehouse,
+            })
+        });
+        const data = await response.json();
+        if (data.packages) {
+            packageRulesData.value = data.packages;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+const getSelectedPackage = () => {
+    // Find the selected package from the packages array based on the selected ID
+    const selectedRule = packageRulesData.value.find(pkg => pkg.id === packageItem.package_rule);
+    // console.log(packageItem, selectedRule);
+    if (selectedRule) {
+        isPackageRuleSelected.value = true;
+        packageItem.length = selectedRule.length;
+        packageItem.width = selectedRule.width;
+        packageItem.height = selectedRule.height;
+    }else {
+        isPackageRuleSelected.value = false;
+        packageItem.length = 0;
+        packageItem.width = 0;
+        packageItem.height = 0;
+    }
 };
 </script>
 
 <template>
     <form @submit.prevent="handleHBLUpdate">
-        <div class="grid grid-cols-1 sm:grid-cols-5 my-4 gap-4">
-            <div class="sm:col-span-3 space-y-5">
+        <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
+            <div class="sm:col-span-2 grid grid-rows gap-4">
+
                 <div class="card px-4 py-4 sm:px-5">
+                    <!-- Primary Details -->
                     <div>
                         <h2
                             class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                         >
-                            Basic Details
+                            Primary Details
                         </h2>
                     </div>
+
+                    <!-- Cargo Type -->
+                    <div class="card px-4 py-4 sm:px-5">
+                        <div>
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Cargo Type
+                            </h2>
+                        </div>
+                        <div class="my-5">
+                            <div class="space-x-5">
+                                <label
+                                    v-for="cargoType in cargoTypes"
+                                    class="inline-flex items-center space-x-2"
+                                >
+                                    <input
+                                        v-model="form.cargo_type"
+                                        :value="cargoType"
+                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                                        name="cargo_type"
+                                        type="radio"
+                                    />
+                                    <p>{{ cargoType }}</p>
+                                </label>
+                            </div>
+                            <InputError :message="form.errors.cargo_type"/>
+                        </div>
+                    </div>
+
+                    <!-- Type -->
+                    <div class="card px-4 py-4 sm:px-5">
+                        <div>
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Type
+                            </h2>
+                        </div>
+                        <div class="my-5">
+                            <div class="space-x-5">
+                                <label
+                                    v-for="hblType in hblTypes"
+                                    class="inline-flex items-center space-x-2"
+                                >
+                                    <input
+                                        v-model="form.hbl_type"
+                                        :value="hblType"
+                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                                        name="hbl_type"
+                                        type="radio"
+                                    />
+                                    <p>{{ hblType }}</p>
+                                </label>
+                            </div>
+                            <InputError :message="form.errors.hbl_type"/>
+                        </div>
+                    </div>
+
+                    <!-- Warehouse -->
+                    <div class="card px-4 py-4 sm:px-5">
+                        <div>
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Warehouse
+                            </h2>
+                        </div>
+                        <div class="my-5">
+                            <div class="space-x-5">
+                                <label
+                                    v-for="warehouse in warehouses"
+                                    class="inline-flex items-center space-x-2"
+                                >
+                                    <input
+                                        v-model="form.warehouse"
+                                        :value="warehouse"
+                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                                        name="warehouse"
+                                        type="radio"
+                                    />
+                                    <p>{{ warehouse }}</p>
+                                </label>
+                            </div>
+                            <InputError :message="form.errors.warehouse"/>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center">
+                        <img :src="hblImage" class="mx-auto" style="width: 50%;">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="sm:col-span-2">
+                <div class="card px-4 py-4 sm:px-5">
+                    <div class="flex justify-between items-center">
+                        <h2
+                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                        >
+                            Shipper Details
+                        </h2>
+
+                        <a @click.prevent="confirmShowingCopyFromHBLToShipperModal"
+                           x-tooltip.placement.bottom="'Copy from HBL'">
+                            <svg class="icon icon-paste text-[#64748b]" fill="none" stroke="#64748b"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" height="24"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <!-- Clipboard shape -->
+                                <path
+                                    d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h1v-1a2 2 0 0 1 2 -2z"/>
+                                <!-- Horizontal line representing pasted content -->
+                                <path d="M9 7h6"/>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <DialogModal :maxWidth="'xl'" :show="copyFromHBLToShipperModalShow"
+                                 @close="closeCopyFromHBLToShipperModal">
+                        <template #title>
+                            Copy
+                        </template>
+
+                        <template #content>
+                            <div class="mt-4">
+                                <TextInput
+                                    v-model="reference"
+                                    class="w-full"
+                                    placeholder="Enter HBL Reference"
+                                    required
+                                    type="text"
+                                />
+                            </div>
+                        </template>
+
+                        <template #footer>
+                            <SecondaryButton @click="closeCopyFromHBLToShipperModal">
+                                Cancel
+                            </SecondaryButton>
+                            <PrimaryButton
+                                class="ms-3"
+                                @click.prevent="handleCopyFromHBLToShipper"
+                            >
+                                Copy From HBL
+                            </PrimaryButton>
+                        </template>
+                    </DialogModal>
+
                     <div class="grid grid-cols-3 gap-5 mt-3">
                         <div class="col-span-3">
                             <span>Name</span>
@@ -378,8 +599,8 @@ const openEditModal = (index) => {
                             <InputError :message="form.errors.hbl_name"/>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-5 mt-3">
-                        <div>
+                    <div class="grid grid-cols-3 gap-5 mt-3">
+                        <div class="col-span-3">
                             <span>Email</span>
                             <label class="relative flex">
                                 <input
@@ -409,8 +630,10 @@ const openEditModal = (index) => {
                             </label>
                             <InputError :message="form.errors.email"/>
                         </div>
+                    </div>
 
-                        <div>
+                    <div class="grid grid-cols-3 gap-5 mt-3">
+                        <div class="col-span-3">
                             <span>Mobile Number</span>
                             <div class="flex -space-x-px">
                                 <select
@@ -430,91 +653,136 @@ const openEditModal = (index) => {
                             </div>
                             <InputError :message="form.errors.contact_number"/>
                         </div>
+                    </div>
 
-                        <div>
+                    <div class="grid grid-cols-3 gap-5 mt-3">
+                        <div class="col-span-3">
                             <span>PP or NIC No</span>
                             <label class="relative flex">
                                 <input
                                     v-model="form.nic"
-                                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    placeholder="ID/PP Number"
+                                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    placeholder="PP or NIC No"
                                     type="text"
                                 />
-                                <div
-                                    class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                >
-                                    <svg
-                                        class="size-4.5 transition-colors duration-200"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="1.5"
-                                        viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        />
-                                    </svg>
-                                </div>
                             </label>
                             <InputError :message="form.errors.nic"/>
                         </div>
+                    </div>
 
-                        <div>
-                            <span>IQ Number</span>
+                    <div class="grid grid-cols-3 gap-5 mt-3">
+                        <div class="col-span-3">
+                            <span>Residency No</span>
                             <label class="relative flex">
                                 <input
                                     v-model="form.iq_number"
-                                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    placeholder="IQ Number"
+                                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    placeholder="Residency No"
                                     type="text"
                                 />
-                                <div
-                                    class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                >
-                                    <svg
-                                        class="size-4.5 transition-colors duration-200"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="1.5"
-                                        viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        />
-                                    </svg>
-                                </div>
                             </label>
                             <InputError :message="form.errors.iq_number"/>
                         </div>
+                    </div>
 
-                        <div class="col-span-2">
+                    <div class="grid grid-cols-3 gap-5 mt-3">
+                        <div class="col-span-3">
                             <span>Address</span>
                             <label class="block">
-                <textarea
-                    v-model="form.address"
-                    class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="Type address here..."
-                    rows="4"
-                ></textarea>
+                  <textarea
+                      v-model="form.address"
+                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                      placeholder="Type address here..."
+                      rows="4"
+                  ></textarea>
                             </label>
                             <InputError :message="form.errors.address"/>
                         </div>
                     </div>
-                </div>
+                    <div v-if="form.hbl_type === 'Door to Door'" class="col-span-2">
+                        <Checkbox
+                            v-model="isChecked"
+                            @change="addToConsigneeDetails"
+                        ></Checkbox>
 
-                <div class="card px-4 py-4 sm:px-5">
-                    <div>
+                        <span class="ml-5">Same as Consignee Details</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sm:col-span-2 grid grid-rows">
+                <div class="card px-4 sm:px-5 p-4">
+                    <div class="flex justify-between items-center">
                         <h2
                             class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                         >
                             Consignee Details
                         </h2>
+
+                        <div class="flex space-x-1">
+                            <a  v-if="form.hbl_name"  @click.prevent="handleCopyShipper"
+                                x-tooltip.placement.bottom="'Copy Shippier'"
+                                class="relative inline-flex items-center">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
+                                     height="24" stroke="currentColor" stroke-linecap="round"
+                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path
+                                        d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
+                                    <path
+                                        d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
+                                </svg>
+                            </a>
+
+                            <a
+                                @click.prevent="confirmShowingCopyFromHBLToConsigneeModal"
+                                x-tooltip.placement.bottom="'Copy from HBL'"
+                            >
+                                <svg class="icon icon-paste text-[#64748b] ml-1" fill="none" stroke="#64748b"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" height="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <!-- Clipboard shape -->
+                                    <path
+                                        d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h1v-1a2 2 0 0 1 2 -2z"/>
+                                    <!-- Horizontal line representing pasted content -->
+                                    <path d="M9 7h6"/>
+                                </svg>
+
+                            </a>
+                        </div>
+
+                        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToConsigneeModalShow"
+                                     @close="closeCopyFromHBLToConsigneeModal">
+                            <template #title>
+                                Copy
+                            </template>
+
+                            <template #content>
+                                <div class="mt-4">
+                                    <TextInput
+                                        v-model="reference"
+                                        class="w-full"
+                                        placeholder="Enter HBL Reference"
+                                        required
+                                        type="text"
+                                    />
+                                </div>
+                            </template>
+
+                            <template #footer>
+                                <SecondaryButton @click="closeCopyFromHBLToConsigneeModal">
+                                    Cancel
+                                </SecondaryButton>
+                                <PrimaryButton
+                                    class="ms-3"
+                                    @click.prevent="handleCopyFromHBLToConsignee"
+                                >
+                                    Copy From HBL
+                                </PrimaryButton>
+                            </template>
+                        </DialogModal>
                     </div>
                     <div class="grid grid-cols-2 gap-5 mt-3">
                         <div class="col-span-2">
@@ -548,38 +816,20 @@ const openEditModal = (index) => {
                             <InputError :message="form.errors.consignee_name"/>
                         </div>
 
-                        <div>
+                        <div class="col-span-2">
                             <span>PP or NIC No</span>
                             <label class="relative flex">
                                 <input
                                     v-model="form.consignee_nic"
-                                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    placeholder="NIC/PP Number"
+                                    class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    placeholder="PP or NIC No"
                                     type="text"
                                 />
-                                <div
-                                    class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                >
-                                    <svg
-                                        class="size-4.5 transition-colors duration-200"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="1.5"
-                                        viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        />
-                                    </svg>
-                                </div>
                             </label>
                             <InputError :message="form.errors.consignee_nic"/>
                         </div>
 
-                        <div>
+                        <div class="col-span-2">
                             <span>Mobile Number</span>
                             <div class="flex -space-x-px">
                                 <select
@@ -603,12 +853,12 @@ const openEditModal = (index) => {
                         <div class="col-span-2">
                             <span>Address</span>
                             <label class="block">
-                <textarea
-                    v-model="form.consignee_address"
-                    class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="Type address here..."
-                    rows="4"
-                ></textarea>
+                                  <textarea
+                                      v-model="form.consignee_address"
+                                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                      placeholder="Type address here..."
+                                      rows="4"
+                                  ></textarea>
                             </label>
                             <InputError :message="form.errors.consignee_address"/>
                         </div>
@@ -616,238 +866,300 @@ const openEditModal = (index) => {
                         <div class="col-span-2">
                             <span>Note</span>
                             <label class="block">
-                <textarea
-                    v-model="form.consignee_note"
-                    class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                    placeholder="Type note here..."
-                    rows="4"
-                ></textarea>
+                                  <textarea
+                                      v-model="form.consignee_note"
+                                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                      placeholder="Type note here..."
+                                      rows="2"
+                                  ></textarea>
                             </label>
                             <InputError :message="form.errors.consignee_note"/>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="sm:col-span-2 space-y-5">
-                <!-- Action Buttons -->
-                <div class="flex justify-end space-x-5">
-                    <DangerOutlineButton @click="router.visit(route('hbls.index'))"
-                    >Cancel
-                    </DangerOutlineButton
-                    >
-                    <PrimaryButton class="space-x-2" type="submit">
-                        <span>Update HBL</span>
-                        <svg
-                            class="size-5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </PrimaryButton>
-                </div>
 
-                <!-- Cargo Type -->
-                <div class="card px-4 py-4 sm:px-5">
-                    <div>
-                        <h2
-                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                        >
-                            Cargo Type
-                        </h2>
-                    </div>
-                    <div class="my-5">
-                        <div class="space-x-5">
-                            <label
-                                v-for="cargoType in cargoTypes"
-                                class="inline-flex items-center space-x-2"
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
+            <div class="sm:col-span-4">
+                <div class="card p-1" style="height: 100%">
+                    <div class="mt-4 flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                <input
-                                    v-model="form.cargo_type"
-                                    :value="cargoType"
-                                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                    name="cargo_type"
-                                    type="radio"
-                                />
-                                <p>{{ cargoType }}</p>
-                            </label>
+                                Package Details
+                            </h2>
+                            <InputError :message="errors.packages"/>
                         </div>
-                        <InputError :message="form.errors.cargo_type"/>
+                        <PrimaryOutlineButton type="button" @click="showPackageDialog">
+                            New Package <i class="fas fa-plus fa-fw fa-fw"></i>
+                        </PrimaryOutlineButton>
                     </div>
-                </div>
-
-                <!-- Type -->
-                <div class="card px-4 py-4 sm:px-5">
-                    <div>
-                        <h2
-                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                    <div class="mt-5">
+                        <div
+                            v-if="form.packages.length > 0"
+                            class="is-scrollbar-hidden min-w-full overflow-x-auto"
                         >
-                            Type
-                        </h2>
-                    </div>
-                    <div class="my-5">
-                        <div class="space-x-5">
-                            <label
-                                v-for="hblType in hblTypes"
-                                class="inline-flex items-center space-x-2"
-                            >
-                                <input
-                                    v-model="form.hbl_type"
-                                    :value="hblType"
-                                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                    name="hbl_type"
-                                    type="radio"
-                                />
-                                <p>{{ hblType }}</p>
-                            </label>
-                        </div>
-                        <InputError :message="form.errors.hbl_type"/>
-                    </div>
-                </div>
+                            <table class="is-zebra w-full text-left">
+                                <thead>
+                                <tr>
+                                    <th
+                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 text-center"
+                                    >
+                                        <span class="hidden">Actions</span>
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                    >
+                                        Type
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                    >
+                                        Length (CM)
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                    >
+                                        Width
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                    >
+                                        Height
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                    >
+                                        Quantity
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                    >
+                                        Weight
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                    >
+                                        Volume (M.CU)
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                                    >
+                                        Remark
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="(item, index) in form.packages">
+                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
+                                        <button
+                                            class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
+                                            @click.prevent="confirmRemovePackage(index)"
+                                        >
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
 
-                <!-- Warehouse -->
-                <div class="card px-4 py-4 sm:px-5">
-                    <div>
-                        <h2
-                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                        >
-                            Warehouse
-                        </h2>
-                    </div>
-                    <div class="my-5">
-                        <div class="space-x-5">
-                            <label
-                                v-for="warehouse in warehouses"
-                                class="inline-flex items-center space-x-2"
-                            >
-                                <input
-                                    v-model="form.warehouse"
-                                    :value="warehouse"
-                                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                    name="warehouse"
-                                    type="radio"
-                                />
-                                <p>{{ warehouse }}</p>
-                            </label>
+                                        <button
+                                            class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
+                                            @click.prevent="openEditModal(index)"
+                                        >
+                                            <i class="fa-solid fa-edit"></i>
+                                        </button>
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                        {{ item.package_type }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                        {{ item.length }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                        {{ item.width }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                        {{ item.height }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                        {{ item.quantity }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                        {{ item.weight }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                        {{ item.volume }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                        {{ item.remarks || "-" }}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <InputError :message="form.errors.warehouse"/>
-                    </div>
-                </div>
-
-                <!-- Price & Payment -->
-                <div class="card px-4 py-4 sm:px-5">
-                    <div class="flex justify-between items-center">
-                        <h2
-                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                        >
-                            Price and Payment
-                        </h2>
-                        <button
-                            class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
-                            type="button"
-                            @click="calculatePayment"
-                        >
-                            Re Calculate Payment
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-2 gap-5 mt-5">
-                        <div>
-                            <span>Freight Charge</span>
-                            <TextInput
-                                v-model="form.freight_charge"
-                                :disabled="!isEditable"
-                                class="w-full"
-                                min="0"
-                                step="any"
-                                type="number"
-                            />
-                            <InputError :message="form.errors.freight_charge"/>
-                        </div>
-
-                        <div>
-                            <span>Bill Charge</span>
-                            <TextInput
-                                v-model="form.bill_charge"
-                                :disabled="!isEditable"
-                                class="w-full"
-                                min="0"
-                                step="any"
-                                type="number"
-                            />
-                            <InputError :message="form.errors.bill_charge"/>
-                        </div>
-
-                        <div>
-                            <span>Destination Charge</span>
-                            <TextInput
-                                v-model="form.other_charge"
-                                :disabled="!isEditable"
-                                class="w-full"
-                                min="0"
-                                step="any"
-                                type="number"
-                            />
-                            <InputError :message="form.errors.other_charge"/>
-                        </div>
-
-                        <div>
-                            <span>Discount</span>
-                            <TextInput
-                                v-model="form.discount"
-                                :disabled="!isEditable"
-                                class="w-full"
-                                placeholder="0"
-                                step="any"
-                                type="number"
-                            />
-                            <InputError :message="form.errors.discount"/>
-                        </div>
-
-                        <div class="col-span-2">
-                            <span>Paid Amount</span>
-                            <TextInput
-                                v-model="form.paid_amount"
-                                :disabled="!isEditable"
-                                class="w-full"
-                                min="0"
-                                step="any"
-                                type="number"
-                            />
-                            <InputError :message="form.errors.paid_amount"/>
-                        </div>
-
-                        <div class="col-start-2 mt-2 space-y-2.5 font-bold">
-                            <div class="flex justify-between">
-                                <p class="line-clamp-1">Packages</p>
-                                <p class="text-slate-700 dark:text-navy-100">
-                                    {{ packageList.length }}
+                        <div v-else class="text-center">
+                            <div class="text-center mb-8">
+                                <svg
+                                    class="w-24 h-24 mx-auto mb-4 text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M12 9l-2 2-2-2m4 2h4a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2h4m4-2l2 2 2-2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                    ></path>
+                                </svg>
+                                <p class="text-gray-600">
+                                    No packages. Please add packages to view data.
                                 </p>
                             </div>
-                            <div class="flex justify-between">
-                                <p class="line-clamp-1">Weight</p>
-                                <p class="text-slate-700 dark:text-navy-100">
-                                    {{ grandTotalWeight }}
-                                </p>
-                            </div>
-                            <div class="flex justify-between">
-                                <p class="line-clamp-1">Volume</p>
-                                <p class="text-slate-700 dark:text-navy-100">
-                                    {{ grandTotalVolume }}
-                                </p>
-                            </div>
+                            <PrimaryOutlineButton type="button" @click="showPackageDialog">
+                                New Package <i class="fas fa-plus fa-fw fa-fw"></i>
+                            </PrimaryOutlineButton>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="col-span-2">
-                            <div class="flex justify-between text-2xl text-success font-bold">
-                                <p class="line-clamp-1">Grand Total</p>
-                                <p>{{ hblTotal.toFixed(2) }} {{ currency }}</p>
+            <div class="sm:col-span-2 grid-cols-2 grid gap-4 space-y-5">
+                <div class="sm:col-span-2 space-y-5">
+                    <!-- Price & Payment -->
+                    <div class="card px-4 py-4 sm:px-5">
+                        <div class="flex justify-between items-center">
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Price and Payment
+                            </h2>
+                            <button
+                                class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
+                                type="button"
+                                @click="calculatePayment"
+                            >
+                                Re Calculate Payment
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-5 mt-5">
+                            <div>
+                                <span>Freight Charge</span>
+                                <TextInput
+                                    v-model="form.freight_charge"
+                                    :disabled="!isEditable"
+                                    class="w-full"
+                                    min="0"
+                                    step="any"
+                                    type="number"
+                                />
+                                <InputError :message="form.errors.freight_charge"/>
+                            </div>
+
+                            <div>
+                                <span>Bill Charge</span>
+                                <TextInput
+                                    v-model="form.bill_charge"
+                                    :disabled="!isEditable"
+                                    class="w-full"
+                                    min="0"
+                                    step="any"
+                                    type="number"
+                                />
+                                <InputError :message="form.errors.bill_charge"/>
+                            </div>
+
+                            <div>
+                                <span>Destination Charge</span>
+                                <TextInput
+                                    v-model="form.other_charge"
+                                    :disabled="!isEditable"
+                                    class="w-full"
+                                    min="0"
+                                    step="any"
+                                    type="number"
+                                />
+                                <InputError :message="form.errors.other_charge"/>
+                            </div>
+
+                            <div>
+                                <span>Package Charges</span>
+                                <TextInput
+                                    v-model="form.package_charges"
+                                    :disabled="!isEditable"
+                                    class="w-full"
+                                    min="0"
+                                    step="any"
+                                    type="number"
+                                />
+                            </div>
+
+                            <div>
+                                <span>Discount</span>
+                                <TextInput
+                                    v-model="form.discount"
+                                    :disabled="!isEditable"
+                                    class="w-full"
+                                    placeholder="0"
+                                    step="any"
+                                    type="number"
+                                />
+                                <InputError :message="form.errors.discount"/>
+                            </div>
+
+                            <div>
+                                <span>Paid Amount</span>
+                                <TextInput
+                                    v-model="form.paid_amount"
+                                    :disabled="!isEditable"
+                                    class="w-full"
+                                    min="0"
+                                    step="any"
+                                    type="number"
+                                />
+                                <InputError :message="form.errors.paid_amount"/>
+                            </div>
+
+                            <div>
+                                <span>Additional Charges</span>
+                                <TextInput
+                                    v-model="form.additional_charge"
+                                    :disabled="!isEditable"
+                                    class="w-full"
+                                    placeholder="0"
+                                    step="any"
+                                    type="number"
+                                />
+                                <InputError :message="form.errors.additional_charges"/>
+                            </div>
+
+                            <div class="col-start-2 mt-2 space-y-2.5 font-bold">
+                                <div class="flex justify-between">
+                                    <p class="line-clamp-1">Packages</p>
+                                    <p class="text-slate-700 dark:text-navy-100">
+                                        {{ packageList.length }}
+                                    </p>
+                                </div>
+                                <div class="flex justify-between">
+                                    <p class="line-clamp-1">Weight</p>
+                                    <p class="text-slate-700 dark:text-navy-100">
+                                        {{ grandTotalWeight.toFixed(2) }}
+                                    </p>
+                                </div>
+                                <div class="flex justify-between">
+                                    <p class="line-clamp-1">Volume</p>
+                                    <p class="text-slate-700 dark:text-navy-100">
+                                        {{ grandTotalVolume.toFixed(2) }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="col-span-2">
+                                <div class="flex justify-between text-2xl text-success font-bold">
+                                    <p class="line-clamp-1">Grand Total</p>
+                                    <p>{{ hblTotal ? hblTotal.toFixed(2) : 0.00 }} {{ currency }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -855,147 +1167,36 @@ const openEditModal = (index) => {
             </div>
         </div>
 
-        <div class="card col-span-5 px-4 py-4 sm:px-5 mb-10">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Package Details
-                    </h2>
-                    <InputError :message="errors.packages"/>
-                </div>
-                <PrimaryOutlineButton type="button" @click="showPackageDialog">
-                    New Package <i class="fas fa-plus fa-fw fa-fw"></i>
-                </PrimaryOutlineButton>
-            </div>
+        <div class="grid grid-cols-1 sm:grid-cols-6 my-6 gap-4">
+            <!-- Empty grid columns for spacing -->
+            <div class="col-span-4"></div>
 
-            <div class="mt-5">
-                <div
-                    v-if="form.packages.length > 0"
-                    class="is-scrollbar-hidden min-w-full overflow-x-auto"
+            <!-- Action Buttons -->
+            <div class="flex justify-end space-x-5 col-span-2">
+                <DangerOutlineButton @click="router.visit(route('hbls.index'))"
+                >Cancel
+                </DangerOutlineButton
                 >
-                    <table class="is-zebra w-full text-left">
-                        <thead>
-                        <tr>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 text-center"
-                            >
-                                <span class="hidden">Actions</span>
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Type
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Length (CM)
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Width
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Height
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Quantity
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Weight
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Volume (M.CU)
-                            </th>
-                            <th
-                                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                            >
-                                Remark
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="(item, index) in form.packages">
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
-                                <button
-                                    class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
-                                    @click.prevent="confirmRemovePackage(index)"
-                                >
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-
-                                <button
-                                    class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
-                                    @click.prevent="openEditModal(index)"
-                                >
-                                    <i class="fa-solid fa-edit"></i>
-                                </button>
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                {{ item.package_type }}
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                {{ item.length }}
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                {{ item.width }}
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                {{ item.height }}
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                {{ item.quantity }}
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                {{ item.weight }}
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                {{ item.volume }}
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                {{ item.remarks || "-" }}
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div v-else class="text-center">
-                    <div class="text-center mb-8">
-                        <svg
-                            class="w-24 h-24 mx-auto mb-4 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M12 9l-2 2-2-2m4 2h4a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2h4m4-2l2 2 2-2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                            ></path>
-                        </svg>
-                        <p class="text-gray-600">
-                            No packages. Please add packages to view data.
-                        </p>
-                    </div>
-                    <PrimaryOutlineButton type="button" @click="showPackageDialog">
-                        New Package <i class="fas fa-plus fa-fw fa-fw"></i>
-                    </PrimaryOutlineButton>
-                </div>
+                <PrimaryButton class="space-x-2" type="submit">
+                    <span>Update HBL</span>
+                    <svg
+                        class="size-5"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </PrimaryButton>
             </div>
         </div>
+
     </form>
 
     <div
@@ -1045,6 +1246,32 @@ const openEditModal = (index) => {
 
                 <div class="mt-4 space-y-4">
                     <div class="grid grid-cols-4 gap-4">
+                        <div class="col-span-4">
+                            <label class="block">
+                                    <span>
+                                        Package
+                                        <span v-if="form.is_active_package" class="text-red-500 text-sm">*</span>
+                                    </span>
+                                <select
+                                    v-model="packageItem.package_rule"
+                                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    @change="getSelectedPackage"
+                                    :required="form.is_active_package"
+                                    :disabled="!form.is_active_package && packageList.length > 0"
+                                >
+                                    <option value="0">Choose Package</option>
+                                    <option
+                                        v-for="pkg in packageRulesData"
+                                        :key="pkg.id"
+                                        :value="pkg.id"
+                                    >
+                                        {{
+                                            pkg.rule_title + ' (' + pkg.length + '*' + pkg.width + '*' + pkg.height + ')'
+                                        }}
+                                    </option>
+                                </select>
+                            </label>
+                        </div>
                         <div class="col-span-2">
                             <label class="block">
                                 <span>Type </span>
@@ -1070,7 +1297,7 @@ const openEditModal = (index) => {
                   <span class="text-red-500 text-sm">*</span></span
                 >
                                 <input
-                                    v-model="packageItem.package_type"
+                                    v-model="packageItem.type"
                                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     placeholder="Sofa set"
                                     type="text"
@@ -1149,7 +1376,7 @@ const openEditModal = (index) => {
                                     v-model="packageItem.volume"
                                     class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                     placeholder="1.00"
-                                    step="0.01"
+                                    step="0.001"
                                     type="number"
                                 />
                             </label>

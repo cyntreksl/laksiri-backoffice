@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\User\GetUserCurrentBranchID;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserBranchRequest;
 use App\Http\Requests\UpdateUserPasswordRequest;
@@ -39,6 +40,8 @@ class UserController extends Controller
         return Inertia::render('User/UserList', [
             'roles' => $this->roleRepository->getRoles(),
             'branches' => $this->branchRepository->getBranches(),
+            'userRole' => Auth()->user()->getRoleNames()[0],
+            'userBranch' => GetUserCurrentBranchID::run(),
         ]);
     }
 

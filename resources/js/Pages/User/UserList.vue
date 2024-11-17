@@ -20,6 +20,14 @@ const props = defineProps({
         default: () => {
         },
     },
+    userRole: {
+        type: String,
+        required: false
+    },
+    userBranch: {
+        type: Number,
+        required: false
+    },
 });
 const wrapperRef = ref(null);
 let grid = null;
@@ -245,7 +253,7 @@ const handleDeleteUser = () => {
 
         <Breadcrumb/>
 
-        <CreateUserForm :branches="branches" :roles="roles"/>
+        <CreateUserForm :branches="branches" :roles="roles" :user-role="userRole" :user-branch="userBranch"/>
 
         <div class="card mt-4">
             <div>

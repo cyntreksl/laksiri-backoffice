@@ -20,6 +20,7 @@ class HBLPackage extends Model
 
     protected $fillable = [
         'hbl_id',
+        'package_rule',
         'branch_id',
         'package_type',
         'length',
