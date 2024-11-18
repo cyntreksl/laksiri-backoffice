@@ -18,8 +18,8 @@ class GenerateLoadingReferenceNumber
                 case 'Riyadh':
                     $branch_code = 'RY';
                     break;
-                case 'Sri Lanka':
-                    $branch_code = 'SL';
+                case 'Colombo':
+                    $branch_code = 'CO';
                     break;
                 case 'Dubai':
                     $branch_code = 'DB';
