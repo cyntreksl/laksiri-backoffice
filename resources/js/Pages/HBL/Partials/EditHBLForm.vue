@@ -13,6 +13,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import hblImage from "../../../../images/illustrations/hblimage.png";
 import DialogModal from "@/Components/DialogModal.vue";
 import Checkbox from "@/Components/Checkbox.vue";
+import {float} from "quill/ui/icons.js";
 
 const props = defineProps({
     hbl: {
@@ -127,7 +128,11 @@ const packageItem = reactive({
     remarks: "",
 });
 
-const grandTotalVolume = ref(0);
+const grandTotalVolume = computed(() => {
+    return form.packages.reduce((acc, pack) => {
+        return parseFloat(acc) + parseFloat(pack.volume);
+    }, 0);
+});
 
 const grandTotalWeight = computed(() => {
     return form.packages.reduce((acc, pack) => {
@@ -176,7 +181,7 @@ const addPackageData = () => {
 
         const volume = parseFloat(newItem.volume) || 0;
         grandTotalWeight.value += parseFloat(newItem.totalWeight);
-        grandTotalVolume.value += parseFloat(volume.toFixed(3));
+        grandTotalVolume.value = grandTotalVolume.value += parseFloat(volume.toFixed(3));
         calculatePayment();
     }
     closeAddPackageModal();
