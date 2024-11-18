@@ -78,7 +78,7 @@ const form = useForm({
 
 onMounted(() => {
     calculatePayment();
-    packageRules();
+    hblRules();
 });
 
 const handleHBLUpdate = () => {
@@ -365,10 +365,11 @@ const openEditModal = (index) => {
 const isPackageRuleSelected = ref(form.is_active_package);
 const packageRulesData = ref([]);
 const selectedPackage = ref("");
+const isExistsRules = ref(false);
 
-const packageRules = async () => {
+const hblRules = async () => {
     try {
-        const response = await fetch(`/get-hbl-packages`, {
+        const response = await fetch(`/get-hbl-rules`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -382,14 +383,36 @@ const packageRules = async () => {
             })
         });
         const data = await response.json();
-        if (data.packages) {
-            packageRulesData.value = data.packages;
+        if ((!data.package_rules || data.package_rules.length === 0) &&
+            (!data.price_rules || data.price_rules.length === 0)) {
+            push.error('Please add price rules');
+            isExistsRules.value = false;
+        }else{
+            isExistsRules.value = true;
+        }
+        if (data.package_rules) {
+            packageRulesData.value = data.package_rules;
         }
 
     } catch (error) {
         console.log(error);
     }
 };
+
+watch([() => form.cargo_type], ([newCargoType]) => {
+    calculatePayment();
+    hblRules();
+});
+
+watch([() => form.hbl_type], ([newHBLType]) => {
+    calculatePayment();
+    hblRules();
+});
+
+watch([() => form.warehouse], ([newHBLType]) => {
+    calculatePayment();
+    hblRules();
+});
 const getSelectedPackage = () => {
     // Find the selected package from the packages array based on the selected ID
     const selectedRule = packageRulesData.value.find(pkg => pkg.id === packageItem.package_rule);
@@ -898,7 +921,7 @@ const getSelectedPackage = () => {
                             </h2>
                             <InputError :message="errors.packages"/>
                         </div>
-                        <PrimaryOutlineButton type="button" @click="showPackageDialog">
+                        <PrimaryOutlineButton type="button" @click="showPackageDialog" :disabled="!isExistsRules">
                             New Package <i class="fas fa-plus fa-fw fa-fw"></i>
                         </PrimaryOutlineButton>
                     </div>

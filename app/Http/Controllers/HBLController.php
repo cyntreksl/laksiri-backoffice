@@ -313,4 +313,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->getHBLPackageRules($request->all());
     }
+
+    public function getHBLRules(Request $request)
+    {
+        return $this->HBLRepository->getHBLRules($request->all());
+    }
 }

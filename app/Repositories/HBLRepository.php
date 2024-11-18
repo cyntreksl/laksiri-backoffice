@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
 use App\Actions\CallFlag\CreateCallFlag;
 use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
@@ -373,6 +374,19 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             $packages = GetHBLPackageRules::run($data['cargo_type'], $data['hbl_type'], $destination_branch[0]['id']);
 
             return response()->json(['packages' => $packages]);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to get package rules '.$e->getMessage());
+        }
+    }
+
+    public function getHBLRules($data): JsonResponse
+    {
+        try {
+            $destination_branch = Branch::where('name', '=', $data['warehouse'])->get();
+            $packagesRules = GetHBLPackageRules::run($data['cargo_type'], $data['hbl_type'], $destination_branch[0]['id']);
+            $priceRules = GetPriceRulesByCargoModeAndHBLType::run($data['cargo_type'], $data['hbl_type'], $destination_branch[0]['id']);
+
+            return response()->json(['package_rules' => $packagesRules, 'price_rules' => $priceRules]);
         } catch (\Exception $e) {
             throw new \Exception('Failed to get package rules '.$e->getMessage());
         }

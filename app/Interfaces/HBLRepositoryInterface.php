@@ -66,4 +66,6 @@ interface HBLRepositoryInterface
     public function createCallFlag(HBL $hbl, array $data);
 
     public function getHBLPackageRules(array $data);
+
+    public function getHBLRules(array $data);
 }

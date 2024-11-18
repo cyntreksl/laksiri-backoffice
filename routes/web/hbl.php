@@ -73,3 +73,5 @@ Route::post('hbls/create-call-flag/{hbl}', [HBLController::class, 'createCallFla
 Route::get('/get-call-flags/{hbl}', [HBLController::class, 'getHBLCallFlags']);
 
 Route::post('/get-hbl-packages', [HBLController::class, 'getHBLPackageRules']);
+
+Route::post('/get-hbl-rules', [HBLController::class, 'getHBLRules'])->name('hbls.rules');
