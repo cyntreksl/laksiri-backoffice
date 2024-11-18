@@ -272,17 +272,17 @@ watch(
 
 watch([() => form.cargo_type], ([newCargoType]) => {
     calculatePayment();
-    packageRules();
+    hblRules();
 });
 
 watch([() => form.hbl_type], ([newHBLType]) => {
     calculatePayment();
-    packageRules();
+    hblRules();
 });
 
 watch([() => form.warehouse], ([newHBLType]) => {
     calculatePayment();
-    packageRules();
+    hblRules();
 });
 
 const selectedType = ref("");
@@ -624,11 +624,13 @@ const shipIcon = ref(`
 
 const isPackageRuleSelected = ref(false);
 const packageRulesData = ref([]);
+const priceRulesData = ref([]);
 const selectedPackage = ref("");
+const isExistsRules = ref(false);
 
-const packageRules = async () => {
+const hblRules = async () => {
     try {
-        const response = await fetch(`/get-hbl-packages`, {
+        const response = await fetch(`/get-hbl-rules`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -642,8 +644,18 @@ const packageRules = async () => {
             })
         });
         const data = await response.json();
-        if (data.packages) {
-            packageRulesData.value = data.packages;
+        if ((!data.package_rules || data.package_rules.length === 0) &&
+            (!data.price_rules || data.price_rules.length === 0)) {
+            push.error('Please add price rules');
+            isExistsRules.value = false;
+        }else{
+            isExistsRules.value = true;
+        }
+        if (data.package_rules) {
+            packageRulesData.value = data.package_rules;
+        }
+        if (data.price_rules) {
+            priceRulesData.value = data.price_rules;
         }
 
     } catch (error) {
@@ -1195,7 +1207,7 @@ const getSelectedPackage = () => {
                                     Remove Copied Packages
                                 </DangerOutlineButton>
                             </div>
-                            <PrimaryOutlineButton v-if="Object.values(copiedPackages).length === 0" type="button"
+                            <PrimaryOutlineButton v-if="Object.values(copiedPackages).length === 0" type="button" :disabled="!isExistsRules"
                                                   @click="showPackageDialog">
                                 New Package <i class="fas fa-plus fa-fw fa-fw"></i>
                             </PrimaryOutlineButton>
@@ -1432,7 +1444,7 @@ const getSelectedPackage = () => {
                                         No packages. Please add packages to view data.
                                     </p>
                                 </div>
-                                <PrimaryOutlineButton type="button" @click="showPackageDialog">
+                                <PrimaryOutlineButton type="button" @click="showPackageDialog" :disabled="!isExistsRules">
                                     New Package <i class="fas fa-plus fa-fw fa-fw"></i>
                                 </PrimaryOutlineButton>
                             </div>
@@ -1666,7 +1678,7 @@ const getSelectedPackage = () => {
                     </DangerOutlineButton>
                     <PrimaryButton
                         :class="{ 'opacity-50': form.processing }"
-                        :disabled="form.processing"
+                        :disabled="form.processing || !isExistsRules"
                         class="space-x-2"
                         type="submit"
                     >
