@@ -349,7 +349,7 @@
                                             <ul class="flex flex-1 flex-col px-4 font-inter">
                                                 <li v-for="item in childMenuList">
                                                     <template v-if="$page.props.user.roles.includes('viewer')">
-                                                        <template v-if="$page.props.currentBranch.name === 'Sri Lanka'">
+                                                        <template v-if="$page.props.currentBranch.name === 'Colombo'">
                                                             <Link
                                                                 v-if="item.title === 'Shipments Arrivals'"
                                                                 :class="
@@ -368,7 +368,7 @@
                                                         <template
                                                             v-if="item.title === 'Shipments Arrivals' || item.title === 'Bonded Warehouse'">
                                                             <template
-                                                                v-if="$page.props.currentBranch.name === 'Sri Lanka'">
+                                                                v-if="$page.props.currentBranch.name === 'Colombo'">
                                                                 <Link
                                                                     :class="
                       route().current() === item.route
