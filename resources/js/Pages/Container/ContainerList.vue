@@ -285,7 +285,7 @@ const createColumns = () => [
                 {
                     class: `badge px-2 py-1 rounded-full text-sm font-semibold ${badgeClasses[status] || "bg-gray-200 text-gray-800"}`,
                 },
-                status.charAt(0).toUpperCase() + status.slice(1) // Capitalize the first letter
+                status.toUpperCase() // Capitalize
             );
         },
     },
