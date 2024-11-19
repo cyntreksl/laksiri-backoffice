@@ -12,4 +12,6 @@ interface HBLRepositoryInterface
     public function storeHBL(array $data);
 
     public function calculatePayment(array $data): JsonResponse;
+
+    public function getHBLRules(array $data);
 }
