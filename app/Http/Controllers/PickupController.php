@@ -63,8 +63,7 @@ class PickupController extends Controller
         return Inertia::render('Pickup/CreateJob', [
             'pickupTypes' => PickupType::cases(),
             'cargoTypes' => CargoType::cases(),
-            //            'noteTypes' => $this->pickupRepository->getNoteTypes(),
-            'noteTypes' => $this->packageTypeRepository->getPackageTypes(),
+            'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
             'zones' => GetZones::run(),
         ]);
     }
@@ -90,7 +89,7 @@ class PickupController extends Controller
         return Inertia::render('Pickup/EditJob', [
             'pickupTypes' => PickupType::cases(),
             'cargoTypes' => CargoType::cases(),
-            'noteTypes' => $this->pickupRepository->getNoteTypes(),
+            'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
             'zones' => GetZones::run(),
             'pickup' => $pickup,
         ]);

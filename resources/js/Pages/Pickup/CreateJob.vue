@@ -12,7 +12,7 @@ import {push} from "notivue";
 import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
-    noteTypes: {
+    packageTypes: {
         type: Object,
         default: () => {
         },
@@ -121,7 +121,7 @@ const handlePickupCreate = () => {
 watch(
     () => form.note_type,
     (newValue) => {
-        form.notes += newValue;
+        form.notes = props.packageTypes.find(type => type.name === newValue)?.description || newValue
     }
 );
 
@@ -311,17 +311,18 @@ const shipIcon = ref(`
                             <div class="col-span-2">
                                 <label class="block">
                                     <InputLabel value="Package Type"/>
+                                    <span v-if="packageTypes.length === 0" class="text-red-500">Please add at least one package type for create job.</span>
                                     <select
                                         v-model="form.note_type"
                                         class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
                                         <option :value="null" disabled>Select One</option>
                                         <option
-                                            v-for="noteType in noteTypes"
-                                            :key="noteType"
-                                            :value="noteType.note_type"
+                                            v-for="packageType in packageTypes"
+                                            :key="packageType"
+                                            :value="packageType.name"
                                         >
-                                            {{ noteType.name }}
+                                            {{ packageType.name }}
                                         </option>
                                     </select>
                                 </label>
@@ -525,7 +526,7 @@ const shipIcon = ref(`
                         >
                         <PrimaryButton
                             :class="{ 'opacity-50': form.processing }"
-                            :disabled="form.processing"
+                            :disabled="form.processing || packageTypes.length === 0"
                             class="space-x-2"
                             type="submit"
                         >
