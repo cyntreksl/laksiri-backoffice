@@ -51,4 +51,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->calculatePayment($request->all());
     }
+
+    public function getHBLRules(Request $request)
+    {
+        return $this->HBLRepository->getHBLRules($request->all());
+    }
 }
