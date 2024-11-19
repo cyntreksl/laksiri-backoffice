@@ -349,6 +349,10 @@ watch(unloadedHBLs, (newVal) => {
                             name="hblType"
                         />
                     </label>
+
+                    <div v-if="filters.hblType" class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer" @click.prevent="filters.hblType = ''">
+                        <i class="fa fa-times-circle text-base"></i>
+                    </div>
                 </div>
                 <div class="flex space-x-4 bg-amber-100 p-5 rounded-lg">
                     <label
@@ -363,6 +367,10 @@ watch(unloadedHBLs, (newVal) => {
                             name="warehouse"
                         />
                     </label>
+
+                    <div v-if="filters.warehouse" class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer" @click.prevent="filters.warehouse = ''">
+                        <i class="fa fa-times-circle text-base"></i>
+                    </div>
                 </div>
             </div>
 

@@ -67,6 +67,7 @@ const handleAssignDriver = () => {
             <div class="grid grid-cols-1 gap-5">
                 <div>
                     <InputLabel value="Select Driver"/>
+                    <span v-if="drivers.length === 0" class="text-red-500">Please add at least one driver to system.</span>
                     <div class="space-x-5 mt-1">
                         <label class="block">
                             <select
@@ -93,7 +94,7 @@ const handleAssignDriver = () => {
             </SecondaryButton>
             <PrimaryButton
                 :class="{ 'opacity-25': form.processing }"
-                :disabled="form.processing"
+                :disabled="form.processing || drivers.length === 0"
                 class="ms-3"
                 @click="handleAssignDriver"
             >
