@@ -9,6 +9,10 @@ class FromDateFilter implements FilterInterface
 {
     public function apply(Builder $query, $value)
     {
-        return $query->whereDate('created_at', '>=', $value);
+        if ($value) {
+            $query->whereDate('created_at', '>=', $value);
+        }
+
+        return $query;
     }
 }

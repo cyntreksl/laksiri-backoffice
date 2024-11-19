@@ -551,7 +551,7 @@ const confirmShowCreateIssueModal = (index) => {
                                                 </p>
                                             </div>
                                             <div class="flex items-center space-x-8 px-2.5">
-                                                <WarningButton :disabled="element.unloading_issue" @click.prevent="confirmShowCreateIssueModal(index)">
+                                                <WarningButton :disabled="element.unloading_issue.length > 0" @click.prevent="confirmShowCreateIssueModal(index)">
                                                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle mr-2" fill="none" height="24"
                                                          stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                                          stroke-width="2" viewBox="0 0 24 24" width="24"
