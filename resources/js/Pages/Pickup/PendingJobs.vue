@@ -772,6 +772,7 @@ const pickupId = ref(null);
 const showConfirmDeletePickupModal = ref(false);
 
 const closeModal = () => {
+    showConfirmDeletePickupModal.value = false;
     showConfirmAssignDriverModal.value = false;
     pickupId.value = null;
     idList.value = [];

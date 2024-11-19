@@ -12,7 +12,7 @@ import {push} from "notivue";
 import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
-    noteTypes: {
+    packageTypes: {
         type: Object,
         default: () => {
         },
@@ -94,7 +94,7 @@ const handlePickupUpdate = () => {
 watch(
     () => form.note_type,
     (newValue) => {
-        form.notes += newValue;
+        form.notes = props.packageTypes.find(type => type.name === newValue)?.description || newValue
     }
 );
 
@@ -289,11 +289,11 @@ const shipIcon = ref(`
                                     >
                                         <option :value="null" disabled>Select One</option>
                                         <option
-                                            v-for="noteType in noteTypes"
-                                            :key="noteType"
-                                            :value="noteType.note_type"
+                                            v-for="packageType in packageTypes"
+                                            :key="packageType"
+                                            :value="packageType.name"
                                         >
-                                            {{ noteType.note_type }}
+                                            {{ packageType.name }}
                                         </option>
                                     </select>
                                 </label>
