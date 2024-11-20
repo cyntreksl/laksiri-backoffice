@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Setting;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateSettingRequest extends FormRequest
 {
@@ -21,6 +23,8 @@ class UpdateSettingRequest extends FormRequest
      */
     public function rules(): array
     {
+        $setting = Setting::query()->first();
+
         return [
             'invoice_header_title' => ['required', 'string'],
             'invoice_header_subtitle' => ['required', 'string'],
@@ -28,7 +32,14 @@ class UpdateSettingRequest extends FormRequest
             'invoice_header_telephone' => ['required', 'string'],
             'invoice_footer_title' => ['required', 'string'],
             'invoice_footer_text' => ['required', 'string'],
-            'logo' => ['required', 'dimensions:max_width=600,max_height=600', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'logo' => [
+                Rule::requiredIf(function () use ($setting) {
+                    return (! $setting || ! $setting->logo) && ! $this->logo;
+                }),
+                'dimensions:max_width=600,max_height=600',
+                'mimes:jpg,jpeg,png',
+                'max:2048',
+            ],
         ];
     }
 }
