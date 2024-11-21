@@ -4,6 +4,7 @@ import InputError from "@/Components/InputError.vue";
 import {useForm} from "@inertiajs/vue3";
 import notification from "@/magics/notification.js";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import {push} from "notivue";
 
 const props = defineProps({
     user: {
@@ -22,10 +23,7 @@ const handleUpdatePassword = () => {
     form.put(route("users.password.change", props.user.id), {
         onSuccess: () => {
             form.reset();
-            notification({
-                text: 'Password Updated Successfully!',
-                variant: 'success',
-            })
+            push.success('Password Updated Successfully!');
         },
         preserveScroll: true,
         preserveState: true,

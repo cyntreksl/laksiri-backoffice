@@ -8,6 +8,7 @@ import {router, usePage} from "@inertiajs/vue3";
 import notification from "@/magics/notification.js";
 import DeleteUserConfirmationModal from "@/Pages/User/Partials/DeleteUserConfirmationModal.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import {push} from "notivue";
 
 const props = defineProps({
     roles: {
@@ -236,10 +237,7 @@ const handleDeleteUser = () => {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
-            notification({
-                text: "User Deleted Successfully!",
-                variant: "success",
-            });
+            push.success('User Deleted Successfully!');
             userId.value = null;
             router.visit(route("users.index"), {only: ["users"]});
         },
