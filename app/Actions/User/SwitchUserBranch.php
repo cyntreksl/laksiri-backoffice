@@ -15,6 +15,7 @@ class SwitchUserBranch
         session(['current_branch_id' => $branch->id]);
         session(['current_branch_name' => $branch->name]);
         session(['current_branch_type' => $branch->type]);
+        session(['current_branch_code' => $branch->branch_code]);
 
         $user = Auth::user();
         if ($user->last_logged_branch_id !== $branch->id) {

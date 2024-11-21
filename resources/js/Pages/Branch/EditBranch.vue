@@ -43,6 +43,7 @@ const props = defineProps({
 
 const form = useForm({
     name: props.branch.name,
+    branch_code: props.branch.branch_code,
     type: props.branch.type || null,
     currency_name: props.branch.currency_name || '',
     currency_symbol: props.branch.currency_symbol || '',
@@ -174,7 +175,13 @@ const clearPhotoFileInput = () => {
                             <InputError :message="form.errors.name"/>
                         </div>
 
-                        <div class="sm:col-span-2">
+                        <div class="sm:col-span-1">
+                            <InputLabel value="Branch Code"/>
+                            <TextInput v-model="form.branch_code" class="w-full"/>
+                            <InputError :message="form.errors.branch_code"/>
+                        </div>
+
+                        <div class="sm:col-span-1">
                             <label class="block">
                                 <InputLabel value="Type"/>
                                 <select

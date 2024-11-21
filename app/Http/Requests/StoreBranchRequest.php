@@ -24,6 +24,7 @@ class StoreBranchRequest extends FormRequest
     {
         return [
             'name' => ['required'],
+            'branch_code' => ['required', 'unique:branches,branch_code', 'max:10'],
             'type' => ['required'],
             'currency_name' => ['required'],
             'currency_symbol' => ['required', 'max:3'],

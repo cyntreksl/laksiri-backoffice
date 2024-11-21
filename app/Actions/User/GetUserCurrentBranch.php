@@ -15,6 +15,7 @@ class GetUserCurrentBranch
         $branchName = session('current_branch_name');
         $branchId = session('current_branch_id');
         $branchType = session('current_branch_type');
+        $branchCode = session('current_branch_code');
 
         //      For API
         if (empty($branchId)) {
@@ -22,12 +23,14 @@ class GetUserCurrentBranch
             $branchId = $primaryBranch->id;
             $branchName = $primaryBranch->name;
             $branchType = $primaryBranch->type;
+            $branchCode = $primaryBranch->branch_code;
         }
 
         return [
             'branchName' => $branchName,
             'branchId' => $branchId,
             'branchType' => $branchType,
+            'branchCode' => $branchCode,
         ];
     }
 }

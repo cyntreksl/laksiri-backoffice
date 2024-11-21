@@ -17,6 +17,7 @@ class Branch extends Model
     protected $fillable = [
         'name',
         'slug',
+        'branch_code',
         'parent_id',
         'type',
         'currency_name',

@@ -30,6 +30,7 @@ defineProps({
 
 const form = useForm({
     name: '',
+    branch_code: '',
     type: null,
     currency_name: '',
     currency_symbol: '',
@@ -107,7 +108,13 @@ const handleBranchCreate = () => {
                                 <InputError :message="form.errors.name"/>
                             </div>
 
-                            <div class="sm:col-span-2">
+                            <div class="sm:col-span-1">
+                                <InputLabel value="Branch Code"/>
+                                <TextInput v-model="form.branch_code" class="w-full"/>
+                                <InputError :message="form.errors.branch_code"/>
+                            </div>
+
+                            <div class="sm:col-span-1">
                                 <label class="block">
                                     <InputLabel value="Type"/>
                                     <select

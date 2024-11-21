@@ -14,6 +14,7 @@ class CreateBranch
     {
         return Branch::create([
             'name' => $data['name'],
+            'branch_code' => $data['branch_code'],
             'slug' => Str::slug($data['name']),
             'type' => $data['type'],
             'currency_name' => $data['currency_name'],
