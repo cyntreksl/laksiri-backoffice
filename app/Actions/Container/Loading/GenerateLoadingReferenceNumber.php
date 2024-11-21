@@ -11,24 +11,7 @@ class GenerateLoadingReferenceNumber
 
     public function handle(string $branch_name): string
     {
-        $branch_code = '';
-
-        if ($branch_name) {
-            switch ($branch_name) {
-                case 'Riyadh':
-                    $branch_code = 'RY';
-                    break;
-                case 'Colombo':
-                    $branch_code = 'CO';
-                    break;
-                case 'Dubai':
-                    $branch_code = 'DB';
-                    break;
-                case 'Kuwait':
-                    $branch_code = 'KW';
-                    break;
-            }
-        }
+        $branch_code = session('current_branch_code');
 
         $last_loading = Container::latest()->first();
 

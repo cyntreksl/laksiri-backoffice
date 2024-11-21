@@ -11,36 +11,7 @@ class GeneratePickupReferenceNumber
 
     public function handle(string $branch_name): string
     {
-        $branch_code = '';
-
-        if ($branch_name) {
-            switch ($branch_name) {
-                case 'Riyadh':
-                    $branch_code = 'RY';
-                    break;
-                case 'Colombo':
-                    $branch_code = 'CL';
-                    break;
-                case 'Dubai':
-                    $branch_code = 'DB';
-                    break;
-                case 'Kuwait':
-                    $branch_code = 'KW';
-                    break;
-                case 'Qatar':
-                    $branch_code = 'QT';
-                    break;
-                case 'Malaysia':
-                    $branch_code = 'ML';
-                    break;
-                case 'Nintavur':
-                    $branch_code = 'NT';
-                    break;
-                case 'London':
-                    $branch_code = 'LD';
-                    break;
-            }
-        }
+        $branch_code = session('current_branch_code');
 
         $last_pickup = PickUp::latest()->first();
 
