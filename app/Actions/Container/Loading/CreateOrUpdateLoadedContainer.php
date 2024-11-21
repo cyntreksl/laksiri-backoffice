@@ -52,7 +52,7 @@ class CreateOrUpdateLoadedContainer
 
             UpdateContainerStatus::run($container, ContainerStatus::LOADED->value);
 
-            $reference = GenerateLoadingReferenceNumber::run(GetUserCurrentBranch::run()['branchCode']);
+            $reference = GenerateLoadingReferenceNumber::run(GetUserCurrentBranch::run()['branchName']);
 
             UpdateReferenceNumber::run($container, $reference);
 
