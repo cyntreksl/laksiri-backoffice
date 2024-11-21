@@ -4,6 +4,7 @@ import notification from "@/magics/notification.js";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import {push} from "notivue";
 
 const props = defineProps({
     user: {
@@ -26,10 +27,7 @@ const form = useForm({
 const updateUserBranch = () => {
     form.put(route("users.branch.update", props.user.id), {
         onSuccess: () => {
-            notification({
-                text: 'User Branches Updated Successfully!',
-                variant: 'success',
-            })
+            push.success('User Branches Updated Successfully!');
         },
         preserveScroll: true,
         preserveState: true,

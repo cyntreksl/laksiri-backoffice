@@ -14,12 +14,23 @@ class GetLoadedContainers
     {
         // Retrieve containers with their loaded HBLs
         $containersWithLoadedHBLs = Container::withoutGlobalScope(BranchScope::class)
-            ->with(['hbl_packages' => function ($query) {
-                $query->wherePivot('status', 'loaded');
+            ->with([
+                'hbl_packages' => function ($query) {
+                    $query->withoutGlobalScope(BranchScope::class)
+                        ->with(['hbl' => function ($hblQuery) {
+                            $hblQuery->withoutGlobalScope(BranchScope::class);
+                        }]);
+                },
+            ])
+            ->withCount(['hbl_packages' => function ($query) {
+                $query->withoutGlobalScope(BranchScope::class);
             }])
-            ->withCount('hbl_packages')
-            ->withSum('hbl_packages', 'weight')
-            ->withSum('hbl_packages', 'volume')
+            ->withSum(['hbl_packages' => function ($query) {
+                $query->withoutGlobalScope(BranchScope::class);
+            }], 'weight')
+            ->withSum(['hbl_packages' => function ($query) {
+                $query->withoutGlobalScope(BranchScope::class);
+            }], 'volume')
             ->get();
 
         $containersWithLoadedHBLs->each(function ($container) {

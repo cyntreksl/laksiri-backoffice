@@ -16,6 +16,7 @@ use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\ContainerDocument\DeleteDocument;
 use App\Actions\ContainerDocument\DownloadDocument;
 use App\Actions\ContainerDocument\UploadDocument;
+use App\Actions\Setting\GetSettings;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
@@ -187,7 +188,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
         foreach ($container->hbls as $hbl) {
             // Render each HBL as HTML and append to combinedHtml
-            $combinedHtml .= view('pdf.hbls.hbl', ['hbl' => $hbl])->render();
+            $combinedHtml .= view('pdf.hbls.hbl', ['hbl' => $hbl, 'settings' => GetSettings::run()])->render();
             //            $combinedHtml .= '<div style="page-break-after: always;"></div>'; // Add page break after each HBL
         }
 

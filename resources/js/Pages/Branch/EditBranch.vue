@@ -67,7 +67,6 @@ const handleBranchUpdate = () => {
 
 const photoPreview = ref(null);
 const photoInput = ref(null);
-
 const settingForm = useForm({
     invoice_header_title: props.settings ? props.settings.invoice_header_title : '',
     invoice_header_subtitle: props.settings ? props.settings.invoice_header_subtitle : '',
@@ -75,7 +74,7 @@ const settingForm = useForm({
     invoice_header_telephone: props.settings ? props.settings.invoice_header_telephone : '',
     invoice_footer_title: props.settings ? props.settings.invoice_footer_title : '',
     invoice_footer_text: props.settings ? props.settings.invoice_footer_text : '',
-    logo: null,
+    logo: props.settings ? props.settings.logo : null,
 });
 
 const handleSettingUpdate = () => {
