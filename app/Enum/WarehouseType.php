@@ -8,11 +8,14 @@ enum WarehouseType: string
 
     case NINTAVUR = 'NINTAVUR';
 
+    case OTHER = 'OTHER';
+
     public static function getWarehouseOptions(): array
     {
         return array_filter(self::cases(), fn ($case) => in_array($case, [
             self::COLOMBO,
             self::NINTAVUR,
+            self::OTHER,
         ]));
     }
 }
