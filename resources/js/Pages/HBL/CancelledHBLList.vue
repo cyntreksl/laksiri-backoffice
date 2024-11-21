@@ -47,7 +47,7 @@ const filters = reactive({
     cargoMode: ["Air Cargo", "Sea Cargo"],
     hblType: ["UPB", "Gift", "Door to Door"],
     isHold: false,
-    warehouse: ["COLOMBO", "NINTAVUR"],
+    warehouse: ["COLOMBO", "NINTAVUR", "OTHER"],
     createdBy: "",
     paymentStatus: [],
 });
@@ -493,7 +493,7 @@ const resetFilter = () => {
     filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
     filters.hblType = ["UPB", "Gift", "Door to Door"];
     filters.isHold = false;
-    filters.warehouse = ["COLOMBO", "NINTAVUR"];
+    filters.warehouse = ["COLOMBO", "NINTAVUR", "OTHER"];
     filters.createdBy = "";
     filters.paymentStatus = [];
     applyFilters();
@@ -1023,6 +1023,14 @@ const shipIcon = ref(`
                         v-model="filters.warehouse"
                         label="NINTAVUR"
                         value="NINTAVUR"
+                    />
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch
+                        v-model="filters.warehouse"
+                        label="OTHER"
+                        value="OTHER"
                     />
                 </label>
 

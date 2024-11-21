@@ -98,6 +98,17 @@ class BranchSeeder extends Seeder
                 'delivery_types' => json_encode(['Gift', 'UBP', 'Door to Door']),
                 'package_types' => json_encode(['Departure']),
             ],
+            [
+                'name' => 'Other',
+                'slug' => 'other',
+                'branch_code' => 'OTR',
+                'type' => 'Destination',
+                'currency_name' => 'Dollers',
+                'currency_symbol' => 'USD',
+                'cargo_modes' => json_encode(['Sea Cargo', 'Air Cargo']),
+                'delivery_types' => json_encode(['UBP', 'Door to Door', 'Gift']),
+                'package_types' => json_encode(['Destination']),
+            ],
         ];
 
         if (Branch::count() === 0) {
