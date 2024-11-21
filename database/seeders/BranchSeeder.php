@@ -13,6 +13,7 @@ class BranchSeeder extends Seeder
             [
                 'name' => 'Riyadh',
                 'slug' => 'riyadh',
+                'branch_code' => 'RY',
                 'type' => 'Departure',
                 'currency_name' => 'Saudi Arabian Riyal',
                 'currency_symbol' => 'SA',
@@ -23,6 +24,7 @@ class BranchSeeder extends Seeder
             [
                 'name' => 'Colombo',
                 'slug' => 'colombo',
+                'branch_code' => 'CO',
                 'type' => 'Destination',
                 'currency_name' => 'Sri Lankan Rupee',
                 'currency_symbol' => 'LKR',
@@ -33,6 +35,7 @@ class BranchSeeder extends Seeder
             [
                 'name' => 'Dubai',
                 'slug' => 'dubai',
+                'branch_code' => 'DB',
                 'type' => 'Departure',
                 'currency_name' => 'United Arab Emirates Dirham',
                 'currency_symbol' => 'AED',
@@ -43,6 +46,7 @@ class BranchSeeder extends Seeder
             [
                 'name' => 'Kuwait',
                 'slug' => 'kuwait',
+                'branch_code' => 'KW',
                 'type' => 'Departure',
                 'currency_name' => 'Kuwaiti Dinar',
                 'currency_symbol' => 'KD',
@@ -53,6 +57,7 @@ class BranchSeeder extends Seeder
             [
                 'name' => 'Qatar',
                 'slug' => 'qatar',
+                'branch_code' => 'QT',
                 'type' => 'Departure',
                 'currency_name' => 'Qatari riyal',
                 'currency_symbol' => 'QAR',
@@ -63,6 +68,7 @@ class BranchSeeder extends Seeder
             [
                 'name' => 'Malaysia',
                 'slug' => 'malaysia',
+                'branch_code' => 'ML',
                 'type' => 'Departure',
                 'currency_name' => 'Malaysian Ringgit',
                 'currency_symbol' => 'MYR',
@@ -73,6 +79,7 @@ class BranchSeeder extends Seeder
             [
                 'name' => 'Nintavur',
                 'slug' => 'nintavur',
+                'branch_code' => 'NT',
                 'type' => 'Destination',
                 'currency_name' => 'Dollers',
                 'currency_symbol' => 'USD',
@@ -83,6 +90,7 @@ class BranchSeeder extends Seeder
             [
                 'name' => 'London',
                 'slug' => 'london',
+                'branch_code' => 'LD',
                 'type' => 'Departure',
                 'currency_name' => 'GBP',
                 'currency_symbol' => 'GBP',

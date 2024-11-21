@@ -14,6 +14,7 @@ class UpdateBranch
     {
         return $branch->update([
             'name' => $data['name'],
+            'branch_code' => $data['branch_code'],
             'slug' => Str::slug($data['name']),
             'type' => $data['type'],
             'currency_name' => $data['currency_name'],

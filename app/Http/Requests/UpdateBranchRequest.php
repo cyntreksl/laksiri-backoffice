@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateBranchRequest extends FormRequest
 {
@@ -23,6 +24,11 @@ class UpdateBranchRequest extends FormRequest
     {
         return [
             'name' => ['required'],
+            'branch_code' => [
+                'required',
+                'max:10',
+                Rule::unique('branches', 'branch_code')->ignore($this->route('branch')),
+            ],
             'type' => ['required'],
             'currency_name' => ['required'],
             'currency_symbol' => ['required', 'max:3'],

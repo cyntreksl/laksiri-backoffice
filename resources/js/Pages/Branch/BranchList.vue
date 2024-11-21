@@ -49,6 +49,11 @@ defineProps({
                     <th
                         class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
+                        Branch Code
+                    </th>
+                    <th
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                    >
                         Currency Name
                     </th>
                     <th
@@ -92,6 +97,11 @@ defineProps({
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
                         {{branch.type}}
+                    </td>
+                    <td
+                        class="whitespace-nowrap px-4 py-3 sm:px-5"
+                    >
+                        {{branch.branch_code}}
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
