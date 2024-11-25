@@ -507,7 +507,7 @@ const handlePerPageChange = (event) => {
                     </div>
 
                     <div class="flex">
-                        <ColumnVisibilityPopover>
+                        <ColumnVisibilityPopover v-if="false">
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
                                     :checked="data.columnVisibility.maximum_volume"
