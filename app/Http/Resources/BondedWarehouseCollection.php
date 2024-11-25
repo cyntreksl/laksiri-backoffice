@@ -20,7 +20,7 @@ class BondedWarehouseCollection extends JsonResource
 
         return [
             'id' => $this->id ?? '-',
-            'hbl' => $this->hbl ?? '-',
+            'hbl' => $this->hbl_number ?? '-',
             'hbl_name' => $this->hbl_name ?? '-',
             'consignee_name' => $this->consignee_name ?? '-',
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
