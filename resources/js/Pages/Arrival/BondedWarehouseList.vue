@@ -182,7 +182,7 @@ const createColumns = () => [
                         {
                             className:
                                 "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                            onClick: () => confirmViewHBL(row.cells[0].data?.id),
+                            onClick: () => confirmViewHBL(row.cells[0].data),
                             "x-tooltip..placement.bottom.primary": "'View'",
                         },
                         [
@@ -601,7 +601,7 @@ const handlePerPageChange = (event) => {
                                        @short-loading="handleMarkAsShortLoading"/>
 
         <HBLDetailModal
-            :hbl-id="hblId"
+            :hblId="hblId"
             :show="showConfirmViewHBLModal"
             @close="closeShowHBLModal"
         />
