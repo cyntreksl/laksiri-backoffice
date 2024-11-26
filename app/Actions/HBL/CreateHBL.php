@@ -14,7 +14,6 @@ class CreateHBL
     public function handle(array $data): HBL
     {
         $reference = GenerateHBLReferenceNumber::run();
-        //        dd($data);
         $hbl = HBL::create([
             'reference' => $reference,
             'branch_id' => GetUserCurrentBranchID::run(),

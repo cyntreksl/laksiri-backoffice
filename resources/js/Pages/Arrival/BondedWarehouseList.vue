@@ -601,7 +601,7 @@ const handlePerPageChange = (event) => {
                                        @short-loading="handleMarkAsShortLoading"/>
 
         <HBLDetailModal
-            :hblId="hblId"
+            :hbl-id="hblId"
             :show="showConfirmViewHBLModal"
             @close="closeShowHBLModal"
         />
