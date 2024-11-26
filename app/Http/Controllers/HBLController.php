@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Enum\CargoType;
 use App\Enum\HBLPaymentStatus;
 use App\Enum\HBLType;
-use App\Enum\WarehouseType;
 use App\Http\Requests\StoreCallFlagRequest;
 use App\Http\Requests\StoreHBLRequest;
 use App\Http\Requests\UpdateHBLRequest;
@@ -70,7 +70,7 @@ class HBLController extends Controller
         return Inertia::render('HBL/CreateHBL', [
             'cargoTypes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
-            'warehouses' => WarehouseType::cases(),
+            'warehouses' => GetDestinationBranches::run(),
             'priceRules' => $this->priceRepository->getPriceRules(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
         ]);
@@ -102,7 +102,7 @@ class HBLController extends Controller
             'hbl' => $hbl->load('packages'),
             'cargoTypes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
-            'warehouses' => WarehouseType::cases(),
+            'warehouses' => GetDestinationBranches::run(),
             'priceRules' => $this->priceRepository->getPriceRules(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
         ]);
@@ -133,8 +133,9 @@ class HBLController extends Controller
         $this->HBLRepository->toggleHold($hbl);
     }
 
-    public function downloadHBLPDF(HBL $hbl)
+    public function downloadHBLPDF($HBL)
     {
+        $hbl = GetHBLByIdWithPackages::run($HBL);
         $this->authorize('hbls.download pdf');
 
         return $this->HBLRepository->downloadHBLPDF($hbl);

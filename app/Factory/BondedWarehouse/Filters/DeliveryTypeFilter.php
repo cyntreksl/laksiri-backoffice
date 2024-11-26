@@ -12,7 +12,7 @@ class DeliveryTypeFilter implements FilterInterface
         if (! is_null($value)) {
             $value = ! is_array($value) ? explode(',', $value) : $value;
 
-            return $query->orWhereIn('hbl_type', $value);
+            return $query->whereIn('hbl_type', $value);
         }
     }
 }

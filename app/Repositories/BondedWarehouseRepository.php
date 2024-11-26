@@ -23,7 +23,18 @@ class BondedWarehouseRepository implements BondedWarehouseRepositoryInterface, G
         $query->whereIn('system_status', [4.3, 4.4]);
 
         if (! empty($search)) {
-            $query->where('hbl', 'like', "%$search%");
+            $query->whereAny([
+                'reference',
+                'hbl_number',
+                'hbl_name',
+                'contact_number',
+                'consignee_name',
+                'consignee_nic',
+                'consignee_contact',
+                'iq_number',
+                'nic',
+                'email',
+            ], 'like', '%'.$search.'%');
         }
 
         //apply filters

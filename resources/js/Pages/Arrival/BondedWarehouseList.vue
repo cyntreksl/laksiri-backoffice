@@ -182,7 +182,7 @@ const createColumns = () => [
                         {
                             className:
                                 "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                            onClick: () => confirmViewHBL(row.cells[0].data?.id),
+                            onClick: () => confirmViewHBL(row.cells[0].data),
                             "x-tooltip..placement.bottom.primary": "'View'",
                         },
                         [
@@ -215,50 +215,50 @@ const createColumns = () => [
                             ),
                         ]
                     ) : null,
-                usePage().props.user.permissions.includes('bonded.complete registration') ?
-                    h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25",
-                            onClick: () =>
-                                router.visit(
-                                    route("arrival.unloading-points.index", {
-                                        container: row.cells[0].data,
-                                    })
-                                ),
-                            "x-tooltip..placement.bottom.success": "'Complete Reception'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class:
-                                        "size-6 icon icon-tabler icons-tabler-outline icon-tabler-rosette-discount-check",
-                                    fill: "none",
-                                    stroke: "currentColor",
-                                    strokeWidth: 2,
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        stroke: "none",
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M5 7.2a2.2 2.2 0 0 1 2.2 -2.2h1a2.2 2.2 0 0 0 1.55 -.64l.7 -.7a2.2 2.2 0 0 1 3.12 0l.7 .7c.412 .41 .97 .64 1.55 .64h1a2.2 2.2 0 0 1 2.2 2.2v1c0 .58 .23 1.138 .64 1.55l.7 .7a2.2 2.2 0 0 1 0 3.12l-.7 .7a2.2 2.2 0 0 0 -.64 1.55v1a2.2 2.2 0 0 1 -2.2 2.2h-1a2.2 2.2 0 0 0 -1.55 .64l-.7 .7a2.2 2.2 0 0 1 -3.12 0l-.7 -.7a2.2 2.2 0 0 0 -1.55 -.64h-1a2.2 2.2 0 0 1 -2.2 -2.2v-1a2.2 2.2 0 0 0 -.64 -1.55l-.7 -.7a2.2 2.2 0 0 1 0 -3.12l.7 -.7a2.2 2.2 0 0 0 .64 -1.55v-1",
-                                    }),
-                                    h("path", {
-                                        d: "M9 12l2 2l4 -4",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
+                // usePage().props.user.permissions.includes('bonded.complete registration') ?
+                //     h(
+                //         "button",
+                //         {
+                //             className:
+                //                 "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25",
+                //             onClick: () =>
+                //                 router.visit(
+                //                     route("arrival.unloading-points.index", {
+                //                         container: row.cells[0].data,
+                //                     })
+                //                 ),
+                //             "x-tooltip..placement.bottom.success": "'Complete Reception'",
+                //         },
+                //         [
+                //             h(
+                //                 "svg",
+                //                 {
+                //                     xmlns: "http://www.w3.org/2000/svg",
+                //                     viewBox: "0 0 24 24",
+                //                     class:
+                //                         "size-6 icon icon-tabler icons-tabler-outline icon-tabler-rosette-discount-check",
+                //                     fill: "none",
+                //                     stroke: "currentColor",
+                //                     strokeWidth: 2,
+                //                     strokeLinecap: "round",
+                //                     strokeLinejoin: "round",
+                //                 },
+                //                 [
+                //                     h("path", {
+                //                         stroke: "none",
+                //                         d: "M0 0h24v24H0z",
+                //                         fill: "none",
+                //                     }),
+                //                     h("path", {
+                //                         d: "M5 7.2a2.2 2.2 0 0 1 2.2 -2.2h1a2.2 2.2 0 0 0 1.55 -.64l.7 -.7a2.2 2.2 0 0 1 3.12 0l.7 .7c.412 .41 .97 .64 1.55 .64h1a2.2 2.2 0 0 1 2.2 2.2v1c0 .58 .23 1.138 .64 1.55l.7 .7a2.2 2.2 0 0 1 0 3.12l-.7 .7a2.2 2.2 0 0 0 -.64 1.55v1a2.2 2.2 0 0 1 -2.2 2.2h-1a2.2 2.2 0 0 0 -1.55 .64l-.7 .7a2.2 2.2 0 0 1 -3.12 0l-.7 -.7a2.2 2.2 0 0 0 -1.55 -.64h-1a2.2 2.2 0 0 1 -2.2 -2.2v-1a2.2 2.2 0 0 0 -.64 -1.55l-.7 -.7a2.2 2.2 0 0 1 0 -3.12l.7 -.7a2.2 2.2 0 0 0 .64 -1.55v-1",
+                //                     }),
+                //                     h("path", {
+                //                         d: "M9 12l2 2l4 -4",
+                //                     }),
+                //                 ]
+                //             ),
+                //         ]
+                //     ) : null,
                 usePage().props.user.permissions.includes('bonded.mark as short loading') ?
                     row.cells[9].data === 1 ||
                     h(
@@ -507,7 +507,7 @@ const handlePerPageChange = (event) => {
                     </div>
 
                     <div class="flex">
-                        <ColumnVisibilityPopover>
+                        <ColumnVisibilityPopover v-if="false">
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
                                     :checked="data.columnVisibility.maximum_volume"

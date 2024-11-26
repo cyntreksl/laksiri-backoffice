@@ -33,6 +33,7 @@ class ConvertPickupToHBL
             'consignee_address' => $request->consignee_address,
             'consignee_note' => $request->consignee_note,
             'warehouse' => $request->warehouse,
+            'warehouse_id' => $request->warehouse_id ?? null,
             'freight_charge' => $request->freight_charge,
             'bill_charge' => $request->bill_charge,
             'other_charge' => $request->other_charge,
