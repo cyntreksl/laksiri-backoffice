@@ -27,7 +27,7 @@ interface HBLRepositoryInterface
 
     public function getHBLWithUnloadedPackagesByReference(string $reference, string $cargo_type);
 
-    public function downloadHBLPDF(HBL $hbl);
+    public function downloadHBLPDF(HBL $HBL);
 
     public function downloadHBLInvoicePDF(HBL $hbl);
 

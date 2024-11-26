@@ -133,8 +133,9 @@ class HBLController extends Controller
         $this->HBLRepository->toggleHold($hbl);
     }
 
-    public function downloadHBLPDF(HBL $hbl)
+    public function downloadHBLPDF($HBL)
     {
+        $hbl = GetHBLByIdWithPackages::run($HBL);
         $this->authorize('hbls.download pdf');
 
         return $this->HBLRepository->downloadHBLPDF($hbl);
