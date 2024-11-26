@@ -15,10 +15,10 @@ class GetHBLByIdWithPackages
         return HBL::withoutGlobalScope(BranchScope::class)
             ->where('id', $hbl)
             ->withTrashed()
-            ->withCount(['packages'=> function ($query) {
+            ->withCount(['packages' => function ($query) {
                 $query->withoutGlobalScope(BranchScope::class);
             }])
-            ->with(['packages'=> function ($query) {
+            ->with(['packages' => function ($query) {
                 $query->withoutGlobalScope(BranchScope::class);
             }])
             ->withSum(['packages' => function ($query) {

@@ -7,7 +7,6 @@ use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Enum\CargoType;
 use App\Enum\HBLPaymentStatus;
 use App\Enum\HBLType;
-use App\Enum\WarehouseType;
 use App\Http\Requests\StoreCallFlagRequest;
 use App\Http\Requests\StoreHBLRequest;
 use App\Http\Requests\UpdateHBLRequest;
