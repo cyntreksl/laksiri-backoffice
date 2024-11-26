@@ -21,6 +21,6 @@ class DownloadHBLPDF
 
         $filename = $hbl->hbl.'.pdf';
 
-        return $pdf->stream($filename);
+        return $pdf->download($filename);
     }
 }
