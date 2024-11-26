@@ -14,7 +14,7 @@ class CreateHBL
     public function handle(array $data): HBL
     {
         $reference = GenerateHBLReferenceNumber::run();
-
+//        dd($data);
         $hbl = HBL::create([
             'reference' => $reference,
             'branch_id' => GetUserCurrentBranchID::run(),
@@ -32,7 +32,8 @@ class CreateHBL
             'consignee_contact' => $data['consignee_contact'],
             'consignee_address' => $data['consignee_address'],
             'consignee_note' => $data['consignee_note'],
-            'warehouse' => $data['warehouse'],
+            'warehouse' => strtoupper($data['warehouse']),
+            'warehouse_id' => $data['warehouse_id'] ?? null,
             'freight_charge' => $data['freight_charge'],
             'bill_charge' => $data['bill_charge'],
             'other_charge' => $data['other_charge'],

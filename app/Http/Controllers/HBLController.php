@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Enum\CargoType;
 use App\Enum\HBLPaymentStatus;
@@ -70,7 +71,7 @@ class HBLController extends Controller
         return Inertia::render('HBL/CreateHBL', [
             'cargoTypes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
-            'warehouses' => WarehouseType::cases(),
+            'warehouses' => GetDestinationBranches::run(),
             'priceRules' => $this->priceRepository->getPriceRules(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
         ]);
@@ -102,7 +103,7 @@ class HBLController extends Controller
             'hbl' => $hbl->load('packages'),
             'cargoTypes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
-            'warehouses' => WarehouseType::cases(),
+            'warehouses' => GetDestinationBranches::run(),
             'priceRules' => $this->priceRepository->getPriceRules(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
         ]);

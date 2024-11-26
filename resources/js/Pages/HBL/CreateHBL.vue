@@ -114,6 +114,7 @@ const form = useForm({
     cargo_type: "",
     hbl_type: "",
     warehouse: "",
+    warehouse_id: "",
     freight_charge: 0,
     bill_charge: 0,
     other_charge: 0,
@@ -778,16 +779,18 @@ const getSelectedPackage = () => {
                             <div class="space-x-5">
                                 <label
                                     v-for="warehouse in warehouses"
+                                    :key="warehouse.id"
                                     class="inline-flex items-center space-x-2"
                                 >
                                     <input
                                         v-model="form.warehouse"
-                                        :value="warehouse"
+                                        :value="warehouse.name"
                                         class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                                         name="warehouse"
                                         type="radio"
+                                        @change="form.warehouse_id = warehouse.id"
                                     />
-                                    <p>{{ warehouse }}</p>
+                                    <p>{{ warehouse.name }}</p>
                                 </label>
                             </div>
                             <InputError :message="form.errors.warehouse"/>

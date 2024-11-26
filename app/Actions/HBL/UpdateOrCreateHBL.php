@@ -55,6 +55,7 @@ class UpdateOrCreateHBL
             'consignee_address' => $data['consignee_address'],
             'consignee_note' => $data['consignee_note'],
             'warehouse' => $data['warehouse'],
+            'warehouse_id' => $data['warehouse_id'] ?? null,
             'freight_charge' => $data['freight_charge'],
             'bill_charge' => $data['bill_charge'],
             'other_charge' => $data['other_charge'],

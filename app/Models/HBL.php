@@ -71,6 +71,7 @@ class HBL extends Model
         'consignee_address',
         'consignee_note',
         'warehouse',
+        'warehouse_id',
         'freight_charge',
         'bill_charge',
         'other_charge',

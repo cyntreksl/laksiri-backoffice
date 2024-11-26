@@ -63,7 +63,10 @@ const form = useForm({
     consignee_note: props.hbl.consignee_note,
     cargo_type: props.hbl.cargo_type,
     hbl_type: props.hbl.hbl_type,
-    warehouse: props.hbl.warehouse,
+    warehouse: props.hbl.warehouse
+        ? props.hbl.warehouse.charAt(0).toUpperCase() + props.hbl.warehouse.slice(1).toLowerCase()
+        : '',
+    warehouse_id: props.hbl.warehouse_id,
     freight_charge: props.hbl.freight_charge.toFixed(2),
     bill_charge: props.hbl.bill_charge.toFixed(2),
     other_charge: props.hbl.other_charge.toFixed(2),
@@ -518,15 +521,17 @@ const getSelectedPackage = () => {
                                 <label
                                     v-for="warehouse in warehouses"
                                     class="inline-flex items-center space-x-2"
+                                    :key="warehouse.id"
                                 >
                                     <input
                                         v-model="form.warehouse"
-                                        :value="warehouse"
+                                        :value="warehouse.name"
                                         class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
                                         name="warehouse"
                                         type="radio"
+                                        @change="form.warehouse_id = warehouse.id"
                                     />
-                                    <p>{{ warehouse }}</p>
+                                    <p>{{ warehouse.name }}</p>
                                 </label>
                             </div>
                             <InputError :message="form.errors.warehouse"/>
