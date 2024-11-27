@@ -58,6 +58,7 @@ class BranchController extends Controller
      */
     public function edit(Branch $branch)
     {
+//        dd();
         return Inertia::render('Branch/EditBranch', [
             'cargoModes' => CargoType::cases(),
             'deliveryTypes' => HBLType::cases(),
