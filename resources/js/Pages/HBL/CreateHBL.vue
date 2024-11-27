@@ -40,44 +40,27 @@ const props = defineProps({
     packageTypes: {
         type: Array,
         default: () => [],
-    }
+    },
+    countryCodes: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 //branch set
 const currentBranch = usePage().props?.auth.user.active_branch_name;
 
 const findCountryCodeByBranch = (country) => {
-    switch (country) {
-        case "Sri Lanka":
-            return "+94";
-        case "Riyadh":
-            return "+966";
-        case "Colombo":
-            return "+94";
-        case "Nintavur":
-            return "+94";
-        case "Dubai":
-            return "+971";
-        case "Kuwait":
-            return "+965";
-        case "Qatar":
-            return "+974";
-        case "Malaysia":
-            return "+60";
-        case "London":
-            return "+44";
-    }
+    return usePage().props.currentBranch.country_code;
 };
 
-
-const countryCodes = ["+94", "+966", "+971", "+965", "+974", "+60", "+44"];
 const countryCode = ref(findCountryCodeByBranch(currentBranch));
-const consignee_countryCode = ref(findCountryCodeByBranch("Sri Lanka"));
+const consignee_countryCode = ref('+94');
 const contactNumber = ref("");
 const consignee_contact = ref("");
 
 const splitNumber = (fullNumber) => {
-    for (let code of countryCodes) {
+    for (let code of props.countryCodes) {
         if (fullNumber.startsWith(code)) {
             countryCode.value = code;
             contactNumber.value = fullNumber.slice(code.length);
@@ -87,7 +70,7 @@ const splitNumber = (fullNumber) => {
 }
 
 const splitNumberConsignee = (fullNumber) => {
-    for (let code of countryCodes) {
+    for (let code of props.countryCodes) {
         if (fullNumber.startsWith(code)) {
             consignee_countryCode.value = code;
             consignee_contact.value = fullNumber.slice(code.length);
@@ -934,6 +917,7 @@ const getSelectedPackage = () => {
                                         <option
                                             v-for="(countryCode, index) in countryCodes"
                                             :key="index"
+                                            :value="countryCode"
                                         >
                                             {{ countryCode }}
                                         </option>

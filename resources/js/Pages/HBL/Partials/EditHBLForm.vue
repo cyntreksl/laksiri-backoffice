@@ -44,21 +44,48 @@ const props = defineProps({
     packageTypes: {
         type: Array,
         default: () => [],
-    }
+    },
+    countryCodes: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const errors = ref([]);
 
+const splitCountryCode = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            return code;
+        }
+    }
+}
+
+const splitContactNumber = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            return fullNumber.slice(code.length);
+        }
+    }
+}
+
+const countryCode = ref(splitCountryCode(props.hbl.contact_number));
+const contactNumber = ref(splitContactNumber(props.hbl.contact_number));
+const consigneeCountryCode = ref(splitCountryCode(props.hbl.consignee_contact));
+const consigneeContactNumber = ref(splitContactNumber(props.hbl.consignee_contact));
+
 const form = useForm({
     hbl_name: props.hbl.hbl_name,
     email: props.hbl.email,
-    contact_number: props.hbl.contact_number,
+    contact_number: computed(() => countryCode.value + contactNumber.value),
     nic: props.hbl.nic,
     iq_number: props.hbl.iq_number,
     address: props.hbl.address,
     consignee_name: props.hbl.consignee_name,
     consignee_nic: props.hbl.consignee_nic,
-    consignee_contact: props.hbl.consignee_contact,
+    consignee_contact: computed(
+        () => consigneeCountryCode.value + consigneeContactNumber.value
+    ),
     consignee_address: props.hbl.consignee_address,
     consignee_note: props.hbl.consignee_note,
     cargo_type: props.hbl.cargo_type,
@@ -670,15 +697,20 @@ const getSelectedPackage = () => {
                             <span>Mobile Number</span>
                             <div class="flex -space-x-px">
                                 <select
+                                    v-model="countryCode"
                                     class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                 >
-                                    <option>+94</option>
-                                    <option>+95</option>
-                                    <option>+96</option>
+                                    <option
+                                        v-for="(countryCode, index) in countryCodes"
+                                        :key="index"
+                                        :value="countryCode"
+                                    >
+                                        {{ countryCode }}
+                                    </option>
                                 </select>
 
                                 <input
-                                    v-model="form.contact_number"
+                                    v-model="contactNumber"
                                     class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                     placeholder="123 4567 890"
                                     type="text"
@@ -866,15 +898,20 @@ const getSelectedPackage = () => {
                             <span>Mobile Number</span>
                             <div class="flex -space-x-px">
                                 <select
+                                    v-model="consigneeCountryCode"
                                     class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                 >
-                                    <option>+94</option>
-                                    <option>+95</option>
-                                    <option>+96</option>
+                                    <option
+                                        v-for="(countryCode, index) in countryCodes"
+                                        :key="index"
+                                        :value="countryCode"
+                                    >
+                                        {{ countryCode }}
+                                    </option>
                                 </select>
 
                                 <input
-                                    v-model="form.consignee_contact"
+                                    v-model="consigneeContactNumber"
                                     class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                     placeholder="123 4567 890"
                                     type="text"

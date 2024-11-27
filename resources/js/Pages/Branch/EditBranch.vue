@@ -38,7 +38,11 @@ const props = defineProps({
         type: Object,
         default: () => {
         }
-    }
+    },
+    countryCodes: {
+        type: Array,
+        default: () => [],
+    },
 })
 
 const form = useForm({
@@ -47,6 +51,7 @@ const form = useForm({
     type: props.branch.type || null,
     currency_name: props.branch.currency_name || '',
     currency_symbol: props.branch.currency_symbol || '',
+    country_code: props.branch.country_code || '',
     cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
     delivery_types: JSON.parse(props.branch.delivery_types) || [],
     package_types: JSON.parse(props.branch.package_types) || [],
@@ -200,7 +205,7 @@ const clearPhotoFileInput = () => {
                             <InputError :message="form.errors.type"/>
                         </div>
 
-                        <div class="sm:col-span-3">
+                        <div class="sm:col-span-2">
                             <InputLabel value="Currency Name"/>
                             <TextInput v-model="form.currency_name" class="w-full" placeholder="Sri Lankan Rupee"/>
                             <InputError :message="form.errors.currency_name"/>
@@ -210,6 +215,25 @@ const clearPhotoFileInput = () => {
                             <InputLabel value="Currency Symbol"/>
                             <TextInput v-model="form.currency_symbol" class="w-full" placeholder="LKR"/>
                             <InputError :message="form.errors.currency_symbol"/>
+                        </div>
+
+                        <div class="sm:col-span-1">
+                            <label class="block">
+                                <InputLabel value="Country Code"/>
+                                <select
+                                    v-model="form.country_code"
+                                    class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                >
+                                    <option :value="null" disabled>
+                                        Country Code
+                                    </option>
+                                    <option v-for="(countryCode, index) in countryCodes" :key="index"
+                                            :value="countryCode">
+                                        {{ countryCode }}
+                                    </option>
+                                </select>
+                            </label>
+                            <InputError :message="form.errors.country_code"/>
                         </div>
                     </div>
                 </div>

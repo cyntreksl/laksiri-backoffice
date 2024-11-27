@@ -32,7 +32,11 @@ defineProps({
     packageTypes: {
         type: Array,
         default: () => [],
-    }
+    },
+    countryCodes: {
+        type: Array,
+        default: () => [],
+    },
 })
 </script>
 
@@ -43,7 +47,7 @@ defineProps({
         <Breadcrumb :hbl="hbl"/>
 
         <div class="grid grid-cols-1 mt-4 gap-4">
-            <EditHBLForm :cargo-types="cargoTypes" :hbl="hbl" :hbl-types="hblTypes" :package-types="packageTypes" :price-rules="priceRules" :warehouses="warehouses" />
+            <EditHBLForm :cargo-types="cargoTypes" :hbl="hbl" :hbl-types="hblTypes" :package-types="packageTypes" :price-rules="priceRules" :warehouses="warehouses" :country-codes="countryCodes"/>
         </div>
     </AppLayout>
 </template>

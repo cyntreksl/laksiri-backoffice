@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
+use App\Enum\CountryCode;
 use App\Enum\PickupType;
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
@@ -65,6 +66,7 @@ class PickupController extends Controller
             'cargoTypes' => CargoType::cases(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
             'zones' => GetZones::run(),
+            'countryCodes' => CountryCode::cases(),
         ]);
     }
 

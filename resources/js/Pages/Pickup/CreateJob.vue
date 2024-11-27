@@ -32,34 +32,20 @@ const props = defineProps({
         default: () => {
         },
     },
+    countryCodes: {
+        type: Array,
+        default: () => [],
+    },
+
 });
 
 const currentBranch = usePage().props?.auth.user.active_branch_name;
 
-const findCountryCodeByBranch = computed(() => {
-    switch (currentBranch) {
-        case "Riyadh":
-            return "+966";
-        case "Colombo":
-            return "+94";
-        case "Nintavur":
-            return "+94";
-        case "Dubai":
-            return "+971";
-        case "Kuwait":
-            return "+965";
-        case "Qatar":
-            return "+974";
-        case "Malaysia":
-            return "+60";
-        case "London":
-            return "+44";
-    }
-});
+const findCountryCodeByBranch = () => {
+    return usePage().props.currentBranch.country_code;
+};
 
-const countryCodes = ["+94", "+966", "+971", "+965", "+974", "+60", "+44"];
-
-const countryCode = ref(findCountryCodeByBranch.value);
+const countryCode = ref(findCountryCodeByBranch());
 const contactNumber = ref("");
 
 // Get today's date in yyyy-mm-dd format
@@ -268,6 +254,7 @@ const shipIcon = ref(`
                                         <option
                                             v-for="(countryCode, index) in countryCodes"
                                             :key="index"
+                                            :value="countryCode"
                                         >
                                             {{ countryCode }}
                                         </option>
