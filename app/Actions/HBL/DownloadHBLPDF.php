@@ -14,7 +14,7 @@ class DownloadHBLPDF
     public function handle(HBL $hbl)
     {
         $pdf = Pdf::loadView('pdf.hbls.hbl', [
-            'hbl' => $hbl->load('packages'),
+            'hbl' => $hbl,
             'settings' => GetSettings::run(),
             'logoPath' => GetSettings::run()['logo_url'] ?? null,
         ])->setPaper('a4');
