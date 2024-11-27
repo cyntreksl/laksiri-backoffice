@@ -22,6 +22,7 @@ class Branch extends Model
         'type',
         'currency_name',
         'currency_symbol',
+        'country_code',
         'cargo_modes',
         'delivery_types',
         'package_types',

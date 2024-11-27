@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enum\BranchType;
 use App\Enum\CargoType;
+use App\Enum\CountryCode;
 use App\Enum\HBLType;
 use App\Enum\PackageType;
 use App\Http\Requests\StoreBranchRequest;
@@ -64,6 +65,7 @@ class BranchController extends Controller
             'branchTypes' => BranchType::cases(),
             'branch' => $branch,
             'settings' => $this->settingRepository->getSettings(),
+            'countryCodes' => CountryCode::cases(),
         ]);
     }
 
