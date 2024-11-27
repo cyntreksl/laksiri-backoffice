@@ -74,8 +74,6 @@ const contactNumber = ref(splitContactNumber(props.hbl.contact_number));
 const consigneeCountryCode = ref(splitCountryCode(props.hbl.consignee_contact));
 const consigneeContactNumber = ref(splitContactNumber(props.hbl.consignee_contact));
 
-console.log(countryCode.value, contactNumber.value);
-
 const form = useForm({
     hbl_name: props.hbl.hbl_name,
     email: props.hbl.email,
