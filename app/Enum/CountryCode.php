@@ -4,6 +4,7 @@ namespace App\Enum;
 
 enum CountryCode: string
 {
+    case US = '+1';
     case SRI_LANKA = '+94';
     case SAUDI_ARABIA = '+966';
     case UAE = '+971';

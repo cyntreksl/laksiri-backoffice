@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Enum\CargoType;
+use App\Enum\CountryCode;
 use App\Enum\HBLPaymentStatus;
 use App\Enum\HBLType;
 use App\Http\Requests\StoreCallFlagRequest;
@@ -13,6 +14,7 @@ use App\Http\Requests\UpdateHBLRequest;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
+use App\Interfaces\SettingRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
 use App\Models\HBLDocument;
@@ -30,6 +32,7 @@ class HBLController extends Controller
         private readonly UserRepositoryInterface $userRepository,
         private readonly PriceRepositoryInterface $priceRepository,
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
+        private readonly SettingRepositoryInterface $settingRepository,
     ) {
     }
 
@@ -73,6 +76,7 @@ class HBLController extends Controller
             'warehouses' => GetDestinationBranches::run(),
             'priceRules' => $this->priceRepository->getPriceRules(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
+            'countryCodes' => CountryCode::cases(),
         ]);
     }
 
@@ -105,6 +109,7 @@ class HBLController extends Controller
             'warehouses' => GetDestinationBranches::run(),
             'priceRules' => $this->priceRepository->getPriceRules(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
+            'countryCodes' => CountryCode::cases(),
         ]);
     }
 
