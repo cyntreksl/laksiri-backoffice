@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\CallCenter\HBLRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
-use App\Models\HBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -54,6 +53,7 @@ class HBLController extends Controller
     public function createToken($hbl)
     {
         $hbl = GetHBLByIdWithPackages::run($hbl);
+
         return $this->HBLRepository->createAndIssueToken($hbl);
     }
 }

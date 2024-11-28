@@ -224,6 +224,7 @@ class HBLController extends Controller
     public function getHBLStatus($HBL)
     {
         $hbl = GetHBLById::run($HBL);
+
         return $this->HBLRepository->getHBLStatus($hbl);
     }
 
@@ -259,6 +260,7 @@ class HBLController extends Controller
     public function getHBLLogs($HBL)
     {
         $hbl = GetHBLByIdWithPackages::run($HBL);
+
         return response()->json($hbl->activities()->with('causer')->withoutGlobalScopes()->get());
     }
 

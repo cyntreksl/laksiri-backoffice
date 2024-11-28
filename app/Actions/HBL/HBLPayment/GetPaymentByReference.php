@@ -3,7 +3,6 @@
 namespace App\Actions\HBL\HBLPayment;
 
 use App\Models\HBL;
-use App\Models\HBLPayment;
 use Illuminate\Http\JsonResponse;
 use Lorisleiva\Actions\Concerns\AsAction;
 
