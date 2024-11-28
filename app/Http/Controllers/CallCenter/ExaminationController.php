@@ -46,7 +46,7 @@ class ExaminationController extends Controller
         return Inertia::render('CallCenter/Examination/ExaminationForm', [
             'customerQueue' => $customerQueue,
             'reference' => $customerQueue->token->reference,
-            'hblId' => HBL::where('reference', $customerQueue->token->reference)->first()->id,
+            'hblId' => HBL::withoutGlobalScopes()->where('reference', $customerQueue->token->reference)->first()->id,
         ]);
     }
 

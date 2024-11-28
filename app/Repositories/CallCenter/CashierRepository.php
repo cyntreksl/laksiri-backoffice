@@ -53,7 +53,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
                 $paymentArray = (array) $payment->getData();
 
                 if (! empty($paymentArray)) {
-                    if ($payment->getData()->paid_amount >= $payment->getData()->grand_total) {
+                    if ($data['paid_amount'] >= $payment->getData()->grand_total-$payment->getData()->paid_amount) {
                         // send examination queue
                         $customerQueue->create([
                             'type' => CustomerQueue::EXAMINATION_QUEUE,

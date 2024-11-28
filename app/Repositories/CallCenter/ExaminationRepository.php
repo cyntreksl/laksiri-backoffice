@@ -16,7 +16,7 @@ class ExaminationRepository implements ExaminationRepositoryInterface
         try {
             DB::beginTransaction();
 
-            $hbl = HBL::where('reference', $data['customer_queue']['token']['reference'])->first();
+            $hbl = HBL::withoutGlobalScopes()->where('reference', $data['customer_queue']['token']['reference'])->first();
 
             // release packages
             $examination = CreateExamination::run($data, $hbl->id);
