@@ -45,7 +45,7 @@ class CashierController extends Controller
 
         return Inertia::render('CallCenter/Cashier/CashierForm', [
             'customerQueue' => $customerQueue,
-            'hblId' => HBL::where('reference', $customerQueue->token->reference)->first()->id,
+            'hblId' => HBL::withoutGlobalScopes()->where('reference', $customerQueue->token->reference)->first()->id,
         ]);
     }
 
