@@ -61,7 +61,7 @@ const fetchHBLStatus = async () => {
     isLoadingHBLStatus.value = true;
 
     try {
-        const response = await fetch(`get-hbl-status/${props.hbl?.id}`, {
+        const response = await fetch(`/get-hbl-status/${props.hbl?.id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

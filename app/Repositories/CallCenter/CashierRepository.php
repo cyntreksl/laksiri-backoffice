@@ -20,7 +20,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         try {
             DB::beginTransaction();
 
-            $hbl = HBL::where('reference', $data['customer_queue']['token']['reference'])->firstOrFail();
+            $hbl = HBL::where('reference', $data['customer_queue']['token']['reference'])->withoutGlobalScopes()->firstOrFail();
 
             $new_paid_amount = $data['paid_amount'];
             $old_paid_amount = $hbl->paid_amount;
