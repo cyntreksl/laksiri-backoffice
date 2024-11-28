@@ -17,6 +17,7 @@ import {router, usePage} from "@inertiajs/vue3";
 import ShortLoadingConfirmationModal from "@/Pages/Arrival/Partials/ShortLoadingConfirmationModal.vue";
 import {push} from "notivue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 
 const props = defineProps({
     hblTypes: {
@@ -432,7 +433,7 @@ const handlePerPageChange = (event) => {
 };
 </script>
 <template>
-    <AppLayout title="Bonded Warehouse">
+    <DestinationAppLayout title="Bonded Warehouse">
         <template #header>Bonded Warehouse</template>
 
         <Breadcrumb/>
@@ -605,5 +606,5 @@ const handlePerPageChange = (event) => {
             :show="showConfirmViewHBLModal"
             @close="closeShowHBLModal"
         />
-    </AppLayout>
+    </DestinationAppLayout>
 </template>

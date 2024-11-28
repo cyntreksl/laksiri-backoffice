@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\CallCenter;
 
+use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Enum\HBLPaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CallCenter\HBLRepositoryInterface;
@@ -50,8 +51,9 @@ class HBLController extends Controller
         return $this->HBLRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 
-    public function createToken(HBL $hbl)
+    public function createToken($hbl)
     {
+        $hbl = GetHBLByIdWithPackages::run($hbl);
         return $this->HBLRepository->createAndIssueToken($hbl);
     }
 }

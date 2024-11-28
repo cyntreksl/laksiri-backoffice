@@ -16,6 +16,7 @@ import FilterHeader from "@/Components/FilterHeader.vue";
 import LoadedShipmentDetailModal from "@/Pages/Loading/Partials/LoadedShipmentDetailModal.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
+import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 
 const props = defineProps({
     cargoTypes: {
@@ -747,7 +748,7 @@ class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
 `);
 </script>
 <template>
-    <AppLayout title="Shipments Arrivals">
+    <DestinationAppLayout title="Shipments Arrivals">
         <template #header>Shipments Arrivals</template>
 
         <Breadcrumb/>
@@ -1159,5 +1160,5 @@ class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
             :show="showConfirmLoadedShipmentModal"
             @close="closeModal"
         />
-    </AppLayout>
+    </DestinationAppLayout>
 </template>

@@ -8,6 +8,7 @@ use App\Http\Resources\CallCenter\PackageQueueResource;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
 use App\Models\CustomerQueue;
 use App\Models\PackageQueue;
+use App\Models\Scopes\BranchScope;
 use Illuminate\Http\JsonResponse;
 
 class QueueRepository implements QueueRepositoryInterface
