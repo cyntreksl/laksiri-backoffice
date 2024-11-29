@@ -15,7 +15,7 @@ const props = defineProps({
         default: () => {}
     }
 })
-
+console.log(props.examinationQueue);
 const filteredExaminationQueue = computed(() => {
     return props.examinationQueue.filter(q => {
         return q.is_verified === true && q.is_paid === true && q.is_force_released === false
