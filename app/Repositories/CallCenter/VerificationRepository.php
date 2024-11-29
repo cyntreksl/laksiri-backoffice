@@ -55,7 +55,7 @@ class VerificationRepository implements GridJsInterface, VerificationRepositoryI
 
                         // find hbl
                         if ($token) {
-                            $hbl = HBL::where('reference', $token->reference)->firstOrFail();
+                            $hbl = HBL::where('reference', $token->reference)->withoutGlobalScopes()->firstOrFail();
 
                             // create package queue
                             PackageQueue::create([
