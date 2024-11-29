@@ -9,6 +9,7 @@ import {router} from "@inertiajs/vue3";
 import ReviewModal from "@/Pages/Arrival/Partials/ReviewModal.vue";
 import WarningButton from "@/Components/WarningButton.vue";
 import CreateUnloadingIssueModal from "@/Pages/Arrival/Partials/CreateUnloadingIssueModal.vue";
+import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 
 const props = defineProps({
     container: {
@@ -152,7 +153,7 @@ const confirmShowCreateIssueModal = (index) => {
 </script>
 
 <template>
-    <AppLayout title="Unloading Point">
+    <DestinationAppLayout title="Unloading Point">
         <template #header>Unloading Point</template>
 
         <main class="kanban-app w-full">
@@ -607,7 +608,7 @@ const confirmShowCreateIssueModal = (index) => {
                      :warehouse-array="warehouseArr" @close="showReviewModal = false"/>
 
         <CreateUnloadingIssueModal :hbl-package-id="hblPackageId" :show="showUnloadingIssueModal" @close="showUnloadingIssueModal = false"/>
-    </AppLayout>
+    </DestinationAppLayout>
 </template>
 
 <style scoped>

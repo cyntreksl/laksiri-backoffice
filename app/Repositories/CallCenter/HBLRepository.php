@@ -10,6 +10,7 @@ use App\Interfaces\CallCenter\HBLRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\CustomerQueue;
 use App\Models\HBL;
+use App\Models\Scopes\BranchScope;
 use App\Models\Token;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -24,7 +25,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = HBL::query()->with('tokens.customerQueue');
+        $query = HBL::query()->withoutGlobalScope(BranchScope::class)->with('tokens.customerQueue');
 
         if (! empty($search)) {
             $query->whereAny([

@@ -1035,14 +1035,14 @@ export default {
                     childMenuList.splice(
                         0,
                         childMenuList.length,
-                        {
-                            title: "Shipments Arrivals",
-                            route: "arrival.shipments-arrivals.index",
-                        },
-                        {
-                            title: "Bonded Warehouse",
-                            route: "arrival.bonded-warehouses.index",
-                        },
+                        // {
+                        //     title: "Shipments Arrivals",
+                        //     route: "arrival.shipments-arrivals.index",
+                        // },
+                        // {
+                        //     title: "Bonded Warehouse",
+                        //     route: "arrival.bonded-warehouses.index",
+                        // },
                         {
                             title: "Unloading Issues",
                             route: "arrival.unloading-issues.index",

@@ -45,7 +45,7 @@ interface HBLRepositoryInterface
 
     public function getPickupStatus(HBL $hbl): JsonResponse;
 
-    public function getHBLStatus(HBL $hbl): JsonResponse;
+    public function getHBLStatus(HBL $HBL): JsonResponse;
 
     public function export(array $filters);
 

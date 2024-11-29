@@ -12,9 +12,9 @@ class GetPaymentByReference
 
     public function handle(string $reference): JsonResponse
     {
-        $hbl = HBL::where('reference', $reference)->firstOrFail();
+        $hbl = HBL::withoutGlobalScopes()->where('reference', $reference)->firstOrFail();
 
-        $payments = $hbl->hblPayment;
+        $payments = $hbl->hblPayment()->withoutGlobalScopes()->first();
 
         return response()->json($payments);
     }

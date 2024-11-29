@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Branch\GetDestinationBranches;
+use App\Actions\HBL\GetHBLById;
 use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Enum\CargoType;
 use App\Enum\CountryCode;
@@ -220,8 +221,10 @@ class HBLController extends Controller
         return $this->HBLRepository->getPickupStatus($hbl);
     }
 
-    public function getHBLStatus(HBL $hbl)
+    public function getHBLStatus($HBL)
     {
+        $hbl = GetHBLById::run($HBL);
+
         return $this->HBLRepository->getHBLStatus($hbl);
     }
 
@@ -254,9 +257,11 @@ class HBLController extends Controller
         return $this->HBLRepository->getHBLStatusByReference($reference);
     }
 
-    public function getHBLLogs(HBL $hbl)
+    public function getHBLLogs($HBL)
     {
-        return response()->json($hbl->activities()->with('causer')->get());
+        $hbl = GetHBLByIdWithPackages::run($HBL);
+
+        return response()->json($hbl->activities()->with('causer')->withoutGlobalScopes()->get());
     }
 
     public function getHBLsByUser(string $user)

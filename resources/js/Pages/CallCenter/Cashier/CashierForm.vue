@@ -122,19 +122,25 @@ const form = useForm({
 });
 
 const handleUpdatePayment = () => {
-    form.post(route("call-center.cashier.store"), {
-        onSuccess: () => {
-            router.visit(route("call-center.cashier.queue.list"));
-            form.reset();
-            push.success('Payment Update Successfully!');
-        },
-        onError: () => {
-            push.error('Something went to wrong!');
-        },
-        preserveScroll: true,
-        preserveState: true,
-    });
+    if(form.paid_amount <= (paymentRecord.value.grand_total - paymentRecord.value.paid_amount).toFixed(2)){
+        push.error('Please pay full amount');
+    }else {
+        form.post(route("call-center.cashier.store"), {
+            onSuccess: () => {
+                router.visit(route("call-center.cashier.queue.list"));
+                form.reset();
+                push.success('Payment Update Successfully!');
+            },
+            onError: () => {
+                push.error('Something went to wrong!');
+            },
+            preserveScroll: true,
+            preserveState: true,
+        });
+    }
 }
+
+
 
 
 </script>
@@ -166,7 +172,6 @@ const handleUpdatePayment = () => {
                         </div>
                     </div>
                 </div>
-
                 <div v-else :class="`flex rounded-lg bg-gradient-to-r ${Object.keys(paymentRecord).length > 0 ? 'from-purple-500 to-indigo-600' : 'from-red-500 to-pink-600'} py-5 sm:py-6 my-4`">
                     <div v-if="Object.keys(paymentRecord).length > 0" class="px-4 text-white sm:px-5">
                         <div class="-mt-1 flex items-center space-x-2">

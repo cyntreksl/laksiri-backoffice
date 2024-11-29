@@ -14,6 +14,7 @@ const getDocumentVerificationQueue = async () => {
         const response = await fetch(`/call-center/get-document-verification-queue`, {
             method: "GET",
             headers: {
+                "Accept": "application/json",
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": usePage().props.csrf,
             },

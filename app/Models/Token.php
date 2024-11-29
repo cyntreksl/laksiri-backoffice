@@ -57,7 +57,8 @@ class Token extends Model
 
     public function isPaid(): bool
     {
-        $hbl = HBL::where('reference', $this->reference)->firstOrFail();
+        $hbl = HBL::withoutGlobalScopes()
+            ->where('reference', $this->reference)->firstOrFail();
 
         if ($this->cashierPayment()->exists()) {
             return true;
