@@ -13,10 +13,10 @@ class GetPackagesByReference
     public function handle(string $reference)
     {
         $hbl = HBL::withoutGlobalScopes()->with([
-                    'packages' => function ($query) {
-                        $query->withoutGlobalScope(BranchScope::class);
-                    },
-                ])
+            'packages' => function ($query) {
+                $query->withoutGlobalScope(BranchScope::class);
+            },
+        ])
             ->where('reference', $reference)->firstOrFail();
 
         $packages = $hbl->packages;

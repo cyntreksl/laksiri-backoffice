@@ -122,19 +122,25 @@ const form = useForm({
 });
 
 const handleUpdatePayment = () => {
-    form.post(route("call-center.cashier.store"), {
-        onSuccess: () => {
-            router.visit(route("call-center.cashier.queue.list"));
-            form.reset();
-            push.success('Payment Update Successfully!');
-        },
-        onError: () => {
-            push.error('Something went to wrong!');
-        },
-        preserveScroll: true,
-        preserveState: true,
-    });
+    if(form.paid_amount <= (paymentRecord.value.grand_total - paymentRecord.value.paid_amount).toFixed(2)){
+        push.error('Please pay full amount');
+    }else {
+        form.post(route("call-center.cashier.store"), {
+            onSuccess: () => {
+                router.visit(route("call-center.cashier.queue.list"));
+                form.reset();
+                push.success('Payment Update Successfully!');
+            },
+            onError: () => {
+                push.error('Something went to wrong!');
+            },
+            preserveScroll: true,
+            preserveState: true,
+        });
+    }
 }
+
+
 
 
 </script>
