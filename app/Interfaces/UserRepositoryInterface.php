@@ -6,7 +6,7 @@ use App\Models\User;
 
 interface UserRepositoryInterface
 {
-    public function getUsers();
+    public function getUsers(array $withoutRoles = []);
 
     public function storeUser(array $data);
 
