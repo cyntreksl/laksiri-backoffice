@@ -36,6 +36,7 @@ class UpdateBranchRequest extends FormRequest
             'cargo_modes' => ['required'],
             'delivery_types' => ['required'],
             'package_types' => ['required'],
+            'email' => ['nullable', 'email', 'string'],
         ];
     }
 }

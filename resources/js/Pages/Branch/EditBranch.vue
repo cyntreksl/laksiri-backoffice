@@ -52,6 +52,7 @@ const form = useForm({
     currency_name: props.branch.currency_name || '',
     currency_symbol: props.branch.currency_symbol || '',
     country_code: props.branch.country_code || '',
+    email: props.branch.email || '',
     cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
     delivery_types: JSON.parse(props.branch.delivery_types) || [],
     package_types: JSON.parse(props.branch.package_types) || [],
@@ -234,6 +235,12 @@ const clearPhotoFileInput = () => {
                                 </select>
                             </label>
                             <InputError :message="form.errors.country_code"/>
+                        </div>
+
+                        <div class="sm:col-span-4">
+                            <InputLabel value="Email"/>
+                            <TextInput v-model="form.email" class="w-full" placeholder="Enter Email" type="email"/>
+                            <InputError :message="form.errors.email"/>
                         </div>
                     </div>
                 </div>
