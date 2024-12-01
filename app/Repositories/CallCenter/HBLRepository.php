@@ -87,6 +87,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             $tokenValue = $lastToken ? $lastToken->token + 1 : 1;
 
             $token = Token::create([
+                'hbl_id' => $hbl->id,
                 'customer_id' => $hbl->consignee_id,
                 'receptionist_id' => auth()->id(),
                 'reference' => $hbl->reference,
@@ -112,10 +113,12 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             $customPaper = [0, 0, 283.80, 567.00];
 
             $pdf = Pdf::loadView('pdf.customer.token', [
-                'token' => $token,
+                'token' => $token->load(['hbl' => function ($query) {
+                    $query->withoutGlobalScope(BranchScope::class);
+                }]),
             ])->setPaper($customPaper);
 
-            $filename = 'sample'.'.pdf';
+            $filename = $hbl->hbl_number.'.pdf';
 
             return $pdf->stream($filename);
         }

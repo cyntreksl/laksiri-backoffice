@@ -17,7 +17,7 @@
 <table  class="table-row" >
 	<tbody>
 		<tr>
-			<td width="50%">{{ $token->reference }}</td>
+			<td width="50%">{{ $token->hbl->hbl_number }}</td>
             <td width="50%" style="text-align: right">
                 @php
                     $barcode = new Milon\Barcode\DNS1D();
@@ -34,7 +34,7 @@
         <td width="50%" >
             @php
                 $qrcode = new Milon\Barcode\DNS2D();
-                echo '<img src="data:image/png;base64,' . $qrcode->getBarcodePNG($token->reference, 'QRCODE', 5, 5) . '" alt="barcode" />';
+                echo '<img src="data:image/png;base64,' . $qrcode->getBarcodePNG($token->hbl->hbl_number, 'QRCODE', 5, 5) . '" alt="barcode" />';
             @endphp
         </td>
         <td width="50%" >

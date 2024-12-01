@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\CallCenter;
 
+use App\Models\Scopes\BranchScope;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -23,6 +24,7 @@ class PackageCollection extends JsonResource
             'note' => $this->note,
             'released_by' => $this->releasedBy->name,
             'token' => $this->token->token,
+            'hbl' => $this->token->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first(),
         ];
     }
 }

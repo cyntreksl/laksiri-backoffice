@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\CallCenter;
 
+use App\Models\Scopes\BranchScope;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -26,6 +27,7 @@ class PaidCollection extends JsonResource
             'paid_amount' => $this->cashierHBLPayment->paid_amount,
             'note' => $this->cashierHBLPayment->note,
             'paid_at' => $this->cashierHBLPayment->created_at->format('Y-m-d H:i:s'),
+            'hbl' => $this->token->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first(),
         ];
     }
 }

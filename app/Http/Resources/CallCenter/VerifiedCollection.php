@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\CallCenter;
 
+use App\Models\Scopes\BranchScope;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,6 +26,7 @@ class VerifiedCollection extends JsonResource
             'verified_by' => $this->verification->verifiedBy->name,
             'note' => $this->verification->note,
             'verified_at' => $this->verification->created_at->format('Y-m-d H:i:s'),
+            'hbl' => $this->token->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first(),
         ];
     }
 }

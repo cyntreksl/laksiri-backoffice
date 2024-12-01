@@ -40,7 +40,7 @@ const filteredVerificationQueue = computed(() => {
                 </div>
                 <div class="my-2 grow">
                     <h3 class="text-lg font-medium text-slate-700 dark:text-navy-100">
-                        {{ queue.reference }}
+                        {{ queue.hbl?.hbl_number }}
                     </h3>
                 </div>
                 <div class="mt-3 flex space-x-1">
