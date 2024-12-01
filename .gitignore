@@ -23,4 +23,4 @@ yarn-error.log
 /public/docs
 .scribe
 public/uploads
-package-lock.json
+./package-lock.json

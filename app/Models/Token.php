@@ -17,7 +17,7 @@ class Token extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'customer_id', 'receptionist_id', 'reference', 'package_count', 'token',
+        'hbl_id', 'customer_id', 'receptionist_id', 'reference', 'package_count', 'token',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -71,5 +71,10 @@ class Token extends Model
         }
 
         return false;
+    }
+
+    public function hbl(): BelongsTo
+    {
+        return $this->belongsTo(HBL::class, 'hbl_id', 'id');
     }
 }

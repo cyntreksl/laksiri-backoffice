@@ -3,6 +3,7 @@
 namespace App\Http\Resources\CallCenter;
 
 use App\Models\PackageQueue;
+use App\Models\Scopes\BranchScope;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -29,6 +30,7 @@ class CustomerQueueResource extends JsonResource
             'is_paid' => $this->token->isPaid(),
             'is_released_from_boned_area' => $is_released_from_boned_area,
             'is_force_released' => $this->examination()->exists(),
+            'hbl' => $this->token->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first(),
         ];
     }
 }

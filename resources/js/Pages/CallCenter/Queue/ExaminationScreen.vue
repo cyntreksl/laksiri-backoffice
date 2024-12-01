@@ -68,7 +68,7 @@ setInterval(getExaminationQueue, 3000);
                     <h1 class="text-5xl text-black">NOW</h1>
                     <h1 class="text-9xl xl:text-[200px] text-black font-bold">{{ firstToken.token }}</h1>
                     <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
-                        {{ firstToken.reference }}
+                        {{ firstToken.hbl?.hbl_number }}
                     </h3>
                     <button
                         class="btn h-7 rounded-full bg-slate-150 px-3 text-xs+ font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
@@ -87,7 +87,7 @@ setInterval(getExaminationQueue, 3000);
                             </div>
                             <div class="my-2 grow">
                                 <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
-                                    {{ queue.reference }}
+                                    {{ queue.hbl?.hbl_number }}
                                 </h3>
                             </div>
                             <div class="mt-3 flex space-x-1">
@@ -108,7 +108,7 @@ setInterval(getExaminationQueue, 3000);
                     <h1 class="text-5xl text-black">NEXT</h1>
                     <h1 class="text-9xl xl:text-[200px] text-black font-bold">{{ nextToken.token }}</h1>
                     <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
-                        {{ nextToken.reference }}
+                        {{ nextToken.hbl?.hbl_number }}
                     </h3>
                     <button
                         class="btn h-7 rounded-full bg-slate-150 px-3 text-xs+ font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
