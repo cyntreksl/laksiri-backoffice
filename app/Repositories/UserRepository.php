@@ -17,9 +17,9 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function getUsers()
+    public function getUsers(array $withoutRoles = [])
     {
-        return GetUsers::run();
+        return GetUsers::run($withoutRoles);
     }
 
     public function storeUser(array $data)

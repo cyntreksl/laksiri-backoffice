@@ -39,7 +39,7 @@ class PickupController extends Controller
 
         return Inertia::render('Pickup/PendingJobs', [
             'drivers' => $this->driverRepository->getAllDrivers(),
-            'users' => $this->userRepository->getUsers(),
+            'users' => $this->userRepository->getUsers(['customer']),
             'zones' => $this->zoneRepository->getZones(),
         ]);
     }

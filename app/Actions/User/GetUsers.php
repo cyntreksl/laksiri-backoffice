@@ -10,10 +10,15 @@ class GetUsers
 {
     use AsAction;
 
-    public function handle(): Collection|array
+    public function handle(array $withoutRoles = []): Collection|array
     {
-        return User::withoutRole('driver')
-            ->with(['branches', 'primaryBranch'])
+        $query = User::query()->withoutRole('driver');
+
+        if ($withoutRoles) {
+            $query->withoutRole($withoutRoles);
+        }
+
+        return $query->with(['branches', 'primaryBranch'])
             ->latest()
             ->get();
     }
