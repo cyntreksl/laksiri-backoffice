@@ -91,7 +91,7 @@ watch(
 
                     <InfoDisplay :value="pickup?.address" label="Address"/>
 
-                    <InfoDisplay :value="pickup?.packages" label="Packages"/>
+                    <InfoDisplay :value="pickup.packages === '-' ? pickup.packages : pickup?.packages.map(pack => pack.package_type).join(', ')" label="Packages"/>
 
                     <InfoDisplay :value="pickup?.cargo_type" label="Cargo Mode"/>
 
