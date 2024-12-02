@@ -1737,7 +1737,7 @@ const getSelectedPackage = () => {
 
                     <div class="mt-4 space-y-4">
                         <div class="grid grid-cols-4 gap-4">
-                            <div class="col-span-4">
+                            <div class="col-span-4" v-if="packageRulesData.length > 0" >
                                 <label class="block">
                                     <span>
                                         Package
