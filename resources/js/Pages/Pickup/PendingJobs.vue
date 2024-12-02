@@ -67,7 +67,7 @@ const data = reactive({
         cargo_type: true,
         driver: true,
         pickup_type: true,
-        packages: true,
+        packages: false,
         exception_note: true,
         status: false,
         actions: true,
@@ -457,6 +457,7 @@ const createColumns = () => [
     },
     {
         name: "Pickup Type",
+        sort: false,
         hidden: !data.columnVisibility.pickup_type,
         attributes: (cell, row) => {
             // add these attributes to the td elements only
