@@ -8,6 +8,7 @@ use App\Enum\ContainerType;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
+use App\Models\Scopes\BranchScope;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -104,9 +105,11 @@ class LoadedContainerController extends Controller
         return $this->loadedContainerRepository->deleteDraft($request->all());
     }
 
-    public function exportManifest(Container $container)
+    public function exportManifest($container)
     {
         $this->authorize('shipment.download manifest');
+
+        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
 
         return $this->loadedContainerRepository->downloadManifestFile($container);
     }

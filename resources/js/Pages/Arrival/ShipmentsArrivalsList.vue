@@ -1,5 +1,4 @@
 <script setup>
-import AppLayout from "@/Layouts/AppLayout.vue";
 import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
@@ -42,6 +41,14 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    seaContainerOptions: {
+        type: Array,
+        default: () => [],
+    },
+    airContainerOptions: {
+        type: Array,
+        default: () => [],
+    }
 });
 
 const wrapperRef = ref(null);
@@ -405,7 +412,7 @@ const createColumns = () => [
                         {
                             href: route(
                                 "loading.loaded-containers.manifest.export",
-                                row.cells[0].data
+                                row.cells[0]?.data
                             ),
                         },
                         [
@@ -1158,6 +1165,8 @@ class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
             :container="selectedContainer"
             :container-status="containerStatus"
             :show="showConfirmLoadedShipmentModal"
+            :air-container-options="airContainerOptions"
+            :sea-container-options="seaContainerOptions"
             @close="closeModal"
         />
     </DestinationAppLayout>

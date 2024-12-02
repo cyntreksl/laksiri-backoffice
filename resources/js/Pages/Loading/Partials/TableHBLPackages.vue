@@ -147,7 +147,7 @@ const closeShowHBLModal = () => {
             <tr v-for="hbl in containerData?.hbls"
                 class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                 <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
-                    {{ hbl.hbl || '-' }}
+                    {{ hbl.hbl_number || '-' }}
                 </td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.packages_count || '-' }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">
