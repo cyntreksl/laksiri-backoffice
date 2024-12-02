@@ -11,6 +11,7 @@ use App\Enum\ContainerType;
 use App\Enum\HBLType;
 use App\Enum\WarehouseType;
 use App\Http\Requests\StoreContainerRequest;
+use App\Http\Requests\StoreUnloadingIssue;
 use App\Http\Requests\UpdateContainerRequest;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
@@ -178,7 +179,7 @@ class ContainerController extends Controller
         $this->containerRepository->reloadContainer($request->all());
     }
 
-    public function storeUnloadingIssue(Request $request)
+    public function storeUnloadingIssue(StoreUnloadingIssue $request)
     {
         $this->containerRepository->createUnloadingIssue($request->all());
     }

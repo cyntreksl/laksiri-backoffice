@@ -1,5 +1,4 @@
 <script setup>
-import AppLayout from "@/Layouts/AppLayout.vue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import draggable from 'vuedraggable'
