@@ -28,7 +28,7 @@ const wrapperRef = ref(null);
 let grid = null;
 
 const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(1, "months").format("YYYY-MM-DD");
+const fromDate = moment(new Date()).subtract(2, "months").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 
 const filters = reactive({
@@ -64,7 +64,7 @@ const initializeGrid = () => {
         search: {
             debounceTimeout: 1000,
             server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`,
+                url: (prev, keyword) => `${prev}&search=${keyword}`,
             },
         },
         sort: {
@@ -116,7 +116,7 @@ const initializeGrid = () => {
 const createColumns = () => [
     {name: "ID", hidden: !data.columnVisibility.id},
     {name: "Username", hidden: !data.columnVisibility.username},
-    {name: "Name", hidden: !data.columnVisibility.name},
+    {name: "Name", hidden: !data.columnVisibility.name, sort: false},
     {
         name: "Primary Branch Name",
         hidden: !data.columnVisibility.primary_branch_name,
@@ -132,6 +132,7 @@ const createColumns = () => [
         hidden: !data.columnVisibility.status,
         formatter: (cell) =>
             html(`<div class="${resolveStatus(cell)}">${cell}</div>`),
+        sort: false,
     },
     {
         name: "Actions",
