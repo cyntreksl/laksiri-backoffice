@@ -53,6 +53,7 @@ const props = defineProps({
 
 const errors = ref([]);
 
+
 const splitCountryCode = (fullNumber) => {
     for (let code of props.countryCodes) {
         if (fullNumber.startsWith(code)) {
@@ -156,7 +157,47 @@ const packageItem = reactive({
     volume: 0,
     weight: 0,
     remarks: "",
+    measure_type: "cm"
 });
+
+const packageItemLength = ref(0);
+const packageItemWidth = ref(0);
+const packageItemHeight = ref(0);
+
+function convertMeasurements(measureType, value) {
+    const factor = conversionFactors[measureType] || 1;
+    return value * factor;
+}
+
+watch(
+    () => packageItem.measure_type,
+    (newMeasureType) => {
+        packageItemLength.value = convertMeasurements(newMeasureType, packageItem.length);
+        packageItemWidth.value = convertMeasurements(newMeasureType, packageItem.width);
+        packageItemHeight.value = convertMeasurements(newMeasureType, packageItem.height);
+    }
+);
+
+watch(
+    [() => packageItem.length],
+    ([newLength]) => {
+        packageItemLength.value = convertMeasurements(packageItem.measure_type, newLength);
+    }
+);
+
+watch(
+    [() => packageItem.width],
+    ([newWidth]) => {
+        packageItemWidth.value = convertMeasurements(packageItem.measure_type, newWidth);
+    }
+);
+
+watch(
+    [() => packageItem.height],
+    ([newHeight]) => {
+        packageItemHeight.value = convertMeasurements(packageItem.measure_type, newHeight);
+    }
+);
 
 const grandTotalVolume = computed(() => {
     return form.packages.reduce((acc, pack) => {
@@ -382,6 +423,13 @@ const closeAddPackageModal = () => {
 const editMode = ref(false);
 const editIndex = ref(null);
 
+const conversionFactors = {
+    cm: 1,
+    m: 100,
+    in: 2.54,
+    ft: 30.48,
+};
+
 const openEditModal = (index) => {
     editMode.value = true;
     editIndex.value = index;
@@ -391,6 +439,10 @@ const openEditModal = (index) => {
     // populate packageItem with existing data for editing
     Object.assign(packageItem, packageList.value[index]);
     packageItem.type = packageList.value[index].package_type;
+    const factor = conversionFactors[packageItem.measure_type] || 1;
+    packageItem.length = packageItem.length/factor;
+    packageItem.width = packageItem.width/factor;
+    packageItem.height = packageItem.height/factor;
 };
 const isPackageRuleSelected = ref(form.is_active_package);
 const packageRulesData = ref([]);
@@ -1342,7 +1394,7 @@ const getSelectedPackage = () => {
                                 </select>
                             </label>
                         </div>
-                        <div class="col-span-2">
+                        <div class="col-span-4 md:col-span-1">
                             <label class="block">
                                 <span>Type </span>
                                 <select
@@ -1360,7 +1412,7 @@ const getSelectedPackage = () => {
                                 </select>
                             </label>
                         </div>
-                        <div class="col-span-2">
+                        <div class="col-span-4 md:col-span-2">
                             <label class="block">
                 <span
                 >Type Description
@@ -1372,6 +1424,24 @@ const getSelectedPackage = () => {
                                     placeholder="Sofa set"
                                     type="text"
                                 />
+                            </label>
+                        </div>
+
+                        <div class="col-span-4 md:col-span-1">
+                            <label class="block">
+                                  <span
+                                  >Measure Type <span class="text-red-500 text-sm"
+                                  >*<br/></span
+                                  ></span>
+                                <select
+                                    v-model="packageItem.measure_type"
+                                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                >
+                                    <option value="cm">cm</option>
+                                    <option value="m">m</option>
+                                    <option value="in">in</option>
+                                    <option value="ft">ft</option>
+                                </select>
                             </label>
                         </div>
 
@@ -1388,6 +1458,7 @@ const getSelectedPackage = () => {
                                     step="0.01"
                                     type="number"
                                 />
+                                <span class="ml-2 text-red-500 text-sm">{{packageItemLength}} cm</span>
                             </label>
                         </div>
                         <div>
@@ -1402,6 +1473,7 @@ const getSelectedPackage = () => {
                                     step="0.01"
                                     type="number"
                                 />
+                                <span class="ml-2 text-red-500 text-sm">{{packageItemWidth}} cm</span>
                             </label>
                         </div>
 
@@ -1418,6 +1490,7 @@ const getSelectedPackage = () => {
                                     step="0.01"
                                     type="number"
                                 />
+                                <span class="ml-2 text-red-500 text-sm">{{packageItemHeight}} cm</span>
                             </label>
                         </div>
                         <div>
