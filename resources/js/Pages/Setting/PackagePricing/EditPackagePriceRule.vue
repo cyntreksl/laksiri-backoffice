@@ -8,6 +8,7 @@ import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import {push} from "notivue";
+import {ref, watch} from "vue";
 
 const props = defineProps({
     cargoModes: {
@@ -28,21 +29,82 @@ const props = defineProps({
     },
 });
 
+function convertToMeasureType(value, measureType) {
+    const conversionRates = {
+        cm: 1,
+        m: 0.01,
+        in: 0.393701,
+        ft: 0.0328084
+    };
+
+    return value * (conversionRates[measureType] || 1);
+}
+
 const form = useForm({
     destination_branch_id: props.packageRule.destination_branch_id || null,
     cargo_mode: props.packageRule.cargo_mode || '',
     hbl_type: props.packageRule.hbl_type || '',
     rule_title: props.packageRule.rule_title || '',
-    length: props.packageRule.length || '',
-    width: props.packageRule.width || '',
-    height: props.packageRule.height || '',
+    length: convertToMeasureType(props.packageRule.length || 0, props.packageRule.measureType || 'cm').toFixed(2),
+    width: convertToMeasureType(props.packageRule.width || 0, props.packageRule.measureType || 'cm').toFixed(2),
+    height: convertToMeasureType(props.packageRule.height || 0, props.packageRule.measureType || 'cm').toFixed(2),
     per_package_charge: props.packageRule.per_package_charge || 0,
     bill_price: props.packageRule.bill_price || 0,
     volume_charges: props.packageRule.volume_charges || 0,
     bill_vat: props.packageRule.bill_vat || 0,
+    measureType: props.packageRule.measureType || 'cm',
 });
 
+const conversionFactors = {
+    cm: 1,
+    m: 100,
+    in: 2.54,
+    ft: 30.48,
+};
+
+function convertMeasurements(measureType, value) {
+    const factor = conversionFactors[measureType] || 1;
+    return value * factor;
+}
+
+const ruleLength = ref(convertMeasurements(form.measureType, form.length));
+const ruleWidth = ref(convertMeasurements(form.measureType, form.width));
+const ruleHeight = ref(convertMeasurements(form.measureType, form.height));
+
+watch(
+    () => form.measureType,
+    (newMeasureType) => {
+        ruleLength.value = convertMeasurements(newMeasureType, form.length);
+        ruleWidth.value = convertMeasurements(newMeasureType, form.width);
+        ruleHeight.value = convertMeasurements(newMeasureType, form.height);
+    }
+);
+
+watch(
+    [() => form.length],
+    ([newLength]) => {
+        ruleLength.value = convertMeasurements(form.measureType, newLength);
+    }
+);
+
+watch(
+    [() => form.width],
+    ([newWidth]) => {
+        ruleWidth.value = convertMeasurements(form.measureType, newWidth);
+    }
+);
+
+watch(
+    [() => form.height],
+    ([newHeight]) => {
+        ruleHeight.value = convertMeasurements(form.measureType, newHeight);
+    }
+);
+
 const handlePackagePriceRuleUpdate = () => {
+    form.length = ruleLength.value;
+    form.width = ruleWidth.value;
+    form.height = ruleHeight.value;
     form.put(route("setting.package-prices.update", props.packageRule.id), {
         onSuccess: () => {
             form.reset();
@@ -165,20 +227,39 @@ const handlePackagePriceRuleUpdate = () => {
                             </div>
 
                             <div>
+                                <InputLabel value="Measure Type"/>
+                                <label for="">
+                                    <select
+                                        v-model="form.measureType"
+                                        class="w-full"
+                                        x-init="$el._tom = new Tom($el)"
+                                    >
+                                        <option value="cm">cm</option>
+                                        <option value="m">m</option>
+                                        <option value="in">in</option>
+                                        <option value="ft">ft</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div>
                                 <InputLabel value="Package Length"/>
                                 <TextInput v-model="form.length" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <span class="ml-2 text-red-500 text-sm">{{ruleLength}} cm</span>
                                 <InputError :message="form.errors.length"/>
                             </div>
 
                             <div>
                                 <InputLabel value="Package Width"/>
                                 <TextInput v-model="form.width" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <span class="ml-2 text-red-500 text-sm">{{ruleHeight}} cm</span>
                                 <InputError :message="form.errors.width"/>
                             </div>
 
                             <div>
                                 <InputLabel value="Package Height"/>
                                 <TextInput v-model="form.height" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <span class="ml-2 text-red-500 text-sm">{{ruleWidth}} cm</span>
                                 <InputError :message="form.errors.height"/>
                             </div>
 
