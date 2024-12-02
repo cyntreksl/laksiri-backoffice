@@ -88,7 +88,7 @@ const initializeGrid = () => {
             multiColumn: false,
             server: {
                 url: (prev, columns) => {
-                    if (!columns.length) return prev;
+                    if (!columns.length) return `${prev}&order=id&dir=desc`;
                     const col = columns[0];
                     const dir = col.direction === 1 ? "asc" : "desc";
                     let colName = visibleColumns[col.index];

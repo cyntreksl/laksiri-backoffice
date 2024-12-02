@@ -60,14 +60,18 @@ class Token extends Model
         $hbl = HBL::withoutGlobalScopes()
             ->where('reference', $this->reference)->firstOrFail();
 
-        if ($this->cashierPayment()->exists()) {
-            return true;
+        $payment = $hbl->hblPayment()->withoutGlobalScopes()->latest()->first();
+
+        if ($payment) {
+            if ($payment->paid_amount >= $payment->grand_total) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
-        if ($hbl->hblPayment()->exists()) {
-            if ($hbl->hblPayment->paid_amount >= $hbl->hblPayment->grand_total) {
-                return true;
-            }
+        if ($this->cashierPayment()->exists()) {
+            return true;
         }
 
         return false;
