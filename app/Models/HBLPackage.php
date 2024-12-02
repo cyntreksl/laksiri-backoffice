@@ -32,6 +32,7 @@ class HBLPackage extends Model
         'is_loaded',
         'is_unloaded',
         'remarks',
+        'measure_type',
     ];
 
     public function hbl(): BelongsTo
