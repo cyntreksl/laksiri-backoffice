@@ -970,8 +970,6 @@ const shipIcon = ref(`
             <template #title> Filter Containers</template>
 
             <template #content>
-
-
                 <div class="grid grid-cols-2  space-x-2">
                     <!--Filter Rest Button-->
                     <SoftPrimaryButton class="space-x-2" @click="resetFilter">
