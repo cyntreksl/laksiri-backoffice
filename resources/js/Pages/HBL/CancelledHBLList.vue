@@ -303,7 +303,7 @@ const createColumns = () => [
                           {
                               className:
                                   "btn size-8 p-0 text-pink-500 hover:bg-pink-500/20 focus:bg-pink-500/20 active:bg-pink-500/25",
-                              href: route("hbls.download", row.cells[0].data),
+                              href: route("hbls.cancelled-hbls.download", row.cells[0].data),
                               "x-tooltip..placement.bottom.primary":
                                   "'Download HBL'",
                           },

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\HBL\GetHBLById;
 use App\Actions\HBL\GetHBLByIdWithPackages;
+use App\Actions\HBL\GetHBLWithTrashedById;
 use App\Enum\CargoType;
 use App\Enum\CountryCode;
 use App\Enum\HBLPaymentStatus;
@@ -142,6 +143,14 @@ class HBLController extends Controller
     public function downloadHBLPDF($HBL)
     {
         $hbl = GetHBLByIdWithPackages::run($HBL);
+        $this->authorize('hbls.download pdf');
+
+        return $this->HBLRepository->downloadHBLPDF($hbl);
+    }
+
+    public function downloadCancelledHBLPDF($HBL)
+    {
+        $hbl = GetHBLWithTrashedById::run($HBL);
         $this->authorize('hbls.download pdf');
 
         return $this->HBLRepository->downloadHBLPDF($hbl);
