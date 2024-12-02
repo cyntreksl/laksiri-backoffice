@@ -110,6 +110,10 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
         }
 
         return $query
+            ->whereIn('system_status', [
+                PickUp::SYSTEM_STATUS_PICKUP_CREATED,
+                PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
+            ])
             ->with('zone')
             ->orderBy('pickup_order')
             ->get();
@@ -135,9 +139,5 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     public function export(array $filters)
     {
         return Excel::download(new PickupsExport($filters), 'pickups.xlsx');
-    }
-
-    public function showPickupException(int $exceptionId)
-    {
     }
 }
