@@ -157,7 +157,7 @@ const packageItem = reactive({
     volume: 0,
     weight: 0,
     remarks: "",
-    measureType: "cm"
+    measure_type: "cm"
 });
 
 const packageItemLength = ref(0);
@@ -170,7 +170,7 @@ function convertMeasurements(measureType, value) {
 }
 
 watch(
-    () => packageItem.measureType,
+    () => packageItem.measure_type,
     (newMeasureType) => {
         packageItemLength.value = convertMeasurements(newMeasureType, packageItem.length);
         packageItemWidth.value = convertMeasurements(newMeasureType, packageItem.width);
@@ -181,21 +181,21 @@ watch(
 watch(
     [() => packageItem.length],
     ([newLength]) => {
-        packageItemLength.value = convertMeasurements(packageItem.measureType, newLength);
+        packageItemLength.value = convertMeasurements(packageItem.measure_type, newLength);
     }
 );
 
 watch(
     [() => packageItem.width],
     ([newWidth]) => {
-        packageItemWidth.value = convertMeasurements(packageItem.measureType, newWidth);
+        packageItemWidth.value = convertMeasurements(packageItem.measure_type, newWidth);
     }
 );
 
 watch(
     [() => packageItem.height],
     ([newHeight]) => {
-        packageItemHeight.value = convertMeasurements(packageItem.measureType, newHeight);
+        packageItemHeight.value = convertMeasurements(packageItem.measure_type, newHeight);
     }
 );
 
@@ -439,7 +439,7 @@ const openEditModal = (index) => {
     // populate packageItem with existing data for editing
     Object.assign(packageItem, packageList.value[index]);
     packageItem.type = packageList.value[index].package_type;
-    const factor = conversionFactors[packageItem.measureType] || 1;
+    const factor = conversionFactors[packageItem.measure_type] || 1;
     packageItem.length = packageItem.length/factor;
     packageItem.width = packageItem.width/factor;
     packageItem.height = packageItem.height/factor;
@@ -1434,7 +1434,7 @@ const getSelectedPackage = () => {
                                   >*<br/></span
                                   ></span>
                                 <select
-                                    v-model="packageItem.measureType"
+                                    v-model="packageItem.measure_type"
                                     class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                 >
                                     <option value="cm">cm</option>

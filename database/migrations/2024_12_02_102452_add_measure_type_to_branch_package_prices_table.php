@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('branch_package_prices', function (Blueprint $table) {
-            $table->string('measureType', 10)->nullable()->after('bill_vat');
+            $table->string('measure_type', 10)->nullable()->after('bill_vat');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('branch_package_prices', function (Blueprint $table) {
-            $table->dropColumn('measureType');
+            $table->dropColumn('measure_type');
         });
     }
 };

@@ -146,7 +146,7 @@ const packageItem = reactive({
     totalWeight: 0,
     remarks: "",
     packageRule: 0,
-    measureType: "cm",
+    measure_type: "cm",
 });
 
 const grandTotalWeight = ref(0);
@@ -211,7 +211,7 @@ watch(
         () => packageItem.width,
         () => packageItem.height,
         () => packageItem.quantity,
-        () => packageItem.measureType,
+        () => packageItem.measure_type,
     ],
     ([newLength, newWidth, newHeight, newQuantity, newMeasureType]) => {
         // Convert dimensions from cm to meters
@@ -229,13 +229,13 @@ watch(
 
         // Update reactive properties
         packageItem.volume = (newLength*newWidth*newHeight*newQuantity).toFixed(3);
-        if (packageItem.measureType === 'cm') {
+        if (packageItem.measure_type === 'cm') {
             // Convert cm³ to m³ by dividing by 1,000,000
             packageItemVolume.value = (packageItem.volume / 1000000).toFixed(3);
-        } else if (packageItem.measureType === 'in') {
+        } else if (packageItem.measure_type === 'in') {
             // Convert from inches to cubic centimeters (1 inch = 16.387 cm³)
             packageItemVolume.value = (packageItem.volume * 16.387 / 1000000).toFixed(3);  // Convert to m³
-        } else if (packageItem.measureType === 'ft') {
+        } else if (packageItem.measure_type === 'ft') {
             // Convert from cubic feet to cubic meters (1 ft³ = 0.0283 m³)
             packageItemVolume.value = (packageItem.volume * 0.0283).toFixed(3);
         } else {
@@ -431,7 +431,7 @@ const openEditModal = (index) => {
     showAddNewPackageDialog.value = true;
     // populate packageItem with existing data for editing
     Object.assign(packageItem, packageList.value[index]);
-    const factor = conversionFactors[packageItem.measureType] || 1;
+    const factor = conversionFactors[packageItem.measure_type] || 1;
     packageItem.length = packageItem.length/factor;
     packageItem.width = packageItem.width/factor;
     packageItem.height = packageItem.height/factor;
@@ -706,7 +706,7 @@ function convertMeasurements(measureType, value) {
 }
 
 watch(
-    () => packageItem.measureType,
+    () => packageItem.measure_type,
     (newMeasureType) => {
         packageItemLength.value = convertMeasurements(newMeasureType, packageItem.length);
         packageItemWidth.value = convertMeasurements(newMeasureType, packageItem.width);
@@ -717,21 +717,21 @@ watch(
 watch(
     [() => packageItem.length],
     ([newLength]) => {
-        packageItemLength.value = convertMeasurements(packageItem.measureType, newLength);
+        packageItemLength.value = convertMeasurements(packageItem.measure_type, newLength);
     }
 );
 
 watch(
     [() => packageItem.width],
     ([newWidth]) => {
-        packageItemWidth.value = convertMeasurements(packageItem.measureType, newWidth);
+        packageItemWidth.value = convertMeasurements(packageItem.measure_type, newWidth);
     }
 );
 
 watch(
     [() => packageItem.height],
     ([newHeight]) => {
-        packageItemHeight.value = convertMeasurements(packageItem.measureType, newHeight);
+        packageItemHeight.value = convertMeasurements(packageItem.measure_type, newHeight);
     }
 );
 
@@ -742,7 +742,7 @@ const volumeUnit = computed(() => {
         in: 'IN.CU',
         ft: 'FT.CU',
     };
-    return units[packageItem.measureType] || 'M.CM';
+    return units[packageItem.measure_type] || 'M.CM';
 });
 
 </script>
@@ -1882,7 +1882,7 @@ const volumeUnit = computed(() => {
                                   >*<br/></span
                                   ></span>
                                     <select
-                                        v-model="packageItem.measureType"
+                                        v-model="packageItem.measure_type"
                                         class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
                                         <option value="cm">cm</option>

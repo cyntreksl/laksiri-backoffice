@@ -37,7 +37,7 @@ const form = useForm({
     bill_price: 0,
     volume_charges: 0,
     bill_vat: 0,
-    measureType: 'cm'
+    measure_type: 'cm'
 });
 
 const ruleLength = ref(0);
@@ -57,7 +57,7 @@ function convertMeasurements(measureType, value) {
 }
 
 watch(
-    () => form.measureType,
+    () => form.measure_type,
     (newMeasureType) => {
         ruleLength.value = convertMeasurements(newMeasureType, form.length);
         ruleWidth.value = convertMeasurements(newMeasureType, form.width);
@@ -68,21 +68,21 @@ watch(
 watch(
     [() => form.length],
     ([newLength]) => {
-        ruleLength.value = convertMeasurements(form.measureType, newLength);
+        ruleLength.value = convertMeasurements(form.measure_type, newLength);
     }
 );
 
 watch(
     [() => form.width],
     ([newWidth]) => {
-        ruleWidth.value = convertMeasurements(form.measureType, newWidth);
+        ruleWidth.value = convertMeasurements(form.measure_type, newWidth);
     }
 );
 
 watch(
     [() => form.height],
     ([newHeight]) => {
-        ruleHeight.value = convertMeasurements(form.measureType, newHeight);
+        ruleHeight.value = convertMeasurements(form.measure_type, newHeight);
     }
 );
 
@@ -216,7 +216,7 @@ const handlePriceRuleCreate = () => {
                                 <InputLabel value="Measure Type"/>
                                 <label for="">
                                     <select
-                                        v-model="form.measureType"
+                                        v-model="form.measure_type"
                                         class="w-full"
                                         x-init="$el._tom = new Tom($el)"
                                     >

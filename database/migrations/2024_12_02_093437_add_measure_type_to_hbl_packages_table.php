@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('hbl_packages', function (Blueprint $table) {
-            $table->string('measureType', 10)->nullable()->after('remarks');
+            $table->string('measure_type', 10)->nullable()->after('remarks');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('hbl_packages', function (Blueprint $table) {
-            $table->dropColumn('measureType');
+            $table->dropColumn('measure_type');
         });
     }
 };

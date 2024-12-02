@@ -45,14 +45,14 @@ const form = useForm({
     cargo_mode: props.packageRule.cargo_mode || '',
     hbl_type: props.packageRule.hbl_type || '',
     rule_title: props.packageRule.rule_title || '',
-    length: convertToMeasureType(props.packageRule.length || 0, props.packageRule.measureType || 'cm').toFixed(2),
-    width: convertToMeasureType(props.packageRule.width || 0, props.packageRule.measureType || 'cm').toFixed(2),
-    height: convertToMeasureType(props.packageRule.height || 0, props.packageRule.measureType || 'cm').toFixed(2),
+    length: convertToMeasureType(props.packageRule.length || 0, props.packageRule.measure_type || 'cm').toFixed(2),
+    width: convertToMeasureType(props.packageRule.width || 0, props.packageRule.measure_type || 'cm').toFixed(2),
+    height: convertToMeasureType(props.packageRule.height || 0, props.packageRule.measure_type || 'cm').toFixed(2),
     per_package_charge: props.packageRule.per_package_charge || 0,
     bill_price: props.packageRule.bill_price || 0,
     volume_charges: props.packageRule.volume_charges || 0,
     bill_vat: props.packageRule.bill_vat || 0,
-    measureType: props.packageRule.measureType || 'cm',
+    measure_type: props.packageRule.measure_type || 'cm',
 });
 
 const conversionFactors = {
@@ -67,12 +67,12 @@ function convertMeasurements(measureType, value) {
     return value * factor;
 }
 
-const ruleLength = ref(convertMeasurements(form.measureType, form.length));
-const ruleWidth = ref(convertMeasurements(form.measureType, form.width));
-const ruleHeight = ref(convertMeasurements(form.measureType, form.height));
+const ruleLength = ref(convertMeasurements(form.measure_type, form.length));
+const ruleWidth = ref(convertMeasurements(form.measure_type, form.width));
+const ruleHeight = ref(convertMeasurements(form.measure_type, form.height));
 
 watch(
-    () => form.measureType,
+    () => form.measure_type,
     (newMeasureType) => {
         ruleLength.value = convertMeasurements(newMeasureType, form.length);
         ruleWidth.value = convertMeasurements(newMeasureType, form.width);
@@ -83,7 +83,7 @@ watch(
 watch(
     [() => form.length],
     ([newLength]) => {
-        ruleLength.value = convertMeasurements(form.measureType, newLength);
+        ruleLength.value = convertMeasurements(form.measure_type, newLength);
     }
 );
 
@@ -97,7 +97,7 @@ watch(
 watch(
     [() => form.height],
     ([newHeight]) => {
-        ruleHeight.value = convertMeasurements(form.measureType, newHeight);
+        ruleHeight.value = convertMeasurements(form.measure_type, newHeight);
     }
 );
 
@@ -230,7 +230,7 @@ const handlePackagePriceRuleUpdate = () => {
                                 <InputLabel value="Measure Type"/>
                                 <label for="">
                                     <select
-                                        v-model="form.measureType"
+                                        v-model="form.measure_type"
                                         class="w-full"
                                         x-init="$el._tom = new Tom($el)"
                                     >
