@@ -18,6 +18,8 @@ import DangerButton from "@/Components/DangerButton.vue";
 import DeleteExceptionConfirmationModal from "@/Pages/Pickup/Partials/DeleteExceptionConfirmationModal.vue";
 import {push} from "notivue";
 import {router} from "@inertiajs/vue3";
+import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import RetryPickupConfirmationModal from "@/Pages/Pickup/Partials/RetryPickupConfirmationModal.vue";
 
 defineProps({
     drivers: {
@@ -64,6 +66,7 @@ const data = reactive({
         driver: true,
         auth: true,
         actions: true,
+        pickup_id: false,
     },
 });
 
@@ -198,7 +201,7 @@ const createColumns = () => [
                     {
                         className:
                             "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                        onClick: () => alert(row.cells[0].data),
+                        onClick: () => confirmRetry(row.cells[11].data),
                     },
                     [
                         h(
@@ -227,7 +230,7 @@ const createColumns = () => [
                     {
                         className:
                             "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                        onClick: () => alert(row.cells[0].data),
+                        onClick: () => confirmViewPickup(row.cells[11].data),
                     },
                     [
                         h(
@@ -258,6 +261,7 @@ const createColumns = () => [
             ]);
         },
     },
+    {name: "Pickup Id", hidden: !data.columnVisibility.pickup_id},
 ];
 
 const updateGridConfig = () => {
@@ -312,6 +316,31 @@ const isDataEmpty = computed(() => selectedData.value.length === 0);
 const countOfSelectedData = computed(() => selectedData.value.length);
 const idList = ref([]);
 
+const pickupId = ref(null);
+const showConfirmViewPickupModal = ref(false);
+
+const confirmViewPickup = async (id) => {
+    pickupId.value = id;
+    showConfirmViewPickupModal.value = true;
+};
+
+const closeViewModal = () => {
+    showConfirmViewPickupModal.value = false;
+    pickupId.value = null;
+};
+
+const showConfirmRetryModal = ref(false);
+
+const confirmRetry = async (id) => {
+    pickupId.value = id;
+    showConfirmRetryModal.value = true;
+};
+
+const closeRetryModal = () => {
+    showConfirmRetryModal.value = false;
+    pickupId.value = null;
+};
+
 const confirmAssignDriver = () => {
     idList.value = selectedData.value.map((item) => item[0]);
     showConfirmAssignDriverModal.value = true;
@@ -349,6 +378,21 @@ const handleDeleteExceptions = () => {
         }
     );
 };
+
+const handleRetryPickup = () => {
+    router.get(route("pickups.exceptions.retry", pickupId.value), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeRetryModal();
+            push.success("Added into Pending Jobs!");
+            router.visit(route("pickups.index"), {only: ["pickups"]});
+        },
+        onError: () => {
+            closeRetryModal();
+            push.error("Something went to wrong!");
+        },
+    });
+}
 
 const resetFilter = () => {
     filters.fromDate = fromDate;
@@ -708,8 +752,6 @@ const handlePerPageChange = (event) => {
                         {{ zone.name }}
                     </option>
                 </select>
-
-
             </template>
         </FilterDrawer>
 
@@ -718,6 +760,18 @@ const handlePerPageChange = (event) => {
             :show="showConfirmDeleteExceptionModal"
             @close="closeModal"
             @delete-exceptions="handleDeleteExceptions"
+        />
+
+        <HBLDetailModal
+            :pickup-id="pickupId"
+            :show="showConfirmViewPickupModal"
+            @close="closeViewModal"
+        />
+
+        <RetryPickupConfirmationModal
+            :show="showConfirmRetryModal"
+            @close="closeRetryModal"
+            @retry-pickup="handleRetryPickup"
         />
     </AppLayout>
 </template>

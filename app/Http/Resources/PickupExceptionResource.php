@@ -25,6 +25,7 @@ class PickupExceptionResource extends JsonResource
             'created_date' => $this->created_at->format('Y-m-d'),
             'driver' => $this->driver?->name,
             'auth' => $this->auth,
+            'pickup_id' => $this->pickup_id,
         ];
     }
 }
