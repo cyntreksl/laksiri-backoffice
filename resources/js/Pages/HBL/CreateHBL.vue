@@ -146,6 +146,7 @@ const packageItem = reactive({
     totalWeight: 0,
     remarks: "",
     packageRule: 0,
+    measureType: "cm",
 });
 
 const grandTotalWeight = ref(0);
@@ -164,6 +165,10 @@ const addPackageData = () => {
         push.error("Please fill all required data");
         return;
     }
+    packageItem.length = packageItemLength.value;
+    packageItem.width = packageItemWidth.value;
+    packageItem.height = packageItemHeight.value;
+    packageItem.volume = packageItemVolume.value;
 
     if (form.cargo_type === 'Air Cargo') {
         if (packageItem.totalWeight <= 0) {
@@ -197,6 +202,8 @@ const addPackageData = () => {
     closeAddPackageModal();
 };
 
+const packageItemVolume = ref(0);
+
 // Watch for changes in length, width, height, or quantity to update volume and totalWeight
 watch(
     [
@@ -204,8 +211,9 @@ watch(
         () => packageItem.width,
         () => packageItem.height,
         () => packageItem.quantity,
+        () => packageItem.measureType,
     ],
-    ([newLength, newWidth, newHeight, newQuantity]) => {
+    ([newLength, newWidth, newHeight, newQuantity, newMeasureType]) => {
         // Convert dimensions from cm to meters
         const lengthMeters = newLength / 100; // 1 cm = 0.01 meters
         const widthMeters = newWidth / 100;
@@ -220,7 +228,21 @@ watch(
         const totalWeightKg = (volumeCubicMeters * newQuantity) / 1000; // 1 gram = 0.001 kilograms
 
         // Update reactive properties
-        packageItem.volume = volumeCubicMeters.toFixed(3);
+        packageItem.volume = (newLength*newWidth*newHeight*newQuantity).toFixed(3);
+        if (packageItem.measureType === 'cm') {
+            // Convert cm³ to m³ by dividing by 1,000,000
+            packageItemVolume.value = (packageItem.volume / 1000000).toFixed(3);
+        } else if (packageItem.measureType === 'in') {
+            // Convert from inches to cubic centimeters (1 inch = 16.387 cm³)
+            packageItemVolume.value = (packageItem.volume * 16.387 / 1000000).toFixed(3);  // Convert to m³
+        } else if (packageItem.measureType === 'ft') {
+            // Convert from cubic feet to cubic meters (1 ft³ = 0.0283 m³)
+            packageItemVolume.value = (packageItem.volume * 0.0283).toFixed(3);
+        } else {
+            // Assume volume is already in cubic meters if no unit conversion is needed
+            packageItemVolume.value = packageItem.volume;
+        }
+
         // packageItem.totalWeight = totalWeightKg;
     }
 );
@@ -409,6 +431,10 @@ const openEditModal = (index) => {
     showAddNewPackageDialog.value = true;
     // populate packageItem with existing data for editing
     Object.assign(packageItem, packageList.value[index]);
+    const factor = conversionFactors[packageItem.measureType] || 1;
+    packageItem.length = packageItem.length/factor;
+    packageItem.width = packageItem.width/factor;
+    packageItem.height = packageItem.height/factor;
 };
 
 const copyFromHBLToShipperModalShow = ref(false);
@@ -662,6 +688,63 @@ const getSelectedPackage = () => {
         packageItem.height = 0;
     }
 };
+
+const packageItemLength = ref(0);
+const packageItemWidth = ref(0);
+const packageItemHeight = ref(0);
+
+const conversionFactors = {
+    cm: 1,
+    m: 100,
+    in: 2.54,
+    ft: 30.48,
+};
+
+function convertMeasurements(measureType, value) {
+    const factor = conversionFactors[measureType] || 1;
+    return value * factor;
+}
+
+watch(
+    () => packageItem.measureType,
+    (newMeasureType) => {
+        packageItemLength.value = convertMeasurements(newMeasureType, packageItem.length);
+        packageItemWidth.value = convertMeasurements(newMeasureType, packageItem.width);
+        packageItemHeight.value = convertMeasurements(newMeasureType, packageItem.height);
+    }
+);
+
+watch(
+    [() => packageItem.length],
+    ([newLength]) => {
+        packageItemLength.value = convertMeasurements(packageItem.measureType, newLength);
+    }
+);
+
+watch(
+    [() => packageItem.width],
+    ([newWidth]) => {
+        packageItemWidth.value = convertMeasurements(packageItem.measureType, newWidth);
+    }
+);
+
+watch(
+    [() => packageItem.height],
+    ([newHeight]) => {
+        packageItemHeight.value = convertMeasurements(packageItem.measureType, newHeight);
+    }
+);
+
+const volumeUnit = computed(() => {
+    const units = {
+        cm: 'CM.CU',
+        m: 'M.CU',
+        in: 'IN.CU',
+        ft: 'FT.CU',
+    };
+    return units[packageItem.measureType] || 'M.CM';
+});
+
 </script>
 
 <template>
@@ -1763,7 +1846,7 @@ const getSelectedPackage = () => {
                                     </select>
                                 </label>
                             </div>
-                            <div class="col-span-2">
+                            <div class="col-span-4 md:col-span-1">
                                 <label class="block">
                                     <span>Type </span>
                                     <select
@@ -1778,7 +1861,7 @@ const getSelectedPackage = () => {
                                     </select>
                                 </label>
                             </div>
-                            <div class="col-span-2">
+                            <div class="col-span-4 md:col-span-2">
                                 <label class="block">
                                   <span
                                   >Type Description
@@ -1790,6 +1873,23 @@ const getSelectedPackage = () => {
                                         placeholder="Sofa set"
                                         type="text"
                                     />
+                                </label>
+                            </div>
+                            <div class="col-span-4 md:col-span-1">
+                                <label class="block">
+                                  <span
+                                  >Measure Type <span class="text-red-500 text-sm"
+                                  >*<br/></span
+                                  ></span>
+                                    <select
+                                        v-model="packageItem.measureType"
+                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    >
+                                        <option value="cm">cm</option>
+                                        <option value="m">m</option>
+                                        <option value="in">in</option>
+                                        <option value="ft">ft</option>
+                                    </select>
                                 </label>
                             </div>
 
@@ -1807,6 +1907,7 @@ const getSelectedPackage = () => {
                                         step="0.01"
                                         type="number"
                                     />
+                                    <span class="ml-2 text-red-500 text-sm">{{packageItemLength}} cm</span>
                                 </label>
                             </div>
                             <div class="col-span-4 md:col-span-1">
@@ -1823,6 +1924,7 @@ const getSelectedPackage = () => {
                                         step="0.01"
                                         type="number"
                                     />
+                                    <span class="ml-2 text-red-500 text-sm">{{packageItemWidth}} cm</span>
                                 </label>
                             </div>
 
@@ -1840,8 +1942,14 @@ const getSelectedPackage = () => {
                                         step="0.01"
                                         type="number"
                                     />
+                                    <span class="ml-2 text-red-500 text-sm">{{packageItemHeight}} cm</span>
                                 </label>
                             </div>
+
+<!--                            <div class="col-span-4 md:col-span-1">-->
+<!--                                -->
+<!--                            </div>-->
+
                             <div class="col-span-4 md:col-span-1">
                                 <label class="block">
                   <span
@@ -1859,10 +1967,12 @@ const getSelectedPackage = () => {
                                 </label>
                             </div>
 
+                            <div class="col-span-4 md:col-span-3"></div>
+
                             <div class="col-span-2">
                                 <label class="block">
                   <span
-                  >Volume (M.CU)
+                  >Volume ({{volumeUnit }})
                     <span class="text-red-500 text-sm">*</span></span
                   >
                                     <input
@@ -1872,6 +1982,7 @@ const getSelectedPackage = () => {
                                         step="0.001"
                                         type="number"
                                     />
+                                    <span class="ml-2 text-red-500 text-sm">{{packageItemVolume}} M.CU</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
