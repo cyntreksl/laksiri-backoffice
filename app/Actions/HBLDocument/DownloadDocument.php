@@ -14,8 +14,8 @@ class DownloadDocument
     {
         $filePath = $hbl_document->document;
 
-        if (Storage::disk('public')->exists($filePath)) {
-            return Storage::disk('public')->download($filePath);
+        if (Storage::disk('s3')->exists($filePath)) {
+            return Storage::disk('s3')->download($filePath);
         }
     }
 }

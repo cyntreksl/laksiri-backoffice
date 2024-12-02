@@ -78,7 +78,16 @@ const form = useForm({
     document: null,
 })
 
+watch(() => props.hblId, (newHblId) => {
+    form.hbl_id = newHblId;
+});
+
 const handleFileUpload = () => {
+    if (!form.hbl_id) {
+        push.error('HBL ID is missing!');
+        return;
+    }
+
     form.post(route('hbls.upload.document'), {
         preserveScroll: true,
         onSuccess: () => {
