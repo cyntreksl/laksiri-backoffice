@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\Container;
 use App\Models\HBL;
+use App\Models\Scopes\BranchScope;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -46,21 +47,25 @@ class LoadedContainerManifestExport implements FromQuery, ShouldAutoSize, WithHe
 
     public function query()
     {
-        return Container::query()->where('id', $this->container->id);
+        return Container::query()
+            ->withoutGlobalScope(BranchScope::class)
+            ->with(['hbl_packages' => function ($query) {
+                $query->withoutGlobalScope(BranchScope::class);
+            }])
+            ->where('id', $this->container->id);
     }
 
-    /**
-     * @param  Container  $container
-     */
-    public function map($container): array
+    public function map($row): array
     {
         $data = [];
 
-        foreach ($container->hbl_packages->groupBy('hbl_id') as $hblId => $loadedHBLPackages) {
-            $hbl = HBL::find($hblId);
+        foreach ($row->hbl_packages->groupBy('hbl_id') as $hblId => $loadedHBLPackages) {
+            $hbl = HBL::withoutGlobalScope(BranchScope::class)->find($hblId);
+            if (! $hbl) {
+                continue;
+            } // Skip if HBL is missing
 
             $isFirst = true;
-
             $totalQuantity = $loadedHBLPackages->sum('quantity');
 
             foreach ($loadedHBLPackages as $hbl_package) {
@@ -77,35 +82,10 @@ class LoadedContainerManifestExport implements FromQuery, ShouldAutoSize, WithHe
                 $isFirst = false;
             }
 
-            $data[] = [
-                '',
-                $hbl->address,
-                $hbl->consignee_address,
-                '',
-                '',
-                '',
-                '',
-            ];
-
-            $data[] = [
-                '',
-                $hbl->nic,
-                $hbl->consignee_nic,
-                '',
-                '',
-                '',
-                '',
-            ];
-
-            $data[] = [
-                '',
-                $hbl->contact_number,
-                $hbl->consignee_contact,
-                '',
-                '',
-                '',
-                '',
-            ];
+            // Add additional rows (address, NIC, etc.)
+            $data[] = ['', $hbl->address, $hbl->consignee_address, '', '', '', ''];
+            $data[] = ['', $hbl->nic, $hbl->consignee_nic, '', '', '', ''];
+            $data[] = ['', $hbl->contact_number, $hbl->consignee_contact, '', '', '', ''];
         }
 
         return $data;

@@ -38,22 +38,22 @@ const warehouseArr = ref([]);
 const groupedPackages = props.container.hbl_packages
     .filter(p => p.pivot?.status !== 'draft-unload')
     .reduce((acc, p) => {
-        const reference = p.hbl.reference;
-        if (!acc[reference]) {
-            acc[reference] = [];
+        const hbl_number = p.hbl.hbl_number;
+        if (!acc[hbl_number]) {
+            acc[hbl_number] = [];
         }
-        acc[reference].push(p);
+        acc[hbl_number].push(p);
         return acc;
     }, {});
 
 const groupedWarehousePackages = props.container.hbl_packages
     .filter(p => p.pivot?.status  === 'draft-unload');
 
-containerArr.value = Object.keys(groupedPackages).map(reference => {
+containerArr.value = Object.keys(groupedPackages).map(hbl_number => {
     return {
-        reference: reference,
+        hbl_number: hbl_number,
         expanded: true,
-        packages: groupedPackages[reference]
+        packages: groupedPackages[hbl_number]
     };
 });
 
@@ -64,7 +64,7 @@ const filteredPackages = computed(() => {
         return containerArr.value;
     }
     return containerArr.value.filter(packageData => {
-        return packageData?.reference.toLowerCase().includes(searchQuery.value.toLowerCase());
+        return packageData?.hbl_number.toLowerCase().includes(searchQuery.value.toLowerCase());
     });
 })
 
@@ -82,12 +82,12 @@ const handleUnloadToWarehouse = (groupIndex, packageIndex) => {
 const handleReLoadToContainer = (index) => {
     if (index !== -1) {
         const packageToMove = warehouseArr.value.splice(index, 1)[0];
-        const group = containerArr.value.find(g => g.reference === packageToMove.hbl.reference);
+        const group = containerArr.value.find(g => g.hbl_number === packageToMove.hbl.hbl_number);
         if (group) {
             group.packages.push(packageToMove);
         } else {
             containerArr.value.push({
-                reference: packageToMove.hbl.reference,
+                hbl_number: packageToMove.hbl.hbl_number,
                 expanded: true,
                 packages: [packageToMove]
             });
@@ -276,7 +276,7 @@ const confirmShowCreateIssueModal = (index) => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ hbl.reference }}</span>
+                                        <span>{{ hbl.hbl_number }}</span>
                                     </div>
                                     <ul v-show="hbl.expanded" class="pl-4">
                                         <draggable v-model="hbl.packages"
@@ -291,7 +291,7 @@ const confirmShowCreateIssueModal = (index) => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ hbl?.reference }}
+                                                                        {{ hbl?.hbl_number }}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -462,7 +462,7 @@ const confirmShowCreateIssueModal = (index) => {
                                             <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
                                                 <div>
                                                     <div class="flex items-center">
-                                                        <svg v-show="element.unloading_issue" class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle text-warning mr-2" fill="none" height="24"
+                                                        <svg v-show="element.unloading_issue.length > 0" class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle text-warning mr-2" fill="none" height="24"
                                                              stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                                              stroke-width="2" viewBox="0 0 24 24" width="24"
                                                              xmlns="http://www.w3.org/2000/svg">
@@ -474,7 +474,7 @@ const confirmShowCreateIssueModal = (index) => {
                                                         </svg>
 
                                                         <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
-                                                            {{ element.hbl?.reference }}
+                                                            {{ element.hbl?.hbl_number }}
                                                         </p>
                                                     </div>
                                                 </div>

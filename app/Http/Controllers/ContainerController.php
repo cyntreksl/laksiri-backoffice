@@ -151,6 +151,8 @@ class ContainerController extends Controller
             'containerTypes' => ContainerType::cases(),
             'containerStatus' => ContainerStatus::cases(),
             'branches' => GetBranches::run(),
+            'seaContainerOptions' => ContainerType::getSeaCargoOptions(),
+            'airContainerOptions' => ContainerType::getAirCargoOptions(),
         ]);
     }
 

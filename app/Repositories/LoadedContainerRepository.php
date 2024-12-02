@@ -90,7 +90,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         ]);
     }
 
-    public function downloadManifestFile(Container $container): BinaryFileResponse
+    public function downloadManifestFile($container): BinaryFileResponse
     {
         // generate file name
         $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.xlsx';
