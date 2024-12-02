@@ -10,7 +10,7 @@ let grid = null;
 const data = reactive({
     columnVisibility: {
         id: false,
-        reference: true,
+        hbl: true,
         token: true,
         customer: true,
         reception: true,
@@ -75,7 +75,14 @@ const initializeGrid = () => {
 
 const createColumns = () => [
     {name: "ID", hidden: !data.columnVisibility.id},
-    {name: "Reference", hidden: !data.columnVisibility.reference, sort: false},
+    {
+        name: "HBL",
+        hidden: !data.columnVisibility.hbl,
+        sort: false,
+        formatter: cell => {
+            return cell?.hbl_number
+        }
+    },
     {name: "Token", hidden: !data.columnVisibility.token},
     {name: "Customer", hidden: !data.columnVisibility.customer, sort: false},
     {name: "Reception", hidden: !data.columnVisibility.reception, sort: false},

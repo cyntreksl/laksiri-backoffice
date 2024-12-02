@@ -27,7 +27,7 @@ const filteredPackageQueue = computed(() => {
         <div v-if="Object.keys(filteredPackageQueue).length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-5">
             <Link v-for="queue in filteredPackageQueue" :key="queue.id" :href="route('call-center.package.create', queue.id)" class="card grow cursor-pointer hover:bg-indigo-300 items-center p-4 text-center sm:p-5 border w-60 rounded-lg">
                 <div class="my-5">
-                    <h1 class="text-3xl text-black font-bold">{{ queue.reference }}</h1>
+                    <h1 class="text-3xl text-black font-bold">{{ queue.hbl?.hbl_number }}</h1>
                 </div>
                 <div class="my-2 grow">
                     <h3 class="text-lg font-medium text-slate-700 dark:text-navy-100">
