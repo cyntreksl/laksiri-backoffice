@@ -130,7 +130,7 @@ const handleCreateLoadedContainer = () => {
                     <tbody>
                     <tr v-for="(packageData, index) in uniqueContainerArray" class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                         <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ findHblByPackageId(packageData.id).hbl }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ findHblByPackageId(packageData.id).hbl_number }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                             {{ findHblByPackageId(packageData.id)?.packages.length }}
                         </td>

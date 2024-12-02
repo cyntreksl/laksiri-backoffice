@@ -107,7 +107,7 @@ const handleFinishUnloading = () => {
                         class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                         <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                            {{ packageData.hbl.reference }}
+                            {{ packageData.hbl.hbl_number }}
                         </td>
                         <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
                             {{ countPackages(packageData.hbl_id) }}
