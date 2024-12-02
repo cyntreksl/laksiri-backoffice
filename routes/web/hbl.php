@@ -18,6 +18,9 @@ Route::put('hbls/toggle-hold/{hbl}', [HBLController::class, 'toggleHold'])
 Route::get('hbls/download/{hbl}', [HBLController::class, 'downloadHBLPDF'])
     ->name('hbls.download');
 
+Route::get('hbls/cancelled-hbls/download/{hbl}', [HBLController::class, 'downloadCancelledHBLPDF'])
+    ->name('hbls.cancelled-hbls.download');
+
 Route::get('hbls/show/cancelled-hbls', [HBLController::class, 'cancelledHBLs'])
     ->name('hbls.cancelled-hbls');
 
