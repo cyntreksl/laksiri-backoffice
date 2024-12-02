@@ -554,9 +554,22 @@ const handlePerPageChange = (event) => {
         </div>
 
         <FilterDrawer :show="showFilters" @close="showFilters = false">
-            <template #title> Filter Containers</template>
+            <template #title> Filter Bonded Warehouse</template>
 
             <template #content>
+                <div class="grid grid-cols-2  space-x-2">
+                    <!--Filter Rest Button-->
+                    <SoftPrimaryButton class="space-x-2" @click="resetFilter">
+                        <i class="fa-solid fa-refresh"></i>
+                        <span>Reset</span>
+                    </SoftPrimaryButton>
+                    <!--Filter Now Action Button-->
+                    <button class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90 dark:border-accent dark:text-accent-light dark:hover:bg-accent dark:hover:text-white dark:focus:bg-accent dark:focus:text-white dark:active:bg-accent/90" @click="applyFilters">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Apply</span>
+                    </button>
+                </div>
+
                 <div>
                     <InputLabel value="From"/>
                     <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
@@ -582,19 +595,6 @@ const handlePerPageChange = (event) => {
                         :value="hblType"
                     />
                 </label>
-
-                <FilterBorder/>
-
-                <!--Filter Now Action Button-->
-                <SoftPrimaryButton class="space-x-2" @click="applyFilters">
-                    <i class="fa-solid fa-filter"></i>
-                    <span>Apply Filters</span>
-                </SoftPrimaryButton>
-                <!--Filter Rest Button-->
-                <SoftPrimaryButton class="space-x-2" @click="resetFilter">
-                    <i class="fa-solid fa-refresh"></i>
-                    <span>Reset Filters</span>
-                </SoftPrimaryButton>
             </template>
         </FilterDrawer>
 
