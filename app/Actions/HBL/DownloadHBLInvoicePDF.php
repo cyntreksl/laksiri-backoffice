@@ -2,6 +2,7 @@
 
 namespace App\Actions\HBL;
 
+use App\Actions\Setting\GetSettings;
 use App\Models\HBL;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -14,6 +15,8 @@ class DownloadHBLInvoicePDF
     {
         $pdf = Pdf::loadView('pdf.hbls.hblInvoice', [
             'hbl' => $hbl->load('packages'),
+            'settings' => GetSettings::run(),
+            'logoPath' => GetSettings::run()['logo_url'] ?? null,
         ])->setPaper('a4');
 
         $filename = $hbl->hbl.'.pdf';
