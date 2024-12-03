@@ -87,7 +87,12 @@ class HBLController extends Controller
      */
     public function store(StoreHBLRequest $request)
     {
-        $this->HBLRepository->storeHBL($request->all());
+        $hbl = $this->HBLRepository->storeHBL($request->all());
+
+        return Inertia::render('HBL/CreateHBL', [
+            'success' => 'HBL Created Successfully!',
+            'hbl_id' => $hbl->id,
+        ]);
     }
 
     public function show($hbl_id)

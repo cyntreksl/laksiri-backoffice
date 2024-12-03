@@ -12,9 +12,9 @@ import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageCo
 import TextInput from "@/Components/TextInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import {push} from "notivue";
-import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
+import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 
 const props = defineProps({
     hblTypes: {
@@ -113,13 +113,12 @@ const form = useForm({
 
 const handleHBLCreate = () => {
     form.post(route("hbls.store"), {
-        onSuccess: () => {
-            router.visit(route("hbls.create"));
+        onSuccess: (page) => {
+            confirmViewHBL(page.props.hbl_id)
             form.reset();
             push.success("HBL Created Successfully!");
         },
         onError: () => console.log("error"),
-        onFinish: () => console.log("finish"),
         preserveScroll: true,
         preserveState: true,
     });
@@ -391,6 +390,12 @@ const confirmRemovePackage = (index) => {
 
 const closeModal = () => {
     showConfirmRemovePackageModal.value = false;
+};
+
+const closeViewModal = () => {
+    showConfirmViewHBLModal.value = false;
+    hblId.value = null;
+    router.visit(route("hbls.create"));
 };
 
 const handleRemovePackage = () => {
@@ -742,6 +747,13 @@ const volumeUnit = computed(() => {
     return units[packageItem.measure_type] || 'M.CM';
 });
 
+const hblId = ref(null);
+const showConfirmViewHBLModal = ref(false);
+
+const confirmViewHBL = async (id) => {
+    hblId.value = id;
+    showConfirmViewHBLModal.value = true;
+};
 </script>
 
 <template>
@@ -2033,6 +2045,12 @@ const volumeUnit = computed(() => {
             :show="showConfirmRemovePackageModal"
             @close="closeModal"
             @remove-package="handleRemovePackage"
+        />
+
+        <HBLDetailModal
+            :hbl-id="hblId"
+            :show="showConfirmViewHBLModal"
+            @close="closeViewModal"
         />
     </AppLayout>
 </template>
