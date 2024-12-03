@@ -28,7 +28,7 @@ const wrapperRef = ref(null);
 let grid = null;
 
 const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(2, "months").format("YYYY-MM-DD");
+const fromDate = moment(new Date()).subtract(12, "months").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 
 const filters = reactive({
