@@ -506,7 +506,7 @@ const initializeGrid = () => {
         search: {
             debounceTimeout: 1000,
             server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`,
+                url: (prev, keyword) => `${prev}&search=${keyword}`,
             },
         },
         sort: {
@@ -939,7 +939,6 @@ const shipIcon = ref(`
                             </button>
                         </a>
                     </div>
-
                     <div>
                         <PrimaryButton
                             v-if="$page.props.user.permissions.includes('warehouse.revert to cash settlement')"
