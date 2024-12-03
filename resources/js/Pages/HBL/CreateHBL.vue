@@ -585,10 +585,7 @@ const handleRemoveCopiedPackages = () => {
 
 const handleCopyShipper = () => {
     form.consignee_name = form.hbl_name;
-    consignee_countryCode.value = countryCode.value;
-    consignee_contact.value = contactNumber.value;
     form.consignee_nic = form.nic;
-    form.consignee_address = form.address;
 }
 
 const isShowedPaymentSummery = ref(false);
