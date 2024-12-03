@@ -126,7 +126,7 @@ $count=count($hbl->packages);
 	</tbody>
 </table>
 
-<table>
+<table class="table-row">
     <tbody>
     <tr>
         <td><br>
