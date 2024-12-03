@@ -136,7 +136,9 @@ const showPackageDialog = () => {
 const packageList = ref([]);
 
 const packageItem = reactive({
-    type: "",
+    type: props.packageTypes.find(
+        type => type.name.toLowerCase() === 'cartoon'.toLowerCase()
+    )?.name || "",
     length: 0,
     width: 0,
     height: 0,
@@ -1864,7 +1866,7 @@ const confirmViewHBL = async (id) => {
                                         @change="updateTypeDescription"
                                     >
                                         <option value="">Choose one</option>
-                                        <option v-for="type in packageTypes" :key="type">
+                                        <option v-for="type in packageTypes" :key="type.name">
                                             {{ type.name }}
                                         </option>
                                     </select>
