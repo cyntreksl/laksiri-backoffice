@@ -236,9 +236,9 @@ const createUser = () => {
                 </div>
 
                 <div class="col-span-1 sm:col-span-2">
-                    <InputLabel value="Select Role"/>
-                    <div class="space-x-5 mt-1">
-                        <template v-for="role in roles">
+                    <InputLabel value="Select Role" />
+                    <div class="grid grid-cols-3 gap-4 mt-1">
+                        <template v-for="(role, index) in roles" :key="index">
                             <label
                                 v-if="usePage().props?.auth.user.active_branch_type !== 'destination' || (role.name !== 'call center' && role.name !== 'boned area')"
                                 class="inline-flex items-center space-x-2"
@@ -254,30 +254,7 @@ const createUser = () => {
                             </label>
                         </template>
                     </div>
-                    <InputError :message="form.errors.role"/>
-                </div>
-            </div>
-
-            <div class="mt-4">
-                <div class="space-y-3">
-                    <div class="badge bg-navy-700 text-white dark:bg-navy-900">
-                        EMPTY
-                    </div>
-                    <div>
-                        User can`t login to this branch. But can view details from other branches
-                    </div>
-                    <div class="badge bg-navy-700 text-white dark:bg-navy-900">
-                        VIEWER
-                    </div>
-                    <div>
-                        User can view, create, edit. Based on permissions
-                    </div>
-                    <div class="badge bg-navy-700 text-white dark:bg-navy-900">
-                        ADMIN
-                    </div>
-                    <div>
-                        All privileges. User can view, create, edit and delete
-                    </div>
+                    <InputError :message="form.errors.role" />
                 </div>
             </div>
         </template>
