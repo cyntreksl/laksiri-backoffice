@@ -149,7 +149,9 @@ const packageList = ref(form.packages ?? []);
 
 const packageItem = reactive({
     package_rule: "",
-    type: "",
+    type: props.packageTypes.find(
+        type => type.name.toLowerCase() === 'cartoon'.toLowerCase()
+    )?.name || "",
     length: 0,
     width: 0,
     height: 0,
