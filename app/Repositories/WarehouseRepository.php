@@ -25,7 +25,7 @@ class WarehouseRepository implements GridJsInterface, WarehouseRepositoryInterfa
         $query->warehouse();
 
         if (! empty($search)) {
-            $query->where('hbl', 'like', "%$search%");
+            $query->where('hbl_number', 'like', "%$search%");
         }
 
         //apply filters

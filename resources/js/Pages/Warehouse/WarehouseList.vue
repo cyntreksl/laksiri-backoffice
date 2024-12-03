@@ -16,7 +16,7 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import HoldConfirmationModal from "@/Pages/Warehouse/Partials/HoldConfirmationModal.vue";
-import {router, usePage} from "@inertiajs/vue3";
+import {Link, router, usePage} from "@inertiajs/vue3";
 import AssignZoneModal from "@/Pages/Warehouse/Partials/AssignZoneModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
@@ -249,7 +249,7 @@ const createColumns = () => [
   </div>`);
             } else if (cell === "Partial Paid") {
                 return html(`<div class="badge space-x-2.5 text-warning">
-    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-question-mark"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 8a3.5 3 0 0 1 3.5 -3h1a3.5 3 0 0 1 3.5 3a3 3 0 0 1 -2 3a3 4 0 0 0 -2 4" /><path d="M12 19l0 .01" /></svg>
+  <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-cash-off"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 9h6a2 2 0 0 1 2 2v6m-2 2h-10a2 2 0 0 1 -2 -2v-6a2 2 0 0 1 2 -2" /><path d="M12.582 12.59a2 2 0 0 0 2.83 2.826" /><path d="M17 9v-2a2 2 0 0 0 -2 -2h-6m-4 0a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h2" /><path d="M3 3l18 18" /></svg>
     <span>${cell}</span>
   </div>`);
             } else if (cell === "Unpaid") {
@@ -506,7 +506,7 @@ const initializeGrid = () => {
         search: {
             debounceTimeout: 1000,
             server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`,
+                url: (prev, keyword) => `${prev}&search=${keyword}`,
             },
         },
         sort: {
@@ -810,7 +810,16 @@ const shipIcon = ref(`
 
             <SimpleOverviewWidget :count="totalQuantity" bg-color="white" title="Total Quantity"/>
         </div>
-
+        <div class="flex justify-end mt-5">
+            <PrimaryButton
+                v-if="$page.props.user.permissions.includes('warehouse.revert to cash settlement')"
+                :disabled="isDataEmpty"
+                @click="revertToCashSettlement"
+            >
+                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-back-up mr-2"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" /></svg>
+                Revert To Cash Settlement
+            </PrimaryButton>
+        </div>
         <div class="card mt-4">
             <div>
                 <div class="flex items-center justify-between p-2">
@@ -938,17 +947,6 @@ const shipIcon = ref(`
                                 <i class="fa-solid fa-cloud-arrow-down"></i>
                             </button>
                         </a>
-                    </div>
-
-                    <div>
-                        <PrimaryButton
-                            v-if="$page.props.user.permissions.includes('warehouse.revert to cash settlement')"
-                            :disabled="isDataEmpty"
-                            @click="revertToCashSettlement"
-                        >
-                            <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-back-up mr-2"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" /></svg>
-                            Revert To Cash Settlement
-                        </PrimaryButton>
                     </div>
                 </div>
                 <div class="mt-3">
