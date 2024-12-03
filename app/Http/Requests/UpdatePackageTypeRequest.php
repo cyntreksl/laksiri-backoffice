@@ -30,7 +30,7 @@ class UpdatePackageTypeRequest extends FormRequest
                 'required',
                 'string',
                 'max:250',
-                Rule::unique('package_types')->where(function ($query) use ($branchId) {
+                Rule::unique('package_types')->whereNull('deleted_at')->where(function ($query) use ($branchId) {
                     return $query->where('branch_id', $branchId);
                 })->ignore($this->package_type->id),
             ],
