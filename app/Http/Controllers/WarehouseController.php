@@ -47,7 +47,6 @@ class WarehouseController extends Controller
         $order = $request->input('order', 'id');
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
-        
 
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus']);
 
