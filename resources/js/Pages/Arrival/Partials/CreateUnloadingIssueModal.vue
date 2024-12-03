@@ -30,7 +30,7 @@ const types = ref([
 const form = useForm({
     hbl_package_id: null,
     issue: '',
-    rtf: '',
+    rtf: false,
     is_damaged: false,
     type: null,
 });
