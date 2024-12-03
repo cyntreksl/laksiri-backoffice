@@ -12,7 +12,6 @@ import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageCo
 import TextInput from "@/Components/TextInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import {push} from "notivue";
-import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
 
@@ -137,7 +136,9 @@ const showPackageDialog = () => {
 const packageList = ref([]);
 
 const packageItem = reactive({
-    type: "",
+    type: props.packageTypes.find(
+        type => type.name.toLowerCase() === 'cartoon'.toLowerCase()
+    )?.name || "",
     length: 0,
     width: 0,
     height: 0,
@@ -1852,7 +1853,7 @@ const volumeUnit = computed(() => {
                                         @change="updateTypeDescription"
                                     >
                                         <option value="">Choose one</option>
-                                        <option v-for="type in packageTypes" :key="type">
+                                        <option v-for="type in packageTypes" :key="type.name">
                                             {{ type.name }}
                                         </option>
                                     </select>
