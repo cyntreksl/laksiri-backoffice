@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
 use App\Actions\CallFlag\CreateCallFlag;
-use App\Actions\Cashier\DownloadGatePassPDF;
 use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
@@ -161,8 +160,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function downloadHBLPDF(HBL $hbl)
     {
-        return DownloadGatePassPDF::run($hbl['id']);
-        //        return DownloadHBLPDF::run($hbl);
+        return DownloadHBLPDF::run($hbl);
     }
 
     public function downloadHBLInvoicePDF(HBL $hbl)
