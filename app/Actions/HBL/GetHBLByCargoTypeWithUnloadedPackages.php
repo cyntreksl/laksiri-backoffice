@@ -25,7 +25,7 @@ class GetHBLByCargoTypeWithUnloadedPackages
             $query->where('warehouse', $data['warehouse']);
         }
 
-        return $query->whereIn('system_status', [HBL::SYSTEM_STATUS_CASH_RECEIVED, 4.1])
+        return $query->where('is_hold', false)->whereIn('system_status', [HBL::SYSTEM_STATUS_CASH_RECEIVED, 4.1])
             ->latest()
             ->with(['packages' => function ($query) {
                 $query->where('is_loaded', false);

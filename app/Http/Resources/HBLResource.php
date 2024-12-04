@@ -47,6 +47,7 @@ class HBLResource extends JsonResource
                 : '',
             'hbl_number' => $this->hbl_number,
             'cr_number' => $this->cr_number,
+            'system_status' => $this->system_status,
         ];
     }
 }
