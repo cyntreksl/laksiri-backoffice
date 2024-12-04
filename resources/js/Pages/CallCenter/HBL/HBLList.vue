@@ -154,7 +154,7 @@ const createColumns = () => [
         sort: false,
         hidden: !data.columnVisibility.cargo_type,
         formatter: (_, row) =>
-            row.cells[10].data == "Sea Cargo"
+            row.cells[9].data == "Sea Cargo"
                 ? h(
                       "span",
                       { className: "flex" },
@@ -192,9 +192,9 @@ const createColumns = () => [
                               }),
                           ]
                       ),
-                      row.cells[10].data
+                      row.cells[9].data
                   )
-                : row.cells[10].data == "Air Cargo"
+                : row.cells[9].data == "Air Cargo"
                 ? h("span", { className: "flex space-x-2" }, [
                       h(
                           "svg",
@@ -221,9 +221,9 @@ const createColumns = () => [
                               }),
                           ]
                       ),
-                      row.cells[10].data,
+                      row.cells[9].data,
                   ])
-                : row.cells[10].data,
+                : row.cells[9].data,
     },
     { name: "HBL Type", hidden: !data.columnVisibility.hbl_type },
     { name: "Warehouse", hidden: !data.columnVisibility.warehouse },

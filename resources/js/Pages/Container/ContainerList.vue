@@ -107,6 +107,9 @@ const initializeGrid = () => {
                 url: (prev, keyword) => `${prev}&search=${keyword}`,
             },
         },
+        language: {
+            search: "Type a Reference"
+        },
         sort: {
             multiColumn: false,
             server: {

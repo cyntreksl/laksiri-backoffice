@@ -6,12 +6,11 @@
 @endsection
 
 @section('pdf-content')
-
-
+    @include('pdf.hbls.partials.header')
 @php
    $branch=App\Models\Branch::find($hbl?->branch_id);
 @endphp
-   
+
 <table>
     <tbody>
         <tr>
@@ -45,36 +44,26 @@
                     <td  style="width: 15%;" >C.R.No</td>
                     <td style="width: 2%;" >:</td>
                     <td>{{ $hbl?->reference }}</td>
-                    <td style="width: 2%;" >:</td>
-                    <td></td>
                 </tr>
                 <tr>
                     <td>Time:</td>
                     <td>:</td>
                     <td>{{  Carbon\Carbon::parse($hbl?->created_at)->format('Y-m-d') }}</td>
-                    <td>:</td>
-                    <td></td>
                 </tr>
                 <tr>
                     <td>Date</td>
                     <td>:</td>
                     <td>{{ Carbon\Carbon::parse($hbl?->created_at)->format('h:i A') }}</td>
-                    <td>:</td>
-                    <td></td>
                 </tr>
                 <tr>
                     <td>Salesman:</td>
                     <td>:</td>
                     <td>-</td>
-                    <td>:</td>
-                    <td></td>
                 </tr>
             </table>
         </td>
     </tr>
 </table>
-
-
 
 <hr style="border:1px solid silver;padding: 0px;">
 
@@ -97,12 +86,10 @@
         <td>{{$hbl?->grand_total }} {{$branch->currency_symbol}}</td>
 
     </tr>
-   
+
 </table>
 
-
-
-<div style="height: 350px;">
+<div style="height: 300px;">
 
 </div>
 
@@ -145,7 +132,7 @@ Terms and conditions will be provided on request</td>
 		</tr>
 		<tr>
 			<td colspan="3">Received As below
-           
+
             </td>
 		</tr>
 		<tr>
@@ -172,7 +159,4 @@ Terms and conditions will be provided on request</td>
 	</tbody>
 </table>
 
-
-
-  @endsection
-
+@endsection

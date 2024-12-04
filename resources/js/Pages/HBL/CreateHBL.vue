@@ -12,9 +12,9 @@ import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageCo
 import TextInput from "@/Components/TextInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import {push} from "notivue";
-import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
+import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 
 const props = defineProps({
     hblTypes: {
@@ -113,13 +113,12 @@ const form = useForm({
 
 const handleHBLCreate = () => {
     form.post(route("hbls.store"), {
-        onSuccess: () => {
-            router.visit(route("hbls.create"));
+        onSuccess: (page) => {
+            confirmViewHBL(page.props.hbl_id)
             form.reset();
             push.success("HBL Created Successfully!");
         },
         onError: () => console.log("error"),
-        onFinish: () => console.log("finish"),
         preserveScroll: true,
         preserveState: true,
     });
@@ -137,7 +136,9 @@ const showPackageDialog = () => {
 const packageList = ref([]);
 
 const packageItem = reactive({
-    type: "",
+    type: props.packageTypes.find(
+        type => type.name.toLowerCase() === 'carton'.toLowerCase()
+    )?.name || "",
     length: 0,
     width: 0,
     height: 0,
@@ -393,6 +394,12 @@ const closeModal = () => {
     showConfirmRemovePackageModal.value = false;
 };
 
+const closeViewModal = () => {
+    showConfirmViewHBLModal.value = false;
+    hblId.value = null;
+    router.visit(route("hbls.create"));
+};
+
 const handleRemovePackage = () => {
     if (packageIndex.value !== null) {
         grandTotalVolume.value -= packageList.value[packageIndex.value].volume;
@@ -585,10 +592,7 @@ const handleRemoveCopiedPackages = () => {
 
 const handleCopyShipper = () => {
     form.consignee_name = form.hbl_name;
-    consignee_countryCode.value = countryCode.value;
-    consignee_contact.value = contactNumber.value;
     form.consignee_nic = form.nic;
-    form.consignee_address = form.address;
 }
 
 const isShowedPaymentSummery = ref(false);
@@ -745,6 +749,13 @@ const volumeUnit = computed(() => {
     return units[packageItem.measure_type] || 'M.CM';
 });
 
+const hblId = ref(null);
+const showConfirmViewHBLModal = ref(false);
+
+const confirmViewHBL = async (id) => {
+    hblId.value = id;
+    showConfirmViewHBLModal.value = true;
+};
 </script>
 
 <template>
@@ -1855,7 +1866,7 @@ const volumeUnit = computed(() => {
                                         @change="updateTypeDescription"
                                     >
                                         <option value="">Choose one</option>
-                                        <option v-for="type in packageTypes" :key="type">
+                                        <option v-for="type in packageTypes" :key="type.name">
                                             {{ type.name }}
                                         </option>
                                     </select>
@@ -2036,6 +2047,12 @@ const volumeUnit = computed(() => {
             :show="showConfirmRemovePackageModal"
             @close="closeModal"
             @remove-package="handleRemovePackage"
+        />
+
+        <HBLDetailModal
+            :hbl-id="hblId"
+            :show="showConfirmViewHBLModal"
+            @close="closeViewModal"
         />
     </AppLayout>
 </template>
