@@ -14,8 +14,8 @@ class DownloadGatePassPDF
 
     public function handle($hbl)
     {
-        $hbl = GetHBLByIdWithPackages::run($hbl)->load('packages.containers');
-        dd($hbl->packages);
+        $hbl = GetHBLByIdWithPackages::run($hbl);
+        $container = $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
 
         $charges = [
             'port_charge' => [
@@ -45,7 +45,7 @@ class DownloadGatePassPDF
         $data = [
             'clearing_time' => date('H:i:s'),
             'date' => date('Y-m-d'),
-            'vessel' => $hbl->packages[0]->containers[0],
+            'vessel' => $container,
             'hbl' => $hbl,
             'grand_volume' => $hbl->packages->sum('volume'),
             'charges' => $charges,
