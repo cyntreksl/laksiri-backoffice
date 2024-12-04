@@ -112,6 +112,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
                 }
             }
 
+            DownloadGatePassPDF::run($hbl->id);
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
