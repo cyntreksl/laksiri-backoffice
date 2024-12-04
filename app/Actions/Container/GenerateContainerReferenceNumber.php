@@ -13,8 +13,12 @@ class GenerateContainerReferenceNumber
     {
         $branch_code = session('current_branch_code');
         $last_container = Container::latest()->first();
+        if ($last_container) {
+            $parts = explode('-', $last_container->reference);
+            $code = end($parts);
+        }
 
-        $next_reference = $last_container ? ((int) substr($last_container->reference, 6) + 1) : 000001;
+        $next_reference = $last_container ? ($code + 1) : 000001;
 
         $reference = $branch_code.'-'.'LD'.'-'.str_pad($next_reference, 6, '0', STR_PAD_LEFT);
 

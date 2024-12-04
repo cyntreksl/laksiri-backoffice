@@ -35,7 +35,7 @@ class CreateHBLPackages
                 $package->volume = $packageData['volume'];
                 $package->weight = $packageData['totalWeight'] ?? $packageData['weight'];
                 $package->remarks = $packageData['remarks'];
-                $package->measure_type = $packageData['measure_type'];
+                $package->measure_type = $packageData['measure_type'] ?? 'cm';
                 $package->save();
             }
 
