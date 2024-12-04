@@ -11,6 +11,9 @@
         <h4>{{$settings->invoice_header_subtitle ?: 'BAB AL TAWASUL TRADING EST.'}}</h4>
         <h6>{{$settings->invoice_header_address ?: 'P.O.Box: 245452 - Riyadh: 11312 - K.S.A.'}}</h6>
         <h5>{{$settings->invoice_header_telephone ?: 'Tel. Office: +966 55 304 4684 / 50 926 5586 / 55 611 2199 / 54 076 9814'}}</h5>
+        @if($hbl->branch->email)
+            <h5>{{$hbl->branch->email}}</h5>
+        @endif
     </div>
 @endif
 
