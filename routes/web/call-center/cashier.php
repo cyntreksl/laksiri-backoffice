@@ -16,5 +16,3 @@ Route::get('/cashier/show/paid', [CashierController::class, 'showPaidList'])
 
 Route::get('/cashier/paid/list', [CashierController::class, 'getPaidList']);
 
-Route::get('cashier/download/{hbl}', [CashierController::class, 'getCashierReceipt'])
-    ->name('getCashierReceipt');
