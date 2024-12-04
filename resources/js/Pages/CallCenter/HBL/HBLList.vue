@@ -62,6 +62,7 @@ const data = reactive({
         is_hold: true,
         tokens: true,
         actions: true,
+        system_status: false,
     },
 });
 
@@ -250,9 +251,10 @@ const createColumns = () => [
         sort: false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
+            console.log(row)
             return h("div", { className: "flex space-x-2" }, [
                 usePage().props.user.permissions.includes("hbls.issue token") &&
-                !row.cells[15].data
+                row.cells[16].data > 4.2
                     ? h(
                           "a",
                           {
@@ -644,6 +646,10 @@ const createColumns = () => [
                     : null,
             ]);
         },
+    },
+    {
+        name: "System Status",
+        hidden: !data.columnVisibility.system_status,
     },
 ];
 
