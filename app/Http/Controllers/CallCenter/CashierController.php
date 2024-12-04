@@ -51,7 +51,7 @@ class CashierController extends Controller
 
     public function store(Request $request)
     {
-//        $this->cashierRepository->updatePayment($request->all());
+        //        $this->cashierRepository->updatePayment($request->all());
         return $this->cashierRepository->downloadGatePass($request->all());
     }
 
