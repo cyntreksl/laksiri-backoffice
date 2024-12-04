@@ -419,7 +419,9 @@ const closeAddPackageModal = () => {
 };
 
 const restModalFields = () => {
-    packageItem.type = "";
+    packageItem.type = props.packageTypes.find(
+        type => type.name.toLowerCase() === 'carton'.toLowerCase()
+    )?.name || "";
     packageItem.length = 0;
     packageItem.width = 0;
     packageItem.height = 0;
