@@ -137,7 +137,7 @@ const packageList = ref([]);
 
 const packageItem = reactive({
     type: props.packageTypes.find(
-        type => type.name.toLowerCase() === 'cartoon'.toLowerCase()
+        type => type.name.toLowerCase() === 'carton'.toLowerCase()
     )?.name || "",
     length: 0,
     width: 0,
