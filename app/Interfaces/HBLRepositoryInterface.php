@@ -68,4 +68,6 @@ interface HBLRepositoryInterface
     public function getHBLPackageRules(array $data);
 
     public function getHBLRules(array $data);
+
+    public function downloadGatePass($hbl);
 }

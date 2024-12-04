@@ -15,7 +15,7 @@ class DownloadGatePassPDF
     public function handle($hbl)
     {
         $hbl = GetHBLByIdWithPackages::run($hbl)->load('packages.containers');
-        //        dd( $hbl->packages->sum('volume'));
+
         $charges = [
             'port_charge' => [
                 'rate' => 600.00,

@@ -143,8 +143,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         ]);
     }
 
-    public function downloadGatePass($data)
+    public function downloadGatePass($hbl)
     {
-        return DownloadGatePassPDF::run($data);
+        return DownloadGatePassPDF::run($hbl);
     }
 }

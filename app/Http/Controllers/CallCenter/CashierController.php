@@ -69,4 +69,9 @@ class CashierController extends Controller
 
         return $this->cashierRepository->dataset($limit, $page, $order, $dir);
     }
+
+    public function getCashierReceipt($hbl)
+    {
+        return $this->cashierRepository->downloadGatePass($hbl);
+    }
 }
