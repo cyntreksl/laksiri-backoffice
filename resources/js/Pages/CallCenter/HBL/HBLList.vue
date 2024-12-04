@@ -251,7 +251,6 @@ const createColumns = () => [
         sort: false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
-            console.log(row)
             return h("div", { className: "flex space-x-2" }, [
                 usePage().props.user.permissions.includes("hbls.issue token") &&
                 row.cells[16].data > 4.2
