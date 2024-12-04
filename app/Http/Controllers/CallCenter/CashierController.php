@@ -69,5 +69,4 @@ class CashierController extends Controller
 
         return $this->cashierRepository->dataset($limit, $page, $order, $dir);
     }
-
 }
