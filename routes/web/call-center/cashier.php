@@ -15,4 +15,3 @@ Route::get('/cashier/show/paid', [CashierController::class, 'showPaidList'])
     ->name('cashier.show.paid');
 
 Route::get('/cashier/paid/list', [CashierController::class, 'getPaidList']);
-
