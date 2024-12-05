@@ -354,9 +354,7 @@ watch(unloadedHBLs, (newVal) => {
                         />
                     </label>
 
-                    <div v-if="filters.hblType"
-                         class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer"
-                         @click.prevent="filters.hblType = ''">
+                    <div v-if="filters.hblType" class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer" @click.prevent="filters.hblType = ''">
                         <i class="fa fa-times-circle text-base"></i>
                     </div>
                 </div>
