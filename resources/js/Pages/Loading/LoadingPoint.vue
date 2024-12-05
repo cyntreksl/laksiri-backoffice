@@ -442,7 +442,7 @@ watch(unloadedHBLs, (newVal) => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl}}
+                                                                        {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -453,8 +453,7 @@ watch(unloadedHBLs, (newVal) => {
                                                                          viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                                         <path
                                                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                                            stroke-linecap="round"
-                                                                            stroke-linejoin="round"
+                                                                            stroke-linecap="round" stroke-linejoin="round"
                                                                             stroke-width="2"/>
                                                                     </svg>
                                                                     <span>{{
@@ -468,12 +467,10 @@ watch(unloadedHBLs, (newVal) => {
                                                                         class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
                                                                         fill="none"
                                                                         stroke="currentColor" stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2"
-                                                                        viewBox="0 0 24 24"
+                                                                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                                                         width="24"
                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
+                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                                                         <path d="M7 20l10 0"/>
                                                                         <path d="M6 6l6 -1l6 1"/>
                                                                         <path d="M12 3l0 17"/>
@@ -489,14 +486,11 @@ watch(unloadedHBLs, (newVal) => {
                                                                         class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
                                                                         fill="none" height="24" stroke="currentColor"
                                                                         stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2"
-                                                                        viewBox="0 0 24 24"
+                                                                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                                                         width="24"
                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
-                                                                        <path
-                                                                            d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                                        <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
                                                                         <path
                                                                             d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                                     </svg>
@@ -512,8 +506,7 @@ watch(unloadedHBLs, (newVal) => {
                                                                         stroke-width="2"
                                                                         viewBox="0 0 24 24"
                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
+                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                                                         <path d="M5 9l14 0"/>
                                                                         <path d="M5 15l14 0"/>
                                                                         <path d="M11 4l-4 16"/>
@@ -529,10 +522,8 @@ watch(unloadedHBLs, (newVal) => {
                                                         <div class="px-2.5">
                                                             <svg
                                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
-                                                                fill="none" height="24" stroke="currentColor"
-                                                                stroke-linecap="round"
-                                                                stroke-linejoin="round" stroke-width="2"
-                                                                viewBox="0 0 24 24"
+                                                                fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                                                 width="24"
                                                                 x-tooltip.placement.top.success="'Click to Load'"
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -600,9 +591,7 @@ watch(unloadedHBLs, (newVal) => {
                                                 <div>
                                                     <div class="flex justify-between">
                                                         <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
-                                                            {{
-                                                                findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id)?.hbl
-                                                            }}
+                                                            {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id)?.hbl }}
                                                         </p>
                                                     </div>
                                                 </div>
