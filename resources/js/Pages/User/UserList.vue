@@ -29,6 +29,10 @@ const props = defineProps({
         type: Number,
         required: false
     },
+    isSuperAdmin: {
+        type: Boolean,
+        required: false
+    },
 });
 const wrapperRef = ref(null);
 let grid = null;
@@ -251,7 +255,7 @@ const handleDeleteUser = () => {
 
         <Breadcrumb/>
 
-        <CreateUserForm :branches="branches" :roles="roles" :user-role="userRole" :user-branch="userBranch"/>
+        <CreateUserForm :branches="branches" :roles="roles" :user-role="userRole" :user-branch="userBranch" :is-super-admin="isSuperAdmin"/>
 
         <div class="card mt-4">
             <div>
