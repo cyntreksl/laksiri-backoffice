@@ -10,6 +10,7 @@ use App\Enum\PackageType;
 use App\Http\Requests\StoreBranchRequest;
 use App\Http\Requests\UpdateBranchRequest;
 use App\Interfaces\BranchRepositoryInterface;
+use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\SettingRepositoryInterface;
 use App\Models\Branch;
 use Inertia\Inertia;
@@ -19,6 +20,7 @@ class BranchController extends Controller
     public function __construct(
         private readonly BranchRepositoryInterface $branchRepository,
         private readonly SettingRepositoryInterface $settingRepository,
+        private readonly CountryRepositoryInterface $countryRepository,
     ) {
     }
 
@@ -65,7 +67,7 @@ class BranchController extends Controller
             'branchTypes' => BranchType::cases(),
             'branch' => $branch,
             'settings' => $this->settingRepository->getSettings(),
-            'countryCodes' => CountryCode::cases(),
+            'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
         ]);
     }
 

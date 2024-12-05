@@ -13,6 +13,7 @@ use App\Enum\HBLType;
 use App\Http\Requests\StoreCallFlagRequest;
 use App\Http\Requests\StoreHBLRequest;
 use App\Http\Requests\UpdateHBLRequest;
+use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
@@ -35,6 +36,7 @@ class HBLController extends Controller
         private readonly PriceRepositoryInterface $priceRepository,
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
         private readonly SettingRepositoryInterface $settingRepository,
+        private readonly CountryRepositoryInterface $countryRepository,
     ) {
     }
 
@@ -78,7 +80,7 @@ class HBLController extends Controller
             'warehouses' => GetDestinationBranches::run(),
             'priceRules' => $this->priceRepository->getPriceRules(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
-            'countryCodes' => CountryCode::cases(),
+            'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
         ]);
     }
 
@@ -116,7 +118,7 @@ class HBLController extends Controller
             'warehouses' => GetDestinationBranches::run(),
             'priceRules' => $this->priceRepository->getPriceRules(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
-            'countryCodes' => CountryCode::cases(),
+            'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
         ]);
     }
 
