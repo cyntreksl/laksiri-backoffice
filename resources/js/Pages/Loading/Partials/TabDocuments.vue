@@ -77,7 +77,6 @@ const handleFileInput = (event, docType) => {
         console.log("File uploaded:", form.document.name);
         console.log("Document type:", docType);
         console.log("Document name set as:", form.document_name);
-
     }
 };
 
