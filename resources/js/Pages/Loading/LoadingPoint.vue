@@ -287,8 +287,7 @@ watch(unloadedHBLs, (newVal) => {
                 </label>
             </div>
 
-            <div
-                class="flex flex-wrap space-x-10 items-center p-4 my-4 rounded bg-white border border-indigo-400 mx-[var(--margin-x)]">
+            <div class="flex flex-wrap space-x-10 items-center p-4 my-4 rounded bg-white border border-indigo-400 mx-[var(--margin-x)]">
                 <div class="flex space-x-4 bg-green-100 p-5 rounded-lg">
                     <label
                         v-for="cargoType in cargoTypes"
@@ -372,9 +371,7 @@ watch(unloadedHBLs, (newVal) => {
                         />
                     </label>
 
-                    <div v-if="filters.warehouse"
-                         class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer"
-                         @click.prevent="filters.warehouse = ''">
+                    <div v-if="filters.warehouse" class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer" @click.prevent="filters.warehouse = ''">
                         <i class="fa fa-times-circle text-base"></i>
                     </div>
                 </div>
