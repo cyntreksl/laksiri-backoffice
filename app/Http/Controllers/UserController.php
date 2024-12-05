@@ -37,6 +37,7 @@ class UserController extends Controller
     public function index()
     {
         $this->authorize('users.list');
+
         return Inertia::render('User/UserList', [
             'roles' => $this->roleRepository->getRoles(),
             'branches' => $this->branchRepository->getUserBranches(),

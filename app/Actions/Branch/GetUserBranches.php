@@ -2,7 +2,6 @@
 
 namespace App\Actions\Branch;
 
-use App\Models\Branch;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -17,9 +16,10 @@ class GetUserBranches
         $branches = $user->branches;
         $userPrimaryBranch = $user->primaryBranch;
 
-        if (!$branches->contains($userPrimaryBranch->id)) {
+        if (! $branches->contains($userPrimaryBranch->id)) {
             $branches = $branches->merge([$userPrimaryBranch]);
         }
+
         return $branches;
     }
 }
