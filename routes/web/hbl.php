@@ -21,6 +21,9 @@ Route::get('hbls/download/{hbl}', [HBLController::class, 'downloadHBLPDF'])
 Route::get('hbls/cancelled-hbls/download/{hbl}', [HBLController::class, 'downloadCancelledHBLPDF'])
     ->name('hbls.cancelled-hbls.download');
 
+Route::get('hbls/download/receipt/{hbl}', [HBLController::class, 'getCashierReceipt'])
+    ->name('hbls.getCashierReceipt');
+
 Route::get('hbls/show/cancelled-hbls', [HBLController::class, 'cancelledHBLs'])
     ->name('hbls.cancelled-hbls');
 
