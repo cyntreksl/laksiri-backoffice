@@ -27,6 +27,10 @@ const props = defineProps({
         type: Number,
         required: false
     },
+    isSuperAdmin: {
+        type: Boolean,
+        required: false
+    },
 })
 
 const confirmingUserCreation = ref(false);
@@ -215,7 +219,7 @@ const createUser = () => {
                     <InputError :message="form.errors.primary_branch_id"/>
                 </div>
 
-                <div v-if="userRole === 'admin'">
+                <div v-if="isSuperAdmin">
                     <label class="block z-50">
                         <InputLabel value="Select Secondary Branch"/>
                         <select

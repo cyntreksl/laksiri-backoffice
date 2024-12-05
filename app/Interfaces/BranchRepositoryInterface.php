@@ -13,4 +13,6 @@ interface BranchRepositoryInterface
     public function createBranch(array $data);
 
     public function updateBranch(array $data, Branch $branch);
+
+    public function getUserBranches();
 }
