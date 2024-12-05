@@ -2,10 +2,18 @@
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import DialogModal from "@/Components/DialogModal.vue";
-import {useForm} from "@inertiajs/vue3";
-import {push} from "notivue";
-import {ref} from "vue";
+import { useForm } from "@inertiajs/vue3";
+import { push } from "notivue";
+import { ref } from "vue";
 import InputError from "@/Components/InputError.vue";
+import 'filepond/dist/filepond.min.css';
+import vueFilePond from 'vue-filepond';
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+
+
+const FilePond = vueFilePond(FilePondPluginImagePreview, FilePondPluginFileValidateType);
 
 const props = defineProps({
     show: {
@@ -16,17 +24,11 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
-const fileInput = ref(null);
-
 const form = useForm({
     files: []
 });
 
 const handleUploadFiles = () => {
-    if (fileInput.value.files.length) {
-        form.files = [...fileInput.value.files];
-    }
-
     form.post(route('file-manager.upload'), {
         onSuccess: () => {
             push.success('File Uploaded Successfully!');
@@ -40,10 +42,14 @@ const handleUploadFiles = () => {
 }
 
 const clearFileInput = () => {
-    if (fileInput.value) {
-        fileInput.value = null;
+    if (pond.value) {
+        pond.value.removeFiles();
     }
 };
+
+const updateFiles = (files) => {
+    form.files = files.map(file => file.file);
+}
 </script>
 
 <template>
@@ -65,7 +71,15 @@ const clearFileInput = () => {
 
         <template #content>
             <div class="mt-4">
-                <input ref="fileInput" multiple type="file" v-on:change="form.files"/>
+                <FilePond
+                    name="test"
+                    ref="pond"
+                    label-idle="Drop files here or <span class='filepond--label-action'>Browse</span>"
+                    allow-multiple="true"
+                    accepted-file-types="image/jpeg, image/png, application/pdf"
+                    style="border: 2px dashed #e2e7ee; border-radius: 2px; padding: 2px;"
+                    v-on:updatefiles="updateFiles"
+                />
                 <InputError :message="form.errors.files"/>
             </div>
         </template>

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Interfaces\AnyFileUploadRepositoryInterface;
 use App\Interfaces\BondedWarehouseRepositoryInterface;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\CallCenter\BonedAreaRepositoryInterface;
@@ -32,6 +33,7 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Interfaces\WarehousezoneRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
+use App\Repositories\AnyFileUploadRepository;
 use App\Repositories\BondedWarehouseRepository;
 use App\Repositories\BranchRepository;
 use App\Repositories\CallCenter\BonedAreaRepository;
@@ -101,6 +103,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(BonedAreaRepositoryInterface::class, BonedAreaRepository::class);
         $this->app->bind(ExaminationRepositoryInterface::class, ExaminationRepository::class);
         $this->app->bind(UserFeedbackRepositoryInterface::class, UserFeedbackRepository::class);
+        $this->app->bind(AnyFileUploadRepositoryInterface::class, AnyFileUploadRepository::class);
     }
 
     public function boot(): void

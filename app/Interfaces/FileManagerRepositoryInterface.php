@@ -11,4 +11,6 @@ interface FileManagerRepositoryInterface
     public function downloadSingleFile(string $id);
 
     public function deleteFile(string $id);
+
+    public function anyFileUpload(array $data, string $id);
 }
