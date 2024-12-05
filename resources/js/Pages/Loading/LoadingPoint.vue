@@ -392,8 +392,7 @@ watch(unloadedHBLs, (newVal) => {
                             </div>
                         </div>
                         <div>
-                            <ul v-if="Object.keys(filteredPackages).length > 0"
-                                class="space-y-1 font-inter font-medium">
+                            <ul v-if="Object.keys(filteredPackages).length > 0" class="space-y-1 font-inter font-medium">
                                 <li v-for="hbl in filteredPackages" :key="hbl.id">
                                     <div
                                         v-if="Object.keys(hbl.packages).length > 0"
@@ -435,8 +434,7 @@ watch(unloadedHBLs, (newVal) => {
                                                    class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
                                                    group="people"
                                                    item-key="id"
-                                                   @change="handlePackageChange"
-                                        >
+                                                   @change="handlePackageChange">
                                             <template #item="{element, index}">
                                                 <div class="card cursor-pointer shadow-sm">
                                                     <div class="flex justify-between items-center">
@@ -444,19 +442,15 @@ watch(unloadedHBLs, (newVal) => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{
-                                                                            findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl
-                                                                        }}
+                                                                        {{findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl}}
                                                                     </p>
                                                                 </div>
                                                             </div>
                                                             <div class="flex flex-wrap gap-1">
                                                                 <div
                                                                     class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
-                                                                    <svg class="size-3.5" fill="none"
-                                                                         stroke="currentColor"
-                                                                         viewBox="0 0 24 24"
-                                                                         xmlns="http://www.w3.org/2000/svg">
+                                                                    <svg class="size-3.5" fill="none" stroke="currentColor"
+                                                                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                                         <path
                                                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                                                                             stroke-linecap="round"
