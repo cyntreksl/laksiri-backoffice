@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
-use App\Enum\CountryCode;
 use App\Enum\PickupType;
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
