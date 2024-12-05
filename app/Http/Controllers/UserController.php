@@ -16,6 +16,7 @@ use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -36,12 +37,12 @@ class UserController extends Controller
     public function index()
     {
         $this->authorize('users.list');
-
         return Inertia::render('User/UserList', [
             'roles' => $this->roleRepository->getRoles(),
-            'branches' => $this->branchRepository->getBranches(),
+            'branches' => $this->branchRepository->getUserBranches(),
             'userRole' => Auth()->user()->getRoleNames()[0],
             'userBranch' => GetUserCurrentBranchID::run(),
+            'isSuperAdmin' => Auth::user()->name === 'Super Administrator' && Auth::user()->hasRole('admin'),
         ]);
     }
 
