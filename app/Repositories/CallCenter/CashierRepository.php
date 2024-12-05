@@ -2,6 +2,7 @@
 
 namespace App\Repositories\CallCenter;
 
+use App\Actions\Cashier\DownloadGatePassPDF;
 use App\Actions\Cashier\UpdateCashierHBLPayments;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\HBLPayment\GetPaymentByReference;
@@ -111,6 +112,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
                 }
             }
 
+            DownloadGatePassPDF::run($hbl->id);
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -140,5 +143,10 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function downloadGatePass($hbl)
+    {
+        return DownloadGatePassPDF::run($hbl);
     }
 }
