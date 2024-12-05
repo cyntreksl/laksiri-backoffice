@@ -32,6 +32,7 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Interfaces\WarehousezoneRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
+use App\Interfaces\CountryRepositoryInterface;
 use App\Repositories\BondedWarehouseRepository;
 use App\Repositories\BranchRepository;
 use App\Repositories\CallCenter\BonedAreaRepository;
@@ -62,6 +63,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\WareahouseZoneRepository;
 use App\Repositories\WarehouseRepository;
 use App\Repositories\ZoneRepository;
+use App\Repositories\CountryRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -101,6 +103,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(BonedAreaRepositoryInterface::class, BonedAreaRepository::class);
         $this->app->bind(ExaminationRepositoryInterface::class, ExaminationRepository::class);
         $this->app->bind(UserFeedbackRepositoryInterface::class, UserFeedbackRepository::class);
+        $this->app->bind(CountryRepositoryInterface::class, CountryRepository::class);
     }
 
     public function boot(): void
