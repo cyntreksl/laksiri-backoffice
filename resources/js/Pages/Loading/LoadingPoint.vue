@@ -113,11 +113,14 @@ const filteredPackages = computed(() => {
 
 const containerArr = ref(props.loadedHBLs.flatMap(hbl => hbl.packages));
 
-const handleLoad = (index) => {
+const handleLoad = (index, pkg_id) => {
     if (index !== -1) {
-        const packageToLoad = hblPackagesArr.value[index];
+        const packageToLoad = hblPackagesArr.value.find(
+            (pkg) => pkg.id === pkg_id
+        );
         containerArr.value = [...containerArr.value, packageToLoad];
-        hblPackagesArr.value.splice(index, 1);
+        const objectIndex = hblPackagesArr.value.findIndex(pkg => pkg.id === pkg_id);
+        hblPackagesArr.value.splice(objectIndex, 1);
 
         const hblIndex = unloadedHBLs.value.findIndex(hbl => hbl.packages.some(p => p.id === packageToLoad.id));
         if (hblIndex !== -1) {
@@ -284,7 +287,8 @@ watch(unloadedHBLs, (newVal) => {
                 </label>
             </div>
 
-            <div class="flex flex-wrap space-x-10 items-center p-4 my-4 rounded bg-white border border-indigo-400 mx-[var(--margin-x)]">
+            <div
+                class="flex flex-wrap space-x-10 items-center p-4 my-4 rounded bg-white border border-indigo-400 mx-[var(--margin-x)]">
                 <div class="flex space-x-4 bg-green-100 p-5 rounded-lg">
                     <label
                         v-for="cargoType in cargoTypes"
@@ -350,7 +354,9 @@ watch(unloadedHBLs, (newVal) => {
                         />
                     </label>
 
-                    <div v-if="filters.hblType" class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer" @click.prevent="filters.hblType = ''">
+                    <div v-if="filters.hblType"
+                         class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer"
+                         @click.prevent="filters.hblType = ''">
                         <i class="fa fa-times-circle text-base"></i>
                     </div>
                 </div>
@@ -368,7 +374,9 @@ watch(unloadedHBLs, (newVal) => {
                         />
                     </label>
 
-                    <div v-if="filters.warehouse" class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer" @click.prevent="filters.warehouse = ''">
+                    <div v-if="filters.warehouse"
+                         class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer"
+                         @click.prevent="filters.warehouse = ''">
                         <i class="fa fa-times-circle text-base"></i>
                     </div>
                 </div>
@@ -389,7 +397,8 @@ watch(unloadedHBLs, (newVal) => {
                             </div>
                         </div>
                         <div>
-                            <ul v-if="Object.keys(filteredPackages).length > 0" class="space-y-1 font-inter font-medium">
+                            <ul v-if="Object.keys(filteredPackages).length > 0"
+                                class="space-y-1 font-inter font-medium">
                                 <li v-for="hbl in filteredPackages" :key="hbl.id">
                                     <div
                                         v-if="Object.keys(hbl.packages).length > 0"
@@ -431,7 +440,8 @@ watch(unloadedHBLs, (newVal) => {
                                                    class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
                                                    group="people"
                                                    item-key="id"
-                                                   @change="handlePackageChange">
+                                                   @change="handlePackageChange"
+                                        >
                                             <template #item="{element, index}">
                                                 <div class="card cursor-pointer shadow-sm">
                                                     <div class="flex justify-between items-center">
@@ -439,18 +449,23 @@ watch(unloadedHBLs, (newVal) => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }}
+                                                                        {{
+                                                                            findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl
+                                                                        }}
                                                                     </p>
                                                                 </div>
                                                             </div>
                                                             <div class="flex flex-wrap gap-1">
                                                                 <div
                                                                     class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
-                                                                    <svg class="size-3.5" fill="none" stroke="currentColor"
-                                                                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                    <svg class="size-3.5" fill="none"
+                                                                         stroke="currentColor"
+                                                                         viewBox="0 0 24 24"
+                                                                         xmlns="http://www.w3.org/2000/svg">
                                                                         <path
                                                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                                            stroke-linecap="round"
+                                                                            stroke-linejoin="round"
                                                                             stroke-width="2"/>
                                                                     </svg>
                                                                     <span>{{
@@ -464,10 +479,12 @@ watch(unloadedHBLs, (newVal) => {
                                                                         class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
                                                                         fill="none"
                                                                         stroke="currentColor" stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                                                        stroke-linejoin="round" stroke-width="2"
+                                                                        viewBox="0 0 24 24"
                                                                         width="24"
                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                                        <path d="M0 0h24v24H0z" fill="none"
+                                                                              stroke="none"/>
                                                                         <path d="M7 20l10 0"/>
                                                                         <path d="M6 6l6 -1l6 1"/>
                                                                         <path d="M12 3l0 17"/>
@@ -483,11 +500,14 @@ watch(unloadedHBLs, (newVal) => {
                                                                         class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
                                                                         fill="none" height="24" stroke="currentColor"
                                                                         stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                                                        stroke-linejoin="round" stroke-width="2"
+                                                                        viewBox="0 0 24 24"
                                                                         width="24"
                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                                        <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                                                        <path d="M0 0h24v24H0z" fill="none"
+                                                                              stroke="none"/>
+                                                                        <path
+                                                                            d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
                                                                         <path
                                                                             d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                                     </svg>
@@ -503,7 +523,8 @@ watch(unloadedHBLs, (newVal) => {
                                                                         stroke-width="2"
                                                                         viewBox="0 0 24 24"
                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                                        <path d="M0 0h24v24H0z" fill="none"
+                                                                              stroke="none"/>
                                                                         <path d="M5 9l14 0"/>
                                                                         <path d="M5 15l14 0"/>
                                                                         <path d="M11 4l-4 16"/>
@@ -519,12 +540,14 @@ watch(unloadedHBLs, (newVal) => {
                                                         <div class="px-2.5">
                                                             <svg
                                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
-                                                                fill="none" height="24" stroke="currentColor" stroke-linecap="round"
-                                                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                                                fill="none" height="24" stroke="currentColor"
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round" stroke-width="2"
+                                                                viewBox="0 0 24 24"
                                                                 width="24"
                                                                 x-tooltip.placement.top.success="'Click to Load'"
                                                                 xmlns="http://www.w3.org/2000/svg"
-                                                                @click.prevent="handleLoad(index)">
+                                                                @click.prevent="handleLoad(index, element.id)">
                                                                 <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                                                 <path d="M4 18v-6a3 3 0 0 1 3 -3h7"/>
                                                                 <path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4"/>
@@ -588,7 +611,9 @@ watch(unloadedHBLs, (newVal) => {
                                                 <div>
                                                     <div class="flex justify-between">
                                                         <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
-                                                            {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id)?.hbl }}
+                                                            {{
+                                                                findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id)?.hbl
+                                                            }}
                                                         </p>
                                                     </div>
                                                 </div>
