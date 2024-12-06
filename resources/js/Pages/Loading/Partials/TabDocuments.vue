@@ -1,9 +1,18 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
-import {ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import DeleteDocConfirmationModal from "@/Pages/Loading/Partials/DeleteDocConfirmationModal.vue";
+//my vue file
+import vueFilePond from "vue-filepond";
+import 'filepond/dist/filepond.min.css';
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css';
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+
 
 const props = defineProps({
     containerId: {
@@ -11,6 +20,13 @@ const props = defineProps({
         required: true,
     }
 });
+
+const FilePond = vueFilePond(
+    FilePondPluginFileValidateType,
+    FilePondPluginImagePreview
+);
+const myFiles = ref([]);
+const csrfToken = usePage().props.csrf;
 
 const containerDocumentsRecords = ref([]);
 
@@ -58,6 +74,9 @@ const handleFileInput = (event, docType) => {
         form.document_name = 'Manifest';
     } else {
         form.document_name = 'Receipt for Freight Charges';
+        console.log("File uploaded:", form.document.name);
+        console.log("Document type:", docType);
+        console.log("Document name set as:", form.document_name);
     }
 };
 
@@ -68,6 +87,20 @@ const form = useForm({
 })
 
 const handleFileUpload = () => {
+    form.post(route('loading.containers.upload.document'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            push.success('Document Uploaded!');
+            form.reset();
+            fetchContainerDocuments();
+        },
+        onError: () => {
+            push.error('Something went to wrong!')
+        }
+    })
+}
+
+const fileUploads = () => {
     form.post(route('loading.containers.upload.document'), {
         preserveScroll: true,
         onSuccess: () => {
@@ -148,8 +181,17 @@ const handleDeleteDoc = () => {
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload">
 
-                                    <a  v-if="containerDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')" :href="route('loading.containers-documents.download', containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').id)">
-                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    <a v-if="containerDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')"
+                                       :href="route('loading.containers-documents.download', containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').id)">
+                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-download"
+                                             fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                             stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+                                            <path d="M7 11l5 5l5 -5"/>
+                                            <path d="M12 4l0 12"/>
+                                        </svg>
                                     </a>
 
                                     <input ref="blDocumentInput" hidden type="file"
@@ -175,7 +217,8 @@ const handleDeleteDoc = () => {
                                         Save
                                     </button>
 
-                                    <template v-if="$page.props.user.permissions.includes('container.delete documents')">
+                                    <template
+                                        v-if="$page.props.user.permissions.includes('container.delete documents')">
                                         <button
                                             v-if="containerDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')"
                                             class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
@@ -224,8 +267,17 @@ const handleDeleteDoc = () => {
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
 
-                                    <a  v-if="containerDocumentsRecords.some(doc => doc.document_name === 'Manifest')" :href="route('loading.containers-documents.download', containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').id)">
-                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    <a v-if="containerDocumentsRecords.some(doc => doc.document_name === 'Manifest')"
+                                       :href="route('loading.containers-documents.download', containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').id)">
+                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-download"
+                                             fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                             stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+                                            <path d="M7 11l5 5l5 -5"/>
+                                            <path d="M12 4l0 12"/>
+                                        </svg>
                                     </a>
 
                                     <input ref="manifestDocumentInput" hidden type="file"
@@ -251,7 +303,8 @@ const handleDeleteDoc = () => {
                                         Save
                                     </button>
 
-                                    <template v-if="$page.props.user.permissions.includes('container.delete documents')">
+                                    <template
+                                        v-if="$page.props.user.permissions.includes('container.delete documents')">
                                         <button
                                             v-if="containerDocumentsRecords.some(doc => doc.document_name === 'Manifest')"
                                             class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
@@ -301,8 +354,17 @@ const handleDeleteDoc = () => {
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
 
-                                    <a  v-if="containerDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')" :href="route('loading.containers-documents.download', containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id)">
-                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    <a v-if="containerDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')"
+                                       :href="route('loading.containers-documents.download', containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id)">
+                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-download"
+                                             fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                             stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+                                            <path d="M7 11l5 5l5 -5"/>
+                                            <path d="M12 4l0 12"/>
+                                        </svg>
                                     </a>
 
                                     <input ref="receiptDocumentInput" hidden type="file"
@@ -328,7 +390,8 @@ const handleDeleteDoc = () => {
                                         Save
                                     </button>
 
-                                    <template v-if="$page.props.user.permissions.includes('container.delete documents')">
+                                    <template
+                                        v-if="$page.props.user.permissions.includes('container.delete documents')">
                                         <button
                                             v-if="containerDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')"
                                             class="btn size-6 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
@@ -351,7 +414,26 @@ const handleDeleteDoc = () => {
                         </tr>
                         </tbody>
                     </table>
+                    <div class="filepond-container">
+                        <file-pond
+                            name="files"
+                            ref="pond"
+                            label-idle="Drop files here or <span class='filepond--label-action'>Browse</span>"
+                            allow-multiple="true"
+                            accepted-file-types="image/jpeg, image/png, application/pdf"
+                            :server="{
+                                url: `/any-file-manager/${containerId}`,
+                                process: {
+                                  headers: {
+                                    'X-CSRF-TOKEN': csrfToken,
+                                  },
+                                },
+                              }"
+                            style="border: 2px dashed #e2e7ee; border-radius: 2px; padding: 2px;"
+                        />
+                    </div>
                 </div>
+
             </div>
         </div>
         <DeleteDocConfirmationModal :doc-name="docName" :show="showConfirmDeleteDocModal" @close="closeDeleteModal"
