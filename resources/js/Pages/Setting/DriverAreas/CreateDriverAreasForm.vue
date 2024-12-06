@@ -9,7 +9,7 @@ import InputError from "@/Components/InputError.vue";
 import {push} from "notivue";
 import TextInput from "@/Components/TextInput.vue";
 
-defineProps({
+const props = defineProps({
     zones: {
         type: Object,
         default: () => {

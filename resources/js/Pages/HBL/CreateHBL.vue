@@ -419,7 +419,9 @@ const closeAddPackageModal = () => {
 };
 
 const restModalFields = () => {
-    packageItem.type = "";
+    packageItem.type = props.packageTypes.find(
+        type => type.name.toLowerCase() === 'carton'.toLowerCase()
+    )?.name || "";
     packageItem.length = 0;
     packageItem.width = 0;
     packageItem.height = 0;
@@ -1008,11 +1010,7 @@ const confirmViewHBL = async (id) => {
                                         v-model="countryCode"
                                         class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
-                                        <option
-                                            v-for="(countryCode, index) in countryCodes"
-                                            :key="index"
-                                            :value="countryCode"
-                                        >
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
                                             {{ countryCode }}
                                         </option>
                                     </select>
@@ -1209,10 +1207,7 @@ const confirmViewHBL = async (id) => {
                                         v-model="consignee_countryCode"
                                         class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
-                                        <option
-                                            v-for="(countryCode, index) in countryCodes"
-                                            :key="index"
-                                        >
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
                                             {{ countryCode }}
                                         </option>
                                     </select>

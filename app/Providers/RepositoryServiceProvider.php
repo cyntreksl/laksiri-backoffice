@@ -13,6 +13,7 @@ use App\Interfaces\CallCenter\UserFeedbackRepositoryInterface;
 use App\Interfaces\CallCenter\VerificationRepositoryInterface;
 use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\ContainerRepositoryInterface;
+use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\CustomerRepositoryInterface;
 use App\Interfaces\DashboardRepositoryInterface;
 use App\Interfaces\DriverAreasRepositoryInterface;
@@ -44,6 +45,7 @@ use App\Repositories\CallCenter\UserFeedbackRepository;
 use App\Repositories\CallCenter\VerificationRepository;
 use App\Repositories\CashSettlementRepository;
 use App\Repositories\ContainerRepositories;
+use App\Repositories\CountryRepository;
 use App\Repositories\CustomerRepository;
 use App\Repositories\DashboardRepository;
 use App\Repositories\DriverAreasRepository;
@@ -104,6 +106,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ExaminationRepositoryInterface::class, ExaminationRepository::class);
         $this->app->bind(UserFeedbackRepositoryInterface::class, UserFeedbackRepository::class);
         $this->app->bind(AnyFileUploadRepositoryInterface::class, AnyFileUploadRepository::class);
+        $this->app->bind(CountryRepositoryInterface::class, CountryRepository::class);
     }
 
     public function boot(): void

@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
-use App\Enum\CountryCode;
 use App\Enum\PickupType;
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\UpdatePickupRequest;
 use App\Http\Resources\PickupResource;
+use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
@@ -30,6 +30,7 @@ class PickupController extends Controller
         private readonly UserRepositoryInterface $userRepository,
         private readonly ZoneRepositoryInterface $zoneRepository,
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
+        private readonly CountryRepositoryInterface $countryRepository,
     ) {
     }
 
@@ -66,7 +67,7 @@ class PickupController extends Controller
             'cargoTypes' => CargoType::cases(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
             'zones' => GetZones::run(),
-            'countryCodes' => CountryCode::cases(),
+            'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
         ]);
     }
 

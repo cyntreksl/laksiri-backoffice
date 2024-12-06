@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
 use App\Actions\CallFlag\CreateCallFlag;
+use App\Actions\Cashier\DownloadGatePassPDF;
 use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
@@ -390,5 +391,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         } catch (\Exception $e) {
             throw new \Exception('Failed to get package rules '.$e->getMessage());
         }
+    }
+
+    public function downloadGatePass($hbl)
+    {
+        return DownloadGatePassPDF::run($hbl);
     }
 }
