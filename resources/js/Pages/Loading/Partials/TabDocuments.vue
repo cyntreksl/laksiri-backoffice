@@ -141,9 +141,12 @@ const handleDeleteDoc = () => {
                                     <path d="M12 15v-10"/>
                                 </svg>
 
+
                                 BL From Shipping Line
                             </td>
+
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+
                                 <form v-if="$page.props.user.permissions.includes('container.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload">
@@ -174,6 +177,12 @@ const handleDeleteDoc = () => {
                                     >
                                         Save
                                     </button>
+                                    <label class="inline-flex items-center space-x-2">
+                                        <input
+                                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                                            type="checkbox"
+                                        />
+                                    </label>
 
                                     <template v-if="$page.props.user.permissions.includes('container.delete documents')">
                                         <button
@@ -250,6 +259,12 @@ const handleDeleteDoc = () => {
                                     >
                                         Save
                                     </button>
+                                    <label class="inline-flex items-center space-x-2">
+                                        <input
+                                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                                            type="checkbox"
+                                        />
+                                    </label>
 
                                     <template v-if="$page.props.user.permissions.includes('container.delete documents')">
                                         <button
@@ -327,6 +342,12 @@ const handleDeleteDoc = () => {
                                     >
                                         Save
                                     </button>
+                                    <label class="inline-flex items-center space-x-2">
+                                        <input
+                                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                                            type="checkbox"
+                                        />
+                                    </label>
 
                                     <template v-if="$page.props.user.permissions.includes('container.delete documents')">
                                         <button
