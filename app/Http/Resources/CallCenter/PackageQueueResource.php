@@ -22,7 +22,7 @@ class PackageQueueResource extends JsonResource
             'package_count' => $this->package_count,
             'is_released' => $this->is_released,
             'created_at' => $this->token()->exists() ?? $this->token->created_at->format('Y-m-d H:i:s'),
-            'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()),
+            'hbl' => $this->token()->exists() ?? $this->token->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first(),
         ];
     }
 }
