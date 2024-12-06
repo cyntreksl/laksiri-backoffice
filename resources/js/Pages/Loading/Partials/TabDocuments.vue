@@ -1,6 +1,6 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
-import {onMounted, ref, watch} from "vue";
+import {ref} from "vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import DeleteDocConfirmationModal from "@/Pages/Loading/Partials/DeleteDocConfirmationModal.vue";
@@ -10,8 +10,6 @@ import 'filepond/dist/filepond.min.css';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css';
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 
 const props = defineProps({
