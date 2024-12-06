@@ -12,6 +12,7 @@ use App\Http\Resources\ContainerResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
+use App\Models\ContainerDocument;
 use App\Models\Scopes\BranchScope;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -97,4 +98,12 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
         return Excel::download(new LoadedContainerManifestExport($container), $filename);
     }
+    public function updateVerificationStatus (array $data)
+    {
+        $document = ContainerDocument::where('container_id', $data['containerId'])->first();
+        $document->update(['is_verified' => $data['isChecked']]);
+
+        return $document;
+    }
+
 }

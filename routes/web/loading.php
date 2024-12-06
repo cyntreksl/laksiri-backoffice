@@ -65,6 +65,10 @@ Route::name('loading.')->group(function () {
 
     Route::get('loaded-containers/list/export', [ContainerController::class, 'exportLoadedShipments']);
 
+    Route::post('loaded-containers/verify', [LoadedContainerController::class, 'verifyDocument'])
+        ->name('loaded-containers.verify');
+
+
     // Manual Loadings
     Route::get('manual-loadings', function () {
         return Inertia::render('Loading/ManualLoading');
