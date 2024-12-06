@@ -30,7 +30,7 @@ class CustomerQueueResource extends JsonResource
             'is_paid' => $this->token->isPaid(),
             'is_released_from_boned_area' => $is_released_from_boned_area,
             'is_force_released' => $this->examination()->exists(),
-            'hbl' => optional($this->token->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()),
+            'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()),
         ];
     }
 }
