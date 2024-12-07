@@ -28,6 +28,18 @@ const closeModal = () => {
     packagePriceRuleId.value = null;
 };
 
+const conversionFactors = {
+    cm: 1,
+    m: 100,
+    in: 2.54,
+    ft: 30.48,
+};
+
+function convertMeasurements(measureType, value) {
+    const factor = conversionFactors[measureType] || 1;
+    return (value / factor).toFixed(2);
+}
+
 const handleDeletePackagePriceRule = () => {
     router.delete(route("setting.package-prices.destroy", packagePriceRuleId.value), {
         preserveScroll: true,
@@ -129,13 +141,13 @@ const handleDeletePackagePriceRule = () => {
                         {{ packageRule.rule_title }}
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                        {{ packageRule.length }}
+                        {{ convertMeasurements(packageRule.measure_type, packageRule.length )}} {{ packageRule.measure_type }}
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                        {{ packageRule.width }}
+                        {{ convertMeasurements(packageRule.measure_type, packageRule.width )}} {{ packageRule.measure_type }}
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                        {{ packageRule.height }}
+                        {{ convertMeasurements(packageRule.measure_type, packageRule.height )}} {{ packageRule.measure_type }}
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                         {{ packageRule.per_package_charge }}
