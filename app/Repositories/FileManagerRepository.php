@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Actions\FileManager\AnyFiles;
 use App\Actions\FileManager\DeleteSingleFile;
 use App\Actions\FileManager\DownloadSingleFile;
 use App\Actions\FileManager\GetFilesWithProperties;
@@ -40,5 +41,15 @@ class FileManagerRepository implements FileManagerRepositoryInterface
         } catch (\Exception $exception) {
             throw new \Exception('Failed to delete file: '.$exception->getMessage());
         }
+    }
+
+    public function anyFileUpload(array $data, string $id)
+    {
+        try {
+            return AnyFiles::run($data, $id);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to upload file: '.$e->getMessage());
+        }
+
     }
 }

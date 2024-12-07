@@ -24,7 +24,7 @@ class PackageCollection extends JsonResource
             'note' => $this->note,
             'released_by' => $this->releasedBy->name,
             'token' => $this->token->token,
-            'hbl' => optional($this->token->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()),
+            'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()),
         ];
     }
 }

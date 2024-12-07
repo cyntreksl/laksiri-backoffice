@@ -18,9 +18,13 @@ class GenerateContainerReferenceNumber
             $code = end($parts);
         }
 
-        $next_reference = $last_container ? ($code + 1) : 000001;
+        $next_reference = $last_container ? ((int) $code + 1) : 1; // Start from 1 if no container exists
 
-        $reference = $branch_code.'-'.'LD'.'-'.str_pad($next_reference, 6, '0', STR_PAD_LEFT);
+        do {
+            $reference = $branch_code.'-LD-'.str_pad($next_reference, 6, '0', STR_PAD_LEFT);
+            $exists = Container::where('reference', $reference)->exists();
+            $next_reference++;
+        } while ($exists);
 
         return $reference;
     }
