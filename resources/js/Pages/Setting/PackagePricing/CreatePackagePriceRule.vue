@@ -53,7 +53,7 @@ const conversionFactors = {
 
 function convertMeasurements(measureType, value) {
     const factor = conversionFactors[measureType] || 1;
-    return value * factor;
+    return (value * factor).toFixed(2);
 }
 
 watch(
@@ -230,21 +230,21 @@ const handlePriceRuleCreate = () => {
 
                             <div>
                                 <InputLabel value="Package Length"/>
-                                <TextInput v-model="form.length" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <TextInput v-model="form.length" class="w-full" min="0" placeholder="0.00" step="0.01" type="number"/>
                                 <span class="ml-2 text-red-500 text-sm">{{ruleLength}} cm</span>
                                 <InputError :message="form.errors.length"/>
                             </div>
 
                             <div>
                                 <InputLabel value="Package Width"/>
-                                <TextInput v-model="form.width" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <TextInput v-model="form.width" class="w-full" min="0" step="0.01" placeholder="0.00" type="number"/>
                                 <span class="ml-2 text-red-500 text-sm">{{ruleWidth}} cm</span>
                                 <InputError :message="form.errors.width"/>
                             </div>
 
                             <div>
                                 <InputLabel value="Package Height"/>
-                                <TextInput v-model="form.height" class="w-full" min="0" placeholder="0.00" type="number"/>
+                                <TextInput v-model="form.height" class="w-full" min="0" step="0.01" placeholder="0.00" type="number"/>
                                 <span class="ml-2 text-red-500 text-sm">{{ruleHeight}} cm</span>
                                 <InputError :message="form.errors.height"/>
                             </div>
