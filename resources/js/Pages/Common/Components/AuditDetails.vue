@@ -64,11 +64,9 @@ const closeModal = () => {
         </template>
 
         <template #footer>
-            <div class="px-6 py-4">
-                <SecondaryButton @click="closeModal" class="px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium">
-                    Close
-                </SecondaryButton>
-            </div>
+            <SecondaryButton @click="closeModal">
+                Cancel
+            </SecondaryButton>
         </template>
     </DialogModal>
 </template>
