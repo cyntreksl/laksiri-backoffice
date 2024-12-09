@@ -222,6 +222,7 @@ class HBLController extends Controller
     public function getHBLDocuments($HBL)
     {
         $hbl = GetHBLById::run($HBL);
+
         return response()->json($hbl->hblDocuments);
     }
 
