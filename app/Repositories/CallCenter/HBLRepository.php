@@ -30,6 +30,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         if (! empty($search)) {
             $query->whereAny([
                 'reference',
+                'hbl_number',
                 'hbl_name',
                 'contact_number',
                 'consignee_name',
