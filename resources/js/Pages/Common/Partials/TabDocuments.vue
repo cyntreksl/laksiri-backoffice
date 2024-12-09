@@ -22,7 +22,7 @@ const hblDocumentsRecords = ref([]);
 const fetchHBLDocuments = async () => {
     isLoading.value = true;
     try {
-        const response = await fetch(`hbls/get-hbl-documents/${props.hblId}`, {
+        const response = await fetch(`/hbls/get-hbl-documents/${props.hblId}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -196,6 +196,16 @@ onMounted(() => {
                                 Copy of Passport
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                <form
+                                    v-if="props.editPermission && !$page.props.user.permissions.includes('hbls.upload documents') && $page.props.user.permissions.includes('hbls.download pdf')"
+                                    class="flex items-center space-x-4 float-right"
+                                    @submit.prevent="handleFileUpload()">
+
+                                        <a  v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Copy of Passport')" :href="route('hbls.download.document-hbl-document', hblDocumentsRecords.find(doc => doc.document_name === 'Copy of Passport').id)">
+                                            <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                        </a>
+                                </form>
+
                                 <form v-if="props.editPermission && $page.props.user.permissions.includes('hbls.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
@@ -272,6 +282,15 @@ onMounted(() => {
                                 Copy of NIC
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                <form
+                                    v-if="props.editPermission && !$page.props.user.permissions.includes('hbls.upload documents') && $page.props.user.permissions.includes('hbls.download pdf')"
+                                    class="flex items-center space-x-4 float-right"
+                                    @submit.prevent="handleFileUpload()">
+
+                                    <a  v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Copy of NIC')" :href="route('hbls.download.document-hbl-document', hblDocumentsRecords.find(doc => doc.document_name === 'Copy of Passport').id)">
+                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    </a>
+                                </form>
                                 <form v-if="props.editPermission && $page.props.user.permissions.includes('hbls.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
@@ -348,6 +367,15 @@ onMounted(() => {
                                 Packing List
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                <form
+                                    v-if="props.editPermission && !$page.props.user.permissions.includes('hbls.upload documents') && $page.props.user.permissions.includes('hbls.download pdf')"
+                                    class="flex items-center space-x-4 float-right"
+                                    @submit.prevent="handleFileUpload()">
+
+                                    <a  v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Packing List')" :href="route('hbls.download.document-hbl-document', hblDocumentsRecords.find(doc => doc.document_name === 'Copy of Passport').id)">
+                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    </a>
+                                </form>
                                 <form v-if="props.editPermission && $page.props.user.permissions.includes('hbls.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">
@@ -425,6 +453,15 @@ onMounted(() => {
                                 Special Note
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                <form
+                                    v-if="props.editPermission && !$page.props.user.permissions.includes('hbls.upload documents') && $page.props.user.permissions.includes('hbls.download pdf')"
+                                    class="flex items-center space-x-4 float-right"
+                                    @submit.prevent="handleFileUpload()">
+
+                                    <a  v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Special Note')" :href="route('hbls.download.document-hbl-document', hblDocumentsRecords.find(doc => doc.document_name === 'Copy of Passport').id)">
+                                        <svg   class="icon icon-tabler icons-tabler-outline icon-tabler-download"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                    </a>
+                                </form>
                                 <form v-if="props.editPermission && $page.props.user.permissions.includes('hbls.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload()">

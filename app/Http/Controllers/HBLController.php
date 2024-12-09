@@ -219,8 +219,9 @@ class HBLController extends Controller
         return $this->HBLRepository->uploadDocument($request->all());
     }
 
-    public function getHBLDocuments(HBL $hbl)
+    public function getHBLDocuments($HBL)
     {
+        $hbl = GetHBLById::run($HBL);
         return response()->json($hbl->hblDocuments);
     }
 
