@@ -562,7 +562,7 @@ const createColumns = () => [
                             ),
                         ]
                     ) : null,
-                usePage().props.user.permissions.includes('arrivals.mark as reached') ?
+                usePage().props.user.permissions.includes('arrivals.mark as reached') && row._cells[37].data !== 'REACHED' ?
                     h(
                         "button",
                         {
