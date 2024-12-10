@@ -138,7 +138,7 @@ const handleDeleteDoc = () => {
         },
     });
 };
-const verifyContainerDocuments = async (event) => {
+const verifyContainerDocuments = async (event,docId) => {
     const isChecked = event.target.checked; // Checkbox value
     // console.log('Checkbox value:', isChecked);
     try {
@@ -149,7 +149,7 @@ const verifyContainerDocuments = async (event) => {
                 "X-CSRF-TOKEN": usePage().props.csrf, // CSRF token
             },
             body: JSON.stringify({
-                containerId: props.containerId, // Container ID
+                containerId: docId, // Container ID
                 isChecked: isChecked,     // Checkbox value
             }),
         });
@@ -211,7 +211,7 @@ const verifyContainerDocuments = async (event) => {
                                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                            type="checkbox"
                                            :checked="containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').is_verified === 1"
-                                           @change="verifyContainerDocuments($event)"
+                                           @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').id)"
 
                                     />
                                 </label>
@@ -307,8 +307,11 @@ const verifyContainerDocuments = async (event) => {
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 <label class="inline-flex items-center space-x-2">
                                     <input :disabled="$page.props.currentBranch.type === 'Destination'"
+                                           v-if ="containerDocumentsRecords.some(doc => doc.document_name === 'Manifest')"
                                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                            type="checkbox"
+                                           :checked="containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').is_verified === 1 "
+                                           @change="verifyContainerDocuments($event)"
 
                                     />
                                 </label>
