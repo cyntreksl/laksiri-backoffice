@@ -113,11 +113,14 @@ const filteredPackages = computed(() => {
 
 const containerArr = ref(props.loadedHBLs.flatMap(hbl => hbl.packages));
 
-const handleLoad = (index) => {
+const handleLoad = (index, pkg_id) => {
     if (index !== -1) {
-        const packageToLoad = hblPackagesArr.value[index];
+        const packageToLoad = hblPackagesArr.value.find(
+            (pkg) => pkg.id === pkg_id
+        );
         containerArr.value = [...containerArr.value, packageToLoad];
-        hblPackagesArr.value.splice(index, 1);
+        const objectIndex = hblPackagesArr.value.findIndex(pkg => pkg.id === pkg_id);
+        hblPackagesArr.value.splice(objectIndex, 1);
 
         const hblIndex = unloadedHBLs.value.findIndex(hbl => hbl.packages.some(p => p.id === packageToLoad.id));
         if (hblIndex !== -1) {
@@ -524,7 +527,7 @@ watch(unloadedHBLs, (newVal) => {
                                                                 width="24"
                                                                 x-tooltip.placement.top.success="'Click to Load'"
                                                                 xmlns="http://www.w3.org/2000/svg"
-                                                                @click.prevent="handleLoad(index)">
+                                                                @click.prevent="handleLoad(index, element.id)">
                                                                 <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                                                 <path d="M4 18v-6a3 3 0 0 1 3 -3h7"/>
                                                                 <path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4"/>

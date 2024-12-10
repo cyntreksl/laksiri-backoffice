@@ -130,6 +130,8 @@ const handleUpdatePayment = () => {
                 router.visit(route("call-center.cashier.queue.list"));
                 form.reset();
                 push.success('Payment Update Successfully!');
+                // Trigger the download of the PDF
+                window.location.href = route("hbls.getCashierReceipt", { hbl: props.hblId });
             },
             onError: () => {
                 push.error('Something went to wrong!');

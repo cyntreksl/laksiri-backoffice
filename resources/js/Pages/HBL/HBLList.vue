@@ -488,10 +488,10 @@ const createColumns = () => [
                         onClick: () => confirmDeleteHBL(row.cells[0].data),
                     }, "Delete"),
 
-                    usePage().props.user.permissions.includes("hbls.download pdf") && h("a", {
-                        href: route("hbls.getCashierReceipt", row.cells[0].data),
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                    }, "Download Cashier Receipt"),
+                    // usePage().props.user.permissions.includes("hbls.download pdf") && h("a", {
+                    //     href: route("hbls.getCashierReceipt", row.cells[0].data),
+                    //     className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
+                    // }, "Download Cashier Receipt"),
                 ]),
             ]);
         }

@@ -31,7 +31,7 @@
                     </tr>
                     <tr>
                         <td style="width: 50%;"></td>
-                        <td style="width: 50%;">{{ $data['vessel']['bl_number'] }}</td>
+                        <td style="width: 50%;">{{ $data['vessel']['bl_number'] ?? ''}}</td>
                     </tr>
                     <tr>
                         <td style="width: 50%;"></td>
@@ -39,7 +39,7 @@
                     </tr>
                     <tr>
                         <td style="width: 50%;"></td>
-                        <td style="width: 50%;">{{ $data['vessel']['vessel_name'] }}</td>
+                        <td style="width: 50%;">{{ $data['vessel']['vessel_name'] ?? '' }}</td>
                     </tr>
                     <tr>
                         <td style="width: 50%;"></td>
@@ -169,7 +169,7 @@
                     </tr>
                     <tr>
                         <td style="width: 50%;"></td>
-                        <td style="width: 50%;">{{ $data['vessel']['bl_number'] }}</td>
+                        <td style="width: 50%;">{{ $data['vessel']['bl_number'] ?? '' }}</td>
                     </tr>
                     <tr>
                         <td style="width: 50%;"></td>
@@ -210,7 +210,7 @@
                     </tr>
                     <tr>
                         <td style="width: 50%;"></td>
-                        <td style="width: 50%;">{{ $data['vessel']['vessel_name'] }}</td>
+                        <td style="width: 50%;">{{ $data['vessel']['vessel_name'] ?? ''}}</td>
                     </tr>
                     <tr>
                         <td style="width: 50%;"></td>

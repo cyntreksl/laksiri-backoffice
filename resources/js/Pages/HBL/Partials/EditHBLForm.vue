@@ -168,7 +168,7 @@ const packageItemLength = ref(0);
 const packageItemWidth = ref(0);
 const packageItemHeight = ref(0);
 
-function convertMeasurements(measureType, value) {
+function convertMeasurementstocm(measureType, value) {
     const factor = conversionFactors[measureType] || 1;
     return value * factor;
 }
@@ -176,30 +176,30 @@ function convertMeasurements(measureType, value) {
 watch(
     () => packageItem.measure_type,
     (newMeasureType) => {
-        packageItemLength.value = convertMeasurements(newMeasureType, packageItem.length);
-        packageItemWidth.value = convertMeasurements(newMeasureType, packageItem.width);
-        packageItemHeight.value = convertMeasurements(newMeasureType, packageItem.height);
+        packageItemLength.value = convertMeasurementstocm(newMeasureType, packageItem.length);
+        packageItemWidth.value = convertMeasurementstocm(newMeasureType, packageItem.width);
+        packageItemHeight.value = convertMeasurementstocm(newMeasureType, packageItem.height);
     }
 );
 
 watch(
     [() => packageItem.length],
     ([newLength]) => {
-        packageItemLength.value = convertMeasurements(packageItem.measure_type, newLength);
+        packageItemLength.value = convertMeasurementstocm(packageItem.measure_type, newLength);
     }
 );
 
 watch(
     [() => packageItem.width],
     ([newWidth]) => {
-        packageItemWidth.value = convertMeasurements(packageItem.measure_type, newWidth);
+        packageItemWidth.value = convertMeasurementstocm(packageItem.measure_type, newWidth);
     }
 );
 
 watch(
     [() => packageItem.height],
     ([newHeight]) => {
-        packageItemHeight.value = convertMeasurements(packageItem.measure_type, newHeight);
+        packageItemHeight.value = convertMeasurementstocm(packageItem.measure_type, newHeight);
     }
 );
 
@@ -443,15 +443,32 @@ const openEditModal = (index) => {
     // populate packageItem with existing data for editing
     Object.assign(packageItem, packageList.value[index]);
     packageItem.type = packageList.value[index].package_type;
-    const factor = conversionFactors[packageItem.measure_type] || 1;
-    packageItem.length = packageItem.length/factor;
-    packageItem.width = packageItem.width/factor;
-    packageItem.height = packageItem.height/factor;
+    packageItem.length = convertMeasurements(packageItem.measure_type,packageItem.length).toFixed(2);
+    packageItem.width = convertMeasurements(packageItem.measure_type,packageItem.width).toFixed(2);
+    packageItem.height = convertMeasurements(packageItem.measure_type,packageItem.height).toFixed(2);
 };
 const isPackageRuleSelected = ref(form.is_active_package);
 const packageRulesData = ref([]);
 const selectedPackage = ref("");
 const isExistsRules = ref(false);
+
+const volumeMeasurements = {
+    cm: 'cm.cu',
+    m: 'm.cu',
+    in: 'in.cu',
+    ft: 'ft.cu',
+};
+
+function convertMeasurements(measureType, value) {
+    const factor = conversionFactors[measureType] || 1;
+    return value / factor;
+}
+
+function getPackageRuleTitle(title, length, width , height, measureType) {
+    const volumeMeasurement = volumeMeasurements[measureType] || 'cm.cu';
+
+    return title + ' (' + convertMeasurements(measureType,length).toFixed(2) + '*' + convertMeasurements(measureType,width).toFixed(2) + '*' + convertMeasurements(measureType,height).toFixed(2) + ')'+volumeMeasurement;
+}
 
 const hblRules = async () => {
     try {
@@ -505,9 +522,10 @@ const getSelectedPackage = () => {
     // console.log(packageItem, selectedRule);
     if (selectedRule) {
         isPackageRuleSelected.value = true;
-        packageItem.length = selectedRule.length;
-        packageItem.width = selectedRule.width;
-        packageItem.height = selectedRule.height;
+        packageItem.length = convertMeasurements(selectedRule.measure_type, selectedRule.length).toFixed(2);
+        packageItem.width = convertMeasurements(selectedRule.measure_type, selectedRule.width).toFixed(2);
+        packageItem.height = convertMeasurements(selectedRule.measure_type, selectedRule.height).toFixed(2);
+        packageItem.measure_type = selectedRule.measure_type;
     }else {
         isPackageRuleSelected.value = false;
         packageItem.length = 0;
@@ -1391,9 +1409,7 @@ const getSelectedPackage = () => {
                                         :key="pkg.id"
                                         :value="pkg.id"
                                     >
-                                        {{
-                                            pkg.rule_title + ' (' + pkg.length + '*' + pkg.width + '*' + pkg.height + ')'
-                                        }}
+                                        {{ getPackageRuleTitle(pkg.rule_title,pkg.length, pkg.width, pkg.height, pkg.measure_type)}}
                                     </option>
                                 </select>
                             </label>
@@ -1452,7 +1468,7 @@ const getSelectedPackage = () => {
                         <div>
                             <label class="block">
                 <span
-                >Length (cm) <br/>
+                >Length<br/>
                     <span class="text-red-500 text-sm">*</span></span
                 >
                                 <input
@@ -1462,7 +1478,7 @@ const getSelectedPackage = () => {
                                     step="0.01"
                                     type="number"
                                 />
-                                <span class="ml-2 text-red-500 text-sm">{{packageItemLength}} cm</span>
+                                <span class="ml-2 text-red-500 text-sm">{{packageItemLength.toFixed(2)}} cm</span>
                             </label>
                         </div>
                         <div>
@@ -1477,7 +1493,7 @@ const getSelectedPackage = () => {
                                     step="0.01"
                                     type="number"
                                 />
-                                <span class="ml-2 text-red-500 text-sm">{{packageItemWidth}} cm</span>
+                                <span class="ml-2 text-red-500 text-sm">{{packageItemWidth.toFixed(2)}} cm</span>
                             </label>
                         </div>
 
@@ -1494,7 +1510,7 @@ const getSelectedPackage = () => {
                                     step="0.01"
                                     type="number"
                                 />
-                                <span class="ml-2 text-red-500 text-sm">{{packageItemHeight}} cm</span>
+                                <span class="ml-2 text-red-500 text-sm">{{packageItemHeight.toFixed(2)}} cm</span>
                             </label>
                         </div>
                         <div>

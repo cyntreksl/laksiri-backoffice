@@ -504,6 +504,19 @@ const closeCopyFromHBLToConsigneeModal = () => {
     copyFromHBLToConsigneeModalShow.value = false;
 }
 
+const volumeMeasurements = {
+    cm: 'cm.cu',
+    m: 'm.cu',
+    in: 'in.cu',
+    ft: 'ft.cu',
+};
+
+function getPackageRuleTitle(title, length, width , height, measureType) {
+    const volumeMeasurement = volumeMeasurements[measureType] || 'cm.cu';
+
+    return title + ' (' + convertMeasurements(measureType,length).toFixed(2) + '*' + convertMeasurements(measureType,width).toFixed(2) + '*' + convertMeasurements(measureType,height).toFixed(2) + ')'+volumeMeasurement;
+}
+
 const handleCopyFromHBLToConsignee = async () => {
     try {
         const response = await fetch(`/get-hbl-by-reference/${reference.value}`, {
@@ -684,9 +697,10 @@ const getSelectedPackage = () => {
     const selectedRule = packageRulesData.value.find(pkg => pkg.id === packageItem.packageRule);
     if (selectedRule) {
         isPackageRuleSelected.value = true;
-        packageItem.length = selectedRule.length;
-        packageItem.width = selectedRule.width;
-        packageItem.height = selectedRule.height;
+        packageItem.length = convertMeasurements(selectedRule.measure_type, selectedRule.length).toFixed(2);
+        packageItem.width = convertMeasurements(selectedRule.measure_type, selectedRule.width).toFixed(2);
+        packageItem.height = convertMeasurements(selectedRule.measure_type, selectedRule.height).toFixed(2);
+        packageItem.measure_type = selectedRule.measure_type;
     }else {
         isPackageRuleSelected.value = false;
         packageItem.length = 0;
@@ -708,36 +722,41 @@ const conversionFactors = {
 
 function convertMeasurements(measureType, value) {
     const factor = conversionFactors[measureType] || 1;
+    return value / factor;
+}
+
+function convertMeasurementstocm(measureType, value) {
+    const factor = conversionFactors[measureType] || 1;
     return value * factor;
 }
 
 watch(
     () => packageItem.measure_type,
     (newMeasureType) => {
-        packageItemLength.value = convertMeasurements(newMeasureType, packageItem.length);
-        packageItemWidth.value = convertMeasurements(newMeasureType, packageItem.width);
-        packageItemHeight.value = convertMeasurements(newMeasureType, packageItem.height);
+        packageItemLength.value = convertMeasurementstocm(newMeasureType, packageItem.length);
+        packageItemWidth.value = convertMeasurementstocm(newMeasureType, packageItem.width);
+        packageItemHeight.value = convertMeasurementstocm(newMeasureType, packageItem.height);
     }
 );
 
 watch(
     [() => packageItem.length],
     ([newLength]) => {
-        packageItemLength.value = convertMeasurements(packageItem.measure_type, newLength);
+        packageItemLength.value = convertMeasurementstocm(packageItem.measure_type, newLength);
     }
 );
 
 watch(
     [() => packageItem.width],
     ([newWidth]) => {
-        packageItemWidth.value = convertMeasurements(packageItem.measure_type, newWidth);
+        packageItemWidth.value = convertMeasurementstocm(packageItem.measure_type, newWidth);
     }
 );
 
 watch(
     [() => packageItem.height],
     ([newHeight]) => {
-        packageItemHeight.value = convertMeasurements(packageItem.measure_type, newHeight);
+        packageItemHeight.value = convertMeasurementstocm(packageItem.measure_type, newHeight);
     }
 );
 
@@ -1396,13 +1415,13 @@ const confirmViewHBL = async (id) => {
                                             {{ item.type }}
                                         </td>
                                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.length }}
+                                            {{ item.length.toFixed(3) }}
                                         </td>
                                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.width }}
+                                            {{ item.width.toFixed(3) }}
                                         </td>
                                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.height }}
+                                            {{ item.height.toFixed(3) }}
                                         </td>
                                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                             {{ item.quantity }}
@@ -1845,9 +1864,7 @@ const confirmViewHBL = async (id) => {
                                             :key="pkg.id"
                                             :value="pkg.id"
                                         >
-                                            {{
-                                                pkg.rule_title + ' (' + pkg.length + '*' + pkg.width + '*' + pkg.height + ')'
-                                            }}
+                                            {{ getPackageRuleTitle(pkg.rule_title,pkg.length, pkg.width, pkg.height, pkg.measure_type)}}
                                         </option>
                                     </select>
                                 </label>
@@ -1913,7 +1930,7 @@ const confirmViewHBL = async (id) => {
                                         step="0.01"
                                         type="number"
                                     />
-                                    <span class="ml-2 text-red-500 text-sm">{{packageItemLength}} cm</span>
+                                    <span class="ml-2 text-red-500 text-sm">{{packageItemLength.toFixed(2)}} cm</span>
                                 </label>
                             </div>
                             <div class="col-span-4 md:col-span-1">
@@ -1930,7 +1947,7 @@ const confirmViewHBL = async (id) => {
                                         step="0.01"
                                         type="number"
                                     />
-                                    <span class="ml-2 text-red-500 text-sm">{{packageItemWidth}} cm</span>
+                                    <span class="ml-2 text-red-500 text-sm">{{packageItemWidth.toFixed(2)}} cm</span>
                                 </label>
                             </div>
 
@@ -1948,7 +1965,7 @@ const confirmViewHBL = async (id) => {
                                         step="0.01"
                                         type="number"
                                     />
-                                    <span class="ml-2 text-red-500 text-sm">{{packageItemHeight}} cm</span>
+                                    <span class="ml-2 text-red-500 text-sm">{{packageItemHeight.toFixed(2)}} cm</span>
                                 </label>
                             </div>
 
