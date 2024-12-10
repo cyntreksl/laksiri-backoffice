@@ -100,8 +100,11 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
     }
     public function updateVerificationStatus (array $data)
     {
+
         $document = ContainerDocument::where('container_id', $data['containerId'])->first();
-        $document->update(['is_verified' => $data['isChecked']]);
+        $value = $data['isChecked'] == true ? '1' : '0';
+        $document->update(['is_verified' => $value]);
+
 
         return $document;
     }

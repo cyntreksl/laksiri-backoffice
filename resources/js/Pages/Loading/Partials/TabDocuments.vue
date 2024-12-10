@@ -1,6 +1,6 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
-import {ref, watch} from "vue";
+import {ref} from "vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import DeleteDocConfirmationModal from "@/Pages/Loading/Partials/DeleteDocConfirmationModal.vue";
@@ -211,6 +211,7 @@ const verifyContainerDocuments = async (event) => {
                                     <input :disabled="$page.props.currentBranch.type === 'Destination'"
                                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                            type="checkbox"
+                                           v-model="checked"
                                            @change="verifyContainerDocuments($event)"
 
                                     />
@@ -489,9 +490,76 @@ const verifyContainerDocuments = async (event) => {
                                 },
                               }"
                             style="border: 2px dashed #e2e7ee; border-radius: 2px; padding: 2px;"
+                            @init="onFilePondInit"
+                            @processfile="onFileUploadComplete"
                         />
                     </div>
+                    <div class="mt-8">
+                        <h2 class="text-base font-medium tracking-wide text-slate-800 line-clamp-1 dark:text-navy-100 mb-4">
+                            Uploaded Files
+                        </h2>
+                        <div class="overflow-x-auto">
+                            <table class="is-hoverable w-full text-left">
+                                <thead>
+                                <tr class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500">
+                                    <th class="whitespace-nowrap px-4 py-3 font-semibold text-slate-800 dark:text-navy-100">
+                                        File Name
+                                    </th>
+                                    <th class="whitespace-nowrap px-4 py-3 font-semibold text-slate-800 dark:text-navy-100 text-right">
+                                        Actions
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr
+                                    v-for="file in containerDocumentsRecords"
+                                    :key="file.id"
+                                    class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500"
+                                >
+                                    <td class="whitespace-nowrap px-4 py-3">
+                                        {{ file.document_name }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-4 py-3 text-right">
+                                        <!-- Download Button -->
+                                        <a
+                                            :href="route('loading.containers-documents.download', file.id  )"
+                                            download
+                                            class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                            title="Download"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="h-5 w-5"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                                />
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr v-if="containerDocumentsRecords.length === 0">
+                                    <td
+                                        colspan="2"
+                                        class="px-4 py-3 text-center text-slate-500 dark:text-navy-200"
+                                    >
+                                        No files uploaded yet
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
                 </div>
+
             </div>
         </div>
         <DeleteDocConfirmationModal :doc-name="docName" :show="showConfirmDeleteDocModal" @close="closeDeleteModal"
