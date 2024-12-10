@@ -79,9 +79,6 @@ const createColumns = () => [
         name: "HBL",
         hidden: !data.columnVisibility.hbl,
         sort: false,
-        formatter: cell => {
-            return cell?.hbl_number
-        }
     },
     {name: "Token", hidden: !data.columnVisibility.token},
     {name: "Customer", hidden: !data.columnVisibility.customer, sort: false},
