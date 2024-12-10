@@ -17,7 +17,7 @@ class PackageQueueResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'token' => $this->token()->exists() ?? $this->token->token,
+            'token' => $this->token->token,
             'reference' => $this->reference,
             'package_count' => $this->package_count,
             'is_released' => $this->is_released,
