@@ -62,7 +62,7 @@ class QueueRepository implements QueueRepositoryInterface
 
     public function getPackageQueue(): JsonResponse
     {
-        $queue = PackageQueue::all();
+        $queue = PackageQueue::whereHas('token')->get();
 
         $packageQueues = PackageQueueResource::collection($queue);
 

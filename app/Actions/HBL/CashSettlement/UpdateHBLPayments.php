@@ -16,7 +16,7 @@ class UpdateHBLPayments
             'paid_amount' => $total_paid_amount,
         ]);
 
-        $hbl->hblPayment()->updateOrCreate([
+        $hbl->hblPayment()->withoutGlobalScopes()->updateOrCreate([
             'hbl_id' => $hbl->id,
         ], [
             'branch_id' => GetUserCurrentBranchID::run(),

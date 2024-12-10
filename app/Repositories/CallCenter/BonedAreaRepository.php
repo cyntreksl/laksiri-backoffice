@@ -34,6 +34,7 @@ class BonedAreaRepository implements BonedAreaRepositoryInterface, GridJsInterfa
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
         $query = PackageQueue::query()
+            ->whereHas('token')
             ->where('is_released', true);
 
         $records = $query->orderBy($order, $direction)

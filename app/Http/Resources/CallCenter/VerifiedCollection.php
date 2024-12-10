@@ -26,7 +26,7 @@ class VerifiedCollection extends JsonResource
             'verified_by' => $this->verification->verifiedBy->name,
             'note' => $this->verification->note,
             'verified_at' => $this->verification->created_at->format('Y-m-d H:i:s'),
-            'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()),
+            'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first())->hbl_number,
         ];
     }
 }
