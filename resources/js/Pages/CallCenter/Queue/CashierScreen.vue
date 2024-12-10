@@ -66,7 +66,7 @@ setInterval(getCashierQueue, 3000);
                     v-if="firstToken.token"
                     class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-lime-300">
                     <h1 class="text-5xl text-black">NOW</h1>
-                    <h1 class="text-9xl xl:text-[200px] text-black font-bold">{{ firstToken.token }}</h1>
+                    <h1 class="text-9xl xl:text-[180px] text-black font-bold">{{ firstToken.token }}</h1>
                     <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
                         {{ firstToken.hbl?.hbl_number }}
                     </h3>
@@ -106,7 +106,7 @@ setInterval(getCashierQueue, 3000);
                     v-if="nextToken.token"
                     class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-yellow-300">
                     <h1 class="text-5xl text-black">NEXT</h1>
-                    <h1 class="text-9xl xl:text-[200px] text-black font-bold">{{ nextToken.token }}</h1>
+                    <h1 class="text-9xl xl:text-[180px] text-black font-bold">{{ nextToken.token }}</h1>
                     <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
                         {{ nextToken.hbl?.hbl_number }}
                     </h3>
