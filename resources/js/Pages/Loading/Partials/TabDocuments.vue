@@ -215,6 +215,9 @@ const verifyContainerDocuments = async (event,docId) => {
 
                                     />
                                 </label>
+                                <span v-if="containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line')?.is_verified === 1" class="ml-6 text-green-600">Verified</span>
+                                <span v-else class="ml-6 text-red-600">Not Verified</span>
+
                             </td>
 
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
@@ -315,6 +318,8 @@ const verifyContainerDocuments = async (event,docId) => {
 
                                     />
                                 </label>
+                                <span v-if="containerDocumentsRecords.find(doc => doc.document_name === 'Manifest')?.is_verified === 1" class="ml-6 text-green-600">Verified</span>
+                                <span v-else class="ml-6 text-red-600">Not Verified</span>
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 <form v-if="$page.props.user.permissions.includes('container.upload documents')"
@@ -413,6 +418,8 @@ const verifyContainerDocuments = async (event,docId) => {
                                        @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id)"
                                     />
                                 </label>
+                                <span v-if="containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges')?.is_verified === 1" class="ml-6 text-green-600">Verified</span>
+                                <span v-else class="ml-6 text-red-600">Not Verified</span>
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 <form v-if="$page.props.user.permissions.includes('container.upload documents')"
