@@ -2,7 +2,9 @@
 
 namespace App\Actions\HBL;
 
+use App\Models\Branch;
 use App\Models\HBL;
+use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class GenerateHBLReferenceNumber
@@ -11,7 +13,13 @@ class GenerateHBLReferenceNumber
 
     public function handle(): string
     {
-        $branch_code = session('current_branch_code');
+        if (session('current_branch_code')) {
+            $branch_code = session('current_branch_code');
+        } else {
+            $branch_code = Branch::where('id', Auth::user()->primary_branch_id)->pluck('branch_code')->first();
+
+        }
+
         $last_hbl = HBL::whereNotNull('reference')->latest()->first();
 
         if ($last_hbl) {
