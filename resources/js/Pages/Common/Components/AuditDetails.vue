@@ -5,6 +5,11 @@ import { ref } from "vue";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 
 const props = defineProps({
+    oldProperties: {
+        type: Object,
+        default: () => {
+        }
+    },
     properties: {
         type: Object,
         default: () => {
@@ -49,19 +54,23 @@ const closeModal = () => {
         </template>
 
         <template #content>
-            <div class="p-2">
-                <dl class="grid grid-cols-3 gap-4">
-                    <div v-for="(value, key) in props.properties" :key="key" class="p-2">
-                        <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
-                            {{ key.replace(/_/g, ' ') }}
-                        </p>
-                        <p class="mt-1 text-xl font-medium text-slate-700 dark:text-navy-100" style="font-size: 1.15rem;">
-                            {{ value || '-' }}
-                        </p>
-                    </div>
-                </dl>
+            <div class="p-4">
+                <p v-for="(newValue, key) in properties" :key="key" class="mb-2">
+            <span class="font-semibold text-slate-500 dark:text-navy-100">
+                {{ key.replace(/_/g, ' ').toUpperCase() }}
+            </span>
+                    <span v-if="oldProperties[key] !== newValue" class="text-slate-500">
+                "{{ oldProperties[key] || 'N/A' }}" changed to
+                <span class="text-green-500">"{{ newValue || 'N/A' }}"</span>.
+            </span>
+                    <span v-else class="text-slate-700 dark:text-navy-100">
+                No change ({{ newValue || 'N/A' }}).
+            </span>
+                </p>
             </div>
         </template>
+
+
 
         <template #footer>
             <SecondaryButton @click="closeModal">

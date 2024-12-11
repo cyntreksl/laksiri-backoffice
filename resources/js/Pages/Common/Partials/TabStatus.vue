@@ -678,7 +678,7 @@ onMounted(() => {
                                 {{ activity.causer?.name }}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                                <AuditDetails :properties="activity.properties?.attributes"/>
+                                <AuditDetails :old-properties="activity.properties?.old" :properties="activity.properties?.attributes"/>
                             </td>
                         </tr>
                         </tbody>

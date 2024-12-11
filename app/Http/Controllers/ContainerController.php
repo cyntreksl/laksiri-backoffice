@@ -99,7 +99,7 @@ class ContainerController extends Controller
         ]);
     }
 
-    public function update(UpdateContainerRequest $request, Container $container)
+    public function update(Container $container, UpdateContainerRequest $request)
     {
         return $this->containerRepository->update($request->all(), $container);
     }

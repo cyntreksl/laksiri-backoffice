@@ -66,7 +66,7 @@ setInterval(getPackageQueue, 3000);
                     v-if="firstToken.token"
                     class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-lime-300 space-y-3">
                     <h1 class="text-5xl text-black">NOW</h1>
-                    <h1 class="text-7xl xl:text-[120px] text-black font-bold">{{ firstToken.reference }}</h1>
+                    <h1 class="text-7xl xl:text-[120px] text-black font-bold">{{ firstToken.token }}</h1>
                     <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
                         {{ firstToken.package_count }} Packages
                     </h3>
@@ -79,7 +79,7 @@ setInterval(getPackageQueue, 3000);
                         <div
                             class="card grow cursor-pointer hover:bg-info/20 items-center p-4 text-center sm:p-5 border w-50 rounded-lg">
                             <div class="my-5">
-                                <h1 class="text-4xl text-black font-bold">{{ queue.reference }}</h1>
+                                <h1 class="text-4xl text-black font-bold">{{ queue.token }}</h1>
                             </div>
                             <div class="my-2 grow">
                                 <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
@@ -96,7 +96,7 @@ setInterval(getPackageQueue, 3000);
                     v-if="nextToken.token"
                     class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-yellow-300 space-y-3">
                     <h1 class="text-5xl text-black">NEXT</h1>
-                    <h1 class="text-7xl xl:text-[120px] text-black font-bold">{{ nextToken.reference }}</h1>
+                    <h1 class="text-7xl xl:text-[120px] text-black font-bold">{{ nextToken.token }}</h1>
                     <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
                         {{ nextToken.package_count }} Packages
                     </h3>

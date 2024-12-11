@@ -230,7 +230,14 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function update(array $data, Container $container)
     {
         try {
+            $data['is_reached'] = $data['is_reached'] ? 1 : 0;
             UpdateContainer::run($container, $data);
+            if ($data['is_reached']) {
+                foreach ($container->hbl_packages as $package) {
+                    $hbl = HBL::withoutGlobalScope(BranchScope::class)->find($package->hbl_id);
+                    $hbl->addStatus('Container Arrival', $container->estimated_time_of_arrival);
+                }
+            }
         } catch (\Exception $e) {
             throw new \Exception('Failed to update loaded shipment container: '.$e->getMessage());
         }

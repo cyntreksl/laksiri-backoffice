@@ -15,6 +15,9 @@ class BranchScope implements Scope
     public function apply(Builder $builder, Model $model): void
     {
         $currentBranch = GetUserCurrentBranch::run();
-        $builder->where('branch_id', '=', $currentBranch['branchId']);
+        //        $builder->where('branch_id', '=', $currentBranch['branchId']);
+        if ($currentBranch['branchType'] === 'Departure') {
+            $builder->where('branch_id', '=', $currentBranch['branchId']);
+        }
     }
 }
