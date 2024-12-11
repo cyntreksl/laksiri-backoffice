@@ -12,15 +12,11 @@ class AnyFiles
     public function handle(array $data, int $id)
     {
         if (isset($data['files'])) {
-            $container_document = ContainerDocument::firstOrNew(
-                [
-                    'document_name' => $data['files']->getClientOriginalName(),
-                ],
-                [
-                    'uploaded_by' => auth()->id(),
-                    'container_id' => $id,
-                ]
-            );
+            $container_document = ContainerDocument::create([
+                'document_name' => $data['files']->getClientOriginalName(),
+                'uploaded_by' => auth()->id(),
+                'container_id' => $id,
+            ]);
 
             $container_document->updateFile($data['files'], 'document', 'container/docs');
             $container_document->save();

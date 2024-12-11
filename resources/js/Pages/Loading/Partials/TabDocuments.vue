@@ -413,7 +413,7 @@ const handleDeleteDoc = () => {
                         </tr>
                         </tbody>
                     </table>
-                    <div class="filepond-container">
+                    <div class="filepond-container" style="margin: 20px 0; padding: 10px;" >
                         <file-pond
                             name="files"
                             ref="pond"

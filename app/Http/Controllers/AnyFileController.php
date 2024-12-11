@@ -14,8 +14,7 @@ class AnyFileController extends Controller
     public function upload(Request $request, $id)
     {
         $request->validate([
-            'files' => 'required |array',
-            'files.*' => 'required |file|mimes:pdf,doc,docx,jpg,png,jpeg|max:2048',
+            'files.*' => 'required |file|mimes:pdf,doc,docx,jpg,png,jpeg|max:10000',
         ]);
 
         try {
