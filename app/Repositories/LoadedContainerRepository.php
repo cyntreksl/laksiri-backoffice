@@ -98,15 +98,13 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
         return Excel::download(new LoadedContainerManifestExport($container), $filename);
     }
-    public function updateVerificationStatus (array $data)
+
+    public function updateVerificationStatus(array $data)
     {
 
-        $document = ContainerDocument::where('container_id', $data['containerId'])->first();
-        $value = $data['isChecked'] == true ? '1' : '0';
-        $document->update(['is_verified' => $value]);
-
+        $document = ContainerDocument::find($data['containerId']);
+        $document->update(['is_verified' => $data['isChecked']]);
 
         return $document;
     }
-
 }

@@ -311,7 +311,7 @@ const verifyContainerDocuments = async (event,docId) => {
                                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                            type="checkbox"
                                            :checked="containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').is_verified === 1 "
-                                           @change="verifyContainerDocuments($event)"
+                                           @change="verifyContainerDocuments($event,containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').id)"
 
                                     />
                                 </label>
@@ -406,8 +406,11 @@ const verifyContainerDocuments = async (event,docId) => {
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 <label class="inline-flex items-center space-x-2">
                                     <input :disabled="$page.props.currentBranch.type === 'Destination'"
+                                           v-if ="containerDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')"
                                         class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                         type="checkbox"
+                                        :checked="containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').is_verified === 1 "
+                                       @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id)"
                                     />
                                 </label>
                             </td>

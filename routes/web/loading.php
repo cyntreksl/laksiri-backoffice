@@ -68,7 +68,6 @@ Route::name('loading.')->group(function () {
     Route::post('loaded-containers/verify', [LoadedContainerController::class, 'verifyDocument'])
         ->name('loaded-containers.verify');
 
-
     // Manual Loadings
     Route::get('manual-loadings', function () {
         return Inertia::render('Loading/ManualLoading');

@@ -113,9 +113,9 @@ class LoadedContainerController extends Controller
 
         return $this->loadedContainerRepository->downloadManifestFile($container);
     }
+
     public function verifyDocument(Request $request)
     {
-        return $this->loadedContainerRepository-> updateVerificationStatus($request->all());
+        return $this->loadedContainerRepository->updateVerificationStatus($request->all());
     }
-
 }
