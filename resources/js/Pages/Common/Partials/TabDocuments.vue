@@ -83,10 +83,11 @@ watch(() => props.hblId, (newHblId) => {
 });
 
 const handleFileUpload = () => {
-    if (!form.hbl_id) {
-        push.error('HBL ID is missing!');
-        return;
-    }
+    // if (!form.hbl_id) {
+    //     push.error('HBL ID is missing!');
+    //     return;
+    // }
+    form.hbl_id = props.hblId;
 
     form.post(route('hbls.upload.document'), {
         preserveScroll: true,
