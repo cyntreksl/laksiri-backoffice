@@ -31,9 +31,9 @@ const form = useForm({
 const handleUploadFiles = () => {
     form.post(route('file-manager.upload'), {
         onSuccess: () => {
+            emit('close');
             push.success('File Uploaded Successfully!');
             clearFileInput();
-            emit('close');
         },
         onError: () => {
             console.log('wrong')
