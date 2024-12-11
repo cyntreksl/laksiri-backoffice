@@ -67,6 +67,12 @@ setInterval(getPackageQueue, 3000);
                     class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-lime-300 space-y-3">
                     <h1 class="text-5xl text-black">NOW</h1>
                     <h1 class="text-7xl xl:text-[120px] text-black font-bold">{{ firstToken.token }}</h1>
+                    <h5 class="text-xl font-medium text-slate-700 dark:text-navy-100">
+                        <template v-for="(hbl_package, index) in firstToken.hbl_packages" :key="index">
+                            {{ hbl_package.package_type }} PKG {{ hbl_package.quantity }}<span v-if="index < firstToken.hbl_packages.length - 1"><br> </span>
+                        </template>
+                    </h5>
+
                     <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
                         {{ firstToken.package_count }} Packages
                     </h3>
@@ -82,6 +88,11 @@ setInterval(getPackageQueue, 3000);
                                 <h1 class="text-4xl text-black font-bold">{{ queue.token }}</h1>
                             </div>
                             <div class="my-2 grow">
+                                <h5 class="text-xl font-medium text-slate-700 dark:text-navy-100">
+                                    <template v-for="(hbl_package, index) in queue.hbl_packages" :key="index">
+                                        {{ hbl_package.package_type }} PKG {{ hbl_package.quantity }}<span v-if="index < queue.hbl_packages.length - 1"><br> </span>
+                                    </template>
+                                </h5>
                                 <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
                                     {{ queue.package_count }} Packages
                                 </h3>
@@ -97,6 +108,11 @@ setInterval(getPackageQueue, 3000);
                     class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-yellow-300 space-y-3">
                     <h1 class="text-5xl text-black">NEXT</h1>
                     <h1 class="text-7xl xl:text-[120px] text-black font-bold">{{ nextToken.token }}</h1>
+                    <h5 class="text-xl font-medium text-slate-700 dark:text-navy-100">
+                        <template v-for="(hbl_package, index) in nextToken.hbl_packages" :key="index">
+                            {{ hbl_package.package_type }} PKG {{ hbl_package.quantity }}<span v-if="index < nextToken.hbl_packages.length - 1"><br> </span>
+                        </template>
+                    </h5>
                     <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
                         {{ nextToken.package_count }} Packages
                     </h3>
