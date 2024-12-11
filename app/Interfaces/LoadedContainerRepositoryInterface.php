@@ -11,4 +11,6 @@ interface LoadedContainerRepositoryInterface
     public function deleteDraft(array $data);
 
     public function downloadManifestFile($container): BinaryFileResponse;
+
+    public function updateVerificationStatus(array $data);
 }

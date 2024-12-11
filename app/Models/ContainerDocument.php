@@ -14,6 +14,6 @@ class ContainerDocument extends Model
     protected $table = 'container_documents';
 
     protected $fillable = [
-        'container_id', 'uploaded_by', 'document_name', 'document',
+        'container_id', 'uploaded_by', 'document_name', 'document', 'is_verified',
     ];
 }

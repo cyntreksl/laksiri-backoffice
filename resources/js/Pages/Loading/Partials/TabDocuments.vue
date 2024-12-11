@@ -1,6 +1,6 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
-import {onMounted, ref, watch} from "vue";
+import {ref} from "vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import DeleteDocConfirmationModal from "@/Pages/Loading/Partials/DeleteDocConfirmationModal.vue";
@@ -10,7 +10,6 @@ import 'filepond/dist/filepond.min.css';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css';
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-
 
 
 const props = defineProps({
@@ -139,6 +138,37 @@ const handleDeleteDoc = () => {
         },
     });
 };
+const verifyContainerDocuments = async (event,docId) => {
+    const isChecked = event.target.checked; // Checkbox value
+    // console.log('Checkbox value:', isChecked);
+    try {
+        const response = await fetch(`loaded-containers/verify`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf, // CSRF token
+            },
+            body: JSON.stringify({
+                containerId: docId, // Container ID
+                isChecked: isChecked,     // Checkbox value
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        }else {
+            const data = await response.json();
+            push.success(data.message);
+        }
+
+    } catch (error) {
+        console.error( error.message);
+
+    }
+};
+
+
+
 </script>
 
 <template>
@@ -172,10 +202,26 @@ const handleDeleteDoc = () => {
                                     <path d="M12 19v.01"/>
                                     <path d="M12 15v-10"/>
                                 </svg>
-
                                 BL From Shipping Line
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                <label class="inline-flex items-center space-x-2">
+                                    <input :disabled="$page.props.currentBranch.type === 'Destination'"
+                                           v-if="containerDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')"
+                                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                                           type="checkbox"
+                                           :checked="containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').is_verified === 1"
+                                           @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').id)"
+
+                                    />
+                                </label>
+                                <span v-if="containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line')?.is_verified === 1" class="ml-6 text-green-600">Verified</span>
+                                <span v-else class="ml-6 text-red-600">Not Verified</span>
+
+                            </td>
+
+                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+
                                 <form v-if="$page.props.user.permissions.includes('container.upload documents')"
                                       class="flex items-center space-x-4 float-right"
                                       @submit.prevent="handleFileUpload">
@@ -260,6 +306,20 @@ const handleDeleteDoc = () => {
                                 </svg>
 
                                 Manifest
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                <label class="inline-flex items-center space-x-2">
+                                    <input :disabled="$page.props.currentBranch.type === 'Destination'"
+                                           v-if ="containerDocumentsRecords.some(doc => doc.document_name === 'Manifest')"
+                                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                                           type="checkbox"
+                                           :checked="containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').is_verified === 1 "
+                                           @change="verifyContainerDocuments($event,containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').id)"
+
+                                    />
+                                </label>
+                                <span v-if="containerDocumentsRecords.find(doc => doc.document_name === 'Manifest')?.is_verified === 1" class="ml-6 text-green-600">Verified</span>
+                                <span v-else class="ml-6 text-red-600">Not Verified</span>
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 <form v-if="$page.props.user.permissions.includes('container.upload documents')"
@@ -347,6 +407,19 @@ const handleDeleteDoc = () => {
                                 </svg>
 
                                 Receipt for Freight Charges
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
+                                <label class="inline-flex items-center space-x-2">
+                                    <input :disabled="$page.props.currentBranch.type === 'Destination'"
+                                           v-if ="containerDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')"
+                                        class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                                        type="checkbox"
+                                        :checked="containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').is_verified === 1 "
+                                       @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id)"
+                                    />
+                                </label>
+                                <span v-if="containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges')?.is_verified === 1" class="ml-6 text-green-600">Verified</span>
+                                <span v-else class="ml-6 text-red-600">Not Verified</span>
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 <form v-if="$page.props.user.permissions.includes('container.upload documents')"
@@ -498,6 +571,7 @@ const handleDeleteDoc = () => {
 
 
                 </div>
+
             </div>
         </div>
         <DeleteDocConfirmationModal :doc-name="docName" :show="showConfirmDeleteDocModal" @close="closeDeleteModal"
