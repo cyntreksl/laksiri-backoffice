@@ -10,14 +10,10 @@
             border-collapse: collapse;
             font-family: Arial, sans-serif;
         }
-        th {
-            border: 1px solid black;
+        th, td {
+            border: 1px solid black; /* Apply border to both th and td */
             padding: 5px;
             text-align: left;
-        }
-        td {
-            border: 1px solid black;
-            padding: 5px;
         }
         th {
             background-color: #f0f0f0;
@@ -37,11 +33,11 @@
 
     </tr>
 
-     <tr>
-         <th colspan="10" style = "text-align: center;">
-             <strong> <em> SEA CARGO DOOR TO DOOR MANIFEST </em> </strong>
-         </th>
-     </tr>
+    <tr>
+        <th colspan="10" style = "text-align: center;">
+            <strong> <em> SEA CARGO DOOR TO DOOR MANIFEST </em> </strong>
+        </th>
+    </tr>
     <tr>
         <th colspan="10">
             DATE:<span id="current-date"></span>                                                                                                                                                                 SHIPMENT NO:2734
@@ -49,7 +45,7 @@
     </tr>
     <tr>
         <th colspan="10">
-          SHIPPER : UNIVERSAL FREIGHT SERVICES, P.O.BOX: 55239, DOHA, QATAR. TEL: +974 4620961 TEL/FAX: +974 4620812 <br>
+            SHIPPER : UNIVERSAL FREIGHT SERVICES, P.O.BOX: 55239, DOHA, QATAR. TEL: +974 4620961 TEL/FAX: +974 4620812 <br>
             CONSIGNEE: LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA <br>
             NOTIFY : LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94 11-2574180/ TEL: +94 11-47722800
         </th>
@@ -59,9 +55,9 @@
         $vtotal = 0;
         $gtotal = 0;
         foreach($data as $item){
-            $nototal += floatval($item[7] ?? 0);
-            $vtotal += floatval($item[8] ?? 0);
-            $gtotal += floatval($item[9] ?? 0);
+            $nototal += floatval($item[11] ?? 0);
+            $vtotal += floatval($item[12] ?? 0);
+            $gtotal += floatval($item[13] ?? 0);
         }
     @endphp
     <tr>
@@ -95,7 +91,6 @@
             <td>{{ $item[13] ?? 0}}</td>
             <td>PERSONAL EFFECT</td>
             <td>{{$item[14]}}</td>
-            <td></td>
         </tr>
     @endforeach
     <tr>
