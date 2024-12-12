@@ -50,29 +50,29 @@ class LoadedContainerManifestExport
 
             $isFirst = true;
             $totalQuantity = $loadedHBLPackages->sum('quantity');
+//            dd($loadedHBLPackages);
 
             foreach ($loadedHBLPackages as $hbl_package) {
                 $data[] = [
                     $isFirst ? $hbl->hbl_number ?: $hbl->reference : '',
                     $isFirst ? $hbl->hbl_name : '',
-                    $isFirst ? $hbl->consignee_name : '',
-                    $isFirst ? $hbl->consignee_address : '',
-                    $isFirst ? $hbl->consignee_nic : '',
-                    $isFirst ? $hbl->consignee_contact : '',
+                    $isFirst ? $hbl->address : '',
+                    $isFirst ? $hbl->nic : '',
+                    $isFirst ? $hbl->contact_number : '',
+                    $isFirst ? $hbl->consignee_name  : '',
+                    $isFirst ? $hbl->consignee_address  : '',
+                    $isFirst ? $hbl->consignee_nic  : '',
+                    $isFirst ? $hbl->consignee_contact  : '',
                     $hbl_package->package_type,
-                    $isFirst ? $totalQuantity : '',
+                    $totalQuantity,
+                    $hbl_package->quantity,
                     $hbl_package->volume,
                     $hbl_package->weight,
-
+                    $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
                 ];
 
                 $isFirst = false;
             }
-
-            // Add additional rows (address, NIC, etc.)
-            $data[] = ['', $hbl->address, $hbl->consignee_address, '', '', '', ''];
-            $data[] = ['', $hbl->nic, $hbl->consignee_nic, '', '', '', ''];
-            $data[] = ['', $hbl->contact_number, $hbl->consignee_contact, '', '', '', ''];
         }
 
         return $data;

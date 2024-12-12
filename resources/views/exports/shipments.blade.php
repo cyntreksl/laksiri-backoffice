@@ -59,14 +59,14 @@
         $vtotal = 0;
         $gtotal = 0;
         foreach($data as $item){
-            $nototal += floatval($item[4]);
-            $vtotal += floatval($item[5]);
-            $gtotal += floatval($item[6]);
+            $nototal += floatval($item[7] ?? 0);
+            $vtotal += floatval($item[8] ?? 0);
+            $gtotal += floatval($item[9] ?? 0);
         }
     @endphp
     <tr>
         <th colspan="10">
-            CONTR NO ONEU0364971                                       MHBL -122122                                        TOTAL VOLUME:  {{ number_format($vtotal, 3) }}                                       TOTAL WEIGHT:KG   {{ number_format($gtotal, 1) }}
+            AWB NO 157 0364971                                       TOTAL WEIGHT:KG   {{ number_format($gtotal, 1) }}                                        TOTAL VOLUME:  {{ number_format($vtotal, 3) }}                                   NO OF PKG:-{{ number_format($nototal, 2) }}
         </th>
     </tr>
     <tr>
@@ -85,17 +85,17 @@
     <tbody>
     @foreach($data as $item)
         <tr>
-            <td rowspan="4" >{{ $loop->iteration }}</td>
-            <td rowspan="4" > {{ $item[0]}} </td>
-            <td rowspan="4" >{{ $item[1]}}</td>
-            <td rowspan="4">{{ $item[2] }} {{ $item[3] }} {{ $item[4] }} {{ $item[5] }} </td>
-            <td>Yes</td>
-            <td>Yes</td>
-            <td>Yes</td>
-            <td>Yes</td>
-            <td>Yes</td>
+            <td >{{ $loop->iteration }}</td>
+            <td > {{ $item[0]}} </td>
+            <td>{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
+            <td>{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
+            <td>{{ $item[9] }}</td>
+            <td>{{ $item[11] ?? 0}}</td>
+            <td>{{ $item[12] ?? 0}}</td>
+            <td>{{ $item[13] ?? 0}}</td>
+            <td>PERSONAL EFFECT</td>
+            <td>{{$item[14]}}</td>
             <td></td>
-
         </tr>
     @endforeach
     <tr>

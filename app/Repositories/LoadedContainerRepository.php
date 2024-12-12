@@ -100,7 +100,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         //    dd($data[0][7]);
 
         $pdf = PDF::loadView('exports.shipments', ['data' => $data]);
-        $pdf->setPaper('a3', 'portrait');
+        $pdf->setPaper('a2', 'portrait');
 
         // Return PDF file for download
         return $pdf->stream($filename);
