@@ -5,92 +5,140 @@ namespace App\Services;
 class GatePassChargesService
 {
     private float $vat;
-    private float $port_charge;
-    private float $handling_charge;
-    private float $bond_charge;
-    private float $demurrage_charge_first;
-    private float $demurrage_charge_second;
-    private float $demurrage_charge_third;
+
+    private string $cargo_mode;
+
+    private array $charges;
+
+    // Define charge rates for both sea and air cargo
+    private array $chargeModes = [
+        'Sea Cargo' => [
+            'port_charge' => 600.00,
+            'handling_charge' => 670.00,
+            'bond_charge' => 9450.00,
+            'demurrage_charge' => [0.00, 9.50, 10.00, 0.00],
+            'demurrage_charge_first' => 0.00,
+            'demurrage_charge_second' => 9.50,
+            'demurrage_charge_third' => 10.00,
+        ],
+        'Air Cargo' => [
+            'port_charge' => 0.00,
+            'handling_charge' => 450.00,
+            'bond_charge' => 29.00,
+            'demurrage_charge' => [0.00, 8.00, 16.00, 24.00],
+            'demurrage_charge_first' => 0.00,
+            'demurrage_charge_second' => 8.00,
+            'demurrage_charge_third' => 6.00,
+            'demurrage_charge_fourth' => 24.00,
+        ],
+    ];
 
     /**
-     * Create a new instance.
-     *
-     * @param float $vat
-     * @param float $port_charge
-     * @param float $handling_charge
-     * @param float $bond_charge
+     * Create a new instance with VAT and cargo mode.
      */
-    public function __construct(float $port_charge = 600, float $vat = 18, float $handling_charge = 670, float $bond_charge = 9450, float $demurrage_charge_first = 0, float $demurrage_charge_second = 9.5, float $demurrage_charge_third = 10)
+    public function __construct(string $cargo_mode = 'Sea Cargo', float $vat = 18)
     {
         $this->vat = $vat;
-        $this->port_charge = $port_charge;
-        $this->handling_charge = $handling_charge;
-        $this->bond_charge = $bond_charge;
-        $this->demurrage_charge_first = $demurrage_charge_first;
-        $this->demurrage_charge_second = $demurrage_charge_second;
-        $this->demurrage_charge_third = $demurrage_charge_third;
+        $this->cargo_mode = $cargo_mode;
+        $this->setCharges($cargo_mode);
+    }
+
+    /**
+     * Set charges based on cargo mode.
+     */
+    private function setCharges(string $cargo_mode): void
+    {
+        // Check if cargo mode exists
+        if (! isset($this->chargeModes[$cargo_mode])) {
+            throw new \InvalidArgumentException("Invalid cargo mode: $cargo_mode");
+        }
+        $this->charges = $this->chargeModes[$cargo_mode];
     }
 
     /**
      * Get port charge details.
      *
-     * @return array
+     * @param  float  $volume  MCU
      */
-    public function portCharge(): array
+    public function portCharge(float $volume): array
     {
-        $amount = $this->port_charge * (1 + $this->vat / 100);
         return [
-            'rate' => round($this->port_charge, 2),
-            'amount' => round($amount, 2),
+            'rate' => round($this->charges['port_charge'] * $volume, 2),
+            'amount' => round($this->charges['port_charge'] * $volume * (1 + $this->vat / 100), 2),
         ];
     }
 
     /**
      * Get handling charge details.
      *
-     * @return array
+     * @param  int  $package_count  package count
      */
-    public function handlingCharge(): array
+    public function handlingCharge(int $package_count): array
     {
-        $amount = $this->handling_charge * (1 + $this->vat / 100);
         return [
-            'rate' => round($this->handling_charge, 2),
-            'amount' => round($amount, 2),
+            'rate' => round($this->charges['handling_charge'] * $package_count, 2),
+            'amount' => round($this->charges['handling_charge'] * $package_count * (1 + $this->vat / 100), 2),
         ];
     }
 
     /**
      * Get bond charge details.
      *
-     * @return array
+     * @param  float  $grand_volume  packages volume
+     * @param  float  $grand_weight  packages weight
      */
-    public function bondCharge(): array
+    public function bondCharge(float $grand_volume, float $grand_weight): array
     {
-        $amount = $this->bond_charge * (1 + $this->vat / 100);
+        $quantity = $this->cargo_mode === 'Sea Cargo' ? $grand_volume : $grand_weight;
+
         return [
-            'rate' => round($this->bond_charge, 2),
-            'amount' => round($amount, 2),
+            'rate' => round($quantity * $this->charges['bond_charge'], 2),
+            'amount' => round($quantity * $this->charges['bond_charge'] * (1 + $this->vat / 100), 2),
         ];
     }
 
     /**
-     * Get Demurrag charge details.
+     * Get Demurrage charge details.
      *
-     * @return array
+     * @param  int  $containerArrivalDatesCount  Number of days since container arrival.
+     * @param  float  $grand_volume  packages grand volume
+     * @param  float  $grand_weight  packages grand weight
      */
-    public function demurragCharge(): array
+    public function demurrageCharge(int $containerArrivalDatesCount, float $grand_volume, float $grand_weight): array
     {
-        $amount = $this->bond_charge * (1 + $this->vat / 100);
+
+        $quantity = $this->cargo_mode === 'Sea Cargo' ? ($grand_volume * 35) : $grand_weight;
+        $rate = 0.0;
+
+        $chargeBrackets = [
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][0]],
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][1]],
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][2]],
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][3]],
+        ];
+
+        foreach ($chargeBrackets as $bracket) {
+            if ($containerArrivalDatesCount <= 0) {
+                break;
+            }
+
+            $applicableDays = min($bracket['days'], $containerArrivalDatesCount);
+
+            $rate += $bracket['rate'] * $applicableDays * $quantity;
+
+            $containerArrivalDatesCount -= $applicableDays;
+        }
+
+        $amount = $rate * (1 + $this->vat / 100);
+
         return [
-            'rate' => round($this->bond_charge, 2),
+            'rate' => round($rate, 2),
             'amount' => round($amount, 2),
         ];
     }
 
     /**
      * Get VAT charge details.
-     *
-     * @return array
      */
     public function vatCharge(): array
     {
