@@ -4,32 +4,39 @@ namespace App\Actions\Cashier;
 
 use App\Actions\HBL\GetHBLByIdWithPackages;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\Concerns\AsAction;
+use App\Services\GatePassChargesService;
 use NumberFormatter;
 
 class DownloadGatePassPDF
 {
     use AsAction;
 
+    protected $gatePassChargesService;
+
+    /**
+     * Constructor to inject the GatePassChargesService.
+     */
+    public function __construct(GatePassChargesService $gatePassChargesService)
+    {
+        $this->gatePassChargesService = $gatePassChargesService;
+    }
+
     public function handle($hbl)
     {
         $hbl = GetHBLByIdWithPackages::run($hbl);
         $container = $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
+        
+        $arrivalDatesCount = Carbon::parse($container['estimated_time_of_arrival'])->diffInDays(Carbon::now()->startOfDay(), false);
+
+        dd($container['estimated_time_of_arrival'],$arrivalDatesCount);
 
         $charges = [
-            'port_charge' => [
-                'rate' => 600.00,
-                'amount' => 00.00,
-            ],
-            'handling_charge' => [
-                'rate' => 00.00,
-                'amount' => 00.00,
-            ],
-            'storage_charge' => [
-                'rate' => 270.00,
-                'amount' => 00.00,
-            ],
+            'port_charge' => $this->gatePassChargesService->portCharge(),
+            'handling_charge' => $this->gatePassChargesService->portCharge(),
+            'storage_charge' => $this->gatePassChargesService->bondCharge(),
             'dmg_charge' => [
                 'rate' => 00.00,
                 'amount' => 4310.00,
@@ -56,6 +63,6 @@ class DownloadGatePassPDF
 
         $filename = 'RECEIPT'.$hbl['reference'].'.pdf';
 
-        return $pdf->download($filename);
+        return $pdf->stream($filename);
     }
 }
