@@ -14,7 +14,7 @@ class DownloadGatePassPDF
 {
     use AsAction;
 
-    public function handle($hbl)
+    public function handle($hbl, $do_charge = 0)
     {
         $hbl = GetHBLByIdWithPackages::run($hbl);
         $container = $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
@@ -33,7 +33,7 @@ class DownloadGatePassPDF
             'storage_charge' => $service->bondCharge($grand_volume, $grand_weight),
             'dmg_charge' => $service->demurrageCharge(28, $grand_volume, $grand_weight),
             'total' => $service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount'],
-            'do_charge' => 00.00,
+            'do_charge' => $do_charge,
             'stamp_charge' => ($service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount']) > 25000 ? 25.00 : 00.00,
             'g_total' => 6810.16,
         ];
@@ -55,6 +55,6 @@ class DownloadGatePassPDF
 
         $filename = 'RECEIPT'.$hbl['reference'].'.pdf';
 
-        return $pdf->stream($filename);
+        return $pdf->download($filename);
     }
 }

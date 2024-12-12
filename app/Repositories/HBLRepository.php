@@ -393,8 +393,8 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         }
     }
 
-    public function downloadGatePass($hbl)
+    public function downloadGatePass($hbl, $do_charge = 0)
     {
-        return DownloadGatePassPDF::run($hbl);
+        return DownloadGatePassPDF::run($hbl, $do_charge);
     }
 }
