@@ -50,7 +50,7 @@ class LoadedContainerManifestExport
 
             $isFirst = true;
             $totalQuantity = $loadedHBLPackages->sum('quantity');
-//            dd($loadedHBLPackages);
+            //            dd($loadedHBLPackages);
 
             foreach ($loadedHBLPackages as $hbl_package) {
                 $data[] = [
@@ -59,10 +59,10 @@ class LoadedContainerManifestExport
                     $isFirst ? $hbl->address : '',
                     $isFirst ? $hbl->nic : '',
                     $isFirst ? $hbl->contact_number : '',
-                    $isFirst ? $hbl->consignee_name  : '',
-                    $isFirst ? $hbl->consignee_address  : '',
-                    $isFirst ? $hbl->consignee_nic  : '',
-                    $isFirst ? $hbl->consignee_contact  : '',
+                    $isFirst ? $hbl->consignee_name : '',
+                    $isFirst ? $hbl->consignee_address : '',
+                    $isFirst ? $hbl->consignee_nic : '',
+                    $isFirst ? $hbl->consignee_contact : '',
                     $hbl_package->package_type,
                     $totalQuantity,
                     $hbl_package->quantity,
