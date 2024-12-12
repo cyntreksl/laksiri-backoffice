@@ -14,8 +14,7 @@ use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\Scopes\BranchScope;
-use Maatwebsite\Excel\Facades\Excel;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepositoryInterface
 {
@@ -91,12 +90,20 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         ]);
     }
 
-    public function downloadManifestFile($container): BinaryFileResponse
+    public function downloadManifestFile($container)
     {
-        // generate file name
-        $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.xlsx';
 
-        return Excel::download(new LoadedContainerManifestExport($container), $filename);
+        $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.pdf';
+
+        $export = new LoadedContainerManifestExport($container);
+        $data = $export->prepareData();
+        //    dd($data[0][7]);
+
+        $pdf = PDF::loadView('exports.shipments', ['data' => $data]);
+        $pdf->setPaper('a3', 'portrait');
+
+        // Return PDF file for download
+        return $pdf->stream($filename);
     }
 
     public function updateVerificationStatus(array $data)
