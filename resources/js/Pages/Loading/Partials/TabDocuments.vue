@@ -28,6 +28,10 @@ const csrfToken = usePage().props.csrf;
 
 const containerDocumentsRecords = ref([]);
 
+const blVerification = ref('Not Verified');
+const manifestVerification= ref('Not Verified');
+const freightChargeVerification= ref('Not Verified');
+
 const fetchContainerDocuments = async () => {
     try {
         const response = await fetch(`containers/get-container-documents/${props.containerId}`, {
@@ -43,6 +47,9 @@ const fetchContainerDocuments = async () => {
         } else {
             containerDocumentsRecords.value = await response.json();
         }
+        containerDocumentsRecords.value.find(doc => doc.document_name === 'BL From Shipping Line')?.is_verified === 1 ? blVerification.value='Verified': blVerification.value='Not Verified'
+        containerDocumentsRecords.value.find(doc => doc.document_name === 'Manifest')?.is_verified === 1 ? manifestVerification.value='Verified': manifestVerification.value='Not Verified'
+        containerDocumentsRecords.value.find(doc => doc.document_name === 'Receipt for Freight Charges')?.is_verified === 1 ? freightChargeVerification.value='Verified': freightChargeVerification.value='Not Verified'
     } catch (error) {
         console.error(error.message);
     }
@@ -138,9 +145,26 @@ const handleDeleteDoc = () => {
         },
     });
 };
-const verifyContainerDocuments = async (event,docId) => {
+const verifyContainerDocuments = async (event,docId, docName) => {
     const isChecked = event.target.checked; // Checkbox value
-    // console.log('Checkbox value:', isChecked);
+    if(isChecked){
+        if(docName === 'BL From Shipping Line'){
+            blVerification.value = 'Verified'
+        } else if(docName === 'Manifest'){
+            manifestVerification.value = 'Verified'
+        } else {
+            freightChargeVerification.value = 'Verified';
+        }
+    }else {
+        if(docName === 'BL From Shipping Line'){
+            blVerification.value = 'Not Verified'
+        } else if(docName === 'Manifest'){
+            manifestVerification.value = 'Not Verified'
+        } else {
+            freightChargeVerification.value = 'Not Verified';
+        }
+    }
+
     try {
         const response = await fetch(`loaded-containers/verify`, {
             method: "POST",
@@ -211,12 +235,13 @@ const verifyContainerDocuments = async (event,docId) => {
                                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                            type="checkbox"
                                            :checked="containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').is_verified === 1"
-                                           @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').id)"
+                                           @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line').id, 'BL From Shipping Line')"
 
                                     />
                                 </label>
-                                <span v-if="containerDocumentsRecords.find(doc => doc.document_name === 'BL From Shipping Line')?.is_verified === 1" class="ml-6 text-green-600">Verified</span>
-                                <span v-else class="ml-6 text-red-600">Not Verified</span>
+                                <span :class="{'text-green-600': blVerification === 'Verified', 'text-red-600': blVerification !== 'Verified'}" class="ml-6">
+                                  {{ blVerification === 'Verified' ? blVerification : 'Not Verified' }}
+                                </span>
 
                             </td>
 
@@ -314,12 +339,14 @@ const verifyContainerDocuments = async (event,docId) => {
                                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                            type="checkbox"
                                            :checked="containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').is_verified === 1 "
-                                           @change="verifyContainerDocuments($event,containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').id)"
+                                           @change="verifyContainerDocuments($event,containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').id, 'Manifest')"
 
                                     />
                                 </label>
-                                <span v-if="containerDocumentsRecords.find(doc => doc.document_name === 'Manifest')?.is_verified === 1" class="ml-6 text-green-600">Verified</span>
-                                <span v-else class="ml-6 text-red-600">Not Verified</span>
+                                <span :class="{'text-green-600': manifestVerification === 'Verified', 'text-red-600': manifestVerification !== 'Verified'}" class="ml-6">
+                                  {{ manifestVerification === 'Verified' ? manifestVerification : 'Not Verified' }}
+                                </span>
+
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 <form v-if="$page.props.user.permissions.includes('container.upload documents')"
@@ -415,11 +442,13 @@ const verifyContainerDocuments = async (event,docId) => {
                                         class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                         type="checkbox"
                                         :checked="containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').is_verified === 1 "
-                                       @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id)"
+                                       @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id, 'Receipt for Freight Charges')"
                                     />
                                 </label>
-                                <span v-if="containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges')?.is_verified === 1" class="ml-6 text-green-600">Verified</span>
-                                <span v-else class="ml-6 text-red-600">Not Verified</span>
+                                <span :class="{'text-green-600': freightChargeVerification === 'Verified', 'text-red-600': freightChargeVerification !== 'Verified'}" class="ml-6">
+                                  {{ freightChargeVerification === 'Verified' ? freightChargeVerification : 'Not Verified' }}
+                                </span>
+
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 <form v-if="$page.props.user.permissions.includes('container.upload documents')"
