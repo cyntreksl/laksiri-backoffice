@@ -19,7 +19,7 @@ class DownloadGatePassPDF
         $hbl = GetHBLByIdWithPackages::run($hbl);
         $container = $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
 
-        $arrivalDatesCount = Carbon::parse($container['estimated_time_of_arrival'])->diffInDays(Carbon::now()->startOfDay(), false);
+        $arrivalDatesCount = $container ? Carbon::parse($container['estimated_time_of_arrival'])->diffInDays(Carbon::now()->startOfDay(), false) : 0;
 
         $service = new GatePassChargesService($hbl['cargo_type']);
         //        $service = new GatePassChargesService('Air Cargo');
@@ -31,7 +31,7 @@ class DownloadGatePassPDF
             'port_charge' => $service->portCharge($grand_volume),
             'handling_charge' => $service->handlingCharge($hbl->packages()->count()),
             'storage_charge' => $service->bondCharge($grand_volume, $grand_weight),
-            'dmg_charge' => $service->demurrageCharge(28, $grand_volume, $grand_weight),
+            'dmg_charge' => $service->demurrageCharge($arrivalDatesCount, $grand_volume, $grand_weight),
             'total' => $service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount'],
             'do_charge' => $hbl->do_charge,
             'stamp_charge' => ($service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount']) > 25000 ? 25.00 : 00.00,
