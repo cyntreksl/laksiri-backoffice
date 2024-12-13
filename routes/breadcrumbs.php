@@ -334,4 +334,12 @@ Breadcrumbs::for('setting.package-types.edit', function (BreadcrumbTrail $trail,
     $trail->push('Edit Package Type', route('setting.package-types.edit', $packageType));
 });
 
+// Shipper & Consignee > Create
+Breadcrumbs::for('shipper-consignee.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push ('Shipper-Consignee', route('shipper-consignee.index'));
+    $trail->push ('Create Shipper-Consignee', route('shipper-consignee.create'));
+});
+
+
 require_once __DIR__.'/call-center-breadcrumbs.php';
