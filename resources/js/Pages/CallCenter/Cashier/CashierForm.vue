@@ -118,10 +118,8 @@ getHBLPayments();
 const form = useForm({
     paid_amount: 0,
     customer_queue: props.customerQueue,
-    note: ''
-});
-const pdfForm = useForm({
-    do_amount: 0,
+    note: '',
+    do_charge: 0,
 });
 
 const handleUpdatePayment = () => {
@@ -134,9 +132,7 @@ const handleUpdatePayment = () => {
                 form.reset();
                 push.success('Payment Update Successfully!');
                 // Trigger the download of the PDF
-                console.log(pdfForm.data());
-                pdfForm.get(route('hbls.getCashierReceipt', { hbl: props.hblId }));
-                // window.location.href = route("hbls.getCashierReceipt", { hbl: props.hblId });
+                window.location.href = route("hbls.getCashierReceipt", { hbl: props.hblId });
             },
             onError: () => {
                 push.error('Something went to wrong!');
@@ -267,14 +263,14 @@ const handleUpdatePayment = () => {
                                 <div class="mt-4">
                                     <InputLabel value="D/O Chgs" />
                                     <TextInput
-                                        v-model="pdfForm.do_amount"
+                                        v-model="form.do_charge"
                                         class="w-full"
                                         min="0"
                                         placeholder="Enter Amount"
                                         required
                                         type="number"
                                     />
-                                    <InputError :message="pdfForm.errors.do_amount"/>
+                                    <InputError :message="form.errors.do_charge"/>
                                 </div>
 
                                 <div class="mt-4">

@@ -347,8 +347,8 @@ class HBLController extends Controller
         return $this->HBLRepository->getHBLRules($request->all());
     }
 
-    public function getCashierReceipt($hbl, Request $request)
+    public function getCashierReceipt($hbl)
     {
-        return $this->HBLRepository->downloadGatePass($hbl, floatval($request->input('do_amount')));
+        return $this->HBLRepository->downloadGatePass($hbl);
     }
 }
