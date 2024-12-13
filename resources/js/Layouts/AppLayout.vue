@@ -325,35 +325,6 @@
                                     <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
                                 </svg>
                             </a>
-                            <!-- shipper and consignee -->
-                            <a
-                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
-                                :class="[activeMenu === 'shipper-consignee' ? 'bg-primary/10 text-primary' : '']"
-                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.right="'Shipper & Consignee Officer'"
-                                @click="
-        setMenu('shipper-consignee');
-        openSideBar();
-    "
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-user-off"
-                                >
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                    <path d="M8.18 8.189a4.01 4.01 0 0 0 2.616 2.627m3.507 -.545a4 4 0 1 0 -5.59 -5.552" />
-                                    <path d="M6 21v-2a4 4 0 0 1 4 -4h4c.412 0 .81 .062 1.183 .178m2.633 2.618c.12 .38 .184 .785 .184 1.204v2" />
-                                    <path d="M3 3l18 18" />
-                                </svg>
-                            </a>
                         </template>
                     </div>
 
@@ -1132,19 +1103,6 @@ export default {
                     );
                     changeSidePanelTitle("Users");
                     break;
-
-                case "shipper-consignee":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Shippers-Consignees",
-                            route: "shipper-consignee.create",
-                        }
-                    );
-                    changeSidePanelTitle("Shippers & Consignees");
-                    break;
-
                 case "setting":
                     childMenuList.splice(
                         0,
@@ -1176,7 +1134,17 @@ export default {
                         {
                             title: "Package Types",
                             route: "setting.package-types.index",
+                        },
+                        {
+                            title: "Shipper Details",
+                            route: "setting.shipper-details.index",
+                        },
+                        {
+                            title: "Consignee Details",
+                            route: "setting.consignee-details.index",
                         }
+
+
                     );
                     changeSidePanelTitle("Setting");
                     break;

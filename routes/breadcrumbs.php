@@ -334,11 +334,19 @@ Breadcrumbs::for('setting.package-types.edit', function (BreadcrumbTrail $trail,
     $trail->push('Edit Package Type', route('setting.package-types.edit', $packageType));
 });
 
-// Shipper & Consignee > Create
+// Shipper  Create
 Breadcrumbs::for('shipper-consignee.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push ('Shipper-Consignee', route('shipper-consignee.index'));
-    $trail->push ('Create Shipper-Consignee', route('shipper-consignee.create'));
+    $trail->push ('Shipper', route('setting.Shipper.index'));
+    $trail->push ('Create Shipper', route('setting.Shipper.create'));
+});
+
+// Shipper  Edit
+Breadcrumbs::for('shipper-consignee.edit', function (BreadcrumbTrail $trail, Shipper $shipper) {
+    $trail->parent('dashboard');
+    $trail->push ('Shipper', route('setting.Shipper.index'));
+    $trail->push ('Edit Shipper', route('setting.Shipper.edit', $shipper));
+
 });
 
 
