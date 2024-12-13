@@ -26,6 +26,24 @@
 <body>
 <table>
     <thead>
+    @php
+        $total_nototal = 0;
+        $total_vtotal = 0;
+        $total_gtotal = 0;
+        $row_nototal = 0;
+        $row_vtotal = 0;
+        $row_gtotal = 0;
+    @endphp
+    @foreach($data as $item)
+        @foreach ($item[9] as $package)
+            @php
+                $total_nototal += $package['quantity'];
+                $total_vtotal += $package['volume'];
+                $total_gtotal += $package['weight'];
+            @endphp
+        @endforeach
+    @endforeach
+
     <tr>
         <th colspan="10" style="text-align:center;">
             <strong><em>UNIVERSAL FREIGHT SERVICES </em></strong>
@@ -50,11 +68,6 @@
             NOTIFY : LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94 11-2574180/ TEL: +94 11-47722800
         </th>
     </tr>
-    @php
-        $total_nototal = 0;
-        $total_vtotal = 0;
-        $total_gtotal = 0;
-    @endphp
     <tr>
         <th colspan="10">
             AWB NO 157 0364971                                       TOTAL WEIGHT:KG {{ number_format($total_gtotal, 2) }}                                        TOTAL VOLUME:   {{ number_format($total_vtotal, 2) }}                                   NO OF PKG:- {{ number_format($total_nototal, 0) }}
@@ -75,11 +88,6 @@
     </thead>
     <tbody>
     @foreach($data as $item)
-        @php
-            $row_nototal = 0;
-            $row_vtotal = 0;
-            $row_gtotal = 0;
-        @endphp
         <tr>
             <td >{{ $loop->iteration }}</td>
             <td > {{ $item[0]}} </td>
@@ -88,11 +96,6 @@
             <td>
                 @foreach ($item[9] as $package)
                     {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
-                    @php
-                        $row_nototal += floatval($package['quantity'] ?? 0);
-                        $row_vtotal += floatval($package['volume'] ?? 0);
-                         $row_gtotal += floatval($package['weight'] ?? 0);
-                    @endphp
                 @endforeach
             </td>
             <td>
@@ -114,11 +117,6 @@
             <td>{{$item[10]}}</td>
 
         </tr>
-        @php
-            $total_nototal += $row_nototal;
-            $total_vtotal += $row_vtotal;
-            $total_gtotal += $row_gtotal;
-        @endphp
     @endforeach
     <tr>
         <td colspan="5"></td>
