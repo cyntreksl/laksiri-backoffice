@@ -117,7 +117,8 @@
                     <tr>
                         <td style="width: 60%;"></td>
                         <td style="width: 20%;"></td>
-                        <td style="width: 20%; font-weight: bold;">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
+                        <td style="width: 20%; font-weight: bold;">{{ number_format($data['charges']['total'],2)}}
+                        </td>
                     </tr>
                     <tr>
                         <td style="width: 60%;"></td>
@@ -132,7 +133,17 @@
                     <tr>
                         <td style="width: 60%;"></td>
                         <td style="width: 20%;"></td>
-                        <td style="width: 20%; font-weight: bold;">{{ number_format($data['charges']['total'],2) }}</td>
+                        <td style="width: 20%; font-weight: bold;">
+                            {{ number_format
+                                (
+                                    (
+                                       $data['charges']['total']+
+                                        $data['charges']['do_charge']+
+                                        $data['charges']['stamp_charge']
+                                    ),2
+                                )
+                            }}
+                        </td>
                     </tr>
                 </table>
 

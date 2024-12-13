@@ -26,6 +26,7 @@ class Branch extends Model
         'cargo_modes',
         'delivery_types',
         'package_types',
+        'do_charge',
         'email',
     ];
 
