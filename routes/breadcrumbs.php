@@ -63,11 +63,18 @@ Breadcrumbs::for('hbls.index', function (BreadcrumbTrail $trail) {
     $trail->push('HBL List', route('hbls.index'));
 });
 
+Breadcrumbs::for('hbls.door-to-door-list', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('HBL');
+    $trail->push('HBL Door to Door List', route('hbls.door-to-door-list'));
+});
+
 Breadcrumbs::for('hbls.draft-list', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('HBL');
     $trail->push('HBL Draft List', route('hbls.draft-list'));
 });
+
 
 Breadcrumbs::for('hbls.get-hbls-by-user', function (BreadcrumbTrail $trail, string $userData) {
     $trail->parent('dashboard');

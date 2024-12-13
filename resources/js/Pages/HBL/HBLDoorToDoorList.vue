@@ -719,8 +719,8 @@ const shipIcon = ref(`
 `);
 </script>
 <template>
-    <AppLayout title="Cash Settlements">
-        <template #header>Cash Settlements</template>
+    <AppLayout title="Door to Door HBL List">
+        <template #header>Door to Door HBL List</template>
 
         <Breadcrumb/>
 
@@ -732,7 +732,7 @@ const shipIcon = ref(`
                             <h2
                                 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                Cash Settlement List
+                              Door to Door HBL List
                             </h2>
 
                             <div class="flex m-3">
