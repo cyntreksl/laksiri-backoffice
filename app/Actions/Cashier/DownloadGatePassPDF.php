@@ -35,7 +35,6 @@ class DownloadGatePassPDF
             'total' => $service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount'],
             'do_charge' => $hbl->do_charge,
             'stamp_charge' => ($service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount']) > 25000 ? 25.00 : 00.00,
-            'g_total' => 6810.16,
         ];
 
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
