@@ -403,13 +403,14 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         if (isset($filters['userData'])) {
             $query = HBL::query()
+                ->where('hbl_type', '=', 'Door to Door')
                 ->where(function ($query) {
                     $query->where('status', '!=', 'draft')
                         ->orWhereNull('status');
                 })->where('hbl_name', $filters['userData'])
                 ->orWhere('contact_number', $filters['userData']);
         } else {
-            $query = HBL::query()->where(function ($query) {
+            $query = HBL::query()->where('hbl_type', '=', 'Door to Door')->where(function ($query) {
                 $query->where('status', '!=', 'draft')
                     ->orWhereNull('status');
             });

@@ -50,7 +50,7 @@ const filters = reactive({
   fromDate: fromDate,
   toDate: toDate,
   cargoMode: ["Air Cargo", "Sea Cargo"],
-  hblType: ["UPB", "Gift", "Door to Door"],
+  hblType: ["Door to Door"],
   isHold: false,
   warehouse: ["COLOMBO", "NINTAVUR", "OTHER"],
   createdBy: "",
@@ -201,16 +201,54 @@ const createColumns = () => [
     sort: false,
     hidden: !data.columnVisibility.cargo_type,
     formatter: (_, row) =>
-        row.cells[10].data == "Sea Cargo"
-            ? h(
-                "span",
-                {className: "flex"},
+      row.cells[11].data == "Sea Cargo"
+          ? h(
+              "span",
+              {className: "flex"},
+              h(
+                  "svg",
+                  {
+                    xmlns: "http://www.w3.org/2000/svg",
+                    viewBox: "0 0 24 24",
+                    class: "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
+                    fill: "none",
+                    height: 24,
+                    width: 24,
+                    stroke: "currentColor",
+                    strokeLinecap: "round",
+                    strokeLinejoin: "round",
+                    strokeWidth: 2,
+                  },
+                  [
+                    h("path", {
+                      stroke: "none",
+                      d: "M0 0h24v24H0z",
+                      fill: "none",
+                    }),
+                    h("path", {
+                      d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
+                    }),
+                    h("path", {
+                      d: "M4 18l-1 -5h18l-2 4",
+                    }),
+                    h("path", {
+                      d: "M5 13v-6h8l4 6",
+                    }),
+                    h("path", {
+                      d: "M7 7v-4h-1",
+                    }),
+                  ]
+              ),
+              row.cells[11].data
+          )
+          : row.cells[11].data == "Air Cargo"
+              ? h("span", {className: "flex space-x-2"}, [
                 h(
                     "svg",
                     {
                       xmlns: "http://www.w3.org/2000/svg",
                       viewBox: "0 0 24 24",
-                      class: "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
+                      class: "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
                       fill: "none",
                       height: 24,
                       width: 24,
@@ -226,51 +264,13 @@ const createColumns = () => [
                         fill: "none",
                       }),
                       h("path", {
-                        d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
-                      }),
-                      h("path", {
-                        d: "M4 18l-1 -5h18l-2 4",
-                      }),
-                      h("path", {
-                        d: "M5 13v-6h8l4 6",
-                      }),
-                      h("path", {
-                        d: "M7 7v-4h-1",
+                        d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
                       }),
                     ]
                 ),
-                row.cells[10].data
-            )
-            : row.cells[10].data == "Air Cargo"
-                ? h("span", {className: "flex space-x-2"}, [
-                  h(
-                      "svg",
-                      {
-                        xmlns: "http://www.w3.org/2000/svg",
-                        viewBox: "0 0 24 24",
-                        class: "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
-                        fill: "none",
-                        height: 24,
-                        width: 24,
-                        stroke: "currentColor",
-                        strokeLinecap: "round",
-                        strokeLinejoin: "round",
-                        strokeWidth: 2,
-                      },
-                      [
-                        h("path", {
-                          stroke: "none",
-                          d: "M0 0h24v24H0z",
-                          fill: "none",
-                        }),
-                        h("path", {
-                          d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
-                        }),
-                      ]
-                  ),
-                  row.cells[10].data,
-                ])
-                : row.cells[10].data,
+                row.cells[11].data,
+              ])
+              : row.cells[11].data,
   },
   {name: "HBL Type", hidden: !data.columnVisibility.hbl_type},
   {name: "Warehouse", hidden: !data.columnVisibility.warehouse},
@@ -1126,18 +1126,6 @@ const shipIcon = ref(`
           <FilterBorder/>
 
           <FilterHeader value="HBL Type"/>
-
-          <label class="inline-flex items-center space-x-2 mt-2">
-            <Switch v-model="filters.hblType" label="UPB" value="UPB"/>
-          </label>
-
-          <label class="inline-flex items-center space-x-2 mt-2">
-            <Switch
-                v-model="filters.hblType"
-                label="Gift"
-                value="Gift"
-            />
-          </label>
 
           <label class="inline-flex items-center space-x-2 mt-2">
             <Switch
