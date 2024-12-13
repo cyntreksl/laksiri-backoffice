@@ -31,7 +31,6 @@ use App\Actions\HBLDocument\UploadDocument;
 use App\Exports\CancelledHBLExport;
 use App\Exports\HBLExport;
 use App\Factory\HBL\FilterFactory;
-use App\Http\Resources\CashSettlementCollection;
 use App\Http\Resources\HBLResource;
 use App\Http\Resources\HBLStatusResource;
 use App\Http\Resources\PickupStatusResource;
@@ -92,6 +91,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
         if (! empty($search)) {
             $query->whereAny([
+                'hbl_number',
                 'reference',
                 'hbl_name',
                 'contact_number',
@@ -418,6 +418,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         if (! empty($search)) {
             $query->whereAny([
                 'reference',
+                'hbl_number',
                 'hbl_name',
                 'contact_number',
                 'consignee_name',

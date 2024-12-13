@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import {Grid, h, html} from "gridjs";
 import {push} from "notivue";
 import moment from "moment";
@@ -20,6 +20,7 @@ import HoldConfirmationModal from "@/Pages/CashSettlement/Partials/HoldConfirmat
 import {router, usePage} from "@inertiajs/vue3";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
+import {forEach} from "vuedraggable/dist/vuedraggable.common.js";
 
 const props = defineProps({
     drivers: {
@@ -105,7 +106,6 @@ const createColumns = () => [
           const isChecked = event.target.checked;
           if (isChecked) {
             const rowData = row.cells.map((cell) => cell.data); // Extract data from cells array
-            console.log(rowData);
             selectedData.value.push(rowData); // Push extracted data into selectedData
           } else {
             // Remove the specific row from selectedData (assuming uniqueness of rows)
@@ -127,7 +127,7 @@ const createColumns = () => [
     name: "HBL",
     hidden: !data.columnVisibility.hbl,
     formatter: (_, row) => {
-      return row.cells[15].data || row.cells[1].data
+      return row.cells[16].data || row.cells[1].data
     },
   },
   {
@@ -480,13 +480,13 @@ const createColumns = () => [
 const baseUrl = ref("/hbl-door-to-door-list");
 
 const constructUrl = () => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
-        }
+  const params = new URLSearchParams();
+  for (const key in filters) {
+    if (filters.hasOwnProperty(key)) {
+      params.append(key, filters[key].toString());
     }
-    return baseUrl.value + "?" + params.toString();
+  }
+  return baseUrl.value + "?" + params.toString();
 };
 
 const initializeGrid = () => {
@@ -495,10 +495,10 @@ const initializeGrid = () => {
     grid = new Grid({
         columns: createColumns(),
         search: {
-            debounceTimeout: 1000,
-            server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`,
-            },
+          debounceTimeout: 1000,
+          server: {
+            url: (prev, keyword) => `${prev}&search=${keyword}`,
+          },
         },
         sort: {
             multiColumn: false,
@@ -577,16 +577,30 @@ const applyFilters = () => {
   grid.forceRender();
 };
 
-const totalRecord = ref(0);
-const totalGrandAmount = ref(0);
-const totalPaidAmount = ref(0);
-
 const createMHBL = async () => {
     // const idList = selectedData.value.map((item) => item[0]);
   console.log(selectedData.value);
 };
 
-const isDataEmpty = computed(() => selectedData.value.length === 0);
+watch(
+    () => selectedData.value.length,
+    (newCount) => {
+      const cargo_mode=selectedData.value[0][11];
+      const hbl_type=selectedData.value[0][12];
+      const checkEqualCargoMode = selectedData.value.every((item, index) => {
+        return item[11] === cargo_mode;
+      });
+      const checkEqualHBLType = selectedData.value.every((item, index) => {
+        return item[12] === hbl_type;
+      });
+
+      if(checkEqualCargoMode && checkEqualHBLType){
+        isCreateMHBL.value = true;
+      } else isCreateMHBL.value = false;
+    }
+);
+
+const isCreateMHBL = ref(false);
 const countOfSelectedData = computed(() => selectedData.value.length);
 const valueOfSelectedData = computed(() => {
     return selectedData.value.reduce((total, item) => {
@@ -1032,11 +1046,11 @@ const shipIcon = ref(`
                         <div>
                             <button
                                 :class="{
-                  'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90':
-                    !isDataEmpty,
-                  'bg-gray-300 cursor-not-allowed': isDataEmpty,
-                }"
-                                :disabled="isDataEmpty"
+                                  'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90':
+                                    isCreateMHBL,
+                                  'bg-gray-300 cursor-not-allowed': !isCreateMHBL,
+                                }"
+                                :disabled="!isCreateMHBL"
                                 class="btn font-medium text-white"
                                 @click="createMHBL"
                             >
