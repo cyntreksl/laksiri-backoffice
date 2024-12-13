@@ -22,6 +22,10 @@ const props = defineProps({
     pickupId: {
         type: Number,
         default: null
+    },
+    doCharge: {
+        type: Number,
+        default: null
     }
 })
 
@@ -119,7 +123,7 @@ const form = useForm({
     paid_amount: 0,
     customer_queue: props.customerQueue,
     note: '',
-    do_charge: 0,
+    do_charge: props.doCharge,
 });
 
 const handleUpdatePayment = () => {
