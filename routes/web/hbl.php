@@ -12,6 +12,11 @@ Route::get('hbls/show/draft-list', [HBLController::class, 'showDraftList'])
 
 Route::get('hbl-draft-list', [HBLController::class, 'getDraftList']);
 
+Route::get('hbls/show/door-to-door', [HBLController::class, 'showDoorToDoorList'])
+    ->name('hbls.door-to-door-list');
+
+Route::get('hbl-door-to-door-list', [HBLController::class, 'getDoorToDoorList']);
+
 Route::put('hbls/toggle-hold/{hbl}', [HBLController::class, 'toggleHold'])
     ->name('hbls.toggle-hold');
 
