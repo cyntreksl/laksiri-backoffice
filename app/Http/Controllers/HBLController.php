@@ -20,6 +20,7 @@ use App\Interfaces\SettingRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
 use App\Models\HBLDocument;
+use App\Repositories\CashSettlementRepository;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -366,7 +367,8 @@ class HBLController extends Controller
         $order = $request->input('order', 'id');
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus']);
 
-        return $this->HBLRepository->getDraftList($limit, $page, $order, $dir, $search);
+        return $this->HBLRepository->getDoorToDoorHBL($limit, $page, $order, $dir, $search, $filters);
     }
 }
