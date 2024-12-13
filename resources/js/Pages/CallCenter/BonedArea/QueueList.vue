@@ -30,6 +30,11 @@ const filteredPackageQueue = computed(() => {
                     <h1 class="text-3xl text-black font-bold">{{ queue?.token }}</h1>
                 </div>
                 <div class="my-2 grow">
+                    <h5 class="text-m font-medium text-slate-700 dark:text-navy-100">
+                        <template v-for="(hbl_package, index) in queue?.hbl_packages" :key="index">
+                            {{ hbl_package.package_type }} PKG {{ hbl_package.quantity }}<span v-if="index < queue?.hbl_packages.length - 1"><br> </span>
+                        </template>
+                    </h5>
                     <h3 class="text-lg font-medium text-slate-700 dark:text-navy-100">
                         {{ queue.package_count }} Packages
                     </h3>

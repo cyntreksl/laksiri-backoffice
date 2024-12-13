@@ -15,10 +15,10 @@ class UploadDocument
             $container_document = ContainerDocument::firstOrNew(
                 [
                     'document_name' => $data['document_name'],
+                    'container_id' => $data['container_id'],
                 ],
                 [
                     'uploaded_by' => auth()->id(),
-                    'container_id' => $data['container_id'],
                 ]
             );
 
