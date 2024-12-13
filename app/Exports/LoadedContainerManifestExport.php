@@ -63,12 +63,8 @@ class LoadedContainerManifestExport
                     $isFirst ? $hbl->consignee_address : '',
                     $isFirst ? $hbl->consignee_nic : '',
                     $isFirst ? $hbl->consignee_contact : '',
-                    $hbl_package->package_type,
-                    $totalQuantity,
-                    $hbl_package->quantity,
-                    $hbl_package->volume,
-                    $hbl_package->weight,
-                    $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
+                    $isFirst ? $hbl->packages : [],
+                    $isFirst && $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
                 ];
 
                 $isFirst = false;

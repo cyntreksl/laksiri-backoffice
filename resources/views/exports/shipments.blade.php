@@ -11,7 +11,7 @@
             font-family: Arial, sans-serif;
         }
         th, td {
-            border: 1px solid black; /* Apply border to both th and td */
+            border: 1px solid black;
             padding: 5px;
             text-align: left;
         }
@@ -40,7 +40,7 @@
     </tr>
     <tr>
         <th colspan="10">
-            DATE:<span id="current-date"></span>                                                                                                                                                                 SHIPMENT NO:2734
+            DATE: <?php echo date('F j, Y'); ?>                                                                                                                                                                SHIPMENT NO:2734
         </th>
     </tr>
     <tr>
@@ -51,18 +51,13 @@
         </th>
     </tr>
     @php
-        $nototal = 0;
-        $vtotal = 0;
-        $gtotal = 0;
-        foreach($data as $item){
-            $nototal += floatval($item[11] ?? 0);
-            $vtotal += floatval($item[12] ?? 0);
-            $gtotal += floatval($item[13] ?? 0);
-        }
+        $total_nototal = 0;
+        $total_vtotal = 0;
+        $total_gtotal = 0;
     @endphp
     <tr>
         <th colspan="10">
-            AWB NO 157 0364971                                       TOTAL WEIGHT:KG   {{ number_format($gtotal, 1) }}                                        TOTAL VOLUME:  {{ number_format($vtotal, 3) }}                                   NO OF PKG:-{{ number_format($nototal, 2) }}
+            AWB NO 157 0364971                                       TOTAL WEIGHT:KG {{ number_format($total_gtotal, 2) }}                                        TOTAL VOLUME:   {{ number_format($total_vtotal, 2) }}                                   NO OF PKG:- {{ number_format($total_nototal, 0) }}
         </th>
     </tr>
     <tr>
@@ -80,24 +75,56 @@
     </thead>
     <tbody>
     @foreach($data as $item)
+        @php
+            $row_nototal = 0;
+            $row_vtotal = 0;
+            $row_gtotal = 0;
+        @endphp
         <tr>
             <td >{{ $loop->iteration }}</td>
             <td > {{ $item[0]}} </td>
             <td>{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
             <td>{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
-            <td>{{ $item[9] }}</td>
-            <td>{{ $item[11] ?? 0}}</td>
-            <td>{{ $item[12] ?? 0}}</td>
-            <td>{{ $item[13] ?? 0}}</td>
+            <td>
+                @foreach ($item[9] as $package)
+                    {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
+                    @php
+                        $row_nototal += floatval($package['quantity'] ?? 0);
+                        $row_vtotal += floatval($package['volume'] ?? 0);
+                         $row_gtotal += floatval($package['weight'] ?? 0);
+                    @endphp
+                @endforeach
+            </td>
+            <td>
+                @foreach ($item[9] as $package)
+                    {{ $package['quantity'] }}<br>
+                @endforeach
+            </td>
+            <td>
+                @foreach ($item[9] as $package)
+                    {{ $package['volume'] }}<br>
+                @endforeach
+            </td>
+            <td>
+                @foreach ($item[9] as $package)
+                    {{ $package['weight'] }}<br>
+                @endforeach
+            </td>
             <td>PERSONAL EFFECT</td>
-            <td>{{$item[14]}}</td>
+            <td>{{$item[10]}}</td>
+
         </tr>
+        @php
+            $total_nototal += $row_nototal;
+            $total_vtotal += $row_vtotal;
+            $total_gtotal += $row_gtotal;
+        @endphp
     @endforeach
     <tr>
         <td colspan="5"></td>
-        <td class="center-text">{{ $nototal }}</td>
-        <td class="center-text">{{ number_format($vtotal, 3) }}</td>
-        <td class="center-text">{{ number_format($gtotal, 1) }}</td>
+        <td class="center-text">{{ number_format($total_nototal, 0) }}</td>
+        <td class="center-text">{{ number_format($total_vtotal, 3) }}</td>
+        <td class="center-text">{{ number_format($total_gtotal, 1) }}</td>
         <td></td>
         <td></td>
     </tr>
@@ -106,12 +133,5 @@
     </tr>
     </tbody>
 </table>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const today = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('current-date').textContent = today.toLocaleDateString('en-US', options);
-    });
-</script>
 </body>
 </html>
