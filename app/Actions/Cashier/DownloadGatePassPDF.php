@@ -3,7 +3,9 @@
 namespace App\Actions\Cashier;
 
 use App\Actions\HBL\GetHBLByIdWithPackages;
+use App\Services\GatePassChargesService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\Concerns\AsAction;
 use NumberFormatter;
@@ -17,26 +19,22 @@ class DownloadGatePassPDF
         $hbl = GetHBLByIdWithPackages::run($hbl);
         $container = $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
 
+        $arrivalDatesCount = $container ? Carbon::parse($container['estimated_time_of_arrival'])->diffInDays(Carbon::now()->startOfDay(), false) : 0;
+
+        $service = new GatePassChargesService($hbl['cargo_type']);
+        //        $service = new GatePassChargesService('Air Cargo');
+
+        $grand_volume = $hbl->packages()->withoutGlobalScopes()->sum('volume');
+        $grand_weight = $hbl->packages()->withoutGlobalScopes()->sum('weight');
+
         $charges = [
-            'port_charge' => [
-                'rate' => 600.00,
-                'amount' => 00.00,
-            ],
-            'handling_charge' => [
-                'rate' => 00.00,
-                'amount' => 00.00,
-            ],
-            'storage_charge' => [
-                'rate' => 270.00,
-                'amount' => 00.00,
-            ],
-            'dmg_charge' => [
-                'rate' => 00.00,
-                'amount' => 4310.00,
-            ],
-            'do_charge' => 2500.00,
-            'stamp_charge' => 00.00,
-            'total' => 6810.16,
+            'port_charge' => $service->portCharge($grand_volume),
+            'handling_charge' => $service->handlingCharge($hbl->packages()->count()),
+            'storage_charge' => $service->bondCharge($grand_volume, $grand_weight),
+            'dmg_charge' => $service->demurrageCharge($arrivalDatesCount, $grand_volume, $grand_weight),
+            'total' => $service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount'],
+            'do_charge' => $hbl->do_charge,
+            'stamp_charge' => ($service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount']) > 25000 ? 25.00 : 00.00,
         ];
 
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);

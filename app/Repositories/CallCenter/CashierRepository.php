@@ -4,6 +4,7 @@ namespace App\Repositories\CallCenter;
 
 use App\Actions\Cashier\DownloadGatePassPDF;
 use App\Actions\Cashier\UpdateCashierHBLPayments;
+use App\Actions\HBL\CashSettlement\UpdateHBLDOCharge;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\HBLPayment\GetPaymentByReference;
 use App\Http\Resources\CallCenter\PaidCollection;
@@ -28,6 +29,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             $total_paid_amount = $old_paid_amount + $new_paid_amount;
 
             UpdateHBLPayments::run($total_paid_amount, $hbl);
+            UpdateHBLDOCharge::run($hbl, $data['do_charge']);
 
             UpdateCashierHBLPayments::run($data, $hbl, $new_paid_amount);
 
@@ -111,8 +113,6 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
                     );
                 }
             }
-
-            DownloadGatePassPDF::run($hbl->id);
 
             DB::commit();
         } catch (\Exception $e) {
