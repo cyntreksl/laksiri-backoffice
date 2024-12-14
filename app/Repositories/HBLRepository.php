@@ -28,6 +28,7 @@ use App\Actions\HBL\UpdateHBLPackages;
 use App\Actions\HBLDocument\DeleteDocument;
 use App\Actions\HBLDocument\DownloadDocument;
 use App\Actions\HBLDocument\UploadDocument;
+use App\Enum\HBLType;
 use App\Exports\CancelledHBLExport;
 use App\Exports\HBLExport;
 use App\Factory\HBL\FilterFactory;
@@ -403,14 +404,14 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         if (isset($filters['userData'])) {
             $query = HBL::query()
-                ->where('hbl_type', '=', 'Door to Door')
+                ->where('hbl_type', '=', HBLType::DOOR_TO_DOOR->value)
                 ->where(function ($query) {
                     $query->where('status', '!=', 'draft')
                         ->orWhereNull('status');
                 })->where('hbl_name', $filters['userData'])
                 ->orWhere('contact_number', $filters['userData']);
         } else {
-            $query = HBL::query()->where('hbl_type', '=', 'Door to Door')->where(function ($query) {
+            $query = HBL::query()->where('hbl_type', '=', HBLType::DOOR_TO_DOOR->value)->where(function ($query) {
                 $query->where('status', '!=', 'draft')
                     ->orWhereNull('status');
             });
