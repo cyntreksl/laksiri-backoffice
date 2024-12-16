@@ -10,6 +10,7 @@ use App\Interfaces\MHBLRepositoryInterface;
 use App\Interfaces\OfficerRepositoryInterface;
 use App\Models\HBL;
 use App\Models\HBLPackage;
+use App\Models\Mhbl;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -91,5 +92,12 @@ class MHBLController extends Controller
     public function store(Request $request)
     {
         $this->mhblRepository->storeHBL($request->all());
+    }
+
+    public function destroy(MHBL $mhbl)
+    {
+        $this->authorize('hbls.delete');
+
+        $this->mhblRepository->deleteMHBL($mhbl);
     }
 }

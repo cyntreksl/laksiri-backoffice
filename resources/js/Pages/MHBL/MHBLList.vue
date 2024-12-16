@@ -50,7 +50,7 @@ const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo"],
-    hblType: ["UPB", "Gift", "Door to Door"],
+    hblType: ["Gift", "Door to Door"],
     isHold: false,
     warehouse: ["COLOMBO", "NINTAVUR", "OTHER"],
     createdBy: "",

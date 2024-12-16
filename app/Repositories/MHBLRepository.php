@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\Branch\GetBranchByName;
 use App\Actions\MHBL\CreateMHBL;
 use App\Actions\MHBL\CreateMHBLsHBL;
+use App\Actions\MHBL\DeleteMHBL;
 use App\Factory\MHBL\FilterFactory;
 use App\Http\Resources\MHBLResource;
 use App\Interfaces\GridJsInterface;
@@ -37,8 +38,6 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
     {
         $query = MHBL::with('shipper')->with('consignee');
 
-        //        dd($filters);
-
         if (! empty($search)) {
             $query->whereAny([
                 'reference',
@@ -65,5 +64,10 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function deleteMHBL(MHBL $mhbl)
+    {
+        return DeleteMHBL::run($mhbl);
     }
 }
