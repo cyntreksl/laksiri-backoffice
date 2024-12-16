@@ -20,7 +20,7 @@ class ShipperConsigneeController extends Controller
     }
     public function index()
     {
-        return Inertia::render('Setting/ShippersConsignees/CreateShippersConsignees');
+        return Inertia::render('Setting/ShippersConsignees/OfficerList');
     }
     public function store(Request $request)
     {
