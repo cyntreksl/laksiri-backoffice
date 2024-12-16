@@ -97,24 +97,18 @@
         </th>
     </tr>
     <tr>
-        <th colspan="3">
-            AWB NO {{$container?->awb_number}}
-            <hr style="border: 0.3px solid black; margin: 8px 0;">
-            NO OF PKG: {{ number_format($total_nototal, 0) }}
-        </th>
+    <tr>
+        <th colspan="3">AWB NO            {{$container?->awb_number}}</th>
+        <th rowspan="2" colspan="1">  <p> TOTAL VOLUME: </p></th>
+        <th rowspan="2" colspan="3">                   {{ number_format($total_vtotal, 2) }}</th>
+        <th rowspan="2" colspan="1">TOTAL WEIGHT</th>
+        <th rowspan="2" colspan="2">                {{ number_format($total_gtotal, 2) }}</th>
 
-        <th colspan="1">
-            <p> TOTAL VOLUME: </p>
-        </th>
-        <th colspan="3">
-                               {{ number_format($total_vtotal, 2) }}
-        </th>
-        <th colspan="1">
-            TOTAL WEIGHT
-        </th>
-        <th colspan="2">
-                            {{ number_format($total_gtotal, 2) }}
-        </th>
+    </tr>
+    <tr>
+        <th colspan="3"> NO OF PKG:            {{ number_format($total_nototal, 0) }}</th>
+    </tr>
+
     </tr>
 
     <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: gray ;">
