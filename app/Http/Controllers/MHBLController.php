@@ -25,6 +25,11 @@ class MHBLController extends Controller
     ) {
     }
 
+    public function index()
+    {
+        return Inertia::render('MHBL/MHBLList');
+    }
+
     public function create(Request $request)
     {
         $this->authorize('hbls.create');

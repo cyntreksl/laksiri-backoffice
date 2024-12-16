@@ -987,6 +987,10 @@ export default {
                             route: "hbls.index",
                         },
                         {
+                            title: "All MHBL",
+                            route: "mhbls.index",
+                        },
+                        {
                             title: "Door to Door HBL",
                             route: "hbls.door-to-door-list",
                         },
