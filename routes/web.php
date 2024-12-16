@@ -33,6 +33,7 @@ Route::middleware([
     require_once __DIR__.'/web/branch.php';
     require_once __DIR__.'/web/delivery.php';
     require_once __DIR__.'/web/hbl.php';
+    require_once __DIR__.'/web/mhbl.php';
     require_once __DIR__.'/web/loading.php';
     require_once __DIR__.'/web/pickup.php';
     require_once __DIR__.'/web/report.php';
