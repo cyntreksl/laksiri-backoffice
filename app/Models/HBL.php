@@ -79,6 +79,7 @@ class HBL extends Model
         'additional_charge',
         'paid_amount',
         'grand_total',
+        'do_charge',
         'status',
         'created_by',
         'branch_id',

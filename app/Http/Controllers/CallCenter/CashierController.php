@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\CallCenter;
 
+use App\Actions\Branch\GetBranchById;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CallCenter\CashierRepositoryInterface;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
@@ -42,10 +43,14 @@ class CashierController extends Controller
                 null,
             );
         }
+        $hbl = HBL::withoutGlobalScopes()->where('reference', $customerQueue->token->reference)->first();
+
+        $branch = GetBranchById::run($hbl->branch_id);
 
         return Inertia::render('CallCenter/Cashier/CashierForm', [
             'customerQueue' => $customerQueue,
-            'hblId' => HBL::withoutGlobalScopes()->where('reference', $customerQueue->token->reference)->first()->id,
+            'hblId' => $hbl->id,
+            'doCharge' => $branch->do_charge,
         ]);
     }
 

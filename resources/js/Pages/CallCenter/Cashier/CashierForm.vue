@@ -22,6 +22,10 @@ const props = defineProps({
     pickupId: {
         type: Number,
         default: null
+    },
+    doCharge: {
+        type: Number,
+        default: null
     }
 })
 
@@ -118,7 +122,8 @@ getHBLPayments();
 const form = useForm({
     paid_amount: 0,
     customer_queue: props.customerQueue,
-    note: ''
+    note: '',
+    do_charge: props.doCharge,
 });
 
 const handleUpdatePayment = () => {
@@ -258,6 +263,18 @@ const handleUpdatePayment = () => {
                                         type="number"
                                     />
                                     <InputError :message="form.errors.paid_amount"/>
+                                </div>
+                                <div class="mt-4">
+                                    <InputLabel value="D/O Chgs" />
+                                    <TextInput
+                                        v-model="form.do_charge"
+                                        class="w-full"
+                                        min="0"
+                                        placeholder="Enter Amount"
+                                        required
+                                        type="number"
+                                    />
+                                    <InputError :message="form.errors.do_charge"/>
                                 </div>
 
                                 <div class="mt-4">
