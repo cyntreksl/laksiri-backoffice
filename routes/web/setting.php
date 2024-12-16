@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\DriverAreasController;
 use App\Http\Controllers\ExceptionNameController;
+use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\PackagePriceController;
 use App\Http\Controllers\PackageTypeController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ShipperConsigneeController;
 use App\Http\Controllers\WarehouseZoneController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Support\Facades\Route;
@@ -57,4 +59,9 @@ Route::name('setting.')->group(function () {
     // Invoice Settings
     Route::post('invoice/settings', [SettingController::class, 'updateInvoiceSettings'])
         ->name('invoice.update');
+
+    // Shipper and Consignee Settings
+    Route::get ('shipper-consignees',[OfficerController::class,'index'])
+        ->name('shipper-consignees.index');
+
 });

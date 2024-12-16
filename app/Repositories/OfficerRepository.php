@@ -2,8 +2,10 @@
 
 namespace App\Repositories;
 
+use App\Actions\Officer\GetOfficers;
 use App\Actions\Officer\GetOfficersByType;
 use App\Interfaces\OfficerRepositoryInterface;
+use App\Models\Officer;
 
 class OfficerRepository implements OfficerRepositoryInterface
 {
@@ -17,4 +19,10 @@ class OfficerRepository implements OfficerRepositoryInterface
     {
         return GetOfficersByType::run('consignee');
     }
+    public function getAllofficers()
+    {
+
+        return GetOfficers::run();
+    }
+
 }
