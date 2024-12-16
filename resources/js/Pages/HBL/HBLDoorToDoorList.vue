@@ -17,7 +17,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import HoldConfirmationModal from "@/Pages/CashSettlement/Partials/HoldConfirmationModal.vue";
-import {router, usePage} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import {forEach} from "vuedraggable/dist/vuedraggable.common.js";
@@ -127,7 +127,7 @@ const createColumns = () => [
     name: "HBL",
     hidden: !data.columnVisibility.hbl,
     formatter: (_, row) => {
-      return row.cells[16].data || row.cells[1].data
+      return row.cells[16].data || row.cells[1].data;
     },
   },
   {
@@ -527,9 +527,27 @@ const applyFilters = () => {
   grid.forceRender();
 };
 
+const mhblFrom = useForm({
+  hbls: [],
+  cargo_type: '',
+  hbl_type: '',
+  warehouse: '',
+});
+
 const createMHBL = async () => {
-    // const idList = selectedData.value.map((item) => item[0]);
   console.log(selectedData.value);
+  const idList = selectedData.value.map((item) => item[0]);
+  mhblFrom.hbls = idList;
+  mhblFrom.get(route("mhbls.create"), {
+    onSuccess: () => {
+      form.reset();
+    },
+    onError: () => {
+      push.error('Something went to wrong!');
+    },
+    preserveScroll: true,
+    preserveState: true,
+  });
 };
 
 watch(
@@ -537,16 +555,24 @@ watch(
     (newCount) => {
       const cargo_mode=selectedData.value[0][11];
       const hbl_type=selectedData.value[0][12];
+      const warehouse = selectedData.value[0][13];
       const checkEqualCargoMode = selectedData.value.every((item, index) => {
         return item[11] === cargo_mode;
       });
       const checkEqualHBLType = selectedData.value.every((item, index) => {
         return item[12] === hbl_type;
       });
+      const checkEqualWarehouse = selectedData.value.every((item, index) => {
+        return item[13] === warehouse;
+      });
 
-      if(checkEqualCargoMode && checkEqualHBLType){
+      if(checkEqualCargoMode && checkEqualHBLType && warehouse){
         isCreateMHBL.value = true;
       } else isCreateMHBL.value = false;
+
+      mhblFrom.cargo_type = cargo_mode;
+      mhblFrom.hbl_type = hbl_type;
+      mhblFrom.warehouse = warehouse;
     }
 );
 
