@@ -2,10 +2,8 @@
 
 namespace App\Repositories;
 
-
 use App\Interfaces\ShipperConsigneeRepositoryInterface;
 use App\Models\ShippersConsignees;
-
 
 class ShipperConsigneeRepository implements ShipperConsigneeRepositoryInterface
 {
@@ -18,6 +16,4 @@ class ShipperConsigneeRepository implements ShipperConsigneeRepositoryInterface
     {
         return ShippersConsignees::create($data);
     }
-
-
 }

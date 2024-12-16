@@ -10,7 +10,8 @@ class ShippersConsignees extends Model
 {
     use HasFactory;
     use HasFile;
+
     protected $fillable = [
-        'type', 'name', 'email', 'mobile_number', 'pp_or_nic_no', 'residency_no', 'address'
+        'type', 'name', 'email', 'mobile_number', 'pp_or_nic_no', 'residency_no', 'address',
     ];
 }

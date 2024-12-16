@@ -9,9 +9,9 @@ use Lorisleiva\Actions\Concerns\AsAction;
 class GetOfficers
 {
     use AsAction;
+
     public function handle(): Collection|array
     {
         return Officer::withoutGlobalScopes()->get();
     }
-
 }

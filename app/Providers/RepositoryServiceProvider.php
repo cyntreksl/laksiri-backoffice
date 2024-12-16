@@ -37,7 +37,6 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Interfaces\WarehousezoneRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
-use App\Models\ShippersConsignees;
 use App\Repositories\AnyFileUploadRepository;
 use App\Repositories\BondedWarehouseRepository;
 use App\Repositories\BranchRepository;

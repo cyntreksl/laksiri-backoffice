@@ -340,8 +340,6 @@ Breadcrumbs::for('setting.package-types.edit', function (BreadcrumbTrail $trail,
     $trail->push('Edit Package Type', route('setting.package-types.edit', $packageType));
 });
 
-
-
 Breadcrumbs::for('setting.shipper-consignees.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');

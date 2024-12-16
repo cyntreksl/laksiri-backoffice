@@ -7,7 +7,6 @@ use App\Http\Controllers\PackagePriceController;
 use App\Http\Controllers\PackageTypeController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\SettingController;
-use App\Http\Controllers\ShipperConsigneeController;
 use App\Http\Controllers\WarehouseZoneController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Support\Facades\Route;
@@ -61,7 +60,7 @@ Route::name('setting.')->group(function () {
         ->name('invoice.update');
 
     // Shipper and Consignee Settings
-    Route::get ('shipper-consignees',[OfficerController::class,'index'])
+    Route::get('shipper-consignees', [OfficerController::class, 'index'])
         ->name('shipper-consignees.index');
 
 });
