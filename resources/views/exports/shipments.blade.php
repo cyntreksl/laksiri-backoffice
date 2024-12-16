@@ -137,28 +137,28 @@
             <td style="border-right:none ;vertical-align: top" > {{ $item[0]}} </td>
             <td  style="border-left:none">{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
             <td>{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
-            <td>
+            <td style="vertical-align: top" >
                 @foreach ($item[9] as $package)
                     {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
                 @endforeach
             </td>
-            <td>
+            <td style="vertical-align: top">
                 @foreach ($item[9] as $package)
                           {{ $package['quantity'] }}<br>
                 @endforeach
             </td>
-            <td>
+            <td style="vertical-align: top" >
                 @foreach ($item[9] as $package)
                           {{ $package['volume'] }}<br>
                 @endforeach
             </td>
-            <td>
+            <td style="vertical-align: top" >
                 @foreach ($item[9] as $package)
                          {{ $package['weight'] }}<br>
                 @endforeach
             </td>
             <td>  PERSONAL EFFECT</td>
-            <td>     {{$item[10]}}</td>
+            <td> <b>     {{$item[10]}}</b> </td>
 
         </tr>
     @endforeach
