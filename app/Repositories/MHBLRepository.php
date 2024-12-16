@@ -5,6 +5,9 @@ namespace App\Repositories;
 use App\Actions\Branch\GetBranchByName;
 use App\Actions\MHBL\CreateMHBL;
 use App\Actions\MHBL\CreateMHBLsHBL;
+use App\Factory\MHBL\FilterFactory;
+use App\Http\Resources\HBLResource;
+use App\Http\Resources\MHBLResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\MHBLRepositoryInterface;
 use App\Models\Mhbl;
@@ -33,19 +36,7 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        if (isset($filters['userData'])) {
-            $query = MHBL::query()
-                ->where(function ($query) {
-                    $query->where('status', '!=', 'draft')
-                        ->orWhereNull('status');
-                })->where('hbl_name', $filters['userData'])
-                ->orWhere('contact_number', $filters['userData']);
-        } else {
-            $query = Mhbl::query()->where(function ($query) {
-                $query->where('status', '!=', 'draft')
-                    ->orWhereNull('status');
-            });
-        }
+        $query = MHBL::with('shipper')->with('consignee');
 
         if (! empty($search)) {
             $query->whereAny([
@@ -56,16 +47,17 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
         //apply filters
         FilterFactory::apply($query, $filters);
 
+
         $countQuery = $query;
         $totalRecords = $countQuery->count();
 
-        $hbls = $query->orderBy($order, $direction)
+        $mhbls = $query->orderBy($order, $direction)
             ->skip($offset)
             ->take($limit)
             ->get();
 
         return response()->json([
-            'data' => HBLResource::collection($hbls),
+            'data' => MHBLResource::collection($mhbls),
             'meta' => [
                 'total' => $totalRecords,
                 'page' => $offset,

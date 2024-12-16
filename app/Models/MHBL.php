@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -37,5 +38,17 @@ class Mhbl extends Model
     public function hbls(): HasMany
     {
         return $this->hasMany(MHBLsHBL::class, 'mhbl_id', 'id');
+    }
+
+    public function shipper(): HasOne
+    {
+        return $this->hasOne(Officer::class, 'id', 'shipper_id')
+            ->where('type', 'shipper');
+    }
+
+    public function consignee(): HasOne
+    {
+        return $this->hasOne(Officer::class, 'id', 'consignee_id')
+            ->where('type', 'consignee');
     }
 }

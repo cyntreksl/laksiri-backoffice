@@ -15,7 +15,7 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
-import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
+import DeleteMHBLConfirmationModal from "@/Pages/MHBL/Partials/DeleteMHBLConfirmationModal.vue";
 import {push} from "notivue";
 import HoldConfirmationModal from "@/Pages/HBL/Partials/HoldConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
@@ -60,27 +60,27 @@ const filters = reactive({
 const data = reactive({
     columnVisibility: {
         id: false,
-        reference: false,
-        hbl: true,
-        hbl_name: true,
-        consignee_name: true,
-        consignee_address: true,
-        consignee_contact: true,
-        email: false,
-        address: false,
-        contact_number: true,
+        reference: true,
         cargo_type: true,
         hbl_type: true,
-        warehouse: false,
-        status: false,
-        is_hold: false,
-        hbl_number: false,
-        view: true,
+        warehouse: true,
+        shipper_name: true,
+        shipper_nic: true,
+        shipper_residence_no: false,
+        shipper_address: false,
+        shipper_contact: false,
+        shipper_email: true,
+        consignee_name: true,
+        consignee_nic: true,
+        consignee_residence_no: false,
+        consignee_address: false,
+        consignee_contact: false,
+        consignee_email: true,
         actions: true,
     },
 });
 
-const baseUrl = ref("/hbl-list");
+const baseUrl = ref("/mhbl-list");
 
 const toggleColumnVisibility = (columnName) => {
     data.columnVisibility[columnName] = !data.columnVisibility[columnName];
@@ -121,14 +121,16 @@ const initializeGrid = () => {
         },
         server: {
             url: constructUrl(),
-            then: (data) =>
-                data.data.map((item) => {
-                    const row = [];
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                }),
+            then: (data) => {
+              console.log(data);
+              return data.data.map((item) => {
+                const row = [];
+                visibleColumns.forEach((column) => {
+                  row.push(item[column]);
+                });
+                return row;
+              })
+            },
             total: (response) => {
                 if (response && response.meta) {
                     return response.meta.total;
@@ -143,360 +145,81 @@ const initializeGrid = () => {
 };
 
 const createColumns = () => [
-    {name: "ID", hidden: !data.columnVisibility.id},
-    {name: "Reference", hidden: !data.columnVisibility.reference},
-    {
-        name: "HBL",
-        hidden: !data.columnVisibility.hbl,
-        formatter: (_, row) => {
-            return row.cells[15].data || row.cells[1].data
-        },
-    },
-    {
-        name: "HBL Name",
-        hidden: !data.columnVisibility.hbl_name,
-        formatter: (cell) => {
-            if (!cell) return "";
-            let value = cell.toString();
+  {name: "ID", hidden: !data.columnVisibility.id},
+  {name: "Reference", hidden: !data.columnVisibility.reference},
+  {name: "Cargo Type", hidden: !data.columnVisibility.cargo_type},
+  {name: "HBL Type", hidden: !data.columnVisibility.hbl_type},
+  {name: "Warehouse", hidden: !data.columnVisibility.warehouse},
+  {name: "Shipper Name", hidden: !data.columnVisibility.shipper_name},
+  {name: "Shipper NIC", hidden: !data.columnVisibility.shipper_nic},
+  {name: "Shipper Residence", hidden: !data.columnVisibility.shipper_residence_no},
+  {name: "Shipper Address", hidden: !data.columnVisibility.shipper_address},
+  {name: "Shipper Contact", hidden: !data.columnVisibility.shipper_contact},
+  {name: "Shipper Email", hidden: !data.columnVisibility.shipper_email},
+  {name: "Consignee Name", hidden: !data.columnVisibility.consignee_name},
+  {name: "Consignee NIC", hidden: !data.columnVisibility.consignee_nic},
+  {name: "Consignee Residence", hidden: !data.columnVisibility.consignee_residence_no},
+  {name: "Consignee Address", hidden: !data.columnVisibility.consignee_address},
+  {name: "Consignee Contact", hidden: !data.columnVisibility.consignee_contact},
+  {name: "Consignee Email", hidden: !data.columnVisibility.consignee_email},
+  {
+    name: "",
+    sort: false,
+    hidden: !data.columnVisibility.actions,
+    formatter: (_, row) => {
+      return h("div", { className: "flex space-x-2 relative group" }, [
+        // Popover action button (Hamburger or similar)
+        h(
+            "a",
+            {
+              className:
+                  "btn size-5 p-0 hover:bg-dark/20 focus:bg-dark/20 active:bg-dark/25 mr-2",
+            },
+            [
+              h(
+                  "svg",
+                  {
+                    xmlns: "http://www.w3.org/2000/svg",
+                    viewBox: "0 0 128 512",
+                    class: "icon icon-ellipsis",
+                    fill: "currentColor",
+                    height: 24,
+                    width: 24,
+                  },
+                  [
+                    h("path", {
+                      d: "M64 360a56 56 0 1 0 0 112 56 56 0 1 0 0-112zm0-160a56 56 0 1 0 0 112 56 56 0 1 0 0-112zM120 96A56 56 0 1 0 8 96a56 56 0 1 0 112 0z",
+                    })
+                  ]
+              )
 
-            if (value.length < 20) {
-                return html(
-                    `<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">${value}</a>`
-                );
-            }
+            ]),
 
-            return html(
-                `<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">${
-                    value.substring(0, 20) + "..."
-                }</a>`
-            );
-        },
-    },
-    {name: "Consignee Name", hidden: !data.columnVisibility.consignee_name},
-    {
-        name: "Consignee Address",
-        hidden: !data.columnVisibility.consignee_address,
-        sort: false,
-        formatter: (cell) => {
-            if (!cell) return "";
-            let value = cell.toString();
+        // Popover content
+        h("div", {
+          className: "absolute hidden group-hover:block bg-white shadow-lg rounded-md mt-2 w-32 z-100 right-full mr-2 transition-opacity duration-200 ease-in-out opacity-0 group-hover:opacity-100",
+        }, [
+          usePage().props.user.permissions.includes("hbls.edit") && h("a", {
+            href: "#",
+            className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
+            onClick: () => router.visit(route("hbls.edit", row.cells[0].data)),
+          }, "Edit"),
 
-            if (value.length < 10) {
-                return html(
-                    `<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">${value}</a>`
-                );
-            }
+          usePage().props.user.permissions.includes("hbls.show") && h("a", {
+            href: "#",
+            className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
+            onClick: () => confirmViewHBL(row.cells[0].data),
+          }, "View HBL"),
 
-            //     hover icon and show full address
-            // Display with info icon and tooltip for addresses longer than 20 characters
-            return html(
-                `<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">
-                ${value.substring(0, 10) + "..."}
-            </a>
-            <i class="fa fa-info-circle"
-            x-tooltip.placement.bottom.error="'${value}'"
-               class="info-icon"></i>`
-            );
-        },
-    },
-    {
-        name: "Consignee Contact",
-        hidden: !data.columnVisibility.consignee_contact,
-        sort: false,
-    },
-    {name: "Email", hidden: !data.columnVisibility.email, sort: false},
-    {name: "Address", hidden: !data.columnVisibility.address, sort: false},
-    {
-        name: "Contact",
-        hidden: !data.columnVisibility.contact_number,
-        sort: false,
-        formatter: (cell) => {
-            if (!cell) return "";
-
-            return html(
-                `<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">${cell} </a>`
-            );
-        },
-    },
-    {
-        name: "Cargo Mode",
-        sort: false,
-        hidden: !data.columnVisibility.cargo_type,
-        formatter: (_, row) =>
-            row.cells[10].data == "Sea Cargo"
-                ? h(
-                    "span",
-                    {className: "flex"},
-                    h(
-                        "svg",
-                        {
-                            xmlns: "http://www.w3.org/2000/svg",
-                            viewBox: "0 0 24 24",
-                            class: "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
-                            fill: "none",
-                            height: 24,
-                            width: 24,
-                            stroke: "currentColor",
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                            strokeWidth: 2,
-                        },
-                        [
-                            h("path", {
-                                stroke: "none",
-                                d: "M0 0h24v24H0z",
-                                fill: "none",
-                            }),
-                            h("path", {
-                                d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
-                            }),
-                            h("path", {
-                                d: "M4 18l-1 -5h18l-2 4",
-                            }),
-                            h("path", {
-                                d: "M5 13v-6h8l4 6",
-                            }),
-                            h("path", {
-                                d: "M7 7v-4h-1",
-                            }),
-                        ]
-                    ),
-                    row.cells[10].data
-                )
-                : row.cells[10].data == "Air Cargo"
-                    ? h("span", {className: "flex space-x-2"}, [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class: "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                                strokeWidth: 2,
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
-                                }),
-                            ]
-                        ),
-                        row.cells[10].data,
-                    ])
-                    : row.cells[10].data,
-    },
-    {name: "HBL Type", hidden: !data.columnVisibility.hbl_type},
-    {name: "Warehouse", hidden: !data.columnVisibility.warehouse},
-    {name: "Status", hidden: !data.columnVisibility.status},
-    {
-        name: "Is Hold",
-        hidden: !data.columnVisibility.is_hold,
-        formatter: (cell) => {
-            return cell
-                ? html(`<div></div class="text-center"><svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg></div>`)
-                : null;
-        },
-        sort: false,
-    },
-    // {
-    //     name: "Actions",
-    //     sort: false,
-    //     hidden: !data.columnVisibility.actions,
-    //     formatter: (_, row) => {
-    //         return h("div", {className: "flex space-x-2"}, [
-    //             usePage().props.user.permissions.includes("hbls.show")
-    //                 ? h(
-    //                     "a",
-    //                     {
-    //                         className:
-    //                             "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-    //                         onClick: () => confirmViewHBL(row.cells[0].data),
-    //                         "x-tooltip..placement.bottom.primary":
-    //                             "'View HBL'",
-    //                     },
-    //                     [
-    //                         h(
-    //                             "svg",
-    //                             {
-    //                                 xmlns: "http://www.w3.org/2000/svg",
-    //                                 viewBox: "0 0 24 24",
-    //                                 class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-    //                                 fill: "none",
-    //                                 height: 24,
-    //                                 width: 24,
-    //                                 stroke: "currentColor",
-    //                                 strokeLinecap: "round",
-    //                                 strokeLinejoin: "round",
-    //                             },
-    //                             [
-    //                                 h("path", {
-    //                                     d: "M0 0h24v24H0z",
-    //                                     fill: "none",
-    //                                     stroke: "none",
-    //                                 }),
-    //                                 h("path", {
-    //                                     d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-    //                                 }),
-    //                                 h("path", {
-    //                                     d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-    //                                 }),
-    //                             ]
-    //                         ),
-    //                     ]
-    //                 )
-    //                 : null,
-    //         ]);
-    //     },
-    // },
-    {
-        name: "",
-        sort: false,
-        formatter: (_, row) => {
-            return usePage().props.user.permissions.includes("hbls.show")
-                ? h(
-                    "a",
-                    {
-                        className:
-                            "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                        onClick: () => confirmViewHBL(row.cells[0].data),
-                        "x-tooltip..placement.bottom.primary":
-                            "'View HBL'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                    stroke: "none",
-                                }),
-                                h("path", {
-                                    d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                }),
-                            ]
-                        ),
-                    ]
-                )
-                : null
-        }
-    },
-    {
-        name: "",
-        sort: false,
-        hidden: !data.columnVisibility.actions,
-        formatter: (_, row) => {
-            return h("div", { className: "flex space-x-2 relative group" }, [
-                // Popover action button (Hamburger or similar)
-                h(
-                    "a",
-                    {
-                        className:
-                            "btn size-5 p-0 hover:bg-dark/20 focus:bg-dark/20 active:bg-dark/25 mr-2",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 128 512",
-                                class: "icon icon-ellipsis",
-                                fill: "currentColor",
-                                height: 24,
-                                width: 24,
-                            },
-                            [
-                                h("path", {
-                                    d: "M64 360a56 56 0 1 0 0 112 56 56 0 1 0 0-112zm0-160a56 56 0 1 0 0 112 56 56 0 1 0 0-112zM120 96A56 56 0 1 0 8 96a56 56 0 1 0 112 0z",
-                                })
-                            ]
-                        )
-
-                    ]),
-
-                // Popover content
-                h("div", {
-                    className: "absolute hidden group-hover:block bg-white shadow-lg rounded-md mt-2 w-32 z-100 right-full mr-2 transition-opacity duration-200 ease-in-out opacity-0 group-hover:opacity-100",
-                }, [
-                    usePage().props.user.permissions.includes("hbls.edit") && h("a", {
-                        href: "#",
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                        onClick: () => confirmViewCallFlagModal(row.cells),
-                    }, "Call Flag"),
-
-                    usePage().props.user.permissions.includes("hbls.edit") && h("a", {
-                        href: "#",
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                        onClick: () => router.visit(route("hbls.edit", row.cells[0].data)),
-                    }, "Edit"),
-
-                    usePage().props.user.permissions.includes("hbls.show") && h("a", {
-                        href: "#",
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                        onClick: () => confirmViewHBL(row.cells[0].data),
-                    }, "View HBL"),
-
-                    usePage().props.user.permissions.includes("hbls.hold and release") && h("a", {
-                        href: "#",
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                        onClick: () => confirmIsHold(row.cells),
-                    }, row.cells[14].data ? "Release HBL" : "Hold HBL"),
-
-                    usePage().props.user.permissions.includes("hbls.download pdf") && h("a", {
-                        href: route("hbls.download", row.cells[0].data),
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                    }, "Download HBL"),
-
-                    usePage().props.user.permissions.includes("hbls.download invoice") && h("a", {
-                        href: route("hbls.download.invoice", row.cells[0].data),
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                    }, "Invoice"),
-
-                    usePage().props.user.permissions.includes("hbls.download barcode") && h("a", {
-                        href: route("hbls.download.barcode", row.cells[0].data),
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                    }, "Barcode"),
-
-                    usePage().props.user.permissions.includes("hbls.delete") && h("a", {
-                        href: "#",
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                        onClick: () => confirmDeleteHBL(row.cells[0].data),
-                    }, "Delete"),
-
-                    // usePage().props.user.permissions.includes("hbls.download pdf") && h("a", {
-                    //     href: route("hbls.getCashierReceipt", row.cells[0].data),
-                    //     className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                    // }, "Download Cashier Receipt"),
-                ]),
-            ]);
-        }
-    },
-
+          usePage().props.user.permissions.includes("hbls.delete") && h("a", {
+            href: "#",
+            className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
+            onClick: () => confirmDeleteMHBL(row.cells[0].data),
+          }, "Delete"),
+        ]),
+      ]);
+    }
+  },
 ];
 
 const updateGridConfig = () => {
@@ -547,22 +270,22 @@ const applyFilters = () => {
     grid.forceRender();
 };
 
-const showConfirmDeleteHBLModal = ref(false);
+const showConfirmDeleteMHBLModal = ref(false);
 const hblId = ref(null);
 const selectedHBL = ref({});
 
-const confirmDeleteHBL = (id) => {
+const confirmDeleteMHBL = (id) => {
     hblId.value = id;
-    showConfirmDeleteHBLModal.value = true;
+    showConfirmDeleteMHBLModal.value = true;
 };
 
-const handleDeleteHBL = () => {
-    router.delete(route("hbls.destroy", hblId.value), {
+const handleDeleteMHBL = () => {
+    router.delete(route("mhbls.destroy", hblId.value), {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
-            push.success("HBL record Deleted Successfully!");
-            router.visit(route("hbls.index"), {only: ["hbls"]});
+            push.success("MHBL record Deleted Successfully!");
+            router.visit(route("mhbls.index"), {only: ["hbls"]});
         },
         onError: () => {
             closeModal();
@@ -637,7 +360,7 @@ const exportURL = computed(() => {
 });
 
 const closeModal = () => {
-    showConfirmDeleteHBLModal.value = false;
+    showConfirmDeleteMHBLModal.value = false;
     showConfirmViewHBLModal.value = false;
     hblId.value = null;
     selectedHBL.value = null;
@@ -841,27 +564,139 @@ const shipIcon = ref(`
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
-                                    :checked="data.columnVisibility.hbl"
+                                    :checked="data.columnVisibility.cargo_type"
                                     @change="
-                                        toggleColumnVisibility('hbl', $event)
+                                        toggleColumnVisibility('cargo_type', $event)
                                     "
                                 />
-                                <span class="hover:cursor-pointer">HBL</span>
+                                <span class="hover:cursor-pointer">Cargo Type</span>
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                              <Checkbox
+                                  :checked="data.columnVisibility.hbl_type"
+                                  @change="
+                                          toggleColumnVisibility('hbl_type', $event)
+                                      "
+                              />
+                              <span class="hover:cursor-pointer">HBL Type</span>
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
-                                    :checked="data.columnVisibility.hbl_name"
+                                    :checked="data.columnVisibility.warehouse"
                                     @change="
                                         toggleColumnVisibility(
-                                            'hbl_name',
+                                            'warehouse',
                                             $event
                                         )
                                     "
                                 />
                                 <span class="hover:cursor-pointer"
-                                >HBL Name</span
+                                >Warehouse</span
                                 >
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                              <Checkbox
+                                  :checked="
+                                          data.columnVisibility.shipper_name
+                                      "
+                                  @change="
+                                          toggleColumnVisibility(
+                                              'shipper_name',
+                                              $event
+                                          )
+                                      "
+                              />
+                              <span class="hover:cursor-pointer"
+                              >Shipper Name</span
+                              >
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                              <Checkbox
+                                  :checked="
+                                            data.columnVisibility.shipper_nic
+                                        "
+                                  @change="
+                                            toggleColumnVisibility(
+                                                'shipper_nic',
+                                                $event
+                                            )
+                                        "
+                              />
+                              <span class="hover:cursor-pointer"
+                              >Shipper NIC</span
+                              >
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                              <Checkbox
+                                  :checked="
+                                              data.columnVisibility.shipper_residence_no
+                                          "
+                                  @change="
+                                              toggleColumnVisibility(
+                                                  'shipper_residence_no',
+                                                  $event
+                                              )
+                                          "
+                              />
+                              <span class="hover:cursor-pointer"
+                              >Shipper Residence No</span
+                              >
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                              <Checkbox
+                                  :checked="
+                                                data.columnVisibility.shipper_address
+                                            "
+                                  @change="
+                                                toggleColumnVisibility(
+                                                    'shipper_address',
+                                                    $event
+                                                )
+                                            "
+                              />
+                              <span class="hover:cursor-pointer"
+                              >Shipper Address</span
+                              >
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                              <Checkbox
+                                  :checked="
+                                                data.columnVisibility.shipper_contact
+                                            "
+                                  @change="
+                                                toggleColumnVisibility(
+                                                    'shipper_contact',
+                                                    $event
+                                                )
+                                            "
+                              />
+                              <span class="hover:cursor-pointer"
+                              >Shipper Contact</span
+                              >
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                              <Checkbox
+                                  :checked="
+                                                data.columnVisibility.shipper_email
+                                            "
+                                  @change="
+                                                toggleColumnVisibility(
+                                                    'shipper_email',
+                                                    $event
+                                                )
+                                            "
+                              />
+                              <span class="hover:cursor-pointer"
+                              >Shipper Email</span
+                              >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
@@ -879,6 +714,40 @@ const shipIcon = ref(`
                                 <span class="hover:cursor-pointer"
                                 >Consignee Name</span
                                 >
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                              <Checkbox
+                                  :checked="
+                                          data.columnVisibility.consignee_nic
+                                      "
+                                  @change="
+                                          toggleColumnVisibility(
+                                              'consignee_nic',
+                                              $event
+                                          )
+                                      "
+                              />
+                              <span class="hover:cursor-pointer"
+                              >Consignee NIC</span
+                              >
+                            </label>
+
+                            <label class="inline-flex items-center space-x-2">
+                              <Checkbox
+                                  :checked="
+                                          data.columnVisibility.consignee_residence_no
+                                      "
+                                  @change="
+                                          toggleColumnVisibility(
+                                              'consignee_residence_no',
+                                              $event
+                                          )
+                                      "
+                              />
+                              <span class="hover:cursor-pointer"
+                              >Consignee Residence No</span
+                              >
                             </label>
 
                             <label class="inline-flex items-center space-x-2">
@@ -917,99 +786,12 @@ const shipIcon = ref(`
 
                             <label class="inline-flex items-center space-x-2">
                                 <Checkbox
-                                    :checked="data.columnVisibility.email"
+                                    :checked="data.columnVisibility.consignee_email"
                                     @change="
-                                        toggleColumnVisibility('email', $event)
+                                        toggleColumnVisibility('consignee_email', $event)
                                     "
                                 />
-                                <span class="hover:cursor-pointer">Email</span>
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.address"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'address',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Address</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="
-                                        data.columnVisibility.contact_number
-                                    "
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'contact_number',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Contact</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.cargo_type"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'cargo_type',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Cargo Mode</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.hbl_type"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'hbl_type',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >HBL Type</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.warehouse"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'warehouse',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Warehouse</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.status"
-                                    @change="
-                                        toggleColumnVisibility('status', $event)
-                                    "
-                                />
-                                <span class="hover:cursor-pointer">Status</span>
+                                <span class="hover:cursor-pointer">Consignee Email</span>
                             </label>
                         </ColumnVisibilityPopover>
                         <button
@@ -1198,10 +980,10 @@ const shipIcon = ref(`
             </template>
         </FilterDrawer>
 
-        <DeleteHBLConfirmationModal
-            :show="showConfirmDeleteHBLModal"
+        <DeleteMHBLConfirmationModal
+            :show="showConfirmDeleteMHBLModal"
             @close="closeModal"
-            @delete-hbl="handleDeleteHBL"
+            @delete-mhbl="handleDeleteMHBL"
         />
 
         <HBLDetailModal
