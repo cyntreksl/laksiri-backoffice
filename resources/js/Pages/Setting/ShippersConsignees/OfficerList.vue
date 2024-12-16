@@ -2,7 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import CreateOfficerModal from "@/Pages/Setting/ShippersConsignees/Partials/CreateOfficer.vue";
+import CreateOfficerModal from "@/Pages/Setting/ShippersConsignees/Partials/CreateConsignee.vue";
 
 
 
