@@ -3,23 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sea Cargo Manifest</title>
+    <title> AIR Cargo Manifest </title>
     <style>
         table {
             width: 100%;
             border-collapse: collapse;
-            font-family: Arial, sans-serif;
+            font-family: Times New Roman, serif;
         }
+
         th, td {
             border: 1px solid black;
             padding: 5px;
             text-align: left;
         }
-        th {
-            background-color: #f0f0f0;
-        }
+
         .center-text {
             text-align: center;
+        }
+        .ship {
+            display: flex;
+        }
+
+        .hbl {
+            margin-right: 20px; /* Adjust as needed */
+            display: flex;
+            flex-direction: column;  /* Stack elements vertically */
+        }
+
+
+        .name {
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            margin-left: 70px; /* Adjust as needed */
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -46,89 +62,100 @@
 
     <tr>
         <th colspan="10" style="text-align:center;">
-            <strong><em>UNIVERSAL FREIGHT SERVICES </em></strong>
+            <strong><em>
+                    <mark style="background-color: #89b3e3">UNIVERSAL FREIGHT SERVICES</mark>
+                </em></strong>
         </th>
 
     </tr>
 
     <tr>
-        <th colspan="10" style = "text-align: center;">
-            <strong> <em> SEA CARGO DOOR TO DOOR MANIFEST </em> </strong>
+        <th colspan="10" style="background-color: gray ; text-align: center; ">
+            <strong> <em> AIR CARGO MANIFEST </em> </strong>
         </th>
     </tr>
     <tr>
-        <th colspan="10">
-            DATE: <?php echo date('F j, Y'); ?>                                                                                                                                                                SHIPMENT NO:2734
+        <th colspan="2">
+
+        </th>
+        <th colspan="1">
+
+        </th>
+        <th colspan="7">DATE: <?php echo date('d/m/Y'); ?>                                                              
+                                            SHIPMENT NO :602
+
+        </th>
+    </tr>
+
+    <tr>
+        <th colspan="10" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+            SHIPPER :       UNIVERSAL FREIGHT SERVICES, P.O.BOX: 55239, DOHA, QATAR. TEL: +974 4620961 TEL/FAX: +974
+            4620812 <br>
+            CONSIGNEE:  LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA <br>
+            NOTIFY :  LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94
+            11-47722800
         </th>
     </tr>
     <tr>
-        <th colspan="10">
-            SHIPPER : UNIVERSAL FREIGHT SERVICES, P.O.BOX: 55239, DOHA, QATAR. TEL: +974 4620961 TEL/FAX: +974 4620812 <br>
-            CONSIGNEE: LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA <br>
-            NOTIFY : LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94 11-2574180/ TEL: +94 11-47722800
-        </th>
+    <tr>
+        <th colspan="3">AWB NO            {{$container?->awb_number}}</th>
+        <th rowspan="2" colspan="1">  <p> TOTAL VOLUME: </p></th>
+        <th rowspan="2" colspan="3">                   {{ number_format($total_vtotal, 2) }}</th>
+        <th rowspan="2" colspan="1">TOTAL WEIGHT</th>
+        <th rowspan="2" colspan="2">                {{ number_format($total_gtotal, 2) }}</th>
+
     </tr>
     <tr>
-        <th colspan="10">
-            AWB NO 157 0364971                                       TOTAL WEIGHT:KG {{ number_format($total_gtotal, 2) }}                                        TOTAL VOLUME:   {{ number_format($total_vtotal, 2) }}                                   NO OF PKG:- {{ number_format($total_nototal, 0) }}
-        </th>
+        <th colspan="3"> NO OF PKG:            {{ number_format($total_nototal, 0) }}</th>
     </tr>
-    <tr>
-        <th>SR NO</th>
+
+    </tr>
+
+    <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: gray ;">
+        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">SR NO</th>
         <th>HBL NO</th>
-        <th>NAME OF SHIPPER</th>
+        <th>  NAME OF SHIPPER </th>
         <th>NAME OF CONSIGNEES</th>
-        <th>TYPE OF PKGS CARGO TYPE</th>
-        <th>NO.OF PKGS</th>
-        <th>VOLUME CBM</th>
-        <th>GWHT KGS</th>
-        <th>DESCRIPTION OF CARGO</th>
-        <th>REMARKS</th>
+        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">TYPE OF PKGS CARGO TYPE</th>
+        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">NO.OF PKGS</th>
+        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">VOLUME CBM</th>
+        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">GWHT KGS</th>
+        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">DESCRIPTION OF CARGO</th>
+        <th style="font-family: 'Times New Roman',fantasy; font-size: 11px;">REMARKS</th>
     </tr>
     </thead>
     <tbody>
     @foreach($data as $item)
         <tr>
             <td >{{ $loop->iteration }}</td>
-            <td > {{ $item[0]}} </td>
-            <td>{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
+            <td style="border-right:none ;vertical-align: top" > {{ $item[0]}} </td>
+            <td  style="border-left:none">{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
             <td>{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
-            <td>
+            <td style="vertical-align: top" >
                 @foreach ($item[9] as $package)
                     {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
                 @endforeach
             </td>
-            <td>
+            <td style="vertical-align: top">
                 @foreach ($item[9] as $package)
-                    {{ $package['quantity'] }}<br>
+                          {{ $package['quantity'] }}<br>
                 @endforeach
             </td>
-            <td>
+            <td style="vertical-align: top" >
                 @foreach ($item[9] as $package)
-                    {{ $package['volume'] }}<br>
+                          {{ $package['volume'] }}<br>
                 @endforeach
             </td>
-            <td>
+            <td style="vertical-align: top" >
                 @foreach ($item[9] as $package)
-                    {{ $package['weight'] }}<br>
+                         {{ $package['weight'] }}<br>
                 @endforeach
             </td>
-            <td>PERSONAL EFFECT</td>
-            <td>{{$item[10]}}</td>
+            <td>  PERSONAL EFFECT</td>
+            <td> <b>     {{$item[10]}}</b> </td>
 
         </tr>
     @endforeach
-    <tr>
-        <td colspan="5"></td>
-        <td class="center-text">{{ number_format($total_nototal, 0) }}</td>
-        <td class="center-text">{{ number_format($total_vtotal, 3) }}</td>
-        <td class="center-text">{{ number_format($total_gtotal, 1) }}</td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td colspan="10" style="text-align:left; font-size: 10px; padding-top: 20px;"> UNIVERSAL FREIGHT SERVICES<br>DOHA QATAR <br><span style="font-style:italic; margin-top: 10px;">Universal Freight Services                                                                                                                         Page 1 of 1 </span></td>
-    </tr>
     </tbody>
 </table>
 </body>
