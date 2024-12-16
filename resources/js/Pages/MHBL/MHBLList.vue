@@ -122,7 +122,6 @@ const initializeGrid = () => {
         server: {
             url: constructUrl(),
             then: (data) => {
-              console.log(data);
               return data.data.map((item) => {
                 const row = [];
                 visibleColumns.forEach((column) => {
