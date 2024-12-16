@@ -18,6 +18,9 @@ class MHBLRepository implements MHBLRepositoryInterface
             'consignee_id' => $data['consignee_id'],
             'shipper_id' => $data['shipper_id'],
             'cargo_type' => $data['cargo_type'],
+            'grand_volume' => $data['grand_volume'],
+            'grand_weight' => $data['grand_weight'],
+            'grand_total' => $data['grand_total'],
             'warehouse_id' => GetBranchByName::run($data['warehouse'])->id,
         ];
         $mhbl = CreateMHBL::run($mhbl_data);

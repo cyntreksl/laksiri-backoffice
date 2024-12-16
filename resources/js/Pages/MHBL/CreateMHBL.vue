@@ -15,6 +15,7 @@ import {push} from "notivue";
 import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import {float} from "quill/ui/icons.js";
 
 const props = defineProps({
     hblTypes: {
@@ -73,6 +74,18 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    grandVolume: {
+        type: float,
+        required: true,
+    },
+    grandWeight: {
+        type: float,
+        required: true,
+    },
+    grandTotal: {
+        type: float,
+        required: true,
+    },
 });
 
 
@@ -128,16 +141,9 @@ const form = useForm({
     cargo_type: props.selectedCargoType,
     hbl_type: props.selectedHblType,
     warehouse: props.selectedWarehouse,
-    warehouse_id: "",
-    freight_charge: 0,
-    bill_charge: 0,
-    other_charge: 0,
-    destination_charges: 0,
-    package_charges: 0,
-    discount: 0,
-    paid_amount: '',
-    additional_charge: 0,
-    grand_total: 0,
+    grand_volume: props.grandVolume,
+    grand_weight: props.grandWeight,
+    grand_total: props.grandTotal,
     packages: {},
     is_active_package: false,
     shipper_id: 0,
@@ -973,101 +979,45 @@ const shipIcon = ref(`
                                 >
                                     Price and Payment
                                 </h2>
-                                <button
-                                    class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
-                                    type="button"
-                                    @click="calculatePayment"
-                                >
-                                    Calculate
-                                </button>
                             </div>
                             <div class="grid grid-cols-2 gap-5 mt-5">
                                 <div>
-                                    <span>Freight Charge</span>
+                                    <span>Grand Volume</span>
                                     <TextInput
-                                        v-model="form.freight_charge"
-                                        :disabled="!isEditable"
+                                        v-model="form.grand_volume"
+                                        disabled
                                         class="w-full"
                                         min="0"
                                         step="any"
                                         type="number"
                                     />
-                                    <InputError :message="form.errors.freight_charge"/>
+                                    <InputError :message="form.errors.grand_volume"/>
                                 </div>
 
                                 <div>
-                                    <span>Bill Charge</span>
+                                    <span>Grand Weight</span>
                                     <TextInput
-                                        v-model="form.bill_charge"
-                                        :disabled="!isEditable"
+                                        v-model="form.grand_weight"
+                                        disabled
                                         class="w-full"
                                         min="0"
                                         step="any"
                                         type="number"
                                     />
-                                    <InputError :message="form.errors.bill_charge"/>
+                                    <InputError :message="form.errors.grand_weight"/>
                                 </div>
 
                                 <div>
-                                    <span>Destination Charges</span>
+                                    <span>Grand Total</span>
                                     <TextInput
-                                        v-model="form.destination_charges"
-                                        :disabled="!isEditable"
+                                        v-model="form.grand_total"
+                                        disabled
                                         class="w-full"
                                         min="0"
                                         step="any"
                                         type="number"
                                     />
-                                </div>
-
-                                <div>
-                                    <span>Package Charges</span>
-                                    <TextInput
-                                        v-model="form.package_charges"
-                                        :disabled="!isEditable"
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                </div>
-
-                                <div>
-                                    <span>Discount</span>
-                                    <TextInput
-                                        v-model="form.discount"
-                                        :disabled="!isEditable"
-                                        class="w-full"
-                                        placeholder="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.discount"/>
-                                </div>
-
-                                <div>
-                                    <span>Paid Amount</span>
-                                    <TextInput
-                                        v-model="form.paid_amount"
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.paid_amount"/>
-                                </div>
-
-                                <div>
-                                    <span>Additional Charges</span>
-                                    <TextInput
-                                        v-model="form.additional_charge"
-                                        :disabled="!isEditable"
-                                        class="w-full"
-                                        placeholder="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.additional_charges"/>
+                                    <InputError :message="form.errors.grand_total"/>
                                 </div>
 
                                 <div class="col-start-2 mt-20 space-y-2.5 font-bold">
@@ -1080,13 +1030,13 @@ const shipIcon = ref(`
                                     <div class="flex justify-between">
                                         <p class="line-clamp-1">Weight</p>
                                         <p class="text-slate-700 dark:text-navy-100">
-                                            {{ grandTotalWeight.toFixed(2) }}
+                                            {{ form.grand_weight.toFixed(2) }}
                                         </p>
                                     </div>
                                     <div class="flex justify-between">
                                         <p class="line-clamp-1">Volume</p>
                                         <p class="text-slate-700 dark:text-navy-100">
-                                            {{ grandTotalVolume.toFixed(2) }}
+                                            {{ form.grand_volume.toFixed(2) }}
                                         </p>
                                     </div>
                                 </div>
@@ -1097,7 +1047,7 @@ const shipIcon = ref(`
                                     >
                                         <p class="line-clamp-1">Grand Total</p>
                                         <div class="flex items-center">
-                                            <p>{{ hblTotal ? hblTotal.toFixed(2) : 0.00 }} {{ currency }}</p>
+                                            <p>{{form.grand_total.toFixed(2) ?? 0.00 }}</p>
                                         </div>
                                     </div>
                                 </div>

@@ -8,6 +8,7 @@ use App\Enum\HBLType;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\MHBLRepositoryInterface;
 use App\Interfaces\OfficerRepositoryInterface;
+use App\Models\HBL;
 use App\Models\HBLPackage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -30,12 +31,11 @@ class MHBLController extends Controller
         $data = $request->all();
         $hblIds = array_column($data['hbls'], 'id');
 
+        $grand_total = HBL::whereIn('id', $hblIds)->get()->sum('grand_total');
+
         $hblPackages = HblPackage::whereIn('hbl_id', $hblIds)->get();
-        $additional_charge = $hblPackages->sum('freight_charge');
-        $additional_charge = $hblPackages->sum('bill_charge');
-        $additional_charge = $hblPackages->sum('other_charge');
-        $additional_charge = $hblPackages->sum('discount');
-        $additional_charge = $hblPackages->sum('additional_charge');
+        $grand_volume = $hblPackages->sum('volume');
+        $grand_weight = $hblPackages->sum('weight');
         $packages = $hblPackages->map(function ($package) {
             return [
                 'id' => $package->id,
@@ -64,6 +64,9 @@ class MHBLController extends Controller
             'consignees' => $this->officerRepository->getConsignees(),
             'packages' => $packages,
             'hblIds' => $hblIds,
+            'grandVolume' => $grand_volume,
+            'grandWeight' => $grand_weight,
+            'grandTotal' => $grand_total,
         ]);
     }
 
