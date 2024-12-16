@@ -28,6 +28,7 @@ use App\Actions\HBL\UpdateHBLPackages;
 use App\Actions\HBLDocument\DeleteDocument;
 use App\Actions\HBLDocument\DownloadDocument;
 use App\Actions\HBLDocument\UploadDocument;
+use App\Enum\HBLType;
 use App\Exports\CancelledHBLExport;
 use App\Exports\HBLExport;
 use App\Factory\HBL\FilterFactory;
@@ -91,6 +92,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
         if (! empty($search)) {
             $query->whereAny([
+                'hbl_number',
                 'reference',
                 'hbl_name',
                 'contact_number',
@@ -396,5 +398,59 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function downloadGatePass($hbl)
     {
         return DownloadGatePassPDF::run($hbl);
+    }
+
+    public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        if (isset($filters['userData'])) {
+            $query = HBL::query()
+                ->where('hbl_type', '=', HBLType::DOOR_TO_DOOR->value)
+                ->where(function ($query) {
+                    $query->where('status', '!=', 'draft')
+                        ->orWhereNull('status');
+                })->where('hbl_name', $filters['userData'])
+                ->orWhere('contact_number', $filters['userData']);
+        } else {
+            $query = HBL::query()->where('hbl_type', '=', HBLType::DOOR_TO_DOOR->value)->where(function ($query) {
+                $query->where('status', '!=', 'draft')
+                    ->orWhereNull('status');
+            });
+        }
+
+        if (! empty($search)) {
+            $query->whereAny([
+                'reference',
+                'hbl_number',
+                'hbl_name',
+                'contact_number',
+                'consignee_name',
+                'consignee_nic',
+                'consignee_contact',
+                'iq_number',
+                'nic',
+                'email',
+            ], 'like', '%'.$search.'%');
+        }
+
+        //apply filters
+        FilterFactory::apply($query, $filters);
+
+        $countQuery = $query;
+        $totalRecords = $countQuery->count();
+
+        $hbls = $query->orderBy($order, $direction)
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        return response()->json([
+            'data' => HBLResource::collection($hbls),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
     }
 }
