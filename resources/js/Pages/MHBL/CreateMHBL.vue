@@ -57,6 +57,14 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    shippers: {
+        type: Array,
+        default: () => [],
+    },
+    consignees: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 //branch set
@@ -624,6 +632,52 @@ const handleCopyShipper = () => {
 
 const isShowedPaymentSummery = ref(false);
 
+const splitCountryCode = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            return code;
+        }
+    }
+}
+
+const splitContactNumber = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            return fullNumber.slice(code.length);
+        }
+    }
+}
+
+watch(
+    [() => form.hbl_name],
+    ([newShipper]) => {
+        // Filter shipper based on form.hbl_name
+        const filteredShipper = props.shippers.find(
+            shipper => shipper.name.toLowerCase() === newShipper.toLowerCase()
+        );
+        form.email = filteredShipper['email'];
+        form.nic = filteredShipper['pp_or_nic_no'];
+        form.iq_number = filteredShipper['residency_no'];
+        form.address = filteredShipper['address'];
+        countryCode.value = splitCountryCode(filteredShipper['mobile_number'])
+        contactNumber.value = splitContactNumber(filteredShipper['mobile_number'])
+    }
+);
+
+watch(
+    [() => form.consignee_name],
+    ([newConsignee]) => {
+        // Filter shipper based on form.hbl_name
+        const filteredConsignee = props.consignees.find(
+            consignee => consignee.name.toLowerCase() === newConsignee.toLowerCase()
+        );
+        form.consignee_address = filteredConsignee['address'];
+        form.consignee_nic = filteredConsignee['pp_or_nic_no'];
+        consignee_countryCode.value = splitCountryCode(filteredConsignee['mobile_number'])
+        consignee_contact.value = splitContactNumber(filteredConsignee['mobile_number'])
+    }
+);
+
 const planeIcon = ref(`
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -974,32 +1028,19 @@ const confirmViewHBL = async (id) => {
                         <div class="grid grid-cols-3 gap-5 mt-3">
                             <div class="col-span-3">
                                 <span>Name</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.hbl_name"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Name"
-                                        type="text"
-                                    />
-                                    <div
-                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                                <select
+                                    v-model="form.hbl_name"
+                                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                >
+                                    <option :value="null" disabled>Select shipper</option>
+                                    <option
+                                        v-for="shipper in shippers"
+                                        :key="shipper"
+                                        :value="shipper.name"
                                     >
-                                        <svg
-                                            class="size-4.5 transition-colors duration-200"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                            />
-                                        </svg>
-                                    </div>
-                                </label>
+                                        {{ shipper.name }}
+                                    </option>
+                                </select>
                                 <InputError :message="form.errors.hbl_name"/>
                             </div>
                         </div>
@@ -1125,21 +1166,6 @@ const confirmViewHBL = async (id) => {
                             </h2>
 
                             <div class="flex space-x-1">
-                                <a  v-if="form.hbl_name"  @click.prevent="handleCopyShipper"
-                                    x-tooltip.placement.bottom="'Copy Shippier'"
-                                    class="relative inline-flex items-center">
-                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
-                                         height="24" stroke="currentColor" stroke-linecap="round"
-                                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                        <path
-                                            d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
-                                        <path
-                                            d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
-                                    </svg>
-                                </a>
-
                                 <a
                                     @click.prevent="confirmShowingCopyFromHBLToConsigneeModal"
                                     x-tooltip.placement.bottom="'Copy from HBL'"
@@ -1192,32 +1218,19 @@ const confirmViewHBL = async (id) => {
                         <div class="grid grid-cols-2 gap-5 mt-3">
                             <div class="col-span-2">
                                 <span>Name</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.consignee_name"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Name"
-                                        type="text"
-                                    />
-                                    <div
-                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                                <select
+                                    v-model="form.consignee_name"
+                                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                >
+                                    <option :value="null" disabled>Select shipper</option>
+                                    <option
+                                        v-for="consignee in consignees"
+                                        :key="consignee"
+                                        :value="consignee.name"
                                     >
-                                        <svg
-                                            class="size-4.5 transition-colors duration-200"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                            />
-                                        </svg>
-                                    </div>
-                                </label>
+                                        {{ consignee.name }}
+                                    </option>
+                                </select>
                                 <InputError :message="form.errors.consignee_name"/>
                             </div>
 

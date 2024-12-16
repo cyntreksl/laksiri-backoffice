@@ -34,6 +34,7 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Interfaces\WarehousezoneRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
+use App\Interfaces\OfficerRepositoryInterface;
 use App\Repositories\AnyFileUploadRepository;
 use App\Repositories\BondedWarehouseRepository;
 use App\Repositories\BranchRepository;
@@ -66,6 +67,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\WareahouseZoneRepository;
 use App\Repositories\WarehouseRepository;
 use App\Repositories\ZoneRepository;
+use App\Repositories\OfficerRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -107,6 +109,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(UserFeedbackRepositoryInterface::class, UserFeedbackRepository::class);
         $this->app->bind(AnyFileUploadRepositoryInterface::class, AnyFileUploadRepository::class);
         $this->app->bind(CountryRepositoryInterface::class, CountryRepository::class);
+        $this->app->bind(OfficerRepositoryInterface::class, OfficerRepository::class);
     }
 
     public function boot(): void
