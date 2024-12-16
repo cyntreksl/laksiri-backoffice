@@ -98,9 +98,9 @@
     </tr>
     <tr>
         <th colspan="3">
-            AWB NO 157 0364971
+            AWB NO {{$container?->awb_number}}
             <hr style="border: 0.3px solid black; margin: 8px 0;">
-            NO OF PKG:- {{ number_format($total_nototal, 0) }}
+            NO OF PKG: {{ number_format($total_nototal, 0) }}
         </th>
 
         <th colspan="1">
@@ -134,8 +134,8 @@
     @foreach($data as $item)
         <tr>
             <td >{{ $loop->iteration }}</td>
-            <td > {{ $item[0]}} </td>
-            <td>{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
+            <td style="border-right:none ;vertical-align: top" > {{ $item[0]}} </td>
+            <td  style="border-left:none">{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
             <td>{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
             <td>
                 @foreach ($item[9] as $package)
