@@ -6,7 +6,6 @@ use App\Actions\Branch\GetBranchByName;
 use App\Actions\MHBL\CreateMHBL;
 use App\Actions\MHBL\CreateMHBLsHBL;
 use App\Factory\MHBL\FilterFactory;
-use App\Http\Resources\HBLResource;
 use App\Http\Resources\MHBLResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\MHBLRepositoryInterface;
@@ -38,6 +37,8 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
     {
         $query = MHBL::with('shipper')->with('consignee');
 
+        //        dd($filters);
+
         if (! empty($search)) {
             $query->whereAny([
                 'reference',
@@ -46,7 +47,6 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
 
         //apply filters
         FilterFactory::apply($query, $filters);
-
 
         $countQuery = $query;
         $totalRecords = $countQuery->count();

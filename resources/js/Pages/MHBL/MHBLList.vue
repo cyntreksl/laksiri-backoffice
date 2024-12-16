@@ -878,28 +878,6 @@ const shipIcon = ref(`
 
                 <FilterBorder/>
 
-                <FilterHeader value="HBL Type"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.hblType" label="UPB" value="UPB"/>
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.hblType"
-                        label="Gift"
-                        value="Gift"
-                    />
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.hblType"
-                        label="Door to Door"
-                        value="Door to Door"
-                    />
-                </label>
-
                 <FilterBorder/>
 
                 <FilterHeader value="Payment Status"/>

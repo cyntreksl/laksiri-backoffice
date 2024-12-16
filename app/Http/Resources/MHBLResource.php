@@ -20,7 +20,7 @@ class MHBLResource extends JsonResource
             'reference' => $this->reference,
             'cargo_type' => $this->cargo_type,
             'hbl_type' => 'Gift',
-            'warehouse'=> GetBranchById::run($this->warehouse_id)['name'],
+            'warehouse' => GetBranchById::run($this->warehouse_id)['name'],
             'shipper_name' => $this->shipper['name'],
             'shipper_email' => $this->shipper['email'],
             'shipper_nic' => $this->shipper['pp_or_nic_no'],
