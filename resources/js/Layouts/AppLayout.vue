@@ -1136,13 +1136,13 @@ export default {
                             route: "setting.package-types.index",
                         },
                         {
-                            title: "Shipper Details",
-                            route: "setting.shipper-details.index",
+                            title: "Shipper and Consignee Details",
+                            route: "setting.shipper-consignees.store",
                         },
-                        {
-                            title: "Consignee Details",
-                            route: "setting.consignee-details.index",
-                        }
+                        // {
+                        //     title: "Consignee Details",
+                        //     route: "setting.consignee-details.index",
+                        // }
 
 
                     );
