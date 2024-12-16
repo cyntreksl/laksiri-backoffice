@@ -109,6 +109,13 @@ Breadcrumbs::for('users.index', function (BreadcrumbTrail $trail) {
     $trail->push('System Users', route('users.index'));
 });
 
+// HBLs
+Breadcrumbs::for('mhbls.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('MHBL');
+    $trail->push('MHBL List', route('mhbls.index'));
+});
+
 // Users > Edit
 Breadcrumbs::for('users.edit', function (BreadcrumbTrail $trail, User $user) {
     $trail->parent('users.index');

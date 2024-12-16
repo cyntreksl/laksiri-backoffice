@@ -715,18 +715,11 @@ const shipIcon = ref(`
 </script>
 
 <template>
-    <AppLayout title="HBL List">
-        <template #header>HBL List</template>
+    <AppLayout title="MHBL List">
+        <template #header>MHBL List</template>
 
         <Breadcrumb/>
-        <div class="flex justify-end mt-5">
-            <Link
-                v-if="$page.props.user.permissions.includes('hbls.create')"
-                :href="route('hbls.create')"
-            >
-                <PrimaryButton> Create New HBL</PrimaryButton>
-            </Link>
-        </div>
+
         <div class="card mt-4">
             <div>
                 <div class="flex items-center justify-between p-2">
@@ -735,7 +728,7 @@ const shipIcon = ref(`
                             <h2
                                 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                HBL List
+                                MHBL List
                             </h2>
                             <div class="flex m-3">
                                 <select

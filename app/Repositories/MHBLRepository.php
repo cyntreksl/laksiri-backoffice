@@ -5,10 +5,12 @@ namespace App\Repositories;
 use App\Actions\Branch\GetBranchByName;
 use App\Actions\MHBL\CreateMHBL;
 use App\Actions\MHBL\CreateMHBLsHBL;
+use App\Interfaces\GridJsInterface;
 use App\Interfaces\MHBLRepositoryInterface;
+use App\Models\Mhbl;
 use Illuminate\Support\Facades\Auth;
 
-class MHBLRepository implements MHBLRepositoryInterface
+class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
 {
     public function storeHBL(array $data)
     {
@@ -27,5 +29,49 @@ class MHBLRepository implements MHBLRepositoryInterface
         CreateMHBLsHBL::run($mhbl, $data['hbls']);
 
         return $mhbl;
+    }
+
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        if (isset($filters['userData'])) {
+            $query = MHBL::query()
+                ->where(function ($query) {
+                    $query->where('status', '!=', 'draft')
+                        ->orWhereNull('status');
+                })->where('hbl_name', $filters['userData'])
+                ->orWhere('contact_number', $filters['userData']);
+        } else {
+            $query = Mhbl::query()->where(function ($query) {
+                $query->where('status', '!=', 'draft')
+                    ->orWhereNull('status');
+            });
+        }
+
+        if (! empty($search)) {
+            $query->whereAny([
+                'reference',
+            ], 'like', '%'.$search.'%');
+        }
+
+        //apply filters
+        FilterFactory::apply($query, $filters);
+
+        $countQuery = $query;
+        $totalRecords = $countQuery->count();
+
+        $hbls = $query->orderBy($order, $direction)
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        return response()->json([
+            'data' => HBLResource::collection($hbls),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
     }
 }
