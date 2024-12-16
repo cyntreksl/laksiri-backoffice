@@ -9,11 +9,14 @@ use App\Models\ShippersConsignees;
 
 class ShipperConsigneeRepository implements ShipperConsigneeRepositoryInterface
 {
-    public function create(array $data)
+    public function getAllShipperConsignees()
+    {
 
+    }
+
+    public function create(array $data)
     {
         return ShippersConsignees::create($data);
-
     }
 
 

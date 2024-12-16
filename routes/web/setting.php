@@ -60,8 +60,8 @@ Route::name('setting.')->group(function () {
         ->name('invoice.update');
 
     // Shipper and Consignee Settings
-//    Route::get ('shipper-consignees',ShipperConsigneeController::class,'index'])
-//        ->name('shipper-consignees.index');
-    Route::get('shipper-consignees',[ShipperConsigneeController::class,'store'])
+    Route::get ('shipper-consignees',[ShipperConsigneeController::class,'index'])
+        ->name('shipper-consignees.index');
+    Route::post('shipper-consignees',[ShipperConsigneeController::class,'store'])
         ->name('shipper-consignees.store');
 });
