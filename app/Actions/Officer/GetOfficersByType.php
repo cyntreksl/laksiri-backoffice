@@ -3,8 +3,8 @@
 namespace App\Actions\Officer;
 
 use App\Models\Officer;
-use Lorisleiva\Actions\Concerns\AsAction;
 use Illuminate\Database\Eloquent\Collection;
+use Lorisleiva\Actions\Concerns\AsAction;
 
 class GetOfficersByType
 {

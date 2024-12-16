@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Actions\MHBL;
+
+use App\Models\Branch;
+use App\Models\Mhbl;
+use Illuminate\Support\Facades\Auth;
+use Lorisleiva\Actions\Concerns\AsAction;
+
+class GenerateMHBLReferenceNumber
+{
+    use AsAction;
+
+    public function handle(): string
+    {
+        if (session('current_branch_code')) {
+            $branch_code = session('current_branch_code');
+        } else {
+            $branch_code = Branch::where('id', Auth::user()->primary_branch_id)->pluck('branch_code')->first();
+
+        }
+
+        $last_mhbl = MHBL::whereNotNull('reference')->latest()->first();
+
+        if ($last_mhbl) {
+            $extracted = substr($last_mhbl->reference, strpos($last_mhbl->reference, 'REF') + 3);
+        }
+
+        $next_reference = $last_mhbl ? ((int) $extracted + 1) : 000001;
+
+        $reference = $branch_code.'-'.'REF'.str_pad($next_reference, 6, '0', STR_PAD_LEFT);
+
+        return $reference;
+    }
+}

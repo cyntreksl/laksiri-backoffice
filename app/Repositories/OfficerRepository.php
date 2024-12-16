@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Actions\Officer\GetOfficersByType;
 use App\Interfaces\OfficerRepositoryInterface;
-use App\Models\Officer;
 
 class OfficerRepository implements OfficerRepositoryInterface
 {

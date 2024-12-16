@@ -65,7 +65,18 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    packages: {
+        type: Array,
+        default: () => [],
+    },
+    hblIds: {
+        type: Array,
+        default: () => [],
+    },
 });
+
+
+const packageList = ref(props.packages);
 
 //branch set
 const currentBranch = usePage().props?.auth.user.active_branch_name;
@@ -100,7 +111,7 @@ const splitNumberConsignee = (fullNumber) => {
 }
 
 const form = useForm({
-    hbl: "",
+    hbls: props.hblIds,
     hbl_name: "",
     email: "",
     contact_number: computed(() => countryCode.value + contactNumber.value),
@@ -129,508 +140,9 @@ const form = useForm({
     grand_total: 0,
     packages: {},
     is_active_package: false,
+    shipper_id: 0,
+    consignee_id: 0,
 });
-
-const handleHBLCreate = () => {
-    form.post(route("hbls.store"), {
-        onSuccess: (page) => {
-            confirmViewHBL(page.props.hbl_id)
-            form.reset();
-            push.success("HBL Created Successfully!");
-        },
-        onError: () => console.log("error"),
-        preserveScroll: true,
-        preserveState: true,
-    });
-};
-
-const showAddNewPackageDialog = ref(false);
-const editMode = ref(false);
-const showPackageDialog = () => {
-    showAddNewPackageDialog.value = true;
-    if (!editMode.value) {
-        selectedType.value = "";
-    }
-};
-
-const packageList = ref([]);
-
-const packageItem = reactive({
-    type: props.packageTypes.find(
-        type => type.name.toLowerCase() === 'carton'.toLowerCase()
-    )?.name || "",
-    length: 0,
-    width: 0,
-    height: 0,
-    quantity: 1,
-    volume: 0,
-    totalWeight: 0,
-    remarks: "",
-    packageRule: 0,
-    measure_type: "cm",
-});
-
-const grandTotalWeight = ref(0);
-const grandTotalVolume = ref(0);
-
-const addPackageData = () => {
-    if (
-        !packageItem.type ||
-        packageItem.length <= 0 ||
-        packageItem.width <= 0 ||
-        packageItem.height <= 0 ||
-        packageItem.quantity <= 0 ||
-        packageItem.volume <= 0 ||
-        (form.is_active_package && !packageItem.packageRule)
-    ) {
-        push.error("Please fill all required data");
-        return;
-    }
-    packageItem.length = packageItemLength.value;
-    packageItem.width = packageItemWidth.value;
-    packageItem.height = packageItemHeight.value;
-    packageItem.volume = packageItemVolume.value;
-
-    if (form.cargo_type === 'Air Cargo') {
-        if (packageItem.totalWeight <= 0) {
-            push.error("Please fill the total weight");
-            return;
-        }
-    }
-
-    if (editMode.value) {
-        packageList.value.splice(editIndex.value, 1, {...packageItem});
-        grandTotalWeight.value = packageList.value.reduce(
-            (accumulator, currentValue) => accumulator + parseFloat(currentValue.totalWeight),
-            0
-        );
-        grandTotalVolume.value = packageList.value.reduce(
-            (accumulator, currentValue) => accumulator + parseFloat(currentValue.volume),
-            0
-        );
-
-        calculatePayment();
-    } else {
-        const newItem = {...packageItem}; // Create a copy of packageItem
-        packageList.value.push(newItem); // Add the new item to packageList
-        form.packages = packageList.value;
-
-        const volume = parseFloat(newItem.volume) || 0;
-        grandTotalWeight.value += parseFloat(newItem.totalWeight);
-        grandTotalVolume.value += parseFloat(volume.toFixed(3));
-        calculatePayment();
-    }
-    closeAddPackageModal();
-};
-
-const packageItemVolume = ref(0);
-
-// Watch for changes in length, width, height, or quantity to update volume and totalWeight
-watch(
-    [
-        () => packageItem.length,
-        () => packageItem.width,
-        () => packageItem.height,
-        () => packageItem.quantity,
-        () => packageItem.measure_type,
-    ],
-    ([newLength, newWidth, newHeight, newQuantity, newMeasureType]) => {
-        // Convert dimensions from cm to meters
-        const lengthMeters = newLength / 100; // 1 cm = 0.01 meters
-        const widthMeters = newWidth / 100;
-        const heightMeters = newHeight / 100;
-
-        // Calculate volume in cubic meters (m³)
-        const volumeCubicMeters =
-            lengthMeters * widthMeters * heightMeters * newQuantity;
-
-        // Assuming weight is directly proportional to volume
-        // Convert weight from grams to kilograms
-        const totalWeightKg = (volumeCubicMeters * newQuantity) / 1000; // 1 gram = 0.001 kilograms
-
-        // Update reactive properties
-        packageItem.volume = (newLength*newWidth*newHeight*newQuantity).toFixed(3);
-        if (packageItem.measure_type === 'cm') {
-            // Convert cm³ to m³ by dividing by 1,000,000
-            packageItemVolume.value = (packageItem.volume / 1000000).toFixed(3);
-        } else if (packageItem.measure_type === 'in') {
-            // Convert from inches to cubic centimeters (1 inch = 16.387 cm³)
-            packageItemVolume.value = (packageItem.volume * 16.387 / 1000000).toFixed(3);  // Convert to m³
-        } else if (packageItem.measure_type === 'ft') {
-            // Convert from cubic feet to cubic meters (1 ft³ = 0.0283 m³)
-            packageItemVolume.value = (packageItem.volume * 0.0283).toFixed(3);
-        } else {
-            // Assume volume is already in cubic meters if no unit conversion is needed
-            packageItemVolume.value = packageItem.volume;
-        }
-
-        // packageItem.totalWeight = totalWeightKg;
-    }
-);
-
-const vat = ref(0);
-
-watch(
-    [
-        () => form.other_charge,
-        () => form.discount,
-        () => form.freight_charge,
-        () => vat,
-        () => form.additional_charge,
-        () => form.bill_charge,
-        () => form.destination_charges,
-        () => form.package_charges,
-    ],
-    ([newOtherCharge, newDiscount, newFreightCharge]) => {
-        // Convert dimensions from cm to meters
-        hblTotal.value =
-            parseFloat(form.freight_charge) +
-            parseFloat(form.bill_charge) +
-            parseFloat(form.package_charges) +
-            parseFloat(form.destination_charges) +
-            // parseFloat(form.other_charge) +
-            parseFloat(vat.value) -
-            form.discount +
-            parseFloat(form.additional_charge);
-        hblTotal.value = Number(hblTotal.value.toFixed(2))
-        form.grand_total = hblTotal.value;
-    }
-);
-
-watch([() => form.cargo_type], ([newCargoType]) => {
-    calculatePayment();
-    hblRules();
-});
-
-watch([() => form.hbl_type], ([newHBLType]) => {
-    calculatePayment();
-    hblRules();
-});
-
-watch([() => form.warehouse], ([newHBLType]) => {
-    calculatePayment();
-    hblRules();
-});
-
-const selectedType = ref("");
-
-const isChecked = ref(false);
-
-const addToConsigneeDetails = () => {
-    if (isChecked.value) {
-        form.consignee_name = form.hbl_name;
-        consignee_contact.value = contactNumber.value;
-        form.consignee_nic = form.nic;
-        form.consignee_address = form.address;
-    } else {
-        resetConsigneeDetails();
-    }
-};
-
-const resetConsigneeDetails = () => {
-    form.consignee_name = "";
-    consignee_contact.value = "";
-    form.consignee_nic = "";
-    form.consignee_address = "";
-};
-
-const updateTypeDescription = () => {
-    packageItem.type = (packageItem.type ? " " : "") + selectedType.value;
-};
-
-const hblTotal = ref(0);
-const currency = ref(usePage().props.currentBranch.currency_symbol || "SAR");
-const isEditable = ref(false);
-const perPackageCharge = ref(0);
-const perVolumeCharge = ref(0);
-const perFreightCharge = ref(0);
-const freightOperator = ref('');
-const priceMode = ref('');
-
-const freight_charge_operations = ref([]);
-
-const calculatePayment = async () => {
-    try {
-        for (let pkg of packageList.value) {
-            if (pkg.packageRule > 0) {
-                form.is_active_package = true;
-                break;
-            } else form.is_active_package = false;
-        }
-        const response = await fetch(`/hbls/calculate-payment`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-                // "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            },
-            body: JSON.stringify({
-                cargo_type: form.cargo_type,
-                hbl_type: form.hbl_type,
-                warehouse: form.warehouse,
-                grand_total_volume: grandTotalVolume.value,
-                grand_total_weight: grandTotalWeight.value,
-                package_list_length: packageList.value.length,
-                package_list: packageList.value,
-                is_active_package: form.is_active_package,
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-
-            form.freight_charge = data.freight_charge;
-            form.bill_charge = data.bill_charge;
-            form.other_charge = data.other_charge;
-            form.package_charges = data.package_charges;
-            form.destination_charges = data.destination_charges;
-            isEditable.value = data.is_editable;
-            vat.value = data.vat;
-            perPackageCharge.value = data.per_package_charge;
-            perVolumeCharge.value = data.per_volume_charge;
-            perFreightCharge.value = data.per_freight_charge;
-            freightOperator.value = data.freight_operator;
-            priceMode.value = data.price_mode;
-            freight_charge_operations.value = data.freight_charge_operations;
-        }
-
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-const showConfirmRemovePackageModal = ref(false);
-const packageIndex = ref(null);
-
-// remove package
-const confirmRemovePackage = (index) => {
-    packageIndex.value = index;
-    showConfirmRemovePackageModal.value = true;
-};
-
-const closeModal = () => {
-    showConfirmRemovePackageModal.value = false;
-};
-
-const closeViewModal = () => {
-    showConfirmViewHBLModal.value = false;
-    hblId.value = null;
-    router.visit(route("hbls.create"));
-};
-
-const handleRemovePackage = () => {
-    if (packageIndex.value !== null) {
-        grandTotalVolume.value -= packageList.value[packageIndex.value].volume;
-        grandTotalWeight.value -= packageList.value[packageIndex.value].totalWeight;
-        packageList.value.splice(packageIndex.value, 1);
-        calculatePayment();
-        closeModal();
-    }
-};
-
-// edit package
-const closeAddPackageModal = () => {
-    showAddNewPackageDialog.value = false;
-    editIndex.value = null;
-    editMode.value = false;
-    restModalFields();
-};
-
-const restModalFields = () => {
-    packageItem.type = props.packageTypes.find(
-        type => type.name.toLowerCase() === 'carton'.toLowerCase()
-    )?.name || "";
-    packageItem.length = 0;
-    packageItem.width = 0;
-    packageItem.height = 0;
-    packageItem.quantity = 1;
-    packageItem.volume = 0;
-    packageItem.totalWeight = 0;
-    packageItem.remarks = "";
-    packageItem.packageRule = 0;
-};
-
-const editIndex = ref(null);
-
-const openEditModal = (index) => {
-    editMode.value = true;
-    editIndex.value = index;
-    showAddNewPackageDialog.value = true;
-    // populate packageItem with existing data for editing
-    Object.assign(packageItem, packageList.value[index]);
-    const factor = conversionFactors[packageItem.measure_type] || 1;
-    packageItem.length = packageItem.length/factor;
-    packageItem.width = packageItem.width/factor;
-    packageItem.height = packageItem.height/factor;
-};
-
-const copyFromHBLToShipperModalShow = ref(false);
-
-const reference = ref(null);
-
-const confirmShowingCopyFromHBLToShipperModal = () => {
-    copyFromHBLToShipperModalShow.value = true;
-}
-
-const closeCopyFromHBLToShipperModal = () => {
-    reference.value = null;
-    copyFromHBLToShipperModalShow.value = false;
-}
-
-const handleCopyFromHBLToShipper = async () => {
-    try {
-        const response = await fetch(`/get-hbl-by-reference/${reference.value}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-            },
-        });
-
-        if (!response.ok) {
-            closeCopyFromHBLToShipperModal()
-            push.error('HBL Missing or Invalid Reference Number');
-            throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-            closeCopyFromHBLToShipperModal()
-
-            form.hbl_name = data.hbl_name;
-            form.email = data.email;
-            form.nic = data.nic;
-            form.iq_number = data.iq_number;
-            form.address = data.address;
-
-            splitNumber(data.contact_number);
-
-            push.success('Copied!');
-        }
-
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-const copyFromHBLToConsigneeModalShow = ref(false);
-
-const confirmShowingCopyFromHBLToConsigneeModal = () => {
-    copyFromHBLToConsigneeModalShow.value = true;
-}
-
-const closeCopyFromHBLToConsigneeModal = () => {
-    reference.value = null;
-    copyFromHBLToConsigneeModalShow.value = false;
-}
-
-const volumeMeasurements = {
-    cm: 'cm.cu',
-    m: 'm.cu',
-    in: 'in.cu',
-    ft: 'ft.cu',
-};
-
-function getPackageRuleTitle(title, length, width , height, measureType) {
-    const volumeMeasurement = volumeMeasurements[measureType] || 'cm.cu';
-
-    return title + ' (' + convertMeasurements(measureType,length).toFixed(2) + '*' + convertMeasurements(measureType,width).toFixed(2) + '*' + convertMeasurements(measureType,height).toFixed(2) + ')'+volumeMeasurement;
-}
-
-const handleCopyFromHBLToConsignee = async () => {
-    try {
-        const response = await fetch(`/get-hbl-by-reference/${reference.value}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-            },
-        });
-
-        if (!response.ok) {
-            closeCopyFromHBLToConsigneeModal()
-            push.error('HBL Missing or Invalid Reference Number');
-            throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-            closeCopyFromHBLToConsigneeModal()
-
-            form.consignee_name = data.consignee_name;
-            form.consignee_nic = data.consignee_nic;
-            form.consignee_address = data.consignee_address;
-            form.consignee_note = data.consignee_note;
-
-            splitNumberConsignee(data.consignee_contact);
-
-            push.success('Copied!');
-        }
-
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-const copiedPackages = ref({});
-
-const copyFromHBLToPackageModalShow = ref(false);
-
-const confirmShowingCopyFromHBLToPackageModal = () => {
-    copyFromHBLToPackageModalShow.value = true;
-}
-
-const closeCopyFromHBLToPackageModal = () => {
-    reference.value = null;
-    copyFromHBLToPackageModalShow.value = false;
-}
-
-const handleCopyFromHBLToPackage = async () => {
-    try {
-        const response = await fetch(`/get-hbl-packages-by-reference/${reference.value}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-            },
-        });
-
-        if (!response.ok) {
-            closeCopyFromHBLToPackageModal()
-            push.error('HBL Packages Missing or Invalid Reference Number');
-            throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-            closeCopyFromHBLToPackageModal()
-            copiedPackages.value = data;
-
-            const copiedTotalWeight = copiedPackages.value.reduce((acc, curr) => acc + curr.weight, 0);
-            const copiedTotalVolume = copiedPackages.value.reduce((acc, curr) => acc + curr.volume, 0);
-
-            grandTotalWeight.value += copiedTotalWeight;
-            grandTotalVolume.value += copiedTotalVolume;
-
-            calculatePayment();
-
-            push.success('Copied!');
-        }
-
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-const handleRemoveCopiedPackages = () => {
-    copiedPackages.value = {};
-    grandTotalWeight.value = 0;
-    grandTotalVolume.value = 0;
-    calculatePayment();
-}
-
-const handleCopyShipper = () => {
-    form.consignee_name = form.hbl_name;
-    form.consignee_nic = form.nic;
-}
-
-const isShowedPaymentSummery = ref(false);
 
 const splitCountryCode = (fullNumber) => {
     for (let code of props.countryCodes) {
@@ -655,6 +167,7 @@ watch(
         const filteredShipper = props.shippers.find(
             shipper => shipper.name.toLowerCase() === newShipper.toLowerCase()
         );
+        form.shipper_id = filteredShipper['id'];
         form.email = filteredShipper['email'];
         form.nic = filteredShipper['pp_or_nic_no'];
         form.iq_number = filteredShipper['residency_no'];
@@ -671,12 +184,64 @@ watch(
         const filteredConsignee = props.consignees.find(
             consignee => consignee.name.toLowerCase() === newConsignee.toLowerCase()
         );
+        form.consignee_id = filteredConsignee['id'];
         form.consignee_address = filteredConsignee['address'];
         form.consignee_nic = filteredConsignee['pp_or_nic_no'];
         consignee_countryCode.value = splitCountryCode(filteredConsignee['mobile_number'])
         consignee_contact.value = splitContactNumber(filteredConsignee['mobile_number'])
     }
 );
+
+const handleMHBLCreate = () => {
+    form.packages = packageList.value;
+    form.post(route("mhbls.store"), {
+        onSuccess: (page) => {
+            form.reset();
+            push.success("MHBL Created Successfully!");
+        },
+        onError: () => console.log("error"),
+        preserveScroll: true,
+        preserveState: true,
+    });
+};
+
+const showAddNewPackageDialog = ref(false);
+const editMode = ref(false);
+const showPackageDialog = () => {
+    showAddNewPackageDialog.value = true;
+    if (!editMode.value) {
+        selectedType.value = "";
+    }
+};
+
+const packageItem = reactive({
+    id: 0,
+    type: props.packageTypes.find(
+        type => type.name.toLowerCase() === 'carton'.toLowerCase()
+    )?.name || "",
+    length: 0,
+    width: 0,
+    height: 0,
+    quantity: 1,
+    volume: 0,
+    totalWeight: 0,
+    remarks: "",
+    packageRule: 0,
+    measure_type: "cm",
+});
+
+const grandTotalWeight = ref(0);
+const grandTotalVolume = ref(0);
+
+
+const resetConsigneeDetails = () => {
+    form.consignee_name = "";
+    consignee_contact.value = "";
+    form.consignee_nic = "";
+    form.consignee_address = "";
+};
+
+const copiedPackages = ref({});
 
 const planeIcon = ref(`
 <svg
@@ -717,132 +282,6 @@ const shipIcon = ref(`
 </svg>
 `);
 
-const isPackageRuleSelected = ref(false);
-const packageRulesData = ref([]);
-const priceRulesData = ref([]);
-const selectedPackage = ref("");
-const isExistsRules = ref(false);
-
-const hblRules = async () => {
-    try {
-        const response = await fetch(`/get-hbl-rules`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-                // "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            },
-            body: JSON.stringify({
-                cargo_type: form.cargo_type,
-                hbl_type: form.hbl_type,
-                warehouse: form.warehouse,
-            })
-        });
-        const data = await response.json();
-        if ((!data.package_rules || data.package_rules.length === 0) &&
-            (!data.price_rules || data.price_rules.length === 0)) {
-            push.error('Please add price rules');
-            isExistsRules.value = false;
-        }else{
-            isExistsRules.value = true;
-        }
-        if (data.package_rules) {
-            packageRulesData.value = data.package_rules;
-        }
-        if (data.price_rules) {
-            priceRulesData.value = data.price_rules;
-        }
-
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-const getSelectedPackage = () => {
-    // Find the selected package from the packages array based on the selected ID
-    const selectedRule = packageRulesData.value.find(pkg => pkg.id === packageItem.packageRule);
-    if (selectedRule) {
-        isPackageRuleSelected.value = true;
-        packageItem.length = convertMeasurements(selectedRule.measure_type, selectedRule.length).toFixed(2);
-        packageItem.width = convertMeasurements(selectedRule.measure_type, selectedRule.width).toFixed(2);
-        packageItem.height = convertMeasurements(selectedRule.measure_type, selectedRule.height).toFixed(2);
-        packageItem.measure_type = selectedRule.measure_type;
-    }else {
-        isPackageRuleSelected.value = false;
-        packageItem.length = 0;
-        packageItem.width = 0;
-        packageItem.height = 0;
-    }
-};
-
-const packageItemLength = ref(0);
-const packageItemWidth = ref(0);
-const packageItemHeight = ref(0);
-
-const conversionFactors = {
-    cm: 1,
-    m: 100,
-    in: 2.54,
-    ft: 30.48,
-};
-
-function convertMeasurements(measureType, value) {
-    const factor = conversionFactors[measureType] || 1;
-    return value / factor;
-}
-
-function convertMeasurementstocm(measureType, value) {
-    const factor = conversionFactors[measureType] || 1;
-    return value * factor;
-}
-
-watch(
-    () => packageItem.measure_type,
-    (newMeasureType) => {
-        packageItemLength.value = convertMeasurementstocm(newMeasureType, packageItem.length);
-        packageItemWidth.value = convertMeasurementstocm(newMeasureType, packageItem.width);
-        packageItemHeight.value = convertMeasurementstocm(newMeasureType, packageItem.height);
-    }
-);
-
-watch(
-    [() => packageItem.length],
-    ([newLength]) => {
-        packageItemLength.value = convertMeasurementstocm(packageItem.measure_type, newLength);
-    }
-);
-
-watch(
-    [() => packageItem.width],
-    ([newWidth]) => {
-        packageItemWidth.value = convertMeasurementstocm(packageItem.measure_type, newWidth);
-    }
-);
-
-watch(
-    [() => packageItem.height],
-    ([newHeight]) => {
-        packageItemHeight.value = convertMeasurementstocm(packageItem.measure_type, newHeight);
-    }
-);
-
-const volumeUnit = computed(() => {
-    const units = {
-        cm: 'CM.CU',
-        m: 'M.CU',
-        in: 'IN.CU',
-        ft: 'FT.CU',
-    };
-    return units[packageItem.measure_type] || 'M.CM';
-});
-
-const hblId = ref(null);
-const showConfirmViewHBLModal = ref(false);
-
-const confirmViewHBL = async (id) => {
-    hblId.value = id;
-    showConfirmViewHBLModal.value = true;
-};
 </script>
 
 <template>
@@ -853,7 +292,7 @@ const confirmViewHBL = async (id) => {
         <Breadcrumb/>
 
         <!-- Create Pickup Form -->
-        <form @submit.prevent="handleHBLCreate">
+        <form @submit.prevent="handleMHBLCreate">
             <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
                 <div class="sm:col-span-2 grid grid-rows gap-4">
 
@@ -1309,31 +748,7 @@ const confirmViewHBL = async (id) => {
                                 >
                                     Package Details
                                 </h2>
-                                <a v-if="Object.values(copiedPackages).length === 0"
-                                   @click.prevent="confirmShowingCopyFromHBLToPackageModal"
-                                   x-tooltip.placement.bottom="'Copy from HBL'"
-                                >
-                                    <svg class="icon icon-paste text-[#64748b] ml-5" fill="none" stroke="#64748b"
-                                         stroke-linecap="round"
-                                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" height="24"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <!-- Clipboard shape -->
-                                        <path
-                                            d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h1v-1a2 2 0 0 1 2 -2z"/>
-                                        <!-- Horizontal line representing pasted content -->
-                                        <path d="M9 7h6"/>
-                                    </svg>
-
-                                </a>
-                                <DangerOutlineButton v-if="Object.values(copiedPackages).length > 0"
-                                                     @click.prevent="handleRemoveCopiedPackages">
-                                    Remove Copied Packages
-                                </DangerOutlineButton>
                             </div>
-                            <PrimaryOutlineButton v-if="Object.values(copiedPackages).length === 0" type="button" :disabled="!isExistsRules"
-                                                  @click="showPackageDialog">
-                                New Package <i class="fas fa-plus fa-fw fa-fw"></i>
-                            </PrimaryOutlineButton>
                         </div>
 
                         <DialogModal :maxWidth="'xl'" :show="copyFromHBLToPackageModalShow"
@@ -1355,15 +770,6 @@ const confirmViewHBL = async (id) => {
                             </template>
 
                             <template #footer>
-                                <SecondaryButton @click="closeCopyFromHBLToPackageModal">
-                                    Cancel
-                                </SecondaryButton>
-                                <PrimaryButton
-                                    class="ms-3"
-                                    @click.prevent="handleCopyFromHBLToPackage"
-                                >
-                                    Copy From HBL
-                                </PrimaryButton>
                             </template>
                         </DialogModal>
 
@@ -1375,11 +781,6 @@ const confirmViewHBL = async (id) => {
                                 <table class="is-zebra w-full text-left">
                                     <thead>
                                     <tr>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 text-center"
-                                        >
-                                            <span class="hidden">Actions</span>
-                                        </th>
                                         <th
                                             class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                                         >
@@ -1424,21 +825,7 @@ const confirmViewHBL = async (id) => {
                                     </thead>
                                     <tbody>
                                     <tr v-for="(item, index) in packageList">
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
-                                            <button
-                                                class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
-                                                @click.prevent="confirmRemovePackage(index)"
-                                            >
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
 
-                                            <button
-                                                class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
-                                                @click.prevent="openEditModal(index)"
-                                            >
-                                                <i class="fa-solid fa-edit"></i>
-                                            </button>
-                                        </td>
                                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                             {{ item.type }}
                                         </td>
@@ -1710,79 +1097,9 @@ const confirmViewHBL = async (id) => {
                                     >
                                         <p class="line-clamp-1">Grand Total</p>
                                         <div class="flex items-center">
-                                            <svg v-if="packageList.length > 0"
-                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle mr-3 text-info hover:cursor-pointer"
-                                                 fill="none" height="24" stroke="currentColor" stroke-linecap="round"
-                                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
-                                                 xmlns="http://www.w3.org/2000/svg"
-                                                 @click="isShowedPaymentSummery = !isShowedPaymentSummery">
-                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
-                                                <path d="M12 9h.01"/>
-                                                <path d="M11 12h1v4h1"/>
-                                            </svg>
                                             <p>{{ hblTotal ? hblTotal.toFixed(2) : 0.00 }} {{ currency }}</p>
                                         </div>
                                     </div>
-                                    <template v-if="isShowedPaymentSummery">
-                                        <div v-if="packageList.length > 0" class="p-2 bg-slate-100 rounded-lg mt-2">
-                                            <table class="italic w-full">
-                                                <tr v-if="!form.is_active_package">
-                                                    <td colspan="2">Freight Charges</td>
-                                                    <td colspan="2">
-                                                    <span v-for="(charge, index) in freight_charge_operations"
-                                                          :key="index">
-                                                        {{ charge }} <br>
-                                                    </span>
-                                                    </td>
-                                                    <td class="text-right">{{
-                                                            parseFloat(form.freight_charge).toFixed(2)
-                                                        }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Destination Charge</td>
-                                                    <td class="text-right">
-                                                        {{ parseFloat(form.destination_charges).toFixed(2) }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Package Charge</td>
-                                                    <td class="text-right">
-                                                        {{ parseFloat(form.package_charges).toFixed(2) }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Bill Charges</td>
-                                                    <td class="text-right">{{ parseFloat(form.bill_charge).toFixed(2) }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Discount</td>
-                                                    <td class="text-right">- {{
-                                                            parseFloat(form.discount).toFixed(2)
-                                                        }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Additional Charge</td>
-                                                    <td class="text-right">+
-                                                        {{ parseFloat(form.additional_charge).toFixed(2) }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Vat</td>
-                                                    <td class="text-right">+
-                                                        {{ parseFloat(vat).toFixed(2) }}
-                                                    </td>
-                                                </tr>
-                                                <tr class="font-bold">
-                                                    <td colspan="4">Total</td>
-                                                    <td class="text-right">{{ hblTotal.toFixed(2) }}</td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </template>
                                 </div>
                                 <!-- -->
                             </div>
@@ -1801,11 +1118,11 @@ const confirmViewHBL = async (id) => {
                     </DangerOutlineButton>
                     <PrimaryButton
                         :class="{ 'opacity-50': form.processing }"
-                        :disabled="form.processing || !isExistsRules"
+                        :disabled="form.processing"
                         class="space-x-2"
                         type="submit"
                     >
-                        <span>Create a HBL</span>
+                        <span>Create a MHBL</span>
                         <svg
                             class="size-5"
                             fill="none"
@@ -1825,274 +1142,5 @@ const confirmViewHBL = async (id) => {
             </div>
 
         </form>
-
-        <div
-            v-if="showAddNewPackageDialog"
-            class="fixed px-2 inset-0 z-[100] flex flex-col items-center justify-center overflow-y-auto"
-            role="dialog"
-        >
-            <div
-                class="absolute inset-0 bg-slate-900/60 transition-opacity duration-300"
-                x-show="true"
-                @click="false"
-            ></div>
-
-            <div
-                class="relative w-auto sm:w-1/2 h-auto sm:h-1/5 md:h-fit lg:h-fit rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
-            >
-                <div
-                    class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5"
-                >
-                    <h3 class="text-base font-medium text-slate-700 dark:text-navy-100">
-                        {{ editMode ? "Edit Package" : "Add New Package" }}
-                    </h3>
-                    <button
-                        class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        @click="closeAddPackageModal"
-                    >
-                        <svg
-                            class="size-4.5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M6 18L18 6M6 6l12 12"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            ></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="px-4 py-4 sm:px-5">
-                    <p class="text-base">
-                        {{ !editMode ? "Add new package to HBL" : "" }}
-                    </p>
-
-                    <div class="mt-4 space-y-4">
-                        <div class="grid grid-cols-4 gap-4">
-                            <div class="col-span-4" v-if="packageRulesData.length > 0" >
-                                <label class="block">
-                                    <span>
-                                        Package
-                                        <span v-if="form.is_active_package" class="text-red-500 text-sm">*</span>
-                                    </span>
-                                    <select
-                                        v-model="packageItem.packageRule"
-                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        @change="getSelectedPackage"
-                                        :required="form.is_active_package"
-                                        :disabled="!form.is_active_package && packageList.length > 0"
-                                    >
-                                        <option value="0">Choose Package</option>
-                                        <option
-                                            v-for="pkg in packageRulesData"
-                                            :key="pkg.id"
-                                            :value="pkg.id"
-                                        >
-                                            {{ getPackageRuleTitle(pkg.rule_title,pkg.length, pkg.width, pkg.height, pkg.measure_type)}}
-                                        </option>
-                                    </select>
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                                    <span>Type </span>
-                                    <select
-                                        v-model="selectedType"
-                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        @change="updateTypeDescription"
-                                    >
-                                        <option value="">Choose one</option>
-                                        <option v-for="type in packageTypes" :key="type.name">
-                                            {{ type.name }}
-                                        </option>
-                                    </select>
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-2">
-                                <label class="block">
-                                  <span
-                                  >Type Description
-                                    <span class="text-red-500 text-sm">*</span></span
-                                  >
-                                    <input
-                                        v-model="packageItem.type"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Sofa set"
-                                        type="text"
-                                    />
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                                  <span
-                                  >Measure Type <span class="text-red-500 text-sm"
-                                  >*<br/></span
-                                  ></span>
-                                    <select
-                                        v-model="packageItem.measure_type"
-                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    >
-                                        <option value="cm">cm</option>
-                                        <option value="m">m</option>
-                                        <option value="in">in</option>
-                                        <option value="ft">ft</option>
-                                    </select>
-                                </label>
-                            </div>
-
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                                  <span
-                                  >Length (cm) <br/>
-                                    <span class="text-red-500 text-sm">*</span></span
-                                  >
-                                    <input
-                                        v-model="packageItem.length"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0.00"
-                                        placeholder="1.00"
-                                        step="0.01"
-                                        type="number"
-                                    />
-                                    <span class="ml-2 text-red-500 text-sm">{{packageItemLength.toFixed(2)}} cm</span>
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                                  <span
-                                  >Width <br/><span class="text-red-500 text-sm">*</span>
-                                  </span>
-
-                                    <input
-                                        v-model="packageItem.width"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0.00"
-                                        placeholder="1.00"
-                                        step="0.01"
-                                        type="number"
-                                    />
-                                    <span class="ml-2 text-red-500 text-sm">{{packageItemWidth.toFixed(2)}} cm</span>
-                                </label>
-                            </div>
-
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                  <span
-                  >Height <br/><span class="text-red-500 text-sm"
-                  >*<br/></span
-                  ></span>
-                                    <input
-                                        v-model="packageItem.height"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0.00"
-                                        placeholder="1.00"
-                                        step="0.01"
-                                        type="number"
-                                    />
-                                    <span class="ml-2 text-red-500 text-sm">{{packageItemHeight.toFixed(2)}} cm</span>
-                                </label>
-                            </div>
-
-                            <!--                            <div class="col-span-4 md:col-span-1">-->
-                            <!--                                -->
-                            <!--                            </div>-->
-
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                  <span
-                  >Quantity <br/><span class="text-red-500 text-sm"
-                  >*<br/></span
-                  ></span>
-                                    <input
-                                        v-model="packageItem.quantity"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0"
-                                        placeholder="1"
-                                        step="1"
-                                        type="number"
-                                    />
-                                </label>
-                            </div>
-
-                            <div class="col-span-4 md:col-span-3"></div>
-
-                            <div class="col-span-2">
-                                <label class="block">
-                  <span
-                  >Volume ({{volumeUnit }})
-                    <span class="text-red-500 text-sm">*</span></span
-                  >
-                                    <input
-                                        v-model="packageItem.volume"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="1.00"
-                                        step="0.001"
-                                        type="number"
-                                    />
-                                    <span class="ml-2 text-red-500 text-sm">{{packageItemVolume}} M.CU</span>
-                                </label>
-                            </div>
-                            <div class="col-span-2">
-                                <label class="block">
-                                    <span>Total Weight</span>
-                                    <input
-                                        v-model="packageItem.totalWeight"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0"
-                                        placeholder="1"
-                                        step="1"
-                                        type="number"
-                                    />
-                                </label>
-                            </div>
-
-                            <div class="col-span-4">
-                                <label class="block">
-                                    <span>Remarks</span>
-                                    <textarea
-                                        v-model="packageItem.remarks"
-                                        class="form-textarea mt-1.5 w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Enter Text"
-                                        rows="4"
-                                    ></textarea>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="space-x-2 text-right">
-                            <SecondaryButton
-                                class="min-w-[7rem]"
-                                @click="closeAddPackageModal"
-                            >
-                                Cancel
-                            </SecondaryButton>
-                            <PrimaryButton
-                                class="min-w-[7rem]"
-                                type="button"
-                                @click="addPackageData"
-                            >
-                                {{ editMode ? "Edit" : "Add" }}
-                            </PrimaryButton>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <RemovePackageConfirmationModal
-            :show="showConfirmRemovePackageModal"
-            @close="closeModal"
-            @remove-package="handleRemovePackage"
-        />
-
-        <HBLDetailModal
-            :hbl-id="hblId"
-            :show="showConfirmViewHBLModal"
-            @close="closeViewModal"
-        />
     </AppLayout>
 </template>
