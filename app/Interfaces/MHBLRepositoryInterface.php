@@ -2,7 +2,16 @@
 
 namespace App\Interfaces;
 
+use App\Models\Mhbl;
+use Illuminate\Http\JsonResponse;
+
 interface MHBLRepositoryInterface
 {
     public function storeHBL(array $data);
+
+    public function deleteMHBL(MHBL $MHBL);
+
+    public function addNewHBL(array $data): JsonResponse;
+
+    public function updateMHBL(MHBL $mhbl, array $data);
 }
