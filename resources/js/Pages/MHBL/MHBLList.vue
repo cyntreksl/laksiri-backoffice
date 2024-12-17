@@ -201,7 +201,7 @@ const createColumns = () => [
           usePage().props.user.permissions.includes("hbls.edit") && h("a", {
             href: "#",
             className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-            onClick: () => router.visit(route("hbls.edit", row.cells[0].data)),
+            onClick: () => router.visit(route("mhbls.edit", row.cells[0].data)),
           }, "Edit"),
 
           usePage().props.user.permissions.includes("hbls.show") && h("a", {

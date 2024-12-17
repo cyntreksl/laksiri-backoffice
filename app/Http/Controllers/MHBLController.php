@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Branch\GetDestinationBranches;
 use App\Enum\CargoType;
 use App\Enum\HBLType;
+use App\Http\Requests\UpdateMHBLRequest;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\MHBLRepositoryInterface;
 use App\Interfaces\OfficerRepositoryInterface;
@@ -99,5 +100,65 @@ class MHBLController extends Controller
         $this->authorize('hbls.delete');
 
         $this->mhblRepository->deleteMHBL($mhbl);
+    }
+
+    public function edit(MHBL $mhbl)
+    {
+        $this->authorize('hbls.edit');
+
+        $mhblData = $mhbl
+            ->with([
+                'warehouse',
+                'shipper',
+                'consignee',
+                'hbls.packages'
+            ])
+            ->get()
+            ->first();
+
+        if ($mhblData && $mhblData->hbls) {
+            $hblPackages = $mhblData->hbls->flatMap(function ($hbl) {
+                return $hbl->packages->map(function ($package) use ($hbl) {
+                    return [
+                        'hbl' => $hbl->hbl_number,
+                        'hbl_id' => $hbl->id,
+                        'id' => $package->id,
+                        'type' => $package->package_type ?? '',
+                        'length' => $package->length ?? 0,
+                        'width' => $package->width ?? 0,
+                        'height' => $package->height ?? 0,
+                        'quantity' => $package->quantity ?? 1,
+                        'volume' => $package->volume ?? 0,
+                        'totalWeight' => $package->total_weight ?? 0,
+                        'remarks' => $package->remarks ?? '',
+                        'packageRule' => $package->package_rule ?? 0,
+                        'measure_type' => $package->measure_type ?? 'cm',
+                        'weight' => $package->weight ?? 0,
+                    ];
+                });
+            });
+        }
+
+        return Inertia::render('MHBL/EditMHBL', [
+            'cargoTypes' => CargoType::cases(),
+            'hblTypes' => HBLType::cases(),
+            'warehouses' => GetDestinationBranches::run(),
+            'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
+            'shippers' => $this->officerRepository->getShippers(),
+            'consignees' => $this->officerRepository->getConsignees(),
+            'mhbl' => $mhblData,
+            'hblIds' => $mhblData->hbls->pluck('id')->toArray(),
+            'packages' => $hblPackages ?? [],
+        ]);
+    }
+
+    public function addNewHBL(Request $request)
+    {
+        return $this->mhblRepository->addNewHBL($request->all());
+    }
+
+    public function update(MHBL $mhbl, UpdateMHBLRequest $request)
+    {
+        $this->mhblRepository->updateMHBL($mhbl, $request->all());
     }
 }

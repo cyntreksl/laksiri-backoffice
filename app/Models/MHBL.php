@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
@@ -35,15 +36,27 @@ class Mhbl extends Model
         return LogOptions::defaults()->logAll()->logOnlyDirty();
     }
 
-    public function hbls(): HasMany
+    public function hbls(): HasManyThrough
     {
-        return $this->hasMany(MHBLsHBL::class, 'mhbl_id', 'id');
+        return $this->hasManyThrough(
+            HBL::class,
+            MHBLsHBL::class,
+            'mhbl_id',
+            'id',
+            'id',
+            'hbl_id'
+        );
     }
 
     public function shipper(): HasOne
     {
         return $this->hasOne(Officer::class, 'id', 'shipper_id')
             ->where('type', 'shipper');
+    }
+
+    public function warehouse(): HasOne
+    {
+        return $this->hasOne(Branch::class, 'id', 'warehouse_id');
     }
 
     public function consignee(): HasOne

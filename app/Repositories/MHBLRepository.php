@@ -3,14 +3,19 @@
 namespace App\Repositories;
 
 use App\Actions\Branch\GetBranchByName;
+use App\Actions\HBL\GetHBLByHBLNumber;
+use App\Actions\HBL\GetHBLByReference;
 use App\Actions\MHBL\CreateMHBL;
 use App\Actions\MHBL\CreateMHBLsHBL;
 use App\Actions\MHBL\DeleteMHBL;
+use App\Actions\MHBL\UpdateMHBL;
+use App\Actions\MHBL\UpdateMHBLsHBL;
 use App\Factory\MHBL\FilterFactory;
 use App\Http\Resources\MHBLResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\MHBLRepositoryInterface;
 use App\Models\Mhbl;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
@@ -69,5 +74,20 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
     public function deleteMHBL(MHBL $mhbl)
     {
         return DeleteMHBL::run($mhbl);
+    }
+
+    public function addNewHBL(array $data): JsonResponse
+    {
+        $hbl = GetHBLByHBLNumber::run($data['hbl_number']);
+        return response()->json($hbl);
+    }
+
+    public function updateMHBL(MHBL $mhbl, array $data)
+    {
+        $mhbl = UpdateMHBL::run($mhbl, $data);
+
+        UpdateMHBLsHBL::run($mhbl, $data['hbls']);
+
+        return $mhbl;
     }
 }
