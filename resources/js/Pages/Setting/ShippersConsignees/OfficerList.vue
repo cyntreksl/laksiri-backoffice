@@ -47,22 +47,28 @@ defineProps({
                         Name
                     </th>
                     <th
-                        class="whitespace-nowrap rounded-tl-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
                         Email
                     </th>
                     <th
-                        class="whitespace-nowrap rounded-tl-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
-                        Office Type
+                       Mobile Number
+                    </th>
+
+                    <th
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                    >
+                        Officer Type
                     </th>
                     <th
-                        class="whitespace-nowrap rounded-tl-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
                        NIC
                     </th>
                     <th
-                        class="whitespace-nowrap rounded-tl-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
                         Residency No
                     </th>
@@ -71,11 +77,6 @@ defineProps({
                     >
                         Address
                     </th>
-
-
-
-
-
                 </tr>
                 </thead>
                 <tbody>
@@ -96,6 +97,9 @@ defineProps({
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                         {{officer.mobile_number}}
+                    </td>
+                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                        {{officer.type}}
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                         {{officer.pp_or_nic_no}}

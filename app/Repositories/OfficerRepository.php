@@ -21,7 +21,6 @@ class OfficerRepository implements OfficerRepositoryInterface
 
     public function getAllofficers()
     {
-
         return GetOfficers::run();
     }
 }
