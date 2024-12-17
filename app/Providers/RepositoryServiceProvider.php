@@ -22,6 +22,8 @@ use App\Interfaces\ExceptionNameRepositoryInterface;
 use App\Interfaces\FileManagerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
+use App\Interfaces\MHBLRepositoryInterface;
+use App\Interfaces\OfficerRepositoryInterface;
 use App\Interfaces\PackagePriceRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
@@ -54,6 +56,8 @@ use App\Repositories\ExceptionNameRepository;
 use App\Repositories\FileManagerRepository;
 use App\Repositories\HBLRepository;
 use App\Repositories\LoadedContainerRepository;
+use App\Repositories\MHBLRepository;
+use App\Repositories\OfficerRepository;
 use App\Repositories\PackagePriceRepository;
 use App\Repositories\PackageTypeRepository;
 use App\Repositories\PickupExceptionRepository;
@@ -107,6 +111,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(UserFeedbackRepositoryInterface::class, UserFeedbackRepository::class);
         $this->app->bind(AnyFileUploadRepositoryInterface::class, AnyFileUploadRepository::class);
         $this->app->bind(CountryRepositoryInterface::class, CountryRepository::class);
+        $this->app->bind(OfficerRepositoryInterface::class, OfficerRepository::class);
+        $this->app->bind(MHBLRepositoryInterface::class, MHBLRepository::class);
     }
 
     public function boot(): void

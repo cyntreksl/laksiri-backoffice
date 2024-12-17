@@ -70,4 +70,6 @@ interface HBLRepositoryInterface
     public function getHBLRules(array $data);
 
     public function downloadGatePass($hbl);
+
+    public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []);
 }

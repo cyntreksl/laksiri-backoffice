@@ -351,4 +351,23 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->downloadGatePass($hbl);
     }
+
+    public function showDoorToDoorList()
+    {
+        $this->authorize('hbls.index');
+
+        return Inertia::render('HBL/HBLDoorToDoorList', []);
+    }
+
+    public function getDoorToDoorList(Request $request): JsonResponse
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+        $search = $request->input('search', null);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus']);
+
+        return $this->HBLRepository->getDoorToDoorHBL($limit, $page, $order, $dir, $search, $filters);
+    }
 }
