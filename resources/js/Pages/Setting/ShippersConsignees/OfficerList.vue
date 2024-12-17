@@ -16,7 +16,7 @@ defineProps({
 
 <template>
     <AppLayout title="Officerss">
-        <template #header>Officerss</template>
+        <template #header>Officers</template>
 
         <Breadcrumb/>
 
