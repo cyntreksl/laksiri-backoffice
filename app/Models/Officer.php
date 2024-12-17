@@ -22,7 +22,7 @@ class Officer extends Model
     protected $table = 'officers';
 
     protected $fillable = [
-        'type', 'name', 'email', 'mobile_number', 'pp_or_nic_no', 'residency_no', 'address',
+        'branch_id', 'type', 'name', 'email', 'mobile_number', 'pp_or_nic_no', 'residency_no', 'address',
     ];
 
     public function getActivitylogOptions(): LogOptions
