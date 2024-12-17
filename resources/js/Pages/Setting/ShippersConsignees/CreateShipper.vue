@@ -24,7 +24,7 @@ const form = useForm({
 });
 
 const createShipper = () => {
-    form.post(route("setting.shipper-consignees.storeshipper"), {
+    form.post(route("setting.shipper-consignees.store"), {
         onSuccess: () => {
             closeModal();
             form.reset();
@@ -45,76 +45,107 @@ const createShipper = () => {
     </div>
 
     <DialogModal :maxWidth="'xl'" :show="confirmShipperCreation" @close="closeModal">
-        <template #title> Create New Shipper </template>
+        <template #title>   Create New Shipper </template>
         <template #content>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 gap-5">
                 <!-- Name Field -->
-                <div class="col-span-1 sm:col-span-2">
+                <div>
                     <InputLabel for="name" value="Name" />
-                    <TextInput
-                        v-model="form.name"
-                        id="name"
-                        type="text"
-                        class="w-full"
-                        placeholder="Enter Name"
-                    />
+                    <div class="flex items-center border border-gray-300 rounded-md px-2">
+                        <span class="material-icons text-gray-500">person</span>
+                        <TextInput
+                            v-model="form.name"
+                            id="name"
+                            type="text"
+                            class="w-full border-0 focus:ring-0"
+                            placeholder="Name"
+                        />
+                    </div>
                     <InputError :message="form.errors.name" />
                 </div>
 
                 <!-- Email Field -->
-                <div class="col-span-1 sm:col-span-2">
+                <div>
                     <InputLabel for="email" value="Email" />
-                    <TextInput
-                        v-model="form.email"
-                        id="email"
-                        type="email"
-                        class="w-full"
-                        placeholder="Enter Email"
-                    />
-                    <InputError :message="form.errors.email" />
-                </div>
-                <!-- Mobile Field -->
-                <div class="col-span-1 sm:col-span-2">
-                    <InputLabel for="mobile_number" value="Email" />
-                    <TextInput
-                        v-model="form.mobile_number"
-                        id="mobile_number"
-                        type="text"
-                        class="w-full"
-                        placeholder="Enter Mobile No"
-                    />
+                    <div class="flex items-center border border-gray-300 rounded-md px-2">
+                        <span class="material-icons text-gray-500">email</span>
+                        <TextInput
+                            v-model="form.email"
+                            id="email"
+                            type="email"
+                            class="w-full border-0 focus:ring-0"
+                            placeholder="Email"
+                        />
+                    </div>
                     <InputError :message="form.errors.email" />
                 </div>
 
-                <!-- Passport or NIC Number Field -->
-                <div class="col-span-1 sm:col-span-2">
-                    <InputLabel for="pp_or_nic_no" value="Passport/NIC Number" />
+                <!-- Mobile Number Field -->
+                <div>
+                    <InputLabel for="mobile_number" value="Mobile Number" />
+                    <div class="flex items-center">
+                        <select
+                            v-model="form.country_code"
+                            class="border border-gray-300 rounded-l-md p-2"
+                        >
+                            <option value="+44">+44</option>
+                            <option value="+1">+1</option>
+                            <option value="+94">+94</option>
+                        </select>
+                        <TextInput
+                            v-model="form.mobile_number"
+                            id="mobile_number"
+                            type="text"
+                            class="w-full border border-gray-300 rounded-r-md focus:ring-0"
+                            placeholder="123 4567 890"
+                        />
+                    </div>
+                    <InputError :message="form.errors.mobile_number" />
+                </div>
+
+                <!-- Passport/NIC Field -->
+                <div>
+                    <InputLabel for="pp_or_nic_no" value="PP or NIC No" />
                     <TextInput
                         v-model="form.pp_or_nic_no"
                         id="pp_or_nic_no"
                         type="text"
                         class="w-full"
-                        placeholder="Enter Passport or NIC Number"
+                        placeholder="PP or NIC No"
                     />
                     <InputError :message="form.errors.pp_or_nic_no" />
                 </div>
 
-                <!-- Residency Number Field -->
-                <div class="col-span-1 sm:col-span-2">
-                    <InputLabel for="residency_no" value="Residency Number" />
+                <!-- Residency No Field -->
+                <div>
+                    <InputLabel for="residency_no" value="Residency No" />
                     <TextInput
                         v-model="form.residency_no"
                         id="residency_no"
                         type="text"
                         class="w-full"
-                        placeholder="Enter Residency Number"
+                        placeholder="Residency No"
                     />
                     <InputError :message="form.errors.residency_no" />
                 </div>
+
+                <!-- Address Field -->
+                <div>
+                    <InputLabel for="address" value="Address" />
+                    <textarea
+                        v-model="form.address"
+                        id="address"
+                        class="w-full border-gray-300 rounded-md"
+                        placeholder="Type address here..."
+                        rows="3"
+                    ></textarea>
+                    <InputError :message="form.errors.address" />
+                </div>
             </div>
         </template>
+
         <template #footer>
-            <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
+            <SecondaryButton @click="closeModal">Cancel</SecondaryButton>
             <PrimaryButton
                 :class="{ 'opacity-25': form.processing }"
                 :disabled="form.processing"
@@ -126,6 +157,7 @@ const createShipper = () => {
         </template>
     </DialogModal>
 </template>
+
 
 
 <style scoped></style>

@@ -3,6 +3,7 @@
 use App\Models\Branch;
 use App\Models\Container;
 use App\Models\ExceptionName;
+use App\Models\Mhbl;
 use App\Models\PackageType;
 use App\Models\PickUp;
 use App\Models\User;
@@ -102,11 +103,32 @@ Breadcrumbs::for('hbls.cancelled-hbls', function (BreadcrumbTrail $trail) {
     $trail->push('Cancelled HBL List', route('hbls.cancelled-hbls'));
 });
 
+// MHBL > create
+Breadcrumbs::for('mhbls.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('MHBL', route('mhbls.index'));
+    $trail->push('MHBL Create', route('mhbls.create'));
+});
+
 // Users
 Breadcrumbs::for('users.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('User Management', route('users.index'));
     $trail->push('System Users', route('users.index'));
+});
+
+//MHBLs
+Breadcrumbs::for('mhbls.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('MHBL');
+    $trail->push('MHBL List', route('mhbls.index'));
+});
+
+// Users > Edit
+Breadcrumbs::for('mhbls.edit', function (BreadcrumbTrail $trail, MHBL $mhbl) {
+    $trail->parent('dashboard');
+    $trail->push('MHBL');
+    $trail->push('MHBL Edit', route('mhbls.edit', $mhbl->id));
 });
 
 // Users > Edit
