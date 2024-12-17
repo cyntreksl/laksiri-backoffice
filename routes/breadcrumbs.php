@@ -103,6 +103,13 @@ Breadcrumbs::for('hbls.cancelled-hbls', function (BreadcrumbTrail $trail) {
     $trail->push('Cancelled HBL List', route('hbls.cancelled-hbls'));
 });
 
+// MHBL > create
+Breadcrumbs::for('mhbls.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('MHBL', route('mhbls.index'));
+    $trail->push('MHBL Create', route('mhbls.create'));
+});
+
 // Users
 Breadcrumbs::for('users.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
