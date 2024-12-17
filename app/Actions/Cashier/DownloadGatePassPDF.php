@@ -54,6 +54,6 @@ class DownloadGatePassPDF
 
         $filename = 'RECEIPT'.$hbl['reference'].'.pdf';
 
-        return $pdf->download($filename);
+        return $pdf->stream($filename);
     }
 }
