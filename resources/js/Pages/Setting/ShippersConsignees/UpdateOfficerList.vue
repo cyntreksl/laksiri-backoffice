@@ -23,12 +23,15 @@ const form = useForm({
     pp_or_nic_no: props.officer.pp_or_nic_no,
     residency_no : props.officer.residency_no,
 });
+const updateOfficerList =() =>{
+    form.put(route("setings."))
+}
 
 </script>
 
-<template>
-
-</template>
+<template #header>Edit Officer Details</template>
+<AppLayout title="edit Officer Details"
+<template> </template>
 
 <style scoped>
 
