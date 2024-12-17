@@ -2,12 +2,6 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { push } from "notivue";
-
-import { ref } from "vue";
-import { Link, router } from "@inertiajs/vue3";
-import CreateExceptionNameForm from "@/Pages/Setting/ExceptionNames/CreateExceptionNameForm.vue";
 import CreateShipper from "@/Pages/Setting/ShippersConsignees/CreateShipper.vue";
 import CreateConsignee from "@/Pages/Setting/ShippersConsignees/CreateConsignee.vue";
 defineProps({
@@ -21,8 +15,8 @@ defineProps({
 </script>
 
 <template>
-    <AppLayout title="Package Types">
-        <template #header>Package Types</template>
+    <AppLayout title="Officerss">
+        <template #header>Officerss</template>
 
         <Breadcrumb/>
 

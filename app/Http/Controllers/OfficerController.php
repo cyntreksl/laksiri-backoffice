@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreShipperRequest;
 use App\Interfaces\OfficerRepositoryInterface;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
@@ -21,5 +22,11 @@ class OfficerController extends Controller
         return Inertia::render('Setting/ShippersConsignees/OfficerList', [
             'allOfficers' => $this->officerRepository->getAllofficers(),
         ]);
+    }
+
+    public function storeshipper(StoreShipperRequest $request)
+    {
+
+        $this->officerRepository->storeshipperOfficers($request->all());
     }
 }

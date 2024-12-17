@@ -17,16 +17,18 @@ const form = useForm({
     type:"shipper",
     name: "",
     email: "",
-    mobile_number: "",
-    nic: "",
+    mobile_number:"",
+    pp_or_nic_no: "",
+    residency_no:""
+
 });
 
 const createShipper = () => {
-    form.post(route("setting.shipper.store"), {
+    form.post(route("setting.shipper-consignees.storeshipper"), {
         onSuccess: () => {
             closeModal();
             form.reset();
-            router.visit(route(""));
+            router.visit(route("setting.shipper-consignees.index"));
             push.success("Shipper Created Successfully");
         },
         preserveScroll: true,
@@ -40,8 +42,8 @@ const createShipper = () => {
         <PrimaryButton @click="confirmShipperCreation = !confirmShipperCreation">
             Create New Shipper
         </PrimaryButton>
-
     </div>
+
     <DialogModal :maxWidth="'xl'" :show="confirmShipperCreation" @close="closeModal">
         <template #title> Create New Shipper </template>
         <template #content>
@@ -71,31 +73,43 @@ const createShipper = () => {
                     />
                     <InputError :message="form.errors.email" />
                 </div>
-
-                <!-- Mobile Number Field -->
+                <!-- Mobile Field -->
                 <div class="col-span-1 sm:col-span-2">
-                    <InputLabel for="mobile_number" value="Mobile Number" />
+                    <InputLabel for="mobile_number" value="Email" />
                     <TextInput
                         v-model="form.mobile_number"
                         id="mobile_number"
-                        type="tel"
-                        class="w-full"
-                        placeholder="Enter Mobile Number"
-                    />
-                    <InputError :message="form.errors.mobile_number" />
-                </div>
-
-                <!-- NIC Field -->
-                <div class="col-span-1 sm:col-span-2">
-                    <InputLabel for="nic" value="NIC" />
-                    <TextInput
-                        v-model="form.nic"
-                        id="nic"
                         type="text"
                         class="w-full"
-                        placeholder="Enter NIC"
+                        placeholder="Enter Mobile No"
                     />
-                    <InputError :message="form.errors.nic" />
+                    <InputError :message="form.errors.email" />
+                </div>
+
+                <!-- Passport or NIC Number Field -->
+                <div class="col-span-1 sm:col-span-2">
+                    <InputLabel for="pp_or_nic_no" value="Passport/NIC Number" />
+                    <TextInput
+                        v-model="form.pp_or_nic_no"
+                        id="pp_or_nic_no"
+                        type="text"
+                        class="w-full"
+                        placeholder="Enter Passport or NIC Number"
+                    />
+                    <InputError :message="form.errors.pp_or_nic_no" />
+                </div>
+
+                <!-- Residency Number Field -->
+                <div class="col-span-1 sm:col-span-2">
+                    <InputLabel for="residency_no" value="Residency Number" />
+                    <TextInput
+                        v-model="form.residency_no"
+                        id="residency_no"
+                        type="text"
+                        class="w-full"
+                        placeholder="Enter Residency Number"
+                    />
+                    <InputError :message="form.errors.residency_no" />
                 </div>
             </div>
         </template>
@@ -112,5 +126,6 @@ const createShipper = () => {
         </template>
     </DialogModal>
 </template>
+
 
 <style scoped></style>
