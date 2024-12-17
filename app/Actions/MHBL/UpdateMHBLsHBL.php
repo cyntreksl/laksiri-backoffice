@@ -4,7 +4,6 @@ namespace App\Actions\MHBL;
 
 use App\Models\Mhbl;
 use App\Models\MHBLsHBL;
-use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class UpdateMHBLsHBL

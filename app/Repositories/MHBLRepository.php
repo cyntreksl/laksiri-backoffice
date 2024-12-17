@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Actions\Branch\GetBranchByName;
 use App\Actions\HBL\GetHBLByHBLNumber;
-use App\Actions\HBL\GetHBLByReference;
 use App\Actions\MHBL\CreateMHBL;
 use App\Actions\MHBL\CreateMHBLsHBL;
 use App\Actions\MHBL\DeleteMHBL;
@@ -79,6 +78,7 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
     public function addNewHBL(array $data): JsonResponse
     {
         $hbl = GetHBLByHBLNumber::run($data['hbl_number']);
+
         return response()->json($hbl);
     }
 

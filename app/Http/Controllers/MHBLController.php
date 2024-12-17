@@ -111,7 +111,7 @@ class MHBLController extends Controller
                 'warehouse',
                 'shipper',
                 'consignee',
-                'hbls.packages'
+                'hbls.packages',
             ])
             ->get()
             ->first();
