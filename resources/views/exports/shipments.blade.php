@@ -63,15 +63,15 @@
     <tr>
         <th colspan="10" style="text-align:center;">
             <strong><em>
-                    <mark style="background-color: #89b3e3">UNIVERSAL FREIGHT SERVICES</mark>
+                    <u> UNIVERSAL FREIGHT SERVICES </u>
                 </em></strong>
         </th>
 
     </tr>
 
     <tr>
-        <th colspan="10" style="background-color: gray ; text-align: center; ">
-            <strong> <em> AIR CARGO MANIFEST </em> </strong>
+        <th colspan="10" style="background-color: #D8D8D8 ; text-align: center; ">
+            <strong>  AIR CARGO MANIFEST </em> </strong>
         </th>
     </tr>
     <tr>
@@ -83,7 +83,6 @@
         </th>
         <th colspan="7">DATE: <?php echo date('d/m/Y'); ?>                                                              
                                             SHIPMENT NO :602
-
         </th>
     </tr>
 
@@ -111,7 +110,7 @@
 
     </tr>
 
-    <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: gray ;">
+    <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: #D8D8D8  ;">
         <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">SR NO</th>
         <th>HBL NO</th>
         <th>  NAME OF SHIPPER </th>
@@ -129,7 +128,7 @@
         <tr>
             <td >{{ $loop->iteration }}</td>
             <td style="border-right:none ;vertical-align: top" > {{ $item[0]}} </td>
-            <td  style="border-left:none">{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
+            <td  style="border-left:none;align-content: ">{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
             <td>{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
             <td style="vertical-align: top" >
                 @foreach ($item[9] as $package)
