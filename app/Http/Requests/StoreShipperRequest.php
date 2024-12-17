@@ -26,6 +26,8 @@ class StoreShipperRequest extends FormRequest
             'pp_or_nic_no' => 'required|string|max:255',
             'residency_no' => 'required|string|max:255',
             'type' => 'required|in:shipper,other_type',
+            'description' => 'string|max:500',
+
         ];
     }
 }

@@ -9,25 +9,28 @@ import InputError from "@/Components/InputError.vue";
 import { push } from "notivue";
 import TextInput from "@/Components/TextInput.vue";
 
-const confirmConsigneeCreation= ref(false);
+const confirmShipperCreation = ref(false);
 
-const closeModal = () => (confirmConsigneeCreation.value = false);
+const closeModal = () => (confirmShipperCreation.value = false);
 
 const form = useForm({
-    type:"consignee",
+    type: "consignee",
     name: "",
     email: "",
     mobile_number: "",
-    nic: "",
+    address:"",
+    description:""
+
+
 });
 
-const createConsignee = () => {
-    form.post(route("setting.shipper.store"), {
+const createShipper = () => {
+    form.post(route("setting.shipper-consignees.store"), {
         onSuccess: () => {
             closeModal();
             form.reset();
-            router.visit(route(""));
-            push.success("Shipper Created Successfully");
+            router.visit(route("setting.shipper-consignees.index"));
+            push.success("consignee Created Successfully");
         },
         preserveScroll: true,
         preserveState: true,
@@ -37,80 +40,101 @@ const createConsignee = () => {
 
 <template>
     <div class="flex justify-end mx-5 mt-4">
-        <PrimaryButton @click="confirmConsigneeCreation = !confirmConsigneeCreation">
+        <PrimaryButton @click="confirmShipperCreation = !confirmShipperCreation">
             Create New Consignee
         </PrimaryButton>
-
     </div>
-    <DialogModal :maxWidth="'xl'" :show="confirmConsigneeCreation" @close="closeModal">
-        <template #title> Create New Shipper </template>
+
+    <DialogModal :maxWidth="'xl'" :show="confirmShipperCreation" @close="closeModal">
+        <template #title> Create New Consignee </template>
         <template #content>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <!-- Name Field -->
-                <div class="col-span-1 sm:col-span-2">
+                <div class="col-span-2">
                     <InputLabel for="name" value="Name" />
                     <TextInput
                         v-model="form.name"
                         id="name"
                         type="text"
                         class="w-full"
-                        placeholder="Enter Name"
+                        placeholder="Name"
                     />
                     <InputError :message="form.errors.name" />
                 </div>
 
-                <!-- Email Field -->
-                <div class="col-span-1 sm:col-span-2">
-                    <InputLabel for="email" value="Email" />
+                <!-- Passport/NIC Number Field -->
+                <div class="col-span-2">
+                    <InputLabel for="pp_or_nic_no" value="PP or NIC No" />
                     <TextInput
-                        v-model="form.email"
-                        id="email"
-                        type="email"
+                        v-model="form.pp_or_nic_no"
+                        id="pp_or_nic_no"
+                        type="text"
                         class="w-full"
-                        placeholder="Enter Email"
+                        placeholder="PP or NIC No"
                     />
-                    <InputError :message="form.errors.email" />
+                    <InputError :message="form.errors.pp_or_nic_no" />
                 </div>
 
                 <!-- Mobile Number Field -->
-                <div class="col-span-1 sm:col-span-2">
+                <div class="col-span-2">
                     <InputLabel for="mobile_number" value="Mobile Number" />
-                    <TextInput
-                        v-model="form.mobile_number"
-                        id="mobile_number"
-                        type="tel"
-                        class="w-full"
-                        placeholder="Enter Mobile Number"
-                    />
+                    <div class="flex">
+                        <select class="w-16 border-gray-300 rounded-md">
+                            <option value="+94">+94</option>
+                            <!-- Add more country codes as needed -->
+                        </select>
+                        <TextInput
+                            v-model="form.mobile_number"
+                            id="mobile_number"
+                            type="text"
+                            class="w-full ml-2"
+                            placeholder="123 4567 890"
+                        />
+                    </div>
                     <InputError :message="form.errors.mobile_number" />
                 </div>
 
-                <!-- NIC Field -->
-                <div class="col-span-1 sm:col-span-2">
-                    <InputLabel for="nic" value="NIC" />
-                    <TextInput
-                        v-model="form.nic"
-                        id="nic"
-                        type="text"
-                        class="w-full"
-                        placeholder="Enter NIC"
-                    />
-                    <InputError :message="form.errors.nic" />
+                <!-- Address Field -->
+                <div class="col-span-2">
+                    <InputLabel for="address" value="Address" />
+                    <textarea
+                        v-model="form.address"
+                        id="address"
+                        class="w-full border-gray-300 rounded-md"
+                        placeholder="Type address here..."
+                        rows="3"
+                    ></textarea>
+                    <InputError :message="form.errors.address" />
+                </div>
+
+                <!-- Note Field -->
+                <div class="col-span-2">
+                    <InputLabel for="note" value="Note" />
+                    <textarea
+                        v-model="form.description"
+                        id="note"
+                        class="w-full border-gray-300 rounded-md"
+                        placeholder="Type note here..."
+                        rows="3"
+                    ></textarea>
+                    <InputError :message="form.errors.description" />
                 </div>
             </div>
         </template>
         <template #footer>
-            <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
+            <SecondaryButton @click="closeModal">Cancel</SecondaryButton>
             <PrimaryButton
                 :class="{ 'opacity-25': form.processing }"
                 :disabled="form.processing"
                 class="ms-3"
-                @click="createConsignee"
+                @click="createShipper"
             >
-                consignee
+                Create Consignee
             </PrimaryButton>
         </template>
     </DialogModal>
 </template>
+
+
 
 <style scoped></style>

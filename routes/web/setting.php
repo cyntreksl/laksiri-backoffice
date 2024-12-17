@@ -62,6 +62,6 @@ Route::name('setting.')->group(function () {
     // Shipper and Consignee Settings
     Route::get('shipper-consignees', [OfficerController::class, 'index'])
         ->name('shipper-consignees.index');
-    Route::post('shipper-consignees', [OfficerController::class, 'storeshipper'])
-        ->name('shipper-consignees.storeshipper');
+    Route::post('shipper-consignees', [OfficerController::class, 'store'])
+        ->name('shipper-consignees.store');
 });
