@@ -7,6 +7,8 @@ use App\Actions\HBL\GetHBLByHBLNumber;
 use App\Actions\MHBL\CreateMHBL;
 use App\Actions\MHBL\CreateMHBLsHBL;
 use App\Actions\MHBL\DeleteMHBL;
+use App\Actions\MHBL\GetContainerLoadedMHBLs;
+use App\Actions\MHBL\GetUnloadMHBLWithHBLs;
 use App\Actions\MHBL\UpdateMHBL;
 use App\Actions\MHBL\UpdateMHBLsHBL;
 use App\Factory\MHBL\FilterFactory;
@@ -89,5 +91,21 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
         UpdateMHBLsHBL::run($mhbl, $data['hbls']);
 
         return $mhbl;
+    }
+
+    public function getUnloadedMHBLs(array $data)
+    {
+        $result = GetUnloadMHBLWithHBLs::run($data);
+        return response()->json([
+            'data' => $result,
+        ]);
+    }
+
+    public function getContainerLoadedMHBLs(array $data)
+    {
+        $result = GetContainerLoadedMHBLs::run($data);
+        return response()->json([
+            'data' => $result,
+        ]);
     }
 }

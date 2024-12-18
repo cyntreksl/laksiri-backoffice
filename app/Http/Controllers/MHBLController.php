@@ -161,4 +161,14 @@ class MHBLController extends Controller
     {
         $this->mhblRepository->updateMHBL($mhbl, $request->all());
     }
+
+    public function getUnloadedMHBLs(Request $request)
+    {
+        return $this->mhblRepository->getUnloadedMHBLs($request->all());
+    }
+
+    public function getLoadedMHBLsToContainer(Request $request)
+    {
+        return $this->mhblRepository->getContainerLoadedMHBLs($request->all());
+    }
 }
