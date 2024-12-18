@@ -6,7 +6,6 @@ import CreateShipper from "@/Pages/Setting/ShippersConsignees/CreateShipper.vue"
 import CreateConsignee from "@/Pages/Setting/ShippersConsignees/CreateConsignee.vue";
 import {Link, router} from "@inertiajs/vue3";
 import {push} from "notivue";
-
 defineProps({
     allOfficers: {
         type: Object,
@@ -19,7 +18,7 @@ const handleDeleteOfficer = (id) => {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
-            push.success("Exception Name Deleted Successfully!");
+            push.success("Officer Name Deleted Successfully!");
             router.visit(route("setting.shipper-consignees.index"));
         },
     });
