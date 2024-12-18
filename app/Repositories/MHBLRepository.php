@@ -96,6 +96,7 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
     public function getUnloadedMHBLs(array $data)
     {
         $result = GetUnloadMHBLWithHBLs::run($data);
+
         return response()->json([
             'data' => $result,
         ]);
@@ -104,6 +105,7 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
     public function getContainerLoadedMHBLs(array $data)
     {
         $result = GetContainerLoadedMHBLs::run($data);
+
         return response()->json([
             'data' => $result,
         ]);

@@ -345,6 +345,23 @@ watch(unloadedMHBLs, (newVal) => {
         mhbl.hbls.flatMap(hbl => hbl.packages)
     );
 });
+
+const reviewContainerArr = ref([]);
+const reviewContainer = () => {
+    const copiedContainer = JSON.parse(JSON.stringify(containerArr.value));
+    reviewContainerArr.value = [...copiedContainer];
+
+    // Add packages to reviewContainerArr.value
+    loadedMHBLs.value.forEach(mhbl => {
+        mhbl.hbls.forEach(hbl => {
+            hbl.packages.forEach(pkg => {
+                reviewContainerArr.value.push(pkg);
+            });
+        });
+    });
+
+    showReviewModal.value = true
+}
 </script>
 
 <template>
@@ -374,7 +391,7 @@ watch(unloadedMHBLs, (newVal) => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <PrimaryButton :disabled="containerArr.length === 0" @click.prevent="showReviewModal = true">
+                    <PrimaryButton :disabled="containerArr.length === 0" @click.prevent="reviewContainer">
                         Proceed to Review
                     </PrimaryButton>
                 </div>
@@ -1150,7 +1167,15 @@ watch(unloadedMHBLs, (newVal) => {
                 </div>
             </div>
         </main>
-        <ReviewModal :container-array="containerArr" :find-hbl-by-package-id="findHblByPackageId"
-                     :show="showReviewModal" @close="showReviewModal = false"/>
+        <ReviewModal
+            :container-array="containerArr"
+            :find-hbl-by-package-id="findHblByPackageId"
+            :show="showReviewModal"
+            :containerPackages="reviewContainerArr"
+            :loadedMHBLs="loadedMHBLs"
+            @close="showReviewModal = false"/>
+
+<!--        <ReviewModal :container-array="reviewContainerArr" :find-hbl-by-package-id="findHblByPackageId"-->
+<!--                     :show="showReviewModal" @close="showReviewModal = false"/>-->
     </AppLayout>
 </template>
