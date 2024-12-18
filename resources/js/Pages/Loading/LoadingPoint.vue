@@ -221,13 +221,15 @@ const handleLoadMHBL = (mhbl_id, mhbl_hbls) => {
 const handleUnloadMHBL = (mhbl_id) => {
     const unLoadedPackages = loadedMHBLs.value
         .filter(mhbl => mhbl.id === mhbl_id)[0].hbls
-        .flatMap(hbl => hbl.packages[0]);
+        .flatMap(hbl => hbl.packages);
 
     unloadedMHBLs.value.push((loadedMHBLs.value.filter(mhbl => mhbl.id === mhbl_id))[0]);
     loadedMHBLs.value = loadedMHBLs.value.filter(mhbl => mhbl.id !== mhbl_id);
 
-    if(unLoadedPackages.lenght > 0){
-        handleRemoveDraftLoadedContainer(pkg);
+    if(unLoadedPackages.length > 0){
+        unLoadedPackages.forEach(pkg => {
+            handleRemoveDraftLoadedContainer([pkg]);
+        });
     }
 }
 
