@@ -21,6 +21,7 @@ import {router, useForm, usePage} from "@inertiajs/vue3";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import {forEach} from "vuedraggable/dist/vuedraggable.common.js";
+import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
 
 const props = defineProps({
     drivers: {
@@ -84,6 +85,41 @@ const toggleColumnVisibility = (columnName) => {
     data.columnVisibility[columnName] = !data.columnVisibility[columnName];
     updateGridConfig();
     grid.forceRender();
+};
+
+const showConfirmDeleteHBLModal = ref(false);
+
+const confirmDeleteHBL = (id) => {
+    hblId.value = id;
+    showConfirmDeleteHBLModal.value = true;
+};
+
+const handleDeleteHBL = () => {
+    router.delete(route("hbls.destroy", hblId.value), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeModal();
+            push.success("HBL record Deleted Successfully!");
+            router.visit(route("hbls.door-to-door-list"), {only: ["hbls"]});
+        },
+        onError: () => {
+            closeModal();
+            push.error("Something went to wrong!");
+        },
+    });
+};
+const showConfirmViewCallFlagModal = ref(false);
+const hblName = ref("");
+const confirmViewCallFlagModal = async (row) => {
+    hblId.value = row[0].data.id;
+    hblName.value = row[4].data;
+    showConfirmViewCallFlagModal.value = true;
+};
+
+const closeCallFlagModal = () => {
+    showConfirmViewCallFlagModal.value = false;
+    hblId.value = null;
+    hblName.value = "";
 };
 
 const updateGridConfig = () => {
@@ -297,7 +333,7 @@ const createColumns = () => [
               {
                 className:
                     "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                onClick: () => confirmViewHBL(row.cells[0].data),
+                onClick: () => confirmViewHBL(row.cells[0].data.id),
                 "x-tooltip..placement.bottom.primary":
                     "'View HBL'",
               },
@@ -380,13 +416,13 @@ const createColumns = () => [
           usePage().props.user.permissions.includes("hbls.edit") && h("a", {
             href: "#",
             className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-            onClick: () => router.visit(route("hbls.edit", row.cells[0].data)),
+            onClick: () => router.visit(route("hbls.edit", row.cells[0].data.id)),
           }, "Edit"),
 
           usePage().props.user.permissions.includes("hbls.show") && h("a", {
             href: "#",
             className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-            onClick: () => confirmViewHBL(row.cells[0].data),
+            onClick: () => confirmViewHBL(row.cells[0].data.id),
           }, "View HBL"),
 
           usePage().props.user.permissions.includes("hbls.hold and release") && h("a", {
@@ -396,24 +432,24 @@ const createColumns = () => [
           }, row.cells[14].data ? "Release HBL" : "Hold HBL"),
 
           usePage().props.user.permissions.includes("hbls.download pdf") && h("a", {
-            href: route("hbls.download", row.cells[0].data),
+            href: route("hbls.download", row.cells[0].data.id),
             className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
           }, "Download HBL"),
 
           usePage().props.user.permissions.includes("hbls.download invoice") && h("a", {
-            href: route("hbls.download.invoice", row.cells[0].data),
+            href: route("hbls.download.invoice", row.cells[0].data.id),
             className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
           }, "Invoice"),
 
           usePage().props.user.permissions.includes("hbls.download barcode") && h("a", {
-            href: route("hbls.download.barcode", row.cells[0].data),
+            href: route("hbls.download.barcode", row.cells[0].data.id),
             className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
           }, "Barcode"),
 
           usePage().props.user.permissions.includes("hbls.delete") && h("a", {
             href: "#",
             className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-            onClick: () => confirmDeleteHBL(row.cells[0].data),
+            onClick: () => confirmDeleteHBL(row.cells[0].data.id),
           }, "Delete"),
 
           // usePage().props.user.permissions.includes("hbls.download pdf") && h("a", {
@@ -605,8 +641,10 @@ const confirmPayment = (row) => {
 };
 
 const closeModal = () => {
+    showConfirmDeleteHBLModal.value = false;
     showConfirmPaymentModal.value = false;
     hblData.value = null;
+    hblId.value = null;
 };
 
 const showConfirmHoldModal = ref(false);
@@ -1191,6 +1229,12 @@ const shipIcon = ref(`
         </template>
       </FilterDrawer>
 
+        <DeleteHBLConfirmationModal
+            :show="showConfirmDeleteHBLModal"
+            @close="closeModal"
+            @delete-hbl="handleDeleteHBL"
+        />
+
         <PaymentModal
             :hbl-data="hblData"
             :show="showConfirmPaymentModal"
@@ -1209,5 +1253,11 @@ const shipIcon = ref(`
             :show="showConfirmViewHBLModal"
             @close="closeShowHBLModal"
         />
+
+        <CallFlagModal
+            :caller-name="hblName"
+            :hbl-id="hblId"
+            :show="showConfirmViewCallFlagModal"
+            @close="closeCallFlagModal"/>
     </AppLayout>
 </template>

@@ -86,54 +86,54 @@
                 <table class="table-row" style="padding-top: 10%;">
                     <tr>
                         <td style="width: 60%;"></td>
-                        <td style="width: 20%;">{{ number_format($data['charges']['port_charge']['rate'],2) }}</td>
-                        <td style="width: 20%;">{{ number_format($data['charges']['port_charge']['amount'],2) }}</td>
+                        <td style="width: 20%; text-align: right;">{{ number_format($data['charges']['port_charge']['rate'],2) }}</td>
+                        <td style="width: 20%; text-align: right;">{{ number_format($data['charges']['port_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
                         <td style="width: 60%;"></td>
-                        <td style="width: 20%;">00.00</td>
-                        <td style="width: 20%;">00.00</td>
+                        <td style="width: 20%; text-align: right;">00.00</td>
+                        <td style="width: 20%; text-align: right;">00.00</td>
                     </tr>
                     <tr>
                         <td style="width: 60%;"></td>
-                        <td style="width: 20%;">{{ number_format($data['charges']['handling_charge']['rate'],2) }}</td>
-                        <td style="width: 20%;">{{ number_format($data['charges']['handling_charge']['amount'],2) }}</td>
+                        <td style="width: 20%; text-align: right;">{{ number_format($data['charges']['handling_charge']['rate'],2) }}</td>
+                        <td style="width: 20%; text-align: right;">{{ number_format($data['charges']['handling_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
                         <td style="width: 60%;"></td>
-                        <td style="width: 20%;">{{ number_format($data['charges']['storage_charge']['rate'],2) }}</td>
-                        <td style="width: 20%;">{{ number_format($data['charges']['storage_charge']['amount'],2) }}</td>
+                        <td style="width: 20%; text-align: right;">{{ number_format($data['charges']['storage_charge']['rate'],2) }}</td>
+                        <td style="width: 20%; text-align: right;">{{ number_format($data['charges']['storage_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
                         <td style="width: 60%;"></td>
-                        <td style="width: 20%;"></td>
-                        <td style="width: 20%;"></td>
+                        <td style="width: 20%; text-align: right;"></td>
+                        <td style="width: 20%; text-align: right;"></td>
                     </tr>
                     <tr>
                         <td style="width: 60%;"></td>
-                        <td style="width: 20%;">9.50 <br/> 10.50</td>
-                        <td style="width: 20%;">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
+                        <td style="width: 20%; text-align: right;">9.50 <br/> 10.50</td>
+                        <td style="width: 20%; text-align: right;">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
                         <td style="width: 60%;"></td>
-                        <td style="width: 20%;"></td>
-                        <td style="width: 20%; font-weight: bold;">{{ number_format($data['charges']['total'],2)}}
+                        <td style="width: 20%; text-align: right;"></td>
+                        <td style="width: 20%; text-align: right;">{{ number_format($data['charges']['total'],2)}}
                         </td>
                     </tr>
                     <tr>
                         <td style="width: 60%;"></td>
-                        <td style="width: 20%;"></td>
-                        <td style="width: 20%;">{{ number_format($data['charges']['do_charge'],2) }}</td>
+                        <td style="width: 20%; text-align: right;"></td>
+                        <td style="width: 20%; text-align: right;">{{ number_format($data['charges']['do_charge'],2) }}</td>
                     </tr>
                     <tr>
                         <td style="width: 60%;"></td>
-                        <td style="width: 20%;"></td>
-                        <td style="width: 20%;">{{ number_format($data['charges']['stamp_charge'],2) }}</td>
+                        <td style="width: 20%; text-align: right;"></td>
+                        <td style="width: 20%; text-align: right;">{{ number_format($data['charges']['stamp_charge'],2) }}</td>
                     </tr>
                     <tr>
                         <td style="width: 60%;"></td>
-                        <td style="width: 20%;"></td>
-                        <td style="width: 20%; font-weight: bold;">
+                        <td style="width: 20%; text-align: right;"></td>
+                        <td style="width: 20%; text-align: right;">
                             {{ number_format
                                 (
                                     (
