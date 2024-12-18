@@ -8,7 +8,6 @@ import ReviewModal from "@/Pages/Loading/Partials/ReviewModal.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import ActionMessage from "@/Components/ActionMessage.vue";
 import RadioButton from "@/Components/RadioButton.vue";
-import {forEach} from "vuedraggable/dist/vuedraggable.common.js";
 
 const props = defineProps({
     container: {
@@ -213,9 +212,6 @@ const handleLoadMHBL = (mhbl_id, mhbl_hbls) => {
     if(loadedPackages.length > 0){
         handleCreateDraftLoadedContainer(loadedPackages);
     }
-    // loadedPackages.forEach(pkg => {
-    //     handleCreateDraftLoadedContainer([pkg]);
-    // });
 }
 
 const handleUnloadMHBL = (mhbl_id) => {
