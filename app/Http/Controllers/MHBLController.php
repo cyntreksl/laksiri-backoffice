@@ -106,15 +106,13 @@ class MHBLController extends Controller
     {
         $this->authorize('hbls.edit');
 
-        $mhblData = $mhbl
+        $mhblData = MHBL::where('id', $mhbl->id)
             ->with([
+                'hbls.packages',
                 'warehouse',
                 'shipper',
                 'consignee',
-                'hbls.packages',
-            ])
-            ->get()
-            ->first();
+            ])->first();
 
         if ($mhblData && $mhblData->hbls) {
             $hblPackages = $mhblData->hbls->flatMap(function ($hbl) {
