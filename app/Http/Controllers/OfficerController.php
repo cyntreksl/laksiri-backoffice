@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreOfficerRequest;
 use App\Interfaces\OfficerRepositoryInterface;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class OfficerController extends Controller
@@ -24,7 +24,7 @@ class OfficerController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreOfficerRequest $request)
     {
 
         $this->officerRepository->storeshipperOfficers($request->all());

@@ -51,42 +51,35 @@ const createShipper = () => {
                 <!-- Name Field -->
                 <div>
                     <InputLabel for="name" value="Name" />
-                    <div class="flex items-center border border-gray-300 rounded-md px-2">
-                        <span class="material-icons text-gray-500">person</span>
-                        <TextInput
-                            v-model="form.name"
-                            id="name"
-                            type="text"
-                            class="w-full border-0 focus:ring-0"
-                            placeholder="Name"
-                        />
-                    </div>
+                    <TextInput
+                        v-model="form.name"
+                        id="name"
+                        type="text"
+                        class="w-full border border-gray-300 rounded-md focus:ring-0"
+                        placeholder="Name"
+                    />
                     <InputError :message="form.errors.name" />
                 </div>
 
                 <!-- Email Field -->
                 <div>
                     <InputLabel for="email" value="Email" />
-                    <div class="flex items-center border border-gray-300 rounded-md px-2">
-                        <span class="material-icons text-gray-500">email</span>
-                        <TextInput
-                            v-model="form.email"
-                            id="email"
-                            type="email"
-                            class="w-full border-0 focus:ring-0"
-                            placeholder="Email"
-                        />
-                    </div>
+                    <TextInput
+                        v-model="form.email"
+                        id="email"
+                        type="email"
+                        class="w-full border border-gray-300 rounded-md focus:ring-0"
+                        placeholder="Email"
+                    />
                     <InputError :message="form.errors.email" />
                 </div>
-
                 <!-- Mobile Number Field -->
                 <div>
                     <InputLabel for="mobile_number" value="Mobile Number" />
                     <div class="flex items-center">
                         <select
                             v-model="form.country_code"
-                            class="border border-gray-300 rounded-l-md p-2"
+                            class="border border-gray-300 rounded-l-md p-2 w-1/6"
                         >
                             <option value="+44">+44</option>
                             <option value="+1">+1</option>
@@ -96,7 +89,7 @@ const createShipper = () => {
                             v-model="form.mobile_number"
                             id="mobile_number"
                             type="text"
-                            class="w-full border border-gray-300 rounded-r-md focus:ring-0"
+                            class="w-5/6 border border-gray-300 rounded-r-md focus:ring-0"
                             placeholder="123 4567 890"
                         />
                     </div>
