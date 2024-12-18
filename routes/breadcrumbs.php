@@ -343,7 +343,7 @@ Breadcrumbs::for('setting.package-types.edit', function (BreadcrumbTrail $trail,
 Breadcrumbs::for('setting.shipper-consignees.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');
-    $trail->push('Exception Names', route('setting.shipper-consignees.index'));
+    $trail->push('Shipper& Consignees', route('setting.shipper-consignees.index'));
 });
 
 require_once __DIR__.'/call-center-breadcrumbs.php';
