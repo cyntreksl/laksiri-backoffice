@@ -1142,7 +1142,12 @@ export default {
                         {
                             title: "Package Types",
                             route: "setting.package-types.index",
-                        }
+                        },
+                        {
+                            title: "Shipper & Consignee",
+                            route: "setting.shipper-consignees.index",
+                        },
+
                     );
                     changeSidePanelTitle("Setting");
                     break;
