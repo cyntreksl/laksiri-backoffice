@@ -867,7 +867,6 @@ watch(unloadedMHBLs, (newVal) => {
                             </div>
                         </div>
                         <div class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5">
-                            <p>111</p>
                             <draggable
                                 v-if="containerArr.length > 0"
                                 v-model="containerArr" @change="handlePackageChange"
