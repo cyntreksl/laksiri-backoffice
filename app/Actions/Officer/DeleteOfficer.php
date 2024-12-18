@@ -5,13 +5,13 @@ namespace App\Actions\Officer;
 use App\Models\Officer;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class UpdateOfficer
+class DeleteOfficer
 {
     use AsAction;
-
-    public function handle(array $data, $id)
+    public function handle ($id):void
     {
         $officer = Officer::withoutGlobalScopes()->findOrFail($id);
-        return $officer->update($data);
+        $officer->delete();
     }
+
 }

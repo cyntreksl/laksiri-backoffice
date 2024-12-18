@@ -3,10 +3,12 @@
 namespace App\Repositories;
 
 use App\Actions\Officer\CreateShipperOfficer;
+use App\Actions\Officer\DeleteOfficer;
 use App\Actions\Officer\GetOfficers;
 use App\Actions\Officer\GetOfficersByType;
 use App\Actions\Officer\UpdateOfficer;
 use App\Interfaces\OfficerRepositoryInterface;
+use App\Models\Officer;
 
 class OfficerRepository implements OfficerRepositoryInterface
 {
@@ -44,5 +46,14 @@ class OfficerRepository implements OfficerRepositoryInterface
         } catch (\Exception $e) {
             throw new \Exception('Failed to create Shipper Officer: '.$e->getMessage());
         }
+    }
+    public function destroyShippers($id)
+    {
+        try {
+            return DeleteOfficer::run($id);
+        }catch (\Exception $e){
+            throw new \Exception('Failed to delete exception name:'.$e->getMessage());
+        }
+
     }
 }

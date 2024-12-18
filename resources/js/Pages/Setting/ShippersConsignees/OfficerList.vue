@@ -6,6 +6,7 @@ import CreateShipper from "@/Pages/Setting/ShippersConsignees/CreateShipper.vue"
 import CreateConsignee from "@/Pages/Setting/ShippersConsignees/CreateConsignee.vue";
 import {Link, router} from "@inertiajs/vue3";
 import {push} from "notivue";
+
 defineProps({
     allOfficers: {
         type: Object,

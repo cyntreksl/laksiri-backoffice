@@ -44,4 +44,9 @@ class OfficerController extends Controller
     {
         $this->officerRepository->updateShipper($request->all(), $id);
     }
+    public function destroy($id)
+    {
+        $this->officerRepository->destroyShippers($id);
+
+    }
 }
