@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Interfaces\OfficerRepositoryInterface;
+use App\Models\Officer;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -28,5 +29,19 @@ class OfficerController extends Controller
     {
 
         $this->officerRepository->storeshipperOfficers($request->all());
+    }
+
+    public function edit($id)
+    {
+        $officer = Officer::withoutGlobalScopes()->findOrFail($id);
+
+        return Inertia::render('Setting/ShippersConsignees/UpdateOfficer', [
+            'officer' => $officer,
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $this->officerRepository->updateShipper($request->all(), $id);
     }
 }
