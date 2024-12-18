@@ -12,6 +12,6 @@ class GetOfficersByType
 
     public function handle($type): Collection|array
     {
-        return Officer::withoutGlobalScopes()->where('type', $type)->get();
+        return Officer::where('type', $type)->get();
     }
 }

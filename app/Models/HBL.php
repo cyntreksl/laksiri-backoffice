@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -197,5 +198,17 @@ class HBL extends Model
     public function callFlags(): HasMany
     {
         return $this->hasMany(CallFlag::class, 'hbl_id');
+    }
+
+    public function mhbl(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            MHBL::class,
+            MHBLsHBL::class,
+            'hbl_id',
+            'id',
+            'id',
+            'mhbl_id'
+        );
     }
 }

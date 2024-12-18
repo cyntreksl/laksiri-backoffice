@@ -11,7 +11,7 @@ class GetHBLByCargoTypeWithUnloadedPackages
 
     public function handle(array $data)
     {
-        $query = HBL::query();
+        $query = HBL::whereDoesntHave('mhbl');
 
         if (isset($data['cargoType'])) {
             $query->where('cargo_type', $data['cargoType']);
