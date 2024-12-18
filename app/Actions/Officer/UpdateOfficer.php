@@ -11,7 +11,7 @@ class UpdateOfficer
 
     public function handle(array $data, $id)
     {
-        $officer = Officer::withoutGlobalScopes()->findOrFail($id);
+        $officer = Officer::findOrFail($id);
 
         return $officer->update($data);
     }

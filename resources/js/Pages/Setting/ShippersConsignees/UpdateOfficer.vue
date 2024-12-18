@@ -40,7 +40,7 @@ const updateOfficer = () => {
         <template #header>Exception Name</template>
 
         <!-- Breadcrumb -->
-        <Breadcrumb :exceptionName="officer"/>
+        <Breadcrumb :ExceptionName="officer"/>
 
         <div class="grid grid-cols-1 mt-4 gap-4">
             <div class="card px-4 py-4 sm:px-5">
@@ -48,7 +48,7 @@ const updateOfficer = () => {
                     <h2
                         class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                     >
-                        Update Exception Name {{ officer.type }}
+                        Update Officr Name {{ officer.type }}
                     </h2>
                     <br/>
                 </div>
@@ -226,7 +226,7 @@ const updateOfficer = () => {
                             class="ms-3"
                             type="submit"
                         >
-                            Update Exception Name
+                            Update Officer Name
                         </PrimaryButton>
                     </div>
                 </form>

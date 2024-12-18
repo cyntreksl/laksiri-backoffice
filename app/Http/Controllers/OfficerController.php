@@ -33,7 +33,7 @@ class OfficerController extends Controller
 
     public function edit($id)
     {
-        $officer = Officer::withoutGlobalScopes()->findOrFail($id);
+        $officer = Officer::findOrFail($id);
 
         return Inertia::render('Setting/ShippersConsignees/UpdateOfficer', [
             'officer' => $officer,
