@@ -2,8 +2,6 @@
 
 namespace App\Interfaces;
 
-use App\Models\Officer;
-
 interface OfficerRepositoryInterface
 {
     public function getShippers();
