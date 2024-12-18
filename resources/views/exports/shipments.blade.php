@@ -20,6 +20,7 @@
         .center-text {
             text-align: center;
         }
+
         .ship {
             display: flex;
         }
@@ -27,9 +28,8 @@
         .hbl {
             margin-right: 20px; /* Adjust as needed */
             display: flex;
-            flex-direction: column;  /* Stack elements vertically */
+            flex-direction: column; /* Stack elements vertically */
         }
-
 
         .name {
             display: flex;
@@ -37,125 +37,145 @@
             margin-left: 70px; /* Adjust as needed */
             margin-top: 5px;
         }
+
+        .page-break {
+            page-break-after: always;
+        }
     </style>
 </head>
 <body>
-<table>
-    <thead>
-    @php
-        $total_nototal = 0;
-        $total_vtotal = 0;
-        $total_gtotal = 0;
-        $row_nototal = 0;
-        $row_vtotal = 0;
-        $row_gtotal = 0;
-    @endphp
-    @foreach($data as $item)
-        @foreach ($item[9] as $package)
-            @php
-                $total_nototal += $package['quantity'];
-                $total_vtotal += $package['volume'];
-                $total_gtotal += $package['weight'];
-            @endphp
-        @endforeach
+
+@php
+    $itemsPerPage = 6; // Number of rows per page
+    $chunks = array_chunk($data, $itemsPerPage); // Split data into chunks of $itemsPerPage
+    $total_nototal = 0;
+    $total_vtotal = 0;
+    $total_gtotal = 0;
+@endphp
+
+@foreach($data as $item)
+    @foreach ($item[9] as $package)
+        @php
+            $total_nototal += $package['quantity'];
+            $total_vtotal += $package['volume'];
+            $total_gtotal += $package['weight'];
+        @endphp
     @endforeach
+@endforeach
+@foreach ($chunks as $chunkIndex => $chunk)
+    <table>
+        @if ($chunkIndex === 0)
+            <thead>
+            <tr>
+                <th colspan="10" style="text-align:center;">
+                    <strong><em>
+                            UNIVERSAL FREIGHT SERVICES
+                        </em></strong>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="10" style="background-color: #D8D8D8 ; text-align: center; ">
+                    <strong> <em> AIR CARGO MANIFEST </em> </strong>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="2">
 
-    <tr>
-        <th colspan="10" style="text-align:center;">
-            <strong><em>
-                    <u> UNIVERSAL FREIGHT SERVICES </u>
-                </em></strong>
-        </th>
+                </th>
+                <th colspan="1">
 
-    </tr>
+                </th>
+                <th colspan="7" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                    DATE: <?php echo date('d/m/Y'); ?>
+                    <span style="font-family: 'Times New Roman',fantasy; font-size: 16px;">                                                                                   SHIPMENT NO :602 </span>
+                </th>
+            </tr>
 
-    <tr>
-        <th colspan="10" style="background-color: #D8D8D8 ; text-align: center; ">
-            <strong>  AIR CARGO MANIFEST </em> </strong>
-        </th>
-    </tr>
-    <tr>
-        <th colspan="2">
+            <tr>
+                <th colspan="10" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                    SHIPPER : {{$settings?->invoice_header_title}}, {{$settings?->invoice_header_address}}.
+                    TEL: {{$settings?->invoice_header_telephone}} <br>
+                    CONSIGNEE: LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA <br>
+                    NOTIFY : LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94
+                    11-47722800
+                </th>
+            </tr>
 
-        </th>
-        <th colspan="1">
+            <tr>
+                <th colspan="3" style="height: 3px !important; ">AWB NO {{$container?->awb_number}}</th>
+                <th rowspan="2" colspan="1"><p> TOTAL VOLUME: </p></th>
+                <th rowspan="2" colspan="3"> {{ number_format($total_vtotal, 2) }}</th>
+                <th rowspan="2" colspan="1">TOTAL WEIGHT</th>
+                <th rowspan="2" colspan="2"> {{ number_format($total_gtotal, 2) }}</th>
 
-        </th>
-        <th colspan="7">DATE: <?php echo date('d/m/Y'); ?>                                                              
-                                            SHIPMENT NO :602
-        </th>
-    </tr>
+            </tr>
+            <tr>
+                <th colspan="3"> NO OF PKG: {{ number_format($total_nototal, 0) }}</th>
+            </tr>
+            @endif
+            <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: #D8D8D8  ;">
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">SR NO</th>
+                <th>HBL NO</th>
+                <th> NAME OF SHIPPER</th>
+                <th>NAME OF CONSIGNEES</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">TYPE OF PKGS</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">NO.OF PKGS</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">VOLUME CBM</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">GWHT KGS</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">DESCRIPTION OF CARGO</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 11px;">REMARKS</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach ($chunk as $index => $item)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td style="border-right:none ;vertical-align: top"> {{ $item[0]}} </td>
+                    <td style="border-left:none;vertical-align: top">{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
+                    <td style="vertical-align: top">{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
+                    <td style="vertical-align: top">
+                        @foreach ($item[9] as $package)
+                            {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
+                        @endforeach
+                    </td>
+                    <td style="vertical-align: top">
+                        @foreach ($item[9] as $package)
+                            {{ $package['quantity'] }}<br>
+                        @endforeach
+                    </td>
+                    <td style="vertical-align: top">
+                        @foreach ($item[9] as $package)
+                            {{ $package['volume'] }}<br>
+                        @endforeach
+                    </td>
+                    <td style="vertical-align: top">
+                        @foreach ($item[9] as $package)
+                            {{ $package['weight'] }}<br>
+                        @endforeach
+                    </td>
+                    <td> PERSONAL<br> EFFECT</td>
+                    <td><b>     {{$item[10]}}</b></td>
 
-    <tr>
-        <th colspan="10" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
-            SHIPPER :       UNIVERSAL FREIGHT SERVICES, P.O.BOX: 55239, DOHA, QATAR. TEL: +974 4620961 TEL/FAX: +974
-            4620812 <br>
-            CONSIGNEE:  LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA <br>
-            NOTIFY :  LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94
-            11-47722800
-        </th>
-    </tr>
-    <tr>
-    <tr>
-        <th colspan="3">AWB NO            {{$container?->awb_number}}</th>
-        <th rowspan="2" colspan="1">  <p> TOTAL VOLUME: </p></th>
-        <th rowspan="2" colspan="3">                   {{ number_format($total_vtotal, 2) }}</th>
-        <th rowspan="2" colspan="1">TOTAL WEIGHT</th>
-        <th rowspan="2" colspan="2">                {{ number_format($total_gtotal, 2) }}</th>
+                </tr>
+            @endforeach
+            @if ($loop->last)
+                <tr style="border: none;">
+                    <td colspan="5" style="border: none; text-align: right;"></td>
+                    <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_nototal, 0) }}</u></strong></td>
+                    <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_gtotal, 2) }}</u></strong></td>
+                    <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 2) }}</u></strong></td>
+                    <td style="border: none;">&nbsp;</td>
+                    <td style="border: none;">&nbsp;</td>
+                </tr>
+                <p><b> {{$settings?->invoice_header_title}}</b></p>
+                <p><b>{{$settings?->invoice_header_address}}</b></p>
+            @endif
+            </tbody>
+    </table>
+    @if (!$loop->last)
+        <div class="page-break"></div>
+    @endif
+@endforeach
 
-    </tr>
-    <tr>
-        <th colspan="3"> NO OF PKG:            {{ number_format($total_nototal, 0) }}</th>
-    </tr>
-
-    </tr>
-
-    <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: #D8D8D8  ;">
-        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">SR NO</th>
-        <th>HBL NO</th>
-        <th>  NAME OF SHIPPER </th>
-        <th>NAME OF CONSIGNEES</th>
-        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">TYPE OF PKGS CARGO TYPE</th>
-        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">NO.OF PKGS</th>
-        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">VOLUME CBM</th>
-        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">GWHT KGS</th>
-        <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">DESCRIPTION OF CARGO</th>
-        <th style="font-family: 'Times New Roman',fantasy; font-size: 11px;">REMARKS</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach($data as $item)
-        <tr>
-            <td >{{ $loop->iteration }}</td>
-            <td style="border-right:none ;vertical-align: top" > {{ $item[0]}} </td>
-            <td  style="border-left:none;align-content: ">{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
-            <td>{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
-            <td style="vertical-align: top" >
-                @foreach ($item[9] as $package)
-                    {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
-                @endforeach
-            </td>
-            <td style="vertical-align: top">
-                @foreach ($item[9] as $package)
-                          {{ $package['quantity'] }}<br>
-                @endforeach
-            </td>
-            <td style="vertical-align: top" >
-                @foreach ($item[9] as $package)
-                          {{ $package['volume'] }}<br>
-                @endforeach
-            </td>
-            <td style="vertical-align: top" >
-                @foreach ($item[9] as $package)
-                         {{ $package['weight'] }}<br>
-                @endforeach
-            </td>
-            <td>  PERSONAL EFFECT</td>
-            <td> <b>     {{$item[10]}}</b> </td>
-
-        </tr>
-    @endforeach
-    </tbody>
-</table>
 </body>
 </html>
