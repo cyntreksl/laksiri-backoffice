@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\Container\Loading\CreateDraftLoadedContainer;
 use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
+use App\Actions\Setting\GetSettings;
 use App\Enum\ContainerStatus;
 use App\Exports\LoadedContainerManifestExport;
 use App\Factory\Container\FilterFactory;
@@ -96,11 +97,11 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.pdf';
 
         $export = new LoadedContainerManifestExport($container);
-
+        $settings = GetSettings::run();
         $data = array_filter($export->prepareData(), function ($item) {
             return isset($item[0]) && $item[0] !== '';
         });
-        $pdf = PDF::loadView('exports.shipments', ['data' => $data, 'container' => $container]);
+        $pdf = PDF::loadView('exports.shipments', ['data' => $data, 'container' => $container, 'settings' => $settings]);
         $pdf->setPaper('a3', 'portrait');
 
         return $pdf->download($filename);
