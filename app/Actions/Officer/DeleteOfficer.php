@@ -11,7 +11,7 @@ class DeleteOfficer
 
     public function handle($id): void
     {
-        $officer = Officer::withoutGlobalScopes()->findOrFail($id);
+        $officer = Officer::findOrFail($id);
         $officer->delete();
     }
 }
