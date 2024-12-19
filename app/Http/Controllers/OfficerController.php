@@ -40,7 +40,7 @@ class OfficerController extends Controller
 
         return Inertia::render('Setting/ShippersConsignees/UpdateOfficer', [
             'officer' => $officer,
-            'countryCodes' => $this->countryRepository->getAllPhoneCodes()
+            'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
         ]);
     }
 

@@ -86,7 +86,7 @@ const createShipper = () => {
           <InputError :message="form.errors.email"/>
         </div>
         <!-- Mobile Number Field -->
-        <div class="col-span-2">
+        <div >
           <InputLabel for="mobile_number" value="Mobile Number"/>
           <div class="flex items-center space-x-2">
             <select
