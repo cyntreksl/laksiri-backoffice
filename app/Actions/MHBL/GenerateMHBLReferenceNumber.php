@@ -3,7 +3,7 @@
 namespace App\Actions\MHBL;
 
 use App\Models\Branch;
-use App\Models\Mhbl;
+use App\Models\MHBL;
 use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\Concerns\AsAction;
 
