@@ -4,6 +4,7 @@ import Tabs from "@/Components/Tabs.vue";
 import TabHBLUnderShipment from "@/Pages/Loading/Partials/TabHBLUnderShipment.vue";
 import TabShipmentDetails from "@/Pages/Loading/Partials/TabShipmentDetails.vue";
 import TabDocuments from "@/Pages/Loading/Partials/TabDocuments.vue";
+import TabMHBLUnderShipment from "@/Pages/Loading/Partials/TabMHBLUnderShipment.vue";
 
 const props = defineProps({
     show: {
@@ -80,6 +81,8 @@ const emit = defineEmits(['close']);
                 </template>
 
                 <TabHBLUnderShipment :container="container" @close="emit('close')"/>
+
+                <TabMHBLUnderShipment :container="container" @close="emit('close')"/>
 
                 <TabShipmentDetails :air-container-options="airContainerOptions" :container="container" :container-status="containerStatus" :sea-container-options="seaContainerOptions" @close="emit('close')"/>
 
