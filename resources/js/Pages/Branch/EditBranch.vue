@@ -53,6 +53,7 @@ const form = useForm({
     currency_symbol: props.branch.currency_symbol || '',
     country_code: props.branch.country_code || '',
     email: props.branch.email || '',
+    container_delays: props.branch.container_delays,
     cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
     delivery_types: JSON.parse(props.branch.delivery_types) || [],
     package_types: JSON.parse(props.branch.package_types) || [],
@@ -233,6 +234,18 @@ const clearPhotoFileInput = () => {
 
                             </label>
                             <InputError :message="form.errors.country_code"/>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <InputLabel value="Container Delay Dates" />
+                            <TextInput
+                                v-model="form.container_delays"
+                                class="w-full"
+                                placeholder="Enter No of Days"
+                                type="number"
+                                min="0"
+                            />
+                            <InputError :message="form.errors.container_delays" />
                         </div>
 
                         <div class="sm:col-span-4">
