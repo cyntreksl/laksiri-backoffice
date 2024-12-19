@@ -41,6 +41,40 @@
         .page-break {
             page-break-after: always;
         }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            font-family: 'Times New Roman', serif;
+            left: 0; /* Add this line to ensure the footer starts from the left edge */
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 12px;
+            font-family: 'Times New Roman', serif;
+            left: 0;
+            display: flex; /* Use flexbox for layout */
+            justify-content: space-between; /* Distribute space between elements */
+            align-items: center; /* Vertically center items */
+            padding: 0 20px; /* Add some padding to the sides */
+        }
+
+        .footer-text {
+            text-align: left;
+        }
+
+        .page-number {
+            text-align: center; /* Center the page number */
+        }
+
+        .page-number:after {
+            content: counter(page);
+        }
     </style>
 </head>
 <body>
@@ -153,8 +187,8 @@
                             {{ $package['weight'] }}<br>
                         @endforeach
                     </td>
-                    <td> PERSONAL<br> EFFECT</td>
-                    <td><b>     {{$item[10]}}</b></td>
+                    <td>  PERSONAL<br>      EFFECT</td>
+                    <td style="text-align: center"><b>     {{$item[10]}}</b></td>
 
                 </tr>
             @endforeach
@@ -167,11 +201,17 @@
                     <td style="border: none;">&nbsp;</td>
                     <td style="border: none;">&nbsp;</td>
                 </tr>
-                <p><b> {{$settings?->invoice_header_title}}</b></p>
-                <p><b>{{$settings?->invoice_header_address}}</b></p>
+
             @endif
             </tbody>
     </table>
+    <p><b> {{$settings?->invoice_header_title}}</b></p>
+    <p><b>{{$settings?->invoice_header_address}}</b></p>
+
+    <div class="footer">
+        <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_header_title}}</div>
+        <span class="page-number">Page: </span>
+    </div>
     @if (!$loop->last)
         <div class="page-break"></div>
     @endif
