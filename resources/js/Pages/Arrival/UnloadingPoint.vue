@@ -55,17 +55,6 @@ const groupedPackages = props.packagesWithoutMhbl
         return acc;
     }, {});
 
-// const groupedMHBLPackages = props.packagesWithMhbl
-//     .filter(p => p.pivot?.status !== 'draft-unload')
-//     .reduce((acc, p) => {
-//         const hbl_number = p.hbl.hbl_number;
-//         if (!acc[hbl_number]) {
-//             acc[hbl_number] = [];
-//         }
-//         acc[hbl_number].push(p);
-//         return acc;
-//     }, {});
-
 const groupedMHBLPackages = props.packagesWithMhbl
     .filter(p => p.pivot?.status !== 'draft-unload')
     .reduce((acc, p) => {
