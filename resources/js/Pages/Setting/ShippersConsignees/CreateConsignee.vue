@@ -84,8 +84,12 @@ const createShipper = () => {
                             class="w-1/6 border border-gray-300 rounded-l-md p-2"
                         >
                             <option value="+94">+94</option>
-                            <option value="+44">+44</option>
-                            <option value="+1">+1</option>
+                            <option value="+44">+965</option>
+                            <option value="+966">+966</option>
+                            <option value="+971">+971</option>
+                            <option value="+81">+81</option>
+                            <option value="+60">+60</option>
+                            <option value="+974">+974</option>
 
                         </select>
                         <TextInput

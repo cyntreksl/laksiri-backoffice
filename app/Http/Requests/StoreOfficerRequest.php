@@ -22,7 +22,6 @@ class StoreOfficerRequest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'email' => ['string'],
-            'mobile_number' => ['number'],
             'pp_or_nic_no' => ['string'],
             'residency_no' => ['string'],
             'address' => ['string', 'nullable'],
