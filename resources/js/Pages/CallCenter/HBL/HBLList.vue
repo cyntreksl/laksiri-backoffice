@@ -39,6 +39,7 @@ const filters = reactive({
     cargoMode: [],
     hblType: [],
     isHold: false,
+    isDelayed: false,
     warehouse: [],
     createdBy: "",
     paymentStatus: [],
@@ -902,6 +903,20 @@ const shipIcon = ref(`
                         <Switch
                             v-model="filters.isHold"
                             label="Is Hold"
+                            value="true"
+                        />
+                    </label>
+
+                    <h2
+                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-2"
+                    >
+                        Is Delayed
+                    </h2>
+
+                    <label class="block items-center space-x-2 mt-2">
+                        <Switch
+                            v-model="filters.isDelayed"
+                            label="Is Delayed"
                             value="true"
                         />
                     </label>
