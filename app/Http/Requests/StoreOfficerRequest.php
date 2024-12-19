@@ -20,7 +20,14 @@ class StoreOfficerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'unique:exception_names,name'],
+            'name' => ['required', 'string'],
+            'email' => ['string'],
+            'mobile_number' => ['number'],
+            'pp_or_nic_no' => ['string'],
+            'residency_no' => ['string'],
+            'address' => ['string', 'nullable'],
+            'description' => ['string', 'nullable'],
+
         ];
     }
 }
