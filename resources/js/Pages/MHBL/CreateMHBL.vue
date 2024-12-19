@@ -203,6 +203,7 @@ const handleMHBLCreate = () => {
     form.post(route("mhbls.store"), {
         onSuccess: (page) => {
             form.reset();
+            router.visit(route("mhbls.index"));
             push.success("MHBL Created Successfully!");
         },
         onError: () => console.log("error"),
