@@ -148,8 +148,21 @@ const handleUnloadToWarehouse = (groupIndex, packageIndex) => {
 }
 
 const handleUnloadMHBLToWarehouse = (unloadMhblReference) => {
-    const mhblTounload = mhblContainerArr.value.find(mhbl => mhbl.mhblReference === unloadMhblReference);
-    console.log(warehouseMHBLArr.value);
+    const mhblToUnload = mhblContainerArr.value.find(mhbl => mhbl.mhblReference === unloadMhblReference);
+    mhblToUnload.packages.forEach(pkg => {
+        handleCreateDraftUnload([pkg]);
+    });
+    mhblContainerArr.value = mhblContainerArr.value.filter(mhbl => mhbl.id !== mhblToUnload.id);
+    warehouseMHBLArr.value.push(mhblToUnload);
+}
+
+const handleLoadMHBLToContainer = (loadMhblReference) => {
+    const mhblToLoad = warehouseMHBLArr.value.find(mhbl => mhbl.mhblReference === loadMhblReference);
+    // mhblToLoad.packages.forEach(pkg => {
+    //     handleCreateDraftUnload([pkg]);
+    // });
+    // mhblContainerArr.value = mhblContainerArr.value.filter(mhbl => mhbl.id !== mhblTounload.id);
+    // warehouseMHBLArr.value.push(mhblTounload);
 }
 const handleReLoadToContainer = (index) => {
     if (index !== -1) {
