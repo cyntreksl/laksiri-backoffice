@@ -68,4 +68,6 @@ Route::name('setting.')->group(function () {
         ->name('shipper-consignees.edit');
     Route::put('shipper-consignees/{id}', [OfficerController::class, 'update'])
         ->name('shipper-consignees.update');
+    Route::delete('shipper-consignees/{id}', [OfficerController::class, 'destroy'])
+        ->name('shipper-consignees.destroy');
 });

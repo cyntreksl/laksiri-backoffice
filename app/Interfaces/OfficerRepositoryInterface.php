@@ -13,4 +13,6 @@ interface OfficerRepositoryInterface
     public function storeshipperOfficers(array $data);
 
     public function updateShipper(array $data, $id);
+
+    public function destroyShippers($id);
 }
