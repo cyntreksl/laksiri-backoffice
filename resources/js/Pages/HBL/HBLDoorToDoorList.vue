@@ -76,6 +76,7 @@ const data = reactive({
     status: false,
     is_hold: false,
     hbl_number: false,
+    mhbl: false,
     view: true,
     actions: true,
   },
@@ -134,27 +135,30 @@ const createColumns = () => [
   {
     name: "#",
     formatter: (_, row) => {
-      return h("input", {
-        type: "checkbox",
-        className:
-            "form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent",
-        onChange: (event) => {
-          const isChecked = event.target.checked;
-          if (isChecked) {
-            const rowData = row.cells.map((cell) => cell.data); // Extract data from cells array
-            selectedData.value.push(rowData); // Push extracted data into selectedData
-          } else {
-            // Remove the specific row from selectedData (assuming uniqueness of rows)
-            const index = selectedData.value.findIndex((selectedRow) => {
-              const rowData = row.cells.map((cell) => cell.data);
-              return JSON.stringify(selectedRow) === JSON.stringify(rowData);
-            });
-            if (index !== -1) {
-              selectedData.value.splice(index, 1);
-            }
-          }
-        },
-      });
+      if (row.cells[17].data === null) {
+          return h("input", {
+              type: "checkbox",
+              className:
+                  "form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent",
+              onChange: (event) => {
+                  const isChecked = event.target.checked;
+                  if (isChecked) {
+                      const rowData = row.cells.map((cell) => cell.data); // Extract data from cells array
+                      selectedData.value.push(rowData); // Push extracted data into selectedData
+                  } else {
+                      // Remove the specific row from selectedData (assuming uniqueness of rows)
+                      const index = selectedData.value.findIndex((selectedRow) => {
+                          const rowData = row.cells.map((cell) => cell.data);
+                          return JSON.stringify(selectedRow) === JSON.stringify(rowData);
+                      });
+                      if (index !== -1) {
+                          selectedData.value.splice(index, 1);
+                      }
+                  }
+              },
+          });
+      }
+        return null;
     },
   },
   {name: "ID", hidden: !data.columnVisibility.id},

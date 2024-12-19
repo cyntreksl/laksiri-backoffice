@@ -42,7 +42,7 @@ class GetLoadedContainers
 
             $container
                 ->hbl_packages
-                ->groupBy(fn($package) => $package->hbl?->id)
+                ->groupBy(fn ($package) => $package->hbl?->id)
                 ->each(function ($hblPackage, $hblId) {
                     if ($hblId !== null) {
                         $hbl = $hblPackage->first()->hbl;
