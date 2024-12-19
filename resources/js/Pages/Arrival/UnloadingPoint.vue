@@ -152,17 +152,18 @@ const handleUnloadMHBLToWarehouse = (unloadMhblReference) => {
     mhblToUnload.packages.forEach(pkg => {
         handleCreateDraftUnload([pkg]);
     });
-    mhblContainerArr.value = mhblContainerArr.value.filter(mhbl => mhbl.id !== mhblToUnload.id);
+    mhblContainerArr.value = mhblContainerArr.value.filter(mhbl => mhbl.mhblReference !== mhblToUnload.mhblReference);
+    console.log(mhblContainerArr.value);
     warehouseMHBLArr.value.push(mhblToUnload);
 }
 
-const handleLoadMHBLToContainer = (loadMhblReference) => {
-    const mhblToLoad = warehouseMHBLArr.value.find(mhbl => mhbl.mhblReference === loadMhblReference);
-    // mhblToLoad.packages.forEach(pkg => {
-    //     handleCreateDraftUnload([pkg]);
-    // });
-    // mhblContainerArr.value = mhblContainerArr.value.filter(mhbl => mhbl.id !== mhblTounload.id);
-    // warehouseMHBLArr.value.push(mhblTounload);
+const handleReloadMHBLToContainer = (loadMhblReference) => {
+    const mhblToReload = warehouseMHBLArr.value.find(mhbl => mhbl.mhblReference === loadMhblReference);
+    mhblToReload.packages.forEach(pkg => {
+        handleRemoveDraftUnload([pkg]);
+    });
+    mhblContainerArr.value.push(mhblToReload);
+    warehouseMHBLArr.value = warehouseMHBLArr.value.filter(mhbl => mhbl.mhblReference !== mhblToReload.mhblReference);
 }
 const handleReLoadToContainer = (index) => {
     if (index !== -1) {
@@ -928,7 +929,7 @@ const confirmShowCreateIssueModal = (index) => {
                                                 width="24"
                                                 x-tooltip.placement.top.error="'Click to Re-Load'"
                                                 xmlns="http://www.w3.org/2000/svg"
-                                                @click.prevent="handleReLoadToContainer(mhbl.mhblReference)">
+                                                @click.prevent="handleReloadMHBLToContainer(mhbl.mhblReference)">
                                                 <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                                 <path d="M19 18v-6a3 3 0 0 0 -3 -3h-7"/>
                                                 <path d="M13 13l-4 -4l4 -4m-5 8l-4 -4l4 -4"/>
