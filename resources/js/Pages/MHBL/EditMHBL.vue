@@ -261,6 +261,11 @@ const handleAddNewHBL = async () => {
     } else {
         const data = await response.json();
 
+        if(data.mhbl){
+            closeAddNewHBLModal();
+            push.error("HBL already added to a MHBL.");
+        }
+
         if(data.cargo_type !== form.cargo_type || data.hbl_type !== 'Door to Door' || data.warehouse === form.warehouse){
             closeAddNewHBLModal();
             push.error("Selected HBL is not maching to  Primary Details");
