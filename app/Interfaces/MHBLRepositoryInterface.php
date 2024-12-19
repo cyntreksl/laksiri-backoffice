@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-use App\Models\Mhbl;
+use App\Models\MHBL;
 use Illuminate\Http\JsonResponse;
 
 interface MHBLRepositoryInterface

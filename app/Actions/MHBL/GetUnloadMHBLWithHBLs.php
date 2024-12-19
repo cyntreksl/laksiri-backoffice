@@ -4,7 +4,7 @@ namespace App\Actions\MHBL;
 
 use App\Actions\Branch\GetBranchByName;
 use App\Models\HBL;
-use App\Models\Mhbl;
+use App\Models\MHBL;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class GetUnloadMHBLWithHBLs

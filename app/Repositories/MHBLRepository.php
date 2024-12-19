@@ -15,7 +15,7 @@ use App\Factory\MHBL\FilterFactory;
 use App\Http\Resources\MHBLResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\MHBLRepositoryInterface;
-use App\Models\Mhbl;
+use App\Models\MHBL;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
