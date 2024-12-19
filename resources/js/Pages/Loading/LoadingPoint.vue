@@ -140,7 +140,14 @@ const getLoadedMHBLs = async () => {
         }
     } else {
         const data = await response.json();
-        loadedMHBLs.value = data.data;
+        const filteredMHBLs = data.data.filter(mhbl =>
+            mhbl.hbls.every(hbl =>
+                hbl.packages.every(pkg =>
+                    pkg.containers.every(ctnr => ctnr.pivot.status === 'draft')
+                )
+            )
+        );
+        loadedMHBLs.value = filteredMHBLs;
     }
 }
 
