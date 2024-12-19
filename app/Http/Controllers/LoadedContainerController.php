@@ -118,4 +118,12 @@ class LoadedContainerController extends Controller
     {
         return $this->loadedContainerRepository->updateVerificationStatus($request->all());
     }
+    public function doorToDoorManifest($container)
+    {
+        $this->authorize('doortodoor.download manifest');
+
+        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
+
+        return $this->loadedContainerRepository->downloadDoorToDoorPdf($container);
+    }
 }

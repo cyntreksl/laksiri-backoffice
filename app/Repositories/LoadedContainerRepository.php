@@ -120,10 +120,14 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $filename = $container->reference.'_door_to_door_'.date('Y_m_d_h_i_s').'.pdf';
 
         $export = new DoorToDoorManifestExport($container);
-        $pdf = PDF::loadView('exports.door_to_door', ['container' => $container]);
+
+        $data = array_filter($export->prepareData(), function ($item) {
+            return isset($item[0]) && $item[0] !== '';
+        });
+        $pdf = PDF::loadView('exports.door_to_door', ['data' => $data,'container' => $container]);
         $pdf->setPaper('a3', 'portrait');
 
-        return $pdf->download($filename);
+        return $pdf->stream($filename);
 
 
     }
