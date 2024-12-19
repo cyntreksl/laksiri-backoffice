@@ -421,52 +421,7 @@ const shipIcon = ref(`
                             >
                                 Shipper Details
                             </h2>
-
-                            <a @click.prevent="confirmShowingCopyFromHBLToShipperModal"
-                               x-tooltip.placement.bottom="'Copy from HBL'">
-                                <svg class="icon icon-paste text-[#64748b]" fill="none" stroke="#64748b"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" height="24"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <!-- Clipboard shape -->
-                                    <path
-                                        d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h1v-1a2 2 0 0 1 2 -2z"/>
-                                    <!-- Horizontal line representing pasted content -->
-                                    <path d="M9 7h6"/>
-                                </svg>
-                            </a>
                         </div>
-
-                        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToShipperModalShow"
-                                     @close="closeCopyFromHBLToShipperModal">
-                            <template #title>
-                                Copy
-                            </template>
-
-                            <template #content>
-                                <div class="mt-4">
-                                    <TextInput
-                                        v-model="reference"
-                                        class="w-full"
-                                        placeholder="Enter HBL Reference"
-                                        required
-                                        type="text"
-                                    />
-                                </div>
-                            </template>
-
-                            <template #footer>
-                                <SecondaryButton @click="closeCopyFromHBLToShipperModal">
-                                    Cancel
-                                </SecondaryButton>
-                                <PrimaryButton
-                                    class="ms-3"
-                                    @click.prevent="handleCopyFromHBLToShipper"
-                                >
-                                    Copy From HBL
-                                </PrimaryButton>
-                            </template>
-                        </DialogModal>
 
                         <div class="grid grid-cols-3 gap-5 mt-3">
                             <div class="col-span-3">
@@ -492,6 +447,7 @@ const shipIcon = ref(`
                                 <span>Email</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.email"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         placeholder="Email"
@@ -525,6 +481,7 @@ const shipIcon = ref(`
                                 <span>Mobile Number</span>
                                 <div class="flex -space-x-px">
                                     <select
+                                        disabled
                                         v-model="countryCode"
                                         class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
@@ -534,6 +491,7 @@ const shipIcon = ref(`
                                     </select>
 
                                     <input
+                                        disabled
                                         v-model="contactNumber"
                                         class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
@@ -549,6 +507,7 @@ const shipIcon = ref(`
                                 <span>PP or NIC No</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.nic"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         placeholder="PP or NIC No"
@@ -564,6 +523,7 @@ const shipIcon = ref(`
                                 <span>Residency No</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.iq_number"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         placeholder="Residency No"
@@ -579,6 +539,7 @@ const shipIcon = ref(`
                                 <span>Address</span>
                                 <label class="block">
                   <textarea
+                      disabled
                       v-model="form.address"
                       class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                       placeholder="Type address here..."
@@ -587,14 +548,6 @@ const shipIcon = ref(`
                                 </label>
                                 <InputError :message="form.errors.address"/>
                             </div>
-                        </div>
-                        <div v-if="form.hbl_type === 'Door to Door'" class="col-span-2">
-                            <Checkbox
-                                v-model="isChecked"
-                                @change="addToConsigneeDetails"
-                            ></Checkbox>
-
-                            <span class="ml-5">Same as Consignee Details</span>
                         </div>
                     </div>
                 </div>
@@ -607,56 +560,6 @@ const shipIcon = ref(`
                             >
                                 Consignee Details
                             </h2>
-
-                            <div class="flex space-x-1">
-                                <a
-                                    @click.prevent="confirmShowingCopyFromHBLToConsigneeModal"
-                                    x-tooltip.placement.bottom="'Copy from HBL'"
-                                >
-                                    <svg class="icon icon-paste text-[#64748b] ml-1" fill="none" stroke="#64748b"
-                                         stroke-linecap="round"
-                                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" height="24"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <!-- Clipboard shape -->
-                                        <path
-                                            d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h1v-1a2 2 0 0 1 2 -2z"/>
-                                        <!-- Horizontal line representing pasted content -->
-                                        <path d="M9 7h6"/>
-                                    </svg>
-
-                                </a>
-                            </div>
-
-                            <DialogModal :maxWidth="'xl'" :show="copyFromHBLToConsigneeModalShow"
-                                         @close="closeCopyFromHBLToConsigneeModal">
-                                <template #title>
-                                    Copy
-                                </template>
-
-                                <template #content>
-                                    <div class="mt-4">
-                                        <TextInput
-                                            v-model="reference"
-                                            class="w-full"
-                                            placeholder="Enter HBL Reference"
-                                            required
-                                            type="text"
-                                        />
-                                    </div>
-                                </template>
-
-                                <template #footer>
-                                    <SecondaryButton @click="closeCopyFromHBLToConsigneeModal">
-                                        Cancel
-                                    </SecondaryButton>
-                                    <PrimaryButton
-                                        class="ms-3"
-                                        @click.prevent="handleCopyFromHBLToConsignee"
-                                    >
-                                        Copy From HBL
-                                    </PrimaryButton>
-                                </template>
-                            </DialogModal>
                         </div>
                         <div class="grid grid-cols-2 gap-5 mt-3">
                             <div class="col-span-2">
@@ -681,6 +584,7 @@ const shipIcon = ref(`
                                 <span>PP or NIC No</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.consignee_nic"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         placeholder="PP or NIC No"
@@ -694,6 +598,7 @@ const shipIcon = ref(`
                                 <span>Mobile Number</span>
                                 <div class="flex -space-x-px">
                                     <select
+                                        disabled
                                         v-model="consignee_countryCode"
                                         class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
@@ -703,6 +608,7 @@ const shipIcon = ref(`
                                     </select>
 
                                     <input
+                                        disabled
                                         v-model="consignee_contact"
                                         class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
@@ -716,6 +622,7 @@ const shipIcon = ref(`
                                 <span>Address</span>
                                 <label class="block">
                                   <textarea
+                                      disabled
                                       v-model="form.consignee_address"
                                       class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                       placeholder="Type address here..."
@@ -726,16 +633,6 @@ const shipIcon = ref(`
                             </div>
 
                             <div class="col-span-2">
-                                <span>Note</span>
-                                <label class="block">
-                                  <textarea
-                                      v-model="form.consignee_note"
-                                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                      placeholder="Type note here..."
-                                      rows="2"
-                                  ></textarea>
-                                </label>
-                                <InputError :message="form.errors.consignee_note"/>
                             </div>
                         </div>
                     </div>
