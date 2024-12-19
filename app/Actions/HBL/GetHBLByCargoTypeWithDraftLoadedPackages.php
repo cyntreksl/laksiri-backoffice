@@ -15,6 +15,7 @@ class GetHBLByCargoTypeWithDraftLoadedPackages
     {
         return Hbl::where('cargo_type', $cargoType)
             ->latest()
+            ->doesntHave('mhbl')
             ->whereHas('packages.containers')->with(['packages' => function ($query) use ($container) {
                 $query->whereHas('containers', function ($query) use ($container) {
                     $query->where('container_id', $container->id)

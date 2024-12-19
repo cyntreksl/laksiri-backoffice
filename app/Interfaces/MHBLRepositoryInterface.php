@@ -14,4 +14,8 @@ interface MHBLRepositoryInterface
     public function addNewHBL(array $data): JsonResponse;
 
     public function updateMHBL(MHBL $mhbl, array $data);
+
+    public function getUnloadedMHBLs(array $data);
+
+    public function getContainerLoadedMHBLs(array $data);
 }

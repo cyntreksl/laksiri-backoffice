@@ -106,15 +106,13 @@ class MHBLController extends Controller
     {
         $this->authorize('hbls.edit');
 
-        $mhblData = $mhbl
+        $mhblData = MHBL::where('id', $mhbl->id)
             ->with([
+                'hbls.packages',
                 'warehouse',
                 'shipper',
                 'consignee',
-                'hbls.packages',
-            ])
-            ->get()
-            ->first();
+            ])->first();
 
         if ($mhblData && $mhblData->hbls) {
             $hblPackages = $mhblData->hbls->flatMap(function ($hbl) {
@@ -160,5 +158,15 @@ class MHBLController extends Controller
     public function update(MHBL $mhbl, UpdateMHBLRequest $request)
     {
         $this->mhblRepository->updateMHBL($mhbl, $request->all());
+    }
+
+    public function getUnloadedMHBLs(Request $request)
+    {
+        return $this->mhblRepository->getUnloadedMHBLs($request->all());
+    }
+
+    public function getLoadedMHBLsToContainer(Request $request)
+    {
+        return $this->mhblRepository->getContainerLoadedMHBLs($request->all());
     }
 }
