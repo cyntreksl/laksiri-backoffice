@@ -104,6 +104,11 @@ const closeShowHBLModal = () => {
                 <th
                     class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                 >
+                    MHBL
+                </th>
+                <th
+                    class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                >
                     HBL
                 </th>
                 <th
@@ -151,6 +156,9 @@ const closeShowHBLModal = () => {
             <tbody>
             <tr v-for="hbl in containerHBLS"
                 class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
+                    {{ hbl.mhbl.reference || '-' }}
+                </td>
                 <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
                     {{ hbl.hbl_number || '-' }}
                 </td>
