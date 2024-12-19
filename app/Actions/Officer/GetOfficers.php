@@ -12,6 +12,6 @@ class GetOfficers
 
     public function handle(): Collection|array
     {
-        return Officer::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)->get();
+        return Officer::all();
     }
 }

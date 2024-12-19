@@ -9,4 +9,6 @@ interface OfficerRepositoryInterface
     public function getConsignees();
 
     public function getAllofficers();
+
+    public function storeshipperOfficers(array $data);
 }

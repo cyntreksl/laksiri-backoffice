@@ -2,12 +2,8 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { push } from "notivue";
-
-import { ref } from "vue";
-import { Link, router } from "@inertiajs/vue3";
-import CreateExceptionNameForm from "@/Pages/Setting/ExceptionNames/CreateExceptionNameForm.vue";
+import CreateShipper from "@/Pages/Setting/ShippersConsignees/CreateShipper.vue";
+import CreateConsignee from "@/Pages/Setting/ShippersConsignees/CreateConsignee.vue";
 defineProps({
     allOfficers: {
         type: Object,
@@ -19,17 +15,22 @@ defineProps({
 </script>
 
 <template>
-    <AppLayout title="Package Types">
-        <template #header>Package Types</template>
+    <AppLayout title="Officerss">
+        <template #header>Officerss</template>
 
         <Breadcrumb/>
+
         <div class="flex items-center justify-between p-2 my-5">
-            <h2
-                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-            >
+            <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
                 Shipper & Consignees
             </h2>
+            <div class="flex gap-2">
+                <CreateShipper />
+                <CreateConsignee />
+            </div>
         </div>
+
+
 
 
         <div class="min-w-full overflow-auto">
@@ -125,3 +126,11 @@ defineProps({
 
     </AppLayout>
 </template>
+<style>
+.flex {
+    display: flex;
+}
+.gap-2 {
+    gap: 0.5rem; /* Adjust the gap as needed */
+}
+</style>
