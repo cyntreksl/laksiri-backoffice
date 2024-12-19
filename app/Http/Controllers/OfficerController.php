@@ -27,7 +27,6 @@ class OfficerController extends Controller
 
     public function store(StoreOfficerRequest $request)
     {
-
         $this->officerRepository->storeshipperOfficers($request->all());
     }
 
