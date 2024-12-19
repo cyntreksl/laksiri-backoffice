@@ -14,6 +14,9 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+Route::get('/Tracking', function () {
+    return Inertia::render('Tracking');
+})->name('Tracking.page');
 
 require_once __DIR__.'/web/feedback.php';
 
