@@ -3,7 +3,7 @@
 use App\Models\Branch;
 use App\Models\Container;
 use App\Models\ExceptionName;
-use App\Models\Mhbl;
+use App\Models\MHBL;
 use App\Models\PackageType;
 use App\Models\PickUp;
 use App\Models\User;

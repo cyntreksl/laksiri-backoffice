@@ -11,7 +11,7 @@ use App\Interfaces\MHBLRepositoryInterface;
 use App\Interfaces\OfficerRepositoryInterface;
 use App\Models\HBL;
 use App\Models\HBLPackage;
-use App\Models\Mhbl;
+use App\Models\MHBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

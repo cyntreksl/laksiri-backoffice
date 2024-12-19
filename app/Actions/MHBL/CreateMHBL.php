@@ -2,7 +2,7 @@
 
 namespace App\Actions\MHBL;
 
-use App\Models\Mhbl;
+use App\Models\MHBL;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CreateMHBL
