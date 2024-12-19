@@ -24,6 +24,33 @@ const confirmAddHBLModal = () => {
 const closeModal = () => {
     showConfirmAddHBLModal.value = false;
 }
+const filteredHBLS = ref([]);
+const hblsCount = ref(0)
+const filteredHBLSPackagesCount = ref(0);
+const filteredHBLSPackagesWeight = ref(0);
+const filteredHBLSPackagesVolume = ref(0);
+const hbls = () => {
+    const hbls = props.container.hbls;
+    filteredHBLS.value = Object.values(hbls).filter(hbl => hbl.mhbl === null);
+    hblsCount.value = filteredHBLS.value.length;
+
+    const filteredHblIds = filteredHBLS.value.map(hbl => hbl.id);
+
+    const filteredHblPackages = props.container.hbl_packages.filter(pkg =>
+        filteredHblIds.includes(pkg.hbl_id)
+    );
+
+    filteredHBLSPackagesCount.value = filteredHblPackages.length;
+
+    filteredHBLSPackagesWeight.value = filteredHblPackages.reduce((sum, pkg) => {
+        return sum + (pkg.weight || 0);  // Ensure pkg.weight exists
+    }, 0);
+
+    filteredHBLSPackagesVolume.value = filteredHblPackages.reduce((sum, pkg) => {
+        return sum + (pkg.volume || 0);  // Ensure pkg.weight exists
+    }, 0);
+}
+hbls();
 </script>
 
 <template>
@@ -64,7 +91,7 @@ const closeModal = () => {
         </div>
 
         <div class="flex gap-3 my-3">
-            <SimpleOverviewWidget :count="container?.hbl_count || 0" title="HBL">
+            <SimpleOverviewWidget :count="hblsCount || 0" title="HBL">
                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-app-window text-info"
                      fill="none" height="24" stroke="currentColor"
                      stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
@@ -78,7 +105,7 @@ const closeModal = () => {
                 </svg>
             </SimpleOverviewWidget>
 
-            <SimpleOverviewWidget :count="container?.hbl_packages_count || 0" title="Package">
+            <SimpleOverviewWidget :count="filteredHBLSPackagesCount || 0" title="Package">
                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-package text-info"
                      fill="none"
                      height="24" stroke="currentColor" stroke-linecap="round"
@@ -92,7 +119,7 @@ const closeModal = () => {
                     <path d="M16 5.25l-8 4.5"/>
                 </svg>
             </SimpleOverviewWidget>
-            <SimpleOverviewWidget :count="container?.hbl_packages_sum_weight != null ? container?.hbl_packages_sum_weight.toFixed(2) : 0.00" title="Weight">
+            <SimpleOverviewWidget :count="filteredHBLSPackagesWeight.toFixed(2)" title="Weight">
                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-weight text-info"
                      fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                      stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
@@ -104,7 +131,7 @@ const closeModal = () => {
                 </svg>
             </SimpleOverviewWidget>
 
-            <SimpleOverviewWidget :count="container?.hbl_packages_sum_volume != null ? container?.hbl_packages_sum_volume.toFixed(2) : 0.00" title="Volume">
+            <SimpleOverviewWidget :count="filteredHBLSPackagesVolume.toFixed(2)" title="Volume">
                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-scale text-info"
                      fill="none"
                      height="24" stroke="currentColor" stroke-linecap="round"
@@ -120,7 +147,7 @@ const closeModal = () => {
             </SimpleOverviewWidget>
         </div>
 
-        <TableHBLPackages :container="container"/>
+        <TableHBLPackages :container="container" :containerHBLS="filteredHBLS"/>
     </Tab>
     <AddHBLModal :container="container" :show="showConfirmAddHBLModal" @close="closeModal"/>
 </template>
