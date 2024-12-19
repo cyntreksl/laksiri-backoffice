@@ -236,6 +236,10 @@ const confirmShowCreateIssueModal = (index) => {
     hblPackageId.value = warehouseArr.value[index].id;
     showUnloadingIssueModal.value = true;
 }
+
+const reviewContainer = () => {
+    showReviewModal.value = true
+}
 </script>
 
 <template>
@@ -265,7 +269,7 @@ const confirmShowCreateIssueModal = (index) => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <PrimaryButton :disabled="warehouseArr.length === 0" @click.prevent="showReviewModal = true">
+                    <PrimaryButton :disabled="warehouseArr.length === 0" @click.prevent="reviewContainer">
                         Proceed to Review
                     </PrimaryButton>
                 </div>
@@ -1081,8 +1085,12 @@ const confirmShowCreateIssueModal = (index) => {
             </div>
         </main>
 
-        <ReviewModal :show="showReviewModal"
-                     :warehouse-array="warehouseArr" @close="showReviewModal = false"/>
+        <ReviewModal
+             :show="showReviewModal"
+             :warehouse-array="warehouseArr"
+             :warehouseMHBLs="warehouseMHBLArr"
+             @close="showReviewModal = false"
+        />
 
         <CreateUnloadingIssueModal :hbl-package-id="hblPackageId" :show="showUnloadingIssueModal" @close="showUnloadingIssueModal = false"/>
     </DestinationAppLayout>
