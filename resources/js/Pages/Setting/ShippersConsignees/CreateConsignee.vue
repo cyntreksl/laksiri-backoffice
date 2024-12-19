@@ -76,28 +76,20 @@ const createShipper = () => {
                 </div>
 
                 <!-- Mobile Number Field -->
-                <div class="col-span-2">
-                    <InputLabel for="mobile_number" value="Mobile Number" />
-                    <div class="flex">
-                        <select
-                            v-model="form.country_code"
-                            class="w-1/6 border border-gray-300 rounded-l-md p-2"
-                        >
-                            <option value="+94">+94</option>
-                            <option value="+44">+44</option>
-                            <option value="+1">+1</option>
+              <div>
+                <InputLabel for="mobile_number" value="Mobile Number With Country Code" />
+                <div class="flex items-center">
 
-                        </select>
-                        <TextInput
-                            v-model="form.mobile_number"
-                            id="mobile_number"
-                            type="text"
-                            class="w-5/6 border border-gray-300 rounded-r-md focus:ring-0"
-                            placeholder="123 4567 890"
-                        />
-                    </div>
-                    <InputError :message="form.errors.mobile_number" />
+                  <TextInput
+                      v-model="form.mobile_number"
+                      id="mobile_number"
+                      type="text"
+                      class="w-full  border border-gray-300 rounded-r-md focus:ring-0"
+                      placeholder="123 4567 890"
+                  />
                 </div>
+                <InputError :message="form.errors.mobile_number" />
+              </div>
                 <!-- Address Field -->
                 <div class="col-span-2">
                     <InputLabel for="address" value="Address" />

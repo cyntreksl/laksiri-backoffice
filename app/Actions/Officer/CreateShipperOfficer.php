@@ -17,7 +17,7 @@ class CreateShipperOfficer
         $officer->type = $data['type'];
         $officer->email = $data['email'] ?? null;
         $officer->mobile_number = $data['mobile_number'] ?? null;
-        $officer->pp_or_nic_no = $data['pp_or_nic_no'];
+        $officer->pp_or_nic_no = $data['pp_or_nic_no'] ?? null;
         $officer->residency_no = $data['residency_no'] ?? null;
         $officer->address = $data['address'] ?? null;
         $officer->description = $data['description'] ?? null;

@@ -19,7 +19,8 @@ const form = useForm({
     email: "",
     mobile_number:"",
     pp_or_nic_no: "",
-    residency_no:""
+    residency_no:"",
+    address:""
 
 });
 
@@ -75,21 +76,14 @@ const createShipper = () => {
                 </div>
                 <!-- Mobile Number Field -->
                 <div>
-                    <InputLabel for="mobile_number" value="Mobile Number" />
+                    <InputLabel for="mobile_number" value="Mobile Number With Country Code" />
                     <div class="flex items-center">
-                        <select
-                            v-model="form.country_code"
-                            class="border border-gray-300 rounded-l-md p-2 w-1/6"
-                        >
-                            <option value="+44">+44</option>
-                            <option value="+1">+1</option>
-                            <option value="+94">+94</option>
-                        </select>
+
                         <TextInput
                             v-model="form.mobile_number"
                             id="mobile_number"
                             type="text"
-                            class="w-5/6 border border-gray-300 rounded-r-md focus:ring-0"
+                            class="w-full  border border-gray-300 rounded-r-md focus:ring-0"
                             placeholder="123 4567 890"
                         />
                     </div>
