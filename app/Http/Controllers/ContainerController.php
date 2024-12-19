@@ -19,6 +19,7 @@ use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\HBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -116,6 +117,31 @@ class ContainerController extends Controller
             'warehouses' => WarehouseType::getWarehouseOptions(),
         ]);
     }
+    public function showUnloadingPoint($container_id)
+    {
+        $this->authorize('arrivals.unload');
+
+        $container = GetContainerWithoutGlobalScopesById::run($container_id);
+        $packagesWithMhbl = [];
+        $packagesWithoutMhbl = [];
+
+        foreach ($container->hbl_packages as $package) {
+            if (!empty($package->hbl['mhbl'])) {
+                $packagesWithMhbl[] = $package;
+            } else {
+                $packagesWithoutMhbl[] = $package;
+            }
+        }
+
+        return Inertia::render('Arrival/UnloadingPoint', [
+            'container' => $container,
+            'cargoTypes' => CargoType::getCargoTypeOptions(),
+            'hblTypes' => HBLType::getHBLTypeOptions(),
+            'warehouses' => WarehouseType::getWarehouseOptions(),
+            'packagesWithMhbl' => $packagesWithMhbl,
+            'packagesWithoutMhbl' => $packagesWithoutMhbl,
+        ]);
+    }
 
     public function getUnloadedHBLs(Request $request)
     {
@@ -157,17 +183,7 @@ class ContainerController extends Controller
         ]);
     }
 
-    public function showUnloadingPoint($container_id)
-    {
-        $this->authorize('arrivals.unload');
 
-        return Inertia::render('Arrival/UnloadingPoint', [
-            'container' => GetContainerWithoutGlobalScopesById::run($container_id),
-            'cargoTypes' => CargoType::getCargoTypeOptions(),
-            'hblTypes' => HBLType::getHBLTypeOptions(),
-            'warehouses' => WarehouseType::getWarehouseOptions(),
-        ]);
-    }
 
     public function unloadContainer(Request $request)
     {

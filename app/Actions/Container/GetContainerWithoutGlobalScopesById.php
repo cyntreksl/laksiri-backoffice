@@ -14,14 +14,17 @@ class GetContainerWithoutGlobalScopesById
     {
         return Container::withoutGlobalScope(BranchScope::class)
             ->where('id', $container_id)
-            ->with(['hbl_packages' => function ($query) {
-                $query->withoutGlobalScopes([BranchScope::class])->with([
-                    'hbl' => function ($query) {
-                        $query->withoutGlobalScopes([BranchScope::class]);
-                    },
-                    'unloadingIssue',
-                ]);
-            }])
+            ->with([
+                'hbl_packages' => function ($query) {
+                    $query->withoutGlobalScopes([BranchScope::class])->with([
+                        'hbl' => function ($query) {
+                            $query->withoutGlobalScopes([BranchScope::class])
+                                ->with('mhbl');
+                        },
+                        'unloadingIssue',
+                    ]);
+                },
+            ])
             ->first();
     }
 }
