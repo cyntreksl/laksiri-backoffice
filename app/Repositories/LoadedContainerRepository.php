@@ -6,6 +6,7 @@ use App\Actions\Container\Loading\CreateDraftLoadedContainer;
 use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
 use App\Enum\ContainerStatus;
+use App\Exports\DoorToDoorManifestExport;
 use App\Exports\LoadedContainerManifestExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
@@ -113,5 +114,17 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $document->update(['is_verified' => $data['isChecked']]);
 
         return $document;
+    }
+    public function downloadDoorToDoorPdf($container)
+    {
+        $filename = $container->reference.'_door_to_door_'.date('Y_m_d_h_i_s').'.pdf';
+
+        $export = new DoorToDoorManifestExport($container);
+        $pdf = PDF::loadView('exports.door_to_door', ['container' => $container]);
+        $pdf->setPaper('a3', 'portrait');
+
+        return $pdf->download($filename);
+
+
     }
 }
