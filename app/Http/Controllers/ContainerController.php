@@ -19,7 +19,6 @@ use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\HBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -117,6 +116,7 @@ class ContainerController extends Controller
             'warehouses' => WarehouseType::getWarehouseOptions(),
         ]);
     }
+
     public function showUnloadingPoint($container_id)
     {
         $this->authorize('arrivals.unload');
@@ -126,7 +126,7 @@ class ContainerController extends Controller
         $packagesWithoutMhbl = [];
 
         foreach ($container->hbl_packages as $package) {
-            if (!empty($package->hbl['mhbl'])) {
+            if (! empty($package->hbl['mhbl'])) {
                 $packagesWithMhbl[] = $package;
             } else {
                 $packagesWithoutMhbl[] = $package;
@@ -182,8 +182,6 @@ class ContainerController extends Controller
             'airContainerOptions' => ContainerType::getAirCargoOptions(),
         ]);
     }
-
-
 
     public function unloadContainer(Request $request)
     {
