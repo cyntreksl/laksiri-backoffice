@@ -28,7 +28,7 @@ public function __construct(Container $container)
         $data = [];
 
         foreach ($this->container->hbl_packages->groupBy('hbl_id') as $hblId => $loadedHBLPackages) {
-            $hbl = HBL::withoutGlobalScope(BranchScope::class)->find($hblId);
+            $hbl = HBL::withoutGlobalScope(BranchScope::class)->with('mhbl')->find($hblId);
             if (!$hbl) {
                 continue;
             } // Skip if HBL is missing
