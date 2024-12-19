@@ -21,6 +21,16 @@ const props = defineProps({
         type: Function,
         required: true
     },
+    containerPackages: {
+        type: Object,
+        default: () => {
+        },
+    },
+    loadedMHBLs: {
+        type: Object,
+        default: () => {
+        },
+    }
 });
 
 const emit = defineEmits(['close']);
@@ -46,9 +56,15 @@ const form = useForm({
     container_id: route().params.container,
     cargo_type: route().params.cargoType,
     packages: computed(() => {
-        return props.containerArray;
+        return props.containerPackages;
     }),
 });
+
+const getMHBLPackageCount = (hbls) => {
+    return hbls.reduce((total, hbl) => {
+        return total + (hbl.packages ? hbl.packages.length : 0);
+    }, 0);
+}
 
 const handleCreateLoadedContainer = () => {
     form.post(route("loading.loaded-containers.store"), {
@@ -137,6 +153,44 @@ const handleCreateLoadedContainer = () => {
                         <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
                             {{ countPackages(packageData.hbl_id)}}
                         </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
+                <table class="is-hoverable w-full text-left">
+                    <thead>
+                    <tr>
+                        <th
+                            class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
+                            #
+                        </th>
+                        <th
+                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
+                            MHBL
+                        </th>
+                        <th
+                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
+                            Total Packages
+                        </th>
+                        <th
+                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
+                            Loaded Packages
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(mhbl, index) in loadedMHBLs" class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                        <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.reference }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ getMHBLPackageCount(mhbl.hbls) }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ getMHBLPackageCount(mhbl.hbls) }}</td>
+
                     </tr>
                     </tbody>
                 </table>
