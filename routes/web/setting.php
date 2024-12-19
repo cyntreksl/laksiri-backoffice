@@ -64,4 +64,10 @@ Route::name('setting.')->group(function () {
         ->name('shipper-consignees.index');
     Route::post('shipper-consignees', [OfficerController::class, 'store'])
         ->name('shipper-consignees.store');
+    Route::get('shipper-consignees/{id}/edit', [OfficerController::class, 'edit'])
+        ->name('shipper-consignees.edit');
+    Route::put('shipper-consignees/{id}', [OfficerController::class, 'update'])
+        ->name('shipper-consignees.update');
+    Route::delete('shipper-consignees/{id}', [OfficerController::class, 'destroy'])
+        ->name('shipper-consignees.destroy');
 });
