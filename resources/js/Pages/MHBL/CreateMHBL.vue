@@ -315,7 +315,7 @@ const shipIcon = ref(`
                             <h2
                                 class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-5"
                             >
-                                Cargo Type
+                                Cargo Type <span class="text-xs text-gray-400">(Automatically Selected)</span>
                             </h2>
                         </div>
                         <div class="my-5">
@@ -347,14 +347,14 @@ const shipIcon = ref(`
                         <hr class="my-4 border-t border-slate-200 dark:border-navy-600">
 
                         <!-- Type -->
-                        <div>
+                        <div hidden="true">
                             <h2
                                 class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-0"
                             >
                                 Type
                             </h2>
                         </div>
-                        <div class="my-5">
+                        <div hidden="true" class="my-5">
                             <div class="space-x-5">
                                 <label
                                     v-for="hblType in hblTypes"
@@ -374,14 +374,14 @@ const shipIcon = ref(`
                             <InputError :message="form.errors.hbl_type"/>
                         </div>
 
-                        <hr class="my-4 border-t border-slate-200 dark:border-navy-600">
+                        <hr hidden="true" class="my-4 border-t border-slate-200 dark:border-navy-600">
 
                         <!-- Warehouse -->
                         <div>
                             <h2
                                 class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-0"
                             >
-                                Warehouse
+                                Warehouse <span class="text-xs text-gray-400">(Automatically Selected)</span>
                             </h2>
                         </div>
                         <div class="my-5">
@@ -975,50 +975,12 @@ const shipIcon = ref(`
                                 <h2
                                     class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                                 >
-                                    Price and Payment
+                                    MHBL Summary
                                 </h2>
                             </div>
-                            <div class="grid grid-cols-2 gap-5 mt-5">
-                                <div>
-                                    <span>Grand Volume</span>
-                                    <TextInput
-                                        v-model="form.grand_volume"
-                                        disabled
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.grand_volume"/>
-                                </div>
 
-                                <div>
-                                    <span>Grand Weight</span>
-                                    <TextInput
-                                        v-model="form.grand_weight"
-                                        disabled
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.grand_weight"/>
-                                </div>
-
-                                <div>
-                                    <span>Grand Total</span>
-                                    <TextInput
-                                        v-model="form.grand_total"
-                                        disabled
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.grand_total"/>
-                                </div>
-
-                                <div class="col-start-2 mt-20 space-y-2.5 font-bold">
+                            <div class="mt-5">
+                                <div class="col-start-2 mt-5 space-y-2.5 font-bold">
                                     <div class="flex justify-between">
                                         <p class="line-clamp-1">Packages</p>
                                         <p class="text-slate-700 dark:text-navy-100">
@@ -1031,25 +993,13 @@ const shipIcon = ref(`
                                             {{ form.grand_weight.toFixed(2) }}
                                         </p>
                                     </div>
-                                    <div class="flex justify-between">
+                                    <div class="flex justify-between mb-20">
                                         <p class="line-clamp-1">Volume</p>
                                         <p class="text-slate-700 dark:text-navy-100">
                                             {{ form.grand_volume.toFixed(2) }}
                                         </p>
                                     </div>
                                 </div>
-
-                                <div class="col-span-2">
-                                    <div
-                                        class="flex justify-between text-2xl text-success font-bold"
-                                    >
-                                        <p class="line-clamp-1">Grand Total</p>
-                                        <div class="flex items-center">
-                                            <p>{{form.grand_total.toFixed(2) ?? 0.00 }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- -->
                             </div>
                         </div>
                     </div>

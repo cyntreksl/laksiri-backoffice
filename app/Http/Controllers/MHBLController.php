@@ -78,7 +78,7 @@ class MHBLController extends Controller
             'warehouses' => GetDestinationBranches::run(),
             'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
             'selectedCargoType' => $data['cargo_type'],
-            'selectedHblType' => $data['hbl_type'],
+            'selectedHblType' => 'Gift',
             'selectedWarehouse' => ucfirst(strtolower($data['warehouse'])),
             'shippers' => $this->officerRepository->getShippers(),
             'consignees' => $this->officerRepository->getConsignees(),
