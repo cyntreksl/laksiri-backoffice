@@ -992,7 +992,7 @@ const shipIcon = ref(`
 
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-5 col-span-2">
-                    <DangerOutlineButton @click="router.visit(route('hbls.index'))">
+                    <DangerOutlineButton @click="router.visit(route('mhbls.index'))">
                         Cancel
                     </DangerOutlineButton>
                     <PrimaryButton
