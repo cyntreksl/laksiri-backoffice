@@ -39,7 +39,7 @@ const updateOfficer = () => {
         onSuccess: () => {
             router.visit(route("setting.shipper-consignees.index"));
             form.reset();
-            push.success("Exception Name Updated Successfully!");
+            push.success("Officer Name Updated Successfully!");
         },
         preserveScroll: true,
         preserveState: true,
@@ -48,8 +48,8 @@ const updateOfficer = () => {
 </script>
 
 <template>
-    <AppLayout title="Edit Exception Name">
-        <template #header>Exception Name</template>
+    <AppLayout title="Edit Officer ">
+        <template #header>Officer Edit</template>
 
         <!-- Breadcrumb -->
         <Breadcrumb :ExceptionName="officer"/>
@@ -60,7 +60,7 @@ const updateOfficer = () => {
                     <h2
                         class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                     >
-                        Update Officr Name {{ officer.type }}
+                        Update {{ officer.type }}
                     </h2>
                     <br/>
                 </div>
@@ -242,7 +242,7 @@ const updateOfficer = () => {
                             class="ms-3"
                             type="submit"
                         >
-                            Update Officer Name
+                            Update Officer
                         </PrimaryButton>
                     </div>
                 </form>

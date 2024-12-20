@@ -10,18 +10,18 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['close', 'deleteofficer']);
+const emit = defineEmits(['close', 'deleteOfficer']);
 
 </script>
 
 <template>
     <ConfirmationModal :show="show">
         <template #title>
-            Delete Exception Name?
+            Delete Officer?
         </template>
 
         <template #content>
-            Would you like to delete this name?
+            Would you like to delete this Officer?
         </template>
 
         <template #footer>
@@ -30,8 +30,8 @@ const emit = defineEmits(['close', 'deleteofficer']);
                     Nevermind
                 </SecondaryButton>
 
-                <DangerButton @click="$emit('deleteofficer')">
-                    Delete Exception Name
+                <DangerButton @click="$emit('deleteOfficer')">
+                    Delete Officer
                 </DangerButton>
             </div>
         </template>
