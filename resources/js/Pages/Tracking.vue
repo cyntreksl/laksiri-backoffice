@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import {Head} from "@inertiajs/vue3";
 
 const reference = ref(null);
 const errorMessage = ref('');
@@ -67,6 +68,7 @@ const hblStatusColor = (status) => {
 </script>
 
 <template>
+    <Head title="Tracking"/>
     <div class="min-h-100vh flex grow bg-slate-50 dark:bg-navy-900">
         <div class="flex w-full place-items-center justify-center">
             <div class="w-full max-w-lg p-6">
