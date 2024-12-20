@@ -223,12 +223,6 @@ const hblStatusColor = (status) => {
                 <!--                    </ol>-->
                 <!--                </div>-->
                 <template v-if="hblStatus.length === 0 && ! isLoading">
-                    <Link
-                        :href="route('tracking.page')"
-                        class="btn bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                    >
-                        Track Your HBL Status
-                    </Link>
                     <img
                         :src="DashboardMeet"
                         alt="image"
@@ -353,6 +347,14 @@ const hblStatusColor = (status) => {
                 </form>
             </div>
             <!-- End of login -->
+            <Link
+                :href="route('tracking.page')"
+                class="btn font-medium text-white bg-[#57af84] dark:bg-[#57af84]"
+            >
+                Track Your HBL Status
+            </Link>
+
+
             <div
                 class="my-5 flex justify-center text-xs text-slate-400 dark:text-navy-300"
             >
