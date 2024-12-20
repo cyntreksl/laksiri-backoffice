@@ -8,6 +8,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {ref} from "vue";
 import moment from "moment";
 
+
 defineProps({
     canResetPassword: Boolean,
     status: String,
@@ -136,6 +137,7 @@ const hblStatusColor = (status) => {
         </div>
         <div class="hidden w-full place-items-center lg:grid">
             <div class="w-full max-w-lg p-6">
+
                 <!--                <h1 class="text-3xl font-bold text-center mb-5 text-black">Track Your HBL Status</h1>-->
 
                 <!--                <div class="card mt-5 rounded-lg p-5 lg:p-7">-->
@@ -220,8 +222,13 @@ const hblStatusColor = (status) => {
                 <!--                        </li>-->
                 <!--                    </ol>-->
                 <!--                </div>-->
-
                 <template v-if="hblStatus.length === 0 && ! isLoading">
+                    <Link
+                        :href="route('tracking.page')"
+                        class="btn bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                    >
+                        Track Your HBL Status
+                    </Link>
                     <img
                         :src="DashboardMeet"
                         alt="image"

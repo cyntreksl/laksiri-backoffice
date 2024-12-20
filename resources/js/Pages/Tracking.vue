@@ -1,8 +1,10 @@
-<script setup>
+<script setup xmlns="http://www.w3.org/1999/html">
 import { ref } from "vue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {Head} from "@inertiajs/vue3";
+import {Head, Link} from "@inertiajs/vue3";
+import DashboardMeet from "../../images/illustrations/dashboard-meet.svg";
+import DashboardMeetDark from "../../images/illustrations/dashboard-meet-dark.svg";
 
 const reference = ref(null);
 const errorMessage = ref('');
@@ -69,6 +71,15 @@ const hblStatusColor = (status) => {
 
 <template>
     <Head title="Tracking"/>
+    <div class="text-right m-2">
+        <Link
+            :href="route('login')"
+            class="btn bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+        >
+            Back To Login
+        </Link>
+    </div>
+
     <div class="min-h-100vh flex grow bg-slate-50 dark:bg-navy-900">
         <div class="flex w-full place-items-center justify-center">
             <div class="w-full max-w-lg p-6">
@@ -176,8 +187,24 @@ const hblStatusColor = (status) => {
                     <div v-if="hblStatus.length === 0 && !isLoading" class="mt-10 text-center text-slate-500">
                         <p>No results found. Please enter a valid reference number.</p>
                     </div>
+
                 </div>
+                <template v-if="hblStatus.length === 0 && ! isLoading">
+                    <img
+                        :src="DashboardMeet"
+                        alt="image"
+                        class="w-full mt-10"
+                        x-show="!$store.global.isDarkModeEnabled "
+                    />
+                    <img
+                        :src="DashboardMeetDark"
+                        alt="image"
+                        class="w-full mt-10"
+                        x-show="$store.global.isDarkModeEnabled"
+                    />
+                </template>
             </div>
+
         </div>
     </div>
 </template>
