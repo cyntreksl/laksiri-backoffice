@@ -140,7 +140,14 @@ const getLoadedMHBLs = async () => {
         }
     } else {
         const data = await response.json();
-        loadedMHBLs.value = data.data;
+        const filteredMHBLs = data.data.filter(mhbl =>
+            mhbl.hbls.every(hbl =>
+                hbl.packages.every(pkg =>
+                    pkg.containers.every(ctnr => ctnr.pivot.status === 'draft')
+                )
+            )
+        );
+        loadedMHBLs.value = filteredMHBLs;
     }
 }
 
@@ -387,7 +394,7 @@ const reviewContainer = () => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <PrimaryButton :disabled="containerArr.length === 0" @click.prevent="reviewContainer">
+                    <PrimaryButton :disabled="containerArr.length === 0 && Object.keys(loadedMHBLs).length === 0" @click.prevent="reviewContainer">
                         Proceed to Review
                     </PrimaryButton>
                 </div>

@@ -37,6 +37,7 @@ class UpdateBranchRequest extends FormRequest
             'delivery_types' => ['required'],
             'package_types' => ['required'],
             'email' => ['nullable', 'email', 'string'],
+            'container_delays' => ['required', 'integer'],
         ];
     }
 }

@@ -125,13 +125,13 @@ const splitNumberConsignee = (fullNumber) => {
 
 const form = useForm({
     hbls: props.hblIds,
-    hbl_name: "",
+    hbl_name: null,
     email: "",
     contact_number: computed(() => countryCode.value + contactNumber.value),
     nic: "",
     iq_number: "",
     address: "",
-    consignee_name: "",
+    consignee_name: null,
     consignee_nic: "",
     consignee_contact: computed(
         () => consignee_countryCode.value + consignee_contact.value
@@ -203,6 +203,7 @@ const handleMHBLCreate = () => {
     form.post(route("mhbls.store"), {
         onSuccess: (page) => {
             form.reset();
+            router.visit(route("mhbls.index"));
             push.success("MHBL Created Successfully!");
         },
         onError: () => console.log("error"),
@@ -908,7 +909,7 @@ const shipIcon = ref(`
 
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-5 col-span-2">
-                    <DangerOutlineButton @click="router.visit(route('hbls.index'))">
+                    <DangerOutlineButton @click="router.visit(route('mhbls.index'))">
                         Cancel
                     </DangerOutlineButton>
                     <PrimaryButton
