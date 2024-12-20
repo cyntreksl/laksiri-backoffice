@@ -39,7 +39,7 @@ const updateOfficer = () => {
         onSuccess: () => {
             router.visit(route("setting.shipper-consignees.index"));
             form.reset();
-            push.success("Officer Name Updated Successfully!");
+            push.success("Officer Updated Successfully!");
         },
         preserveScroll: true,
         preserveState: true,
@@ -58,7 +58,6 @@ const updateOfficer = () => {
             <div class="card px-4 py-4 sm:px-5">
                 <div>
                     <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                     >
                         Update {{ officer.type }}
                     </h2>
@@ -69,7 +68,6 @@ const updateOfficer = () => {
                         <div>
                             <InputLabel for="name" value="Name"/>
                             <div class="flex items-center border border-gray-300 rounded-md px-2">
-                                <span class="material-icons text-gray-500">person</span>
                                 <TextInput
                                     v-model="form.name"
                                     id="name"
@@ -85,7 +83,6 @@ const updateOfficer = () => {
                         <div>
                             <InputLabel for="email" value="Email"/>
                             <div class="flex items-center border border-gray-300 rounded-md px-2">
-                                <span class="material-icons text-gray-500">email</span>
                                 <TextInput
                                     v-model="form.email"
                                     id="email"
