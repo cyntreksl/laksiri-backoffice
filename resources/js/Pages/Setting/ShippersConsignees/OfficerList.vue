@@ -6,6 +6,9 @@ import CreateShipper from "@/Pages/Setting/ShippersConsignees/CreateShipper.vue"
 import CreateConsignee from "@/Pages/Setting/ShippersConsignees/CreateConsignee.vue";
 import {Link, router} from "@inertiajs/vue3";
 import {push} from "notivue";
+import {ref} from "vue";
+import DeleteOfficerConfirmationModal
+  from "@/Pages/Setting/ShippersConsignees/Partials/DeleteOfficerConfirmationModal.vue";
 
 defineProps({
   allOfficers: {
@@ -18,17 +21,29 @@ defineProps({
     default: () => [],
   }
 });
+const showDeleteOfficerConfirmationModal = ref(false);
+const officerId = ref(null);
 
-const handleDeleteOfficer = (id) => {
-  router.delete(route("setting.shipper-consignees.destroy", id), {
+const confirmDeleteOfficer = (id) => {
+  officerId.value = id;
+  showDeleteOfficerConfirmationModal.value = true;
+};
+
+const closeModal = () => {
+  showDeleteOfficerConfirmationModal.value = false;
+  officerId.value = null;
+};
+const handleDeleteOfficer = () => {
+  router.delete(route("setting.shipper-consignees.destroy", officerId.value), {
     preserveScroll: true,
     onSuccess: () => {
       closeModal();
-      push.success("Officer Name Deleted Successfully!");
+      push.success("Officer Deleted Successfully!");
       router.visit(route("setting.shipper-consignees.index"));
     },
   });
 };
+
 
 </script>
 
@@ -152,7 +167,7 @@ const handleDeleteOfficer = (id) => {
               </Link>
               <button
                   class="btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
-                  @click="handleDeleteOfficer(officer.id)"
+                  @click="confirmDeleteOfficer(officer.id)"
               >
                 <svg
                     class="size-4.5"
@@ -173,14 +188,19 @@ const handleDeleteOfficer = (id) => {
             v-else
             class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500 last:border-0 bg-white"
         >
-          <td class="whitespace-nowrap px-4 py-3 sm:px-5" colspan="8">
-            No Exception Names.
+          <td class="whitespace-nowrap px-4 py-3 sm:px-5" colspan="9">
+            No Officers .
           </td>
         </tr>
         </tbody>
       </table>
     </div>
+  <DeleteOfficerConfirmationModal
+  :show="showDeleteOfficerConfirmationModal"
+  @close="closeModal"
+  @delete-officer="handleDeleteOfficer"
 
+  />
   </AppLayout>
 </template>
 <style>

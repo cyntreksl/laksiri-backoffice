@@ -21,10 +21,16 @@ class StoreOfficerRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'email' => ['nullable', 'email', 'unique:officers,email', 'max:254'],
+            'email' => [
+                'nullable',
+                'email',
+                'unique:officers,email',
+                'max:254',
+                'required_if:type,shipper',
+            ],
             'mobile_number' => ['required', 'phone:INTERNATIONAL'],
-            'pp_or_nic_no' => ['nullable', 'max:254'],
-            'residency_no' => ['nullable'],
+            'pp_or_nic_no' => ['required', 'max:254'],
+            'residency_no' => ['required_if:type,shipper'],
             'address' => ['required'],
             'type' => ['required'],
         ];
