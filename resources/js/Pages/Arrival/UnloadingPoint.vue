@@ -258,7 +258,7 @@ const reviewContainer = () => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <PrimaryButton :disabled="warehouseArr.length === 0" @click.prevent="reviewContainer">
+                    <PrimaryButton :disabled="warehouseArr.length === 0 && warehouseMHBLArr.length === 0" @click.prevent="reviewContainer">
                         Proceed to Review
                     </PrimaryButton>
                 </div>

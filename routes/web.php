@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    \Illuminate\Support\Facades\Log::error('sever test');
+
     return Inertia::render('Auth/Login', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -14,6 +16,9 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+Route::get('/tracking', function () {
+    return Inertia::render('Tracking');
+})->name('tracking.page');
 
 require_once __DIR__.'/web/feedback.php';
 

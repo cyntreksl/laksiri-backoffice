@@ -11,7 +11,7 @@ class GetHBLByHBLNumber
 
     public function handle(string $hbl_number)
     {
-        $hbl = HBL::where('hbl_number', $hbl_number)->latest()->with('packages')->first();
+        $hbl = HBL::where('hbl_number', $hbl_number)->latest()->with('packages')->with('mhbl')->first();
 
         return $hbl;
     }

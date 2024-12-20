@@ -78,6 +78,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         if (isset($filters['userData'])) {
             $query = HBL::query()
+                ->with('mhbl')
                 ->where(function ($query) {
                     $query->where('status', '!=', 'draft')
                         ->orWhereNull('status');

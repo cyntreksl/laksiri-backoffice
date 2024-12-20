@@ -28,6 +28,7 @@ class Branch extends Model
         'package_types',
         'do_charge',
         'email',
+        'container_delays',
     ];
 
     public function getActivitylogOptions(): LogOptions

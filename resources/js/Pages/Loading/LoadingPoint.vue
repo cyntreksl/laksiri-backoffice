@@ -140,7 +140,14 @@ const getLoadedMHBLs = async () => {
         }
     } else {
         const data = await response.json();
-        loadedMHBLs.value = data.data;
+        const filteredMHBLs = data.data.filter(mhbl =>
+            mhbl.hbls.every(hbl =>
+                hbl.packages.every(pkg =>
+                    pkg.containers.every(ctnr => ctnr.pivot.status === 'draft')
+                )
+            )
+        );
+        loadedMHBLs.value = filteredMHBLs;
     }
 }
 
@@ -387,7 +394,7 @@ const reviewContainer = () => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <PrimaryButton :disabled="containerArr.length === 0" @click.prevent="reviewContainer">
+                    <PrimaryButton :disabled="containerArr.length === 0 && Object.keys(loadedMHBLs).length === 0" @click.prevent="reviewContainer">
                         Proceed to Review
                     </PrimaryButton>
                 </div>
@@ -552,7 +559,7 @@ const reviewContainer = () => {
                                         </svg>
                                         <span>{{ hbl?.hbl_number || hbl.hbl }}</span>
                                     </div>
-                                    <ul v-show="hbl.expanded" class="pl-4">
+                                    <ul v-if="Object.keys(hbl.packages).length > 0" v-show="hbl.expanded" class="pl-4">
                                         <draggable v-model="hbl.packages"
                                                    class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
                                                    group="people"
@@ -875,7 +882,7 @@ const reviewContainer = () => {
                             </div>
                             <div>
                                 <h3 class="text-base text-slate-700 dark:text-navy-100">
-                                    {{ container.container_type }}
+                                    {{ container.container_type }}12
                                 </h3>
                             </div>
                         </div>
