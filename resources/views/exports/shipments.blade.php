@@ -196,8 +196,8 @@
                 <tr style="border: none;">
                     <td colspan="5" style="border: none; text-align: right;"></td>
                     <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_nototal, 0) }}</u></strong></td>
-                    <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_gtotal, 2) }}</u></strong></td>
                     <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 2) }}</u></strong></td>
+                    <td style="border: none; text-align: center;"><strong><u>  {{ number_format($total_gtotal, 2) }}</u></strong></td>
                     <td style="border: none;">&nbsp;</td>
                     <td style="border: none;">&nbsp;</td>
                 </tr>
