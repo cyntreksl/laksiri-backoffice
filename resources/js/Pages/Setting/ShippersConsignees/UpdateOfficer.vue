@@ -7,6 +7,7 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
+import {ref} from "vue";
 
 const props = defineProps({
     officer: {
@@ -14,14 +15,25 @@ const props = defineProps({
         default: () => {
         },
     },
+    countryCodes: {
+        type: Array,
+        default: () => [],
+    }
 });
 
 const form = useForm({
     id: props.officer.id,
     name: props.officer.name,
     type: props.officer.type,
+    email: props.officer.email,
+    mobile_number: props.officer.mobile_number,
+    pp_or_nic_no: props.officer.pp_or_nic_no,
+    residency_no: props.officer.residency_no,
+    address:props.officer.address,
+    description:props.officer.description,
 });
-
+const countryCode = ref('+94');
+const contactNumber = ref("");
 const updateOfficer = () => {
     form.put(route("setting.shipper-consignees.update", props.officer.id), {
         onSuccess: () => {
@@ -86,22 +98,22 @@ const updateOfficer = () => {
                         </div>
 
                         <!-- Mobile Number Field -->
-                        <div>
+                        <div class="col-span-2">
                             <InputLabel for="mobile_number" value="Mobile Number"/>
-                            <div class="flex items-center">
+                            <div class="flex items-center space-x-2">
                                 <select
-                                    v-model="form.country_code"
-                                    class="border border-gray-300 rounded-l-md p-2"
+                                    v-model="countryCode"
+                                    class="form-select rounded-md border border-gray-300 bg-white px-8 py-2 focus:ring-primary focus:border-primary"
                                 >
-                                    <option value="+44">+44</option>
-                                    <option value="+1">+1</option>
-                                    <option value="+94">+94</option>
+                                    <option v-for="code in countryCodes" :key="code" :value="code">
+                                        {{ code }}
+                                    </option>
                                 </select>
                                 <TextInput
-                                    v-model="form.mobile_number"
+                                    v-model="contactNumber"
                                     id="mobile_number"
                                     type="text"
-                                    class="w-full border border-gray-300 rounded-r-md focus:ring-0"
+                                    class="w-full border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
                                     placeholder="123 4567 890"
                                 />
                             </div>
@@ -176,16 +188,20 @@ const updateOfficer = () => {
                         <!-- Mobile Number Field -->
                         <div class="col-span-2">
                             <InputLabel for="mobile_number" value="Mobile Number"/>
-                            <div class="flex">
-                                <select class="w-16 border-gray-300 rounded-md">
-                                    <option value="+94">+94</option>
-                                    <!-- Add more country codes as needed -->
+                            <div class="flex items-center space-x-2">
+                                <select
+                                    v-model="countryCode"
+                                    class="form-select rounded-md border border-gray-300 bg-white px-8 py-2 focus:ring-primary focus:border-primary"
+                                >
+                                    <option v-for="code in countryCodes" :key="code" :value="code">
+                                        {{ code }}
+                                    </option>
                                 </select>
                                 <TextInput
-                                    v-model="form.mobile_number"
+                                    v-model="contactNumber"
                                     id="mobile_number"
                                     type="text"
-                                    class="w-full ml-2"
+                                    class="w-full border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
                                     placeholder="123 4567 890"
                                 />
                             </div>
