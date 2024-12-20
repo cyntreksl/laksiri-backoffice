@@ -246,6 +246,10 @@ const closeRemoveHBLModal = () => {
 }
 
 const handleAddNewHBL = async () => {
+    if(!hblNumber.value){
+        closeAddNewHBLModal();
+        push.error('Please enter HBL Number!')
+    }
     const response = await fetch(`/mhbls/add-hbl`, {
         method: "POST",
         headers: {
@@ -300,6 +304,10 @@ const handleAddNewHBL = async () => {
 }
 
 const handleRemoveHBL = async () => {
+    if(!hblNumber.value){
+        closeAddNewHBLModal();
+        push.error('Please enter HBL Number!')
+    }
     const selectedPackages = packageList.value.filter(pkg => pkg.hbl === hblNumber.value);
     form.grand_weight = form.grand_weight - selectedPackages.reduce((sum, pkg) => sum + pkg.weight, 0);
     form.grand_volume = form.grand_volume - selectedPackages.reduce((sum, pkg) => sum + pkg.volume, 0);
