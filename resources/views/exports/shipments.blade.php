@@ -166,7 +166,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td style="border-right:none ;vertical-align: top"> {{ $item[0]}} </td>
                     <td style="border-left:none;vertical-align: top">{{ $item[1]}} {{ $item[2]}} <br>  {{ $item[3]}} <br> {{ $item[4]}}</td>
-                    <td style="vertical-align: top">{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
+                    <td style="vertical-align: top">{{ $item[5] }} <br> {{ $item[6] }} <br> {{ $item[7] }} <br> {{ $item[8] }} </td>
                     <td style="vertical-align: top">
                         @foreach ($item[9] as $package)
                             {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
