@@ -246,67 +246,77 @@ const closeRemoveHBLModal = () => {
 }
 
 const handleAddNewHBL = async () => {
-    const response = await fetch(`/mhbls/add-hbl`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": usePage().props.csrf,
-        },
-        body: JSON.stringify({
-            hbl_number: hblNumber.value
-        })
-    });
-    if (!response.ok) {
-        throw new Error('Network response was not ok.');
-    } else {
-        const data = await response.json();
+    if(!hblNumber.value){
+        closeAddNewHBLModal();
+        push.error('Please enter HBL Number!')
+    }else{
+        const response = await fetch(`/mhbls/add-hbl`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+            body: JSON.stringify({
+                hbl_number: hblNumber.value
+            })
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
 
-        if(data.mhbl){
-            closeAddNewHBLModal();
-            push.error("HBL already added to a MHBL.");
-        }
-
-        if(data.cargo_type !== form.cargo_type || data.hbl_type !== 'Door to Door' || data.warehouse === form.warehouse){
-            closeAddNewHBLModal();
-            push.error("Selected HBL is not maching to  Primary Details");
-        }else{
-            for (const hblPackage of data.packages) {
-                const packageItem = {
-                    hbl: data.hbl_number,
-                    hbl_id: data.id,
-                    type: hblPackage.package_type,
-                    length: hblPackage.length,
-                    width: hblPackage.width,
-                    height: hblPackage.height,
-                    quantity: hblPackage.quantity,
-                    volume: hblPackage.volume,
-                    weight: hblPackage.weight,
-                    remarks: hblPackage.remarks,
-                    packageRule: hblPackage.package_rule,
-                    measure_type: hblPackage.measure_type,
-                };
-
-                const newItem = {...packageItem};
-                packageList.value.push(newItem);
-                form.grand_weight = form.grand_weight + packageItem.weight;
-                form.grand_volume = form.grand_volume + packageItem.volume;
+            if(data.mhbl){
+                closeAddNewHBLModal();
+                push.error("HBL already added to a MHBL.");
             }
-            form.hbls.push(data.id);
-            closeAddNewHBLModal();
-            push.success('Add new HBL Successfully!')
-        }
 
+            if(data.cargo_type !== form.cargo_type || data.hbl_type !== 'Door to Door' || data.warehouse === form.warehouse){
+                closeAddNewHBLModal();
+                push.error("Selected HBL is not maching to  Primary Details");
+            }else{
+                for (const hblPackage of data.packages) {
+                    const packageItem = {
+                        hbl: data.hbl_number,
+                        hbl_id: data.id,
+                        type: hblPackage.package_type,
+                        length: hblPackage.length,
+                        width: hblPackage.width,
+                        height: hblPackage.height,
+                        quantity: hblPackage.quantity,
+                        volume: hblPackage.volume,
+                        weight: hblPackage.weight,
+                        remarks: hblPackage.remarks,
+                        packageRule: hblPackage.package_rule,
+                        measure_type: hblPackage.measure_type,
+                    };
+
+                    const newItem = {...packageItem};
+                    packageList.value.push(newItem);
+                    form.grand_weight = form.grand_weight + packageItem.weight;
+                    form.grand_volume = form.grand_volume + packageItem.volume;
+                }
+                form.hbls.push(data.id);
+                closeAddNewHBLModal();
+                push.success('Add new HBL Successfully!')
+            }
+
+        }
     }
 }
 
 const handleRemoveHBL = async () => {
-    const selectedPackages = packageList.value.filter(pkg => pkg.hbl === hblNumber.value);
-    form.grand_weight = form.grand_weight - selectedPackages.reduce((sum, pkg) => sum + pkg.weight, 0);
-    form.grand_volume = form.grand_volume - selectedPackages.reduce((sum, pkg) => sum + pkg.volume, 0);
-    packageList.value = packageList.value.filter(pkg => pkg.hbl !== hblNumber.value);
-    form.hbls = form.hbls.filter(hbl => !selectedPackages.some(pkg => pkg.hbl_id === hbl));
-    closeRemoveHBLModal();
-    push.success('Remove HBL Successfully!')
+    if(!hblNumber.value){
+        closeRemoveHBLModal();
+        push.error('Please enter HBL Number!')
+    }else{
+        const selectedPackages = packageList.value.filter(pkg => pkg.hbl === hblNumber.value);
+        form.grand_weight = form.grand_weight - selectedPackages.reduce((sum, pkg) => sum + pkg.weight, 0);
+        form.grand_volume = form.grand_volume - selectedPackages.reduce((sum, pkg) => sum + pkg.volume, 0);
+        packageList.value = packageList.value.filter(pkg => pkg.hbl !== hblNumber.value);
+        form.hbls = form.hbls.filter(hbl => !selectedPackages.some(pkg => pkg.hbl_id === hbl));
+        closeRemoveHBLModal();
+        push.success('Remove HBL Successfully!')
+    }
 }
 
 const grandTotalWeight = ref(0);
