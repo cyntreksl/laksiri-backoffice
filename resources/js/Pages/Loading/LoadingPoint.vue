@@ -1064,12 +1064,10 @@ const reviewContainer = () => {
                                         </div>
                                         <ul v-show="mhbl.expanded" class="pl-4">
                                             <div v-for="hbl in mhbl.hbls" :key="hbl.id">
-                                                <draggable v-model="hbl.packages"
+                                                <div :packages="hbl.packages"
                                                            class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
-                                                           group="people"
-                                                           item-key="id"
-                                                           @change="handlePackageChange">
-                                                    <template #item="{element, index}">
+                                                >
+                                                    <div v-for="(element, index) in hbl.packages" :key="element.id">
                                                         <div class="card cursor-pointer shadow-sm">
                                                             <div class="flex justify-between items-center">
                                                                 <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
@@ -1156,8 +1154,8 @@ const reviewContainer = () => {
 
                                                             </div>
                                                         </div>
-                                                    </template>
-                                                </draggable>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                         </ul>
