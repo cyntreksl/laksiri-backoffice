@@ -11,4 +11,6 @@ interface LoadedContainerRepositoryInterface
     public function downloadManifestFile($container);
 
     public function updateVerificationStatus(array $data);
+
+    public function downloadDoorToDoorPdf($container);
 }
