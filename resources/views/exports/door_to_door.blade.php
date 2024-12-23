@@ -137,7 +137,7 @@
 
             <tr>
                 <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
-                    <strong> CONTR NO </strong>
+                    <strong>CONTR NO       {{$item[12] }} </strong>
                 </th>
                 <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
                     <strong> MHBL </strong> {{$mhbl->reference}}
@@ -178,9 +178,9 @@
         @foreach($chunk as $item)
             <tr>
                 <td>{{ $loop->iteration }}</td>
-                <td style="border-right:none ;vertical-align: top"> {{ $item[0]}} </td>
-                <td>{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
-                <td>{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
+                <td style="border-right:none; vertical-align: top"> {{ $item[0]}} </td>
+                <td style="vertical-align: top">{{ $item[1]}} {{ $item[2]}}  <br>  {{ $item[3]}} <br> {{ $item[4]}}</td>
+                <td>{{ $item[5] }} <br> {{ $item[6] }} <br> {{ $item[7] }} <br> {{ $item[8] }} </td>
                 <td style="vertical-align: top">
                     @foreach ($item[9] as $package)
                         {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
@@ -206,11 +206,24 @@
 
             </tr>
         @endforeach
+
+        @if ($loop->last)
+            <tr style="border: none;">
+                <td colspan="5" style="border: none; text-align: right;"></td>
+                <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_nototal, 0) }}</u></strong></td>
+                <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 2) }}</u></strong></td>
+                <td style="border: none; text-align: center;"><strong><u>  {{ number_format($total_gtotal, 2) }}</u></strong></td>
+                <td style="border: none;">&nbsp;</td>
+                <td style="border: none;">&nbsp;</td>
+            </tr>
+
+        @endif
         </tbody>
         @if ($chunkIndex === count($chunks) - 1)
 
         @endif
     </table>
+
     <div class="footer">
         <div class="footer-text"
              style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_header_title}}</div>

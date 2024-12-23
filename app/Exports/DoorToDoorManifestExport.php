@@ -26,6 +26,7 @@ public function __construct(Container $container)
     public function prepareData(): array
     {
         $data = [];
+        $containerId = $this->container->id;
 
         foreach ($this->container->hbl_packages->groupBy('hbl_id') as $hblId => $loadedHBLPackages) {
             $hbl = HBL::withoutGlobalScope(BranchScope::class)->with('mhbl')->find($hblId);
@@ -43,6 +44,7 @@ public function __construct(Container $container)
 
             foreach ($loadedHBLPackages as $hbl_package) {
                 $data[] = [
+
                     $isFirst ? $hbl->hbl_number ?: $hbl->reference : '',
                     $isFirst ? $hbl->hbl_name : '',
                     $isFirst ? $hbl->address : '',
@@ -56,6 +58,7 @@ public function __construct(Container $container)
                     $isFirst ? $mhbl : [],
 
                     $isFirst && $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
+                    $containerId,
                 ];
 
                 $isFirst = false;
