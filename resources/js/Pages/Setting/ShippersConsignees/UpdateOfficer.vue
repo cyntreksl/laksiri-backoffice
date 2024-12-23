@@ -7,7 +7,7 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 
 const props = defineProps({
     officer: {
@@ -21,19 +21,37 @@ const props = defineProps({
     }
 });
 
+const splitCountryCode = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            return code;
+        }
+    }
+};
+const splitContactNumber = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            return fullNumber.slice(code.length);
+        }
+    }
+};
+
+const countryCode = ref(splitCountryCode(props.officer.mobile_number));
+const contactNumber = ref(splitContactNumber(props.officer.mobile_number));
+
 const form = useForm({
     id: props.officer.id,
     name: props.officer.name,
     type: props.officer.type,
     email: props.officer.email,
-    mobile_number: props.officer.mobile_number,
+    mobile_number:computed(() => countryCode.value + contactNumber.value),
     pp_or_nic_no: props.officer.pp_or_nic_no,
     residency_no: props.officer.residency_no,
     address:props.officer.address,
     description:props.officer.description,
 });
-const countryCode = ref('+94');
-const contactNumber = ref("");
+
+
 const updateOfficer = () => {
     form.put(route("setting.shipper-consignees.update", props.officer.id), {
         onSuccess: () => {

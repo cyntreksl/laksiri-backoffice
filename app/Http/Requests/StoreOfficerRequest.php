@@ -20,7 +20,7 @@ class StoreOfficerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
+            'name' => ['required', 'string', 'max:254'],
             'email' => [
                 'nullable',
                 'email',
@@ -30,8 +30,8 @@ class StoreOfficerRequest extends FormRequest
             ],
             'mobile_number' => ['required', 'phone:INTERNATIONAL'],
             'pp_or_nic_no' => ['required', 'max:254'],
-            'residency_no' => ['required_if:type,shipper'],
-            'address' => ['required'],
+            'residency_no' => ['required_if:type,shipper', 'max:254'],
+            'address' => ['required', 'max:254'],
             'type' => ['required'],
         ];
     }

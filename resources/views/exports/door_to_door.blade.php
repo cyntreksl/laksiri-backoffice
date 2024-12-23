@@ -126,7 +126,7 @@
 
             <tr>
                 <th colspan="10" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
-                    SHIPPER :       UNIVERSAL FREIGHT SERVICES, P.O.BOX: 55239, DOHA, QATAR. TEL: +974 4620961 TEL/FAX:
+                    SHIPPER : {{$settings?->invoice_header_title}}, {{$settings?->invoice_header_address}}.
                     +974
                     4620812 <br>
                     CONSIGNEE:  LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA <br>
@@ -201,7 +201,7 @@
                              {{ $package['weight'] }}<br>
                     @endforeach
                 </td>
-                <td>  PERSONAL EFFECT</td>
+                <td>  PERSONAL<br>      EFFECT</td>
                 <td><b>     {{$item[11]}}</b></td>
 
             </tr>
