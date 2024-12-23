@@ -146,7 +146,7 @@ const getLoadedMHBLs = async () => {
                     pkg.containers.every(ctnr => ctnr.pivot.status === 'draft')
                 )
             )
-        );
+        ).map(mhbl => ({ ...mhbl, expanded: true }));
         loadedMHBLs.value = filteredMHBLs;
     }
 }
