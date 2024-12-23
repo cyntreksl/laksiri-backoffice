@@ -5,7 +5,6 @@ namespace App\Repositories;
 use App\Actions\Container\Loading\CreateDraftLoadedContainer;
 use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
-use App\Actions\MHBL\GetContainerLoadedMHBLs;
 use App\Actions\Setting\GetSettings;
 use App\Enum\ContainerStatus;
 use App\Exports\DoorToDoorManifestExport;
@@ -117,6 +116,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
         return $document;
     }
+
     public function downloadDoorToDoorPdf($container)
     {
         $filename = $container->reference.'_door_to_door_'.date('Y_m_d_h_i_s').'.pdf';
@@ -128,11 +128,10 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             return isset($item[0]) && $item[0] !== '';
         });
 
-        $pdf = PDF::loadView('exports.door_to_door', ['data' => $data,'container' => $container ,'settings' => $settings ]);
+        $pdf = PDF::loadView('exports.door_to_door', ['data' => $data, 'container' => $container, 'settings' => $settings]);
         $pdf->setPaper('a3', 'portrait');
 
-        return $pdf->stream($filename);
-
+        return $pdf->download($filename);
 
     }
 }

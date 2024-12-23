@@ -8,12 +8,13 @@ use App\Models\Scopes\BranchScope;
 
 class DoorToDoorManifestExport
 {
-private Container $container;
+    private Container $container;
 
-public function __construct(Container $container)
-       {
-           $this->container = $container;
-       }
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
+
     public function query()
     {
         return Container::query()
@@ -23,6 +24,7 @@ public function __construct(Container $container)
             }])
             ->where('id', $this->container->id);
     }
+
     public function prepareData(): array
     {
         $data = [];
@@ -30,12 +32,12 @@ public function __construct(Container $container)
 
         foreach ($this->container->hbl_packages->groupBy('hbl_id') as $hblId => $loadedHBLPackages) {
             $hbl = HBL::withoutGlobalScope(BranchScope::class)->with('mhbl')->find($hblId);
-            if (!$hbl) {
+            if (! $hbl) {
                 continue;
             } // Skip if HBL is missing
 
             $mhbl = $hbl->mhbl; // Access mhbl relationship
-            if (!$mhbl) {
+            if (! $mhbl) {
                 continue; // Skip if MHBL is missing
             }
             $isFirst = true;
@@ -65,6 +67,7 @@ public function __construct(Container $container)
             }
 
         }
+
         return $data;
     }
 }
