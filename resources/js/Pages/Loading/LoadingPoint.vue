@@ -213,7 +213,9 @@ const handleLoadMHBL = (mhbl_id, mhbl_hbls) => {
     const loadedPackages = unloadedMHBLs.value
         .filter(mhbl => mhbl.id === mhbl_id)[0].hbls
         .flatMap(hbl => hbl.packages);
-    loadedMHBLs.value.push((unloadedMHBLs.value.filter(mhbl => mhbl.id === mhbl_id))[0]);
+    const loadMHBL = (unloadedMHBLs.value.filter(mhbl => mhbl.id === mhbl_id))[0];
+    loadMHBL['expanded'] = true;
+    loadedMHBLs.value.push(loadMHBL);
     unloadedMHBLs.value = unloadedMHBLs.value.filter(mhbl => mhbl.id !== mhbl_id);
 
     if(loadedPackages.length > 0){
@@ -1162,7 +1164,7 @@ const reviewContainer = () => {
                                     </li>
                                 </ul>
                             </div>
-                            <div v-if="containerArr.length === 0"
+                            <div v-if="containerArr.length === 0 && loadedMHBLs.length === 0"
                                  class="cursor-pointer border-2 rounded-lg border-dashed">
                                 <div class="flex justify-center items-center space-x-3 px-2.5 pb-2 pt-1.5 h-24">
                                     <div class="text-center">
