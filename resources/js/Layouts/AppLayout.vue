@@ -637,9 +637,9 @@
                                 class="btn space-x-1 ml-3 bg-slate-150 font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                                 @click="showBranchPopper = !showBranchPopper"
                             >
-    <span class="text-xs">
-      {{ $page.props.auth.user.active_branch_name }}
-    </span>
+                                <span class="text-xs">
+                                  {{ $page.props.auth.user.active_branch_name }}
+                                </span>
                                 <svg
                                     v-if="userBranches.length > 0"
                                     :class="showBranchPopper && 'rotate-180'"
