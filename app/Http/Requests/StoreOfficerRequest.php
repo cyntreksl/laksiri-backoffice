@@ -29,7 +29,7 @@ class StoreOfficerRequest extends FormRequest
                 'required_if:type,shipper',
             ],
             'mobile_number' => ['required', 'phone:INTERNATIONAL'],
-            'pp_or_nic_no' => ['required_if:type,shipper', 'max:254'],
+            'pp_or_nic_no' => ['required', 'max:254'],
             'residency_no' => ['required_if:type,shipper'],
             'address' => ['required'],
             'type' => ['required'],
