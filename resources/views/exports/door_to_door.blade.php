@@ -143,7 +143,7 @@
                     <strong> MHBL </strong> {{$mhbl->reference}}
                 </th>
                 <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
-                    <strong> HAWB </strong>
+                    <strong>    </strong>
                 </th>
             </tr>
             <tr>
@@ -202,7 +202,7 @@
                     @endforeach
                 </td>
                 <td>  PERSONAL EFFECT</td>
-                <td><b>     {{$item[10]}}</b></td>
+                <td><b>     {{$item[11]}}</b></td>
 
             </tr>
         @endforeach

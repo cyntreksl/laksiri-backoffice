@@ -127,7 +127,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $data = array_filter($export->prepareData(), function ($item) {
             return isset($item[0]) && $item[0] !== '';
         });
-
+//        dd($data);
         $pdf = PDF::loadView('exports.door_to_door', ['data' => $data,'container' => $container ,'settings' => $settings ]);
         $pdf->setPaper('a3', 'portrait');
 
