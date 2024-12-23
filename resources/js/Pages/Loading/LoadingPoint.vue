@@ -213,7 +213,9 @@ const handleLoadMHBL = (mhbl_id, mhbl_hbls) => {
     const loadedPackages = unloadedMHBLs.value
         .filter(mhbl => mhbl.id === mhbl_id)[0].hbls
         .flatMap(hbl => hbl.packages);
-    loadedMHBLs.value.push((unloadedMHBLs.value.filter(mhbl => mhbl.id === mhbl_id))[0]);
+    const loadMHBL = (unloadedMHBLs.value.filter(mhbl => mhbl.id === mhbl_id))[0];
+    loadMHBL['expanded'] = true;
+    loadedMHBLs.value.push(loadMHBL);
     unloadedMHBLs.value = unloadedMHBLs.value.filter(mhbl => mhbl.id !== mhbl_id);
 
     if(loadedPackages.length > 0){
