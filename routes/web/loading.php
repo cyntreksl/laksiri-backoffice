@@ -54,6 +54,9 @@ Route::name('loading.')->group(function () {
     Route::get('/loaded-containers/{container}/manifest/export', [LoadedContainerController::class, 'exportManifest'])
         ->name('loaded-containers.manifest.export');
 
+    Route::get('/loaded-containers/{container}/doorToDoor/export', [LoadedContainerController::class, 'doorToDoorManifest'])
+        ->name('loaded-containers.doorToDoor.export');
+
     Route::put('containers/{container}/unload/hbl', [ContainerController::class, 'unloadHBLFromContainer'])
         ->name('containers.unload.hbl');
 

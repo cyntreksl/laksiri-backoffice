@@ -64,6 +64,7 @@ hbls();
                 <p class="mt-1 hidden sm:block">{{ container.reference }}</p>
             </div>
             <div class="flex items-center space-x-2">
+                <a :href="route('loading.loaded-containers.doorToDoor.export', container.id)">
                 <PrimaryOutlineButton :disabled="container.status !== 'LOADED'">
                     <svg class="size-5 mr-2" fill="none" stroke="currentColor"
                          stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -75,6 +76,7 @@ hbls();
 
                     Print Manifest
                 </PrimaryOutlineButton>
+                </a>
             </div>
         </div>
 
