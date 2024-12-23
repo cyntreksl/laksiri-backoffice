@@ -30,6 +30,7 @@ const form = useForm({
   name: "",
   email: "",
   mobile_number: computed(() => countryCode.value + contactNumber.value),
+    pp_or_nic_no: "",
   address: "",
   description: "",
 });
