@@ -33,6 +33,10 @@ public function __construct(Container $container)
                 continue;
             } // Skip if HBL is missing
 
+            $mhbl = $hbl->mhbl; // Access mhbl relationship
+            if (!$mhbl) {
+                continue; // Skip if MHBL is missing
+            }
             $isFirst = true;
             $totalQuantity = $loadedHBLPackages->sum('quantity');
             //            dd($loadedHBLPackages);
@@ -49,6 +53,8 @@ public function __construct(Container $container)
                     $isFirst ? $hbl->consignee_nic : '',
                     $isFirst ? $hbl->consignee_contact : '',
                     $isFirst ? $hbl->packages : [],
+                    $isFirst ? $mhbl : [],
+
                     $isFirst && $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
                 ];
 

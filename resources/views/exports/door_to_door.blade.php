@@ -77,8 +77,12 @@
     $total_nototal = 0;
     $total_vtotal = 0;
     $total_gtotal = 0;
+    $mhbl = [];
 @endphp
 @foreach($data as $item)
+    @php
+        $mhbl = $item[10];
+    @endphp
     @foreach ($item[9] as $package)
         @php
             $total_nototal += $package['quantity'];
@@ -89,7 +93,7 @@
 @endforeach
 
 @foreach ($chunks as $chunkIndex => $chunk)
-    <table >
+    <table>
         @if ($chunkIndex === 0)
             <thead>
             <tr>
@@ -113,7 +117,8 @@
                 <th colspan="1">
 
                 </th>
-                <th colspan="7">DATE: <?php echo date('d/m/Y'); ?>                                                              
+                <th colspan="7">DATE: <?php echo date('d/m/Y'); ?>                                                      
+                           
                                                     SHIPMENT NO :602
 
                 </th>
@@ -121,7 +126,8 @@
 
             <tr>
                 <th colspan="10" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
-                    SHIPPER :       UNIVERSAL FREIGHT SERVICES, P.O.BOX: 55239, DOHA, QATAR. TEL: +974 4620961 TEL/FAX: +974
+                    SHIPPER :       UNIVERSAL FREIGHT SERVICES, P.O.BOX: 55239, DOHA, QATAR. TEL: +974 4620961 TEL/FAX:
+                    +974
                     4620812 <br>
                     CONSIGNEE:  LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA <br>
                     NOTIFY :  LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94
@@ -131,10 +137,10 @@
 
             <tr>
                 <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
-                    <strong>  CONTR NO  </strong>
+                    <strong> CONTR NO </strong>
                 </th>
                 <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
-                    <strong> MHBL </strong>
+                    <strong> MHBL </strong> {{$mhbl->reference}}
                 </th>
                 <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
                     <strong> HAWB </strong>
@@ -142,21 +148,21 @@
             </tr>
             <tr>
                 <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
-                    <strong>  NO OF PKG   {{ number_format($total_nototal, 0) }} </strong>
+                    <strong> NO OF PKG   {{ number_format($total_nototal, 0) }} </strong>
                 </th>
                 <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
                     <strong> TOTAL VOLUME  {{ number_format($total_vtotal, 2) }} </strong>
                 </th>
                 <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
-                    <strong>  TOTAL WEIGHT:KG                 {{ number_format($total_gtotal, 2) }} </strong>
-                </th>    </tr>
-
+                    <strong> TOTAL WEIGHT:KG                 {{ number_format($total_gtotal, 2) }} </strong>
+                </th>
+            </tr>
 
 
             <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: #C8C8C8 ;">
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">SR NO</th>
                 <th>HBL NO</th>
-                <th>  NAME OF SHIPPER </th>
+                <th> NAME OF SHIPPER</th>
                 <th>NAME OF CONSIGNEES</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">TYPE OF PKGS CARGO TYPE</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">NO.OF PKGS</th>
@@ -164,17 +170,18 @@
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">GWHT KGS</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">DESCRIPTION OF CARGO</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 11px;">REMARKS</th>
+
             </tr>
             </thead>
         @endif
         <tbody>
         @foreach($chunk as $item)
             <tr>
-                <td >{{ $loop->iteration }}</td>
-                <td style="border-right:none ;vertical-align: top" > {{ $item[0]}} </td>
-                <td  >{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
+                <td>{{ $loop->iteration }}</td>
+                <td style="border-right:none ;vertical-align: top"> {{ $item[0]}} </td>
+                <td>{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
                 <td>{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
-                <td style="vertical-align: top" >
+                <td style="vertical-align: top">
                     @foreach ($item[9] as $package)
                         {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
                     @endforeach
@@ -184,18 +191,18 @@
                               {{ $package['quantity'] }}<br>
                     @endforeach
                 </td>
-                <td style="vertical-align: top" >
+                <td style="vertical-align: top">
                     @foreach ($item[9] as $package)
                               {{ $package['volume'] }}<br>
                     @endforeach
                 </td>
-                <td style="vertical-align: top" >
+                <td style="vertical-align: top">
                     @foreach ($item[9] as $package)
                              {{ $package['weight'] }}<br>
                     @endforeach
                 </td>
                 <td>  PERSONAL EFFECT</td>
-                <td> <b>     {{$item[10]}}</b> </td>
+                <td><b>     {{$item[10]}}</b></td>
 
             </tr>
         @endforeach
@@ -205,7 +212,8 @@
         @endif
     </table>
     <div class="footer">
-        <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_header_title}}</div>
+        <div class="footer-text"
+             style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_header_title}}</div>
         <div class="page-number"><i>Page <span class="page-number"></span> of {{count($chunks)}}</i></div>
     </div>
     @if ($chunkIndex < count($chunks) - 1)
