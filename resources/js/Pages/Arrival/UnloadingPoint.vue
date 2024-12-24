@@ -227,6 +227,11 @@ const confirmShowCreateIssueModal = (index) => {
     showUnloadingIssueModal.value = true;
 }
 
+const confirmShowMHBLCreateIssueModal = (packageID) => {
+    hblPackageId.value = packageID;
+    showUnloadingIssueModal.value = true;
+}
+
 const reviewContainer = () => {
     showReviewModal.value = true
 }
@@ -1001,7 +1006,7 @@ const reviewContainer = () => {
                                                             </p>
                                                         </div>
                                                         <div class="flex items-center space-x-8 px-2.5">
-                                                            <WarningButton :disabled="element.unloading_issue.length > 0" @click.prevent="confirmShowCreateIssueModal(index)">
+                                                            <WarningButton :disabled="element.unloading_issue.length > 0" @click.prevent="confirmShowMHBLCreateIssueModal(element.id)">
                                                                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle mr-2" fill="none" height="24"
                                                                      stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                                                      stroke-width="2" viewBox="0 0 24 24" width="24"
