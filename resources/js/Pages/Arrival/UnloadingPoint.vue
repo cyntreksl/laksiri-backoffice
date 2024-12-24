@@ -47,7 +47,6 @@ const warehouseMHBLArr = ref([]);
 const groupedPackages = props.packagesWithoutMhbl
     .filter(p => p.pivot?.status !== 'draft-unload')
     .reduce((acc, p) => {
-        console.log(p);
         const hbl_number = p.hbl.hbl_number;
         if (!acc[hbl_number]) {
             acc[hbl_number] = [];
