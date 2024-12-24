@@ -15,12 +15,17 @@ class UpdateOfficerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
-            'mobile_number' => ['required', 'phone:INTERNATIONAL'],
-            'email' => ['nullable', 'email', Rule::unique('officers')->ignore($this->id)],
+            'name' => ['required', 'string', 'max:254'],
+            'mobile_number' => ['required', 'phone:INTERNATIONAL', 'max:20'],
+            'email' => [
+                'required_if:type,shipper',
+                'nullable',
+                'email',
+                Rule::unique('officers')->ignore($this->id),
+            ],
             'pp_or_nic_no' => ['required', 'max:254'],
-            'residency_no' => ['required_if:type,shipper'],
-            'address' => ['required'],
+            'residency_no' => ['required_if:type,shipper', 'max:254'],
+            'address' => ['required', 'max:254'],
             'type' => ['required'],
         ];
     }

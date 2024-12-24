@@ -7,7 +7,7 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 
 const props = defineProps({
     officer: {
@@ -21,19 +21,37 @@ const props = defineProps({
     }
 });
 
+const splitCountryCode = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            return code;
+        }
+    }
+};
+const splitContactNumber = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            return fullNumber.slice(code.length);
+        }
+    }
+};
+
+const countryCode = ref(splitCountryCode(props.officer.mobile_number));
+const contactNumber = ref(splitContactNumber(props.officer.mobile_number));
+
 const form = useForm({
     id: props.officer.id,
     name: props.officer.name,
     type: props.officer.type,
     email: props.officer.email,
-    mobile_number: props.officer.mobile_number,
+    mobile_number:computed(() => countryCode.value + contactNumber.value),
     pp_or_nic_no: props.officer.pp_or_nic_no,
     residency_no: props.officer.residency_no,
     address:props.officer.address,
     description:props.officer.description,
 });
-const countryCode = ref('+94');
-const contactNumber = ref("");
+
+
 const updateOfficer = () => {
     form.put(route("setting.shipper-consignees.update", props.officer.id), {
         onSuccess: () => {
@@ -64,8 +82,8 @@ const updateOfficer = () => {
                     <br/>
                 </div>
                 <form @submit.prevent="updateOfficer">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5" v-if="officer.type === 'shipper'">
-                        <div>
+                    <div class="grid grid-cols-1 sm:grid-cols-6 gap-5" v-if="officer.type === 'shipper'">
+                        <div class="col-span-3">
                             <InputLabel for="name" value="Name"/>
                             <div class="flex items-center border border-gray-300 rounded-md px-2">
                                 <TextInput
@@ -80,7 +98,7 @@ const updateOfficer = () => {
                         </div>
 
                         <!-- Email Field -->
-                        <div>
+                        <div class="col-span-3">
                             <InputLabel for="email" value="Email"/>
                             <div class="flex items-center border border-gray-300 rounded-md px-2">
                                 <TextInput
@@ -97,10 +115,10 @@ const updateOfficer = () => {
                         <!-- Mobile Number Field -->
                         <div class="col-span-2">
                             <InputLabel for="mobile_number" value="Mobile Number"/>
-                            <div class="flex items-center space-x-2">
+                            <div class="flex space-x-px">
                                 <select
                                     v-model="countryCode"
-                                    class="form-select rounded-md border border-gray-300 bg-white px-8 py-2 focus:ring-primary focus:border-primary"
+                                    class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                 >
                                     <option v-for="code in countryCodes" :key="code" :value="code">
                                         {{ code }}
@@ -110,7 +128,7 @@ const updateOfficer = () => {
                                     v-model="contactNumber"
                                     id="mobile_number"
                                     type="text"
-                                    class="w-full border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+                                    class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                     placeholder="123 4567 890"
                                 />
                             </div>
@@ -118,7 +136,7 @@ const updateOfficer = () => {
                         </div>
 
                         <!-- Passport/NIC Field -->
-                        <div>
+                        <div class="col-span-2">
                             <InputLabel for="pp_or_nic_no" value="PP or NIC No"/>
                             <TextInput
                                 v-model="form.pp_or_nic_no"
@@ -131,7 +149,7 @@ const updateOfficer = () => {
                         </div>
 
                         <!-- Residency No Field -->
-                        <div>
+                        <div class="col-span-2">
                             <InputLabel for="residency_no" value="Residency No"/>
                             <TextInput
                                 v-model="form.residency_no"
@@ -144,7 +162,7 @@ const updateOfficer = () => {
                         </div>
 
                         <!-- Address Field -->
-                        <div>
+                        <div class="col-span-6">
                             <InputLabel for="address" value="Address"/>
                             <textarea
                                 v-model="form.address"
@@ -170,7 +188,7 @@ const updateOfficer = () => {
                         </div>
 
                         <!-- Passport/NIC Number Field -->
-                        <div class="col-span-2">
+                        <div class="col-span-1">
                             <InputLabel for="pp_or_nic_no" value="PP or NIC No"/>
                             <TextInput
                                 v-model="form.pp_or_nic_no"
@@ -183,22 +201,22 @@ const updateOfficer = () => {
                         </div>
 
                         <!-- Mobile Number Field -->
-                        <div class="col-span-2">
+                        <div class="col-span-1">
                             <InputLabel for="mobile_number" value="Mobile Number"/>
-                            <div class="flex items-center space-x-2">
+                            <div class="flex space-x-px">
                                 <select
                                     v-model="countryCode"
-                                    class="form-select rounded-md border border-gray-300 bg-white px-8 py-2 focus:ring-primary focus:border-primary"
+                                    class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                 >
                                     <option v-for="code in countryCodes" :key="code" :value="code">
                                         {{ code }}
                                     </option>
                                 </select>
-                                <TextInput
+                                <input
                                     v-model="contactNumber"
                                     id="mobile_number"
                                     type="text"
-                                    class="w-full border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+                                    class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                     placeholder="123 4567 890"
                                 />
                             </div>
@@ -206,7 +224,7 @@ const updateOfficer = () => {
                         </div>
 
                         <!-- Address Field -->
-                        <div class="col-span-2">
+                        <div class="col-span-1">
                             <InputLabel for="address" value="Address"/>
                             <textarea
                                 v-model="form.address"
@@ -219,7 +237,7 @@ const updateOfficer = () => {
                         </div>
 
                         <!-- Note Field -->
-                        <div class="col-span-2">
+                        <div class="col-span-1">
                             <InputLabel for="note" value="Note"/>
                             <textarea
                                 v-model="form.description"
