@@ -47,6 +47,7 @@ const warehouseMHBLArr = ref([]);
 const groupedPackages = props.packagesWithoutMhbl
     .filter(p => p.pivot?.status !== 'draft-unload')
     .reduce((acc, p) => {
+        console.log(p);
         const hbl_number = p.hbl.hbl_number;
         if (!acc[hbl_number]) {
             acc[hbl_number] = [];
@@ -223,6 +224,11 @@ const hblPackageId = ref(null);
 
 const confirmShowCreateIssueModal = (index) => {
     hblPackageId.value = warehouseArr.value[index].id;
+    showUnloadingIssueModal.value = true;
+}
+
+const confirmShowMHBLCreateIssueModal = (packageID) => {
+    hblPackageId.value = packageID;
     showUnloadingIssueModal.value = true;
 }
 
@@ -1030,7 +1036,7 @@ const reviewContainer = () => {
                                                             </p>
                                                         </div>
                                                         <div class="flex items-center space-x-8 px-2.5">
-                                                            <WarningButton :disabled="element.unloading_issue.length > 0" @click.prevent="confirmShowCreateIssueModal(index)">
+                                                            <WarningButton :disabled="element.unloading_issue.length > 0" @click.prevent="confirmShowMHBLCreateIssueModal(element.id)">
                                                                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle mr-2" fill="none" height="24"
                                                                      stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                                                      stroke-width="2" viewBox="0 0 24 24" width="24"
