@@ -10,6 +10,11 @@ const props = defineProps({
         type: Object,
         default: () => {
         },
+    },
+    containerHBLS: {
+        type: Object,
+        default: () => {
+        },
     }
 });
 
@@ -144,7 +149,7 @@ const closeShowHBLModal = () => {
             </tr>
             </thead>
             <tbody>
-            <tr v-for="hbl in containerData?.hbls"
+            <tr v-for="hbl in containerHBLS"
                 class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                 <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
                     {{ hbl.hbl_number || '-' }}

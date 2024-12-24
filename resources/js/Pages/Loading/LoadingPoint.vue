@@ -140,7 +140,14 @@ const getLoadedMHBLs = async () => {
         }
     } else {
         const data = await response.json();
-        loadedMHBLs.value = data.data;
+        const filteredMHBLs = data.data.filter(mhbl =>
+            mhbl.hbls.every(hbl =>
+                hbl.packages.every(pkg =>
+                    pkg.containers.every(ctnr => ctnr.pivot.status === 'draft')
+                )
+            )
+        ).map(mhbl => ({ ...mhbl, expanded: true }));
+        loadedMHBLs.value = filteredMHBLs;
     }
 }
 
@@ -206,7 +213,9 @@ const handleLoadMHBL = (mhbl_id, mhbl_hbls) => {
     const loadedPackages = unloadedMHBLs.value
         .filter(mhbl => mhbl.id === mhbl_id)[0].hbls
         .flatMap(hbl => hbl.packages);
-    loadedMHBLs.value.push((unloadedMHBLs.value.filter(mhbl => mhbl.id === mhbl_id))[0]);
+    const loadMHBL = (unloadedMHBLs.value.filter(mhbl => mhbl.id === mhbl_id))[0];
+    loadMHBL['expanded'] = true;
+    loadedMHBLs.value.push(loadMHBL);
     unloadedMHBLs.value = unloadedMHBLs.value.filter(mhbl => mhbl.id !== mhbl_id);
 
     if(loadedPackages.length > 0){
@@ -387,7 +396,7 @@ const reviewContainer = () => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <PrimaryButton :disabled="containerArr.length === 0" @click.prevent="reviewContainer">
+                    <PrimaryButton :disabled="containerArr.length === 0 && Object.keys(loadedMHBLs).length === 0" @click.prevent="reviewContainer">
                         Proceed to Review
                     </PrimaryButton>
                 </div>
@@ -552,7 +561,7 @@ const reviewContainer = () => {
                                         </svg>
                                         <span>{{ hbl?.hbl_number || hbl.hbl }}</span>
                                     </div>
-                                    <ul v-show="hbl.expanded" class="pl-4">
+                                    <ul v-if="Object.keys(hbl.packages).length > 0" v-show="hbl.expanded" class="pl-4">
                                         <draggable v-model="hbl.packages"
                                                    class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
                                                    group="people"
@@ -745,102 +754,116 @@ const reviewContainer = () => {
                                     </div>
                                     <ul v-show="mhbl.expanded" class="pl-4">
                                         <div v-for="hbl in mhbl.hbls" :key="hbl.id">
-                                            <draggable v-model="hbl.packages"
-                                                       class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
-                                                       group="people"
-                                                       item-key="id"
-                                                       @change="handlePackageChange">
-                                                <template #item="{element, index}">
-                                                    <div class="card cursor-pointer shadow-sm">
-                                                        <div class="flex justify-between items-center">
-                                                            <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
-                                                                <div>
-                                                                    <div class="flex justify-between">
-                                                                        <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                            {{hbl.hbl_number}}
-                                                                        </p>
-                                                                    </div>
+                                            <div
+                                                :packages="hbl.packages"
+                                                class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
+                                            >
+                                                <div v-for="(element, index) in hbl.packages" :key="element.id" class="card cursor-pointer shadow-sm">
+                                                    <div class="flex justify-between items-center">
+                                                        <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
+                                                            <div>
+                                                                <div class="flex justify-between">
+                                                                    <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
+                                                                        {{ hbl.hbl_number }}
+                                                                    </p>
                                                                 </div>
-                                                                <div class="flex flex-wrap gap-1">
-                                                                    <div
-                                                                        class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
-                                                                        <svg class="size-3.5" fill="none" stroke="currentColor"
-                                                                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                                            <path
-                                                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                                stroke-width="2"/>
-                                                                        </svg>
-                                                                        <span>{{
-                                                                                moment(element.created_at).format('YYYY-MM-DD')
-                                                                            }}</span>
-                                                                    </div>
-
-                                                                    <div
-                                                                        class="badge space-x-1 bg-warning/10 py-1 px-1.5 text-warning dark:bg-warning/15">
-                                                                        <svg
-                                                                            class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
-                                                                            fill="none"
-                                                                            stroke="currentColor" stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                                                            width="24"
-                                                                            xmlns="http://www.w3.org/2000/svg">
-                                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                                            <path d="M7 20l10 0"/>
-                                                                            <path d="M6 6l6 -1l6 1"/>
-                                                                            <path d="M12 3l0 17"/>
-                                                                            <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                                            <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                                        </svg>
-                                                                        <span>Volume {{ element.volume.toFixed(3) }}</span>
-                                                                    </div>
-
-                                                                    <div
-                                                                        class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15">
-                                                                        <svg
-                                                                            class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
-                                                                            fill="none" height="24" stroke="currentColor"
-                                                                            stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                                                            width="24"
-                                                                            xmlns="http://www.w3.org/2000/svg">
-                                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                                            <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
-                                                                            <path
-                                                                                d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
-                                                                        </svg>
-                                                                        <span>Weight {{ element.weight.toFixed(2) }}</span>
-                                                                    </div>
-
-                                                                    <div
-                                                                        class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15">
-                                                                        <svg
-                                                                            class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hash"
-                                                                            fill="none" stroke="currentColor"
-                                                                            stroke-linecap="round" stroke-linejoin="round"
-                                                                            stroke-width="2"
-                                                                            viewBox="0 0 24 24"
-                                                                            xmlns="http://www.w3.org/2000/svg">
-                                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                                            <path d="M5 9l14 0"/>
-                                                                            <path d="M5 15l14 0"/>
-                                                                            <path d="M11 4l-4 16"/>
-                                                                            <path d="M17 4l-4 16"/>
-                                                                        </svg>
-                                                                        <span>Quantity {{ element.quantity }}</span>
-                                                                    </div>
-                                                                </div>
-                                                                <p class="mt-px font-medium text-slate-400 dark:text-navy-300">
-                                                                    {{ element.package_type }}
-                                                                </p>
                                                             </div>
-
+                                                            <div class="flex flex-wrap gap-1">
+                                                                <div
+                                                                    class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100"
+                                                                >
+                                                                    <svg
+                                                                        class="size-3.5"
+                                                                        fill="none"
+                                                                        stroke="currentColor"
+                                                                        viewBox="0 0 24 24"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                    >
+                                                                        <path
+                                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                                            stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            stroke-width="2"
+                                                                        />
+                                                                    </svg>
+                                                                    <span>{{ moment(element.created_at).format('YYYY-MM-DD') }}</span>
+                                                                </div>
+                                                                <div
+                                                                    class="badge space-x-1 bg-warning/10 py-1 px-1.5 text-warning dark:bg-warning/15"
+                                                                >
+                                                                    <svg
+                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
+                                                                        fill="none"
+                                                                        stroke="currentColor"
+                                                                        stroke-linecap="round"
+                                                                        stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        viewBox="0 0 24 24"
+                                                                        width="24"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                    >
+                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                                                                        <path d="M7 20l10 0" />
+                                                                        <path d="M6 6l6 -1l6 1" />
+                                                                        <path d="M12 3l0 17" />
+                                                                        <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0" />
+                                                                        <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0" />
+                                                                    </svg>
+                                                                    <span>Volume {{ element.volume.toFixed(3) }}</span>
+                                                                </div>
+                                                                <div
+                                                                    class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15"
+                                                                >
+                                                                    <svg
+                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
+                                                                        fill="none"
+                                                                        height="24"
+                                                                        stroke="currentColor"
+                                                                        stroke-linecap="round"
+                                                                        stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        viewBox="0 0 24 24"
+                                                                        width="24"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                    >
+                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                                                                        <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                                                                        <path
+                                                                            d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"
+                                                                        />
+                                                                    </svg>
+                                                                    <span>Weight {{ element.weight.toFixed(2) }}</span>
+                                                                </div>
+                                                                <div
+                                                                    class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15"
+                                                                >
+                                                                    <svg
+                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hash"
+                                                                        fill="none"
+                                                                        stroke="currentColor"
+                                                                        stroke-linecap="round"
+                                                                        stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        viewBox="0 0 24 24"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                    >
+                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+                                                                        <path d="M5 9l14 0" />
+                                                                        <path d="M5 15l14 0" />
+                                                                        <path d="M11 4l-4 16" />
+                                                                        <path d="M17 4l-4 16" />
+                                                                    </svg>
+                                                                    <span>Quantity {{ element.quantity }}</span>
+                                                                </div>
+                                                            </div>
+                                                            <p class="mt-px font-medium text-slate-400 dark:text-navy-300">
+                                                                {{ element.package_type }}
+                                                            </p>
                                                         </div>
                                                     </div>
-                                                </template>
-                                            </draggable>
+                                                </div>
+                                            </div>
                                         </div>
-
                                     </ul>
                                 </li>
                             </ul>
@@ -1043,12 +1066,10 @@ const reviewContainer = () => {
                                         </div>
                                         <ul v-show="mhbl.expanded" class="pl-4">
                                             <div v-for="hbl in mhbl.hbls" :key="hbl.id">
-                                                <draggable v-model="hbl.packages"
+                                                <div :packages="hbl.packages"
                                                            class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
-                                                           group="people"
-                                                           item-key="id"
-                                                           @change="handlePackageChange">
-                                                    <template #item="{element, index}">
+                                                >
+                                                    <div v-for="(element, index) in hbl.packages" :key="element.id">
                                                         <div class="card cursor-pointer shadow-sm">
                                                             <div class="flex justify-between items-center">
                                                                 <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
@@ -1135,15 +1156,15 @@ const reviewContainer = () => {
 
                                                             </div>
                                                         </div>
-                                                    </template>
-                                                </draggable>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                         </ul>
                                     </li>
                                 </ul>
                             </div>
-                            <div v-if="containerArr.length === 0"
+                            <div v-if="containerArr.length === 0 && loadedMHBLs.length === 0"
                                  class="cursor-pointer border-2 rounded-lg border-dashed">
                                 <div class="flex justify-center items-center space-x-3 px-2.5 pb-2 pt-1.5 h-24">
                                     <div class="text-center">

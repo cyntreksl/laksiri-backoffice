@@ -125,13 +125,13 @@ const splitNumberConsignee = (fullNumber) => {
 
 const form = useForm({
     hbls: props.hblIds,
-    hbl_name: "",
+    hbl_name: null,
     email: "",
     contact_number: computed(() => countryCode.value + contactNumber.value),
     nic: "",
     iq_number: "",
     address: "",
-    consignee_name: "",
+    consignee_name: null,
     consignee_nic: "",
     consignee_contact: computed(
         () => consignee_countryCode.value + consignee_contact.value
@@ -203,6 +203,7 @@ const handleMHBLCreate = () => {
     form.post(route("mhbls.store"), {
         onSuccess: (page) => {
             form.reset();
+            router.visit(route("mhbls.index"));
             push.success("MHBL Created Successfully!");
         },
         onError: () => console.log("error"),
@@ -315,7 +316,7 @@ const shipIcon = ref(`
                             <h2
                                 class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-5"
                             >
-                                Cargo Type
+                                Cargo Type <span class="text-xs text-gray-400">(Automatically Selected)</span>
                             </h2>
                         </div>
                         <div class="my-5">
@@ -347,14 +348,14 @@ const shipIcon = ref(`
                         <hr class="my-4 border-t border-slate-200 dark:border-navy-600">
 
                         <!-- Type -->
-                        <div>
+                        <div hidden="true">
                             <h2
                                 class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-0"
                             >
                                 Type
                             </h2>
                         </div>
-                        <div class="my-5">
+                        <div hidden="true" class="my-5">
                             <div class="space-x-5">
                                 <label
                                     v-for="hblType in hblTypes"
@@ -374,14 +375,14 @@ const shipIcon = ref(`
                             <InputError :message="form.errors.hbl_type"/>
                         </div>
 
-                        <hr class="my-4 border-t border-slate-200 dark:border-navy-600">
+                        <hr hidden="true" class="my-4 border-t border-slate-200 dark:border-navy-600">
 
                         <!-- Warehouse -->
                         <div>
                             <h2
                                 class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-0"
                             >
-                                Warehouse
+                                Warehouse <span class="text-xs text-gray-400">(Automatically Selected)</span>
                             </h2>
                         </div>
                         <div class="my-5">
@@ -421,52 +422,7 @@ const shipIcon = ref(`
                             >
                                 Shipper Details
                             </h2>
-
-                            <a @click.prevent="confirmShowingCopyFromHBLToShipperModal"
-                               x-tooltip.placement.bottom="'Copy from HBL'">
-                                <svg class="icon icon-paste text-[#64748b]" fill="none" stroke="#64748b"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" height="24"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <!-- Clipboard shape -->
-                                    <path
-                                        d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h1v-1a2 2 0 0 1 2 -2z"/>
-                                    <!-- Horizontal line representing pasted content -->
-                                    <path d="M9 7h6"/>
-                                </svg>
-                            </a>
                         </div>
-
-                        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToShipperModalShow"
-                                     @close="closeCopyFromHBLToShipperModal">
-                            <template #title>
-                                Copy
-                            </template>
-
-                            <template #content>
-                                <div class="mt-4">
-                                    <TextInput
-                                        v-model="reference"
-                                        class="w-full"
-                                        placeholder="Enter HBL Reference"
-                                        required
-                                        type="text"
-                                    />
-                                </div>
-                            </template>
-
-                            <template #footer>
-                                <SecondaryButton @click="closeCopyFromHBLToShipperModal">
-                                    Cancel
-                                </SecondaryButton>
-                                <PrimaryButton
-                                    class="ms-3"
-                                    @click.prevent="handleCopyFromHBLToShipper"
-                                >
-                                    Copy From HBL
-                                </PrimaryButton>
-                            </template>
-                        </DialogModal>
 
                         <div class="grid grid-cols-3 gap-5 mt-3">
                             <div class="col-span-3">
@@ -492,6 +448,7 @@ const shipIcon = ref(`
                                 <span>Email</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.email"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         placeholder="Email"
@@ -525,6 +482,7 @@ const shipIcon = ref(`
                                 <span>Mobile Number</span>
                                 <div class="flex -space-x-px">
                                     <select
+                                        disabled
                                         v-model="countryCode"
                                         class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
@@ -534,6 +492,7 @@ const shipIcon = ref(`
                                     </select>
 
                                     <input
+                                        disabled
                                         v-model="contactNumber"
                                         class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
@@ -549,6 +508,7 @@ const shipIcon = ref(`
                                 <span>PP or NIC No</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.nic"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         placeholder="PP or NIC No"
@@ -564,6 +524,7 @@ const shipIcon = ref(`
                                 <span>Residency No</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.iq_number"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         placeholder="Residency No"
@@ -579,6 +540,7 @@ const shipIcon = ref(`
                                 <span>Address</span>
                                 <label class="block">
                   <textarea
+                      disabled
                       v-model="form.address"
                       class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                       placeholder="Type address here..."
@@ -587,14 +549,6 @@ const shipIcon = ref(`
                                 </label>
                                 <InputError :message="form.errors.address"/>
                             </div>
-                        </div>
-                        <div v-if="form.hbl_type === 'Door to Door'" class="col-span-2">
-                            <Checkbox
-                                v-model="isChecked"
-                                @change="addToConsigneeDetails"
-                            ></Checkbox>
-
-                            <span class="ml-5">Same as Consignee Details</span>
                         </div>
                     </div>
                 </div>
@@ -607,56 +561,6 @@ const shipIcon = ref(`
                             >
                                 Consignee Details
                             </h2>
-
-                            <div class="flex space-x-1">
-                                <a
-                                    @click.prevent="confirmShowingCopyFromHBLToConsigneeModal"
-                                    x-tooltip.placement.bottom="'Copy from HBL'"
-                                >
-                                    <svg class="icon icon-paste text-[#64748b] ml-1" fill="none" stroke="#64748b"
-                                         stroke-linecap="round"
-                                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" height="24"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <!-- Clipboard shape -->
-                                        <path
-                                            d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h1v-1a2 2 0 0 1 2 -2z"/>
-                                        <!-- Horizontal line representing pasted content -->
-                                        <path d="M9 7h6"/>
-                                    </svg>
-
-                                </a>
-                            </div>
-
-                            <DialogModal :maxWidth="'xl'" :show="copyFromHBLToConsigneeModalShow"
-                                         @close="closeCopyFromHBLToConsigneeModal">
-                                <template #title>
-                                    Copy
-                                </template>
-
-                                <template #content>
-                                    <div class="mt-4">
-                                        <TextInput
-                                            v-model="reference"
-                                            class="w-full"
-                                            placeholder="Enter HBL Reference"
-                                            required
-                                            type="text"
-                                        />
-                                    </div>
-                                </template>
-
-                                <template #footer>
-                                    <SecondaryButton @click="closeCopyFromHBLToConsigneeModal">
-                                        Cancel
-                                    </SecondaryButton>
-                                    <PrimaryButton
-                                        class="ms-3"
-                                        @click.prevent="handleCopyFromHBLToConsignee"
-                                    >
-                                        Copy From HBL
-                                    </PrimaryButton>
-                                </template>
-                            </DialogModal>
                         </div>
                         <div class="grid grid-cols-2 gap-5 mt-3">
                             <div class="col-span-2">
@@ -681,6 +585,7 @@ const shipIcon = ref(`
                                 <span>PP or NIC No</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.consignee_nic"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         placeholder="PP or NIC No"
@@ -694,6 +599,7 @@ const shipIcon = ref(`
                                 <span>Mobile Number</span>
                                 <div class="flex -space-x-px">
                                     <select
+                                        disabled
                                         v-model="consignee_countryCode"
                                         class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
                                     >
@@ -703,6 +609,7 @@ const shipIcon = ref(`
                                     </select>
 
                                     <input
+                                        disabled
                                         v-model="consignee_contact"
                                         class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
@@ -716,6 +623,7 @@ const shipIcon = ref(`
                                 <span>Address</span>
                                 <label class="block">
                                   <textarea
+                                      disabled
                                       v-model="form.consignee_address"
                                       class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                       placeholder="Type address here..."
@@ -726,16 +634,6 @@ const shipIcon = ref(`
                             </div>
 
                             <div class="col-span-2">
-                                <span>Note</span>
-                                <label class="block">
-                                  <textarea
-                                      v-model="form.consignee_note"
-                                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                      placeholder="Type note here..."
-                                      rows="2"
-                                  ></textarea>
-                                </label>
-                                <InputError :message="form.errors.consignee_note"/>
                             </div>
                         </div>
                     </div>
@@ -975,50 +873,12 @@ const shipIcon = ref(`
                                 <h2
                                     class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                                 >
-                                    Price and Payment
+                                    MHBL Summary
                                 </h2>
                             </div>
-                            <div class="grid grid-cols-2 gap-5 mt-5">
-                                <div>
-                                    <span>Grand Volume</span>
-                                    <TextInput
-                                        v-model="form.grand_volume"
-                                        disabled
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.grand_volume"/>
-                                </div>
 
-                                <div>
-                                    <span>Grand Weight</span>
-                                    <TextInput
-                                        v-model="form.grand_weight"
-                                        disabled
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.grand_weight"/>
-                                </div>
-
-                                <div>
-                                    <span>Grand Total</span>
-                                    <TextInput
-                                        v-model="form.grand_total"
-                                        disabled
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.grand_total"/>
-                                </div>
-
-                                <div class="col-start-2 mt-20 space-y-2.5 font-bold">
+                            <div class="mt-5">
+                                <div class="col-start-2 mt-5 space-y-2.5 font-bold">
                                     <div class="flex justify-between">
                                         <p class="line-clamp-1">Packages</p>
                                         <p class="text-slate-700 dark:text-navy-100">
@@ -1031,25 +891,13 @@ const shipIcon = ref(`
                                             {{ form.grand_weight.toFixed(2) }}
                                         </p>
                                     </div>
-                                    <div class="flex justify-between">
+                                    <div class="flex justify-between mb-20">
                                         <p class="line-clamp-1">Volume</p>
                                         <p class="text-slate-700 dark:text-navy-100">
                                             {{ form.grand_volume.toFixed(2) }}
                                         </p>
                                     </div>
                                 </div>
-
-                                <div class="col-span-2">
-                                    <div
-                                        class="flex justify-between text-2xl text-success font-bold"
-                                    >
-                                        <p class="line-clamp-1">Grand Total</p>
-                                        <div class="flex items-center">
-                                            <p>{{form.grand_total.toFixed(2) ?? 0.00 }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- -->
                             </div>
                         </div>
                     </div>
@@ -1061,7 +909,7 @@ const shipIcon = ref(`
 
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-5 col-span-2">
-                    <DangerOutlineButton @click="router.visit(route('hbls.index'))">
+                    <DangerOutlineButton @click="router.visit(route('mhbls.index'))">
                         Cancel
                     </DangerOutlineButton>
                     <PrimaryButton

@@ -8,6 +8,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {ref} from "vue";
 import moment from "moment";
 
+
 defineProps({
     canResetPassword: Boolean,
     status: String,
@@ -136,91 +137,91 @@ const hblStatusColor = (status) => {
         </div>
         <div class="hidden w-full place-items-center lg:grid">
             <div class="w-full max-w-lg p-6">
-                <h1 class="text-3xl font-bold text-center mb-5 text-black">Track Your HBL Status</h1>
 
-                <div class="card mt-5 rounded-lg p-5 lg:p-7">
+                <!--                <h1 class="text-3xl font-bold text-center mb-5 text-black">Track Your HBL Status</h1>-->
 
-                    <div
-                        v-if="errorMessage"
-                        class="mb-3 alert flex overflow-hidden rounded-lg bg-error/10 text-error dark:bg-error/15"
-                    >
-                        <div class="flex flex-1 items-center space-x-3 p-4">
-                            <svg
-                                class="size-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                />
-                            </svg>
-                            <div class="flex-1">{{errorMessage}}</div>
-                        </div>
+                <!--                <div class="card mt-5 rounded-lg p-5 lg:p-7">-->
 
-                        <div class="w-1.5 bg-error"></div>
-                    </div>
+                <!--                    <div-->
+                <!--                        v-if="errorMessage"-->
+                <!--                        class="mb-3 alert flex overflow-hidden rounded-lg bg-error/10 text-error dark:bg-error/15"-->
+                <!--                    >-->
+                <!--                        <div class="flex flex-1 items-center space-x-3 p-4">-->
+                <!--                            <svg-->
+                <!--                                class="size-5"-->
+                <!--                                fill="none"-->
+                <!--                                stroke="currentColor"-->
+                <!--                                viewBox="0 0 24 24"-->
+                <!--                                xmlns="http://www.w3.org/2000/svg"-->
+                <!--                            >-->
+                <!--                                <path-->
+                <!--                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"-->
+                <!--                                    stroke-linecap="round"-->
+                <!--                                    stroke-linejoin="round"-->
+                <!--                                    stroke-width="2"-->
+                <!--                                />-->
+                <!--                            </svg>-->
+                <!--                            <div class="flex-1">{{errorMessage}}</div>-->
+                <!--                        </div>-->
 
-                    <div class="flex space-x-2">
-                        <div class="w-full">
-                            <input
-                                v-model="reference"
-                                class="form-input peer rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent w-full"
-                                placeholder="Enter HBL Reference / Number" type="text"/>
-                        </div>
-                        <PrimaryButton @click.prevent="handleSubmit">
-                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-search mr-2" fill="none"
-                                 height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                 stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/>
-                                <path d="M21 21l-6 -6"/>
-                            </svg>
-                            Find
-                        </PrimaryButton>
-                    </div>
-                    <div
-                        v-if="isLoading"
-                        class="flex animate-pulse flex-col space-y-4 border border-slate-150 dark:border-navy-500 mt-10"
-                    >
-                        <div class="px-4 pt-4">
-                            <div class="h-8 w-10/12 rounded-full bg-slate-150 dark:bg-navy-500"></div>
-                        </div>
-                        <div class="h-48 w-full bg-slate-150 dark:bg-navy-500"></div>
-                        <div class="flex flex-1 flex-col justify-between space-y-4 p-4">
-                            <div class="h-4 w-9/12 rounded bg-slate-150 dark:bg-navy-500"></div>
-                            <div class="h-4 w-6/12 rounded bg-slate-150 dark:bg-navy-500"></div>
-                            <div class="h-4 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
-                        </div>
-                    </div>
-                    <ol v-if="hblStatus.length > 0 && ! isLoading" class="timeline max-w-sm mt-10">
-                        <li v-for="(log, index) in hblStatus" class="timeline-item">
-                            <div
-                                :class="`${hblStatusColor(log.status)} timeline-item-point rounded-full dark:bg-accent`"
-                            >
-                                     <span
-                                         v-if="index === Object.keys(hblStatus).length - 1"
-                                         :class="`inline-flex h-full w-full animate-ping rounded-full ${hblStatusColor(log.status)} opacity-80`"
-                                     ></span>
-                            </div>
-                            <div class="timeline-item-content flex-1 pl-4 sm:pl-8">
-                                <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">
-                                    <p
-                                        class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"
-                                    >
-                                        {{ log.status }}
-                                    </p>
-                                </div>
-                                <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>
-                            </div>
-                        </li>
-                    </ol>
-                </div>
+                <!--                        <div class="w-1.5 bg-error"></div>-->
+                <!--                    </div>-->
 
+                <!--                    <div class="flex space-x-2">-->
+                <!--                        <div class="w-full">-->
+                <!--                            <input-->
+                <!--                                v-model="reference"-->
+                <!--                                class="form-input peer rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent w-full"-->
+                <!--                                placeholder="Enter HBL Reference / Number" type="text"/>-->
+                <!--                        </div>-->
+                <!--                        <PrimaryButton @click.prevent="handleSubmit">-->
+                <!--                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-search mr-2" fill="none"-->
+                <!--                                 height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"-->
+                <!--                                 stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">-->
+                <!--                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>-->
+                <!--                                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/>-->
+                <!--                                <path d="M21 21l-6 -6"/>-->
+                <!--                            </svg>-->
+                <!--                            Find-->
+                <!--                        </PrimaryButton>-->
+                <!--                    </div>-->
+                <!--                    <div-->
+                <!--                        v-if="isLoading"-->
+                <!--                        class="flex animate-pulse flex-col space-y-4 border border-slate-150 dark:border-navy-500 mt-10"-->
+                <!--                    >-->
+                <!--                        <div class="px-4 pt-4">-->
+                <!--                            <div class="h-8 w-10/12 rounded-full bg-slate-150 dark:bg-navy-500"></div>-->
+                <!--                        </div>-->
+                <!--                        <div class="h-48 w-full bg-slate-150 dark:bg-navy-500"></div>-->
+                <!--                        <div class="flex flex-1 flex-col justify-between space-y-4 p-4">-->
+                <!--                            <div class="h-4 w-9/12 rounded bg-slate-150 dark:bg-navy-500"></div>-->
+                <!--                            <div class="h-4 w-6/12 rounded bg-slate-150 dark:bg-navy-500"></div>-->
+                <!--                            <div class="h-4 w-full rounded bg-slate-150 dark:bg-navy-500"></div>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                    <ol v-if="hblStatus.length > 0 && ! isLoading" class="timeline max-w-sm mt-10">-->
+                <!--                        <li v-for="(log, index) in hblStatus" class="timeline-item">-->
+                <!--                            <div-->
+                <!--                                :class="`${hblStatusColor(log.status)} timeline-item-point rounded-full dark:bg-accent`"-->
+                <!--                            >-->
+                <!--                                     <span-->
+                <!--                                         v-if="index === Object.keys(hblStatus).length - 1"-->
+                <!--                                         :class="`inline-flex h-full w-full animate-ping rounded-full ${hblStatusColor(log.status)} opacity-80`"-->
+                <!--                                     ></span>-->
+                <!--                            </div>-->
+                <!--                            <div class="timeline-item-content flex-1 pl-4 sm:pl-8">-->
+                <!--                                <div class="flex flex-col justify-between pb-2 sm:flex-row sm:pb-0">-->
+                <!--                                    <p-->
+                <!--                                        class="pb-2 font-medium leading-none text-slate-600 dark:text-navy-100 sm:pb-0"-->
+                <!--                                    >-->
+                <!--                                        {{ log.status }}-->
+                <!--                                    </p>-->
+                <!--                                </div>-->
+                <!--                                <p class="py-1">{{ moment(log.created_at).format('YYYY-MM-DD hh:mm') }}</p>-->
+                <!--                            </div>-->
+                <!--                        </li>-->
+                <!--                    </ol>-->
+                <!--                </div>-->
                 <template v-if="hblStatus.length === 0 && ! isLoading">
                     <img
                         :src="DashboardMeet"
@@ -346,6 +347,14 @@ const hblStatusColor = (status) => {
                 </form>
             </div>
             <!-- End of login -->
+            <Link
+                :href="route('tracking.page')"
+                class="btn font-medium text-white bg-[#57af84] dark:bg-[#57af84]"
+            >
+                Track Your HBL Status
+            </Link>
+
+
             <div
                 class="my-5 flex justify-center text-xs text-slate-400 dark:text-navy-300"
             >

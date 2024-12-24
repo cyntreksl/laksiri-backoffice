@@ -18,7 +18,7 @@ class GetLoadedContainers
                 'hbl_packages' => function ($query) {
                     $query->withoutGlobalScope(BranchScope::class)
                         ->with(['hbl' => function ($hblQuery) {
-                            $hblQuery->withoutGlobalScope(BranchScope::class);
+                            $hblQuery->with('mhbl')->withoutGlobalScope(BranchScope::class);
                         }]);
                 },
             ])
@@ -42,10 +42,14 @@ class GetLoadedContainers
 
             $container
                 ->hbl_packages
-                ->groupBy('hbl.id')
-                ->each(function ($hblPackage) {
-                    $hbl = $hblPackage->first()->hbl;
-                    $hbl->packages_count = $hblPackage->count();
+                ->groupBy(fn ($package) => $package->hbl?->id)
+                ->each(function ($hblPackage, $hblId) {
+                    if ($hblId !== null) {
+                        $hbl = $hblPackage->first()->hbl;
+                        if ($hbl) {
+                            $hbl->packages_count = $hblPackage->count();
+                        }
+                    }
                 });
         });
 

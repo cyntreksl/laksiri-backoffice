@@ -449,6 +449,68 @@ const createColumns = () => [
                             ),
                         ]
                     ) : null,
+                // usePage().props.user.permissions.includes('shipment.download manifest') ?
+                //     h(
+                //         "a",
+                //         {
+                //             href: route(
+                //                 "loading.loaded-containers.doorToDoor.export",
+                //                 row.cells[0].data
+                //             ),
+                //         },
+                //         [
+                //             h(
+                //                 "button",
+                //                 {
+                //                     className:
+                //                         "btn size-8 p-0 text-warning hover:bg-warning/20 focus:bg-warning/20 active:bg-warning/25",
+                //                     "x-tooltip..placement.bottom.warning": "'Download Door to door '",
+                //                 },
+                //                 [
+                //                     h(
+                //                         "svg",
+                //                         {
+                //                             xmlns: "http://www.w3.org/2000/svg",
+                //                             viewBox: "0 0 24 24",
+                //                             class:
+                //                                 "size-6 icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf",
+                //                             fill: "none",
+                //                             stroke: "currentColor",
+                //                             strokeWidth: 2,
+                //                             strokeLinecap: "round",
+                //                             strokeLinejoin: "round",
+                //                         },
+                //                         [
+                //                             h("path", {
+                //                                 stroke: "none",
+                //                                 d: "M0 0h24v24H0z",
+                //                                 fill: "none",
+                //                             }),
+                //                             h("path", {
+                //                                 d: "M14 3v4a1 1 0 0 0 1 1h4",
+                //                             }),
+                //                             h("path", {
+                //                                 d: "M5 12v-7a2 2 0 0 1 2 -2h7l5 5v",
+                //                             }),
+                //                             h("path", {
+                //                                 d: "M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6",
+                //                             }),
+                //                             h("path", {
+                //                                 d: "M17 18h2",
+                //                             }),
+                //                             h("path", {
+                //                                 d: "M20 15h-3v6",
+                //                             }),
+                //                             h("path", {
+                //                                 d: "M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z",
+                //                             }),
+                //
+                //                         ]
+                //                     ),
+                //                 ]
+                //             ),
+                //         ]
+                //     ) : null,
                 usePage().props.user.permissions.includes('shipment.show') ?
                 h(
                     "button",

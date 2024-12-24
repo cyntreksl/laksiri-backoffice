@@ -155,7 +155,7 @@
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">TYPE OF PKGS</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">NO.OF PKGS</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">VOLUME CBM</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">GWHT KGS</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">GWHT</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">DESCRIPTION OF CARGO</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 11px;">REMARKS</th>
             </tr>
@@ -165,8 +165,8 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td style="border-right:none ;vertical-align: top"> {{ $item[0]}} </td>
-                    <td style="border-left:none;vertical-align: top">{{ $item[1]}} {{ $item[2]}} {{ $item[3]}} {{ $item[4]}}</td>
-                    <td style="vertical-align: top">{{ $item[5] }} {{ $item[6] }} {{ $item[7] }} {{ $item[8] }} </td>
+                    <td style="border-left:none;vertical-align: top">{{ $item[1]}} {{ $item[2]}} <br>  {{ $item[3]}} <br> {{ $item[4]}}</td>
+                    <td style="vertical-align: top">{{ $item[5] }} <br> {{ $item[6] }} <br> {{ $item[7] }} <br> {{ $item[8] }} </td>
                     <td style="vertical-align: top">
                         @foreach ($item[9] as $package)
                             {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
@@ -196,8 +196,8 @@
                 <tr style="border: none;">
                     <td colspan="5" style="border: none; text-align: right;"></td>
                     <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_nototal, 0) }}</u></strong></td>
-                    <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_gtotal, 2) }}</u></strong></td>
                     <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 2) }}</u></strong></td>
+                    <td style="border: none; text-align: center;"><strong><u>  {{ number_format($total_gtotal, 2) }}</u></strong></td>
                     <td style="border: none;">&nbsp;</td>
                     <td style="border: none;">&nbsp;</td>
                 </tr>

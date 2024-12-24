@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Actions\Branch\GetDestinationBranches;
 use App\Enum\CargoType;
 use App\Enum\HBLType;
+use App\Http\Requests\StoreMHBLRequest;
 use App\Http\Requests\UpdateMHBLRequest;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\MHBLRepositoryInterface;
 use App\Interfaces\OfficerRepositoryInterface;
 use App\Models\HBL;
 use App\Models\HBLPackage;
-use App\Models\Mhbl;
+use App\Models\MHBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -78,7 +79,7 @@ class MHBLController extends Controller
             'warehouses' => GetDestinationBranches::run(),
             'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
             'selectedCargoType' => $data['cargo_type'],
-            'selectedHblType' => $data['hbl_type'],
+            'selectedHblType' => 'Gift',
             'selectedWarehouse' => ucfirst(strtolower($data['warehouse'])),
             'shippers' => $this->officerRepository->getShippers(),
             'consignees' => $this->officerRepository->getConsignees(),
@@ -90,7 +91,7 @@ class MHBLController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreMHBLRequest $request)
     {
         $this->mhblRepository->storeHBL($request->all());
     }

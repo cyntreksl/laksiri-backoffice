@@ -89,6 +89,7 @@ containerArr.value = Object.keys(groupedPackages).map(hbl_number => {
 });
 
 mhblContainerArr.value = Object.keys(groupedMHBLPackages).map(mhblReference => {
+    console.log(groupedMHBLPackages[mhblReference][0]);
     return {
         mhblReference: mhblReference,
         expanded: true,
@@ -264,7 +265,7 @@ const reviewContainer = () => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <PrimaryButton :disabled="warehouseArr.length === 0" @click.prevent="reviewContainer">
+                    <PrimaryButton :disabled="warehouseArr.length === 0 && warehouseMHBLArr.length === 0" @click.prevent="reviewContainer">
                         Proceed to Review
                     </PrimaryButton>
                 </div>
@@ -376,7 +377,6 @@ const reviewContainer = () => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ hbl?.hbl_number }}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -570,19 +570,17 @@ const reviewContainer = () => {
 
                                     </div>
                                     <ul v-show="pkg.expanded" class="pl-4">
-                                        <draggable v-model="pkg.packages"
+                                        <div :packages="pkg.packages"
                                                    class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
-                                                   group="people"
-                                                   item-key="id"
-                                                   @change="handlePackageChange">
-                                            <template #item="{element, index}">
+                                        >
+                                            <div v-for="(element, index) in pkg.packages" :key="element.id">
                                                 <div class="card cursor-pointer shadow-sm">
                                                     <div class="flex justify-between items-center">
                                                         <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ pkg?.hbl_number }}
+                                                                        {{ element.hbl.hbl_number }}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -670,8 +668,8 @@ const reviewContainer = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </template>
-                                        </draggable>
+                                            </div>
+                                        </div>
                                     </ul>
                                 </li>
                             </ul>
@@ -858,32 +856,7 @@ const reviewContainer = () => {
                                     </div>
                                 </template>
                             </draggable>
-                            <div v-if="warehouseArr.length === 0"
-                                 class="cursor-pointer border-2 rounded-lg border-dashed">
-                                <div class="flex justify-center items-center space-x-3 px-2.5 pb-2 pt-1.5 h-24">
-                                    <div class="text-center">
-                                        <p
-                                            class="font-medium text-lg tracking-wide text-slate-400 line-clamp-2 dark:text-navy-100">
-                                            Warehouse
-                                        </p>
 
-                                        <p class="mt-px text-xs text-slate-400 dark:text-navy-300">
-                                            Active to unloading process
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="board-draggable-handler flex items-center justify-between px-0.5 pb-3">
-                                <div class="flex items-center space-x-2">
-                                    <div class="flex size-8 items-center justify-center rounded-lg bg-info/10 text-info">
-                                        <i class="fa fa-boxes-packing text-base"></i>
-                                    </div>
-                                    <h3 class="text-base text-slate-700 dark:text-navy-100">
-                                        MHBL Packages
-                                    </h3>
-                                </div>
-                            </div>
                             <ul v-if="warehouseMHBLArr.length > 0" class="space-y-1 font-inter font-medium">
                                 <li v-for="(mhbl, groupIndex) in warehouseMHBLArr" :key="mhbl.mhblReference">
                                     <div
@@ -937,19 +910,17 @@ const reviewContainer = () => {
 
                                     </div>
                                     <ul v-show="mhbl.expanded" class="pl-4">
-                                        <draggable v-model="mhbl.packages"
+                                        <div :packages="mhbl.packages"
                                                    class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
-                                                   group="people"
-                                                   item-key="id"
-                                                   @change="handlePackageChange">
-                                            <template #item="{element, index}">
+                                        >
+                                            <div v-for="(element, index) in mhbl.packages" :key="element.id">
                                                 <div class="card cursor-pointer shadow-sm">
                                                     <div class="flex justify-between items-center">
                                                         <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ mhbl?.hbl_number }}
+                                                                        {{ element.hbl.hbl_number }}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -1053,27 +1024,28 @@ const reviewContainer = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </template>
-                                        </draggable>
+                                            </div>
+                                        </div>
                                     </ul>
                                 </li>
                             </ul>
 
-                            <div v-else
-                                 class="cursor-pointer border-2 border-error/20 bg-error/10 rounded-lg border-dashed">
+                            <div v-if="warehouseArr.length === 0 && warehouseMHBLArr.length === 0"
+                                 class="cursor-pointer border-2 rounded-lg border-dashed">
                                 <div class="flex justify-center items-center space-x-3 px-2.5 pb-2 pt-1.5 h-24">
                                     <div class="text-center">
                                         <p
                                             class="font-medium text-lg tracking-wide text-slate-400 line-clamp-2 dark:text-navy-100">
-                                            Sorry! Not Found MHBL Packages.
+                                            Warehouse
                                         </p>
 
                                         <p class="mt-px text-xs text-slate-400 dark:text-navy-300">
-                                            Please add HBL records first.
+                                            Active to unloading process
                                         </p>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>

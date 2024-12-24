@@ -3,7 +3,7 @@
 use App\Models\Branch;
 use App\Models\Container;
 use App\Models\ExceptionName;
-use App\Models\Mhbl;
+use App\Models\MHBL;
 use App\Models\PackageType;
 use App\Models\PickUp;
 use App\Models\User;
@@ -360,6 +360,12 @@ Breadcrumbs::for('setting.package-types.edit', function (BreadcrumbTrail $trail,
     $trail->push('Settings');
     $trail->push('Package Types', route('setting.package-types.index'));
     $trail->push('Edit Package Type', route('setting.package-types.edit', $packageType));
+});
+
+Breadcrumbs::for('setting.shipper-consignees.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Shipper& Consignees', route('setting.shipper-consignees.index'));
 });
 
 require_once __DIR__.'/call-center-breadcrumbs.php';
