@@ -28,6 +28,7 @@ use App\Actions\HBL\UpdateHBLPackages;
 use App\Actions\HBLDocument\DeleteDocument;
 use App\Actions\HBLDocument\DownloadDocument;
 use App\Actions\HBLDocument\UploadDocument;
+use App\Actions\MHBL\DeleteMHBLsHBL;
 use App\Enum\HBLType;
 use App\Exports\CancelledHBLExport;
 use App\Exports\HBLExport;
@@ -130,6 +131,8 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function deleteHBL(HBL $hbl)
     {
+        DeleteMHBLsHBL::run($hbl);
+
         return DeleteHBL::run($hbl);
     }
 
