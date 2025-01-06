@@ -47,6 +47,7 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
         if (! empty($search)) {
             $query->whereAny([
                 'reference',
+                'hbl_number',
             ], 'like', '%'.$search.'%');
         }
 
