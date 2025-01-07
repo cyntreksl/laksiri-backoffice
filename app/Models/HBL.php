@@ -137,9 +137,9 @@ class HBL extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function hblPayment(): HasOne
+    public function hblPayment(): HasMany
     {
-        return $this->hasOne(HBLPayment::class, 'hbl_id', 'id');
+        return $this->HasMany(HBLPayment::class, 'hbl_id', 'id');
     }
 
     public function scopeWarehouse(Builder $query): void
