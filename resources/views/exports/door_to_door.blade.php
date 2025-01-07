@@ -71,6 +71,7 @@
 </head>
 <body >
 
+@foreach($groupedData as $groupIndex => $data)
 @php
     $itemsPerPage = 6; // Number of rows per page - Reduced to fit the content better
     $chunks = array_chunk($data, $itemsPerPage); // Split data into chunks of $itemsPerPage
@@ -232,6 +233,10 @@
     @if ($chunkIndex < count($chunks) - 1)
         <div style="page-break-after: always;"></div>
     @endif
+@endforeach
+@if (!$loop->last)
+    <div style="page-break-after: always;"></div>
+@endif
 @endforeach
 
 </body>
