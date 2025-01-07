@@ -14,7 +14,7 @@ class GetPaymentByReference
     {
         $hbl = HBL::withoutGlobalScopes()->where('reference', $reference)->firstOrFail();
 
-        $payments = $hbl->hblPayment()->withoutGlobalScopes()->first();
+        $payments = $hbl->hblPayment()->withoutGlobalScopes()->latest()->first();
 
         return response()->json($payments);
     }
