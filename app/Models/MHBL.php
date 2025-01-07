@@ -22,6 +22,7 @@ class MHBL extends Model
 
     protected $fillable = [
         'reference',
+        'hbl_number',
         'branch_id',
         'created_by',
         'consignee_id',
