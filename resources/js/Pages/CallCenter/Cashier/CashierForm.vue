@@ -291,13 +291,13 @@ const handleUpdatePayment = () => {
                                 </div>
 
                                 <PrimaryButton
-                                    v-show="(paymentRecord.grand_total - paymentRecord.paid_amount) !== 0"
+                                    v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0"
                                     :class="{ 'opacity-25': form.processing }"
                                     :disabled="form.processing"
                                     class="mt-3 float-right"
                                     @click="handleUpdatePayment"
                                 >
-                                    Update Payment
+                                    Update Payment2
                                 </PrimaryButton>
                             </div>
                         </div>

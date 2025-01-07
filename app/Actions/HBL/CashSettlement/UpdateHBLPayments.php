@@ -16,7 +16,7 @@ class UpdateHBLPayments
             'hbl_id' => $hbl->id,
             'branch_id' => GetUserCurrentBranchID::run(),
             'grand_total' => $hbl->grand_total,
-            'paid_amount' => $total_paid_amount - $hbl->paid_amount,
+            'paid_amount' => $hbl->hblPayment()->withoutGlobalScopes()->get()->isEmpty() ? $total_paid_amount : ($total_paid_amount - $hbl->paid_amount),
             'status' => GetHBLPaymentStatus::run($total_paid_amount, $hbl->grand_total),
             'created_by' => auth()->id(),
         ]);
