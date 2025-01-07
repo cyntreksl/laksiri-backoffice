@@ -28,10 +28,6 @@ const props = defineProps({
         type: Number,
         default: null
     },
-    hbl: {
-        type: Object,
-        required: true,
-    }
 })
 
 const hbl = ref({});

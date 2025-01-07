@@ -49,7 +49,6 @@ class VerificationController extends Controller
             'customerQueue' => $customerQueue,
             'verificationDocuments' => Verification::verification_documents(),
             'hblId' => HBL::withoutGlobalScopes()->where('reference', $customerQueue->token->reference)->first()->id,
-            'hbl' => HBL::withoutGlobalScopes()->where('reference', $customerQueue->token->reference)->first(),
         ]);
     }
 
