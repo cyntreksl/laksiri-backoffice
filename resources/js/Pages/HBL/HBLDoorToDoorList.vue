@@ -137,7 +137,6 @@ const createColumns = () => [
     name: "#",
     sort: false,
     formatter: (_, row) => {
-        console.log(row.cells);
         if(row.cells[17].data === null){
             return h("input", {
                 type: "checkbox",
