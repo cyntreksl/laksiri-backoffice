@@ -2,7 +2,11 @@
 
 namespace App\Actions\Cashier;
 
+use App\Actions\Container\GetContainerWithoutGlobalScopesById;
 use App\Actions\HBL\GetHBLByIdWithPackages;
+use App\Actions\SLInvoice\CreateSLInvoice;
+use App\Actions\User\GetUserById;
+use App\Actions\User\GetUserCurrentBranchID;
 use App\Services\GatePassChargesService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -17,39 +21,80 @@ class DownloadGatePassPDF
     public function handle($hbl)
     {
         $hbl = GetHBLByIdWithPackages::run($hbl);
-        $container = $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
+        $sl_Invoice = $hbl->slInvoices;
+        $container = $sl_Invoice && !is_null($sl_Invoice['container_id'])
+            ? GetContainerWithoutGlobalScopesById::run($sl_Invoice['container_id'])
+            : $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
 
-        $arrivalDatesCount = $container ? Carbon::parse($container['estimated_time_of_arrival'])->diffInDays(Carbon::now()->startOfDay(), false) : 0;
+        if(!$sl_Invoice){
+            $arrivalDatesCount = $container ? Carbon::parse($container['estimated_time_of_arrival'])->diffInDays(Carbon::now()->startOfDay(), false) : 0;
 
-        $service = new GatePassChargesService($hbl['cargo_type']);
-        //        $service = new GatePassChargesService('Air Cargo');
+            $service = new GatePassChargesService($hbl['cargo_type']);
 
-        $grand_volume = $hbl->packages()->withoutGlobalScopes()->sum('volume');
-        $grand_weight = $hbl->packages()->withoutGlobalScopes()->sum('weight');
+            $grand_volume = $hbl->packages()->withoutGlobalScopes()->sum('volume');
+            $grand_weight = $hbl->packages()->withoutGlobalScopes()->sum('weight');
 
-        $charges = [
-            'port_charge' => $service->portCharge($grand_volume),
-            'handling_charge' => $service->handlingCharge($hbl->packages()->count()),
-            'storage_charge' => $service->bondCharge($grand_volume, $grand_weight),
-            'dmg_charge' => $service->demurrageCharge($arrivalDatesCount, $grand_volume, $grand_weight),
-            'total' => $service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount'],
-            'do_charge' => $hbl->do_charge,
-            'stamp_charge' => ($service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount']) > 25000 ? 25.00 : 00.00,
-        ];
+            $port_charge = $service->portCharge($grand_volume);
+            $handling_charge = $service->handlingCharge($hbl->packages()->count());
+            $storage_charge = $service->bondCharge($grand_volume, $grand_weight);
+            $dmg_charge = $service->demurrageCharge($arrivalDatesCount, $grand_volume, $grand_weight);
+
+            $data = [
+                'clearing_time' => date('H:i:s'),
+                'date' => date('Y-m-d'),
+                'vessel' => $container->id ?? null,
+                'grand_volume' => $grand_volume,
+                'grand_weight' => $grand_weight,
+                'port_charge_rate' => $port_charge['rate'],
+                'port_charge_amount' => $port_charge['amount'],
+                'handling_charge_rate' => $handling_charge['rate'],
+                'handling_charge_amount' => $handling_charge['amount'],
+                'storage_charge_rate' => $storage_charge['rate'],
+                'storage_charge_amount' => $storage_charge['amount'],
+                'dmg_charge_rate' => $dmg_charge['rate'],
+                'dmg_charge_amount' => $dmg_charge['amount'],
+                'total' => $service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount'],
+                'do_charge' => $hbl->do_charge,
+                'stamp_charge' => ($service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount']) > 25000 ? 25.00 : 00.00,
+                'created_by' => Auth::id(),
+            ];
+            $sl_Invoice = $hbl->slInvoices()->create($data);
+        }
 
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
-        $total_in_word = strtoupper($formatter->format($charges['total']));
+        $total_in_word = strtoupper($formatter->format($sl_Invoice['total']));
 
         $data = [
-            'clearing_time' => date('H:i:s'),
-            'date' => date('Y-m-d'),
+            'clearing_time' => $sl_Invoice['clearing_time'],
+            'date' => $sl_Invoice['date'],
             'vessel' => $container,
             'hbl' => $hbl,
-            'grand_volume' => $hbl->packages->sum('volume'),
-            'charges' => $charges,
+            'grand_volume' =>  $sl_Invoice['grand_volume'],
+            'charges' => [
+                'port_charge' => [
+                    'rate' => $sl_Invoice['port_charge_rate'],
+                    'amount' => $sl_Invoice['port_charge_amount'],
+                ],
+                'handling_charge' => [
+                    'rate' => $sl_Invoice['handling_charge_rate'],
+                    'amount' => $sl_Invoice['handling_charge_amount'],
+                ],
+                'storage_charge' => [
+                    'rate' => $sl_Invoice['storage_charge_rate'],
+                    'amount' => $sl_Invoice['storage_charge_amount'],
+                ],
+                'dmg_charge' => [
+                    'rate' => $sl_Invoice['dmg_charge_rate'],
+                    'amount' => $sl_Invoice['dmg_charge_amount'],
+                ],
+                'total' => $sl_Invoice['total'],
+                'do_charge' => $sl_Invoice['do_charge'],
+                'stamp_charge' => $sl_Invoice['stamp_charge'],
+            ],
             'total_in_word' => $total_in_word,
-            'by' => Auth::user()->name,
+            'by' => GetUserById::run($sl_Invoice['created_by'])->name,
         ];
+
         $pdf = Pdf::loadView('pdf.cashier.gatePass', ['data' => $data, 'hbl' => $hbl])->setPaper('a4');
 
         $filename = 'RECEIPT'.$hbl['reference'].'.pdf';
