@@ -549,7 +549,7 @@ const reviewContainer = () => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ pkg.mhblReference }}</span>
+                                        <span>{{ pkg.packages[0].hbl.mhbl.hbl_number || pkg.mhblReference }}</span>
                                         <div class="px-2.5">
                                             <svg
                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
@@ -891,7 +891,7 @@ const reviewContainer = () => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ mhbl.mhblReference }}</span>
+                                        <span>{{ mhbl.packages[0].hbl.mhbl.hbl_number || mhbl.mhblReference }}</span>
                                         <div class="px-2.5">
                                             <svg
                                                 class=" hover:text-error icon icon-tabler icons-tabler-outline icon-tabler-corner-up-left-double"

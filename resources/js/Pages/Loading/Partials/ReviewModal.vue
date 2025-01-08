@@ -158,7 +158,7 @@ const handleCreateLoadedContainer = () => {
                 </table>
             </div>
 
-            <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
+            <div class="is-scrollbar-hidden min-w-full overflow-x-auto mt-2">
                 <table class="is-hoverable w-full text-left">
                     <thead>
                     <tr>
@@ -187,7 +187,7 @@ const handleCreateLoadedContainer = () => {
                     <tbody>
                     <tr v-for="(mhbl, index) in loadedMHBLs" class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                         <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.reference }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.hbl_number || mhbl.reference }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ getMHBLPackageCount(mhbl.hbls) }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ getMHBLPackageCount(mhbl.hbls) }}</td>
 
