@@ -130,7 +130,7 @@ const handleFinishUnloading = () => {
                 </table>
             </div>
 
-            <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
+            <div class="is-scrollbar-hidden min-w-full overflow-x-auto mt-2">
                 <table class="is-hoverable w-full text-left">
                     <thead>
                     <tr>
@@ -159,7 +159,7 @@ const handleFinishUnloading = () => {
                     <tbody>
                     <tr v-for="(mhbl, index) in warehouseMHBLs" class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                         <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.mhblReference }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.packages[0].hbl.mhbl.hbl_number || mhbl.mhblReference }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.packages.length }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.packages.length }}</td>
 
