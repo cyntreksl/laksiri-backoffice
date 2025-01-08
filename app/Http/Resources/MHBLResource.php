@@ -18,6 +18,7 @@ class MHBLResource extends JsonResource
         return [
             'id' => $this->id,
             'reference' => $this->reference,
+            'hbl_number' => $this->hbl_number,
             'cargo_type' => $this->cargo_type,
             'hbl_type' => 'Gift',
             'warehouse' => GetBranchById::run($this->warehouse_id)['name'],
