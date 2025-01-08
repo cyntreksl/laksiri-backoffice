@@ -31,7 +31,7 @@ class CashSettlementCollection extends JsonResource
             'hbl_type' => $this->hbl_type ?? '-',
             'officer' => $this->created_by ?? '-',
             'is_hold' => $this->is_hold ?? '-',
-            'status' => $this->hblPayment->status ?? '-',
+            'status' => $this->hblPayment()->latest()->first()->status ?? '-',
             'zone' => $this->warehouseZone?->name,
             'actions' => '-',
         ];

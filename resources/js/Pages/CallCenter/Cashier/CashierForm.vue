@@ -127,7 +127,7 @@ const form = useForm({
 });
 
 const handleUpdatePayment = () => {
-    if(form.paid_amount < (paymentRecord.value.grand_total - paymentRecord.value.paid_amount).toFixed(2)){
+    if(form.paid_amount < (paymentRecord.value.grand_total - hbl.value.paid_amount).toFixed(2)){
         push.error('Please pay full amount');
     }else {
         form.post(route("call-center.cashier.store"), {
@@ -186,7 +186,7 @@ const handleUpdatePayment = () => {
                         </div>
 
                         <div class="mt-3">
-                            <p class="text-2xl font-semibold">{{(paymentRecord.grand_total - paymentRecord.paid_amount).toFixed(2)}}</p>
+                            <p class="text-2xl font-semibold">{{(paymentRecord.grand_total - hbl.paid_amount).toFixed(2)}}</p>
                         </div>
 
                         <div class="mt-4 flex space-x-7">
@@ -206,7 +206,7 @@ const handleUpdatePayment = () => {
                                     <div class="flex size-7 items-center justify-center rounded-full bg-black/20">
                                         <svg  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-cash"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M7 9m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" /><path d="M14 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 9v-2a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h2" /></svg>
                                     </div>
-                                    <p class="text-base font-medium">{{parseFloat(paymentRecord.paid_amount).toFixed(2)}}</p>
+                                    <p class="text-base font-medium">{{parseFloat(hbl.paid_amount).toFixed(2)}}</p>
                                 </div>
                             </div>
 
@@ -253,9 +253,9 @@ const handleUpdatePayment = () => {
                                 <div class="mt-4">
                                     <InputLabel value="Amount" />
                                     <TextInput
-                                        v-show="(paymentRecord.grand_total - paymentRecord.paid_amount) !== 0"
+                                        v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0"
                                         v-model="form.paid_amount"
-                                        :max="(paymentRecord.grand_total - paymentRecord.paid_amount)"
+                                        :max="(paymentRecord.grand_total - hbl.paid_amount)"
                                         class="w-full"
                                         min="0"
                                         placeholder="Enter Amount"
@@ -291,7 +291,7 @@ const handleUpdatePayment = () => {
                                 </div>
 
                                 <PrimaryButton
-                                    v-show="(paymentRecord.grand_total - paymentRecord.paid_amount) !== 0"
+                                    v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0"
                                     :class="{ 'opacity-25': form.processing }"
                                     :disabled="form.processing"
                                     class="mt-3 float-right"

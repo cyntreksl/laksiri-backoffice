@@ -50,6 +50,7 @@ class CashierController extends Controller
         return Inertia::render('CallCenter/Cashier/CashierForm', [
             'customerQueue' => $customerQueue,
             'hblId' => $hbl->id,
+            'hbl' => $hbl,
             'doCharge' => $branch->do_charge,
         ]);
     }

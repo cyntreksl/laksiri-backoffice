@@ -63,7 +63,7 @@ class Token extends Model
         $payment = $hbl->hblPayment()->withoutGlobalScopes()->latest()->first();
 
         if ($payment) {
-            if ($payment->paid_amount >= $payment->grand_total) {
+            if ($hbl->paid_amount >= $payment->grand_total) {
                 return true;
             } else {
                 return false;

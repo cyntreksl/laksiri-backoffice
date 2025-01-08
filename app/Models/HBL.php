@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
@@ -137,9 +136,9 @@ class HBL extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function hblPayment(): HasOne
+    public function hblPayment(): HasMany
     {
-        return $this->hasOne(HBLPayment::class, 'hbl_id', 'id');
+        return $this->HasMany(HBLPayment::class, 'hbl_id', 'id');
     }
 
     public function scopeWarehouse(Builder $query): void

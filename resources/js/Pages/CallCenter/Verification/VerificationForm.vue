@@ -27,7 +27,7 @@ const props = defineProps({
     pickupId: {
         type: Number,
         default: null
-    }
+    },
 })
 
 const hbl = ref({});
@@ -194,7 +194,7 @@ getHBLPayments();
                         </div>
 
                         <div class="mt-3">
-                            <p class="text-2xl font-semibold">{{(paymentRecord.grand_total - paymentRecord.paid_amount).toFixed(2)}}</p>
+                            <p class="text-2xl font-semibold">{{(paymentRecord.grand_total - hbl.paid_amount).toFixed(2)}}</p>
                         </div>
 
                         <div class="mt-4 flex space-x-7">
@@ -214,7 +214,7 @@ getHBLPayments();
                                     <div class="flex size-7 items-center justify-center rounded-full bg-black/20">
                                         <svg  class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-cash"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M7 9m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" /><path d="M14 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 9v-2a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h2" /></svg>
                                     </div>
-                                    <p class="text-base font-medium">{{parseFloat(paymentRecord.paid_amount).toFixed(2)}}</p>
+                                    <p class="text-base font-medium">{{parseFloat(hbl.paid_amount).toFixed(2)}}</p>
                                 </div>
                             </div>
 
