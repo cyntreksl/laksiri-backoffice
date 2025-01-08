@@ -297,7 +297,7 @@ const handleUpdatePayment = () => {
                                     class="mt-3 float-right"
                                     @click="handleUpdatePayment"
                                 >
-                                    Update Payment2
+                                    Update Payment
                                 </PrimaryButton>
                             </div>
                         </div>
