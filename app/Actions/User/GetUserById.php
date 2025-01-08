@@ -2,9 +2,7 @@
 
 namespace App\Actions\User;
 
-use App\Models\Branch;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class GetUserById

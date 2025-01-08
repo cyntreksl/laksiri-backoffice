@@ -4,9 +4,7 @@ namespace App\Actions\Cashier;
 
 use App\Actions\Container\GetContainerWithoutGlobalScopesById;
 use App\Actions\HBL\GetHBLByIdWithPackages;
-use App\Actions\SLInvoice\CreateSLInvoice;
 use App\Actions\User\GetUserById;
-use App\Actions\User\GetUserCurrentBranchID;
 use App\Services\GatePassChargesService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -22,11 +20,11 @@ class DownloadGatePassPDF
     {
         $hbl = GetHBLByIdWithPackages::run($hbl);
         $sl_Invoice = $hbl->slInvoices;
-        $container = $sl_Invoice && !is_null($sl_Invoice['container_id'])
+        $container = $sl_Invoice && ! is_null($sl_Invoice['container_id'])
             ? GetContainerWithoutGlobalScopesById::run($sl_Invoice['container_id'])
             : $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
 
-        if(!$sl_Invoice){
+        if (! $sl_Invoice) {
             $arrivalDatesCount = $container ? Carbon::parse($container['estimated_time_of_arrival'])->diffInDays(Carbon::now()->startOfDay(), false) : 0;
 
             $service = new GatePassChargesService($hbl['cargo_type']);
@@ -69,7 +67,7 @@ class DownloadGatePassPDF
             'date' => $sl_Invoice['date'],
             'vessel' => $container,
             'hbl' => $hbl,
-            'grand_volume' =>  $sl_Invoice['grand_volume'],
+            'grand_volume' => $sl_Invoice['grand_volume'],
             'charges' => [
                 'port_charge' => [
                     'rate' => $sl_Invoice['port_charge_rate'],
