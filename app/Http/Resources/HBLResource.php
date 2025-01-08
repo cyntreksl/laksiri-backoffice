@@ -48,7 +48,12 @@ class HBLResource extends JsonResource
             'hbl_number' => $this->hbl_number,
             'cr_number' => $this->cr_number,
             'system_status' => $this->system_status,
-            'mhbl' => $this->mhbl->id ?? null,
+            'mhbl' => $this->mhbl && $this->mhbl->hbl_number
+                ? $this->mhbl->hbl_number
+                : ($this->mhbl && $this->mhbl->reference
+                    ? $this->mhbl->reference
+                    : null),
+            'is_released' => $this->is_released,
         ];
     }
 }
