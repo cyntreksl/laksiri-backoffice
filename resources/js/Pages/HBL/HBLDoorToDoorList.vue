@@ -77,7 +77,7 @@ const data = reactive({
     is_hold: false,
     hbl_number: false,
     mhbl: false,
-    is_released: true,
+    is_released: false,
     view: true,
     actions: true,
   },
@@ -137,7 +137,7 @@ const createColumns = () => [
     name: "#",
     sort: false,
     formatter: (_, row) => {
-        if(row.cells[17].data === null){
+        if(row.cells[17].data === null && row.cells[18].data === 0 && row.cells[14].data !== 'reached'){
             return h("input", {
                 type: "checkbox",
                 className:
@@ -161,7 +161,7 @@ const createColumns = () => [
             })
         }
          return h("a", {
-            title: row.cells[18].data === 1 ? `Already Released` : `MHBL: ${row.cells[17].data}`,
+            title: row.cells[18].data === 1 ? `Already Released` : row.cells[14].data === 'reached' ? `Already shipped` : `MHBL: ${row.cells[17].data}`,
             style: {
                 cursor: "pointer", // Pointer on hover
                 fontSize: "1.25rem", // Adjust the size of the icon

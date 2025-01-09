@@ -157,7 +157,7 @@ const closeShowHBLModal = () => {
             <tr v-for="hbl in containerHBLS"
                 class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
                 <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
-                    {{ hbl.mhbl.reference || '-' }}
+                    {{ hbl.mhbl.hbl_number || hbl.mhbl.reference || '-' }}
                 </td>
                 <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
                     {{ hbl.hbl_number || '-' }}
