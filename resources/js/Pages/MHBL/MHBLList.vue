@@ -166,7 +166,7 @@ const createColumns = () => [
   {name: "Consignee Contact", hidden: !data.columnVisibility.consignee_contact},
   {name: "Consignee Email", hidden: !data.columnVisibility.consignee_email},
   {
-        name: "View",
+        name: "",
         sort: false,
         formatter: (_, row) => {
             return usePage().props.user.permissions.includes("hbls.show")
