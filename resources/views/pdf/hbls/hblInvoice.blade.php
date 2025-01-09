@@ -126,7 +126,7 @@ Terms and conditions will be provided on request</td>
                 <div style="height: 30px" ></div>
             </td>
 			<td colspan="3" rowspan="5"  style=" vertical-align: top;">
-                For Universal Freight Services
+               For {{ $branch->name ?? 'N/A' }}
                 <div style="height: 50px" ></div>
             </td>
 		</tr>
