@@ -10,4 +10,8 @@ interface DriverRepositoryInterface
     public function updateDriver(Request $data);
 
     public function createDriverLocation(User $user, array $data);
+
+
+    public function updatePassword(Request $request);
+
 }
