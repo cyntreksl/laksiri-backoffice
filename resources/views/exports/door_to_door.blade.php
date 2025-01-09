@@ -141,7 +141,7 @@
                     <strong>CONTR NO       {{$item[12] }} </strong>
                 </th>
                 <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
-                    <strong> MHBL </strong> {{$mhbl->reference}}
+                    <strong> MHBL </strong> {{$mhbl->hbl_number ?? $mhbl->reference}}
                 </th>
                 <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
                     <strong>    </strong>
