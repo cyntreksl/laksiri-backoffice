@@ -38,42 +38,18 @@ class DriverRepository implements DriverRepositoryInterface
             return $this->error($e->getMessage(), $e->getCode());
         }
     }
-    public function updatePassword(Request $request): JsonResponse
+    public function updatePassword(array $data): JsonResponse
     {
         $driverId = auth()->user()->id;
         $driver = User::find($driverId);
 
 
-        if(!hash::check($request->old_password, $driver->password))
+        if(!hash::check($data['old_password'], $driver->password))
         {
             return response()->json(['error' => 'Current password is invalid'], 400);
         }
-        $driver -> password = Hash::make($request->new_password);
-        $driver-> save();
+        $driver->password = Hash::make($data['new_password']);
+        $driver->save();
         return response()->json(['message' => 'Password updated successfully'], 200);
-
-        //        old password check
-//        if (!Hash::check( $driverId ->get('old_password'), $driver->new_password))
-//        {
-//            return back()->with('error', "Current Password is Invalid");
-//        }
-//        if (!Hash::check($old_password, $driver->password)) {
-//            return false;
-//        }
-//        if (!$driver) {
-//            return false;
-//        }
-//        $driver->password = Hash::make($new_password);
-//        return $driver->save();
-//        if (!Hash::check($old_password, $driver->password)) {
-//            return response()->json(['error' => 'Current password is invalid'], 400);
-//        }
-//        $driver->password = Hash::make($new_password);
-//        if ($driver->save()) {
-//            return response()->json(['message' => 'Password updated successfully'], 200);
-//        }
-//
-//        return response()->json(['error' => 'Failed to update password'], 500);
-
     }
 }
