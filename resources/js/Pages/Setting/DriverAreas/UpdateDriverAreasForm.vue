@@ -90,7 +90,7 @@ const updateDriverArea = () => {
                     class="ms-3"
                     type="submit"
                 >
-                    Update Warehouse Zone
+                    Update Driver Area
                 </PrimaryButton>
             </div>
         </form>
