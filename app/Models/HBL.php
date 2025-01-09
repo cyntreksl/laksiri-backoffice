@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
@@ -209,5 +210,10 @@ class HBL extends Model
             'id',
             'mhbl_id'
         );
+    }
+
+    public function slInvoices(): HasOne
+    {
+        return $this->hasOne(SLInvoice::class, 'hbl_id');
     }
 }
