@@ -13,6 +13,7 @@ class GetHBLsWithUnloadedPackagesByReference
     {
         $hbl = HBL::where('reference', $reference)
             ->where('cargo_type', $cargo_type)
+            ->orWhere('hbl_number', $reference)
             ->with(['packages' => function ($query) {
                 $query->where('is_loaded', false);
             }])->first();
