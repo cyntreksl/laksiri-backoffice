@@ -439,6 +439,32 @@ const addPriceRuleData = () => {
                                                 </tbody>
                                             </table>
                                         </div>
+                                        <div v-if="ruleList.length === 0"
+                                             class="text-center">
+                                            <div class="text-center mb-8">
+                                                <svg
+                                                    class="w-24 h-24 mx-auto mb-4 text-gray-400"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M12 9l-2 2-2-2m4 2h4a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2h4m4-2l2 2 2-2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                    ></path>
+                                                </svg>
+                                                <p class="text-gray-600">
+                                                    No price rules. Please add price rules to view data.
+                                                </p>
+                                            </div>
+                                            <PrimaryOutlineButton type="button"
+                                                                  @click="showAddPriceRuleDialog">
+                                                New Price Rule <i class="fas fa-plus fa-fw fa-fw"></i>
+                                            </PrimaryOutlineButton>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
