@@ -27,14 +27,6 @@ class StoreBranchPriceRequest extends FormRequest
             'cargo_mode' => ['required'],
             'hbl_type' => ['required'],
             'price_mode' => ['required'],
-            'condition' => ['required', 'string'],
-            'true_action' => ['required', 'string'],
-            'false_action' => ['required', 'string'],
-            'bill_price' => ['required', 'numeric'],
-            'bill_vat' => ['required', 'numeric'],
-            'per_package_charges' => ['required', 'numeric'],
-            'volume_charges' => ['required', 'numeric'],
-            'is_editable' => ['boolean'],
         ];
     }
 
