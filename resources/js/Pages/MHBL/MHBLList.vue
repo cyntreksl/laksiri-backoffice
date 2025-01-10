@@ -20,6 +20,7 @@ import {push} from "notivue";
 import HoldConfirmationModal from "@/Pages/HBL/Partials/HoldConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
+import MHBLDetailModal from "@/Pages/Common/MHBLDetailModal.vue";
 
 const props = defineProps({
     users: {
@@ -77,6 +78,7 @@ const data = reactive({
         consignee_address: false,
         consignee_contact: false,
         consignee_email: true,
+        view: true,
         actions: true,
     },
 });
@@ -163,6 +165,53 @@ const createColumns = () => [
   {name: "Consignee Address", hidden: !data.columnVisibility.consignee_address},
   {name: "Consignee Contact", hidden: !data.columnVisibility.consignee_contact},
   {name: "Consignee Email", hidden: !data.columnVisibility.consignee_email},
+  {
+        name: "",
+        sort: false,
+        formatter: (_, row) => {
+            return usePage().props.user.permissions.includes("hbls.show")
+                ? h(
+                    "a",
+                    {
+                        className:
+                            "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
+                        onClick: () => confirmViewMHBL(row.cells[0].data),
+                        "x-tooltip..placement.bottom.primary":
+                            "'View HBL'",
+                    },
+                    [
+                        h(
+                            "svg",
+                            {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                viewBox: "0 0 24 24",
+                                class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
+                                fill: "none",
+                                height: 24,
+                                width: 24,
+                                stroke: "currentColor",
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                            },
+                            [
+                                h("path", {
+                                    d: "M0 0h24v24H0z",
+                                    fill: "none",
+                                    stroke: "none",
+                                }),
+                                h("path", {
+                                    d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                                }),
+                                h("path", {
+                                    d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                                }),
+                            ]
+                        ),
+                    ]
+                )
+                : null
+        }
+    },
   {
     name: "",
     sort: false,
@@ -272,16 +321,16 @@ const applyFilters = () => {
 };
 
 const showConfirmDeleteMHBLModal = ref(false);
-const hblId = ref(null);
-const selectedHBL = ref({});
+const mhblId = ref(null);
+const selectedMHBL = ref({});
 
 const confirmDeleteMHBL = (id) => {
-    hblId.value = id;
+    mhblId.value = id;
     showConfirmDeleteMHBLModal.value = true;
 };
 
 const handleDeleteMHBL = () => {
-    router.delete(route("mhbls.destroy", hblId.value), {
+    router.delete(route("mhbls.destroy", mhblId.value), {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
@@ -295,11 +344,11 @@ const handleDeleteMHBL = () => {
     });
 };
 
-const showConfirmViewHBLModal = ref(false);
+const showConfirmViewMHBLModal = ref(false);
 
-const confirmViewHBL = async (id) => {
-    hblId.value = id;
-    showConfirmViewHBLModal.value = true;
+const confirmViewMHBL = async (id) => {
+    mhblId.value = id;
+    showConfirmViewMHBLModal.value = true;
 };
 
 const hblData = ref({});
@@ -362,9 +411,9 @@ const exportURL = computed(() => {
 
 const closeModal = () => {
     showConfirmDeleteMHBLModal.value = false;
-    showConfirmViewHBLModal.value = false;
-    hblId.value = null;
-    selectedHBL.value = null;
+    showConfirmViewMHBLModal.value = false;
+    mhblId.value = null;
+    selectedMHBL.value = null;
 };
 
 const handlePerPageChange = (event) => {
@@ -385,18 +434,6 @@ const handlePerPageChange = (event) => {
 
 const showConfirmViewCallFlagModal = ref(false);
 const hblName = ref("");
-
-const confirmViewCallFlagModal = async (row) => {
-    hblId.value = row[0].data;
-    hblName.value = row[3].data;
-    showConfirmViewCallFlagModal.value = true;
-};
-
-const closeCallFlagModal = () => {
-    showConfirmViewCallFlagModal.value = false;
-    hblId.value = null;
-    hblName.value = "";
-};
 
 const planeIcon = ref(`
 <svg
@@ -803,7 +840,7 @@ const shipIcon = ref(`
                             <i class="fa-solid fa-filter"></i>
                         </button>
 
-                        <a :href="exportURL">
+                        <a v-if="false" :href="exportURL">
                             <button
                                 class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                                 x-tooltip.placement.top="'Download CSV'"
@@ -965,9 +1002,9 @@ const shipIcon = ref(`
             @delete-mhbl="handleDeleteMHBL"
         />
 
-        <HBLDetailModal
-            :hbl-id="hblId"
-            :show="showConfirmViewHBLModal"
+        <MHBLDetailModal
+            :mhbl-id="mhblId"
+            :show="showConfirmViewMHBLModal"
             @close="closeModal"
         />
 
@@ -977,11 +1014,5 @@ const shipIcon = ref(`
             @close="closeHoldModal"
             @toggle-hold="toggleHold"
         />
-
-        <CallFlagModal
-            :caller-name="hblName"
-            :hbl-id="hblId"
-            :show="showConfirmViewCallFlagModal"
-            @close="closeCallFlagModal"/>
     </AppLayout>
 </template>
