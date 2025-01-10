@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class DriverRepository implements DriverRepositoryInterface
 {
@@ -35,5 +36,23 @@ class DriverRepository implements DriverRepositoryInterface
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());
         }
+    }
+
+    public function updatePassword(array $data): bool
+    {
+        $driverId = auth()->user()->id;
+        $driver = User::find($driverId);
+
+        if (! $driver) {
+            throw new \Exception('User not found.');
+        }
+
+        if (! Hash::check($data['old_password'], $driver->password)) {
+            return false;
+        }
+
+        $driver->password = Hash::make($data['new_password']);
+
+        return $driver->save();
     }
 }
