@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Branch\GetDestinationBranches;
+use App\Actions\MHBL\GetMHBLById;
 use App\Enum\CargoType;
 use App\Enum\HBLType;
 use App\Http\Requests\StoreMHBLRequest;
@@ -169,5 +170,12 @@ class MHBLController extends Controller
     public function getLoadedMHBLsToContainer(Request $request)
     {
         return $this->mhblRepository->getContainerLoadedMHBLs($request->all());
+    }
+
+    public function show($mhbl_id)
+    {
+        return response()->json([
+            'mhbl' => GetMHBLById::run($mhbl_id),
+        ]);
     }
 }
