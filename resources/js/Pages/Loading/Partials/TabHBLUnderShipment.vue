@@ -73,7 +73,6 @@ hbls();
 
                     Add HBL To Shipment
                 </PrimaryOutlineButton>
-
                 <a :href="route('loading.hbls.batch-downloads', container.id)">
                     <PrimaryOutlineButton :disabled="container.status !== 'LOADED'">
                         <svg class="size-5 mr-2" fill="none" stroke="currentColor"

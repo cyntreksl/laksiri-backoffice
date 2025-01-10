@@ -126,7 +126,7 @@ Terms and conditions will be provided on request</td>
                 <div style="height: 30px" ></div>
             </td>
 			<td colspan="3" rowspan="5"  style=" vertical-align: top;">
-             {{$invoice_header_title}}  For  {{ $branch->name ?? 'N/A' }}
+           For  {{$invoice_header_title}}
                 <div style="height: 50px" ></div>
             </td>
 		</tr>

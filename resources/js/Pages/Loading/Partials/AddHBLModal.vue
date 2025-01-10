@@ -105,9 +105,8 @@ const handleLoad = (packages) => {
                     <PrimaryButton :disabled="!hblRef" class="w-full mt-2" @click.prevent="getHBLWithPackages">Confirm</PrimaryButton>
                 </div>
             </div>
-
             <div v-if="hblData" class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5 mt-5">
-                <div v-for="(hblPackage, index) in hblData.packages" class="card cursor-pointer border shadow-sm">
+                <div v-if="hblData.packages.length > 0" v-for="(hblPackage, index) in hblData.packages" class="card cursor-pointer border shadow-sm">
                     <div class="flex justify-between items-center">
                         <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
                             <div>
@@ -206,6 +205,7 @@ const handleLoad = (packages) => {
                         </div>
                     </div>
                 </div>
+                <InputError v-else message="Enter Valid HBL OR Reference Number"/>
             </div>
         </template>
     </DialogModal>
