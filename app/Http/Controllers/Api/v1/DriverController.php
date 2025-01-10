@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDriverLocation;
 use App\Http\Requests\UpdateDriverApiRequest;
@@ -40,6 +39,7 @@ class DriverController extends Controller
     {
         $this->driverRepository->createDriverLocation($user, $request->all());
     }
+
     /**
      * Get Driver
      *
@@ -49,13 +49,16 @@ class DriverController extends Controller
      */
     public function updatePassword(UpdateDriverPasswordRequest $request)
     {
-        $updated = $this->driverRepository->updatePassword($request->all());
+        try {
+            $updated = $this->driverRepository->updatePassword($request->all());
 
-        if ($updated) {
-            return response()->json(['message' => 'Password updated successfully.'], 200);
+            if ($updated) {
+                return response()->json(['message' => 'Password updated successfully.'], 200);
+            }
+
+            return response()->json(['message' => 'Current password is invalid.'], 400);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
-
-        return response()->json(['message' => 'Failed to update password.'], 500);
     }
-
 }

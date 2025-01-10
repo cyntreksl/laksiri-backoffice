@@ -40,6 +40,8 @@ Route::domain('api.'.config('app.url'))
         Route::get('/package-type-list', [PackageTypeController::class, 'index']);
 
         Route::post('/get-hbl-rules', [HBLController::class, 'getHBLRules']);
+
+        Route::post('/driver/change-password', [DriverController::class, 'updatePassword']);
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);

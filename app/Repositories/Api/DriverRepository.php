@@ -11,7 +11,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-
 class DriverRepository implements DriverRepositoryInterface
 {
     use ResponseAPI;
@@ -38,18 +37,22 @@ class DriverRepository implements DriverRepositoryInterface
             return $this->error($e->getMessage(), $e->getCode());
         }
     }
-    public function updatePassword(array $data): JsonResponse
+
+    public function updatePassword(array $data): bool
     {
         $driverId = auth()->user()->id;
         $driver = User::find($driverId);
 
-
-        if(!hash::check($data['old_password'], $driver->password))
-        {
-            return response()->json(['error' => 'Current password is invalid'], 400);
+        if (! $driver) {
+            throw new \Exception('User not found.');
         }
+
+        if (! Hash::check($data['old_password'], $driver->password)) {
+            return false;
+        }
+
         $driver->password = Hash::make($data['new_password']);
-        $driver->save();
-        return response()->json(['message' => 'Password updated successfully'], 200);
+
+        return $driver->save();
     }
 }
