@@ -93,6 +93,7 @@ const showAddPriceRuleDialog = () => {
 
 const closeAddPriceRuleModal = () => {
     showAddNewPriceRuleDialog.value = false;
+    restModalFields()
 };
 
 
@@ -326,7 +327,7 @@ const addPriceRuleData = () => {
 
                         <div class="grid grid-cols-1 sm:grid-cols-4 my-4 gap-4">
                             <div class="sm:col-span-4">
-                                <div class="card p-1" style="height: 100%">
+                                <div class="p-1" style="height: 100%">
                                     <div class="mt-4 flex justify-between items-center">
                                         <div class="flex items-center space-x-2">
                                             <h2
@@ -335,8 +336,11 @@ const addPriceRuleData = () => {
                                                 Price Rules
                                             </h2>
                                         </div>
-                                        <PrimaryOutlineButton type="button"
-                                                              @click="showAddPriceRuleDialog">
+                                        <PrimaryOutlineButton
+                                            type="button"
+                                            @click="showAddPriceRuleDialog"
+                                            :disabled="form.destination_branch_id ==null && form.cargo_mode === '' && form.hbl_type === ''"
+                                        >
                                             New Price Rule <i class="fas fa-plus fa-fw fa-fw"></i>
                                         </PrimaryOutlineButton>
                                     </div>
@@ -467,8 +471,11 @@ const addPriceRuleData = () => {
                                                     No price rules. Please add price rules to view data.
                                                 </p>
                                             </div>
-                                            <PrimaryOutlineButton type="button"
-                                                                  @click="showAddPriceRuleDialog">
+                                            <PrimaryOutlineButton
+                                                type="button"
+                                                @click="showAddPriceRuleDialog"
+                                                :disabled="form.destination_branch_id ==null && form.cargo_mode === '' && form.hbl_type === ''"
+                                            >
                                                 New Price Rule <i class="fas fa-plus fa-fw fa-fw"></i>
                                             </PrimaryOutlineButton>
                                         </div>
