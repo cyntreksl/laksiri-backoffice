@@ -56,18 +56,25 @@ const priceRuleItem = reactive({
 const priceModes = ['Weight', 'Volume'];
 const handlePriceRuleCreate = () => {
     form.priceRules = ruleList.value;
-    form.post(route("setting.prices.store"), {
-        onSuccess: () => {
-            form.reset();
-            router.visit(route("setting.prices.index"));
-            push.success('Price rule created successfully!');
-        },
-        onError: () => {
-            push.error('Something went to wrong!');
-        },
-        preserveScroll: true,
-        preserveState: true,
-    });
+    if (form.priceRules.length <= 0) {
+        push.error('Please add at least one price rule.');
+        return;
+    }else{
+        form.priceRules = ruleList.value;
+
+        form.post(route("setting.prices.store"), {
+            onSuccess: () => {
+                form.reset();
+                router.visit(route("setting.prices.index"));
+                push.success('Price rule created successfully!');
+            },
+            onError: () => {
+                push.error('Something went to wrong!');
+            },
+            preserveScroll: true,
+            preserveState: true,
+        });
+    }
 }
 
 watch([() => form.cargo_mode], ([newCargoMode]) => {
