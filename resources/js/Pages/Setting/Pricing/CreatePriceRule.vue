@@ -93,6 +93,7 @@ const showAddPriceRuleDialog = () => {
 
 const closeAddPriceRuleModal = () => {
     showAddNewPriceRuleDialog.value = false;
+    restModalFields()
 };
 
 
@@ -335,8 +336,11 @@ const addPriceRuleData = () => {
                                                 Price Rules
                                             </h2>
                                         </div>
-                                        <PrimaryOutlineButton type="button"
-                                                              @click="showAddPriceRuleDialog">
+                                        <PrimaryOutlineButton
+                                            type="button"
+                                            @click="showAddPriceRuleDialog"
+                                            :disabled="form.destination_branch_id ==null && form.cargo_mode === '' && form.hbl_type === ''"
+                                        >
                                             New Price Rule <i class="fas fa-plus fa-fw fa-fw"></i>
                                         </PrimaryOutlineButton>
                                     </div>
@@ -467,8 +471,11 @@ const addPriceRuleData = () => {
                                                     No price rules. Please add price rules to view data.
                                                 </p>
                                             </div>
-                                            <PrimaryOutlineButton type="button"
-                                                                  @click="showAddPriceRuleDialog">
+                                            <PrimaryOutlineButton
+                                                type="button"
+                                                @click="showAddPriceRuleDialog"
+                                                :disabled="form.destination_branch_id ==null && form.cargo_mode === '' && form.hbl_type === ''"
+                                            >
                                                 New Price Rule <i class="fas fa-plus fa-fw fa-fw"></i>
                                             </PrimaryOutlineButton>
                                         </div>
