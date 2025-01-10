@@ -327,7 +327,7 @@ const addPriceRuleData = () => {
 
                         <div class="grid grid-cols-1 sm:grid-cols-4 my-4 gap-4">
                             <div class="sm:col-span-4">
-                                <div class="card p-1" style="height: 100%">
+                                <div class="p-1" style="height: 100%">
                                     <div class="mt-4 flex justify-between items-center">
                                         <div class="flex items-center space-x-2">
                                             <h2
