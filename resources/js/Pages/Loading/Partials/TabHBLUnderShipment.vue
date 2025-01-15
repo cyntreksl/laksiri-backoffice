@@ -51,6 +51,28 @@ const hbls = () => {
     }, 0);
 }
 hbls();
+
+const filteredMHBLS = ref([]);
+const mhbls = () => {
+    const hbls = Object.values(props.container.hbls);
+    const mhblMap = {};
+
+    hbls.forEach(hbl => {
+        if (hbl.mhbl !== null) {
+            const mhblId = hbl.mhbl.id;
+            if (!mhblMap[mhblId]) {
+                mhblMap[mhblId] = {
+                    ...hbl.mhbl,
+                    hbls: []
+                };
+            }
+            mhblMap[mhblId].hbls.push(hbl);
+        }
+    });
+    filteredMHBLS.value = mhblMap;
+
+}
+mhbls();
 </script>
 
 <template>
@@ -146,7 +168,7 @@ hbls();
             </SimpleOverviewWidget>
         </div>
 
-        <TableHBLPackages :container="container" :containerHBLS="filteredHBLS"/>
+        <TableHBLPackages :container="container" :containerHBLS="filteredHBLS" :containerMHBLS="filteredMHBLS"/>
     </Tab>
     <AddHBLModal :container="container" :show="showConfirmAddHBLModal" @close="closeModal"/>
 </template>

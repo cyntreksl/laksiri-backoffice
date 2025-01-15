@@ -18,7 +18,7 @@ class GetLoadedContainers
                 'hbl_packages' => function ($query) {
                     $query->withoutGlobalScope(BranchScope::class)
                         ->with(['hbl' => function ($hblQuery) {
-                            $hblQuery->with('mhbl')->withoutGlobalScope(BranchScope::class);
+                            $hblQuery->with('mhbl', 'mhbl.shipper', 'mhbl.consignee')->withoutGlobalScope(BranchScope::class);
                         }]);
                 },
             ])

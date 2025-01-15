@@ -1,7 +1,7 @@
 <script setup>
 import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
-import {ref, watchEffect} from "vue";
+import {onMounted, ref, watchEffect} from "vue";
 import DeleteHBLConfirmationModal from "@/Pages/Loading/Partials/DeleteHBLConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 
@@ -15,6 +15,10 @@ const props = defineProps({
         type: Object,
         default: () => {
         },
+    },
+    containerMHBLS: {
+        type: Array,
+        default: () => [],
     }
 });
 
@@ -94,6 +98,23 @@ const confirmViewHBL = async (id) => {
 const closeShowHBLModal = () => {
     showConfirmViewHBLModal.value = false;
 };
+
+const packageCounts = ref([]);
+
+const fetchPackageCount = async () => {
+    const mhbls = Object.values(props.containerMHBLS);
+
+    mhbls.forEach(mhbl => {
+        packageCounts.value[mhbl.id] = mhbl.hbls.reduce((total, hbl) => {
+            console.log(hbl);
+            return total + (hbl.packages_count || 0);
+        }, 0);
+    });
+};
+
+onMounted(() => {
+    fetchPackageCount()
+});
 </script>
 
 <template>
@@ -163,6 +184,40 @@ const closeShowHBLModal = () => {
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.contact_number || '-' }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.consignee_name || '-' }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.consignee_address || '-' }}</td>
+                <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
+                    <button
+                        class="btn size-8 p-0 rounded-full text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
+                        x-tooltip.placement.bottom.error="'Show HBL'"
+                        @click.prevent="confirmViewHBL(hbl.id)">
+                        <svg  class="size-5 icon icon-tabler icons-tabler-outline icon-tabler-eye"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                    </button>
+
+                    <button
+                        class="btn size-8 p-0 rounded-full text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
+                        x-tooltip.placement.bottom.error="'Remove From Shipment'"
+                        @click.prevent="confirmDeleteHBL(hbl.id)">
+                        <svg class="size-5" fill="none" stroke="currentColor"
+                             stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+            <tr v-for="mhbl in containerMHBLS"
+                class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
+                <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
+                    {{ mhbl.hbl_number || '-' }}
+                </td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ packageCounts[mhbl.id] || 0 }}</td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.shipper.name || '-' }}</td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.shipper.pp_or_nic_no || '-' }}</td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.shipper.address || '-' }}</td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.shipper.mobile_number || '-' }}</td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.consignee.name || '-' }}</td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.consignee.address || '-' }}</td>
                 <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
                     <button
                         class="btn size-8 p-0 rounded-full text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
