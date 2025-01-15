@@ -53,8 +53,30 @@ const hbls = () => {
 hbls();
 
 const filteredMHBLS = ref([]);
+const filteredMHBLsLHBL = ref([]);
 const mhbls = () => {
     const hbls = Object.values(props.container.hbls);
+    filteredMHBLsLHBL.value = Object.values(hbls).filter(hbl => hbl.mhbl !== null);
+
+    //Get hbls count
+    hblsCount.value = hblsCount.value + filteredMHBLsLHBL.value.length;
+
+    const filteredMHblsHBLIds = filteredMHBLsLHBL.value.map(hbl => hbl.id);
+    const filteredMHblsHBLPackages = props.container.hbl_packages.filter(pkg =>
+        filteredMHblsHBLIds.includes(pkg.hbl_id)
+    );
+
+    //Get packages Count
+    filteredHBLSPackagesCount.value = filteredHBLSPackagesCount.value + filteredMHblsHBLPackages.length;
+
+    filteredHBLSPackagesWeight.value = filteredHBLSPackagesWeight.value + filteredMHblsHBLPackages.reduce((sum, pkg) => {
+        return sum + (pkg.weight || 0);
+    }, 0);
+
+    filteredHBLSPackagesVolume.value = filteredHBLSPackagesVolume.value + filteredMHblsHBLPackages.reduce((sum, pkg) => {
+        return sum + (pkg.volume || 0);
+    }, 0);
+
     const mhblMap = {};
 
     hbls.forEach(hbl => {

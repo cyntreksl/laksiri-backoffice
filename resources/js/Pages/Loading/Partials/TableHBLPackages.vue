@@ -106,7 +106,6 @@ const fetchPackageCount = async () => {
 
     mhbls.forEach(mhbl => {
         packageCounts.value[mhbl.id] = mhbl.hbls.reduce((total, hbl) => {
-            console.log(hbl);
             return total + (hbl.packages_count || 0);
         }, 0);
     });
