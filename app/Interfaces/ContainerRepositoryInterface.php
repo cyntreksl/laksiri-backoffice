@@ -41,4 +41,6 @@ interface ContainerRepositoryInterface
     public function getContainerByHBL(HBL $hbl);
 
     public function downloadDocument(ContainerDocument $container_document);
+
+    public function unloadMHBLFromContainer(array $data, Container $container);
 }

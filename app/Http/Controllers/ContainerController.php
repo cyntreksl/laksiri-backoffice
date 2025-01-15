@@ -256,4 +256,9 @@ class ContainerController extends Controller
 
         return $this->containerRepository->downloadDocument($container_document);
     }
+
+    public function unloadMHBLFromContainer(Request $request, Container $container)
+    {
+        return $this->containerRepository->unloadMHBLFromContainer($request->all(), $container);
+    }
 }

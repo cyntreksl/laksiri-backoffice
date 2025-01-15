@@ -5,6 +5,7 @@ import {onMounted, ref, watchEffect} from "vue";
 import DeleteHBLConfirmationModal from "@/Pages/Loading/Partials/DeleteHBLConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import MHBLDetailModal from "@/Pages/Common/MHBLDetailModal.vue";
+import DeleteMHBLConfirmationModal from "@/Pages/Loading/Partials/DeleteMHBLConfirmModal.vue";
 
 const props = defineProps({
     container: {
@@ -118,14 +119,55 @@ onMounted(() => {
 
 const mhblId = ref(null);
 const showConfirmViewMHBLModal = ref(false);
+const showConfirmDeleteMHBLModal = ref(false);
 const confirmViewMHBL = async (id) => {
     mhblId.value = id;
     showConfirmViewMHBLModal.value = true;
 };
 
 const closeShowMHBLModal = () => {
+    mhblId.value = null;
     showConfirmViewMHBLModal.value = false;
 };
+
+const confirmDeleteMHBL = (id) => {
+    mhblId.value = id;
+    showConfirmDeleteMHBLModal.value = true;
+};
+
+const closeConfirmDeleteMHBLModal = () => {
+    showConfirmDeleteMHBLModal.value = false;
+    mhblId.value = null;
+};
+const handleRemoveMHBLFromContainer = () => {
+    router.put(route('loading.containers.unload.mhbl', containerData.value.id), {
+            mhbl_id: mhblId.value
+        },
+        {
+            onSuccess: () => {
+                containerData.value = {
+                    ...containerData.value,
+                    hbls: Object.values(containerData.value.hbls).filter(hbl => {
+                        if (hbl.mhbl && hbl.mhbl.id !== null) {
+                            return hbl.mhbl.id !== mhblId.value;
+                        }
+                        return true;
+                    })
+                };
+                closeConfirmDeleteMHBLModal();
+                if (containerData.value.hbls.length === 0) {
+                    router.visit(route('loading.loaded-containers.index'));
+                }
+                push.success('Unloaded successfully!');
+            },
+            onError: () => {
+                console.error('Something went to wrong!');
+            },
+            preserveScroll: true,
+            preserveState: true,
+        }
+    )
+}
 </script>
 
 <template>
@@ -240,7 +282,7 @@ const closeShowMHBLModal = () => {
                     <button
                         class="btn size-8 p-0 rounded-full text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
                         x-tooltip.placement.bottom.error="'Remove From Shipment'"
-                        @click.prevent="confirmDeleteHBL(hbl.id)">
+                        @click.prevent="confirmDeleteMHBL(mhbl.id)">
                         <svg class="size-5" fill="none" stroke="currentColor"
                              stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -256,6 +298,8 @@ const closeShowMHBLModal = () => {
     </div>
 
     <DeleteHBLConfirmationModal :show="showConfirmDeleteHBLModal" @close="closeModal" @unload-hbl="handleRemoveHBLFromContainer"/>
+
+    <DeleteMHBLConfirmationModal :show="showConfirmDeleteMHBLModal" @close="closeConfirmDeleteMHBLModal" @unload-mhbl="handleRemoveMHBLFromContainer"/>
 
     <HBLDetailModal
         :hbl-id="hblRecord?.id"
