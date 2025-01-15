@@ -75,4 +75,17 @@ class CashSettlementController extends Controller
 
         return $this->cashSettlementRepository->export($filters);
     }
+    public function duePaymentindex()
+    {
+        $this->authorize('cash.index');
+
+        $drivers = $this->driverRepository->getAllDrivers();
+        $officers = [];
+
+        return Inertia::render('DuePayment/DuePaymentList', [
+            'drivers' => $drivers,
+            'officers' => $officers,
+            'paymentStatus' => HBLPaymentStatus::cases(),
+        ]);
+    }
 }
