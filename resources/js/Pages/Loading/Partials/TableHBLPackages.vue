@@ -4,6 +4,7 @@ import {push} from "notivue";
 import {onMounted, ref, watchEffect} from "vue";
 import DeleteHBLConfirmationModal from "@/Pages/Loading/Partials/DeleteHBLConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import MHBLDetailModal from "@/Pages/Common/MHBLDetailModal.vue";
 
 const props = defineProps({
     container: {
@@ -114,6 +115,17 @@ const fetchPackageCount = async () => {
 onMounted(() => {
     fetchPackageCount()
 });
+
+const mhblId = ref(null);
+const showConfirmViewMHBLModal = ref(false);
+const confirmViewMHBL = async (id) => {
+    mhblId.value = id;
+    showConfirmViewMHBLModal.value = true;
+};
+
+const closeShowMHBLModal = () => {
+    showConfirmViewMHBLModal.value = false;
+};
 </script>
 
 <template>
@@ -221,7 +233,7 @@ onMounted(() => {
                     <button
                         class="btn size-8 p-0 rounded-full text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
                         x-tooltip.placement.bottom.error="'Show HBL'"
-                        @click.prevent="confirmViewHBL(hbl.id)">
+                        @click.prevent="confirmViewMHBL(mhbl.id)">
                         <svg  class="size-5 icon icon-tabler icons-tabler-outline icon-tabler-eye"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
                     </button>
 
@@ -249,5 +261,11 @@ onMounted(() => {
         :hbl-id="hblRecord?.id"
         :show="showConfirmViewHBLModal"
         @close="closeShowHBLModal"
+    />
+
+    <MHBLDetailModal
+        :mhbl-id="mhblId"
+        :show="showConfirmViewMHBLModal"
+        @close="closeShowMHBLModal"
     />
 </template>
