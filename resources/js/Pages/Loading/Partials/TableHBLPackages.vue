@@ -50,7 +50,7 @@ const handleRemoveHBLFromContainer = () => {
             onSuccess: () => {
                 containerData.value = {
                     ...containerData.value,
-                    hbls: Object.values(containerData.value.hbls).hbls.filter(hbl => hbl.id !== hblId.value)
+                    hbls: Object.values(containerData.value.hbls).filter(hbl => hbl.id !== hblId.value)
                 };
                 closeModal();
                 if (containerData.value.hbls.length === 0) {
