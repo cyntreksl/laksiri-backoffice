@@ -390,8 +390,8 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         try {
             $destination_branch = Branch::where('name', '=', $data['warehouse'])->get();
-            $packagesRules = GetHBLPackageRules::run($data['cargo_type'], $data['hbl_type'], $destination_branch[0]['id']);
-            $priceRules = GetPriceRulesByCargoModeAndHBLType::run($data['cargo_type'], $data['hbl_type'], $destination_branch[0]['id']);
+            $packagesRules = GetHBLPackageRules::run($data['cargo_type'] ?? '', $data['hbl_type'] ?? '', $destination_branch[0]['id'] ?? 0);
+            $priceRules = GetPriceRulesByCargoModeAndHBLType::run($data['cargo_type'] ?? '', $data['hbl_type'] ?? '', $destination_branch[0]['id'] ?? 0);
 
             return response()->json(['package_rules' => $packagesRules, 'price_rules' => $priceRules]);
         } catch (\Exception $e) {
