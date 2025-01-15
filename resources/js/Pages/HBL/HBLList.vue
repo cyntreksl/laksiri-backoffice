@@ -522,19 +522,28 @@ const constructUrl = () => {
 const applyFilters = () => {
     showFilters.value = false;
     const newUrl = constructUrl();
-
     const visibleColumns = Object.keys(data.columnVisibility);
+
     grid.updateConfig({
         server: {
             url: newUrl,
-            then: (data) =>
-                data.data.map((item) => {
+            then: (data) => {
+                if (data.data.length === 0) {
+                    // Return a placeholder row for "No matching data"
+                    return [
+                        visibleColumns.map(() => "No matching data found"),
+                    ];
+                }
+
+                // Map the data to visible columns
+                return data.data.map((item) => {
                     const row = [];
                     visibleColumns.forEach((column) => {
                         row.push(item[column]);
                     });
                     return row;
-                }),
+                });
+            },
             total: (response) => {
                 if (response && response.meta) {
                     return response.meta.total;
@@ -544,6 +553,7 @@ const applyFilters = () => {
             },
         },
     });
+
     grid.forceRender();
 };
 
