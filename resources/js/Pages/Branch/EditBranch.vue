@@ -520,77 +520,38 @@ const clearSealFileInput = () => {
                     </div>
                 </div>
                 <!-- seal -->
-<!--                <div class="card px-4 py-4 sm:px-5">-->
-<!--                    <div class="grid grid-cols-2">-->
-<!--                        <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">-->
-<!--                            Manifest Seal (Max: 600px x 600px)-->
-<!--                        </h2>-->
-<!--                    </div>-->
-<!--                    <div class="grid sm:grid-cols-4 gap-5 mt-3">-->
-<!--                        <div class="sm:col-span-4">-->
-<!--                            <div>-->
-<!--                                <input-->
-<!--                                    id="seal"-->
-<!--                                    ref="sealInput"-->
-<!--                                    class="hidden"-->
-<!--                                    type="file"-->
-<!--                                    @change="updateSealPreview"-->
-<!--                                >-->
-
-<!--                                &lt;!&ndash; Current  Photo &ndash;&gt;-->
-<!--                                <div v-show="!sealPreview" class="mt-2">-->
-<!--                                    <img v-if="settings && settings.seal_url" :src="settings.seal_url" alt="seal" class="rounded-full h-20 w-20 object-cover">-->
-<!--                                </div>-->
-
-<!--                                &lt;!&ndash; New Photo Preview &ndash;&gt;-->
-<!--                                <div v-show="sealPreview" class="mt-2">-->
-<!--                    <span-->
-<!--                        :style="'background-image: url(\'' + sealPreview + '\');'"-->
-<!--                        class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"-->
-<!--                    />-->
-<!--                                </div>-->
-
-<!--                                <SecondaryButton class="mt-2 me-2" type="button" @click.prevent="selectNewSeal">-->
-<!--                                    Select A New Seal-->
-<!--                                </SecondaryButton>-->
-
-<!--                                <InputError :message="settingForm.errors.seal" class="mt-2" />-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
                 <div class="card px-4 py-4 sm:px-5">
                     <div class="grid grid-cols-2">
                         <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                            Invoice Logo (Max: 600px x 600px)
+                            Manifest Seal (Max: 600px x 600px)
                         </h2>
                     </div>
                     <div class="grid sm:grid-cols-4 gap-5 mt-3">
                         <div class="sm:col-span-4">
                             <div>
                                 <input
-                                    id="photo"
-                                    ref="photoInput"
+                                    id="seal"
+                                    ref="sealInput"
                                     class="hidden"
                                     type="file"
-                                    @change="updatePhotoPreview"
+                                    @change="updateSealPreview"
                                 >
 
-                                <!-- Current Profile Photo -->
-                                <div v-show="!photoPreview" class="mt-2">
-                                    <img v-if="settings && settings.seal_url" :src="settings.seal_url" alt="logo" class="rounded-full h-20 w-20 object-cover">
+                                <!-- Current  Photo -->
+                                <div v-show="!sealPreview" class="mt-2">
+                                    <img v-if="settings && settings.seal_url" :src="settings.seal_url" alt="seal" class="rounded-full h-20 w-20 object-cover">
                                 </div>
 
-                                <!-- New Profile Photo Preview -->
-                                <div v-show="photoPreview" class="mt-2">
+                                <!-- New Photo Preview -->
+                                <div v-show="sealPreview" class="mt-2">
                     <span
-                        :style="'background-image: url(\'' + photoPreview + '\');'"
+                        :style="'background-image: url(\'' + sealPreview + '\');'"
                         class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"
                     />
                                 </div>
 
-                                <SecondaryButton class="mt-2 me-2" type="button" @click.prevent="selectNewPhoto">
-                                    Select A New Logo
+                                <SecondaryButton class="mt-2 me-2" type="button" @click.prevent="selectNewSeal">
+                                    Select A New Seal
                                 </SecondaryButton>
 
                                 <InputError :message="settingForm.errors.seal" class="mt-2" />
@@ -598,7 +559,6 @@ const clearSealFileInput = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </AppLayout>

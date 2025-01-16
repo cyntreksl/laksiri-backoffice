@@ -40,8 +40,8 @@ class Setting extends Model
     public function sealUrl(): Attribute
     {
         return Attribute::get(function (): string {
-//            return Storage::disk('s3')->url($this->seal);
-             return $this->seal ? Storage::disk('s3')->url($this->seal) : ''; // This is alternative way to write the above line
+            //            return Storage::disk('s3')->url($this->seal);
+            return $this->seal ? Storage::disk('s3')->url($this->seal) : ''; // This is alternative way to write the above line
         });
     }
 }
