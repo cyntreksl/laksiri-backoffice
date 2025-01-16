@@ -16,6 +16,7 @@ use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\ContainerDocument\DeleteDocument;
 use App\Actions\ContainerDocument\DownloadDocument;
 use App\Actions\ContainerDocument\UploadDocument;
+use App\Actions\MHBL\GetMHBLById;
 use App\Actions\Setting\GetSettings;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
 use App\Enum\ContainerStatus;
@@ -101,6 +102,30 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
                 UpdateContainerStatus::run($container, ContainerStatus::REQUESTED->value);
             }
 
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception('Failed to unload hbl from container: '.$e->getMessage());
+        }
+    }
+
+    public function unloadMHBLFromContainer(array $data, Container $container)
+    {
+        try {
+            DB::beginTransaction();
+
+            $mhblsHBL = GetMHBLById::run($data['mhbl_id'])->hbls;
+
+            foreach ($mhblsHBL as $hbl) {
+                $hblData = [
+                    'hbl_id' => $hbl->id,
+                ];
+                UnloadHBL::run($hblData, $container);
+
+                if (! $container->hbl_packages()->exists()) {
+                    UpdateContainerStatus::run($container, ContainerStatus::REQUESTED->value);
+                }
+            }
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
