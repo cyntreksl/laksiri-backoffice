@@ -33,6 +33,6 @@ Route::name('back-office.')->group(function () {
     Route::post('revert-to-cash-settlement', [WarehouseController::class, 'revertToCashSettlement']);
 
     //Due Payment
-    Route::get('duepayments', [CashSettlementController::class, 'duePaymentindex'])
-        ->name('duepayments.duePaymentindex');
+    Route::get('duepayments', [CashSettlementController::class, 'duePaymentIndex'])
+        ->name('duepayments.duePaymentIndex');
 });

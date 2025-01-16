@@ -76,7 +76,7 @@ class CashSettlementController extends Controller
         return $this->cashSettlementRepository->export($filters);
     }
 
-    public function duePaymentindex()
+    public function duePaymentIndex()
     {
         $this->authorize('cash.index');
 

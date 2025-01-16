@@ -91,30 +91,7 @@ const selectedData = ref([]);
 
 const createColumns = () => [
     {
-        // name: "#",
-        // formatter: (_, row) => {
-        //     return h("input", {
-        //         type: "checkbox",
-        //         className:
-        //             "form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent",
-        //         onChange: (event) => {
-        //             const isChecked = event.target.checked;
-        //             if (isChecked) {
-        //                 const rowData = row.cells.map((cell) => cell.data); // Extract data from cells array
-        //                 selectedData.value.push(rowData); // Push extracted data into selectedData
-        //             } else {
-        //                 // Remove the specific row from selectedData (assuming uniqueness of rows)
-        //                 const index = selectedData.value.findIndex((selectedRow) => {
-        //                     const rowData = row.cells.map((cell) => cell.data);
-        //                     return JSON.stringify(selectedRow) === JSON.stringify(rowData);
-        //                 });
-        //                 if (index !== -1) {
-        //                     selectedData.value.splice(index, 1);
-        //                 }
-        //             }
-        //         },
-        //     });
-        // },
+
     },
     {name: "HBL", hidden: !data.columnVisibility.hbl},
     {name: "Name", hidden: !data.columnVisibility.hbl_name},
@@ -876,21 +853,6 @@ const shipIcon = ref(`
                                 </button>
                             </a>
                         </div>
-<!--                        <div>-->
-<!--                            <button-->
-<!--                                v-if="$page.props.user.permissions.includes('cash.cash received')"-->
-<!--                                :class="{-->
-<!--                  'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90':-->
-<!--                    !isDataEmpty,-->
-<!--                  'bg-gray-300 cursor-not-allowed': isDataEmpty,-->
-<!--                }"-->
-<!--                                :disabled="isDataEmpty"-->
-<!--                                class="btn font-medium text-white"-->
-<!--                                @click="cashReceived"-->
-<!--                            >-->
-<!--                                Cash Received-->
-<!--                            </button>-->
-<!--                        </div>-->
                     </div>
                 </div>
                 <div class="mt-3">

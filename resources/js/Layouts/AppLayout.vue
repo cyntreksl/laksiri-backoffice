@@ -1020,7 +1020,7 @@ export default {
                         },
                         {
                             title: "Due Payments",
-                            route: "back-office.duepayments.duePaymentindex",
+                            route: "back-office.duepayments.duePaymentIndex",
                         }
                     );
                     changeSidePanelTitle("Back Office");
