@@ -55,7 +55,7 @@ const filters = reactive({
 const data = reactive({
     columnVisibility: {
         id: false,
-        reference: true,
+        reference: false,
         hbl: true,
         hbl_name: true,
         consignee_name: true,
@@ -426,6 +426,7 @@ const constructUrl = () => {
 const applyFilters = () => {
     showFilters.value = false;
     const newUrl = constructUrl();
+
     const visibleColumns = Object.keys(data.columnVisibility);
     grid.updateConfig({
         server: {
