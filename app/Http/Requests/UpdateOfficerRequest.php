@@ -18,7 +18,6 @@ class UpdateOfficerRequest extends FormRequest
             'name' => ['required', 'string', 'max:254'],
             'mobile_number' => ['required', 'phone:INTERNATIONAL', 'max:20'],
             'email' => [
-                'required_if:type,shipper',
                 'nullable',
                 'email',
                 Rule::unique('officers')->ignore($this->id),
