@@ -60,6 +60,9 @@ Route::name('loading.')->group(function () {
     Route::put('containers/{container}/unload/hbl', [ContainerController::class, 'unloadHBLFromContainer'])
         ->name('containers.unload.hbl');
 
+    Route::put('containers/{container}/unload/mhbl', [ContainerController::class, 'unloadMHBLFromContainer'])
+        ->name('containers.unload.mhbl');
+
     Route::post('containers/get-hbl/packages', [ContainerController::class, 'getHBLWithUnloadedPackages'])
         ->name('containers.get-hbl-with-packages');
 

@@ -75,6 +75,8 @@ const handleBranchUpdate = () => {
 
 const photoPreview = ref(null);
 const photoInput = ref(null);
+const sealPreview = ref(null);
+const sealInput = ref(null);
 const settingForm = useForm({
     invoice_header_title: props.settings ? props.settings.invoice_header_title : '',
     invoice_header_subtitle: props.settings ? props.settings.invoice_header_subtitle : '',
@@ -83,17 +85,22 @@ const settingForm = useForm({
     invoice_footer_title: props.settings ? props.settings.invoice_footer_title : '',
     invoice_footer_text: props.settings ? props.settings.invoice_footer_text : '',
     logo: props.settings ? props.settings.logo : null,
+    seal: props.settings ? props.settings.seal : null,
 });
 
 const handleSettingUpdate = () => {
     if (photoInput.value) {
         settingForm.logo = photoInput.value.files[0];
     }
+    if (sealInput.value) {
+        settingForm.seal = sealInput.value.files[0];
+    }
 
     settingForm.post(route("setting.invoice.update"), {
         onSuccess: () => {
             router.visit(route("branches.edit", props.branch.id));
             clearPhotoFileInput();
+            clearSealFileInput();
             push.success('Invoice Settings updated successfully!');
         },
         onError: () => {
@@ -127,6 +134,30 @@ const clearPhotoFileInput = () => {
         photoInput.value.value = null;
     }
 };
+const selectNewSeal = () => {
+    sealInput.value.click();
+};
+
+const updateSealPreview = () => {
+    const seal = sealInput.value.files[0];
+
+    if (!seal) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        sealPreview.value = e.target.result;
+    };
+
+    reader.readAsDataURL(seal);
+};
+
+const clearSealFileInput = () => {
+    if (sealInput.value?.value) {
+        sealInput.value.value = null;
+    }
+};
+
 
 </script>
 
@@ -485,6 +516,46 @@ const clearPhotoFileInput = () => {
                                              content-type="html" placeholder="Enter Footer Text"/>
                                 <InputError :message="settingForm.errors.invoice_footer_text"/>
                             </label>
+                        </div>
+                    </div>
+                </div>
+                <!-- seal -->
+                <div class="card px-4 py-4 sm:px-5">
+                    <div class="grid grid-cols-2">
+                        <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
+                            Manifest Seal (Max: 600px x 600px)
+                        </h2>
+                    </div>
+                    <div class="grid sm:grid-cols-4 gap-5 mt-3">
+                        <div class="sm:col-span-4">
+                            <div>
+                                <input
+                                    id="seal"
+                                    ref="sealInput"
+                                    class="hidden"
+                                    type="file"
+                                    @change="updateSealPreview"
+                                >
+
+                                <!-- Current  Photo -->
+                                <div v-show="!sealPreview" class="mt-2">
+                                    <img v-if="settings && settings.seal_url" :src="settings.seal_url" alt="seal" class="rounded-full h-20 w-20 object-cover">
+                                </div>
+
+                                <!-- New Photo Preview -->
+                                <div v-show="sealPreview" class="mt-2">
+                    <span
+                        :style="'background-image: url(\'' + sealPreview + '\');'"
+                        class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"
+                    />
+                                </div>
+
+                                <SecondaryButton class="mt-2 me-2" type="button" @click.prevent="selectNewSeal">
+                                    Select A New Seal
+                                </SecondaryButton>
+
+                                <InputError :message="settingForm.errors.seal" class="mt-2" />
+                            </div>
                         </div>
                     </div>
                 </div>

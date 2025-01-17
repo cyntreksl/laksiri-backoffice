@@ -26,7 +26,6 @@ class StoreOfficerRequest extends FormRequest
                 'email',
                 'unique:officers,email',
                 'max:254',
-                'required_if:type,shipper',
             ],
             'mobile_number' => ['required', 'phone:INTERNATIONAL'],
             'pp_or_nic_no' => ['required', 'max:254'],
