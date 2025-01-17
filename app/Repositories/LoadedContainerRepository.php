@@ -106,7 +106,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $pdf = PDF::loadView('exports.shipments', ['data' => $data, 'container' => $container, 'settings' => $settings]);
         $pdf->setPaper('a3', 'portrait');
 
-        return $pdf->stream($filename);
+        return $pdf->download($filename);
     }
 
     public function updateVerificationStatus(array $data)
