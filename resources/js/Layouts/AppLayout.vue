@@ -1017,6 +1017,10 @@ export default {
                         {
                             title: "Warehouse",
                             route: "back-office.warehouses.index",
+                        },
+                        {
+                            title: "Due Payments",
+                            route: "back-office.duepayments.duePaymentIndex",
                         }
                     );
                     changeSidePanelTitle("Back Office");
