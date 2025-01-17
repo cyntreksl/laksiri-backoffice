@@ -17,7 +17,7 @@ class Setting extends Model
     use HasFile;
 
     protected $fillable = [
-        'branch_id', 'invoice_header_title', 'invoice_header_subtitle', 'invoice_header_address', 'invoice_header_telephone', 'invoice_footer_title', 'invoice_footer_text', 'logo',
+        'branch_id', 'invoice_header_title', 'invoice_header_subtitle', 'invoice_header_address', 'invoice_header_telephone', 'invoice_footer_title', 'invoice_footer_text', 'logo', 'seal',
     ];
 
     /**
@@ -27,12 +27,20 @@ class Setting extends Model
      */
     protected $appends = [
         'logo_url',
+        'seal_url',
     ];
 
     public function logoUrl(): Attribute
     {
         return Attribute::get(function (): string {
             return Storage::disk('s3')->url($this->logo);
+        });
+    }
+
+    public function sealUrl(): Attribute
+    {
+        return Attribute::get(function (): string {
+            return $this->seal ? Storage::disk('s3')->url($this->seal) : '';
         });
     }
 }
