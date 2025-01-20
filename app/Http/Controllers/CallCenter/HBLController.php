@@ -5,6 +5,7 @@ namespace App\Http\Controllers\CallCenter;
 use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Enum\HBLPaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\CallCenter\HBLRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
@@ -21,6 +22,7 @@ class HBLController extends Controller
         private readonly HBLRepositoryInterface $HBLRepository,
         private readonly UserRepositoryInterface $userRepository,
         private readonly PriceRepositoryInterface $priceRepository,
+        private readonly DriverRepositoryInterface $driverRepository,
     ) {
     }
 
@@ -62,7 +64,9 @@ class HBLController extends Controller
     {
         $this->authorize('hbls.index');
 
-        return Inertia::render('CallCenter/HBL/HBLDoorToDoorList', []);
+        return Inertia::render('CallCenter/HBL/HBLDoorToDoorList', [
+            'drivers' => $this->driverRepository->getAllDrivers(),
+        ]);
     }
 
     public function getDoorToDoorList(Request $request): JsonResponse
