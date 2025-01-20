@@ -7,6 +7,7 @@ use App\Interfaces\BondedWarehouseRepositoryInterface;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\CallCenter\BonedAreaRepositoryInterface;
 use App\Interfaces\CallCenter\CashierRepositoryInterface;
+use App\Interfaces\CallCenter\DeliveryRepositoryInterface;
 use App\Interfaces\CallCenter\ExaminationRepositoryInterface;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
 use App\Interfaces\CallCenter\UserFeedbackRepositoryInterface;
@@ -42,6 +43,7 @@ use App\Repositories\BondedWarehouseRepository;
 use App\Repositories\BranchRepository;
 use App\Repositories\CallCenter\BonedAreaRepository;
 use App\Repositories\CallCenter\CashierRepository;
+use App\Repositories\CallCenter\DeliveryRepository;
 use App\Repositories\CallCenter\ExaminationRepository;
 use App\Repositories\CallCenter\QueueRepository;
 use App\Repositories\CallCenter\UserFeedbackRepository;
@@ -116,6 +118,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CountryRepositoryInterface::class, CountryRepository::class);
         $this->app->bind(OfficerRepositoryInterface::class, OfficerRepository::class);
         $this->app->bind(MHBLRepositoryInterface::class, MHBLRepository::class);
+        $this->app->bind(DeliveryRepositoryInterface::class, DeliveryRepository::class);
     }
 
     public function boot(): void
