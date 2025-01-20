@@ -22,6 +22,7 @@ import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import {forEach} from "vuedraggable/dist/vuedraggable.common.js";
 import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
+import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 
 const props = defineProps({
     drivers: {
@@ -795,7 +796,7 @@ const shipIcon = ref(`
 `);
 </script>
 <template>
-    <AppLayout title="Door to Door HBL List">
+    <DestinationAppLayout title="Door to Door HBL List">
         <template #header>Door to Door HBL List</template>
 
         <Breadcrumb/>
@@ -1294,5 +1295,5 @@ const shipIcon = ref(`
             :hbl-id="hblId"
             :show="showConfirmViewCallFlagModal"
             @close="closeCallFlagModal"/>
-    </AppLayout>
+    </DestinationAppLayout>
 </template>
