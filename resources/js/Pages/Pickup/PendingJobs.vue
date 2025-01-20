@@ -736,15 +736,20 @@ const applyFilters = () => {
         server: {
             url: newUrl,
             then: (data) => {
-                totalPickups.value = data.meta.total;
+                if (data.data.length === 0) {
+                    // Display a message when no matching data is found
+                    return [
+                        visibleColumns.map(() => "No matching data found"),
+                    ];
+                }
+
                 return data.data.map((item) => {
                     const row = [];
-                    row.push({id: item.id});
                     visibleColumns.forEach((column) => {
                         row.push(item[column]);
                     });
                     return row;
-                })
+                });
             },
             total: (response) => {
                 if (response && response.meta) {
@@ -755,7 +760,6 @@ const applyFilters = () => {
             },
         },
     });
-
     grid.forceRender();
 };
 
