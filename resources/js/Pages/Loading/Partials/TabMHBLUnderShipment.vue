@@ -26,6 +26,7 @@ const closeModal = () => {
 }
 const filteredHBLS = ref([]);
 const hblsCount = ref(0)
+const mhblsCount = ref(0);
 const filteredHBLSPackagesCount = ref(0);
 const filteredHBLSPackagesWeight = ref(0);
 const filteredHBLSPackagesVolume = ref(0);
@@ -49,6 +50,9 @@ const hbls = () => {
     filteredHBLSPackagesVolume.value = filteredHblPackages.reduce((sum, pkg) => {
         return sum + (pkg.volume || 0);  // Ensure pkg.weight exists
     }, 0);
+    //counting mhbls
+    const mhblSet = new Set(filteredHBLS.value.map(hbl => hbl.mhbl));
+    mhblsCount.value = mhblSet.size;
 }
 hbls();
 </script>
@@ -82,6 +86,19 @@ hbls();
 
         <div class="flex gap-3 my-3">
             <SimpleOverviewWidget :count="hblsCount || 0" title="HBL">
+                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-app-window text-info"
+                     fill="none" height="24" stroke="currentColor"
+                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                     width="24"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                    <path
+                        d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/>
+                    <path d="M6 8h.01"/>
+                    <path d="M9 8h.01"/>
+                </svg>
+            </SimpleOverviewWidget>
+            <SimpleOverviewWidget :count="mhblsCount || 0" title="MHBL">
                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-app-window text-info"
                      fill="none" height="24" stroke="currentColor"
                      stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
