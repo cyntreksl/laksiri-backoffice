@@ -606,49 +606,6 @@ const mhblFrom = useForm({
     warehouse: '',
 });
 
-const createMHBL = async () => {
-    console.log(selectedData.value);
-    const idList = selectedData.value.map((item) => item[0]);
-    mhblFrom.hbls = idList;
-    mhblFrom.get(route("mhbls.create"), {
-        onSuccess: () => {
-            form.reset();
-        },
-        onError: () => {
-            push.error('Something went to wrong!');
-        },
-        preserveScroll: true,
-        preserveState: true,
-    });
-};
-
-watch(
-    () => selectedData.value.length,
-    (newCount) => {
-        const cargo_mode=selectedData.value[0][11];
-        const hbl_type=selectedData.value[0][12];
-        const warehouse = selectedData.value[0][13];
-        const checkEqualCargoMode = selectedData.value.every((item, index) => {
-            return item[11] === cargo_mode;
-        });
-        const checkEqualHBLType = selectedData.value.every((item, index) => {
-            return item[12] === hbl_type;
-        });
-        const checkEqualWarehouse = selectedData.value.every((item, index) => {
-            return item[13] === warehouse;
-        });
-
-        if(checkEqualCargoMode && checkEqualHBLType && warehouse){
-            isCreateMHBL.value = true;
-        } else isCreateMHBL.value = false;
-
-        mhblFrom.cargo_type = cargo_mode;
-        mhblFrom.hbl_type = hbl_type;
-        mhblFrom.warehouse = warehouse;
-    }
-);
-
-const isCreateMHBL = ref(false);
 const countOfSelectedData = computed(() => selectedData.value.length);
 const valueOfSelectedData = computed(() => {
     return selectedData.value.reduce((total, item) => {
@@ -1095,16 +1052,9 @@ const shipIcon = ref(`
                         </div>
                         <div>
                             <button
-                                :class="{
-                                  'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90':
-                                    isCreateMHBL,
-                                  'bg-gray-300 cursor-not-allowed': !isCreateMHBL,
-                                }"
-                                :disabled="!isCreateMHBL"
-                                class="btn font-medium text-white"
-                                @click="createMHBL"
+                                class="btn font-medium text-white bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                             >
-                                Create MHBL
+                                Assign Driver
                             </button>
                         </div>
                     </div>
