@@ -57,7 +57,6 @@ const filters = reactive({
     hblType: ["Door to Door"],
     isHold: false,
     warehouse: ["COLOMBO", "NINTAVUR", "OTHER"],
-    createdBy: "",
     paymentStatus: [],
 });
 
@@ -1206,24 +1205,6 @@ const shipIcon = ref(`
                 </label>
 
                 <FilterBorder/>
-
-                <FilterHeader value="Created By"/>
-
-                <select
-                    v-model="filters.createdBy"
-                    autocomplete="off"
-                    class="w-full"
-                    multiple
-                    placeholder="Select a User..."
-                    x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                >
-                    <option v-for="user in users" :value="user.id">
-                        {{ user.name }}
-                    </option>
-                </select>
 
 
             </template>
