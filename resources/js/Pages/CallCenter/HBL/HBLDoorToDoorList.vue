@@ -499,7 +499,7 @@ const createColumns = () => [
 
 ];
 
-const baseUrl = ref("/hbl-door-to-door-list");
+const baseUrl = ref("/call-center/hbl-door-to-door-list");
 
 const constructUrl = () => {
     const params = new URLSearchParams();
