@@ -211,8 +211,6 @@
     <div style="text-align: right; margin-top: 20px;">
         @if($settings->seal_url)
             <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto;">
-        @else
-            <p>No seal available</p>
         @endif
     </div>
     <div class="footer">
