@@ -158,8 +158,11 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ], 'like', '%'.$search.'%');
         }
 
+//        dd($filters);
+
         //apply filters
         FilterFactory::apply($query, $filters);
+//        dd($query->get());
 
         $countQuery = $query;
         $totalRecords = $countQuery->count();
