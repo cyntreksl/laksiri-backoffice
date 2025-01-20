@@ -3,7 +3,6 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h, html} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
 import moment from "moment";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
@@ -14,11 +13,9 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {Link, router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import DeletePickupConfirmationModal from "@/Pages/Pickup/Partials/DeletePickupConfirmationModal.vue";
-import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import RetryPickupConfirmationModal from "@/Pages/Pickup/Partials/RetryPickupConfirmationModal.vue";
 
@@ -53,6 +50,8 @@ const filters = reactive({
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo"],
     createdBy: "",
+    driver: "",
+    status: "",
     zoneBy: "",
 });
 
@@ -69,7 +68,7 @@ const data = reactive({
         pickup_type: true,
         packages: false,
         exception_note: true,
-        status: true, // Ensure status column is visible
+        status: true,
         actions: true,
     },
 });
@@ -673,6 +672,8 @@ const resetFilter = () => {
     filters.toDate = toDate;
     filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
     filters.createdBy = "";
+    filters.driver = "";
+    filters.status = "";
     filters.zoneBy = "";
     applyFilters();
 };
@@ -962,19 +963,19 @@ const shipIcon = ref(`
             <template #title> Filter All Pickups</template>
 
             <template #content>
-
                 <div class="flex justify-between space-x-2">
                     <!--Filter Now Action Button-->
                     <SoftPrimaryButton class="space-x-2" @click="applyFilters">
                         <i class="fa-solid fa-filter"></i>
                         <span>Apply Filters</span>
                     </SoftPrimaryButton>
-                    <!--Filter Rest Button-->
+                    <!--Filter Reset Button-->
                     <SoftPrimaryButton class="space-x-2" @click="resetFilter">
                         <i class="fa-solid fa-refresh"></i>
                         <span>Reset Filters</span>
                     </SoftPrimaryButton>
                 </div>
+
                 <div>
                     <InputLabel value="From"/>
                     <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
@@ -1029,6 +1030,47 @@ const shipIcon = ref(`
 
                 <FilterBorder/>
 
+                <FilterHeader value="Status"/>
+
+                <select
+                    v-model="filters.status"
+                    autocomplete="off"
+                    class="w-full"
+                    multiple
+                    placeholder="Select a Status..."
+                    x-init="$el._tom = new Tom($el,{
+            plugins: ['remove_button'],
+            create: true,
+          })"
+                >
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+
+                </select>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Driver"/>
+
+                <select
+                    v-model="filters.driver"
+                    autocomplete="off"
+                    class="w-full"
+                    multiple
+                    placeholder="Select a Driver..."
+                    x-init="$el._tom = new Tom($el,{
+            plugins: ['remove_button'],
+            create: true,
+          })"
+                >
+                    <option v-for="driver in drivers" :value="driver.id">
+                        {{ driver.name }}
+                    </option>
+                </select>
+
+                <FilterBorder/>
+
                 <FilterHeader value="Zone"/>
 
                 <select
@@ -1046,7 +1088,6 @@ const shipIcon = ref(`
                         {{ zone.zone_name }}
                     </option>
                 </select>
-
             </template>
         </FilterDrawer>
 
