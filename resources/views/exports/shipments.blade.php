@@ -208,6 +208,11 @@
     <p><b> {{$settings?->invoice_header_title}}</b></p>
     <p><b>{{$settings?->invoice_header_address}}</b></p>
 
+    <div style="text-align: right; margin-top: 20px;">
+        @if($settings->seal_url)
+            <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto;">
+        @endif
+    </div>
     <div class="footer">
         <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_header_title}}</div>
         <span class="page-number">Page: </span>

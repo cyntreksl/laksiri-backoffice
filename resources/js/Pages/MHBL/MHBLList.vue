@@ -300,14 +300,22 @@ const applyFilters = () => {
     grid.updateConfig({
         server: {
             url: newUrl,
-            then: (data) =>
-                data.data.map((item) => {
+            then: (data) => {
+                if (data.data.length === 0) {
+                    // Display a message when no matching data is found
+                    return [
+                        visibleColumns.map(() => "No matching data found"),
+                    ];
+                }
+
+                return data.data.map((item) => {
                     const row = [];
                     visibleColumns.forEach((column) => {
                         row.push(item[column]);
                     });
                     return row;
-                }),
+                });
+            },
             total: (response) => {
                 if (response && response.meta) {
                     return response.meta.total;

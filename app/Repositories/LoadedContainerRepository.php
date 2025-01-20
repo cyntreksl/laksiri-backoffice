@@ -99,6 +99,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
         $export = new LoadedContainerManifestExport($container);
         $settings = GetSettings::run();
+
         $data = array_filter($export->prepareData(), function ($item) {
             return isset($item[0]) && $item[0] !== '';
         });
