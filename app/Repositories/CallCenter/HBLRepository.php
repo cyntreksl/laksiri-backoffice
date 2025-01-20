@@ -137,6 +137,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             $query = HBL::query()
                 ->where('hbl_type', '=', HBLType::DOOR_TO_DOOR->value)
                 ->where('system_status', '>=', 4.3)
+                ->where('is_released', 0)
                 ->where(function ($query) {
                     $query->where('status', '!=', 'draft')
                         ->orWhereNull('status');
