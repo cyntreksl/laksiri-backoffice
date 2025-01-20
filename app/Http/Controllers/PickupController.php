@@ -157,4 +157,19 @@ class PickupController extends Controller
             'userData' => $user,
         ]);
     }
+
+    public function allPickups()
+    {
+        $this->authorize('pickups.allPickups');
+
+        $pickups = $this->pickupRepository->getPickups();
+
+        return Inertia::render('Pickup/AllPickups', [
+            'drivers' => $this->driverRepository->getAllDrivers(),
+            'users' => $this->userRepository->getUsers(['customer']),
+            'zones' => $this->zoneRepository->getZones(),
+            'pickups' => $pickups,
+
+        ]);
+    }
 }
