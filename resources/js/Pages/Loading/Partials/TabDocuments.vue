@@ -1,16 +1,14 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
-import {ref} from "vue";
-import {router, useForm, usePage} from "@inertiajs/vue3";
-import {push} from "notivue";
+import { ref, computed } from "vue";
+import { router, useForm, usePage } from "@inertiajs/vue3";
+import { push } from "notivue";
 import DeleteDocConfirmationModal from "@/Pages/Loading/Partials/DeleteDocConfirmationModal.vue";
-//my vue file
 import vueFilePond from "vue-filepond";
 import 'filepond/dist/filepond.min.css';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css';
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-
 
 const props = defineProps({
     containerId: {
@@ -29,8 +27,10 @@ const csrfToken = usePage().props.csrf;
 const containerDocumentsRecords = ref([]);
 
 const blVerification = ref('Not Verified');
-const manifestVerification= ref('Not Verified');
-const freightChargeVerification= ref('Not Verified');
+const manifestVerification = ref('Not Verified');
+const freightChargeVerification = ref('Not Verified');
+
+const currentBranch = computed(() => usePage().props.currentBranch.type);
 
 const fetchContainerDocuments = async () => {
     try {
@@ -47,9 +47,9 @@ const fetchContainerDocuments = async () => {
         } else {
             containerDocumentsRecords.value = await response.json();
         }
-        containerDocumentsRecords.value.find(doc => doc.document_name === 'BL From Shipping Line')?.is_verified === 1 ? blVerification.value='Verified': blVerification.value='Not Verified'
-        containerDocumentsRecords.value.find(doc => doc.document_name === 'Manifest')?.is_verified === 1 ? manifestVerification.value='Verified': manifestVerification.value='Not Verified'
-        containerDocumentsRecords.value.find(doc => doc.document_name === 'Receipt for Freight Charges')?.is_verified === 1 ? freightChargeVerification.value='Verified': freightChargeVerification.value='Not Verified'
+        containerDocumentsRecords.value.find(doc => doc.document_name === 'BL From Shipping Line')?.is_verified === 1 ? blVerification.value = 'Verified' : blVerification.value = 'Not Verified'
+        containerDocumentsRecords.value.find(doc => doc.document_name === 'Manifest')?.is_verified === 1 ? manifestVerification.value = 'Verified' : manifestVerification.value = 'Not Verified'
+        containerDocumentsRecords.value.find(doc => doc.document_name === 'Receipt for Freight Charges')?.is_verified === 1 ? freightChargeVerification.value = 'Verified' : freightChargeVerification.value = 'Not Verified'
     } catch (error) {
         console.error(error.message);
     }
@@ -100,7 +100,7 @@ const handleFileUpload = () => {
             fetchContainerDocuments();
         },
         onError: () => {
-            push.error('Something went to wrong!')
+            push.error('Something went wrong!')
         }
     })
 }
@@ -114,7 +114,7 @@ const fileUploads = () => {
             fetchContainerDocuments();
         },
         onError: () => {
-            push.error('Something went to wrong!')
+            push.error('Something went wrong!')
         }
     })
 }
@@ -145,20 +145,20 @@ const handleDeleteDoc = () => {
         },
     });
 };
-const verifyContainerDocuments = async (event,docId, docName) => {
+const verifyContainerDocuments = async (event, docId, docName) => {
     const isChecked = event.target.checked; // Checkbox value
-    if(isChecked){
-        if(docName === 'BL From Shipping Line'){
+    if (isChecked) {
+        if (docName === 'BL From Shipping Line') {
             blVerification.value = 'Verified'
-        } else if(docName === 'Manifest'){
+        } else if (docName === 'Manifest') {
             manifestVerification.value = 'Verified'
         } else {
             freightChargeVerification.value = 'Verified';
         }
-    }else {
-        if(docName === 'BL From Shipping Line'){
+    } else {
+        if (docName === 'BL From Shipping Line') {
             blVerification.value = 'Not Verified'
-        } else if(docName === 'Manifest'){
+        } else if (docName === 'Manifest') {
             manifestVerification.value = 'Not Verified'
         } else {
             freightChargeVerification.value = 'Not Verified';
@@ -180,19 +180,23 @@ const verifyContainerDocuments = async (event,docId, docName) => {
 
         if (!response.ok) {
             throw new Error('Network response was not ok.');
-        }else {
+        } else {
             const data = await response.json();
             push.success(data.message);
         }
 
     } catch (error) {
-        console.error( error.message);
+        console.error(error.message);
 
     }
 };
 
-
-
+const filteredFiles = computed(() => {
+    if (currentBranch.value === 'Destination') {
+        return containerDocumentsRecords.value.filter(file => file.is_verified === 1);
+    }
+    return containerDocumentsRecords.value;
+});
 </script>
 
 <template>
@@ -230,7 +234,7 @@ const verifyContainerDocuments = async (event,docId, docName) => {
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 <label class="inline-flex items-center space-x-2">
-                                    <input :disabled="$page.props.currentBranch.type === 'Destination'"
+                                    <input :disabled="currentBranch === 'Destination'"
                                            v-if="containerDocumentsRecords.some(doc => doc.document_name === 'BL From Shipping Line')"
                                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                            type="checkbox"
@@ -334,12 +338,12 @@ const verifyContainerDocuments = async (event,docId, docName) => {
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 <label class="inline-flex items-center space-x-2">
-                                    <input :disabled="$page.props.currentBranch.type === 'Destination'"
-                                           v-if ="containerDocumentsRecords.some(doc => doc.document_name === 'Manifest')"
+                                    <input :disabled="currentBranch === 'Destination'"
+                                           v-if="containerDocumentsRecords.some(doc => doc.document_name === 'Manifest')"
                                            class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
                                            type="checkbox"
-                                           :checked="containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').is_verified === 1 "
-                                           @change="verifyContainerDocuments($event,containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').id, 'Manifest')"
+                                           :checked="containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').is_verified === 1"
+                                           @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'Manifest').id, 'Manifest')"
 
                                     />
                                 </label>
@@ -437,12 +441,12 @@ const verifyContainerDocuments = async (event,docId, docName) => {
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
                                 <label class="inline-flex items-center space-x-2">
-                                    <input :disabled="$page.props.currentBranch.type === 'Destination'"
-                                           v-if ="containerDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')"
-                                        class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
-                                        type="checkbox"
-                                        :checked="containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').is_verified === 1 "
-                                       @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id, 'Receipt for Freight Charges')"
+                                    <input :disabled="currentBranch === 'Destination'"
+                                           v-if="containerDocumentsRecords.some(doc => doc.document_name === 'Receipt for Freight Charges')"
+                                           class="form-switch h-5 w-10 rounded-full bg-slate-300 before:rounded-full before:bg-slate-50 checked:bg-primary checked:before:bg-white dark:bg-navy-900 dark:before:bg-navy-300 dark:checked:bg-accent dark:checked:before:bg-white"
+                                           type="checkbox"
+                                           :checked="containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').is_verified === 1"
+                                           @change="verifyContainerDocuments($event, containerDocumentsRecords.find(doc => doc.document_name === 'Receipt for Freight Charges').id, 'Receipt for Freight Charges')"
                                     />
                                 </label>
                                 <span :class="{'text-green-600': freightChargeVerification === 'Verified', 'text-red-600': freightChargeVerification !== 'Verified'}" class="ml-6">
@@ -553,7 +557,7 @@ const verifyContainerDocuments = async (event,docId, docName) => {
                                 </thead>
                                 <tbody>
                                 <tr
-                                    v-for="file in containerDocumentsRecords"
+                                    v-for="file in filteredFiles"
                                     :key="file.id"
                                     class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500"
                                 >
@@ -585,7 +589,7 @@ const verifyContainerDocuments = async (event,docId, docName) => {
                                         </a>
                                     </td>
                                 </tr>
-                                <tr v-if="containerDocumentsRecords.length === 0">
+                                <tr v-if="filteredFiles.length === 0">
                                     <td
                                         colspan="2"
                                         class="px-4 py-3 text-center text-slate-500 dark:text-navy-200"
@@ -597,7 +601,6 @@ const verifyContainerDocuments = async (event,docId, docName) => {
                             </table>
                         </div>
                     </div>
-
 
                 </div>
 
