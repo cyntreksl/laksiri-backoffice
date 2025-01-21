@@ -88,6 +88,7 @@ class HBL extends Model
         'pickup_id',
         'is_hold',
         'is_short_loading',
+        'is_driver_assigned',
         'shipper_id',
         'consignee_id',
         'is_released',

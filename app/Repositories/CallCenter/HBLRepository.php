@@ -133,22 +133,15 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        if (isset($filters['userData'])) {
-            $query = HBL::query()
-                ->where('hbl_type', '=', HBLType::DOOR_TO_DOOR->value)
-                ->where('system_status', '>=', 4.3)
-                ->where('is_released', 0)
-                ->where(function ($query) {
-                    $query->where('status', '!=', 'draft')
-                        ->orWhereNull('status');
-                })->where('hbl_name', $filters['userData'])
-                ->orWhere('contact_number', $filters['userData']);
-        } else {
-            $query = HBL::query()->where('hbl_type', '=', HBLType::DOOR_TO_DOOR->value)->where(function ($query) {
-                $query->where('status', '!=', 'draft')
+        $query = HBL::query()
+            ->where('hbl_type', '=', HBLType::DOOR_TO_DOOR->value)
+            ->where('system_status', '>=', 4.3)
+            ->where('is_released', '=', 0)
+            ->where('is_driver_assigned', '=', 0)
+            ->where(function ($query) {
+                $query->where('status', '=', 'reached')
                     ->orWhereNull('status');
             });
-        }
 
         if (! empty($search)) {
             $query->whereAny([

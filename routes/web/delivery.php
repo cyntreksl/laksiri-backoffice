@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CallCenter\DeliverController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -18,4 +19,7 @@ Route::name('delivery.')->group(function () {
     Route::get('dispatched-loads', function () {
         return Inertia::render('Delivery/DispatchedLoadList');
     })->name('dispatched-loads.index');
+
+    Route::post('driver/assign', [DeliverController::class, 'assignDriver'])
+        ->name('driver.assign');
 });

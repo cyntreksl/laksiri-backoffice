@@ -23,6 +23,8 @@ import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue"
 import {forEach} from "vuedraggable/dist/vuedraggable.common.js";
 import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
 
 const props = defineProps({
     drivers: {
@@ -55,7 +57,6 @@ const filters = reactive({
     hblType: ["Door to Door"],
     isHold: false,
     warehouse: ["COLOMBO", "NINTAVUR", "OTHER"],
-    createdBy: "",
     paymentStatus: [],
 });
 
@@ -684,6 +685,19 @@ const handlePerPageChange = (event) => {
     grid.forceRender()
 };
 
+const isDataEmpty = computed(() => selectedData.value.length === 0);
+const idList = ref([]);
+const showConfirmAssignDriverModal = ref(false);
+const confirmAssignDriver = () => {
+  idList.value = selectedData.value.map((item) => item[0]);
+  showConfirmAssignDriverModal.value = true;
+};
+
+const closeAssignDriverModal = () => {
+  showConfirmAssignDriverModal.value = false;
+  idList.value = [];
+};
+
 const planeIcon = ref(`
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -1022,11 +1036,32 @@ const shipIcon = ref(`
                             </a>
                         </div>
                         <div>
-                            <button
-                                class="btn font-medium text-white bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                          <PrimaryButton
+                              :disabled="isDataEmpty"
+                              class="flex"
+                              @click="confirmAssignDriver"
+                          >
+                            <svg
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
+                                fill="none"
+                                height="18"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                viewBox="0 0 24 24"
+                                width="18"
+                                xmlns="http://www.w3.org/2000/svg"
                             >
-                                Assign Driver
-                            </button>
+                              <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                              <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
+                              <path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                              <path d="M12 14l0 7"/>
+                              <path d="M10 12l-6.75 -2"/>
+                              <path d="M14 12l6.75 -2"/>
+                            </svg>
+                            Assign Driver ({{ countOfSelectedData }})
+                          </PrimaryButton>
                         </div>
                     </div>
                 </div>
@@ -1038,6 +1073,13 @@ const shipIcon = ref(`
                 </div>
             </div>
         </div>
+
+      <AssignDriverModal
+          :drivers="drivers"
+          :id-list="idList"
+          :show="showConfirmAssignDriverModal"
+          @close="closeAssignDriverModal"
+      />
 
         <FilterDrawer :show="showFilters" @close="showFilters = false">
             <template #title> Filter HBL</template>
@@ -1163,24 +1205,6 @@ const shipIcon = ref(`
                 </label>
 
                 <FilterBorder/>
-
-                <FilterHeader value="Created By"/>
-
-                <select
-                    v-model="filters.createdBy"
-                    autocomplete="off"
-                    class="w-full"
-                    multiple
-                    placeholder="Select a User..."
-                    x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                >
-                    <option v-for="user in users" :value="user.id">
-                        {{ user.name }}
-                    </option>
-                </select>
 
 
             </template>
