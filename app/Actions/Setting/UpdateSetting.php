@@ -17,7 +17,7 @@ class UpdateSetting
         }
         if ($data['seal'] === null) {
             unset($data['seal']);
-        };
+        }
         $data['branch_id'] = GetUserCurrentBranchID::run();
 
         return Setting::updateOrCreate(['branch_id' => $data['branch_id']], $data);
