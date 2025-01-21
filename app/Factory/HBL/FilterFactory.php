@@ -10,7 +10,7 @@ class FilterFactory
 {
     public static function apply(Builder $query, array $filters)
     {
-//        dd($filters);
+        //        dd($filters);
         foreach ($filters as $key => $value) {
             $filter = self::create($key);
             if ($filter instanceof FilterInterface && $value != 'false') {

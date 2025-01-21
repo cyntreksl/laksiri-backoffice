@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,7 +11,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class HBLDeliver extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $table = 'hbl_delivers';
 
@@ -23,6 +24,7 @@ class HBLDeliver extends Model
         'branch_id',
         'hbl_id',
         'driver_id',
+        'deliver_order',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -44,5 +46,10 @@ class HBLDeliver extends Model
     public function driver()
     {
         return $this->belongsTo(User::class, 'driver_id');
+    }
+
+    public function scopeAssignedToDriver(Builder $query): void
+    {
+        $query->where('driver_id', auth()->id());
     }
 }
