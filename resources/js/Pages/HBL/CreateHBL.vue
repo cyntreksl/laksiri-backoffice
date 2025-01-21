@@ -15,7 +15,8 @@ import {push} from "notivue";
 import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-
+import IntlTelInput from "intl-tel-input/vueWithUtils";
+import "intl-tel-input/styles";
 const props = defineProps({
     hblTypes: {
         type: Object,
@@ -1025,18 +1026,10 @@ const confirmViewHBL = async (id) => {
                             <div class="col-span-3">
                                 <span>Mobile Number</span>
                                 <div class="flex -space-x-px">
-                                    <select
-                                        v-model="countryCode"
-                                        class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    >
-                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                            {{ countryCode }}
-                                        </option>
-                                    </select>
 
-                                    <input
+                                    <IntlTelInput
                                         v-model="contactNumber"
-                                        class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        class="form-input custom-width  border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
                                         type="text"
                                     />
@@ -1222,18 +1215,10 @@ const confirmViewHBL = async (id) => {
                             <div class="col-span-2">
                                 <span>Mobile Number</span>
                                 <div class="flex -space-x-px">
-                                    <select
-                                        v-model="consignee_countryCode"
-                                        class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    >
-                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                            {{ countryCode }}
-                                        </option>
-                                    </select>
 
-                                    <input
+                                    <IntlTelInput
                                         v-model="consignee_contact"
-                                        class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        class="form-input custom-width border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
                                         type="text"
                                     />
@@ -2068,3 +2053,8 @@ const confirmViewHBL = async (id) => {
         />
     </AppLayout>
 </template>
+<style>
+.custom-width {
+    width: 545px;
+}
+</style>
