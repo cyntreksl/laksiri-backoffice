@@ -12,6 +12,12 @@ class UpdateSetting
 
     public function handle(array $data)
     {
+        if ($data['logo'] === null) {
+            unset($data['logo']);
+        }
+        if ($data['seal'] === null) {
+            unset($data['seal']);
+        };
         $data['branch_id'] = GetUserCurrentBranchID::run();
 
         return Setting::updateOrCreate(['branch_id' => $data['branch_id']], $data);
