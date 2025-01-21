@@ -3,13 +3,12 @@
 namespace App\Actions\Delivery;
 
 use App\Models\HBLDeliver;
-use App\Models\MHBL;
-use App\Models\MHBLsHBL;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class CreateHBLDelivery{
+class CreateHBLDelivery
+{
     use AsAction;
 
     /**

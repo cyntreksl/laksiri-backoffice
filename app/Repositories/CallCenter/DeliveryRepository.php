@@ -4,8 +4,6 @@ namespace App\Repositories\CallCenter;
 
 use App\Actions\Delivery\CreateHBLDelivery;
 use App\Actions\HBL\MarkAsDriverAssigned;
-use App\Actions\PickUps\AssignDriver;
-use App\Actions\PickUps\GetPickupByIds;
 use App\Interfaces\CallCenter\DeliveryRepositoryInterface;
 
 class DeliveryRepository implements DeliveryRepositoryInterface
@@ -14,7 +12,7 @@ class DeliveryRepository implements DeliveryRepositoryInterface
     {
         $hbl_ids = [];
         foreach ($data['job_ids'] as $job_id) {
-           $hbl_ids[] = $job_id['id'];
+            $hbl_ids[] = $job_id['id'];
         }
         MarkAsDriverAssigned::run($hbl_ids);
 
