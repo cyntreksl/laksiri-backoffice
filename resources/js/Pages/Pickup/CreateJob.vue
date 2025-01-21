@@ -9,7 +9,8 @@ import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import {push} from "notivue";
-import TextInput from "@/Components/TextInput.vue";
+import IntlTelInput from "intl-tel-input/vueWithUtils";
+import "intl-tel-input/styles";
 
 const props = defineProps({
     packageTypes: {
@@ -244,31 +245,16 @@ const shipIcon = ref(`
                                 <InputError :message="form.errors.email"/>
                             </div>
 
-                            <div>
-                                <InputLabel value="Mobile Number"/>
-                                <div class="flex -space-x-px">
-                                    <select
-                                        v-model="countryCode"
-                                        class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    >
-                                        <option
-                                            v-for="(countryCode, index) in countryCodes"
-                                            :key="index"
-                                            :value="countryCode"
-                                        >
-                                            {{ countryCode }}
-                                        </option>
-                                    </select>
-
-                                    <input
-                                        id="telephone"
-                                        v-model="contactNumber"
-                                        class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                        placeholder="123 4567 890"
-                                        type="text"
-                                    />
-                                </div>
-                                <InputError :message="form.errors.contact_number"/>
+                            <div >
+                                <InputLabel for="mobile_number" value="Mobile Number" />
+                                <IntlTelInput
+                                    id="telephone"
+                                    v-model="contactNumber"
+                                    type="text"
+                                    class="custom-width border border-gray-300 rounded-md px-3 py-2 focus:ring-0"
+                                    placeholder="123 4567 890"
+                                />
+                                <InputError :message="form.errors.contact_number" />
                             </div>
 
                             <div class="col-span-2">
@@ -539,3 +525,8 @@ const shipIcon = ref(`
         </form>
     </AppLayout>
 </template>
+<style>
+.custom-width {
+    width: 500px;
+}
+</style>
