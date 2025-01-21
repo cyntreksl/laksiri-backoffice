@@ -23,6 +23,7 @@ class HBLDeliver extends Model
         'branch_id',
         'hbl_id',
         'driver_id',
+        'deliver_order',
     ];
 
     public function getActivitylogOptions(): LogOptions
