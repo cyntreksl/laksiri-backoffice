@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\v1\ExceptionNameController;
 use App\Http\Controllers\Api\v1\HBLController;
 use App\Http\Controllers\Api\v1\PackageTypeController;
 use App\Http\Controllers\Api\v1\PickupController;
+use App\Http\Controllers\CallCenter\DeliverController;
 use Illuminate\Support\Facades\Route;
 
 Route::domain('api.'.config('app.url'))
@@ -42,6 +43,8 @@ Route::domain('api.'.config('app.url'))
         Route::post('/get-hbl-rules', [HBLController::class, 'getHBLRules']);
 
         Route::post('/driver/change-password', [DriverController::class, 'updatePassword']);
+
+        Route::get('/pending-deliver-list', [DeliverController::class, 'index']);
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
