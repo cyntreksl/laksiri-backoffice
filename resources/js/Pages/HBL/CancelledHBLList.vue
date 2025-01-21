@@ -55,7 +55,7 @@ const filters = reactive({
 const data = reactive({
     columnVisibility: {
         id: false,
-        reference: false,
+        reference: true,
         hbl: true,
         hbl_name: true,
         consignee_name: true,
@@ -139,7 +139,7 @@ const initializeGrid = () => {
 
 const createColumns = () => [
     { name: "ID", hidden: !data.columnVisibility.id },
-    {name: "Reference", hidden: true},
+    {name: "Reference", hidden: !data.columnVisibility.reference},
     {
         name: "HBL", hidden: !data.columnVisibility.hbl,
         formatter: (_, row) => {
