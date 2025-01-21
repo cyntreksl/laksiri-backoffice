@@ -45,6 +45,8 @@ Route::domain('api.'.config('app.url'))
         Route::post('/driver/change-password', [DriverController::class, 'updatePassword']);
 
         Route::get('/pending-deliver-list', [DeliverController::class, 'index']);
+
+        Route::get('/delivers/{hblDeliver}', [DeliverController::class, 'show']);
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);

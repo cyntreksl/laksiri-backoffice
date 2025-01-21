@@ -39,4 +39,15 @@ class DeliveryRepository implements DeliveryRepositoryInterface
             return $this->error($e->getMessage(), $e->getCode());
         }
     }
+
+    public function showDeliver(HBLDeliver $hblDeliver): JsonResponse
+    {
+        try {
+            $deliverResource = new HBLDeliverResource($hblDeliver->load('hbl'));
+
+            return $this->success('Success', $deliverResource);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), $e->getCode());
+        }
+    }
 }
