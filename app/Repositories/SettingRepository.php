@@ -16,8 +16,8 @@ class SettingRepository implements SettingRepositoryInterface
             $settings->updateFile($data['logo'], 'logo', 'settings/invoice/logos');
         }
         // seal image
-        if (isset($data['seal'])) {
-            $settings->updateFile($data['seal'], 'seal', 'settings/invoice/logos');
+         if (isset($data['seal'])) {
+            $settings->updateFile($data['seal'], 'seal', 'settings/invoice/seals');
         }
 
     }
