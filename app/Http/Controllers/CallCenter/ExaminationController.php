@@ -54,4 +54,19 @@ class ExaminationController extends Controller
     {
         $this->examinationRepository->releaseHBL($request->all());
     }
+
+    public function showGatePassList()
+    {
+        return Inertia::render('CallCenter/Examination/GatePassList', []);
+    }
+
+    public function getGatePassList(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+
+        return $this->examinationRepository->dataset($limit, $page, $order, $dir);
+    }
 }
