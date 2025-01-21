@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('branch_id');
             $table->unsignedBigInteger('hbl_id');
             $table->unsignedBigInteger('driver_id');
+            $table->float('deliver_order')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

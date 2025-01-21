@@ -971,7 +971,12 @@ export default {
                         {
                             title: "Pickup Exceptions",
                             route: "pickups.exceptions",
+                        },
+                        {
+                            title: "All Pickups",
+                            route: "pickups.all",
                         }
+
                     );
                     changeSidePanelTitle("Pickups");
                     break;

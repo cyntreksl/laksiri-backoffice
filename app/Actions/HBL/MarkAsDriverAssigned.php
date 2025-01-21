@@ -18,6 +18,7 @@ class MarkAsDriverAssigned
 
         return $hbls->map(function ($hbl) {
             $hbl->is_driver_assigned = true;
+
             return $hbl;
         });
     }
