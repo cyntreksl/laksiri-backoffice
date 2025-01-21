@@ -4,6 +4,7 @@ namespace App\Repositories\CallCenter;
 
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLsWithPackages;
+use App\Enum\HBLType;
 use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\CallCenter\HBLRepositoryInterface;
@@ -128,5 +129,61 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function getHBLsWithPackages()
     {
         return GetHBLsWithPackages::run();
+    }
+
+    public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        if (isset($filters['userData'])) {
+            $query = HBL::query()
+                ->where('hbl_type', '=', HBLType::DOOR_TO_DOOR->value)
+                ->where('system_status', '>=', 4.3)
+                ->where('is_released', 0)
+                ->where(function ($query) {
+                    $query->where('status', '!=', 'draft')
+                        ->orWhereNull('status');
+                })->where('hbl_name', $filters['userData'])
+                ->orWhere('contact_number', $filters['userData']);
+        } else {
+            $query = HBL::query()->where('hbl_type', '=', HBLType::DOOR_TO_DOOR->value)->where(function ($query) {
+                $query->where('status', '!=', 'draft')
+                    ->orWhereNull('status');
+            });
+        }
+
+        if (! empty($search)) {
+            $query->whereAny([
+                'reference',
+                'hbl_number',
+                'hbl_name',
+                'contact_number',
+                'consignee_name',
+                'consignee_nic',
+                'consignee_contact',
+                'iq_number',
+                'nic',
+                'email',
+            ], 'like', '%'.$search.'%');
+        }
+
+        //apply filters
+        FilterFactory::apply($query, $filters);
+
+        $countQuery = $query;
+        $totalRecords = $countQuery->count();
+
+        $hbls = $query->orderBy($order, $direction)
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        return response()->json([
+            'data' => HBLResource::collection($hbls),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
     }
 }
