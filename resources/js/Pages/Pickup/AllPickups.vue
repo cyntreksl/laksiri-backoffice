@@ -73,7 +73,7 @@ const data = reactive({
     },
 });
 
-const baseUrl = ref("/pickup-list");
+const baseUrl = ref("/pickup-exception-list");
 const totalPickups = ref(0);
 
 const toggleColumnVisibility = (columnName) => {
@@ -140,8 +140,48 @@ const initializeGrid = () => {
 const selectedData = ref([]);
 
 const createColumns = () => [
-    {},
+    {
+        name: "#",
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
 
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        },
+        formatter: (_, row) => {
+            return h("input", {
+                type: "checkbox",
+                className:
+                    "form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent",
+                onChange: (event) => {
+                    const isChecked = event.target.checked;
+                    if (isChecked) {
+                        const rowData = row.cells.map((cell) => cell.data); // Extract data from cells array
+                        selectedData.value.push(rowData); // Push extracted data into selectedData
+                    } else {
+                        // Remove the specific row from selectedData (assuming uniqueness of rows)
+                        const index = selectedData.value.findIndex((selectedRow) => {
+                            const rowData = row.cells.map((cell) => cell.data);
+                            return JSON.stringify(selectedRow) === JSON.stringify(rowData);
+                        });
+                        if (index !== -1) {
+                            selectedData.value.splice(index, 1);
+                        }
+                    }
+                },
+            });
+        },
+    },
     {
         name: "Reference",
         hidden: !data.columnVisibility.reference,
@@ -566,7 +606,130 @@ const createColumns = () => [
                             ),
                         ]
                     ) : null,
-
+                usePage().props.user.permissions.includes('pickups.edit') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
+                            onClick: () => router.visit(route("pickups.edit", row.cells[0].data?.id)),
+                            "x-tooltip..placement.bottom.primary": "'Edit Pending Job'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-edit",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1",
+                                    }),
+                                    h("path", {
+                                        d: "M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z",
+                                    }),
+                                    h("path", {
+                                        d: "M16 5l3 3",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    )
+                    : null,
+                usePage().props.user.permissions.includes('pickups.retry') ?
+                    row.cells[11].data ?
+                        h(
+                            "button",
+                            {
+                                className:
+                                    "btn size-8 p-0 text-secondary hover:bg-secondary/20 focus:bg-secondary/20 active:bg-secondary/25 mr-2",
+                                onClick: () => confirmRetry(row.cells[0].data?.id),
+                                "x-tooltip..placement.bottom.primary": "'Retry'",
+                            },
+                            [
+                                h(
+                                    "svg",
+                                    {
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        viewBox: "0 0 24 24",
+                                        class: "size-4.5",
+                                        fill: "none",
+                                        stroke: "currentColor",
+                                        strokeWidth: 1.5,
+                                    },
+                                    [
+                                        h("path", {
+                                            strokeLinecap: "round",
+                                            strokeLinejoin: "round",
+                                            d: "M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99",
+                                        }),
+                                    ]
+                                ),
+                            ]
+                        ) : null
+                    : null,
+                usePage().props.user.permissions.includes('pickups.delete') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
+                            onClick: () => confirmDeletePickup(row.cells[0].data?.id),
+                            "x-tooltip..placement.bottom.error": "'Delete HBL'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "icon icon-tabler icons-tabler-outline icon-tabler-trash",
+                                    fill: "none",
+                                    height: 24,
+                                    width: 24,
+                                    stroke: "currentColor",
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                        stroke: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M4 7l16 0",
+                                    }),
+                                    h("path", {
+                                        d: "M10 11l0 6",
+                                    }),
+                                    h("path", {
+                                        d: "M14 11l0 6",
+                                    }),
+                                    h("path", {
+                                        d: "M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12",
+                                    }),
+                                    h("path", {
+                                        d: "M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
             ]);
         },
     },
@@ -672,8 +835,8 @@ const resetFilter = () => {
     filters.toDate = toDate;
     filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
     filters.createdBy = "";
-    filters.driver = "";
-    filters.status = "";
+    filters.driverBy = "";
+    filters.statusBy = "";
     filters.zoneBy = "";
     applyFilters();
 };
@@ -1033,7 +1196,7 @@ const shipIcon = ref(`
                 <FilterHeader value="Status"/>
 
                 <select
-                    v-model="filters.status"
+                    v-model="filters.statusBy"
                     autocomplete="off"
                     class="w-full"
                     multiple
@@ -1054,7 +1217,7 @@ const shipIcon = ref(`
                 <FilterHeader value="Driver"/>
 
                 <select
-                    v-model="filters.driver"
+                    v-model="filters.driverBy"
                     autocomplete="off"
                     class="w-full"
                     multiple
