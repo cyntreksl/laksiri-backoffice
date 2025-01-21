@@ -924,6 +924,10 @@ export default {
                             title: "All HBL",
                             route: "call-center.hbls.index",
                         },
+                        {
+                            title: "Door to Door HBL",
+                            route: "call-center.hbls.door-to-door-list",
+                        }
                     );
                     changeSidePanelTitle("HBL");
                     break;
