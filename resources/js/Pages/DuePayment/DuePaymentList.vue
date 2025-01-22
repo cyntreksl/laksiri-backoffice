@@ -483,7 +483,9 @@ const totalPaidAmount = ref(0);
 
 const getCashSettlementSummary = async (filters) => {
     try {
-        filters.push({ paymentStatus: ["Partial Paid", "Not Paid"] });
+        filters = {
+            paymentStatus: ["Partial Paid", "Not Paid"]
+        };
         const response = await fetch("/cash-settlement-summery", {
             method: "POST",
             headers: {
