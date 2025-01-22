@@ -55,7 +55,7 @@ class HBLDeliverResource extends JsonResource
                     ? $this->mhbl->reference
                     : null),
             'is_released' => $this->is_released,
-            'driver' => $this->assignedDriver->name ?? '-'
+            'driver' => $this->assignedDriver->name ?? '-',
         ];
     }
 }
