@@ -54,13 +54,15 @@ class DeliveryRepository implements DeliveryRepositoryInterface
         }
     }
 
-    public function getFilteredDelivers(Request $request){
+    public function getFilteredDelivers(Request $request)
+    {
         $query = HBLDeliver::query();
         if ($request->filled('driverId')) {
             FilterFactory::apply($query, ['driverBy' => $request->driverId]);
-        }else{
+        } else {
             $query->whereRaw('1 = 0');
         }
+
         return $query
             ->orderBy('deliver_order')
             ->with('hbl')

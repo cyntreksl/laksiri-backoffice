@@ -33,8 +33,6 @@ const props = defineProps({
 console.log(props.deliveries);
 
 const form = reactive({
-    fromDate: props.filters.fromDate || moment(new Date()).subtract(7, 'd').format("YYYY-MM-DD"),
-    toDate: props.filters.toDate || moment(new Date()).format("YYYY-MM-DD"),
     driverId: props.filters.driverId || null,
 });
 
@@ -49,14 +47,6 @@ const checkOrderChange = () => {
 watch(localDeliveries, checkOrderChange, {deep: true});
 
 const handleSearch = () => {
-    if (!form.fromDate) {
-        push.error("From date is required!");
-    }
-
-    if (!form.toDate) {
-        push.error("To date is required!");
-    }
-
     if (!form.driverId) {
         push.error("Please select a driver");
     }
