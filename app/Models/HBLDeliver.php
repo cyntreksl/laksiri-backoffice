@@ -37,7 +37,7 @@ class HBLDeliver extends Model
      */
     public function hbl()
     {
-        return $this->belongsTo(Hbl::class, 'hbl_id');
+        return $this->belongsTo(HBL::class, 'hbl_id');
     }
 
     /**
