@@ -22,4 +22,10 @@ Route::name('delivery.')->group(function () {
 
     Route::post('driver/assign', [DeliverController::class, 'assignDriver'])
         ->name('driver.assign');
+
+    Route::get('deliver-list-order', [DeliverController::class, 'showDeliverOrder'])
+        ->name('ordering');
+
+    Route::put('deliver-list-update-order', [DeliverController::class, 'updateDeliverOrder'])
+        ->name('update-order');
 });

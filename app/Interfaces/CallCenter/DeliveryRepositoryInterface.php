@@ -4,6 +4,7 @@ namespace App\Interfaces\CallCenter;
 
 use App\Models\HBLDeliver;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 interface DeliveryRepositoryInterface
 {
@@ -12,4 +13,8 @@ interface DeliveryRepositoryInterface
     public function getPendingDeliverForDriver();
 
     public function showDeliver(HBLDeliver $hblDeliver): JsonResponse;
+
+    public function getFilteredDelivers(Request $request);
+
+    public function saveDeliveryOrder(array $deliveries);
 }
