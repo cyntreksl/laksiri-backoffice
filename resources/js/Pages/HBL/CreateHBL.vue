@@ -15,8 +15,7 @@ import {push} from "notivue";
 import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-import IntlTelInput from "intl-tel-input/vueWithUtils";
-import "intl-tel-input/styles";
+
 const props = defineProps({
     hblTypes: {
         type: Object,
@@ -1026,10 +1025,18 @@ const confirmViewHBL = async (id) => {
                             <div class="col-span-3">
                                 <span>Mobile Number</span>
                                 <div class="flex -space-x-px">
+                                    <select
+                                        v-model="countryCode"
+                                        class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    >
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                            {{ countryCode }}
+                                        </option>
+                                    </select>
 
-                                    <IntlTelInput
+                                    <input
                                         v-model="contactNumber"
-                                        class="form-input custom-width  border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
                                         type="text"
                                     />
@@ -1104,8 +1111,8 @@ const confirmViewHBL = async (id) => {
 
                             <div class="flex space-x-1">
                                 <a  v-if="form.hbl_name"  @click.prevent="handleCopyShipper"
-                                   x-tooltip.placement.bottom="'Copy Shippier'"
-                                   class="relative inline-flex items-center">
+                                    x-tooltip.placement.bottom="'Copy Shippier'"
+                                    class="relative inline-flex items-center">
                                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
                                          height="24" stroke="currentColor" stroke-linecap="round"
                                          stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
@@ -1119,8 +1126,8 @@ const confirmViewHBL = async (id) => {
                                 </a>
 
                                 <a
-                                   @click.prevent="confirmShowingCopyFromHBLToConsigneeModal"
-                                   x-tooltip.placement.bottom="'Copy from HBL'"
+                                    @click.prevent="confirmShowingCopyFromHBLToConsigneeModal"
+                                    x-tooltip.placement.bottom="'Copy from HBL'"
                                 >
                                     <svg class="icon icon-paste text-[#64748b] ml-1" fill="none" stroke="#64748b"
                                          stroke-linecap="round"
@@ -1215,10 +1222,18 @@ const confirmViewHBL = async (id) => {
                             <div class="col-span-2">
                                 <span>Mobile Number</span>
                                 <div class="flex -space-x-px">
+                                    <select
+                                        v-model="consignee_countryCode"
+                                        class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    >
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                            {{ countryCode }}
+                                        </option>
+                                    </select>
 
-                                    <IntlTelInput
+                                    <input
                                         v-model="consignee_contact"
-                                        class="form-input custom-width border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
                                         type="text"
                                     />
@@ -1693,7 +1708,7 @@ const confirmViewHBL = async (id) => {
                                                     </span>
                                                     </td>
                                                     <td class="text-right">{{
-                                                            parseFloat(form.freight_charge).toFixed(2)
+                                                        parseFloat(form.freight_charge).toFixed(2)
                                                         }}
                                                     </td>
                                                 </tr>
@@ -1717,7 +1732,7 @@ const confirmViewHBL = async (id) => {
                                                 <tr>
                                                     <td colspan="4">Discount</td>
                                                     <td class="text-right">- {{
-                                                            parseFloat(form.discount).toFixed(2)
+                                                        parseFloat(form.discount).toFixed(2)
                                                         }}
                                                     </td>
                                                 </tr>
@@ -1954,9 +1969,9 @@ const confirmViewHBL = async (id) => {
                                 </label>
                             </div>
 
-<!--                            <div class="col-span-4 md:col-span-1">-->
-<!--                                -->
-<!--                            </div>-->
+                            <!--                            <div class="col-span-4 md:col-span-1">-->
+                            <!--                                -->
+                            <!--                            </div>-->
 
                             <div class="col-span-4 md:col-span-1">
                                 <label class="block">
@@ -2053,8 +2068,3 @@ const confirmViewHBL = async (id) => {
         />
     </AppLayout>
 </template>
-<style>
-.custom-width {
-    width: 545px;
-}
-</style>
