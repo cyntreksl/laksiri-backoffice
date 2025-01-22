@@ -20,11 +20,13 @@ class CreateHBLDelivery
 
         try {
             foreach ($hbl_ids as $hbl_id) {
-                $hblDelivery = new HBLDeliver();
-                $hblDelivery->branch_id = Auth::user()->primary_branch_id;
-                $hblDelivery->hbl_id = $hbl_id;
-                $hblDelivery->driver_id = $driver_id;
-                $hblDelivery->save();
+                HBLDeliver::updateOrCreate(
+                    ['hbl_id' => $hbl_id],
+                    [
+                        'branch_id' => Auth::user()->primary_branch_id,
+                        'driver_id' => $driver_id,
+                    ]
+                );
             }
 
             DB::commit();
