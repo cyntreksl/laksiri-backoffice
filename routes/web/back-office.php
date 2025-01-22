@@ -35,4 +35,6 @@ Route::name('back-office.')->group(function () {
     //Due Payment
     Route::get('duepayments', [CashSettlementController::class, 'duePaymentIndex'])
         ->name('duepayments.duePaymentIndex');
+    Route::get('duepayment-list', [CashSettlementController::class, 'duePaymentList'])
+        ->name('duepayments.duePaymentList');    
 });

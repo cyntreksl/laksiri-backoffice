@@ -1,9 +1,9 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {computed, reactive, ref} from "vue";
-import {Grid, h, html} from "gridjs";
-import {push} from "notivue";
+import { computed, reactive, ref } from "vue";
+import { Grid, h, html } from "gridjs";
+import { push } from "notivue";
 import moment from "moment";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
@@ -14,28 +14,25 @@ import InputLabel from "@/Components/InputLabel.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
-import PaymentModal from "@/Pages/DuePayment/Partials/PaymentModal.vue";
+import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
-import HoldConfirmationModal from "@/Pages/DuePayment/Partials/HoldConfirmationModal.vue";
-import {router, usePage} from "@inertiajs/vue3";
+import HoldConfirmationModal from "@/Pages/CashSettlement/Partials/HoldConfirmationModal.vue";
+import { router, usePage } from "@inertiajs/vue3";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 
 const props = defineProps({
     drivers: {
         type: Object,
-        default: () => {
-        },
+        default: () => {},
     },
     officers: {
         type: Object,
-        default: () => {
-        },
+        default: () => {},
     },
     paymentStatus: {
         type: Object,
-        default: () => {
-        },
+        default: () => {},
     },
 });
 
@@ -52,7 +49,7 @@ const filters = reactive({
     drivers: {},
     officers: {},
     cargoMode: ["Air Cargo", "Sea Cargo"],
-    paymentStatus: ['Partial Paid'],
+    paymentStatus: ["Partial Paid", "Not Paid"],
 });
 
 const data = reactive({
@@ -90,13 +87,11 @@ const updateGridConfig = () => {
 const selectedData = ref([]);
 
 const createColumns = () => [
-    {
-
-    },
-    {name: "HBL", hidden: !data.columnVisibility.hbl},
-    {name: "Name", hidden: !data.columnVisibility.hbl_name},
-    {name: "Address", hidden: !data.columnVisibility.address},
-    {name: "Picked Date", hidden: !data.columnVisibility.picked_date},
+    { name: "#", hidden: !data.columnVisibility.id },
+    { name: "HBL", hidden: !data.columnVisibility.hbl },
+    { name: "Name", hidden: !data.columnVisibility.hbl_name },
+    { name: "Address", hidden: !data.columnVisibility.address },
+    { name: "Picked Date", hidden: !data.columnVisibility.picked_date },
     {
         name: "Weight",
         hidden: !data.columnVisibility.weight,
@@ -124,79 +119,77 @@ const createColumns = () => [
         formatter: (_, row) =>
             row.cells[9].data == "Sea Cargo"
                 ? h(
-                    "span",
-                    {className: "flex"},
-                    h(
-                        "svg",
-                        {
-                            xmlns: "http://www.w3.org/2000/svg",
-                            viewBox: "0 0 24 24",
-                            class:
-                                "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
-                            fill: "none",
-                            height: 24,
-                            width: 24,
-                            stroke: "currentColor",
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                            strokeWidth: 2,
-                        },
-                        [
-                            h("path", {
-                                stroke: "none",
-                                d: "M0 0h24v24H0z",
-                                fill: "none",
-                            }),
-                            h("path", {
-                                d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
-                            }),
-                            h("path", {
-                                d: "M4 18l-1 -5h18l-2 4",
-                            }),
-                            h("path", {
-                                d: "M5 13v-6h8l4 6",
-                            }),
-                            h("path", {
-                                d: "M7 7v-4h-1",
-                            }),
-                        ]
-                    ),
-                    row.cells[9].data
-                )
+                      "span",
+                      { className: "flex" },
+                      h(
+                          "svg",
+                          {
+                              xmlns: "http://www.w3.org/2000/svg",
+                              viewBox: "0 0 24 24",
+                              class: "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
+                              fill: "none",
+                              height: 24,
+                              width: 24,
+                              stroke: "currentColor",
+                              strokeLinecap: "round",
+                              strokeLinejoin: "round",
+                              strokeWidth: 2,
+                          },
+                          [
+                              h("path", {
+                                  stroke: "none",
+                                  d: "M0 0h24v24H0z",
+                                  fill: "none",
+                              }),
+                              h("path", {
+                                  d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
+                              }),
+                              h("path", {
+                                  d: "M4 18l-1 -5h18l-2 4",
+                              }),
+                              h("path", {
+                                  d: "M5 13v-6h8l4 6",
+                              }),
+                              h("path", {
+                                  d: "M7 7v-4h-1",
+                              }),
+                          ]
+                      ),
+                      row.cells[9].data
+                  )
                 : row.cells[9].data == "Air Cargo"
-                    ? h("span", {className: "flex space-x-2"}, [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                                strokeWidth: 2,
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
-                                }),
-                            ]
-                        ),
-                        row.cells[9].data,
-                    ])
-                    : row.cells[9].data,
+                ? h("span", { className: "flex space-x-2" }, [
+                      h(
+                          "svg",
+                          {
+                              xmlns: "http://www.w3.org/2000/svg",
+                              viewBox: "0 0 24 24",
+                              class: "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
+                              fill: "none",
+                              height: 24,
+                              width: 24,
+                              stroke: "currentColor",
+                              strokeLinecap: "round",
+                              strokeLinejoin: "round",
+                              strokeWidth: 2,
+                          },
+                          [
+                              h("path", {
+                                  stroke: "none",
+                                  d: "M0 0h24v24H0z",
+                                  fill: "none",
+                              }),
+                              h("path", {
+                                  d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
+                              }),
+                          ]
+                      ),
+                      row.cells[9].data,
+                  ])
+                : row.cells[9].data,
     },
-    {name: "Delivery Type", hidden: !data.columnVisibility.hbl_type},
-    {name: "Officer", hidden: !data.columnVisibility.officer},
+    { name: "Delivery Type", hidden: !data.columnVisibility.hbl_type },
+    { name: "Officer", hidden: !data.columnVisibility.officer },
     {
         name: "Is Hold",
         hidden: !data.columnVisibility.is_hold,
@@ -233,155 +226,161 @@ const createColumns = () => [
             }
         },
     },
-    {name: "Officer", hidden: !data.columnVisibility.officer},
+    { name: "Officer", hidden: !data.columnVisibility.officer },
     {
         name: "Actions",
         hidden: !data.columnVisibility.actions,
         sort: false,
         formatter: (_, row) => {
             return h("div", {}, [
-                usePage().props.user.permissions.includes('cash.show') ?
-                    h(
-                        "a",
-                        {
-                            className:
-                                "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                            onClick: () => confirmViewHBL(row.cells[0].data?.id),
-                            "x-tooltip..placement.bottom.primary": "'View HBL'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                    }),
-                                    h("path", {
-                                        d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
-                usePage().props.user.permissions.includes('cash.update payment') ?
-                    h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                            onClick: () => confirmPayment(row.cells),
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "size-4.5",
-                                    fill: "none",
-                                    stroke: "currentColor",
-                                    strokeWidth: 1.5,
-                                },
-                                [
-                                    h("path", {
-                                        strokeLinecap: "round",
-                                        strokeLinejoin: "round",
-                                        d: "M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
-                usePage().props.user.permissions.includes('cash.hold and release') ?
-                    h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                            onClick: () => confirmIsHold(row.cells),
-                            "x-tooltip..placement.bottom.primary": row.cells[12].data
-                                ? "'Release HBL'"
-                                : "'Hold HBL'",
-                        },
-                        [
-                            row.cells[12].data
-                                ? h(
-                                    "svg",
-                                    {
-                                        xmlns: "http://www.w3.org/2000/svg",
-                                        viewBox: "0 0 24 24",
-                                        class:
-                                            "icon icon-tabler icons-tabler-outline icon-tabler-player-play",
-                                        fill: "none",
-                                        height: 24,
-                                        width: 24,
-                                        stroke: "currentColor",
-                                        strokeLinecap: "round",
-                                        strokeLinejoin: "round",
-                                    },
-                                    [
-                                        h("path", {
-                                            d: "M0 0h24v24H0z",
+                usePage().props.user.permissions.includes("cash.show")
+                    ? h(
+                          "a",
+                          {
+                              className:
+                                  "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
+                              onClick: () =>
+                                  confirmViewHBL(row.cells[0].data?.id),
+                              "x-tooltip..placement.bottom.primary":
+                                  "'View HBL'",
+                          },
+                          [
+                              h(
+                                  "svg",
+                                  {
+                                      xmlns: "http://www.w3.org/2000/svg",
+                                      viewBox: "0 0 24 24",
+                                      class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
+                                      fill: "none",
+                                      height: 24,
+                                      width: 24,
+                                      stroke: "currentColor",
+                                      strokeLinecap: "round",
+                                      strokeLinejoin: "round",
+                                  },
+                                  [
+                                      h("path", {
+                                          d: "M0 0h24v24H0z",
+                                          fill: "none",
+                                          stroke: "none",
+                                      }),
+                                      h("path", {
+                                          d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                                      }),
+                                      h("path", {
+                                          d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                                      }),
+                                  ]
+                              ),
+                          ]
+                      )
+                    : null,
+                usePage().props.user.permissions.includes("cash.update payment")
+                    ? h(
+                          "button",
+                          {
+                              className:
+                                  "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
+                              onClick: () => confirmPayment(row.cells),
+                          },
+                          [
+                              h(
+                                  "svg",
+                                  {
+                                      xmlns: "http://www.w3.org/2000/svg",
+                                      viewBox: "0 0 24 24",
+                                      class: "size-4.5",
+                                      fill: "none",
+                                      stroke: "currentColor",
+                                      strokeWidth: 1.5,
+                                  },
+                                  [
+                                      h("path", {
+                                          strokeLinecap: "round",
+                                          strokeLinejoin: "round",
+                                          d: "M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z",
+                                      }),
+                                  ]
+                              ),
+                          ]
+                      )
+                    : null,
+                usePage().props.user.permissions.includes(
+                    "cash.hold and release"
+                )
+                    ? h(
+                          "button",
+                          {
+                              className:
+                                  "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+                              onClick: () => confirmIsHold(row.cells),
+                              "x-tooltip..placement.bottom.primary": row
+                                  .cells[12].data
+                                  ? "'Release HBL'"
+                                  : "'Hold HBL'",
+                          },
+                          [
+                              row.cells[12].data
+                                  ? h(
+                                        "svg",
+                                        {
+                                            xmlns: "http://www.w3.org/2000/svg",
+                                            viewBox: "0 0 24 24",
+                                            class: "icon icon-tabler icons-tabler-outline icon-tabler-player-play",
                                             fill: "none",
-                                            stroke: "none",
-                                        }),
-                                        h("path", {
-                                            d: "M7 4v16l13 -8z",
-                                        }),
-                                    ]
-                                )
-                                : h(
-                                    "svg",
-                                    {
-                                        xmlns: "http://www.w3.org/2000/svg",
-                                        viewBox: "0 0 24 24",
-                                        class:
-                                            "icon icon-tabler icons-tabler-outline icon-tabler-player-pause",
-                                        fill: "none",
-                                        height: 24,
-                                        width: 24,
-                                        stroke: "currentColor",
-                                        strokeLinecap: "round",
-                                        strokeLinejoin: "round",
-                                    },
-                                    [
-                                        h("path", {
-                                            d: "M0 0h24v24H0z",
+                                            height: 24,
+                                            width: 24,
+                                            stroke: "currentColor",
+                                            strokeLinecap: "round",
+                                            strokeLinejoin: "round",
+                                        },
+                                        [
+                                            h("path", {
+                                                d: "M0 0h24v24H0z",
+                                                fill: "none",
+                                                stroke: "none",
+                                            }),
+                                            h("path", {
+                                                d: "M7 4v16l13 -8z",
+                                            }),
+                                        ]
+                                    )
+                                  : h(
+                                        "svg",
+                                        {
+                                            xmlns: "http://www.w3.org/2000/svg",
+                                            viewBox: "0 0 24 24",
+                                            class: "icon icon-tabler icons-tabler-outline icon-tabler-player-pause",
                                             fill: "none",
-                                            stroke: "none",
-                                        }),
-                                        h("path", {
-                                            d: "M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
-                                        }),
-                                        h("path", {
-                                            d: "M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
-                                        }),
-                                    ]
-                                ),
-                        ]
-                    ) : null,
+                                            height: 24,
+                                            width: 24,
+                                            stroke: "currentColor",
+                                            strokeLinecap: "round",
+                                            strokeLinejoin: "round",
+                                        },
+                                        [
+                                            h("path", {
+                                                d: "M0 0h24v24H0z",
+                                                fill: "none",
+                                                stroke: "none",
+                                            }),
+                                            h("path", {
+                                                d: "M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
+                                            }),
+                                            h("path", {
+                                                d: "M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
+                                            }),
+                                        ]
+                                    ),
+                          ]
+                      )
+                    : null,
             ]);
         },
     },
 ];
 
-const baseUrl = ref("/cash-settlement-list");
+const baseUrl = ref("/duepayment-list");
 
 const constructUrl = () => {
     const params = new URLSearchParams();
@@ -431,7 +430,7 @@ const initializeGrid = () => {
             then: (data) =>
                 data.data.map((item) => {
                     const row = [];
-                    row.push({id: item.id});
+                    row.push({ id: item.id });
                     visibleColumns.forEach((column) => {
                         row.push(item[column]);
                     });
@@ -453,24 +452,19 @@ const applyFilters = () => {
     showFilters.value = false;
     const newUrl = constructUrl();
     const visibleColumns = Object.keys(data.columnVisibility);
-
     grid.updateConfig({
         server: {
             url: newUrl,
-            then: (data) => {
-                if (data.data.length === 0) {
-                    return [
-                        visibleColumns.map(() => "No matching data found"),
-                    ];
-                }
-                return data.data.map((item) => {
+            then: (data) =>
+                data.data.map((item) => {
                     const row = [];
+                    row.push({ id: item.id });
                     visibleColumns.forEach((column) => {
                         row.push(item[column]);
                     });
+
                     return row;
-                });
-            },
+                }),
             total: (response) => {
                 if (response && response.meta) {
                     return response.meta.total;
@@ -480,10 +474,8 @@ const applyFilters = () => {
             },
         },
     });
-
     grid.forceRender();
 };
-
 
 const totalRecord = ref(0);
 const totalGrandAmount = ref(0);
@@ -491,6 +483,7 @@ const totalPaidAmount = ref(0);
 
 const getCashSettlementSummary = async (filters) => {
     try {
+        filters.push({ paymentStatus: ["Partial Paid", "Not Paid"] });
         const response = await fetch("/cash-settlement-summery", {
             method: "POST",
             headers: {
@@ -507,6 +500,8 @@ const getCashSettlementSummary = async (filters) => {
         }
 
         const data = await response.json();
+        console.log(data);
+
         totalRecord.value = data.totalRecords;
         totalGrandAmount.value = data.sumAmount;
         totalPaidAmount.value = data.sumPaidAmount;
@@ -526,7 +521,7 @@ const cashReceived = async () => {
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content"),
             },
-            body: JSON.stringify({hbl_ids: idList}),
+            body: JSON.stringify({ hbl_ids: idList }),
         });
 
         if (!response.ok) {
@@ -621,7 +616,7 @@ const resetFilter = () => {
     filters.drivers = {};
     filters.officers = {};
     filters.cargoMode = ["Air Cargo", "Sea Cargo"];
-    filters.paymentStatus = [];
+    filters.paymentStatus = ["Partial Paid", "Not Paid"];
     applyFilters();
 };
 
@@ -644,7 +639,7 @@ const exportURL = computed(() => {
             params.append(key, filters[key].toString());
         }
     }
-    return '/cash-settlements/export' + "?" + params.toString();
+    return "/cash-settlements/export" + "?" + params.toString();
 });
 
 const handlePerPageChange = (event) => {
@@ -660,7 +655,7 @@ const handlePerPageChange = (event) => {
         },
     });
 
-    grid.forceRender()
+    grid.forceRender();
 };
 
 const planeIcon = ref(`
@@ -706,22 +701,28 @@ const shipIcon = ref(`
     <AppLayout title="Cash Settlements">
         <template #header>Cash Settlements</template>
 
-        <Breadcrumb/>
+        <Breadcrumb />
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2 mt-3">
-            <SimpleOverviewWidget :count="totalRecord" bg-color="white" title="HBL Count"/>
+        <div
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2 mt-3"
+        >
+            <SimpleOverviewWidget
+                :count="totalRecord"
+                bg-color="white"
+                title="HBL Count"
+            />
 
-            <SimpleOverviewWidget :count="totalGrandAmount.toFixed(2)" bg-color="white" title="HBL Amount"/>
+            <SimpleOverviewWidget
+                :count="totalGrandAmount.toFixed(2)"
+                bg-color="white"
+                title="HBL Amount"
+            />
 
-            <SimpleOverviewWidget :count="totalPaidAmount.toFixed(2)" bg-color="white" title="HBL Paid Amount"/>
-
-            <SimpleOverviewWidget :count="countOfSelectedData" bg-color="white" title="Selected HBL Count"/>
-
-            <SimpleOverviewWidget :count="valueOfSelectedData.toFixed(2)" bg-color="white"
-                                  title="Selected HBL Amount"/>
-
-            <SimpleOverviewWidget :count="paidValueOfSelectedData.toFixed(2)" bg-color="white"
-                                  title="Selected HBL Paid Amount"/>
+            <SimpleOverviewWidget
+                :count="totalPaidAmount.toFixed(2)"
+                bg-color="white"
+                title="HBL Paid Amount"
+            />
         </div>
 
         <div class="card mt-4">
@@ -732,11 +733,14 @@ const shipIcon = ref(`
                             <h2
                                 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                Cash Settlement List
+                                Due Payment List
                             </h2>
 
                             <div class="flex m-3">
-                                <select class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" @change="handlePerPageChange">
+                                <select
+                                    class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    @change="handlePerPageChange"
+                                >
                                     <option value="10">10</option>
                                     <option value="25">25</option>
                                     <option value="50">50</option>
@@ -781,21 +785,25 @@ const shipIcon = ref(`
                                 </div>
                                 <div>
                                     <div
-                                        v-for="(mode, index) in filters.cargoMode"
+                                        v-for="(
+                                            mode, index
+                                        ) in filters.cargoMode"
                                         v-if="filters.cargoMode"
                                         :key="index"
                                         class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
                                     >
-                    <span v-if="mode == 'Sea Cargo'">
-                      <div v-html="shipIcon"></div>
-                    </span>
+                                        <span v-if="mode == 'Sea Cargo'">
+                                            <div v-html="shipIcon"></div>
+                                        </span>
                                         <span v-if="mode == 'Air Cargo'">
-                      <div v-html="planeIcon"></div>
-                    </span>
+                                            <div v-html="planeIcon"></div>
+                                        </span>
                                         {{ mode }}
                                     </div>
                                     <div
-                                        v-for="(type, index) in filters.deliveryType"
+                                        v-for="(
+                                            type, index
+                                        ) in filters.deliveryType"
                                         v-if="filters.deliveryType"
                                         :key="index"
                                         class="badge bg-success text-white ml-2"
@@ -810,36 +818,76 @@ const shipIcon = ref(`
                     <div class="mt-1 ml-1 grid sm:grid-cols-2 md:grid-cols-2">
                         <div class="flex ml-5">
                             <ColumnVisibilityPopover>
-                                <label class="inline-flex items-center space-x-2">
+                                <label
+                                    class="inline-flex items-center space-x-2"
+                                >
                                     <Checkbox
                                         :checked="data.columnVisibility.address"
-                                        @change="toggleColumnVisibility('address', $event)"
+                                        @change="
+                                            toggleColumnVisibility(
+                                                'address',
+                                                $event
+                                            )
+                                        "
                                     />
-                                    <span class="hover:cursor-pointer">Address</span>
+                                    <span class="hover:cursor-pointer"
+                                        >Address</span
+                                    >
                                 </label>
 
-                                <label class="inline-flex items-center space-x-2">
+                                <label
+                                    class="inline-flex items-center space-x-2"
+                                >
                                     <Checkbox
-                                        :checked="data.columnVisibility.cargo_type"
-                                        @change="toggleColumnVisibility('cargo_type', $event)"
+                                        :checked="
+                                            data.columnVisibility.cargo_type
+                                        "
+                                        @change="
+                                            toggleColumnVisibility(
+                                                'cargo_type',
+                                                $event
+                                            )
+                                        "
                                     />
-                                    <span class="hover:cursor-pointer">Cargo Mode</span>
+                                    <span class="hover:cursor-pointer"
+                                        >Cargo Mode</span
+                                    >
                                 </label>
 
-                                <label class="inline-flex items-center space-x-2">
+                                <label
+                                    class="inline-flex items-center space-x-2"
+                                >
                                     <Checkbox
-                                        :checked="data.columnVisibility.hbl_type"
-                                        @change="toggleColumnVisibility('hbl_type', $event)"
+                                        :checked="
+                                            data.columnVisibility.hbl_type
+                                        "
+                                        @change="
+                                            toggleColumnVisibility(
+                                                'hbl_type',
+                                                $event
+                                            )
+                                        "
                                     />
-                                    <span class="hover:cursor-pointer">Delivery Type</span>
+                                    <span class="hover:cursor-pointer"
+                                        >Delivery Type</span
+                                    >
                                 </label>
 
-                                <label class="inline-flex items-center space-x-2">
+                                <label
+                                    class="inline-flex items-center space-x-2"
+                                >
                                     <Checkbox
                                         :checked="data.columnVisibility.officer"
-                                        @change="toggleColumnVisibility('officer', $event)"
+                                        @change="
+                                            toggleColumnVisibility(
+                                                'officer',
+                                                $event
+                                            )
+                                        "
                                     />
-                                    <span class="hover:cursor-pointer">Officer</span>
+                                    <span class="hover:cursor-pointer"
+                                        >Officer</span
+                                    >
                                 </label>
                             </ColumnVisibilityPopover>
 
@@ -863,9 +911,11 @@ const shipIcon = ref(`
                     </div>
                 </div>
                 <div class="mt-3">
-                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto p-3">
+                    <div
+                        class="is-scrollbar-hidden min-w-full overflow-x-auto p-3"
+                    >
                         <div v-if="totalRecord > 0" ref="wrapperRef"></div>
-                        <NoRecordsFound v-else/>
+                        <NoRecordsFound v-else />
                     </div>
                 </div>
             </div>
@@ -875,34 +925,41 @@ const shipIcon = ref(`
             <template #title> Filter Cash Settlement</template>
 
             <template #content>
-
-                <div class="grid grid-cols-2  space-x-2">
+                <div class="grid grid-cols-2 space-x-2">
                     <!--Filter Rest Button-->
                     <SoftPrimaryButton class="space-x-2" @click="resetFilter">
                         <i class="fa-solid fa-refresh"></i>
                         <span>Reset</span>
                     </SoftPrimaryButton>
                     <!--Filter Now Action Button-->
-                    <button class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90 dark:border-accent dark:text-accent-light dark:hover:bg-accent dark:hover:text-white dark:focus:bg-accent dark:focus:text-white dark:active:bg-accent/90" @click="applyFilters">
+                    <button
+                        class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90 dark:border-accent dark:text-accent-light dark:hover:bg-accent dark:hover:text-white dark:focus:bg-accent dark:focus:text-white dark:active:bg-accent/90"
+                        @click="applyFilters"
+                    >
                         <i class="fa-solid fa-filter"></i>
                         <span>Apply</span>
                     </button>
                 </div>
 
-
                 <div>
-                    <InputLabel value="From"/>
-                    <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
+                    <InputLabel value="From" />
+                    <DatePicker
+                        v-model="filters.fromDate"
+                        placeholder="Choose date..."
+                    />
                 </div>
 
                 <div>
-                    <InputLabel value="To"/>
-                    <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
+                    <InputLabel value="To" />
+                    <DatePicker
+                        v-model="filters.toDate"
+                        placeholder="Choose date..."
+                    />
                 </div>
 
-                <FilterBorder/>
+                <FilterBorder />
 
-                <FilterHeader value="Cargo Mode"/>
+                <FilterHeader value="Cargo Mode" />
 
                 <label class="inline-flex items-center space-x-2 mt-2">
                     <Switch
@@ -922,29 +979,38 @@ const shipIcon = ref(`
                     <div v-html="shipIcon"></div>
                 </label>
 
-                <FilterBorder/>
+                <FilterBorder />
 
-                <FilterHeader value="Is Hold"/>
+                <FilterHeader value="Is Hold" />
 
                 <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.isHold" label="Is Hold" value="true"/>
+                    <Switch
+                        v-model="filters.isHold"
+                        label="Is Hold"
+                        value="true"
+                    />
                 </label>
 
-                <FilterBorder/>
+                <FilterBorder />
 
-                <FilterHeader value="Payment Status"/>
+                <FilterHeader value="Payment Status" />
 
                 <label
                     v-for="item in paymentStatus"
                     :key="item"
                     class="inline-flex items-center space-x-2 mt-2"
                 >
-                    <Switch v-model="filters.paymentStatus" :label="item" :value="item"/>
+                    <Switch
+                        v-if="item !== 'Full Paid'"
+                        v-model="filters.paymentStatus"
+                        :label="item"
+                        :value="item"
+                    />
                 </label>
 
-                <FilterBorder/>
+                <FilterBorder />
 
-                <FilterHeader value="Select Drivers"/>
+                <FilterHeader value="Select Drivers" />
 
                 <select
                     v-model="filters.drivers"
@@ -954,14 +1020,18 @@ const shipIcon = ref(`
                     x-init="$el._tom = new Tom($el,{   plugins: ['remove_button']})"
                 >
                     <option value="">Select drivers...</option>
-                    <option v-for="(driver, id) in drivers" :key="id" :value="driver.id">
+                    <option
+                        v-for="(driver, id) in drivers"
+                        :key="id"
+                        :value="driver.id"
+                    >
                         {{ driver.name }}
                     </option>
                 </select>
 
-                <FilterBorder/>
+                <FilterBorder />
 
-                <FilterHeader value="Select Officers"/>
+                <FilterHeader value="Select Officers" />
 
                 <select
                     v-model="filters.officers"
@@ -979,8 +1049,6 @@ const shipIcon = ref(`
                         {{ officer.name }}
                     </option>
                 </select>
-
-
             </template>
         </FilterDrawer>
 
