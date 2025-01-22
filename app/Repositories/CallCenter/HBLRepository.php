@@ -6,6 +6,7 @@ use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLsWithPackages;
 use App\Enum\HBLType;
 use App\Factory\HBL\FilterFactory;
+use App\Http\Resources\CallCenter\HBLDeliverResource;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\CallCenter\HBLRepositoryInterface;
 use App\Interfaces\GridJsInterface;
@@ -137,7 +138,6 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ->where('hbl_type', '=', HBLType::DOOR_TO_DOOR->value)
             ->where('system_status', '>=', 4.3)
             ->where('is_released', '=', 0)
-            ->where('is_driver_assigned', '=', 0)
             ->where(function ($query) {
                 $query->where('status', '=', 'reached')
                     ->orWhereNull('status');
@@ -170,7 +170,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ->get();
 
         return response()->json([
-            'data' => HBLResource::collection($hbls),
+            'data' => HBLDeliverResource::collection($hbls),
             'meta' => [
                 'total' => $totalRecords,
                 'page' => $offset,

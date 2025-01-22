@@ -45,7 +45,7 @@ const props = defineProps({
 });
 
 const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(1, "month").format("YYYY-MM-DD");
+const fromDate = moment(new Date()).subtract(6, "month").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 const wrapperRef = ref(null);
 let grid = null;
@@ -68,12 +68,13 @@ const data = reactive({
         hbl_name: true,
         consignee_name: true,
         consignee_address: true,
-        consignee_contact: true,
+        consignee_contact: false,
         email: false,
         address: false,
-        contact_number: true,
+        contact_number: false,
         cargo_type: true,
         hbl_type: true,
+        driver: true,
         warehouse: false,
         status: false,
         is_hold: false,
@@ -168,7 +169,7 @@ const createColumns = () => [
         name: "HBL",
         hidden: !data.columnVisibility.hbl,
         formatter: (_, row) => {
-            return row.cells[16].data || row.cells[1].data;
+            return row.cells[17].data || row.cells[1].data;
         },
     },
     {
@@ -314,6 +315,7 @@ const createColumns = () => [
                     : row.cells[11].data,
     },
     {name: "HBL Type", hidden: !data.columnVisibility.hbl_type},
+    {name: "Assigned Driver", hidden: !data.columnVisibility.driver},
     {name: "Warehouse", hidden: !data.columnVisibility.warehouse},
     {name: "Status", hidden: !data.columnVisibility.status},
     {

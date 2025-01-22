@@ -217,4 +217,16 @@ class HBL extends Model
     {
         return $this->hasOne(SLInvoice::class, 'hbl_id');
     }
+
+    public function assignedDriver(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            User::class,
+            HBLDeliver::class,
+            'hbl_id',
+            'id',
+            'id',
+            'driver_id'
+        );
+    }
 }
