@@ -43,6 +43,12 @@ Breadcrumbs::for('call-center.verification.show.verified', function (BreadcrumbT
     $trail->push('Verified', route('call-center.verification.show.verified'));
 });
 
+Breadcrumbs::for('call-center.examination.show.gate-pass', function (BreadcrumbTrail $trail) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Gate Pass');
+    $trail->push('Released', route('call-center.examination.show.gate-pass'));
+});
+
 // Cashier
 Breadcrumbs::for('call-center.cashier.queue.list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
