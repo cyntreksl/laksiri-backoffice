@@ -36,17 +36,21 @@ class UpdateSettingRequest extends FormRequest
                 Rule::requiredIf(function () use ($setting) {
                     return (! $setting || ! $setting->logo) && ! $this->logo;
                 }),
-                'dimensions:max_width=600,max_height=600',
-                'mimes:jpg,jpeg,png',
-                'max:2048',
+                Rule::when($this->logo, [
+                    'dimensions:max_width=600,max_height=600',
+                    'mimes:jpg,jpeg,png',
+                    'max:2048',
+                ]),
             ],
             'seal' => [
                 Rule::requiredIf(function () use ($setting) {
                     return (! $setting || ! $setting->seal) && ! $this->seal;
                 }),
-                'dimensions:max_width=600,max_height=600',
-                'mimes:jpg,jpeg,png',
-                'max:2048',
+                Rule::when($this->seal, [
+                    'dimensions:max_width=600,max_height=600',
+                    'mimes:jpg,jpeg,png',
+                    'max:2048',
+                ]),
             ],
         ];
     }
