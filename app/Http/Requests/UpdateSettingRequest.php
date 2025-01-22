@@ -47,6 +47,7 @@ class UpdateSettingRequest extends FormRequest
                     return (! $setting || ! $setting->seal) && ! $this->seal;
                 }),
                 Rule::when($this->seal, [
+                    'image',
                     'dimensions:max_width=600,max_height=600',
                     'mimes:jpg,jpeg,png',
                     'max:2048',
