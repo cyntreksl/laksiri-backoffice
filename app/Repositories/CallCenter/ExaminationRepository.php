@@ -4,6 +4,7 @@ namespace App\Repositories\CallCenter;
 
 use App\Actions\CustomerFeedback\SendFeedbackMail;
 use App\Actions\Examination\CreateExamination;
+use App\Http\Resources\CallCenter\ExaminationCollection;
 use App\Interfaces\CallCenter\ExaminationRepositoryInterface;
 use App\Models\CustomerQueue;
 use App\Models\HBL;
@@ -64,5 +65,30 @@ class ExaminationRepository implements ExaminationRepositoryInterface
             DB::rollBack();
             throw new \Exception('Failed to create examination record when releasing hbl packages: '.$e->getMessage());
         }
+    }
+
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        $query = CustomerQueue::query()
+            ->examinationQueue()
+            ->whereNotNull('left_at')
+            ->has('token.verification');
+
+        $records = $query->orderBy($order, $direction)
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        $totalRecords = $query->count();
+
+        return response()->json([
+            'data' => ExaminationCollection::collection($records),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
     }
 }
