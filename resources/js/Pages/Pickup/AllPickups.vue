@@ -1192,28 +1192,6 @@ const shipIcon = ref(`
                 </select>
 
                 <FilterBorder/>
-
-                <FilterHeader value="Status"/>
-
-                <select
-                    v-model="filters.statusBy"
-                    autocomplete="off"
-                    class="w-full"
-                    multiple
-                    placeholder="Select a Status..."
-                    x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                >
-                    <option value="Pending">Pending</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-
-                </select>
-
-                <FilterBorder/>
-
                 <FilterHeader value="Driver"/>
 
                 <select
