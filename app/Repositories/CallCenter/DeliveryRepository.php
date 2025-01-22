@@ -3,12 +3,15 @@
 namespace App\Repositories\CallCenter;
 
 use App\Actions\Delivery\CreateHBLDelivery;
+use App\Actions\Delivery\SaveDeliveryOrder;
 use App\Actions\HBL\MarkAsDriverAssigned;
+use App\Factory\Delivery\FilterFactory;
 use App\Http\Resources\HBLDeliverResource;
 use App\Interfaces\CallCenter\DeliveryRepositoryInterface;
 use App\Models\HBLDeliver;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DeliveryRepository implements DeliveryRepositoryInterface
 {
@@ -48,6 +51,24 @@ class DeliveryRepository implements DeliveryRepositoryInterface
             return $this->success('Success', $deliverResource);
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), $e->getCode());
+        }
+    }
+
+    public function getFilteredDelivers(Request $request){
+        $query = HBLDeliver::query();
+        if ($request->filled('driverId')) {
+            FilterFactory::apply($query, ['driverBy' => $request->driverId]);
+        }
+        return $query
+            ->orderBy('deliver_order')
+            ->with('hbl')
+            ->get();
+    }
+
+    public function saveDeliveryOrder(array $deliveries): void
+    {
+        foreach ($deliveries as $delivery) {
+            SaveDeliveryOrder::run($delivery);
         }
     }
 }

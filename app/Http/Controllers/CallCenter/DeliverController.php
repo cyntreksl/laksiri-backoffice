@@ -5,9 +5,11 @@ namespace App\Http\Controllers\CallCenter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AssignDriverRequest;
 use App\Interfaces\CallCenter\DeliveryRepositoryInterface;
+use App\Interfaces\DriverRepositoryInterface;
 use App\Models\HBLDeliver;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class DeliverController extends Controller
 {
@@ -15,6 +17,7 @@ class DeliverController extends Controller
 
     public function __construct(
         private readonly DeliveryRepositoryInterface $deliveryRepository,
+        private readonly DriverRepositoryInterface $driverRepository,
     ) {
     }
 
@@ -31,5 +34,21 @@ class DeliverController extends Controller
     public function show(HBLDeliver $hblDeliver)
     {
         return $this->deliveryRepository->showDeliver($hblDeliver);
+    }
+
+    public function showDeliverOrder(Request $request)
+    {
+        return Inertia::render('CallCenter/Delivery/DeliveryOrder', [
+            'filters' => $request->only('fromDate', 'toDate', 'driverId'),
+            'drivers' => $this->driverRepository->getAllDrivers(),
+            'deliveries' => $this->deliveryRepository->getFilteredDelivers($request),
+        ]);
+    }
+
+    public function updateDeliverOrder(Request $request)
+    {
+        if ($request->deliveries) {
+            $this->deliveryRepository->saveDeliveryOrder($request->deliveries);
+        }
     }
 }
