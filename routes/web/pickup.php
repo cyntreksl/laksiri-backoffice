@@ -44,7 +44,3 @@ Route::get('pickups-all-list', [PickupController::class, 'allPickups'])
     ->name('pickups.all');
 
 Route::get('pickup-exception-list', [PickupController::class, 'allPickupsExport']);
-
-
-
-

@@ -25,14 +25,13 @@ class PickupController extends Controller
     use AuthorizesRequests;
 
     public function __construct(
-        private readonly PickupRepositoryInterface      $pickupRepository,
-        private readonly DriverRepositoryInterface      $driverRepository,
-        private readonly UserRepositoryInterface        $userRepository,
-        private readonly ZoneRepositoryInterface        $zoneRepository,
+        private readonly PickupRepositoryInterface $pickupRepository,
+        private readonly DriverRepositoryInterface $driverRepository,
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly ZoneRepositoryInterface $zoneRepository,
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
-        private readonly CountryRepositoryInterface     $countryRepository,
-    )
-    {
+        private readonly CountryRepositoryInterface $countryRepository,
+    ) {
     }
 
     public function index()
@@ -183,6 +182,7 @@ class PickupController extends Controller
         $search = $request->input('search', null);
 
         $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'zoneBy', 'driverBy', 'statusBy']);
+
         return $this->pickupRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 }
