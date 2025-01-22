@@ -42,3 +42,5 @@ Route::get('pickups/get-pending-jobs-by-user/{user}', [PickupController::class, 
 
 Route::get('pickups-all-list', [PickupController::class, 'allPickups'])
     ->name('pickups.all');
+
+Route::get('pickup-exception-list', [PickupController::class, 'allPickupsExport']);

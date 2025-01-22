@@ -172,4 +172,17 @@ class PickupController extends Controller
 
         ]);
     }
+
+    public function allPickupsExport(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'zoneBy', 'driverBy', 'statusBy']);
+
+        return $this->pickupRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+    }
 }
