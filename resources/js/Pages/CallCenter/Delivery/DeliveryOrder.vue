@@ -30,8 +30,6 @@ const props = defineProps({
     },
 });
 
-console.log(props.deliveries);
-
 const form = reactive({
     driverId: props.filters.driverId || null,
 });
