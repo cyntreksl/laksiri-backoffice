@@ -224,7 +224,11 @@
 
         @endif
     </table>
-
+    <div style="text-align: right; margin-top: 20px;">
+        @if($settings->seal_url)
+            <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto;">
+        @endif
+    </div>
     <div class="footer">
         <div class="footer-text"
              style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_header_title}}</div>
