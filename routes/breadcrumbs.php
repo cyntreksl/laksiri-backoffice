@@ -188,6 +188,12 @@ Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail
     $trail->push('Back Office');
     $trail->push('Cash Settlement List', route('back-office.cash-settlements.index'));
 });
+//due payment
+Breadcrumbs::for('back-office.duepayments.duePaymentIndex', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Back Office');
+    $trail->push('Due Payment List', route('back-office.duepayments.duePaymentIndex'));
+});
 
 // Settings > Zones
 Breadcrumbs::for('setting.driver-zones.index', function (BreadcrumbTrail $trail) {

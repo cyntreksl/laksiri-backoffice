@@ -90,7 +90,8 @@ class CashSettlementController extends Controller
         ]);
     }
 
-    public function duePaymentList(Request $request){
+    public function duePaymentList(Request $request)
+    {
         $limit = $request->input('limit', 10);
         $page = $request->input('offset', 1);
         $order = $request->input('order', 'id');
