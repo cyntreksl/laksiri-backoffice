@@ -567,7 +567,8 @@ const filteredFiles = computed(() => {
                                     <td class="whitespace-nowrap px-4 py-3 text-right">
                                         <!-- Download Button -->
                                         <a
-                                            :href="route('loading.containers-documents.download', file.id  )"
+                                            v-if="$page.props.user.permissions.includes('container.download documents')"
+                                            :href="route('loading.containers-documents.download', file.id)"
                                             download
                                             class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                                             title="Download"
