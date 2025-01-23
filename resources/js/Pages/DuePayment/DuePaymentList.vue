@@ -449,6 +449,7 @@ const initializeGrid = () => {
 };
 
 const applyFilters = () => {
+    getCashSettlementSummary(filters);
     showFilters.value = false;
     const newUrl = constructUrl();
     const visibleColumns = Object.keys(data.columnVisibility);
@@ -483,9 +484,6 @@ const totalPaidAmount = ref(0);
 
 const getCashSettlementSummary = async (filters) => {
     try {
-        filters = {
-            paymentStatus: ["Partial Paid", "Not Paid"]
-        };
         const response = await fetch("/cash-settlement-summery", {
             method: "POST",
             headers: {
@@ -553,7 +551,7 @@ const paidValueOfSelectedData = computed(() => {
 });
 
 const pageReady = async () => {
-    await getCashSettlementSummary();
+    await getCashSettlementSummary(filters);
     if (totalRecord.value > 0) {
         initializeGrid();
     } else {
