@@ -44,9 +44,6 @@ class ReleaseDeliveryRequest extends FormRequest
             'delivery_id.required' => 'Delivery ID is required.',
             'hbl_id.required' => 'HBL ID is required.',
             'released_packages.required' => 'Please select at least one package.',
-            //            'released_packages.array' => 'Released packages must be an array.',
-            //            'released_packages.min' => 'Please select at least one package.',
-            //            'released_packages.*.distinct' => 'Duplicate entries are not allowed in released packages.',
         ];
     }
 
