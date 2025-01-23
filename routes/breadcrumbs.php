@@ -56,6 +56,12 @@ Breadcrumbs::for('pickups.exceptions', function (BreadcrumbTrail $trail) {
     $trail->push('Pickup');
     $trail->push('Exceptions', route('pickups.exceptions'));
 });
+//pickups >all pickups
+Breadcrumbs::for('pickups.all', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Pickup');
+    $trail->push('All Pickups', route('pickups.all'));
+});
 
 // HBLs
 Breadcrumbs::for('hbls.index', function (BreadcrumbTrail $trail) {
