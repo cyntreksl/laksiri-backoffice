@@ -17,4 +17,6 @@ interface DeliveryRepositoryInterface
     public function getFilteredDelivers(Request $request);
 
     public function saveDeliveryOrder(array $deliveries);
+
+    public function releaseDeliverOrder(array $data);
 }

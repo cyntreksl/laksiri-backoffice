@@ -3,11 +3,13 @@
 namespace App\Repositories\CallCenter;
 
 use App\Actions\Delivery\CreateHBLDelivery;
+use App\Actions\Delivery\ReleaseHBLDelivery;
 use App\Actions\Delivery\SaveDeliveryOrder;
 use App\Actions\HBL\MarkAsDriverAssigned;
 use App\Factory\Delivery\FilterFactory;
 use App\Http\Resources\HBLDeliverResource;
 use App\Interfaces\CallCenter\DeliveryRepositoryInterface;
+use App\Models\HBL;
 use App\Models\HBLDeliver;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
@@ -57,6 +59,12 @@ class DeliveryRepository implements DeliveryRepositoryInterface
     public function getFilteredDelivers(Request $request)
     {
         $query = HBLDeliver::query();
+
+        // Filter by related HBL where is_released = 0
+        $query->whereHas('hbl', function ($q) {
+            $q->where('is_released', 0);
+        });
+
         if ($request->filled('driverId')) {
             FilterFactory::apply($query, ['driverBy' => $request->driverId]);
         } else {
@@ -74,5 +82,13 @@ class DeliveryRepository implements DeliveryRepositoryInterface
         foreach ($deliveries as $delivery) {
             SaveDeliveryOrder::run($delivery);
         }
+    }
+
+    public function releaseDeliverOrder(array $data): JsonResponse
+    {
+        $hbl = HBL::withoutGlobalScopes()->where('id', $data['hbl_id'])->with('packages')->first();
+        ReleaseHBLDelivery::run($hbl, $data);
+
+        return $this->success('HBL Delivered successfully!', [], 200);
     }
 }

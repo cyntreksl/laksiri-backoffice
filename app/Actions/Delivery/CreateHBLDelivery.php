@@ -25,6 +25,7 @@ class CreateHBLDelivery
                     [
                         'branch_id' => Auth::user()->primary_branch_id,
                         'driver_id' => $driver_id,
+                        'deliver_order' => null,
                     ]
                 );
             }
