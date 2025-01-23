@@ -85,6 +85,7 @@ const form = useForm({
     airport_of_arrival: props.container.airport_of_arrival,
     cargo_class: props.container.cargo_class,
     loading_ended_at: props.container.loading_ended_at,
+    loading_started_at: props.container.loading_started_at
 });
 
 const handleUpdateContainer = () => {
@@ -235,11 +236,15 @@ watchEffect(() => {
                         <InputError :message="form.errors.port_of_discharge" />
                     </div>
                     <div>
-                        <InputLabel value="Loaded Time"/>
-                        <TextInput v-model="form.loading_ended_at" class="w-full"/>
+                        <InputLabel value="Loaded Started Time"/>
+                        <TextInput v-model="form.loading_started_at" class="w-full"  :disabled="true" />
+                        <InputError :message="form.errors.loading_started_at" />
+                    </div>
+                    <div>
+                        <InputLabel value="Loaded End Time"/>
+                        <TextInput v-model="form.loading_ended_at" class="w-full"  :disabled="true" />
                         <InputError :message="form.errors.loading_ended_at" />
                     </div>
-
                     <template v-if="form.cargo_type === 'Air Cargo'">
                         <div>
                             <InputLabel value="Flight Number"/>
