@@ -8,8 +8,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import {computed, ref} from "vue";
-import IntlTelInput from "intl-tel-input/vueWithUtils";
-import "intl-tel-input/styles";
+
 
 const props = defineProps({
     officer: {
@@ -116,15 +115,25 @@ const updateOfficer = () => {
 
                         <!-- Mobile Number Field -->
                         <div class="col-span-2">
-                            <InputLabel for="mobile_number" value="Mobile Number" />
-                            <IntlTelInput
-                                v-model="contactNumber"
-                                id="mobile_number"
-                                type="text"
-                                class="custom-width border border-gray-300 rounded-md px-3 py-2 focus:ring-0"
-                                placeholder="123 4567 890"
-                            />
-                            <InputError :message="form.errors.mobile_number" />
+                            <InputLabel for="mobile_number" value="Mobile Number"/>
+                            <div class="flex space-x-px">
+                                <select
+                                    v-model="countryCode"
+                                    class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                >
+                                    <option v-for="code in countryCodes" :key="code" :value="code">
+                                        {{ code }}
+                                    </option>
+                                </select>
+                                <TextInput
+                                    v-model="contactNumber"
+                                    id="mobile_number"
+                                    type="text"
+                                    class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                    placeholder="123 4567 890"
+                                />
+                            </div>
+                            <InputError :message="form.errors.mobile_number"/>
                         </div>
 
                         <!-- Passport/NIC Field -->
@@ -257,9 +266,4 @@ const updateOfficer = () => {
         </div>
     </AppLayout>
 </template>
-<style>
-.custom-width {
-    width: 500px;
-}
-</style>
 

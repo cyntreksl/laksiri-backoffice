@@ -763,20 +763,15 @@ const applyFilters = () => {
         server: {
             url: newUrl,
             then: (data) => {
-                if (data.data.length === 0) {
-                    // Display a message when no matching data is found
-                    return [
-                        visibleColumns.map(() => "No matching data found"),
-                    ];
-                }
-
+                totalPickups.value = data.meta.total;
                 return data.data.map((item) => {
                     const row = [];
+                    row.push({id: item.id});
                     visibleColumns.forEach((column) => {
                         row.push(item[column]);
                     });
                     return row;
-                });
+                })
             },
             total: (response) => {
                 if (response && response.meta) {
@@ -787,9 +782,9 @@ const applyFilters = () => {
             },
         },
     });
+
     grid.forceRender();
 };
-
 const showConfirmAssignDriverModal = ref(false);
 const isDataEmpty = computed(() => selectedData.value.length === 0);
 const countOfSelectedData = computed(() => selectedData.value.length);

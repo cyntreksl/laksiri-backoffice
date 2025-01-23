@@ -48,7 +48,7 @@ class CashSettlementController extends Controller
 
     public function getSummery(Request $request)
     {
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'deliveryType', 'upb', 'd2d', 'gift', 'drivers', 'officers']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'deliveryType', 'upb', 'd2d', 'gift', 'drivers', 'officers', 'paymentStatus']);
 
         return $this->cashSettlementRepository->getSummery($filters);
     }
@@ -88,5 +88,17 @@ class CashSettlementController extends Controller
             'officers' => $officers,
             'paymentStatus' => HBLPaymentStatus::cases(),
         ]);
+    }
+
+    public function duePaymentList(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+        $search = $request->input('search', null);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus']);
+
+        return $this->cashSettlementRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 }

@@ -56,6 +56,12 @@ Breadcrumbs::for('pickups.exceptions', function (BreadcrumbTrail $trail) {
     $trail->push('Pickup');
     $trail->push('Exceptions', route('pickups.exceptions'));
 });
+//pickups >all pickups
+Breadcrumbs::for('pickups.all', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Pickup');
+    $trail->push('All Pickups', route('pickups.all'));
+});
 
 // HBLs
 Breadcrumbs::for('hbls.index', function (BreadcrumbTrail $trail) {
@@ -187,6 +193,12 @@ Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail
     $trail->parent('dashboard');
     $trail->push('Back Office');
     $trail->push('Cash Settlement List', route('back-office.cash-settlements.index'));
+});
+//due payment
+Breadcrumbs::for('back-office.duepayments.duePaymentIndex', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Back Office');
+    $trail->push('Due Payment List', route('back-office.duepayments.duePaymentIndex'));
 });
 
 // Settings > Zones
