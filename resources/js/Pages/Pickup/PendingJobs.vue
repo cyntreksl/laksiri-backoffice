@@ -745,6 +745,7 @@ const applyFilters = () => {
 
                 return data.data.map((item) => {
                     const row = [];
+                    row.push({id: item.id});
                     visibleColumns.forEach((column) => {
                         row.push(item[column]);
                     });

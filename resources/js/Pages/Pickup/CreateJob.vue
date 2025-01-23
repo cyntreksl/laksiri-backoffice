@@ -11,6 +11,7 @@ import DatePicker from "@/Components/DatePicker.vue";
 import {push} from "notivue";
 import IntlTelInput from "intl-tel-input/vueWithUtils";
 import "intl-tel-input/styles";
+import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
     packageTypes: {
