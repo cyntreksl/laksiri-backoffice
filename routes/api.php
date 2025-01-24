@@ -47,6 +47,8 @@ Route::domain('api.'.config('app.url'))
         Route::get('/pending-deliver-list', [DeliverController::class, 'index']);
 
         Route::get('/delivers/{hblDeliver}', [DeliverController::class, 'show']);
+
+        Route::post('/release-delivery', [DeliverController::class, 'releaseDeliverOrder']);
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
