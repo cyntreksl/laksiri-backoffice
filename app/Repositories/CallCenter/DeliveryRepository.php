@@ -87,6 +87,15 @@ class DeliveryRepository implements DeliveryRepositoryInterface
     public function releaseDeliverOrder(array $data): JsonResponse
     {
         $hbl = HBL::withoutGlobalScopes()->where('id', $data['hbl_id'])->with('packages')->first();
+
+        if (! $hbl) {
+            return $this->error('HBL not found.', [], 404);
+        }
+
+        if (! empty(array_diff($data['released_packages'], $hbl->packages->pluck('id')->toArray()))) {
+            return $this->error('Invalid package(s) detected.', [], 422);
+        }
+
         ReleaseHBLDelivery::run($hbl, $data);
 
         return $this->success('HBL Delivered successfully!', [], 200);
