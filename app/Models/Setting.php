@@ -17,7 +17,7 @@ class Setting extends Model
     use HasFile;
 
     protected $fillable = [
-        'branch_id', 'invoice_header_title', 'invoice_header_subtitle', 'invoice_header_address', 'invoice_header_telephone', 'invoice_footer_title', 'invoice_footer_text', 'logo', 'seal',
+        'branch_id', 'invoice_header_title', 'invoice_header_subtitle', 'invoice_header_address', 'invoice_header_telephone', 'invoice_footer_title', 'invoice_footer_text', 'logo', 'seal', 'notification',
     ];
 
     /**

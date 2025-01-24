@@ -53,6 +53,7 @@ class UpdateSettingRequest extends FormRequest
                     'max:2048',
                 ]),
             ],
+            'notification' => ['required', 'string'],
         ];
     }
 }
