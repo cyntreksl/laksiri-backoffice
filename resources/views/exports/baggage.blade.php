@@ -60,7 +60,7 @@
 </head>
 <body>
 <div class="header">
-    <div>MH00020931/ 2</div>
+
     <div>
         <div>Serial No. :</div>
         <div>Baggage Receipt No. :</div>
@@ -81,34 +81,29 @@
     </tr>
     <tr>
         <td class="label">B/L No. :</td>
-        <td>J2301</td>
+        <td>{{$containers->bl_number}}</td>
     </tr>
     <tr>
         <td class="label">Consignee :</td>
-        <td>H.C.G PERERA</td>
+        <td>{{$hbl->consignee_name}}</td>
     </tr>
     <tr>
         <td class="label">No. of Packages :</td>
         <td>P/E</td>
     </tr>
     <tr>
-        <td class="label">Remarks :</td>
-        <td class="border-bottom"></td>
+        <td class="label">PORT :</td>
+        <td>{{$containers->port_of_discharge}}</td>
     </tr>
     <tr>
-        <td class="label">WT / VOL :</td>
-        <td class="border-bottom"></td>
+        <td class="label">VESSEL :</td>
+        <td>{{$containers->vessel_name}}</td>
+    </tr>
+    <tr>
+        <td class="label">AGENT :</td>
+        <td>{{$settings->invoice_header_title}}</td>
     </tr>
 </table>
 
-<div class="split-section">
-    <div>
-        <div>PORT : JAPAN</div>
-        <div>VESSEL : MAERSK HOUSTON OF 07.01.2025</div>
-    </div>
-    <div>
-        <div>AGENT : JJIRIA INTERNATIONAL CO.,LTD. (JA)</div>
-    </div>
-</div>
 </body>
 </html>

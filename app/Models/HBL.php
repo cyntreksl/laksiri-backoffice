@@ -229,4 +229,11 @@ class HBL extends Model
             'driver_id'
         );
     }
+
+    public function containers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Container::class, 'container_hbl_package', 'hbl_package_id', 'container_id')
+            ->withPivot('status', 'loaded_by')
+            ->withTimestamps();
+    }
 }

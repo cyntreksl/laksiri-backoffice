@@ -6,7 +6,6 @@ use App\Models\Container;
 use App\Models\HBL;
 use App\Models\HBLDocument;
 use Illuminate\Http\JsonResponse;
-use PhpParser\Builder\Function_;
 
 interface HBLRepositoryInterface
 {
@@ -74,5 +73,5 @@ interface HBLRepositoryInterface
 
     public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []);
 
-    public Function downloadBaggagePDF(HBL $hbl);
+    public function downloadBaggagePDF(HBL $hbl);
 }

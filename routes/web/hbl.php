@@ -87,5 +87,5 @@ Route::post('/get-hbl-packages', [HBLController::class, 'getHBLPackageRules']);
 
 Route::post('/get-hbl-rules', [HBLController::class, 'getHBLRules'])->name('hbls.rules');
 
-Route::get ('hbls/download/baggage/{hbl}', [HBLController::class, 'downloadBaggagePDF'])
+Route::get('hbls/download/baggage/{hbl}', [HBLController::class, 'downloadBaggagePDF'])
     ->name('hbls.download.baggage');
