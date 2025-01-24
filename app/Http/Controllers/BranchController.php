@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enum\BranchType;
 use App\Enum\CargoType;
 use App\Enum\HBLType;
+use App\Enum\NotificationType;
 use App\Enum\PackageType;
 use App\Http\Requests\StoreBranchRequest;
 use App\Http\Requests\UpdateBranchRequest;
@@ -67,6 +68,7 @@ class BranchController extends Controller
             'branch' => $branch,
             'settings' => $this->settingRepository->getSettings(),
             'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
+            'notificationTypes' => NotificationType::cases(),
         ]);
     }
 
