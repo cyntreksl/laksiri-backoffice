@@ -9,6 +9,7 @@ use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\DeleteHBL;
+use App\Actions\HBL\DownloadBaggagePDF;
 use App\Actions\HBL\DownloadHBLBarcodePDF;
 use App\Actions\HBL\DownloadHBLInvoicePDF;
 use App\Actions\HBL\DownloadHBLPDF;
@@ -456,5 +457,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function downloadBaggagePDF(HBL $hbl)
+    {
+        return DownloadBaggagePDF::run($hbl);
     }
 }
