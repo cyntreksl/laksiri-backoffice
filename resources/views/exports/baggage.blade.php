@@ -81,7 +81,7 @@
     </tr>
     <tr>
         <td class="label">B/L No. :</td>
-        <td>{{$containers->bl_number}}</td>
+        <td>{{$containers->bl_number ?? ''}}</td>
     </tr>
     <tr>
         <td class="label">Consignee :</td>
