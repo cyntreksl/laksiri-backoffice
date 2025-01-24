@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -42,6 +42,10 @@ const props = defineProps({
     countryCodes: {
         type: Array,
         default: () => [],
+    },
+    notificationTypes: {
+        type: Array,
+        default: () => []
     },
 })
 
@@ -86,6 +90,7 @@ const settingForm = useForm({
     invoice_footer_text: props.settings ? props.settings.invoice_footer_text : '',
     logo: props.settings ? props.settings.logo : null,
     seal: props.settings ? props.settings.seal : null,
+    notification: props.settings ? props.settings.notification : null,
 });
 
 const handleSettingUpdate = () => {
@@ -558,6 +563,32 @@ const clearSealFileInput = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="card px-4 py-4 sm:px-5">
+                    <div class="grid grid-cols-2">
+                        <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
+                            Notification
+                        </h2>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 mt-4">
+                        <template v-for="(notification, index) in notificationTypes" :key="index">
+                            <label
+                                class="inline-flex items-center space-x-2"
+                            >
+                                <input
+                                    v-model="settingForm.notification"
+                                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                                    name="role"
+                                    :value="notification"
+                                    type="radio"
+                                />
+                                <p class="capitalize">{{ notification }}</p>
+                            </label>
+                        </template>
+                    </div>
+                    <InputError class="mt-1" :message="settingForm.errors.notification" />
                 </div>
             </div>
         </div>
