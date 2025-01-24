@@ -19,7 +19,7 @@ class HBLStatusResource extends JsonResource
             'statusable_type' => $this->statusable_type,
             'statusable_id' => $this->statusable_id,
             'status' => $this->status,
-            'created_by' => $this->user->name,
+            'created_by' => $this->user->name ?? '-',
             'description' => $this->description,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
