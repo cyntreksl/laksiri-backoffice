@@ -81,11 +81,11 @@
     </tr>
     <tr>
         <td class="label">B/L No. :</td>
-        <td>{{$containers->bl_number}}</td>
+        <td>{{$containers->bl_number ?? ''}}</td>
     </tr>
     <tr>
         <td class="label">Consignee :</td>
-        <td>{{$hbl->consignee_name}}</td>
+        <td>{{$hbl->consignee_name ?? ''}}</td>
     </tr>
     <tr>
         <td class="label">No. of Packages :</td>
@@ -93,15 +93,15 @@
     </tr>
     <tr>
         <td class="label">PORT :</td>
-        <td>{{$containers->port_of_discharge}}</td>
+        <td>{{$containers->port_of_discharge ?? ''}}</td>
     </tr>
     <tr>
         <td class="label">VESSEL :</td>
-        <td>{{$containers->vessel_name}}</td>
+        <td>{{$containers->vessel_name ?? ''}}</td>
     </tr>
     <tr>
         <td class="label">AGENT :</td>
-        <td>{{$settings->invoice_header_title}}</td>
+        <td>{{$settings->invoice_header_title ?? ''}}</td>
     </tr>
 </table>
 
