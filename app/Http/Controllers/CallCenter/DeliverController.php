@@ -4,6 +4,7 @@ namespace App\Http\Controllers\CallCenter;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AssignDriverRequest;
+use App\Http\Requests\ReleaseDeliveryRequest;
 use App\Interfaces\CallCenter\DeliveryRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Models\HBLDeliver;
@@ -50,5 +51,10 @@ class DeliverController extends Controller
         if ($request->deliveries) {
             $this->deliveryRepository->saveDeliveryOrder($request->deliveries);
         }
+    }
+
+    public function releaseDeliverOrder(ReleaseDeliveryRequest $request)
+    {
+        return $this->deliveryRepository->releaseDeliverOrder($request->all());
     }
 }
