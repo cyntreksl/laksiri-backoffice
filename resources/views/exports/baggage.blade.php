@@ -62,47 +62,92 @@
 <div class="header">
 
     <div>
-        <div>Serial No. :</div>
-        <div>Baggage Receipt No. :</div>
+        <div style="align-items: center">                  </div>
+        <div>                </div>
     </div>
-    <div>Date : 09/01/2025</div>
+
 </div>
 
-<h1 class="title">BAGGAGE RECEIPT</h1>
+
 
 <table class="details-table">
     <tr>
-        <td class="label">Bond Storage No. :</td>
+        <td class="label">     </td>
+        <td>          MF0125455 </td>
+    </tr>
+    <tr>
+        <td class="label">     </td>
+        <td>     </td>
+    <tr>
+    <tr>
+        <td class="label">     </td>
+        <td>     </td>
+    <tr>
+
+    <tr>
+        <td class="label">     </td>
+        <td><?php echo date('d/m/Y'); ?> </td>
+    </tr>
+    <tr>
+        <td class="label">     </td>
+        <td>     </td>
+    <tr>
+    <tr>
+        <td class="label">     </td>
+        <td>     </td>
+    <tr>
+
+    <tr>
+        <td class="label">     </td>
         <td>01/2554-2554</td>
     </tr>
     <tr>
-        <td class="label">Airway Bill No. :</td>
+        <td class="label">     </td>
         <td>APU097099</td>
     </tr>
     <tr>
-        <td class="label">B/L No. :</td>
+        <td class="label">     </td>
         <td>{{$containers->bl_number ?? ''}}</td>
     </tr>
     <tr>
-        <td class="label">Consignee :</td>
+        <td class="label">     </td>
+        <td>     </td>
+    <tr>
+        <td class="label">     </td>
         <td>{{$hbl->consignee_name ?? ''}}</td>
     </tr>
     <tr>
-        <td class="label">No. of Packages :</td>
+        <td class="label">     </td>
         <td>P/E</td>
     </tr>
     <tr>
-        <td class="label">PORT :</td>
+        <td class="label">     </td>
         <td>{{$containers->port_of_discharge ?? ''}}</td>
     </tr>
     <tr>
-        <td class="label">VESSEL :</td>
+        <td class="label">     </td>
+        <td>     </td>
+    <tr>
+    <tr>
+        <td class="label">     </td>
         <td>{{$containers->vessel_name ?? ''}}</td>
     </tr>
     <tr>
-        <td class="label">AGENT :</td>
+        <td class="label">     </td>
         <td>{{$settings->invoice_header_title ?? ''}}</td>
     </tr>
+    <tr>
+        <td class="label">     </td>
+        <td>     </td>
+    <tr>
+    <tr>
+        <td class="label">     </td>
+        <td>     </td>
+    <tr>
+    <tr>
+        <td class="label">     </td>
+        <td>          chef</td>
+    <tr>
 </table>
 
 </body>
