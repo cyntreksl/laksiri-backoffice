@@ -53,7 +53,15 @@ class UpdateSettingRequest extends FormRequest
                     'max:2048',
                 ]),
             ],
-            'notification' => ['required', 'string'],
+            'notification' => [
+                'required',
+                'array',
+                function ($attribute, $value, $fail) {
+                    if (! is_array($value) || ! array_filter($value)) {
+                        $fail('At least one notification method must be enabled.');
+                    }
+                },
+            ],
         ];
     }
 }
