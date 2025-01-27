@@ -50,19 +50,28 @@
         margin: 0 auto;
         text-decoration: none;
     }
+
+    .signature {
+        margin-top: 30px;
+        font-size: 16px;
+        color: #333;
+    }
 </style>
 
 <div>
     <div class="feedback-mail">
         <!-- Logo goes here -->
         <img class="logo" style="width: 30%;"
-            src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/app-logo.png'))) }}"
-            alt="app_logo">
+             src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/app-logo.png'))) }}"
+             alt="app_logo">
 
-        <h1>Hi,</h1>
-        <h4>Thanks for choosing Laksiri! Please tell us your experience in this 30-second survey.Your
-            feedback help us to create a better experience for you and for all of our customers</h4>
+        <h1>{{ $customer ? 'Dear '.$customer : 'Hi'}},</h1>
+        <h4>{{ $success_message ?? ''}}</h4>
+        <h4>{{ $detail_message ?? ''}}</h4>
 
-        <a href="{{ $feedbackURL }}" class="submit-btn">Tell us how it went</a>
+        <div class="signature">
+            Regards,<br>
+            <strong>Laksiri Seva Cargo</strong>
+        </div>
     </div>
 </div>
