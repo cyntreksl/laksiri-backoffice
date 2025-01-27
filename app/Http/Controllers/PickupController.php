@@ -11,6 +11,7 @@ use App\Http\Requests\UpdatePickupRequest;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
+use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\SettingRepositoryInterface;
@@ -35,6 +36,7 @@ class PickupController extends Controller
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly SettingRepositoryInterface $settingRepository,
+        private readonly NotificationMailRepositoryInterface $notificationMailRepository,
     ) {
     }
 
@@ -132,7 +134,11 @@ class PickupController extends Controller
     {
         $this->authorize('pickups.assign driver');
 
-        return $this->pickupRepository->assignDriverToPickups($request->all());
+        $driverPickups = $this->pickupRepository->assignDriverToPickups($request->all());
+
+        $this->notificationMailRepository->sendAssignDriverNotification($request->all());
+
+        return $driverPickups;
     }
 
     public function showPickupOrder(Request $request)

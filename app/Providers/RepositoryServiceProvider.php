@@ -24,6 +24,7 @@ use App\Interfaces\FileManagerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Interfaces\MHBLRepositoryInterface;
+use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Interfaces\OfficerRepositoryInterface;
 use App\Interfaces\PackagePriceRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
@@ -60,6 +61,7 @@ use App\Repositories\FileManagerRepository;
 use App\Repositories\HBLRepository;
 use App\Repositories\LoadedContainerRepository;
 use App\Repositories\MHBLRepository;
+use App\Repositories\NotificationMailRepository;
 use App\Repositories\OfficerRepository;
 use App\Repositories\PackagePriceRepository;
 use App\Repositories\PackageTypeRepository;
@@ -105,6 +107,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(SettingRepositoryInterface::class, SettingRepository::class);
         $this->app->bind(PackageTypeRepositoryInterface::class, PackageTypeRepository::class);
         $this->app->bind(ShipperConsigneeRepositoryInterface::class, ShipperConsigneeRepository::class);
+        $this->app->bind(NotificationMailRepositoryInterface::class, NotificationMailRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);
