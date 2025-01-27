@@ -90,7 +90,7 @@ const settingForm = useForm({
     invoice_footer_text: props.settings ? props.settings.invoice_footer_text : '',
     logo: props.settings ? props.settings.logo : null,
     seal: props.settings ? props.settings.seal : null,
-    notification: props.settings ? props.settings.notification : null,
+    notification: JSON.parse(props.settings?.notification || '{}'),
 });
 
 const handleSettingUpdate = () => {
@@ -161,6 +161,10 @@ const clearSealFileInput = () => {
     if (sealInput.value?.value) {
         sealInput.value.value = null;
     }
+};
+
+const updateChecked = (notification, isChecked) => {
+    settingForm.notification = { ...settingForm.notification, [notification]: isChecked };
 };
 
 
@@ -573,20 +577,19 @@ const clearSealFileInput = () => {
                         </h2>
                     </div>
                     <div class="grid grid-cols-3 gap-4 mt-4">
-                        <template v-for="(notification, index) in notificationTypes" :key="index">
-                            <label
-                                class="inline-flex items-center space-x-2"
-                            >
-                                <input
-                                    v-model="settingForm.notification"
-                                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                    name="role"
-                                    :value="notification"
-                                    type="radio"
-                                />
-                                <p class="capitalize">{{ notification }}</p>
-                            </label>
-                        </template>
+                        <InputLabel
+                            v-for="(notification, index) in notificationTypes"
+                            :key="index"
+                            class="cursor-pointer"
+                        >
+                            <input
+                                :checked="settingForm.notification[notification] || false"
+                                class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent mr-3"
+                                type="checkbox"
+                                @change="(event) => updateChecked(notification, event.target.checked)"
+                            />
+                            {{ notification }}
+                        </InputLabel>
                     </div>
                     <InputError class="mt-1" :message="settingForm.errors.notification" />
                 </div>
