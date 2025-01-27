@@ -72,4 +72,6 @@ interface HBLRepositoryInterface
     public function downloadGatePass($hbl);
 
     public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []);
+
+    public function downloadBaggagePDF(HBL $hbl);
 }
