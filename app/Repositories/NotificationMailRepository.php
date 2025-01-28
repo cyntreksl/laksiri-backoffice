@@ -6,6 +6,7 @@ use App\Actions\Setting\GetSettings;
 use App\Actions\User\GetUserById;
 use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Mail\Notification;
+use App\Models\HBL;
 use App\Models\PickUp;
 use Illuminate\Support\Facades\Mail;
 
@@ -46,6 +47,20 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
                 'detail_message' => 'HBL Reference Number: '.$pickUp->hbl['hbl_number'].' You can track your cargo here:  '.'[Tracking_link]',
             ];
             Mail::to($pickUp['email'])->send(new Notification($email_data));
+        }
+    }
+
+    public function sendCashReceivedNotification(HBL $hbl)
+    {
+        $notification_settings = json_decode($this->settings->notification, true);
+        if (isset($notification_settings['Email']) && $notification_settings['Email'] === true) {
+            $email_data = [
+                'subject' => 'Cash Receiver successfully',
+                'customer_name' => $hbl['hbl_name'],
+                'success_message' => 'Cash Received successfully.  ',
+                'detail_message' => 'HBL Reference Number: '.$hbl['hbl_number'].' You can track your cargo here:  '.'[Tracking_link]',
+            ];
+            Mail::to($hbl['email'])->send(new Notification($email_data));
         }
     }
 }
