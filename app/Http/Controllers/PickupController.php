@@ -134,11 +134,11 @@ class PickupController extends Controller
     {
         $this->authorize('pickups.assign driver');
 
-        $driverPickups = $this->pickupRepository->assignDriverToPickups($request->all());
+        return $this->pickupRepository->assignDriverToPickups($request->all());
 
-        $this->notificationMailRepository->sendAssignDriverNotification($request->all());
+        //        $this->notificationMailRepository->sendAssignDriverNotification($request->all());
 
-        return $driverPickups;
+        //        return $driverPickups;
     }
 
     public function showPickupOrder(Request $request)

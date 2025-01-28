@@ -2,7 +2,9 @@
 
 namespace App\Interfaces;
 
+use App\Models\PickUp;
+
 interface NotificationMailRepositoryInterface
 {
-    public function sendAssignDriverNotification(array $data);
+    public function sendAssignDriverNotification(PickUp $pickUp);
 }
