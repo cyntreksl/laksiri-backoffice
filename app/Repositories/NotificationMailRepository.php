@@ -32,4 +32,20 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
             Mail::to($pickUp['email'])->send(new Notification($email_data));
         }
     }
+
+    public function sendCollectedCargoNotification(PickUp $pickUp)
+    {
+        $notification_settings = json_decode($this->settings->notification, true);
+        $driver = GetUserById::run($pickUp['driver_id']);
+        $hbl = $pickUp->hbl;
+        if (isset($notification_settings['Email']) && $notification_settings['Email'] === true) {
+            $email_data = [
+                'subject' => 'Cargo collected successfully',
+                'customer_name' => $pickUp['name'],
+                'success_message' => 'Your cargo has been collected successfully.  ',
+                'detail_message' => 'HBL Reference Number: '.$pickUp->hbl['hbl_number'].' You can track your cargo here:  '.'[Tracking_link]',
+            ];
+            Mail::to($pickUp['email'])->send(new Notification($email_data));
+        }
+    }
 }
