@@ -41,6 +41,7 @@ const form = useForm({
     is_damaged: false,
     type: null,
     files: [],
+    note: '',
 });
 
 const handleCreateUnloadingIssue = () => {
@@ -126,6 +127,12 @@ const updateFiles = (files) => {
                     <InputLabel value="Is Damage"/>
                     <Checkbox v-model="form.is_damaged"/>
                     <InputError :message="form.errors.is_damaged"/>
+                </div>
+
+                <div>
+                    <InputLabel value="Note"/>
+                    <textarea v-model="form.note" class="w-full h-20 border rounded p-2" placeholder="Note"></textarea>
+                    <InputError :message="form.errors.note"/>
                 </div>
 
                 <div>
