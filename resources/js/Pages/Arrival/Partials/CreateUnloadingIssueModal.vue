@@ -155,5 +155,4 @@ const updateFiles = (files) => {
             </div>
         </template>
     </DialogModal>
-<!--    <ImageUploadModal :show="isShowFileUploadModal" @close="closeFileUploadModal"/>-->
 </template>
