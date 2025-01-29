@@ -127,4 +127,14 @@ class LoadedContainerController extends Controller
 
         return $this->loadedContainerRepository->downloadDoorToDoorPdf($container);
     }
+
+    public function downloadLoadingPointDoc($container)
+    {
+        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
+        dd($container);
+//        $hbl = GetHBLByIdWithPackages::run($HBL);
+//        $this->authorize('hbls.download pdf');
+//
+//        return $this->HBLRepository->downloadHBLPDF($hbl);
+    }
 }
