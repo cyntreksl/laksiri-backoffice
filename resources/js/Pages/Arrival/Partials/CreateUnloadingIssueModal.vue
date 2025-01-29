@@ -9,6 +9,13 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import {push} from "notivue";
+import 'filepond/dist/filepond.min.css';
+import vueFilePond from "vue-filepond";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+
+const FilePond = vueFilePond(FilePondPluginImagePreview, FilePondPluginFileValidateType);
 
 const props = defineProps({
     show: {
@@ -33,6 +40,7 @@ const form = useForm({
     rtf: false,
     is_damaged: false,
     type: null,
+    files: [],
 });
 
 const handleCreateUnloadingIssue = () => {
@@ -49,6 +57,19 @@ const handleCreateUnloadingIssue = () => {
             push.error('Something went to wrong!');
         }
     })
+}
+
+const isShowFileUploadModal = ref(false);
+
+const confirmFileUpload = () => {
+    isShowFileUploadModal.value = true;
+};
+const closeFileUploadModal = () => {
+    isShowFileUploadModal.value = false;
+};
+
+const updateFiles = (files) => {
+    form.files = files.map(file => file.file);
 }
 </script>
 
@@ -106,6 +127,20 @@ const handleCreateUnloadingIssue = () => {
                     <Checkbox v-model="form.is_damaged"/>
                     <InputError :message="form.errors.is_damaged"/>
                 </div>
+
+                <div>
+                    <InputLabel value="Upload Images"/>
+                    <FilePond
+                        name="test"
+                        ref="pond"
+                        label-idle="Drop images here or <span class='filepond--label-action'>Browse</span>"
+                        allow-multiple="true"
+                        accepted-file-types="image/jpeg, image/png, application/pdf"
+                        style="border: 2px dashed #e2e7ee; border-radius: 2px; padding: 2px;"
+                        v-on:updatefiles="updateFiles"
+                    />
+                    <InputError :message="form.errors.files"/>
+                </div>
             </div>
         </template>
 
@@ -120,4 +155,5 @@ const handleCreateUnloadingIssue = () => {
             </div>
         </template>
     </DialogModal>
+<!--    <ImageUploadModal :show="isShowFileUploadModal" @close="closeFileUploadModal"/>-->
 </template>
