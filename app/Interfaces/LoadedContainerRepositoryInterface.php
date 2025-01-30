@@ -2,6 +2,8 @@
 
 namespace App\Interfaces;
 
+use App\Models\Container;
+
 interface LoadedContainerRepositoryInterface
 {
     public function store(array $data);
@@ -13,4 +15,6 @@ interface LoadedContainerRepositoryInterface
     public function updateVerificationStatus(array $data);
 
     public function downloadDoorToDoorPdf($container);
+
+    public function downloadUnloadingPointDoc($container);
 }

@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\Container\Loading\CreateDraftLoadedContainer;
 use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
+use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Setting\GetSettings;
 use App\Enum\ContainerStatus;
 use App\Exports\DoorToDoorManifestExport;
@@ -142,5 +143,13 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
         return $pdf->download($filename);
 
+    }
+
+
+
+    public function downloadUnloadingPointDoc($container)
+    {
+        $container = GetLoadedContainerById::run(Container::withoutGlobalScope(BranchScope::class)->findOrFail($container));
+        dd($container);
     }
 }

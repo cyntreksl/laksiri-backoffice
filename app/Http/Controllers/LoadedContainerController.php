@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Enum\CargoType;
 use App\Enum\ContainerStatus;
 use App\Enum\ContainerType;
@@ -130,11 +131,8 @@ class LoadedContainerController extends Controller
 
     public function downloadLoadingPointDoc($container)
     {
-        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
-        dd($container);
-//        $hbl = GetHBLByIdWithPackages::run($HBL);
-//        $this->authorize('hbls.download pdf');
-//
-//        return $this->HBLRepository->downloadHBLPDF($hbl);
+        $this->authorize('hbls.download pdf');
+
+        return $this->loadedContainerRepository->downloadUnloadingPointDoc($container);
     }
 }
