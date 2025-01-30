@@ -21,6 +21,7 @@ use App\Models\ContainerDocument;
 use App\Models\HBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ContainerController extends Controller
@@ -110,13 +111,23 @@ class ContainerController extends Controller
     {
         $this->authorize('container.load to container');
 
-        return Inertia::render('Loading/LoadingPoint', [
+        if(Auth::user()->hasRole('boned area')){
+            return Inertia::render('Loading/DestinationLoadingPoint', [
+                'container' => $container,
+                'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
+                'cargoTypes' => CargoType::getCargoTypeOptions(),
+                'hblTypes' => HBLType::getHBLTypeOptions(),
+                'warehouses' => WarehouseType::getWarehouseOptions(),
+            ]);
+        } else return Inertia::render('Loading/LoadingPoint', [
             'container' => $container,
             'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
             'cargoTypes' => CargoType::getCargoTypeOptions(),
             'hblTypes' => HBLType::getHBLTypeOptions(),
             'warehouses' => WarehouseType::getWarehouseOptions(),
         ]);
+
+
     }
 
     public function showUnloadingPoint($container_id)
