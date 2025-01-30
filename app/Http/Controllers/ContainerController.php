@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Branch\GetBranches;
+use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\Container\GenerateContainerReferenceNumber;
 use App\Actions\Container\GetContainerWithoutGlobalScopesById;
 use App\Enum\CargoType;
@@ -71,6 +72,7 @@ class ContainerController extends Controller
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
             'cargoTypes' => $cargoTypes,
+            'warehouses' => GetDestinationBranches::run()->reject(fn ($warehouse) => $warehouse->name === 'Other'),
         ]);
     }
 
