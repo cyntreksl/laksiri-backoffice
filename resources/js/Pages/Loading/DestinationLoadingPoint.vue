@@ -589,7 +589,7 @@ const reviewContainer = () => {
                                                 <div>
                                                     <div class="flex justify-between">
                                                         <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
-                                                            {{ findHblByPackageId(element.id)?.hbl }}
+                                                            {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }}
                                                         </p>
                                                     </div>
                                                 </div>
