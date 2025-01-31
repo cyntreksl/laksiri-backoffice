@@ -79,7 +79,7 @@ const handleFinishUnloading = () => {
     <DialogModal :closeable="true" :maxWidth="'2xl'" :show="show" @close="$emit('close')">
         <template #title>
             <div class="flex justify-between items-center">
-                <div>Unloaded Summery</div>
+                <div>Unloaded Summery12</div>
                 <button
                     class="text-gray-500 jus text-right hover:text-red-500 focus:outline-none"
                     @click="$emit('close')"

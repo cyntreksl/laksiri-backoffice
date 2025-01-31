@@ -111,7 +111,7 @@ class ContainerController extends Controller
     {
         $this->authorize('container.load to container');
 
-        if(Auth::user()->hasRole('boned area')){
+        if (Auth::user()->hasRole('boned area')) {
             return Inertia::render('Loading/DestinationLoadingPoint', [
                 'container' => $container,
                 'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
@@ -119,14 +119,15 @@ class ContainerController extends Controller
                 'hblTypes' => HBLType::getHBLTypeOptions(),
                 'warehouses' => WarehouseType::getWarehouseOptions(),
             ]);
-        } else return Inertia::render('Loading/LoadingPoint', [
-            'container' => $container,
-            'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
-            'cargoTypes' => CargoType::getCargoTypeOptions(),
-            'hblTypes' => HBLType::getHBLTypeOptions(),
-            'warehouses' => WarehouseType::getWarehouseOptions(),
-        ]);
-
+        } else {
+            return Inertia::render('Loading/LoadingPoint', [
+                'container' => $container,
+                'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
+                'cargoTypes' => CargoType::getCargoTypeOptions(),
+                'hblTypes' => HBLType::getHBLTypeOptions(),
+                'warehouses' => WarehouseType::getWarehouseOptions(),
+            ]);
+        }
 
     }
 
@@ -273,5 +274,10 @@ class ContainerController extends Controller
     public function unloadMHBLFromContainer(Request $request, Container $container)
     {
         return $this->containerRepository->unloadMHBLFromContainer($request->all(), $container);
+    }
+
+    public function getDestinationUnloadedHBLs(Request $request)
+    {
+        return $this->HBLRepository->getDestinationUnloadedHBLsByCargoType($request->all());
     }
 }

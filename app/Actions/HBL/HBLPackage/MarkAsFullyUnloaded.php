@@ -15,6 +15,7 @@ class MarkAsFullyUnloaded
         $hbl_package = HBLPackage::withoutGlobalScope(BranchScope::class)
             ->find($hbl_package_id);
         $hbl_package->is_unloaded = true;
+        $hbl_package->current_warehouse = session('current_branch_id');
         $hbl_package->save();
     }
 }
