@@ -3,6 +3,7 @@
 namespace App\Actions\HBL\HBLPackage;
 
 use App\Models\HBLPackage;
+use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class MarkAsLoaded
@@ -11,7 +12,7 @@ class MarkAsLoaded
 
     public function handle($hbl_package_id, $is_destination_loaded = false)
     {
-        if ($is_destination_loaded) {
+        if (Auth::user()->hasRole('boned area')) {
             $hbl_package = HBLPackage::find($hbl_package_id);
             $hbl_package->is_de_loaded = true;
             $hbl_package->save();
