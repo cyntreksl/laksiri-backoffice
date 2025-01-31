@@ -110,7 +110,7 @@ class ContainerController extends Controller
     public function showLoadingPoint(Request $request, Container $container)
     {
         $this->authorize('container.load to container');
-
+        //        dd($this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType));
         if (Auth::user()->hasRole('boned area')) {
             return Inertia::render('Loading/DestinationLoadingPoint', [
                 'container' => $container,

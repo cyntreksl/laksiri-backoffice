@@ -1,5 +1,4 @@
 <script setup>
-import AppLayout from "@/Layouts/AppLayout.vue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {computed, reactive, ref, watch} from "vue";
@@ -8,6 +7,7 @@ import ReviewModal from "@/Pages/Loading/Partials/ReviewModal.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import ActionMessage from "@/Components/ActionMessage.vue";
 import RadioButton from "@/Components/RadioButton.vue";
+import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 
 const props = defineProps({
     container: {
@@ -112,12 +112,16 @@ const filteredPackages = computed(() => {
 })
 
 const containerArr = ref(props.loadedHBLs.flatMap(hbl => hbl.packages));
+const reviewContainerArr = ref([]);
 
-const handleLoad = (index) => {
+const handleLoad = (index, pkg_id) => {
     if (index !== -1) {
-        const packageToLoad = hblPackagesArr.value[index];
+        const packageToLoad = hblPackagesArr.value.find(
+            (pkg) => pkg.id === pkg_id
+        );
         containerArr.value = [...containerArr.value, packageToLoad];
-        hblPackagesArr.value.splice(index, 1);
+        const objectIndex = hblPackagesArr.value.findIndex(pkg => pkg.id === pkg_id);
+        hblPackagesArr.value.splice(objectIndex, 1);
 
         const hblIndex = unloadedHBLs.value.findIndex(hbl => hbl.packages.some(p => p.id === packageToLoad.id));
         if (hblIndex !== -1) {
@@ -129,6 +133,7 @@ const handleLoad = (index) => {
             }
         }
     }
+    console.log('01',containerArr.value);
 }
 
 const handleUnload = (index) => {
@@ -232,10 +237,17 @@ watch(unloadedHBLs, (newVal) => {
     });
     hblPackagesArr.value = newVal.flatMap(hbl => hbl.packages);
 });
+
+const reviewContainer = () => {
+    console.log(containerArr.value);
+    reviewContainerArr.value = containerArr.value;
+
+    showReviewModal.value = true
+}
 </script>
 
 <template>
-    <AppLayout title="Loading Points">
+    <DestinationAppLayout title="Loading Points">
         <template #header>Loading Points</template>
 
         <main class="kanban-app w-full">
@@ -381,11 +393,11 @@ watch(unloadedHBLs, (newVal) => {
                             </div>
                         </div>
                         <div>
-                            <ul v-if="Object.keys(filteredPackages).length > 0" class="space-y-1 font-inter font-medium">
-                                <li v-for="hbl in filteredPackages" :key="hbl.id">
-                                    <p>{{hbl}}</p>
+                            <ul v-if="filteredPackages.filter(hbl => hbl.packages.length > 0).length > 0"
+                                class="space-y-1 font-inter font-medium">
+                                <li v-for="hbl in filteredPackages.filter(hbl => hbl.packages.length > 0)"
+                                    :key="hbl.id">
                                     <div
-                                        v-if="Object.keys(hbl.packages).length > 0"
                                         class="flex cursor-pointer items-center rounded px-2 py-1 tracking-wide text-slate-800 outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:text-navy-100 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100"
                                         tabindex="0"
                                     >
@@ -439,11 +451,14 @@ watch(unloadedHBLs, (newVal) => {
                                                             <div class="flex flex-wrap gap-1">
                                                                 <div
                                                                     class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
-                                                                    <svg class="size-3.5" fill="none" stroke="currentColor"
-                                                                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                    <svg class="size-3.5" fill="none"
+                                                                         stroke="currentColor"
+                                                                         viewBox="0 0 24 24"
+                                                                         xmlns="http://www.w3.org/2000/svg">
                                                                         <path
                                                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                                            stroke-linecap="round"
+                                                                            stroke-linejoin="round"
                                                                             stroke-width="2"/>
                                                                     </svg>
                                                                     <span>{{
@@ -457,10 +472,12 @@ watch(unloadedHBLs, (newVal) => {
                                                                         class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
                                                                         fill="none"
                                                                         stroke="currentColor" stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                                                        stroke-linejoin="round" stroke-width="2"
+                                                                        viewBox="0 0 24 24"
                                                                         width="24"
                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                                        <path d="M0 0h24v24H0z" fill="none"
+                                                                              stroke="none"/>
                                                                         <path d="M7 20l10 0"/>
                                                                         <path d="M6 6l6 -1l6 1"/>
                                                                         <path d="M12 3l0 17"/>
@@ -476,11 +493,14 @@ watch(unloadedHBLs, (newVal) => {
                                                                         class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
                                                                         fill="none" height="24" stroke="currentColor"
                                                                         stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                                                        stroke-linejoin="round" stroke-width="2"
+                                                                        viewBox="0 0 24 24"
                                                                         width="24"
                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                                        <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                                                        <path d="M0 0h24v24H0z" fill="none"
+                                                                              stroke="none"/>
+                                                                        <path
+                                                                            d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
                                                                         <path
                                                                             d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                                     </svg>
@@ -496,7 +516,8 @@ watch(unloadedHBLs, (newVal) => {
                                                                         stroke-width="2"
                                                                         viewBox="0 0 24 24"
                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                                        <path d="M0 0h24v24H0z" fill="none"
+                                                                              stroke="none"/>
                                                                         <path d="M5 9l14 0"/>
                                                                         <path d="M5 15l14 0"/>
                                                                         <path d="M11 4l-4 16"/>
@@ -512,12 +533,14 @@ watch(unloadedHBLs, (newVal) => {
                                                         <div class="px-2.5">
                                                             <svg
                                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
-                                                                fill="none" height="24" stroke="currentColor" stroke-linecap="round"
-                                                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                                                fill="none" height="24" stroke="currentColor"
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round" stroke-width="2"
+                                                                viewBox="0 0 24 24"
                                                                 width="24"
                                                                 x-tooltip.placement.top.success="'Click to Load'"
                                                                 xmlns="http://www.w3.org/2000/svg"
-                                                                @click.prevent="handleLoad(index)">
+                                                                @click.prevent="handleLoad(index, element.id)">
                                                                 <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                                                 <path d="M4 18v-6a3 3 0 0 1 3 -3h7"/>
                                                                 <path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4"/>
@@ -696,7 +719,10 @@ watch(unloadedHBLs, (newVal) => {
                 </div>
             </div>
         </main>
-        <ReviewModal :container-array="containerArr" :find-hbl-by-package-id="findHblByPackageId"
-                     :show="showReviewModal" @close="showReviewModal = false"/>
-    </AppLayout>
+        <ReviewModal :container-array="containerArr"
+                     :containerPackages="reviewContainerArr"
+                     :find-hbl-by-package-id="findHblByPackageId"
+                     :show="showReviewModal"
+                     @close="showReviewModal = false" :is-destination-loading="true"/>
+    </DestinationAppLayout>
 </template>

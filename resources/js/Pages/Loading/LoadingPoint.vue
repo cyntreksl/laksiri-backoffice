@@ -264,6 +264,8 @@ const findHblByPackageId = (packageId) => {
     // First, check if the package ID exists in any of the unloaded HBLs
     const packageExists = unloadedHBLs.value.some(hbl => hbl.packages.some(p => p.id === packageId));
 
+    console.log(props.loadedHBLs.find(hbl => hbl.packages.some(p => p.id === packageId)));
+
     // If the package ID exists, find and return the corresponding HBL
     if (packageExists) {
         return unloadedHBLs.value.find(hbl => hbl.packages.some(p => p.id === packageId));

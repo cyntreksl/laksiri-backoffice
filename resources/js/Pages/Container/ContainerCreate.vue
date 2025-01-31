@@ -394,6 +394,36 @@
                         </div>
                     </div>
 
+                    <!--Target warehouse-->
+                    <div class="card px-4 py-4 sm:px-5">
+                        <div>
+                            <h2
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                            >
+                                Target Warehouse
+                            </h2>
+                        </div>
+                        <div class="my-5">
+                            <div class="space-x-5">
+                                <label
+                                    v-for="warehouse in warehouses"
+                                    :key="warehouse.id"
+                                    class="inline-flex items-center space-x-2"
+                                >
+                                    <input
+                                        v-model="form.target_warehouse"
+                                        :value="warehouse.id"
+                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                                        name="target_warehouse"
+                                        type="radio"
+                                    />
+                                    <p>{{ warehouse.name }}</p>
+                                </label>
+                            </div>
+                            <InputError :message="form.errors.target_warehouse" />
+                        </div>
+                    </div>
+
                     <!--                    Container Type-->
                     <div class="card px-4 py-4 sm:px-5">
                         <div>

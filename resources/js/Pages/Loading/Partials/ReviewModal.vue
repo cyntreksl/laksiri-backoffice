@@ -30,6 +30,11 @@ const props = defineProps({
         type: Object,
         default: () => {
         },
+    },
+    isDestinationLoading: {
+        type: Boolean,
+        default: false,
+        required: false,
     }
 });
 
@@ -55,9 +60,8 @@ const form = useForm({
     note: '',
     container_id: route().params.container,
     cargo_type: route().params.cargoType,
-    packages: computed(() => {
-        return props.containerPackages;
-    }),
+    packages: props.isDestinationLoading ? computed(() => {return props.containerArray;}) :computed(() => {return props.containerPackages;}),
+    isDestinationLoading: props.isDestinationLoading,
 });
 
 const getMHBLPackageCount = (hbls) => {
@@ -158,7 +162,7 @@ const handleCreateLoadedContainer = () => {
                 </table>
             </div>
 
-            <div class="is-scrollbar-hidden min-w-full overflow-x-auto mt-2">
+            <div v-if="!isDestinationLoading" class="is-scrollbar-hidden min-w-full overflow-x-auto mt-2">
                 <table class="is-hoverable w-full text-left">
                     <thead>
                     <tr>
