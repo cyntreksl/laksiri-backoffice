@@ -133,7 +133,6 @@ const handleLoad = (index, pkg_id) => {
             }
         }
     }
-    console.log('01',containerArr.value);
 }
 
 const handleUnload = (index) => {
@@ -359,20 +358,6 @@ const reviewContainer = () => {
                             :label="hblType"
                             :value="hblType"
                             name="hblType"
-                        />
-                    </label>
-                </div>
-                <div class="flex space-x-4 bg-amber-100 p-5 rounded-lg">
-                    <label
-                        v-for="warehouse in warehouses"
-                        :key="warehouse"
-                        class="flex space-x-2 items-center"
-                    >
-                        <RadioButton
-                            v-model="filters.warehouse"
-                            :label="warehouse"
-                            :value="warehouse"
-                            name="warehouse"
                         />
                     </label>
                 </div>
