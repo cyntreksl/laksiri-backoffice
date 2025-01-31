@@ -401,6 +401,39 @@
                                     <path d="M16 9l5 -5"/>
                                 </svg>
                             </a>
+                            <!-- Loading -->
+                            <a
+                                :class="[
+                activeMenu === 'loading' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Loading'"
+                                @click="
+                setMenu('loading');
+                openSideBar();
+              "
+                            >
+                                <svg
+                                    class="icon icon-tabler icon-tabler-truck-loading"
+                                    fill="none"
+                                    height="24"
+                                    stroke="#2c3e50"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15"/>
+                                    <path
+                                        d="M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z"
+                                    />
+                                    <path d="M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                    <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                </svg>
+                            </a>
                         </template>
                     </div>
 
@@ -1051,6 +1084,25 @@ export default {
                         },
                     );
                     changeSidePanelTitle("Document Verifications");
+                    break;
+                case "loading":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Containers",
+                            route: "loading.loading-containers.index",
+                        },
+                        // {
+                        //     title: "Manual Loading",
+                        //     route: "loading.manual-loadings.index",
+                        // },
+                        {
+                            title: "Loaded Shipment",
+                            route: "loading.loaded-containers.index",
+                        }
+                    );
+                    changeSidePanelTitle("Loading");
                     break;
                 case "cashier":
                     childMenuList.splice(

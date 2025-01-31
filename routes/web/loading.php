@@ -40,6 +40,8 @@ Route::name('loading.')->group(function () {
 
     Route::get('hbls/get-unloaded-hbl/list', [ContainerController::class, 'getUnloadedHBLs']);
 
+    Route::get('hbls/get-destination-unloaded-hbl/list', [ContainerController::class, 'getDestinationUnloadedHBLs']);
+
     Route::get('containers/list/export', [ContainerController::class, 'export']);
 
     // Loaded Container

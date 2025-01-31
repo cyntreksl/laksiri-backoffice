@@ -27,6 +27,7 @@ class CreateOrUpdateLoadedContainer
             DB::beginTransaction();
 
             $container = Container::find($data['container_id']);
+            $isDestinationLoading = isset($data['isDestinationLoading']) ? $data['isDestinationLoading'] : false;
 
             foreach ($data['packages'] as $package) {
                 $result = $container->hbl_packages()->updateExistingPivot($package['id'], [
@@ -42,7 +43,7 @@ class CreateOrUpdateLoadedContainer
                 }
 
                 // Run the MarkAsLoaded action for the package ID
-                MarkAsLoaded::run($package['id']);
+                MarkAsLoaded::run($package['id'], $isDestinationLoading);
 
                 $hbl_package = HBLPackage::find($package['id']);
                 $hbl = HBL::find($hbl_package->hbl_id);
