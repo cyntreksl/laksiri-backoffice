@@ -526,7 +526,7 @@ onMounted(() => {
                 Other Attachments
             </h2>
 
-            <div class="whitespace-nowrap py-3 hover:bg-gray-50 rounded">
+            <div class="whitespace-nowrap py-3 hover:bg-gray-50 rounded space-y-4">
                 <div class="flex justify-between items-center space-x-4 px-2">
                     <div class="flex items-center space-x-4">
                         <div
@@ -564,20 +564,9 @@ onMounted(() => {
                     <div class="flex items-center space-x-4">
                         <div
                             class="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 dark:bg-accent">
-                            <svg
-                                class="size-5.5 text-primary dark:text-white icon icon-tabler icons-tabler-outline icon-tabler-pdf"
-                                fill="none" height="24" stroke="currentColor"
-                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                width="24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path d="M10 8v8h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-2z"/>
-                                <path d="M3 12h2a2 2 0 1 0 0 -4h-2v8"/>
-                                <path d="M17 12h3"/>
-                                <path d="M21 8h-4v8"/>
-                            </svg>
+                            <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-file-barcode"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M8 13h1v3h-1z" /><path d="M12 13v3" /><path d="M15 13h1v3h-1z" /></svg>
                         </div>
-                        <span class="font-medium text-slate-700 dark:text-navy-100">HBL Download</span>
+                        <span class="font-medium text-slate-700 dark:text-navy-100">Barcode</span>
                     </div>
                     <template v-if="$page.props.user.permissions.includes('hbls.download pdf')">
                         <a v-if="hblId" :href="route('hbls.download.barcode', hblId)">
