@@ -312,6 +312,70 @@
                             </a>
                         </template>
                         <template v-if="usePage().props.auth.user.roles[0].name === 'boned area'">
+                            <!-- HBL -->
+                            <a
+                                v-if="! $page.props.user.roles.includes('viewer')"
+                                :class="[
+                activeMenu === 'hbls' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'HBL'"
+                                @click="
+                setMenu('hbls');
+                openSideBar();
+              "
+                            >
+                                <svg
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-app-window"
+                                    fill="none"
+                                    height="24"
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path
+                                        d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"
+                                    />
+                                    <path d="M6 8h.01"/>
+                                    <path d="M9 8h.01"/>
+                                </svg>
+                            </a>
+                            <!-- Arrivals -->
+                            <a
+                                :class="[
+                activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Arrivals'"
+                                @click="
+                setMenu('arrival');
+                openSideBar();
+              "
+                            >
+                                <svg
+                                    class="icon icon-tabler icon-tabler-inbox"
+                                    fill="none"
+                                    height="24"
+                                    stroke="#2c3e50"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path
+                                        d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"
+                                    />
+                                    <path d="M4 13h3l3 3h4l3 -3h3"/>
+                                </svg>
+                            </a>
                             <!-- Boned Area Screens -->
                             <a
                                 :class="[
@@ -335,6 +399,39 @@
                                     <path d="M15 16l0 4"/>
                                     <path d="M17 4h4v4"/>
                                     <path d="M16 9l5 -5"/>
+                                </svg>
+                            </a>
+                            <!-- Loading -->
+                            <a
+                                :class="[
+                activeMenu === 'loading' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Loading'"
+                                @click="
+                setMenu('loading');
+                openSideBar();
+              "
+                            >
+                                <svg
+                                    class="icon icon-tabler icon-tabler-truck-loading"
+                                    fill="none"
+                                    height="24"
+                                    stroke="#2c3e50"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15"/>
+                                    <path
+                                        d="M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z"
+                                    />
+                                    <path d="M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                    <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
                                 </svg>
                             </a>
                         </template>
@@ -406,7 +503,7 @@
                                             <ul class="flex flex-1 flex-col px-4 font-inter">
                                                 <li v-for="item in childMenuList">
                                                     <template v-if="$page.props.user.roles.includes('viewer')">
-                                                        <template v-if="$page.props.currentBranch.name === 'Colombo'">
+                                                        <template v-if="$page.props.currentBranch.type === 'Destination'">
                                                             <Link
                                                                 v-if="item.title === 'Shipments Arrivals'"
                                                                 :class="
@@ -425,7 +522,7 @@
                                                         <template
                                                             v-if="item.title === 'Shipments Arrivals' || item.title === 'Bonded Warehouse'">
                                                             <template
-                                                                v-if="$page.props.currentBranch.name === 'Colombo'">
+                                                                v-if="$page.props.currentBranch.type === 'Destination'">
                                                                 <Link
                                                                     :class="
                       route().current() === item.route
@@ -987,6 +1084,25 @@ export default {
                         },
                     );
                     changeSidePanelTitle("Document Verifications");
+                    break;
+                case "loading":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Containers",
+                            route: "loading.loading-containers.index",
+                        },
+                        // {
+                        //     title: "Manual Loading",
+                        //     route: "loading.manual-loadings.index",
+                        // },
+                        {
+                            title: "Loaded Shipment",
+                            route: "loading.loaded-containers.index",
+                        }
+                    );
+                    changeSidePanelTitle("Loading");
                     break;
                 case "cashier":
                     childMenuList.splice(

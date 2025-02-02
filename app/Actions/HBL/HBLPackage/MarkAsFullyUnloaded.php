@@ -12,9 +12,13 @@ class MarkAsFullyUnloaded
 
     public function handle($hbl_package_id)
     {
-        $hbl_package = HBLPackage::withoutGlobalScope(BranchScope::class)
+        $hbl_package = HBLPackage::withoutGlobalScope(BranchScope::class)->with('hbl')
             ->find($hbl_package_id);
         $hbl_package->is_unloaded = true;
+        $hbl_package->current_warehouse = session('current_branch_id');
+        if ($hbl_package->hbl->warehouse_id === session('current_branch_id')) {
+            $hbl_package->is_de_unloaded = true;
+        }
         $hbl_package->save();
     }
 }

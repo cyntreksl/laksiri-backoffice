@@ -18,6 +18,7 @@ use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\Scopes\BranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 
 class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepositoryInterface
 {
@@ -60,6 +61,10 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
                 ContainerStatus::REACHED_DESTINATION->value,
                 ContainerStatus::LOADED->value,
             ]);
+        }
+
+        if (Auth::user()->hasRole('boned area')) {
+            $query->where('target_warehouse', session('current_branch_id'));
         }
 
         if (! empty($search)) {
