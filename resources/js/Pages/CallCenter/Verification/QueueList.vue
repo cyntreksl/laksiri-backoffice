@@ -17,7 +17,6 @@ const props = defineProps({
 })
 
 const filteredVerificationQueue = computed(() => {
-    console.log(props.verificationQueue);
     return props.verificationQueue.filter(q => q.is_verified === false);
 })
 </script>
