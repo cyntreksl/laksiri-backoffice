@@ -24,6 +24,12 @@ Breadcrumbs::for('call-center.reception.queue.hbl-list', function (BreadcrumbTra
     $trail->push('HBL List', route('call-center.reception.queue.hbl-list'));
 });
 
+Breadcrumbs::for('call-center.reception.show.verified', function (BreadcrumbTrail $trail) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Reception Verification');
+    $trail->push('Verified', route('call-center.reception.show.verified'));
+});
+
 // Verification
 Breadcrumbs::for('call-center.reception.queue.list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
