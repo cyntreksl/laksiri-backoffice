@@ -51,38 +51,38 @@
                         </Link>
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'boned area'">
                             <!-- HBL -->
-                            <a
-                                v-if="! $page.props.user.roles.includes('viewer')"
-                                :class="[
-                activeMenu === 'hbls' ? 'bg-primary/10 text-primary' : '',
-              ]"
-                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.right="'HBL'"
-                                @click="
-                setMenu('hbls');
-                openSideBar();
-              "
-                            >
-                                <svg
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-app-window"
-                                    fill="none"
-                                    height="24"
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    viewBox="0 0 24 24"
-                                    width="24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path
-                                        d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"
-                                    />
-                                    <path d="M6 8h.01"/>
-                                    <path d="M9 8h.01"/>
-                                </svg>
-                            </a>
+<!--                            <a-->
+<!--                                v-if="! $page.props.user.roles.includes('viewer')"-->
+<!--                                :class="[-->
+<!--                activeMenu === 'hbls' ? 'bg-primary/10 text-primary' : '',-->
+<!--              ]"-->
+<!--                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"-->
+<!--                                x-tooltip.placement.right="'HBL'"-->
+<!--                                @click="-->
+<!--                setMenu('hbls');-->
+<!--                openSideBar();-->
+<!--              "-->
+<!--                            >-->
+<!--                                <svg-->
+<!--                                    class="icon icon-tabler icons-tabler-outline icon-tabler-app-window"-->
+<!--                                    fill="none"-->
+<!--                                    height="24"-->
+<!--                                    stroke="currentColor"-->
+<!--                                    stroke-linecap="round"-->
+<!--                                    stroke-linejoin="round"-->
+<!--                                    stroke-width="2"-->
+<!--                                    viewBox="0 0 24 24"-->
+<!--                                    width="24"-->
+<!--                                    xmlns="http://www.w3.org/2000/svg"-->
+<!--                                >-->
+<!--                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>-->
+<!--                                    <path-->
+<!--                                        d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"-->
+<!--                                    />-->
+<!--                                    <path d="M6 8h.01"/>-->
+<!--                                    <path d="M9 8h.01"/>-->
+<!--                                </svg>-->
+<!--                            </a>-->
                             <!-- Arrivals (Removed from call center)-->
 <!--                            <a-->
 <!--                                v-if="usePage().props.auth.user.roles[0].name !== 'boned area'"-->
@@ -115,30 +115,19 @@
 <!--                                    <path d="M4 13h3l3 3h4l3 -3h3"/>-->
 <!--                                </svg>-->
 <!--                            </a>-->
-                            <!-- Queue Screen -->
+                            <!-- Reception Verifications -->
                             <a
                                 :class="[
-                activeMenu === 'screens' ? 'bg-primary/10 text-primary' : '',
+                activeMenu === 'reception' ? 'bg-primary/10 text-primary' : '',
               ]"
                                 class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.right="'Queue Screens'"
+                                x-tooltip.placement.right="'Reception'"
                                 @click="
-                setMenu('screens');
+                setMenu('reception');
                 openSideBar();
               "
                             >
-                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-screen-share" fill="none" height="24" stroke="currentColor"
-                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                     width="24"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M21 12v3a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1h9"/>
-                                    <path d="M7 20l10 0"/>
-                                    <path d="M9 16l0 4"/>
-                                    <path d="M15 16l0 4"/>
-                                    <path d="M17 4h4v4"/>
-                                    <path d="M16 9l5 -5"/>
-                                </svg>
+                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-certificate"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M15 15m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M13 17.5v4.5l2 -1.5l2 1.5v-4.5" /><path d="M10 19h-5a2 2 0 0 1 -2 -2v-10c0 -1.1 .9 -2 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -1 1.73" /><path d="M6 9l12 0" /><path d="M6 12l3 0" /><path d="M6 15l2 0" /></svg>
                             </a>
                             <!-- Document Verifications -->
                             <a
@@ -206,6 +195,31 @@
               "
                             >
                                 <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-checkup-list"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /><path d="M9 14h.01" /><path d="M9 17h.01" /><path d="M12 16l1 1l3 -3" /></svg>
+                            </a>
+                            <!-- Queue Screen -->
+                            <a
+                                :class="[
+                activeMenu === 'screens' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Queue Screens'"
+                                @click="
+                setMenu('screens');
+                openSideBar();
+              "
+                            >
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-screen-share" fill="none" height="24" stroke="currentColor"
+                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                     width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M21 12v3a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1h9"/>
+                                    <path d="M7 20l10 0"/>
+                                    <path d="M9 16l0 4"/>
+                                    <path d="M15 16l0 4"/>
+                                    <path d="M17 4h4v4"/>
+                                    <path d="M16 9l5 -5"/>
+                                </svg>
                             </a>
                             <!-- Arrivals -->
                             <a
@@ -1069,6 +1083,25 @@ export default {
                         }
                     );
                     changeSidePanelTitle("Queue Screens");
+                    break;
+                case "reception":
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        {
+                            title: "Issue tokens",
+                            route: "call-center.reception.queue.hbl-list",
+                        },
+                        {
+                            title: "Receptionist Queue",
+                            route: "call-center.reception.queue.list",
+                        },
+                        {
+                            title: "Verified List",
+                            route: "call-center.verification.show.verified",
+                        },
+                    );
+                    changeSidePanelTitle("Document Verifications");
                     break;
                 case "verifications":
                     childMenuList.splice(

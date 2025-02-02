@@ -18,6 +18,13 @@ Breadcrumbs::for('call-center.hbls.index', function (BreadcrumbTrail $trail) {
 });
 
 // HBLs
+Breadcrumbs::for('call-center.reception.queue.hbl-list', function (BreadcrumbTrail $trail) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Reception');
+    $trail->push('HBL List', route('call-center.reception.queue.hbl-list'));
+});
+
+// HBLs
 Breadcrumbs::for('call-center.hbls.door-to-door-list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
     $trail->push('HBL', route('call-center.hbls.index'));

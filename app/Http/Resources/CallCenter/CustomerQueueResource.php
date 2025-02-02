@@ -31,6 +31,7 @@ class CustomerQueueResource extends JsonResource
             'is_released_from_boned_area' => $is_released_from_boned_area,
             'is_force_released' => $this->examination()->exists(),
             'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()),
+            'is_reception_verified' => $this->token->isReceptionVerified(),
         ];
     }
 }
