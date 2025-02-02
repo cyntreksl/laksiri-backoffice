@@ -2,8 +2,6 @@
 
 namespace App\Interfaces;
 
-use App\Models\Container;
-
 interface LoadedContainerRepositoryInterface
 {
     public function store(array $data);

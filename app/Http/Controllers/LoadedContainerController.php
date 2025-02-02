@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Enum\CargoType;
 use App\Enum\ContainerStatus;
 use App\Enum\ContainerType;

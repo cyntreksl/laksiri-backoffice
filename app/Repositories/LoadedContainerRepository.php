@@ -145,11 +145,15 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
     }
 
-
-
     public function downloadUnloadingPointDoc($container)
     {
         $container = GetLoadedContainerById::run(Container::withoutGlobalScope(BranchScope::class)->findOrFail($container));
-        dd($container);
+        $filename = $container->reference.'_Loading_Point_Document.pdf';
+        $settings = GetSettings::run();
+
+        $pdf = PDF::loadView('exports.loading-point-doc', ['container' => $container, 'hbls' => $container->hbls, 'settings' => $settings]);
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->download($filename);
     }
 }
