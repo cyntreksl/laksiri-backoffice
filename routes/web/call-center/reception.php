@@ -10,5 +10,11 @@ Route::get('/reception/hbl-list', [HBLController::class, 'index'])
 Route::get('/reception/queue/list', [ReceptionController::class, 'getReceptionQueueList'])
     ->name('reception.queue.list');
 
+Route::get('/reception/{customer_queue}', [ReceptionController::class, 'create'])
+    ->name('reception.create');
+
+Route::post('/reception', [ReceptionController::class, 'store'])
+    ->name('reception.store');
+
 Route::get('/reception/show/verified', [ReceptionController::class, 'showReceptionList'])
     ->name('reception.show.verified');

@@ -17,11 +17,24 @@ Breadcrumbs::for('call-center.hbls.index', function (BreadcrumbTrail $trail) {
     $trail->push('HBL List', route('call-center.hbls.index'));
 });
 
-// HBLs
+// Reception
 Breadcrumbs::for('call-center.reception.queue.hbl-list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
     $trail->push('Reception');
     $trail->push('HBL List', route('call-center.reception.queue.hbl-list'));
+});
+
+// Verification
+Breadcrumbs::for('call-center.reception.queue.list', function (BreadcrumbTrail $trail) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Reception Verification');
+    $trail->push('Queue', route('call-center.reception.queue.list'));
+});
+
+Breadcrumbs::for('call-center.reception.create', function (BreadcrumbTrail $trail, CustomerQueue $customerQueue) {
+    $trail->parent('call-center.dashboard');
+    $trail->push('Queue');
+    $trail->push('Reception Verification', route('call-center.reception.create', $customerQueue));
 });
 
 // HBLs

@@ -41,7 +41,7 @@ const filteredReceptionQueue = computed(() => {
         <div v-if="Object.keys(filteredReceptionQueue).length > 0"
              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-5">
             <Link v-for="queue in filteredReceptionQueue" :key="queue.id"
-                  :href="route('call-center.verification.create', queue.id)"
+                  :href="route('call-center.reception.create', queue.id)"
                   class="card grow cursor-pointer hover:bg-green-300 items-center p-4 text-center sm:p-5 border w-60 rounded-lg">
                 <div class="my-5">
                     <h1 class="text-7xl text-black font-bold">{{ queue.token }}</h1>

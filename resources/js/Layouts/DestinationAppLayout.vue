@@ -127,7 +127,20 @@
                 openSideBar();
               "
                             >
-                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-certificate"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M15 15m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M13 17.5v4.5l2 -1.5l2 1.5v-4.5" /><path d="M10 19h-5a2 2 0 0 1 -2 -2v-10c0 -1.1 .9 -2 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -1 1.73" /><path d="M6 9l12 0" /><path d="M6 12l3 0" /><path d="M6 15l2 0" /></svg>
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-certificate"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg">
+                                    <!-- Reception Desk -->
+                                    <rect x="3" y="14" width="18" height="6" rx="1" fill="black" />
+
+                                    <!-- Receptionist (Head) -->
+                                    <circle cx="12" cy="7" r="2" fill="black" />
+
+                                    <!-- Receptionist (Body) -->
+                                    <path d="M10 12h4l1-2h-6z" fill="black" />
+
+                                    <!-- Bell on Desk -->
+                                    <circle cx="6" cy="13" r="1" fill="black" />
+                                    <rect x="5.5" y="14" width="1" height="1" fill="black" />
+                                </svg>
                             </a>
                             <!-- Document Verifications -->
                             <a
