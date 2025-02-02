@@ -22,7 +22,7 @@ const data = reactive({
     },
 });
 
-const baseUrl = ref("/call-center/verification/verified/list");
+const baseUrl = ref("/call-center/reception/verified/list");
 
 const initializeGrid = () => {
     const visibleColumns = Object.keys(data.columnVisibility);

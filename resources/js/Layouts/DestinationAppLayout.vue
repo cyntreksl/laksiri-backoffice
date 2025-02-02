@@ -1111,7 +1111,7 @@ export default {
                         },
                         {
                             title: "Verified List",
-                            route: "call-center.verification.show.verified",
+                            route: "call-center.reception.show.verified",
                         },
                     );
                     changeSidePanelTitle("Document Verifications");

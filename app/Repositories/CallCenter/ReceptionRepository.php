@@ -3,10 +3,12 @@
 namespace App\Repositories\CallCenter;
 
 use App\Actions\ReceptionVerification\CreateReceptionVerification;
+use App\Http\Resources\CallCenter\ReceptionVerifiedCollection;
 use App\Interfaces\CallCenter\ReceptionRepositoryInterface;
+use App\Interfaces\GridJsInterface;
 use App\Models\CustomerQueue;
 
-class ReceptionRepository implements ReceptionRepositoryInterface
+class ReceptionRepository implements GridJsInterface, ReceptionRepositoryInterface
 {
     public function storeVerification(array $data): void
     {
@@ -37,5 +39,29 @@ class ReceptionRepository implements ReceptionRepositoryInterface
         } catch (\Exception $e) {
             throw new \Exception('Failed to reception verified: '.$e->getMessage());
         }
+    }
+
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        $query = CustomerQueue::query()
+            ->receptionQueue()
+            ->has('token.reception_verification');
+
+        $records = $query->orderBy($order, $direction)
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        $totalRecords = $query->count();
+
+        return response()->json([
+            'data' => ReceptionVerifiedCollection::collection($records),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
     }
 }

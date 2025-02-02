@@ -64,13 +64,18 @@ class ReceptionController extends Controller
         $this->receptionRepository->storeVerification($request->all());
     }
 
-    public function getReceptionList(Request $request)
+    public function showReceptionVerifiedList()
     {
-        //        $limit = $request->input('limit', 10);
-        //        $page = $request->input('offset', 1);
-        //        $order = $request->input('order', 'id');
-        //        $dir = $request->input('dir', 'asc');
-        //
-        //        return $this->verificationRepository->dataset($limit, $page, $order, $dir);
+        return Inertia::render('CallCenter/Reception/ReceptionVerifiedList');
+    }
+
+    public function getReceptionVerifiedList(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+
+        return $this->receptionRepository->dataset($limit, $page, $order, $dir);
     }
 }

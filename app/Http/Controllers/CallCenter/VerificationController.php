@@ -45,7 +45,7 @@ class VerificationController extends Controller
             );
         }
 
-        return Inertia::render('CallCenter/Reception/VerificationForm', [
+        return Inertia::render('CallCenter/Verification/VerificationForm', [
             'customerQueue' => $customerQueue,
             'verificationDocuments' => Verification::verification_documents(),
             'hblId' => HBL::withoutGlobalScopes()->where('reference', $customerQueue->token->reference)->first()->id,

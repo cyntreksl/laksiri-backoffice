@@ -58,6 +58,11 @@ class CustomerQueue extends Model
         return $this->hasOne(CashierHBLPayment::class, 'customer_queue_id');
     }
 
+    public function reception_verification(): HasOne
+    {
+        return $this->hasOne(ReceptionVerification::class, 'customer_queue_id');
+    }
+
     public function verification(): HasOne
     {
         return $this->hasOne(Verification::class, 'customer_queue_id');

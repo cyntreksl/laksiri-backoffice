@@ -16,5 +16,7 @@ Route::get('/reception/{customer_queue}', [ReceptionController::class, 'create']
 Route::post('/reception', [ReceptionController::class, 'store'])
     ->name('reception.store');
 
-Route::get('/reception/show/verified', [ReceptionController::class, 'showReceptionList'])
+Route::get('/reception/show/verified', [ReceptionController::class, 'showReceptionVerifiedList'])
     ->name('reception.show.verified');
+
+Route::get('/reception/verified/list', [ReceptionController::class, 'getReceptionVerifiedList']);
