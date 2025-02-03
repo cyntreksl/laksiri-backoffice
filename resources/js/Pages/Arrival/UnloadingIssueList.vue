@@ -13,6 +13,8 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import {usePage} from "@inertiajs/vue3";
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
+import ShortLoadingConfirmationModal from "@/Pages/Arrival/Partials/ShortLoadingConfirmationModal.vue";
+import HBLDetailModal from "@/Pages/Arrival/Partials/ImageView.vue";
 
 const wrapperRef = ref(null);
 let grid = null;
@@ -108,6 +110,24 @@ const initializeGrid = () => {
     grid.render(wrapperRef.value);
 };
 
+const showConfirmViewHBLModal = ref(false);
+const imageImageViewModal = ref(false);
+const hblId = ref(null);
+
+// const confirmViewHBL = async (id) => {
+//     hblId.value = id;
+//     showConfirmViewHBLModal.value = true;
+// };
+const confirmViewHBL = async (id) => {
+    hblId.value = id;
+    imageImageViewModal.value = true;
+};
+// const closeShowHBLModal = () => {
+//     showConfirmViewHBLModal.value = false;
+// };
+const closeShowHBLModal = () => {
+    imageImageViewModal.value = false;
+};
 const createColumns = () => [
     {name: "ID", hidden: !data.columnVisibility.id},
     {name: "HBL", hidden: !data.columnVisibility.hbl},
@@ -218,7 +238,7 @@ const createColumns = () => [
     //                 {
     //                     className:
     //                         "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-    //                     onClick: () => confirmViewLoadedShipment(row.cells[0].data),
+    //                      onClick: () => confirmViewHBL(row.cells[0].data),
     //                     "x-tooltip..placement.bottom.primary": "'View'",
     //                 },
     //                 [
@@ -254,6 +274,54 @@ const createColumns = () => [
     //         ]);
     //     },
     // },
+    {
+        name: "Actions",
+        sort: false,
+        hidden: !data.columnVisibility.actions,
+        formatter: (_, row) => {
+            return h("div", {}, [
+                usePage().props.user.permissions.includes('bonded.show') ?
+                    h(
+                        "button",
+                        {
+                            className:
+                                "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
+                            onClick: () => confirmViewHBL(row.cells[0].data),
+                            "x-tooltip..placement.bottom.primary": "'View'",
+                        },
+                        [
+                            h(
+                                "svg",
+                                {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    viewBox: "0 0 24 24",
+                                    class:
+                                        "size-6 icon icon-tabler icons-tabler-outline icon-tabler-eye",
+                                    fill: "none",
+                                    stroke: "currentColor",
+                                    strokeWidth: 2,
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                },
+                                [
+                                    h("path", {
+                                        stroke: "none",
+                                        d: "M0 0h24v24H0z",
+                                        fill: "none",
+                                    }),
+                                    h("path", {
+                                        d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
+                                    }),
+                                    h("path", {
+                                        d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
+                                    }),
+                                ]
+                            ),
+                        ]
+                    ) : null,
+            ]);
+        },
+    },
 ];
 
 const updateGridConfig = () => {
@@ -621,5 +689,11 @@ const handlePerPageChange = (event) => {
 
             </template>
         </FilterDrawer>
+
+        <HBLDetailModal
+            :hbl-id="hblId"
+            :show="imageImageViewModal"
+            @close="closeShowHBLModal"
+        />
     </DestinationAppLayout>
 </template>
