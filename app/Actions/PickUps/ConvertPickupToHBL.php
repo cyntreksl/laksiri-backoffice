@@ -21,7 +21,7 @@ class ConvertPickupToHBL
         $data = [
             'cargo_type' => $request->cargo_type ?: $pickup->cargo_type,
             'hbl_type' => $request->hbl_type ?: $pickup->hbl_type,
-            'hbl_name' => $request->name ?: $pickup->name,
+            'hbl_name' => $request->hbl_name ?: $pickup->name,
             'email' => $request->email ?: $pickup->email,
             'contact_number' => $request->contact_number ?: $pickup->contact_number,
             'nic' => $request->nic,
