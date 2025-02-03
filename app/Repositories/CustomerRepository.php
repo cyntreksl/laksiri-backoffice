@@ -18,7 +18,7 @@ class CustomerRepository implements CustomerRepositoryInterface, GridJsInterface
             $query->where('username', 'like', '%'.$search.'%');
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;

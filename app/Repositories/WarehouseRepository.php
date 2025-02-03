@@ -28,7 +28,7 @@ class WarehouseRepository implements GridJsInterface, WarehouseRepositoryInterfa
             $query->where('hbl_number', 'like', "%$search%");
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
@@ -55,7 +55,7 @@ class WarehouseRepository implements GridJsInterface, WarehouseRepositoryInterfa
         $query = HBL::query();
         $query->warehouse();
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $records = $query

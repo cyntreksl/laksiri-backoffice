@@ -11,7 +11,7 @@ class CreateRole
 
     public function handle(string $role_name): Role
     {
-        $role = new Role();
+        $role = new Role;
         $role->name = $role_name;
         $role->guard_name = 'web';
         $role->save();

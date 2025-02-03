@@ -28,7 +28,7 @@ class PickupRepositoryTest extends TestCase
             ->expects('handle')
             ->andReturns([$pickup1, $pickup2]);
         $this->app->instance(GetPickups::class, $getPickupsActionMock);
-        $pickupRepository = new PickupRepository();
+        $pickupRepository = new PickupRepository;
         $pickups = $pickupRepository->getPickups();
 
         $this->assertCount(2, $pickups);
@@ -62,7 +62,7 @@ class PickupRepositoryTest extends TestCase
 
         $this->app->instance(CreatePickUp::class, $createPickUpMock);
 
-        $pickupRepository = new PickupRepository();
+        $pickupRepository = new PickupRepository;
         $storedPickup = $pickupRepository->storePickup($data);
 
         $this->assertInstanceOf(PickUp::class, $storedPickup);

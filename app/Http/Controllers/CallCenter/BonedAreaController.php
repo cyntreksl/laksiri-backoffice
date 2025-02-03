@@ -14,8 +14,7 @@ class BonedAreaController extends Controller
     public function __construct(
         private readonly QueueRepositoryInterface $queueRepository,
         private readonly BonedAreaRepositoryInterface $bonedAreaRepository,
-    ) {
-    }
+    ) {}
 
     public function getPackageQueueList()
     {

@@ -121,7 +121,5 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DeliveryRepositoryInterface::class, DeliveryRepository::class);
     }
 
-    public function boot(): void
-    {
-    }
+    public function boot(): void {}
 }

@@ -28,7 +28,7 @@ class PickupExceptionRepository implements GridJsInterface, PickupExceptionRepos
             });
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;

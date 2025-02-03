@@ -27,7 +27,7 @@ class UnloadingIssuesRepository implements GridJsInterface, UnloadingIssuesRepos
             $query->where('hbl', 'like', "%$search%");
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
