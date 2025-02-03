@@ -45,7 +45,7 @@ class UpdateDriverApi
                     unlink($exitsfilepath);
                 }
             }
-            $user->profile_photo_path = $filename; //update file path
+            $user->profile_photo_path = $filename; // update file path
         }
 
         $user->save();

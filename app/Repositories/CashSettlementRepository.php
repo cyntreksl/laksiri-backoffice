@@ -28,7 +28,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
             $query->where('hbl', 'like', "%$search%");
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
@@ -55,7 +55,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         $query = HBL::query();
         $query->cashSettlement()->whereHas('packages');
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $records = $query->get();

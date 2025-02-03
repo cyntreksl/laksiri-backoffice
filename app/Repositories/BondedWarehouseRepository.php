@@ -37,7 +37,7 @@ class BondedWarehouseRepository implements BondedWarehouseRepositoryInterface, G
             ], 'like', '%'.$search.'%');
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;

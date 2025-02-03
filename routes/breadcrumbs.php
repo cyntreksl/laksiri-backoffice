@@ -56,7 +56,7 @@ Breadcrumbs::for('pickups.exceptions', function (BreadcrumbTrail $trail) {
     $trail->push('Pickup');
     $trail->push('Exceptions', route('pickups.exceptions'));
 });
-//pickups >all pickups
+// pickups >all pickups
 Breadcrumbs::for('pickups.all', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Pickup');
@@ -123,7 +123,7 @@ Breadcrumbs::for('users.index', function (BreadcrumbTrail $trail) {
     $trail->push('System Users', route('users.index'));
 });
 
-//MHBLs
+// MHBLs
 Breadcrumbs::for('mhbls.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('MHBL');
@@ -188,13 +188,13 @@ Breadcrumbs::for('users.customers.index', function (BreadcrumbTrail $trail) {
     $trail->push('Customers', route('users.customers.index'));
 });
 
-//Cash settlement
+// Cash settlement
 Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Back Office');
     $trail->push('Cash Settlement List', route('back-office.cash-settlements.index'));
 });
-//due payment
+// due payment
 Breadcrumbs::for('back-office.duepayments.duePaymentIndex', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Back Office');
@@ -271,7 +271,7 @@ Breadcrumbs::for('setting.prices.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->push('Edit', route('setting.prices.edit', $id));
 });
 
-//Cash settlement
+// Cash settlement
 Breadcrumbs::for('back-office.warehouses.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Back Office');

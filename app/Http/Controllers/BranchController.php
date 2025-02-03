@@ -21,8 +21,7 @@ class BranchController extends Controller
         private readonly BranchRepositoryInterface $branchRepository,
         private readonly SettingRepositoryInterface $settingRepository,
         private readonly CountryRepositoryInterface $countryRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.

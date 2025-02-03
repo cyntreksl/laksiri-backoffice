@@ -35,8 +35,7 @@ class PickupController extends Controller
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly SettingRepositoryInterface $settingRepository,
-    ) {
-    }
+    ) {}
 
     public function index()
     {

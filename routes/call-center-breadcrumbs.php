@@ -126,7 +126,7 @@ Breadcrumbs::for('call-center.package.show.released.list', function (BreadcrumbT
     $trail->push('Released Packages', route('call-center.package.show.released.list'));
 });
 
-//Delivery Ordering
+// Delivery Ordering
 Breadcrumbs::for('delivery.ordering', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
     $trail->push('Delivery');
