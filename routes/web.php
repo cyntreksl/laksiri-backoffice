@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HBLController;
+use App\Http\Controllers\WhatsappController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -56,4 +57,4 @@ Route::middleware([
 });
 
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);
-Route:get('/whatsapp/webhook', [WhatsappController::class, 'webhook']);
+Route::get('/whatsapp/webhook', [WhatsappController::class, 'webhook']);
