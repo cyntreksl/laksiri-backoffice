@@ -32,9 +32,7 @@ class CargoCollectedNotification extends Notification
 
     public function toWhatsapp(object $notifiable)
     {
-        $shipper = $this->HBL->shipper;
-
-        $template = new CargoCollectedWhatsAppTemplate($shipper->name, $this->HBL->hbl);
+        $template = new CargoCollectedWhatsAppTemplate($this->HBL->hbl_name, $this->HBL->hbl_number);
 
         return [
             'messaging_product' => 'whatsapp',

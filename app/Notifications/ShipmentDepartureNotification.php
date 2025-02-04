@@ -32,11 +32,10 @@ class ShipmentDepartureNotification extends Notification
 
     public function toWhatsapp(object $notifiable)
     {
-        $shipper = $this->HBL->shipper;
         $branch = $this->HBL->branch;
         $country = $branch->country ?? 'Qatar';
 
-        $template = new ShipmentDepartureWhatsAppTemplate($shipper->name, $this->HBL->hbl, $country);
+        $template = new ShipmentDepartureWhatsAppTemplate($this->HBL->hbl_name, $this->HBL->hbl_number, $country);
 
         return [
             'messaging_product' => 'whatsapp',
