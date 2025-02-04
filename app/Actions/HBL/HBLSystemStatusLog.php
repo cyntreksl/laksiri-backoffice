@@ -13,7 +13,7 @@ class HBLSystemStatusLog
 
     public function handle(HBL $HBL, float $status): HBLStatusChange
     {
-        $HBLStatus = new HBLStatusChange();
+        $HBLStatus = new HBLStatusChange;
         $HBLStatus->hbl_id = $HBL->id;
         $HBLStatus->title = $this->title($status);
         $HBLStatus->message = sprintf($this->message($status), $HBL->hbl);

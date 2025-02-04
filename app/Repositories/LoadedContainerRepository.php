@@ -76,7 +76,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             });
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;

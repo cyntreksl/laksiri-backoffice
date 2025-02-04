@@ -12,7 +12,7 @@ class UploadUnloadingIssueImages
     public function handle(array $data)
     {
         foreach ($data['files'] as $file) {
-            $unloadingIssueFile = new UnloadingIssueFile();
+            $unloadingIssueFile = new UnloadingIssueFile;
             $unloadingIssueFile->package_id = $data['hbl_package_id'];
             $unloadingIssueFile->name = $file->getClientOriginalName();
             $unloadingIssueFile->save();
