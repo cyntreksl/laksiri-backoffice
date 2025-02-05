@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Actions\Setting\GetSettings;
+use App\Actions\User\GetUserById;
+use App\Interfaces\NotificationMailRepositoryInterface;
+use App\Mail\Notification;
+use App\Models\PickUp;
+use Illuminate\Support\Facades\Mail;
+
+class NotificationMailRepository implements NotificationMailRepositoryInterface
+{
+    protected $settings;
+
+    public function __construct()
+    {
+        $this->settings = GetSettings::run();
+    }
+
+    public function sendAssignDriverNotification(PickUp $pickUp)
+    {
+        $notification_settings = json_decode($this->settings->notification, true);
+        $driver = GetUserById::run($pickUp['driver_id']);
+        if (isset($notification_settings['Email']) && $notification_settings['Email'] === true) {
+            $email_data = [
+                'subject' => 'Driver assigned to collect cargo',
+                'customer_name' => $pickUp['name'],
+                'success_message' => 'A driver has been assigned for your cargo collection. ',
+                'detail_message' => 'Driver Name: '.$driver->name.' Contact Number: '.$driver->contact,
+            ];
+            Mail::to($pickUp['email'])->send(new Notification($email_data));
+        }
+    }
+}

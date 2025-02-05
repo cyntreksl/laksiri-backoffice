@@ -12,6 +12,7 @@ use App\Http\Requests\UpdatePickupRequest;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
+use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\SettingRepositoryInterface;
@@ -36,6 +37,7 @@ class PickupController extends Controller
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly SettingRepositoryInterface $settingRepository,
+        private readonly NotificationMailRepositoryInterface $notificationMailRepository,
     ) {}
 
     public function index()
@@ -83,7 +85,6 @@ class PickupController extends Controller
 
         PickupCreated::dispatch($pickup);
 
-        //      TODO: remove below block from here and update it on listener
         if (isset($notificationSettings['Email']) && $notificationSettings['Email'] === true) {
             $email_data = [
                 'subject' => 'Booking Confirmation',
@@ -135,9 +136,7 @@ class PickupController extends Controller
     {
         $this->authorize('pickups.assign driver');
 
-        $result = $this->pickupRepository->assignDriverToPickups($request->all());
-
-        return $result;
+        return $this->pickupRepository->assignDriverToPickups($request->all());
     }
 
     public function showPickupOrder(Request $request)
