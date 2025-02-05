@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
 use App\Enum\PickupType;
+use App\Events\PickupCreated;
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\UpdatePickupRequest;
@@ -81,6 +82,8 @@ class PickupController extends Controller
         $notificationSettings = json_decode($this->settingRepository->getSettings()->notification, true);
 
         $pickup = $this->pickupRepository->storePickup($request->all());
+
+        PickupCreated::dispatch($pickup);
 
         if (isset($notificationSettings['Email']) && $notificationSettings['Email'] === true) {
             $email_data = [
