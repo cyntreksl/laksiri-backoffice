@@ -36,7 +36,9 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
 
     public function sendAssignDriverNotification(PickUp $pickUp)
     {
-        $notification_settings = json_decode($this->settings->notification, true);
+        $notification_settings = ! empty($this->settings->notification)
+            ? json_decode($this->settings->notification, true)
+            : null;
         $driver = GetUserById::run($pickUp['driver_id']);
         if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $pickUp->email) {
             $email_data = [
@@ -51,7 +53,9 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
 
     public function sendCollectedCargoNotification(PickUp $pickUp)
     {
-        $notification_settings = json_decode($this->settings->notification, true);
+        $notification_settings = ! empty($this->settings->notification)
+            ? json_decode($this->settings->notification, true)
+            : null;
         $driver = GetUserById::run($pickUp['driver_id']);
         $hbl = $pickUp->hbl;
         if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $pickUp->email) {
