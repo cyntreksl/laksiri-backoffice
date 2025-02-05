@@ -2,13 +2,22 @@
 
 namespace App\Providers;
 
+use App\Events\PickupCollected;
+use App\Events\PickupCreated;
+use App\Events\PickupDriverAssigned;
+use App\Events\ShipmentDepartured;
 use App\Events\UpdateLastLogin;
 use App\Events\UpdateLastLogout;
+use App\Listeners\SendPickupCollectedNotification;
+use App\Listeners\SendPickupCreatedNotification;
+use App\Listeners\SendPickupDriverAssignedNotification;
+use App\Listeners\SendShipmentDeparturedNotification;
 use App\Listeners\SetUserCurrentBranch;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
@@ -32,6 +41,8 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        Mail::alwaysTo('ashad@ufsqa.com');
+
         Passport::enablePasswordGrant();
         Event::listen(
             UpdateLastLogin::class,
@@ -45,5 +56,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->hasRole('admin') ? true : null;
         });
+
+        Event::listen(PickupCreated::class, SendPickupCreatedNotification::class);
+        Event::listen(PickupDriverAssigned::class, SendPickupDriverAssignedNotification::class);
+        Event::listen(PickupCollected::class, SendPickupCollectedNotification::class);
+        Event::listen(ShipmentDepartured::class, SendShipmentDeparturedNotification::class);
     }
 }

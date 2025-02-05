@@ -31,6 +31,9 @@ class HBLPackage extends Model
         'weight',
         'is_loaded',
         'is_unloaded',
+        'current_warehouse',
+        'is_de_loaded',
+        'is_de_unloaded',
         'remarks',
         'measure_type',
     ];

@@ -12,7 +12,7 @@ class FilterFactory
     {
         $className = 'App\\Factory\\CashSettlement\\Filters\\'.ucfirst(Str::camel($filterName)).'Filter';
         if (class_exists($className)) {
-            return new $className();
+            return new $className;
         }
 
         return null;

@@ -19,6 +19,7 @@ use App\Actions\ContainerDocument\UploadDocument;
 use App\Actions\MHBL\GetMHBLById;
 use App\Actions\Setting\GetSettings;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
+use App\Actions\UnloadingIssue\UploadUnloadingIssueImages;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
 use App\Exports\LoadedShipmentsExport;
@@ -69,7 +70,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             });
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
@@ -197,14 +198,14 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         if (! File::exists($pdfDirectory)) {
             File::makeDirectory($pdfDirectory, 0755, true);
         } else {
-            $pdfFile = new Filesystem();
+            $pdfFile = new Filesystem;
             $pdfFile->cleanDirectory($pdfDirectory);
         }
 
         $container = GetLoadedContainerById::run($container);
 
         // Initialize a new Dompdf instance with custom options
-        $options = new Options();
+        $options = new Options;
         $options->set('isHtml5ParserEnabled', true);
         $dompdf = new Dompdf($options);
 
@@ -298,6 +299,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function createUnloadingIssue(array $data): void
     {
         CreateUnloadingIssue::run($data);
+        UploadUnloadingIssueImages::run($data);
     }
 
     public function markAsReached($containerId)

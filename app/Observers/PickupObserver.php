@@ -38,6 +38,7 @@ class PickupObserver
         ];
 
         $userExists = User::where('username', $data['username'])
+            ->orWhere('email', $pickup->email)
             ->first();
 
         if ($userExists) {
@@ -47,6 +48,7 @@ class PickupObserver
             $pickup->shipper_id = $user->id;
         }
         $pickup->save();
+        $this->notificationMailRepository->sendPickupCreationNotification($pickup);
     }
 
     public function updated(PickUp $pickup): void

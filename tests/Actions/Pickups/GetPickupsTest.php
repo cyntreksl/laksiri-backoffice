@@ -17,7 +17,7 @@ class GetPickupsTest extends TestCase
         $pickup1 = PickUp::factory()->create(['name' => 'John Doe']);
         $pickup2 = PickUp::factory()->create(['name' => 'Jane Doe']);
 
-        $getPickupsAction = new GetPickups();
+        $getPickupsAction = new GetPickups;
 
         $pickups = $getPickupsAction->handle();
 

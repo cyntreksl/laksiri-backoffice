@@ -20,8 +20,7 @@ class LoadedContainerController extends Controller
     public function __construct(
         private readonly LoadedContainerRepositoryInterface $loadedContainerRepository,
         private readonly ContainerRepositoryInterface $containerRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -126,5 +125,12 @@ class LoadedContainerController extends Controller
         $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
 
         return $this->loadedContainerRepository->downloadDoorToDoorPdf($container);
+    }
+
+    public function downloadLoadingPointDoc($container)
+    {
+        $this->authorize('hbls.download pdf');
+
+        return $this->loadedContainerRepository->downloadUnloadingPointDoc($container);
     }
 }

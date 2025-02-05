@@ -13,7 +13,7 @@ class UnloadingIssue extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'hbl_package_id', 'issue', 'type', 'is_damaged', 'rtf', 'is_fixed',
+        'hbl_package_id', 'issue', 'type', 'is_damaged', 'rtf', 'is_fixed', 'note',
     ];
 
     public function hblPackage(): BelongsTo

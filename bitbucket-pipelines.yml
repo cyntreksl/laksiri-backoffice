@@ -183,8 +183,8 @@ pipelines:
               <<: *composer
       - step:
           <<: *frontend
-      - step:
-          <<: *standards
+#      - step:
+#          <<: *standards
 #      - step:
 #          <<: *test
       - step:

@@ -2,6 +2,4 @@
 
 namespace App\Interfaces;
 
-interface CustomerRepositoryInterface
-{
-}
+interface CustomerRepositoryInterface {}

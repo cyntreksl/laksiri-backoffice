@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
 use App\Enum\PickupType;
+use App\Events\PickupCreated;
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\UpdatePickupRequest;
@@ -17,11 +18,9 @@ use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\SettingRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
-use App\Mail\Notification;
 use App\Models\PickUp;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class PickupController extends Controller
@@ -37,8 +36,7 @@ class PickupController extends Controller
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly SettingRepositoryInterface $settingRepository,
         private readonly NotificationMailRepositoryInterface $notificationMailRepository,
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -79,19 +77,9 @@ class PickupController extends Controller
 
     public function store(StorePickupRequest $request)
     {
-        $notificationSettings = json_decode($this->settingRepository->getSettings()->notification, true);
-
         $pickup = $this->pickupRepository->storePickup($request->all());
 
-        if (isset($notificationSettings['Email']) && $notificationSettings['Email'] === true) {
-            $email_data = [
-                'subject' => 'Booking Confirmation',
-                'customer_name' => $request->all()['name'],
-                'success_message' => 'Thank you for booking with us. Your booking is confirmed. ',
-                'detail_message' => 'Booking Reference Number: '.$pickup->reference.' We will notify you with updates.',
-            ];
-            Mail::to($request->all()['email'])->send(new Notification($email_data));
-        }
+        PickupCreated::dispatch($pickup);
     }
 
     public function show(PickUp $pickup)
@@ -135,10 +123,6 @@ class PickupController extends Controller
         $this->authorize('pickups.assign driver');
 
         return $this->pickupRepository->assignDriverToPickups($request->all());
-
-        //        $this->notificationMailRepository->sendAssignDriverNotification($request->all());
-
-        //        return $driverPickups;
     }
 
     public function showPickupOrder(Request $request)
