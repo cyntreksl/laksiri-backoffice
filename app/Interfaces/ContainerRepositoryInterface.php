@@ -43,4 +43,6 @@ interface ContainerRepositoryInterface
     public function downloadDocument(ContainerDocument $container_document);
 
     public function unloadMHBLFromContainer(array $data, Container $container);
+
+    public function downloadUnloadingIssueImages(int $id);
 }

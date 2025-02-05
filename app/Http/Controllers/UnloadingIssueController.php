@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\UnloadingIssuesRepositoryInterface;
 use App\Models\HBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -14,6 +15,7 @@ class UnloadingIssueController extends Controller
 
     public function __construct(
         private readonly UnloadingIssuesRepositoryInterface $unloadingIssuesRepository,
+        private readonly ContainerRepositoryInterface $ContainerRepository,
     ) {
     }
 
@@ -40,5 +42,10 @@ class UnloadingIssueController extends Controller
     public function getUnloadingIssuesByHbl(HBL $hbl)
     {
         return $this->unloadingIssuesRepository->getUnloadingIssuesByHbl($hbl);
+    }
+
+    public function getUnloadingIssuesImage($id)
+    {
+        return $this->ContainerRepository->downloadUnloadingIssueImages($id);
     }
 }

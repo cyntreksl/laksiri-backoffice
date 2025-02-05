@@ -15,6 +15,7 @@ use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\ContainerDocument\DeleteDocument;
 use App\Actions\ContainerDocument\DownloadDocument;
+use App\Actions\ContainerDocument\DownloadImage;
 use App\Actions\ContainerDocument\UploadDocument;
 use App\Actions\MHBL\GetMHBLById;
 use App\Actions\Setting\GetSettings;
@@ -379,5 +380,11 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function downloadDocument(ContainerDocument $container_document)
     {
         return DownloadDocument::run($container_document);
+    }
+
+    public function downloadUnloadingIssueImages($id)
+    {
+
+        return DownloadImage::run($id);
     }
 }
