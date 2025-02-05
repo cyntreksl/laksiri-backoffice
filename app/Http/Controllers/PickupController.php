@@ -18,11 +18,9 @@ use App\Interfaces\PickupRepositoryInterface;
 use App\Interfaces\SettingRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
-use App\Mail\Notification;
 use App\Models\PickUp;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class PickupController extends Controller
@@ -79,21 +77,9 @@ class PickupController extends Controller
 
     public function store(StorePickupRequest $request)
     {
-        $notificationSettings = json_decode($this->settingRepository->getSettings()->notification, true);
-
         $pickup = $this->pickupRepository->storePickup($request->all());
 
         PickupCreated::dispatch($pickup);
-
-        if (isset($notificationSettings['Email']) && $notificationSettings['Email'] === true) {
-            $email_data = [
-                'subject' => 'Booking Confirmation',
-                'customer_name' => $request->all()['name'],
-                'success_message' => 'Thank you for booking with us. Your booking is confirmed. ',
-                'detail_message' => 'Booking Reference Number: '.$pickup->reference.' We will notify you with updates.',
-            ];
-            Mail::to($request->all()['email'])->send(new Notification($email_data));
-        }
     }
 
     public function show(PickUp $pickup)
