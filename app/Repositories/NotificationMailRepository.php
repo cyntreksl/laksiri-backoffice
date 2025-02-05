@@ -77,7 +77,7 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
             : null;
         if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $hbl['email']) {
             $email_data = [
-                'subject' => 'Cash Receiver successfully',
+                'subject' => 'Cash Received successfully',
                 'customer_name' => $hbl['hbl_name'],
                 'success_message' => 'Cash Received successfully.  ',
                 'detail_message' => 'HBL Reference Number: '.$hbl['hbl_number'].' You can track your cargo here:  '.'[Tracking_link]',
