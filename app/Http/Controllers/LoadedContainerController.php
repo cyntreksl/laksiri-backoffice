@@ -126,4 +126,11 @@ class LoadedContainerController extends Controller
 
         return $this->loadedContainerRepository->downloadDoorToDoorPdf($container);
     }
+
+    public function downloadLoadingPointDoc($container)
+    {
+        $this->authorize('hbls.download pdf');
+
+        return $this->loadedContainerRepository->downloadUnloadingPointDoc($container);
+    }
 }
