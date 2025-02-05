@@ -37,8 +37,7 @@ class PickupController extends Controller
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly SettingRepositoryInterface $settingRepository,
         private readonly NotificationMailRepositoryInterface $notificationMailRepository,
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -135,10 +134,6 @@ class PickupController extends Controller
         $this->authorize('pickups.assign driver');
 
         return $this->pickupRepository->assignDriverToPickups($request->all());
-
-        //        $this->notificationMailRepository->sendAssignDriverNotification($request->all());
-
-        //        return $driverPickups;
     }
 
     public function showPickupOrder(Request $request)

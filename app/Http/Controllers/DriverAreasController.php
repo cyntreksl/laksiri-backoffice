@@ -14,8 +14,7 @@ class DriverAreasController extends Controller
 {
     public function __construct(
         private readonly DriverAreasRepositoryInterface $driverAreasRepositoryInterface,
-    ) {
-    }
+    ) {}
 
     public function index()
     {

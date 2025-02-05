@@ -76,7 +76,7 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
             });
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;

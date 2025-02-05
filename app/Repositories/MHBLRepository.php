@@ -51,7 +51,7 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
             ], 'like', '%'.$search.'%');
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;

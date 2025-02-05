@@ -37,6 +37,7 @@ class PickupObserver
         ];
 
         $userExists = User::where('username', $data['username'])
+            ->orWhere('email', $pickup->email)
             ->first();
 
         if ($userExists) {

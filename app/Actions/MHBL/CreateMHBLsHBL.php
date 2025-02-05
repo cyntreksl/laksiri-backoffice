@@ -22,7 +22,7 @@ class CreateMHBLsHBL
 
         try {
             foreach ($data as $hblData) {
-                $mhblsHBL = new MHBLsHBL();
+                $mhblsHBL = new MHBLsHBL;
                 $mhblsHBL->mhbl_id = $mhbl->id;
                 $mhblsHBL->hbl_id = $hblData;
                 $mhblsHBL->save();

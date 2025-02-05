@@ -32,7 +32,7 @@ Route::name('back-office.')->group(function () {
         ->name('warehouses.download.barcode');
     Route::post('revert-to-cash-settlement', [WarehouseController::class, 'revertToCashSettlement']);
 
-    //Due Payment
+    // Due Payment
     Route::get('duepayments', [CashSettlementController::class, 'duePaymentIndex'])
         ->name('duepayments.duePaymentIndex');
     Route::get('duepayment-list', [CashSettlementController::class, 'duePaymentList'])

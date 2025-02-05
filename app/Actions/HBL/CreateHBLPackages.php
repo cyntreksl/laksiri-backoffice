@@ -23,7 +23,7 @@ class CreateHBLPackages
 
         try {
             foreach ($data as $packageData) {
-                $package = new HBLPackage();
+                $package = new HBLPackage;
                 $package->hbl_id = $hbl->id;
                 $package->package_rule = $packageData['packageRule'] ?? $packageData['package_rule'] ?? null;
                 $package->branch_id = GetUserCurrentBranchID::run();

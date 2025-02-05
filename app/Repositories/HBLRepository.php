@@ -108,7 +108,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ], 'like', '%'.$search.'%');
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
@@ -189,7 +189,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             $query->whereAny(['reference', 'hbl_name', 'contact_number'], 'like', '%'.$search.'%');
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
@@ -437,7 +437,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ], 'like', '%'.$search.'%');
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;

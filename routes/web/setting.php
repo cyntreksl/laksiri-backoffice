@@ -19,14 +19,14 @@ Route::name('setting.')->group(function () {
         ->except(['create', 'show'])
         ->name('index', 'driver-zones.index');
 
-    //Driver Areas
+    // Driver Areas
     Route::resource('driver-areas', DriverAreasController::class)
         ->except('show');
 
     Route::get('driver-areas/list', [DriverAreasController::class, 'list'])
         ->name('driver-area.list');
 
-    //Warehouse Zones
+    // Warehouse Zones
     Route::get('warehouse-zones/list', [WarehouseZoneController::class, 'list'])
         ->name('warehouse-zones.list');
 
@@ -45,7 +45,7 @@ Route::name('setting.')->group(function () {
     Route::get('warehousezones/{id}/edit', [WarehouseZoneController::class, 'edit'])
         ->name('warehouse-zones.edit');
 
-    //Pricing
+    // Pricing
     Route::resource('prices', PriceController::class)->except('show');
 
     Route::resource('package-prices', PackagePriceController::class)->except('show');
