@@ -100,7 +100,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
             // set customer queue
             $token->customerQueue()->create([
-                'type' => CustomerQueue::DOCUMENT_VERIFICATION_QUEUE,
+                'type' => CustomerQueue::RECEPTION_VERIFICATION_QUEUE,
             ]);
 
             // set queue status log
