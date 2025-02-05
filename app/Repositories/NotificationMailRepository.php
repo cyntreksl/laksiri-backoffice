@@ -54,7 +54,7 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
         $notification_settings = json_decode($this->settings->notification, true);
         $driver = GetUserById::run($pickUp['driver_id']);
         $hbl = $pickUp->hbl;
-        if (isset($notification_settings['Email']) && $notification_settings['Email'] === true) {
+        if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $pickUp->email) {
             $email_data = [
                 'subject' => 'Cargo collected successfully',
                 'customer_name' => $pickUp['name'],
