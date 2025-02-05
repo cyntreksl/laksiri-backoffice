@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Branch\GetBranches;
+use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\Container\GenerateContainerReferenceNumber;
 use App\Actions\Container\GetContainerWithoutGlobalScopesById;
 use App\Enum\CargoType;
@@ -20,6 +21,7 @@ use App\Models\ContainerDocument;
 use App\Models\HBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ContainerController extends Controller
@@ -70,6 +72,7 @@ class ContainerController extends Controller
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
             'cargoTypes' => $cargoTypes,
+            'warehouses' => GetDestinationBranches::run()->reject(fn ($warehouse) => $warehouse->name === 'Other'),
         ]);
     }
 
@@ -106,14 +109,25 @@ class ContainerController extends Controller
     public function showLoadingPoint(Request $request, Container $container)
     {
         $this->authorize('container.load to container');
+        //        dd($this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType));
+        if (Auth::user()->hasRole('boned area')) {
+            return Inertia::render('Loading/DestinationLoadingPoint', [
+                'container' => $container,
+                'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
+                'cargoTypes' => CargoType::getCargoTypeOptions(),
+                'hblTypes' => HBLType::getHBLTypeOptions(),
+                'warehouses' => WarehouseType::getWarehouseOptions(),
+            ]);
+        } else {
+            return Inertia::render('Loading/LoadingPoint', [
+                'container' => $container,
+                'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
+                'cargoTypes' => CargoType::getCargoTypeOptions(),
+                'hblTypes' => HBLType::getHBLTypeOptions(),
+                'warehouses' => WarehouseType::getWarehouseOptions(),
+            ]);
+        }
 
-        return Inertia::render('Loading/LoadingPoint', [
-            'container' => $container,
-            'loadedHBLs' => $this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType),
-            'cargoTypes' => CargoType::getCargoTypeOptions(),
-            'hblTypes' => HBLType::getHBLTypeOptions(),
-            'warehouses' => WarehouseType::getWarehouseOptions(),
-        ]);
     }
 
     public function showUnloadingPoint($container_id)
@@ -259,5 +273,10 @@ class ContainerController extends Controller
     public function unloadMHBLFromContainer(Request $request, Container $container)
     {
         return $this->containerRepository->unloadMHBLFromContainer($request->all(), $container);
+    }
+
+    public function getDestinationUnloadedHBLs(Request $request)
+    {
+        return $this->HBLRepository->getDestinationUnloadedHBLsByCargoType($request->all());
     }
 }

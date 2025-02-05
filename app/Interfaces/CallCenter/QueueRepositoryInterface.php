@@ -6,6 +6,8 @@ use Illuminate\Http\JsonResponse;
 
 interface QueueRepositoryInterface
 {
+    public function getReceptionQueue(): JsonResponse;
+
     public function getDocumentVerificationQueue(): JsonResponse;
 
     public function getCashierQueue(): JsonResponse;
@@ -13,6 +15,8 @@ interface QueueRepositoryInterface
     public function getExaminationQueue(): JsonResponse;
 
     public function getPackageQueue(): JsonResponse;
+
+    public function getReceptionQueueCounts(): JsonResponse;
 
     public function getDocumentVerificationQueueCounts(): JsonResponse;
 

@@ -16,6 +16,8 @@ class CustomerQueue extends Model
 
     const TOKEN_ISSUED = 'TOKEN_ISSUED';
 
+    const RECEPTION_VERIFICATION_QUEUE = 'RECEPTION_VERIFICATION_QUEUE';
+
     const DOCUMENT_VERIFICATION_QUEUE = 'DOCUMENT_VERIFICATION_QUEUE';
 
     const CASHIER_QUEUE = 'CASHIER_QUEUE';
@@ -29,6 +31,11 @@ class CustomerQueue extends Model
     public function token(): BelongsTo
     {
         return $this->belongsTo(Token::class, 'token_id');
+    }
+
+    public function scopeReceptionQueue(Builder $query): void
+    {
+        $query->where('type', self::RECEPTION_VERIFICATION_QUEUE);
     }
 
     public function scopeDocumentVerificationQueue(Builder $query): void
@@ -49,6 +56,11 @@ class CustomerQueue extends Model
     public function cashierHBLPayment(): HasOne
     {
         return $this->hasOne(CashierHBLPayment::class, 'customer_queue_id');
+    }
+
+    public function reception_verification(): HasOne
+    {
+        return $this->hasOne(ReceptionVerification::class, 'customer_queue_id');
     }
 
     public function verification(): HasOne

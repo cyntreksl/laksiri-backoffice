@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\HBL\CashSettlement\GetCashSettlementByIds;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\UpdateHBLSystemStatus;
+use App\Events\PickupCollected;
 use App\Exports\CashSettlementsExport;
 use App\Factory\CashSettlement\FilterFactory;
 use App\Http\Resources\CashSettlementCollection;
@@ -79,6 +80,8 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
             UpdateHBLSystemStatus::run($hbl, HBL::SYSTEM_STATUS_CASH_RECEIVED);
             $hbl = HBL::find($hbl->id);
             $hbl->addStatus('Cash Received by Accountant');
+
+            PickupCollected::dispatch($hbl);
         }
 
         return $this->success('Cash Received', []);

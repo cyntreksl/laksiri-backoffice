@@ -19,6 +19,7 @@ use App\Actions\ContainerDocument\UploadDocument;
 use App\Actions\MHBL\GetMHBLById;
 use App\Actions\Setting\GetSettings;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
+use App\Actions\UnloadingIssue\UploadUnloadingIssueImages;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
 use App\Exports\LoadedShipmentsExport;
@@ -298,6 +299,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function createUnloadingIssue(array $data): void
     {
         CreateUnloadingIssue::run($data);
+        UploadUnloadingIssueImages::run($data);
     }
 
     public function markAsReached($containerId)

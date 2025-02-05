@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\Container\Loading\CreateDraftLoadedContainer;
 use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
+use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Setting\GetSettings;
 use App\Enum\ContainerStatus;
 use App\Exports\DoorToDoorManifestExport;
@@ -17,6 +18,7 @@ use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\Scopes\BranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 
 class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepositoryInterface
 {
@@ -59,6 +61,10 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
                 ContainerStatus::REACHED_DESTINATION->value,
                 ContainerStatus::LOADED->value,
             ]);
+        }
+
+        if (Auth::user()->hasRole('boned area')) {
+            $query->where('target_warehouse', session('current_branch_id'));
         }
 
         if (! empty($search)) {
@@ -142,5 +148,17 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
         return $pdf->download($filename);
 
+    }
+
+    public function downloadUnloadingPointDoc($container)
+    {
+        $container = GetLoadedContainerById::run(Container::withoutGlobalScope(BranchScope::class)->findOrFail($container));
+        $filename = $container->reference.'_Loading_Point_Document.pdf';
+        $settings = GetSettings::run();
+
+        $pdf = PDF::loadView('exports.loading-point-doc', ['container' => $container, 'hbls' => $container->hbls, 'settings' => $settings]);
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->download($filename);
     }
 }
