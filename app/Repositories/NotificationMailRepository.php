@@ -23,7 +23,7 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
         $notification_settings = ! empty($this->settings->notification)
             ? json_decode($this->settings->notification, true)
             : null;
-        if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true) {
+        if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $pickUp->email) {
             $email_data = [
                 'subject' => 'Booking Confirmation',
                 'customer_name' => $pickUp->name,
@@ -38,7 +38,7 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
     {
         $notification_settings = json_decode($this->settings->notification, true);
         $driver = GetUserById::run($pickUp['driver_id']);
-        if (isset($notification_settings['Email']) && $notification_settings['Email'] === true) {
+        if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $pickUp->email) {
             $email_data = [
                 'subject' => 'Driver assigned to collect cargo',
                 'customer_name' => $pickUp['name'],
