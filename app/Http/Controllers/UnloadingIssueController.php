@@ -16,8 +16,7 @@ class UnloadingIssueController extends Controller
     public function __construct(
         private readonly UnloadingIssuesRepositoryInterface $unloadingIssuesRepository,
         private readonly ContainerRepositoryInterface $ContainerRepository,
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -42,10 +41,5 @@ class UnloadingIssueController extends Controller
     public function getUnloadingIssuesByHbl(HBL $hbl)
     {
         return $this->unloadingIssuesRepository->getUnloadingIssuesByHbl($hbl);
-    }
-
-    public function getUnloadingIssuesImage($id)
-    {
-        return $this->ContainerRepository->downloadUnloadingIssueImages($id);
     }
 }

@@ -10,6 +10,7 @@ use App\Interfaces\CallCenter\CashierRepositoryInterface;
 use App\Interfaces\CallCenter\DeliveryRepositoryInterface;
 use App\Interfaces\CallCenter\ExaminationRepositoryInterface;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
+use App\Interfaces\CallCenter\ReceptionRepositoryInterface;
 use App\Interfaces\CallCenter\UserFeedbackRepositoryInterface;
 use App\Interfaces\CallCenter\VerificationRepositoryInterface;
 use App\Interfaces\CashSettlementInterface;
@@ -46,6 +47,7 @@ use App\Repositories\CallCenter\CashierRepository;
 use App\Repositories\CallCenter\DeliveryRepository;
 use App\Repositories\CallCenter\ExaminationRepository;
 use App\Repositories\CallCenter\QueueRepository;
+use App\Repositories\CallCenter\ReceptionRepository;
 use App\Repositories\CallCenter\UserFeedbackRepository;
 use App\Repositories\CallCenter\VerificationRepository;
 use App\Repositories\CashSettlementRepository;
@@ -119,9 +121,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(OfficerRepositoryInterface::class, OfficerRepository::class);
         $this->app->bind(MHBLRepositoryInterface::class, MHBLRepository::class);
         $this->app->bind(DeliveryRepositoryInterface::class, DeliveryRepository::class);
+        $this->app->bind(ReceptionRepositoryInterface::class, ReceptionRepository::class);
     }
 
-    public function boot(): void
-    {
-    }
+    public function boot(): void {}
 }

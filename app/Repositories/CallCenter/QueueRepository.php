@@ -12,6 +12,15 @@ use Illuminate\Http\JsonResponse;
 
 class QueueRepository implements QueueRepositoryInterface
 {
+    public function getReceptionQueue(): JsonResponse
+    {
+        $queue = CustomerQueue::receptionQueue()->get();
+
+        $customerQueues = CustomerQueueResource::collection($queue);
+
+        return response()->json($customerQueues, 200);
+    }
+
     public function getDocumentVerificationQueue(): JsonResponse
     {
         $queue = CustomerQueue::documentVerificationQueue()->get();
@@ -19,6 +28,13 @@ class QueueRepository implements QueueRepositoryInterface
         $customerQueues = CustomerQueueResource::collection($queue);
 
         return response()->json($customerQueues, 200);
+    }
+
+    public function getReceptionQueueCounts(): JsonResponse
+    {
+        $queue = CustomerQueue::receptionQueue();
+
+        return QueueCount::run($queue);
     }
 
     public function getDocumentVerificationQueueCounts(): JsonResponse

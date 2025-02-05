@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
 use App\Enum\PickupType;
+use App\Events\PickupCreated;
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\UpdatePickupRequest;
@@ -35,8 +36,7 @@ class PickupController extends Controller
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly SettingRepositoryInterface $settingRepository,
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -81,6 +81,9 @@ class PickupController extends Controller
 
         $pickup = $this->pickupRepository->storePickup($request->all());
 
+        PickupCreated::dispatch($pickup);
+
+        //      TODO: remove below block from here and update it on listener
         if (isset($notificationSettings['Email']) && $notificationSettings['Email'] === true) {
             $email_data = [
                 'subject' => 'Booking Confirmation',
@@ -132,7 +135,9 @@ class PickupController extends Controller
     {
         $this->authorize('pickups.assign driver');
 
-        return $this->pickupRepository->assignDriverToPickups($request->all());
+        $result = $this->pickupRepository->assignDriverToPickups($request->all());
+
+        return $result;
     }
 
     public function showPickupOrder(Request $request)

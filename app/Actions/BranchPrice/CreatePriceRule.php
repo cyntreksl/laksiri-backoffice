@@ -13,7 +13,7 @@ class CreatePriceRule
     public function handle(array $data)
     {
         foreach ($data['priceRules'] as $priceRule) {
-            $branchPrice = new BranchPrice();
+            $branchPrice = new BranchPrice;
 
             $branchPrice->branch_id = GetUserCurrentBranchID::run();
             $branchPrice->destination_branch_id = $data['destination_branch_id'];

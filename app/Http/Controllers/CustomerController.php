@@ -10,8 +10,7 @@ class CustomerController extends Controller
 {
     public function __construct(
         private readonly CustomerRepositoryInterface $customerRepository,
-    ) {
-    }
+    ) {}
 
     public function index()
     {

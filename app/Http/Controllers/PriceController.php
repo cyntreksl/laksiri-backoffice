@@ -16,8 +16,7 @@ class PriceController extends Controller
     public function __construct(
         private readonly PriceRepositoryInterface $priceRepository,
         private readonly BranchRepositoryInterface $branchRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.

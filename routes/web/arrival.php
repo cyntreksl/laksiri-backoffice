@@ -38,7 +38,7 @@ Route::name('arrival.')->group(function () {
 
     Route::get('bonded-warehouse/list/export', [BondedWarehouseController::class, 'export']);
 
-    //Unloading Issues
+    // Unloading Issues
     Route::get('unloading-issues', [UnloadingIssueController::class, 'index'])
         ->name('unloading-issues.index');
 
