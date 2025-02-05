@@ -22,7 +22,7 @@ class FilterFactory
     {
         $className = 'App\\Factory\\HBL\\Filters\\'.ucfirst(Str::camel($filterName)).'Filter';
         if (class_exists($className)) {
-            return new $className();
+            return new $className;
         }
 
         return null;

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HBLController;
+use App\Http\Controllers\WhatsappController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -52,7 +53,11 @@ Route::middleware([
         require_once __DIR__.'/web/call-center/cashier.php';
         require_once __DIR__.'/web/call-center/examination.php';
         require_once __DIR__.'/web/call-center/boned-area.php';
+        require_once __DIR__.'/web/call-center/reception.php';
     });
 });
 
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);
+
+Route::post('/whatsapp/webhook', [WhatsappController::class, 'handleWebhook']);
+Route::get('/whatsapp/webhook', [WhatsappController::class, 'verifyWebhook']);

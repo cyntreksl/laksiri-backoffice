@@ -52,7 +52,7 @@ class ExaminationRepository implements ExaminationRepositoryInterface
 
             // update examinations table as an is_issued_gate_pass is true
 
-            //send mail after 30min
+            // send mail after 30min
             $emailData = [
                 'customerId' => $data['customer_queue']['token']['customer_id'],
                 'hblId' => $hbl->id,

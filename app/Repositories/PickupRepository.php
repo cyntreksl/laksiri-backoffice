@@ -10,6 +10,7 @@ use App\Actions\PickUps\GetPickupByIds;
 use App\Actions\PickUps\GetPickups;
 use App\Actions\PickUps\SavePickUpOrder;
 use App\Actions\PickUps\UpdatePickUp;
+use App\Events\PickupDriverAssigned;
 use App\Exports\PickupsExport;
 use App\Factory\Pickup\FilterFactory;
 use App\Http\Resources\PickupResource;
@@ -45,6 +46,8 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
 
         foreach ($pickupList as $pickup) {
             AssignDriver::run($pickup, $data['driver_id']);
+
+            PickupDriverAssigned::dispatch($pickup);
         }
     }
 
@@ -76,7 +79,7 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
             });
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;

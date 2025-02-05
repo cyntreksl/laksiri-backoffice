@@ -39,7 +39,7 @@ Route::name('users.')->group(function () {
 
     Route::get('drivers/list/export', [DriverController::class, 'export']);
 
-    //Driver Tracking
+    // Driver Tracking
     Route::get('driver-tracings', function () {
         return Inertia::render('User/DriverTracking');
     })->name('driver-tracings.index');

@@ -40,9 +40,19 @@ class Token extends Model
         return $this->belongsTo(User::class, 'receptionist_id');
     }
 
+    public function reception_verification(): HasOne
+    {
+        return $this->hasOne(ReceptionVerification::class, 'token_id');
+    }
+
     public function verification(): HasOne
     {
         return $this->hasOne(Verification::class, 'token_id');
+    }
+
+    public function isReceptionVerified(): bool
+    {
+        return $this->reception_verification()->exists();
     }
 
     public function isVerified(): bool

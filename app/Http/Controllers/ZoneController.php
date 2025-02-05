@@ -15,8 +15,7 @@ class ZoneController extends Controller
     public function __construct(
         private readonly ZoneRepositoryInterface $zoneRepository,
         private readonly DriverAreasRepositoryInterface $driverAreasRepositoryInterface,
-    ) {
-    }
+    ) {}
 
     public function index()
     {

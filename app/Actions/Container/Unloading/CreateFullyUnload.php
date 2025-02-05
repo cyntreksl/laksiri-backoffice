@@ -20,7 +20,6 @@ class CreateFullyUnload
      */
     public function handle(array $data)
     {
-
         try {
             DB::beginTransaction();
 
