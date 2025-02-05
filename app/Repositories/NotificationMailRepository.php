@@ -37,7 +37,9 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
 
     public function sendAssignDriverNotification(PickUp $pickUp)
     {
-        $notification_settings = json_decode($this->settings->notification, true);
+        $notification_settings = ! empty($this->settings->notification)
+            ? json_decode($this->settings->notification, true)
+            : null;
         $driver = GetUserById::run($pickUp['driver_id']);
         if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $pickUp->email) {
             $email_data = [
@@ -52,10 +54,12 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
 
     public function sendCollectedCargoNotification(PickUp $pickUp)
     {
-        $notification_settings = json_decode($this->settings->notification, true);
+        $notification_settings = ! empty($this->settings->notification)
+            ? json_decode($this->settings->notification, true)
+            : null;
         $driver = GetUserById::run($pickUp['driver_id']);
         $hbl = $pickUp->hbl;
-        if (isset($notification_settings['Email']) && $notification_settings['Email'] === true) {
+        if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $pickUp->email) {
             $email_data = [
                 'subject' => 'Cargo collected successfully',
                 'customer_name' => $pickUp['name'],
@@ -68,8 +72,10 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
 
     public function sendCashReceivedNotification(HBL $hbl)
     {
-        $notification_settings = json_decode($this->settings->notification, true);
-        if (isset($notification_settings['Email']) && $notification_settings['Email'] === true) {
+        $notification_settings = ! empty($this->settings->notification)
+            ? json_decode($this->settings->notification, true)
+            : null;
+        if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $hbl['email']) {
             $email_data = [
                 'subject' => 'Cash Receiver successfully',
                 'customer_name' => $hbl['hbl_name'],
