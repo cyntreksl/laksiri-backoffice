@@ -48,6 +48,7 @@ class PickupObserver
             $pickup->shipper_id = $user->id;
         }
         $pickup->save();
+        $this->notificationMailRepository->sendPickupCreationNotification($pickup);
     }
 
     public function updated(PickUp $pickup): void

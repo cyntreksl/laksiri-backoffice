@@ -17,6 +17,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
@@ -39,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
         if (App::environment() == 'production') {
             URL::forceScheme('https');
         }
+
+        Mail::alwaysTo('ashad@ufsqa.com');
 
         Passport::enablePasswordGrant();
         Event::listen(
