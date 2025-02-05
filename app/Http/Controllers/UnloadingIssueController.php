@@ -42,4 +42,8 @@ class UnloadingIssueController extends Controller
     {
         return $this->unloadingIssuesRepository->getUnloadingIssuesByHbl($hbl);
     }
+    public function getUnloadingIssuesImage($id)
+    {
+        return $this->ContainerRepository->downloadUnloadingIssueImages($id);
+    }
 }
