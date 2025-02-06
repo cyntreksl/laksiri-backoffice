@@ -34,4 +34,9 @@ class Country extends Model
     {
         return self::pluck('phonecode')->toArray();
     }
+    public static function getAllCountryNames()
+    {
+        return self::pluck('name')->toArray();
+    }
+
 }

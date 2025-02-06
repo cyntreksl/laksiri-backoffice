@@ -29,6 +29,7 @@ class Branch extends Model
         'do_charge',
         'email',
         'container_delays',
+        'country',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -55,4 +56,5 @@ class Branch extends Model
     {
         return $this->hasMany(WarehouseZone::class);
     }
+
 }

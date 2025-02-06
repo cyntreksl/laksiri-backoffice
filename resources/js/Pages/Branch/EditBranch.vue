@@ -47,6 +47,11 @@ const props = defineProps({
         type: Array,
         default: () => []
     },
+    countryNames: {
+        type: Array,
+        default: () => []
+    }
+
 })
 
 const form = useForm({
@@ -56,6 +61,7 @@ const form = useForm({
     currency_name: props.branch.currency_name || '',
     currency_symbol: props.branch.currency_symbol || '',
     country_code: props.branch.country_code || '',
+    county_name: props.branch.county_name || '',
     email: props.branch.email || '',
     container_delays: props.branch.container_delays,
     cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
@@ -286,6 +292,22 @@ const updateChecked = (notification, isChecked) => {
                                 min="0"
                             />
                             <InputError :message="form.errors.container_delays" />
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block">
+                                <InputLabel value="Country Code"/>
+                                <select
+                                    v-model="form.country_code"
+                                    x-init="$el._tom = new Tom($el)"
+                                    class="w-full"
+                                >
+                                    <option v-for="(countryName, index) in countryNames" :key="index" :value="countryName">
+                                        {{ countryName }}
+                                    </option>
+                                </select>
+
+                            </label>
+                            <InputError :message="form.errors.country_code"/>
                         </div>
 
                         <div class="sm:col-span-4">
