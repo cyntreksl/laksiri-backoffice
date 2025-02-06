@@ -12,18 +12,20 @@ class GetUnloadingIssueImages
 
     public function handle($unloadingIssue)
     {
-        $unloadingIssueFile = UnloadingIssueFile::where('package_id', $unloadingIssue->hbl_package_id)->get();
 
-        if (! $UnloadingIssueFile) {
+        $unloadingIssueFile = UnloadingIssueFile::where('package_id', $unloadingIssue->hbl_package_id)->first();
+
+        if (! $unloadingIssueFile) {
             return response()->json(['message' => 'File not found'], 404);
         }
 
-        $mediaPath = $UnloadingIssueFile->files->getFirstMediaUrl();
-        $path = Storage::disk(config('filesystems.default'))->url($mediaPath);
-        //        $mediaPath = Storage::disk(config('filesystems.default'))->url($UnloadingIssueFile->files->getFirstMediaPath());
+        $mediaPath = $unloadingIssueFile->getFirstMediaUrl();
+
         if (! $mediaPath) {
             return response()->json(['message' => 'Media not found'], 404);
         }
+
+        $path = Storage::disk(config('filesystems.default'))->url($unloadingIssueFile->name);
 
         return response()->json([
             'status' => 'success',
