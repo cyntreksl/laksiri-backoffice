@@ -17,8 +17,7 @@ class OfficerController extends Controller
     public function __construct(
         private readonly OfficerRepositoryInterface $officerRepository,
         private readonly CountryRepositoryInterface $countryRepository,
-    ) {
-    }
+    ) {}
 
     public function index()
     {

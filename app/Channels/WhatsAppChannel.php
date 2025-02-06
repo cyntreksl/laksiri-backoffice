@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class WhatsAppChannel
 {
-    public function __construct(private WhatsAppService $whatAppService)
-    {
-    }
+    public function __construct(private WhatsAppService $whatAppService) {}
 
     public function send($notifiable, Notification $notification)
     {
