@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Actions\User\CreateUser;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\PickupStatus;
 use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Models\PickUp;
 use App\Models\User;
@@ -55,6 +56,10 @@ class PickupObserver
         if ($pickup->wasChanged('driver_id')) {
             // Send notification email
             $this->notificationMailRepository->sendAssignDriverNotification($pickup);
+        }
+        if ($pickup->wasChanged('status') && $pickup->status === PickupStatus::PROCESSING->value) {
+            // Send notification email
+            $this->notificationMailRepository->sendCollectedCargoNotification($pickup);
         }
     }
 }

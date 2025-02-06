@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Actions\User\CreateUser;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Models\HBL;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
@@ -11,6 +12,13 @@ use Spatie\Permission\Models\Role;
 class HBLObserver
 {
     protected static array $cascade_relations = ['packages', 'status', 'hblPayment'];
+
+    protected $notificationMailRepository;
+
+    public function __construct(NotificationMailRepositoryInterface $notificationMailRepository)
+    {
+        $this->notificationMailRepository = $notificationMailRepository;
+    }
 
     /**
      * Handle the PickUp "created" event.
@@ -85,6 +93,14 @@ class HBLObserver
             foreach ($hBL->{$relation}()->withTrashed()->get() as $item) {
                 $item->restore();
             }
+        }
+    }
+
+    public function updated(HBL $hbl): void
+    {
+        if ($hbl->wasChanged('system_status') && $hbl->system_status === HBL::SYSTEM_STATUS_CASH_RECEIVED) {
+            // Send notification email
+            $this->notificationMailRepository->sendCashReceivedNotification($hbl);
         }
     }
 }

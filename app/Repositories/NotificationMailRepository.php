@@ -6,6 +6,7 @@ use App\Actions\Setting\GetSettings;
 use App\Actions\User\GetUserById;
 use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Mail\Notification;
+use App\Models\HBL;
 use App\Models\PickUp;
 use Illuminate\Support\Facades\Mail;
 
@@ -36,7 +37,9 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
 
     public function sendAssignDriverNotification(PickUp $pickUp)
     {
-        $notification_settings = json_decode($this->settings->notification, true);
+        $notification_settings = ! empty($this->settings->notification)
+            ? json_decode($this->settings->notification, true)
+            : null;
         $driver = GetUserById::run($pickUp['driver_id']);
         if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $pickUp->email) {
             $email_data = [
@@ -46,6 +49,40 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
                 'detail_message' => 'Driver Name: '.$driver->name.' Contact Number: '.$driver->contact,
             ];
             Mail::to($pickUp['email'])->send(new Notification($email_data));
+        }
+    }
+
+    public function sendCollectedCargoNotification(PickUp $pickUp)
+    {
+        $notification_settings = ! empty($this->settings->notification)
+            ? json_decode($this->settings->notification, true)
+            : null;
+        $driver = GetUserById::run($pickUp['driver_id']);
+        $hbl = $pickUp->hbl;
+        if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $pickUp->email) {
+            $email_data = [
+                'subject' => 'Cargo collected successfully',
+                'customer_name' => $pickUp['name'],
+                'success_message' => 'Your cargo has been collected successfully.  ',
+                'detail_message' => 'HBL Reference Number: '.$pickUp->hbl['hbl_number'].' You can track your cargo here:  '.'[Tracking_link]',
+            ];
+            Mail::to($pickUp['email'])->send(new Notification($email_data));
+        }
+    }
+
+    public function sendCashReceivedNotification(HBL $hbl)
+    {
+        $notification_settings = ! empty($this->settings->notification)
+            ? json_decode($this->settings->notification, true)
+            : null;
+        if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $hbl['email']) {
+            $email_data = [
+                'subject' => 'Cash Received successfully',
+                'customer_name' => $hbl['hbl_name'],
+                'success_message' => 'Cash Received successfully.  ',
+                'detail_message' => 'HBL Reference Number: '.$hbl['hbl_number'].' You can track your cargo here:  '.'[Tracking_link]',
+            ];
+            Mail::to($hbl['email'])->send(new Notification($email_data));
         }
     }
 }
