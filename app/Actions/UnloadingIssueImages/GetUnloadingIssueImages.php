@@ -2,7 +2,6 @@
 
 namespace App\Actions\UnloadingIssueImages;
 
-use App\Models\UnloadingIssue;
 use App\Models\UnloadingIssueFile;
 use Illuminate\Support\Facades\Storage;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -13,7 +12,7 @@ class GetUnloadingIssueImages
 
     public function handle($unloadingIssue)
     {
-        $unloadingIssueFile = UnloadingIssueFile::where('package_id',$unloadingIssue->hbl_package_id)->get();
+        $unloadingIssueFile = UnloadingIssueFile::where('package_id', $unloadingIssue->hbl_package_id)->get();
 
         if (! $UnloadingIssueFile) {
             return response()->json(['message' => 'File not found'], 404);

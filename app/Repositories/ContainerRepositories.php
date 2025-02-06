@@ -386,7 +386,6 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function downloadUnloadingIssueImages(UnloadingIssue $unloadingIssue)
     {
 
-
         return GetUnloadingIssueImages::run($unloadingIssue);
     }
 }
