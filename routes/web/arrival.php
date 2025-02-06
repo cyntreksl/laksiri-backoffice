@@ -46,5 +46,5 @@ Route::name('arrival.')->group(function () {
 
     Route::get('/get-unloading-issues-by-hbl/{hbl}', [UnloadingIssueController::class, 'getUnloadingIssuesByHbl']);
 
-    Route::get('/get-unloading-issues-image/{id}', [UnloadingIssueController::class, 'getUnloadingIssuesImage']);
+    Route::get('/get-unloading-issues-image/{unloadingIssue}', [UnloadingIssueController::class, 'getUnloadingIssuesImage']);
 });

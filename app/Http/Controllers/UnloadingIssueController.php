@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\UnloadingIssuesRepositoryInterface;
 use App\Models\HBL;
+use App\Models\UnloadingIssue;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -44,8 +45,9 @@ class UnloadingIssueController extends Controller
         return $this->unloadingIssuesRepository->getUnloadingIssuesByHbl($hbl);
     }
 
-    public function getUnloadingIssuesImage($id)
+    public function getUnloadingIssuesImage(unloadingIssue $unloadingIssue)
     {
-        return $this->ContainerRepository->downloadUnloadingIssueImages($id);
+        dd($unloadingIssue);
+        //        return $this->ContainerRepository->downloadUnloadingIssueImages($id);
     }
 }
