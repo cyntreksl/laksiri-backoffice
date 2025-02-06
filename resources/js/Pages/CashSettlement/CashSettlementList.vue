@@ -511,7 +511,6 @@ const totalGrandAmount = ref(0);
 const totalPaidAmount = ref(0);
 
 const getCashSettlementSummary = async (filters) => {
-    console.log("yes");
     try {
         const response = await fetch("/cash-settlement-summery", {
             method: "POST",
