@@ -3,6 +3,7 @@ import DialogModal from "@/Components/DialogModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import {onMounted, ref, watch} from "vue";
 import {usePage} from "@inertiajs/vue3";
+import FileCard from "@/Pages/Arrival/Partials/FileCard.vue";
 
 const props = defineProps({
     show: {
@@ -15,7 +16,7 @@ const props = defineProps({
     }
 });
 
-const image = ref(null);
+const images = ref([]);
 const isLoading = ref(false);
 const emit = defineEmits(['close']);
 
@@ -35,7 +36,8 @@ const fetchImages = async () => {
             throw new Error(`Failed to fetch image with ID ${id}`);
         }
         const data = await response.json();
-        image.value =  data.image;
+        console.log(data);
+        images.value =  data;
     } catch (error) {
         console.error("Error fetching images:", error);
     } finally {
@@ -89,21 +91,11 @@ const downloadImage = (url) => {
                 </svg>
             </div>
 
-            <div v-if="image" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-                <div class="relative group">
-                    <img
-                        :src="image"
-                        alt="Uploaded Image"
-                        class="w-full h-48 object-cover rounded-lg shadow-md"
-                    />
-                    <div class="absolute bottom-2 right-2">
-                        <button
-                            @click="downloadImage(image)"
-                            class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 transition duration-300"
-                        >
-                            Download
-                        </button>
-                    </div>
+            <div
+                v-if="Object.keys(images).length > 0"
+                class="pt-4 transition-all duration-[.25s]">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+                    <FileCard v-for="file in images.slice(0, 12)" :key="file.id" :file="file"/>
                 </div>
             </div>
 

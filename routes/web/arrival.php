@@ -47,4 +47,7 @@ Route::name('arrival.')->group(function () {
     Route::get('/get-unloading-issues-by-hbl/{hbl}', [UnloadingIssueController::class, 'getUnloadingIssuesByHbl']);
 
     Route::get('/get-unloading-issues-image/{unloadingIssue}', [UnloadingIssueController::class, 'getUnloadingIssuesImage']);
+
+    Route::delete('/get-unloading-issues-image/{unloadingIssueFile}', [UnloadingIssueController::class, 'destroyUnloadingIssueImage'])
+        ->name('unloading-issues.destroy-image');
 });

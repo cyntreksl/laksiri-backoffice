@@ -6,6 +6,7 @@ use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\HBL;
 use App\Models\UnloadingIssue;
+use App\Models\UnloadingIssueFile;
 
 interface ContainerRepositoryInterface
 {
@@ -46,4 +47,6 @@ interface ContainerRepositoryInterface
     public function unloadMHBLFromContainer(array $data, Container $container);
 
     public function downloadUnloadingIssueImages(UnloadingIssue $unloadingIssue);
+
+    public function deleteUnloadingIssueFile(UnloadingIssueFile $unloadingIssueFile);
 }
