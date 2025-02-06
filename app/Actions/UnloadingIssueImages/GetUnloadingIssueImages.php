@@ -6,7 +6,7 @@ use App\Models\UnloadingIssue;
 use Illuminate\Support\Facades\Storage;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class UnloadingIssueImages
+class GetUnloadingIssueImages
 {
     use AsAction;
 

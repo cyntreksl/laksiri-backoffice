@@ -20,7 +20,7 @@ use App\Actions\MHBL\GetMHBLById;
 use App\Actions\Setting\GetSettings;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
 use App\Actions\UnloadingIssue\UploadUnloadingIssueImages;
-use App\Actions\UnloadingIssueImages\UnloadingIssueImages;
+use App\Actions\UnloadingIssueImages\GetUnloadingIssueImages;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
 use App\Exports\LoadedShipmentsExport;
@@ -386,6 +386,6 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function downloadUnloadingIssueImages(UnloadingIssue $unloadingIssue)
     {
 
-        return UnloadingIssueImages::run($unloadingIssue);
+        return GetUnloadingIssueImages::run($unloadingIssue);
     }
 }
