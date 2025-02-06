@@ -65,7 +65,7 @@ const downloadImage = (url) => {
         <!-- Title -->
         <template #title>
             <div class="flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-gray-800">Image Viewer </h3>
+                <h3 class="text-lg font-semibold text-gray-800">Image Viewer {{unloadingIssueID}} </h3>
                 <button
                     class="text-gray-500 hover:text-red-500 focus:outline-none"
                     @click="$emit('close')"

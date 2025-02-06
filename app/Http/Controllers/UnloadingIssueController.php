@@ -47,7 +47,7 @@ class UnloadingIssueController extends Controller
 
     public function getUnloadingIssuesImage(unloadingIssue $unloadingIssue)
     {
-        dd($unloadingIssue);
-        //        return $this->ContainerRepository->downloadUnloadingIssueImages($id);
+
+        return $this->ContainerRepository->downloadUnloadingIssueImages($unloadingIssue);
     }
 }

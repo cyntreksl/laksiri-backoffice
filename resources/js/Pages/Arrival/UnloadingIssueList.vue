@@ -692,7 +692,7 @@ const handlePerPageChange = (event) => {
         </FilterDrawer>
 
         <ImageViewModal
-            :hbl-id="unloadingIssueID"
+            :unloadingIssueID="unloadingIssueID"
             :show="imageImageViewModal"
             @close="closeShowHBLModal"
         />
