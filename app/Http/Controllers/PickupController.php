@@ -36,7 +36,8 @@ class PickupController extends Controller
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly SettingRepositoryInterface $settingRepository,
         private readonly NotificationMailRepositoryInterface $notificationMailRepository,
-    ) {}
+    ) {
+    }
 
     public function index()
     {

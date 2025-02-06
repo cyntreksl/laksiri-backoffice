@@ -28,7 +28,8 @@ class UserController extends Controller
         private readonly UserRepositoryInterface $userRepository,
         private readonly RoleRepositoryInterface $roleRepository,
         private readonly BranchRepositoryInterface $branchRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of the resource.

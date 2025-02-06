@@ -19,7 +19,8 @@ class DeliverController extends Controller
     public function __construct(
         private readonly DeliveryRepositoryInterface $deliveryRepository,
         private readonly DriverRepositoryInterface $driverRepository,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request)
     {

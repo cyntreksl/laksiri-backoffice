@@ -13,7 +13,8 @@ class HBLController extends Controller
 {
     public function __construct(
         private readonly HBLRepositoryInterface $HBLRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Show HBL

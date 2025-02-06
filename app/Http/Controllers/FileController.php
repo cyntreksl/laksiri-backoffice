@@ -8,7 +8,9 @@ use Inertia\Inertia;
 
 class FileController extends Controller
 {
-    public function __construct(protected readonly FileManagerRepositoryInterface $fileManagerRepository) {}
+    public function __construct(protected readonly FileManagerRepositoryInterface $fileManagerRepository)
+    {
+    }
 
     public function index()
     {

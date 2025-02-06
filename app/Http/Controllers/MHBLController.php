@@ -26,7 +26,8 @@ class MHBLController extends Controller
         private readonly OfficerRepositoryInterface $officerRepository,
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly MHBLRepositoryInterface $mhblRepository,
-    ) {}
+    ) {
+    }
 
     public function index()
     {

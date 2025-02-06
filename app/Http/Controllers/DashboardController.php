@@ -9,7 +9,8 @@ class DashboardController extends Controller
 {
     public function __construct(
         private readonly DashboardRepositoryInterface $dashboardRepository,
-    ) {}
+    ) {
+    }
 
     public function index()
     {

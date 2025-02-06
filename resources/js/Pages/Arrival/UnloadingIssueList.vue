@@ -113,14 +113,14 @@ const initializeGrid = () => {
 
 const showConfirmViewHBLModal = ref(false);
 const imageImageViewModal = ref(false);
-const hblId = ref(null);
+const unloadingIssueID = ref(null);
 
 // const confirmViewHBL = async (id) => {
 //     hblId.value = id;
 //     showConfirmViewHBLModal.value = true;
 // };
 const confirmViewHBL = async (id) => {
-    hblId.value = id;
+    unloadingIssueID.value = id;
     imageImageViewModal.value = true;
 };
 // const closeShowHBLModal = () => {
@@ -692,7 +692,7 @@ const handlePerPageChange = (event) => {
         </FilterDrawer>
 
         <ImageViewModal
-            :hbl-id="hblId"
+            :hbl-id="unloadingIssueID"
             :show="imageImageViewModal"
             @close="closeShowHBLModal"
         />

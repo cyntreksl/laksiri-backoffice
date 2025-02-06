@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 
 class AnyFileController extends Controller
 {
-    public function __construct(protected readonly FileManagerRepositoryInterface $fileUploadRepository) {}
+    public function __construct(protected readonly FileManagerRepositoryInterface $fileUploadRepository)
+    {
+    }
 
     public function upload(Request $request, $id)
     {

@@ -19,7 +19,8 @@ class DriverController extends Controller
     public function __construct(
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly ZoneRepositoryInterface $zoneRepository,
-    ) {}
+    ) {
+    }
 
     public function index()
     {
@@ -61,7 +62,9 @@ class DriverController extends Controller
 
     }
 
-    public function update(Request $request, User $user) {}
+    public function update(Request $request, User $user)
+    {
+    }
 
     public function changeDriverBasicDetails(UpdateDriverDetailsRequest $request, User $user)
     {

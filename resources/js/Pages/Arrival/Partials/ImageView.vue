@@ -9,7 +9,7 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    hblId: {
+    unloadingIssueID: {
         type: Number,
         default: false,
     }
@@ -21,10 +21,10 @@ const emit = defineEmits(['close']);
 
 // Fetch images based on provided IDs
 const fetchImages = async () => {
-    if (!props.hblId) return;
+    if (!props.unloadingIssueID) return;
     isLoading.value = true;
     try {
-        const response = await fetch(`/get-unloading-issues-image/${props.hblId}`, {
+        const response = await fetch(`/get-unloading-issues-image/${props.unloadingIssueID}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -44,7 +44,7 @@ const fetchImages = async () => {
 };
 
 // Watch for changes in `imageIds` prop
-watch(() => props.hblId, () => {
+watch(() => props.unloadingIssueID, () => {
     fetchImages();
 });
 

@@ -16,7 +16,8 @@ class CashierController extends Controller
     public function __construct(
         private readonly QueueRepositoryInterface $queueRepository,
         private readonly CashierRepositoryInterface $cashierRepository
-    ) {}
+    ) {
+    }
 
     public function getCashierQueueList()
     {
