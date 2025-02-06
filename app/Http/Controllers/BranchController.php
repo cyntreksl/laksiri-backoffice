@@ -67,6 +67,7 @@ class BranchController extends Controller
             'branch' => $branch,
             'settings' => $this->settingRepository->getSettings(),
             'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
+            'countryNames' => $this->countryRepository->getAllCountries(),
             'notificationTypes' => NotificationType::cases(),
         ]);
     }

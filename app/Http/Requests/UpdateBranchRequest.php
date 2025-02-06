@@ -33,6 +33,7 @@ class UpdateBranchRequest extends FormRequest
             'currency_name' => ['required'],
             'currency_symbol' => ['required', 'max:3'],
             'country_code' => ['required', 'max:5'],
+            'country' => ['required', 'max:30'],
             'cargo_modes' => ['required'],
             'delivery_types' => ['required'],
             'package_types' => ['required'],

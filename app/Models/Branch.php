@@ -23,12 +23,14 @@ class Branch extends Model
         'currency_name',
         'currency_symbol',
         'country_code',
+        'country',
         'cargo_modes',
         'delivery_types',
         'package_types',
         'do_charge',
         'email',
         'container_delays',
+        'country',
     ];
 
     public function getActivitylogOptions(): LogOptions
