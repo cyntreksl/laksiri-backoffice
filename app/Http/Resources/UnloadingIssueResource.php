@@ -21,7 +21,7 @@ class UnloadingIssueResource extends JsonResource
             'hbl_name' => $this->hblPackage->hbl->hbl_name ?? '-',
             'consignee_name' => $this->hblPackage->hbl->consignee_name ?? '-',
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'weight' => $this->hblPackage?->weight ,
+            'weight' => $this->hblPackage?->weight,
             'volume' => $this->hblPackage?->volume,
             'quantity' => $this->hblPackage?->quantity,
             'issue' => $this->issue ?? '-',
