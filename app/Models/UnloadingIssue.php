@@ -25,4 +25,9 @@ class UnloadingIssue extends Model
     {
         return $this->belongsTo(HBLPackage::class);
     }
+
+    public function files()
+    {
+        return $this->hasOne(UnloadingIssueFile::class, 'package_id', 'hbl_package_id');
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Interfaces;
 use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\HBL;
+use App\Models\UnloadingIssue;
 
 interface ContainerRepositoryInterface
 {
@@ -43,4 +44,6 @@ interface ContainerRepositoryInterface
     public function downloadDocument(ContainerDocument $container_document);
 
     public function unloadMHBLFromContainer(array $data, Container $container);
+
+    public function downloadUnloadingIssueImages(UnloadingIssue $unloadingIssue);
 }

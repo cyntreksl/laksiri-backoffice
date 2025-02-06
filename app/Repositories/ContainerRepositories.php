@@ -20,6 +20,7 @@ use App\Actions\MHBL\GetMHBLById;
 use App\Actions\Setting\GetSettings;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
 use App\Actions\UnloadingIssue\UploadUnloadingIssueImages;
+use App\Actions\UnloadingIssueImages\GetUnloadingIssueImages;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
 use App\Exports\LoadedShipmentsExport;
@@ -32,6 +33,7 @@ use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
+use App\Models\UnloadingIssue;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -379,5 +381,11 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function downloadDocument(ContainerDocument $container_document)
     {
         return DownloadDocument::run($container_document);
+    }
+
+    public function downloadUnloadingIssueImages(UnloadingIssue $unloadingIssue)
+    {
+
+        return GetUnloadingIssueImages::run($unloadingIssue);
     }
 }

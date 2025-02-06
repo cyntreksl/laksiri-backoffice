@@ -13,4 +13,6 @@ class UnloadingIssueFile extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $table = 'unloading_issue_files';
+
+    protected $fillable = ['package_id', 'name'];
 }
