@@ -13,5 +13,4 @@ class GetAllCountryList
     {
         return Country::getAllCountryNames();
     }
-
 }

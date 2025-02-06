@@ -61,7 +61,7 @@ const form = useForm({
     currency_name: props.branch.currency_name || '',
     currency_symbol: props.branch.currency_symbol || '',
     country_code: props.branch.country_code || '',
-    county_name: props.branch.county_name || '',
+    country: props.branch.country || '',
     email: props.branch.email || '',
     container_delays: props.branch.container_delays,
     cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
@@ -295,9 +295,9 @@ const updateChecked = (notification, isChecked) => {
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block">
-                                <InputLabel value="Country Code"/>
+                                <InputLabel value="Country"/>
                                 <select
-                                    v-model="form.country_code"
+                                    v-model="form.country"
                                     x-init="$el._tom = new Tom($el)"
                                     class="w-full"
                                 >
@@ -307,7 +307,7 @@ const updateChecked = (notification, isChecked) => {
                                 </select>
 
                             </label>
-                            <InputError :message="form.errors.country_code"/>
+                            <InputError :message="form.errors.country"/>
                         </div>
 
                         <div class="sm:col-span-4">
