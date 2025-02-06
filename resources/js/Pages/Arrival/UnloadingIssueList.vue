@@ -14,13 +14,14 @@ import Checkbox from "@/Components/Checkbox.vue";
 import {usePage} from "@inertiajs/vue3";
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import ShortLoadingConfirmationModal from "@/Pages/Arrival/Partials/ShortLoadingConfirmationModal.vue";
-import HBLDetailModal from "@/Pages/Arrival/Partials/ImageView.vue";
+import ImageViewModal from "@/Pages/Arrival/Partials/ImageView.vue";
+import ImageView from "@/Pages/Arrival/Partials/ImageView.vue";
 
 const wrapperRef = ref(null);
 let grid = null;
 const perPage = ref(10);
 const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(7, "days").format("YYYY-MM-DD");
+const fromDate = moment(new Date()).subtract(30, "days").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 
 const filters = reactive({
@@ -690,7 +691,7 @@ const handlePerPageChange = (event) => {
             </template>
         </FilterDrawer>
 
-        <HBLDetailModal
+        <ImageViewModal
             :hbl-id="hblId"
             :show="imageImageViewModal"
             @close="closeShowHBLModal"
