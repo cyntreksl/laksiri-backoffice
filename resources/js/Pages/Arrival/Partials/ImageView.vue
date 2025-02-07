@@ -36,7 +36,6 @@ const fetchImages = async () => {
             throw new Error(`Failed to fetch image with ID ${id}`);
         }
         const data = await response.json();
-        console.log(data);
         images.value =  data;
     } catch (error) {
         console.error("Error fetching images:", error);
@@ -98,7 +97,6 @@ const downloadImage = (url) => {
               <FileCard v-for="file in images.slice(0, 12)" :key="file.id" :file="file" @refresh-files="fetchImages"/>
             </div>
           </div>
-
 
           <div v-else class="text-center text-gray-500 py-8">
                 No images available.
