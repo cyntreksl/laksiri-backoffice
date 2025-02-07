@@ -20,10 +20,11 @@ defineProps({
         }
     }
 })
-
+const emit = defineEmits(['refreshFiles']);
 const handleDeleteFile = (id) => {
     router.delete(route('arrival.unloading-issues.destroy-image', id), {
         onSuccess: () => {
+            emit('refreshFiles');
             push.success('File Deleted Successfully!');
         }
     });

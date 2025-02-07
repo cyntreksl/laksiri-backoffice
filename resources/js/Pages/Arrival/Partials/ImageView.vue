@@ -95,7 +95,7 @@ const downloadImage = (url) => {
                 v-if="Object.keys(images).length > 0"
                 class="pt-4 transition-all duration-[.25s]">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-                    <FileCard v-for="file in images.slice(0, 12)" :key="file.id" :file="file"/>
+                    <FileCard v-for="file in images.slice(0, 12)" :key="file.id" :file="file" @refresh-files="fetchImages"/>
                 </div>
             </div>
 
