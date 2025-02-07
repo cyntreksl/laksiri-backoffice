@@ -31,6 +31,11 @@ class CreateDraftUnload
                     'unloaded_by' => auth()->id(),
                 ]);
 
+                $container->duplicate_hbl_packages()->updateExistingPivot($package['id'], [
+                    'status' => 'draft-unload',
+                    'unloaded_by' => auth()->id(),
+                ]);
+
                 $hbl = HBL::withoutGlobalScope(BranchScope::class)->find($package['hbl_id']);
 
                 UpdateHBLSystemStatus::run($hbl, 4.3);
