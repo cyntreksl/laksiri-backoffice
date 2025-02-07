@@ -209,7 +209,7 @@
     <p><b>{{$settings?->invoice_header_address}}</b></p>
 
     <div style="text-align: right; margin-top: 20px;">
-        @if($settings->seal_url)
+        @if($settings?->seal_url)
             <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto;">
         @endif
     </div>

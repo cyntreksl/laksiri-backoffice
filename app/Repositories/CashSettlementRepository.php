@@ -55,8 +55,12 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
     {
         $query = HBL::query();
         $query->cashSettlement()->whereHas('packages');
-
         // apply filters
+
+        $filters['isHold'] ? $filters['isHold'] = 'true' : $filters['isHold'] = 'false';
+
+        count($filters['paymentStatus']) > 0 ? $filters['paymentStatus'] = implode(',', $filters['paymentStatus']) : $filters['paymentStatus'] = null;
+
         FilterFactory::apply($query, $filters);
 
         $records = $query->get();
