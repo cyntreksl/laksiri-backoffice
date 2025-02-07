@@ -50,6 +50,13 @@ class HBLPackage extends Model
             ->withTimestamps();
     }
 
+    public function duplicate_containers(): BelongsToMany
+    {
+        return $this->belongsToMany(Container::class, 'duplicate_container_hbl_package', 'hbl_package_id', 'container_id')
+            ->withPivot('status', 'loaded_by')
+            ->withTimestamps();
+    }
+
     public function unloadingIssue()
     {
         return $this->hasMany(UnloadingIssue::class, 'hbl_package_id', 'id');
