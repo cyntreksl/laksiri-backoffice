@@ -369,11 +369,11 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function getContainerByHBL(HBL $hbl)
     {
         $package = $hbl->packages()
-            ->whereHas('containers') // Ensures only packages with containers are included
-            ->with('containers') // Eager loads the containers
+            ->whereHas('duplicate_containers') // Ensures only packages with containers are included
+            ->with('duplicate_containers') // Eager loads the containers
             ->first();
 
-        $containerDetails = $package ? $package->containers->flatten()->first() : [];
+        $containerDetails = $package ? $package->duplicate_containers->flatten()->first() : [];
 
         return response()->json($containerDetails);
     }
