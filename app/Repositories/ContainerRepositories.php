@@ -20,6 +20,8 @@ use App\Actions\MHBL\GetMHBLById;
 use App\Actions\Setting\GetSettings;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
 use App\Actions\UnloadingIssue\UploadUnloadingIssueImages;
+use App\Actions\UnloadingIssueImages\DeleteUnloadingIssueFile;
+use App\Actions\UnloadingIssueImages\DownloadSingleUnloadingIssueFile;
 use App\Actions\UnloadingIssueImages\GetUnloadingIssueImages;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
@@ -34,6 +36,7 @@ use App\Models\ContainerDocument;
 use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
 use App\Models\UnloadingIssue;
+use App\Models\UnloadingIssueFile;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -387,5 +390,23 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     {
 
         return GetUnloadingIssueImages::run($unloadingIssue);
+    }
+
+    public function deleteUnloadingIssueFile(UnloadingIssueFile $unloadingIssueFile)
+    {
+        try {
+            return DeleteUnloadingIssueFile::run($unloadingIssueFile);
+        } catch (\Exception $exception) {
+            throw new \Exception('Failed to delete file: '.$exception->getMessage());
+        }
+    }
+
+    public function downloadSingleUnloadingIssueFile(string $id)
+    {
+        try {
+            return DownloadSingleUnloadingIssueFile::run($id);
+        } catch (\Exception $exception) {
+            throw new \Exception('Failed to download file: '.$exception->getMessage());
+        }
     }
 }
