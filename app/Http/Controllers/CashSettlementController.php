@@ -47,7 +47,7 @@ class CashSettlementController extends Controller
 
     public function getSummery(Request $request)
     {
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'deliveryType', 'upb', 'd2d', 'gift', 'drivers', 'officers', 'paymentStatus']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'deliveryType', 'isHold', 'upb', 'd2d', 'gift', 'drivers', 'officers', 'paymentStatus']);
 
         return $this->cashSettlementRepository->getSummery($filters);
     }
