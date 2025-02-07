@@ -26,17 +26,5 @@ class GetUnloadingIssueImages
                 'size' => $file->getFirstMedia()->human_readable_size,
             ];
         });
-        //        return response()->json([
-        //            'status' => 'success',
-        //            'images' => $unloadingIssueFile->map(function ($file) {
-        //                return [
-        //                    'id' => $file->id,
-        //                    'name' => $file->getFirstMedia()->name,
-        //                    'url' => $file->getFirstMediaUrl(),
-        //                    'type' => $file->getFirstMedia()->mime_type,
-        //                    'size' => $file->getFirstMedia()->human_readable_size,
-        //                ];
-        //            }),
-        //        ]);
     }
 }
