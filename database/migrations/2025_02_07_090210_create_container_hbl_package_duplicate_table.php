@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('container_hbl_package_duplicate', function (Blueprint $table) {
+        Schema::create('duplicate_container_hbl_package', function (Blueprint $table) {
             $table->id();
             $table->foreignId('container_id')
                 ->constrained('containers')
@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('hbl_package_id')
                 ->constrained('hbl_packages')
                 ->cascadeOnDelete();
-            $table->enum('status', ['draft', 'loaded', 'draft-unload'])
+            $table->enum('status', ['draft', 'loaded', 'draft-unload', 'unloaded'])
                 ->default('draft');
             $table->unsignedBigInteger('loaded_by');
             $table->unsignedBigInteger('unloaded_by')
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('container_hbl_package_duplicate');
+        Schema::dropIfExists('duplicate_container_hbl_package_duplicate');
     }
 };
