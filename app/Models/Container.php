@@ -58,6 +58,13 @@ class Container extends Model
             ->withTimestamps();
     }
 
+    public function duplicate_hbl_packages(): BelongsToMany
+    {
+        return $this->belongsToMany(HBLPackage::class, 'container_hbl_package_duplicate', 'container_id', 'hbl_package_id')
+            ->withPivot('status', 'loaded_by')
+            ->withTimestamps();
+    }
+
     public function scopeLoadedContainers(Builder $query): void
     {
         $query->where('status', ContainerStatus::LOADED->value);

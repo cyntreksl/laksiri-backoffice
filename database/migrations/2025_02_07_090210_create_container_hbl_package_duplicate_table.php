@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('container_hbl_package_duplicate', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('container_id')
+                ->constrained('containers')
+                ->cascadeOnDelete();
+            $table->foreignId('hbl_package_id')
+                ->constrained('hbl_packages')
+                ->cascadeOnDelete();
+            $table->enum('status', ['draft', 'loaded', 'draft-unload'])
+                ->default('draft');
+            $table->unsignedBigInteger('loaded_by');
+            $table->unsignedBigInteger('unloaded_by')
+                ->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('container_hbl_package_duplicate');
+    }
+};
