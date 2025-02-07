@@ -29,6 +29,10 @@ class CreateFullyUnload
             foreach ($data['packages'] as $package) {
                 $container->hbl_packages()->detach($package['id']);
 
+                $container->duplicate_hbl_packages()->updateExistingPivot($package['id'], [
+                    'status' => 'unloaded',
+                ]);
+
                 // Run the MarkAsUnloaded action for the package ID
                 MarkAsFullyUnloaded::run($package['id']);
             }

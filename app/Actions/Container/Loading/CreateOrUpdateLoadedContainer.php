@@ -34,9 +34,17 @@ class CreateOrUpdateLoadedContainer
                     'status' => 'loaded',
                     'loaded_by' => auth()->id(),
                 ]);
+                $container->duplicate_hbl_packages()->updateExistingPivot($package['id'], [
+                    'status' => 'loaded',
+                    'loaded_by' => auth()->id(),
+                ]);
 
                 if (! $result) {
                     $container->hbl_packages()->attach($package['id'], [
+                        'status' => 'loaded',
+                        'loaded_by' => auth()->id(),
+                    ]);
+                    $container->duplicate_hbl_packages()->attach($package['id'], [
                         'status' => 'loaded',
                         'loaded_by' => auth()->id(),
                     ]);

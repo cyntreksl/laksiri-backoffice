@@ -28,6 +28,8 @@ class DeleteDraftLoadedContainer
 
             $container->hbl_packages()->detach($data['package_id']);
 
+            $container->duplicate_hbl_packages()->detach($data['package_id']);
+
             MarkAsUnloaded::run($data['package_id']);
 
             $package = HBLPackage::find($data['package_id']);
