@@ -49,4 +49,6 @@ interface ContainerRepositoryInterface
     public function downloadUnloadingIssueImages(UnloadingIssue $unloadingIssue);
 
     public function deleteUnloadingIssueFile(UnloadingIssueFile $unloadingIssueFile);
+
+    public function downloadSingleUnloadingIssueFile(string $id);
 }

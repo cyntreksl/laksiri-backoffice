@@ -50,4 +50,7 @@ Route::name('arrival.')->group(function () {
 
     Route::delete('/get-unloading-issues-image/{unloadingIssueFile}', [UnloadingIssueController::class, 'destroyUnloadingIssueImage'])
         ->name('unloading-issues.destroy-image');
+
+    Route::get('/get-unloading-issues-image/downloads/{id}', [UnloadingIssueController::class, 'downloadUnloadingIssueFile'])
+        ->name('unloading-issues.downloads.single');
 });

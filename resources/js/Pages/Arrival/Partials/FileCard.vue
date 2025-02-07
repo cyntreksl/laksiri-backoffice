@@ -184,7 +184,7 @@ const closeModal = () => {
                         <div class="py-1">
                             <MenuItem v-slot="{ active }" class="flex items-center">
                                 <a :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'cursor-pointer block px-4 py-2 text-sm']"
-                                   :href="route('file-manager.downloads.single', file.id)">
+                                   :href="route('arrival.unloading-issues.downloads.single', file.id)">
                                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-download mr-2" fill="none" height="18" stroke="currentColor"
                                          stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                          width="18"

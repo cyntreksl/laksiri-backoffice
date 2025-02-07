@@ -54,4 +54,9 @@ class UnloadingIssueController extends Controller
     {
         return $this->ContainerRepository->deleteUnloadingIssueFile($unloadingIssueFile);
     }
+
+    public function downloadUnloadingIssueFile($id)
+    {
+        return $this->ContainerRepository->downloadSingleUnloadingIssueFile($id);
+    }
 }
