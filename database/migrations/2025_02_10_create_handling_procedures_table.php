@@ -16,9 +16,6 @@ return new class extends Migration
             $table->foreignId('completed_by')->nullable()->constrained('users');
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
-            
-            // Composite unique key to prevent duplicates
-            $table->unique(['container_id', 'step_id']);
         });
     }
 
@@ -26,4 +23,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('handling_procedures');
     }
-}; 
+};

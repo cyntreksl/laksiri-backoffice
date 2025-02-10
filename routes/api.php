@@ -56,5 +56,5 @@ Route::domain('api.'.config('app.url'))
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
 
-Route::get('/containers/{container}/handling-procedures', [HandlingProcedureController::class, 'index']);
-Route::post('/containers/{container}/handling-procedures', [HandlingProcedureController::class, 'store']);
+Route::get('/containers/{container}/handling-procedures', [HandlingProcedureController::class, 'index'])->middleware(['web']);
+Route::post('/containers/{container}/handling-procedures', [HandlingProcedureController::class, 'store'])->middleware(['web']);

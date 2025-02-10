@@ -145,12 +145,10 @@ const getProgress = () => {
             <div class="space-y-3">
                 <div v-for="step in checklist"
                      :key="step.id"
-                     class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                    <button
-                        @click="toggleCheck(step)"
-                        class="flex-shrink-0 mt-0.5 relative group"
-                        :disabled="loading"
-                    >
+                     @click="toggleCheck(step)"
+                     class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                >
+                    <div class="flex-shrink-0 mt-0.5 relative group">
                         <Circle
                             v-if="!step.checked"
                             class="w-5 h-5 text-gray-400 group-hover:text-gray-500 transition-colors"
@@ -159,8 +157,8 @@ const getProgress = () => {
                             v-else
                             class="w-5 h-5 text-emerald-500 animate-scale-check"
                         />
-                    </button>
-                    <div class="flex flex-col">
+                    </div>
+                    <div class="flex flex-col flex-grow">
                         <span
                             class="text-sm text-gray-700 dark:text-gray-200 transition-all duration-200"
                             :class="{
