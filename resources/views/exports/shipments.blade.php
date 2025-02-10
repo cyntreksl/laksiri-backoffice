@@ -101,40 +101,27 @@
         @if ($chunkIndex === 0)
             <thead>
             <tr>
-                <th colspan="10" >
-                    <strong>
-                        OBL    {{$container?->bl_number}}                                                                  UNIVERSAL FREIGHT SERVICES
-                        </strong>
+                <th colspan="10" style="text-align:center;">
+                    <strong><em>
+                            UNIVERSAL FREIGHT SERVICES
+                        </em></strong>
                 </th>
             </tr>
             <tr>
                 <th colspan="10" style="background-color: #D8D8D8 ; text-align: center; ">
-                    <strong> <em>  CARGO MANIFEST </em> </strong>
+                    <strong> <em> AIR CARGO MANIFEST </em> </strong>
                 </th>
             </tr>
             <tr>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
-
-                    VESSEL: {{$container?->vessel_name}} <br>
+                <th colspan="2">
 
                 </th>
-
-                <th colspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
-                    DATE LOADED:   {{$container?->loading_started_at}} <br>
+                <th colspan="1">
 
                 </th>
-
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
-                    DATE:  <br>
-
-                </th>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
-                    DATE:   <br>
-
-                </th>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
-                    DATE:   <br>
-
+                <th colspan="7" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                    DATE: <?php echo date('d/m/Y'); ?>
+                    <span style="font-family: 'Times New Roman',fantasy; font-size: 16px;">                                                                                   SHIPMENT NO :602 </span>
                 </th>
             </tr>
 
@@ -222,7 +209,7 @@
     <p><b>{{$settings?->invoice_header_address}}</b></p>
 
     <div style="text-align: right; margin-top: 20px;">
-        @if($settings?->seal_url)
+        @if($settings->seal_url)
             <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto;">
         @endif
     </div>
