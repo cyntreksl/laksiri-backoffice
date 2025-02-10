@@ -114,6 +114,8 @@ const hblStatusColor = (status) => {
             return 'bg-red-500';
         case 'Revert To Cash Settlement':
             return 'bg-amber-400';
+        case 'Container Unloaded in Colombo':
+            return 'bg-gray-400';
     }
 };
 
