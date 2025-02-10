@@ -205,7 +205,7 @@
             @endif
             </tbody>
     </table>
-    <p><b> {{$settings?->invoice_header_title}}</b></p>
+    <p><b> {{$settings?->invoice_footer_title}}</b></p>
     <p><b>{{$settings?->invoice_header_address}}</b></p>
 
     <div style="text-align: right; margin-top: 20px;">
@@ -214,7 +214,7 @@
         @endif
     </div>
     <div class="footer">
-        <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_header_title}}</div>
+        <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_footer_title}}</div>
         <span class="page-number">Page: </span>
     </div>
     @if (!$loop->last)

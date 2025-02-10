@@ -11,6 +11,34 @@
    $branch=App\Models\Branch::find($hbl?->branch_id);
 @endphp
 
+<style>
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        font-size: 12px;
+        font-family: 'Times New Roman', serif;
+        left: 0;
+    }
+
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        font-size: 12px;
+        font-family: 'Times New Roman', serif;
+        left: 0;
+        display: flex; /* Use flexbox for layout */
+        justify-content: space-between; /* Distribute space between elements */
+        align-items: center; /* Vertically center items */
+        padding: 0 20px; /* Add some padding to the sides */
+    }
+
+    .footer-text {
+        text-align: left;
+    }
+</style>
 <table>
     <tbody>
         <tr>
@@ -58,7 +86,7 @@
                 <tr>
                     <td>Salesman:</td>
                     <td>:</td>
-                    <td>-</td>
+                    <td>{{ $salesman ? $salesman->name : '-' }}</td>
                 </tr>
             </table>
         </td>
@@ -158,5 +186,8 @@ Terms and conditions will be provided on request</td>
 		</tr>
 	</tbody>
 </table>
+<div class="footer">
+    <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_footer_title}}</div>
+</div>
 
 @endsection
