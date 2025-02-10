@@ -79,4 +79,9 @@ class Container extends Model
     {
         return $this->hasMany(ContainerDocument::class, 'container_id', 'id');
     }
+
+    public function handlingProcedures()
+    {
+        return $this->hasMany(HandlingProcedure::class);
+    }
 }

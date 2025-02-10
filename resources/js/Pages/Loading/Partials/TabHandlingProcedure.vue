@@ -1,48 +1,113 @@
 <script setup>
 import Tab from "@/Components/Tab.vue";
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { Circle, CheckCircle2 } from 'lucide-vue-next';
+import axios from 'axios';
+import { usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
     container: {
         type: Object,
-        default: () => ({}),
+        required: true,
     }
 });
 
-
+// Base steps that are always shown
 const seaShipmentSteps = [
-    { id: 1, text: "Receive Notification from agent", checked: false },
-    { id: 2, text: "Receive Arrival Notice from Shipping company before shipment reach to colombo Port", checked: false },
-    { id: 3, text: "Receive Original BL from Agent (Seaway Bill, Telex Release, Surrender BL – Original BL Mode)", checked: false },
-    { id: 4, text: "Collect Delivery Order From Shipping Company", checked: false },
-    { id: 5, text: "Prepare Import Entry – Customs Portal", checked: false },
-    { id: 6, text: "Customs Clearance at Port", checked: false },
-    { id: 7, text: "Transport Arrangement from Port to Colombo Warehouse", checked: false },
-    { id: 8, text: "Receive Container at Colombo Warehouse", checked: false },
-    { id: 9, text: "Receive Customs Documents at Warehouse (After various Approvals)", checked: false },
-    { id: 10, text: "Get Container Unloading Approval from customs", checked: false },
-    { id: 11, text: "Prepare Unloading related File (Manifest, Tally sheet, Location Sheet, Letter Registration)", checked: false },
-    { id: 12, text: "Get customs Approval after Unloaded the Container (From this point we can inform customer)", checked: false },
-    { id: 13, text: "Return the Empty Container to the Shipping Company Yard", checked: false },
+    { id: 1, text: "Receive Notification from agent" },
+    { id: 2, text: "Receive Arrival Notice from Shipping company before shipment reach to colombo Port" },
+    { id: 3, text: "Receive Original BL from Agent (Seaway Bill, Telex Release, Surrender BL – Original BL Mode)" },
+    { id: 4, text: "Collect Delivery Order From Shipping Company" },
+    { id: 5, text: "Prepare Import Entry – Customs Portal" },
+    { id: 6, text: "Customs Clearance at Port" },
+    { id: 7, text: "Transport Arrangement from Port to Colombo Warehouse" },
+    { id: 8, text: "Receive Container at Colombo Warehouse" },
+    { id: 9, text: "Receive Customs Documents at Warehouse (After various Approvals)" },
+    { id: 10, text: "Get Container Unloading Approval from customs" },
+    { id: 11, text: "Prepare Unloading related File (Manifest, Tally sheet, Location Sheet, Letter Registration)" },
+    { id: 12, text: "Get customs Approval after Unloaded the Container (From this point we can inform customer)" },
+    { id: 13, text: "Return the Empty Container to the Shipping Company Yard" },
 ];
 
 const airShipmentSteps = [
-    { id: 1, text: "Receive Notification from agent", checked: false },
-    { id: 5, text: "Prepare Import Entry – Customs Portal", checked: false },
-    { id: 6, text: "Combined Customs Clearance and Transport at Airport", checked: false },
-    { id: 8, text: "Receive Cargo at Colombo Warehouse", checked: false },
-    { id: 9, text: "Receive Customs Documents at Warehouse (After various Approvals)", checked: false },
-    { id: 10, text: "Get Cargo Unloading Approval from customs", checked: false },
-    { id: 11, text: "Prepare Unloading related File (Manifest, Tally sheet, Location Sheet, Letter Registration)", checked: false },
-    { id: 12, text: "Get customs Approval after Unloaded the Cargo (From this point we can inform customer)", checked: false },
+    { id: 1, text: "Receive Notification from agent" },
+    { id: 5, text: "Prepare Import Entry – Customs Portal" },
+    { id: 6, text: "Combined Customs Clearance and Transport at Airport" },
+    { id: 8, text: "Receive Cargo at Colombo Warehouse" },
+    { id: 9, text: "Receive Customs Documents at Warehouse (After various Approvals)" },
+    { id: 10, text: "Get Cargo Unloading Approval from customs" },
+    { id: 11, text: "Prepare Unloading related File (Manifest, Tally sheet, Location Sheet, Letter Registration)" },
+    { id: 12, text: "Get customs Approval after Unloaded the Cargo (From this point we can inform customer)" },
 ];
 
-const checklist = ref(props.container?.cargo_type === 'Air Cargo' ? airShipmentSteps : seaShipmentSteps);
+const checklist = ref([]);
+const loading = ref(false);
+const currentUser = usePage().props.auth.user;
 
-const toggleCheck = (step) => {
-    step.checked = !step.checked;
-    // Here you can add API call to save the status
+const loadHandlingProcedures = async () => {
+    try {
+        loading.value = true;
+        const response = await axios.get(`/containers/${props.container.id}/handling-procedures`);
+        const procedures = response.data;
+
+        // Get the appropriate base steps based on cargo type
+        const baseSteps = props.container?.cargo_type === 'Air Cargo' ? airShipmentSteps : seaShipmentSteps;
+
+        // Map the base steps and merge with saved procedures
+        checklist.value = baseSteps.map(step => {
+            const savedProcedure = procedures.find(p => p.step_id === step.id);
+            return {
+                ...step,
+                checked: savedProcedure?.is_completed || false,
+                completed_by: savedProcedure?.completed_by || null,
+                completed_at: savedProcedure?.completed_at || null
+            };
+        });
+    } catch (error) {
+        console.error('Error loading procedures:', error);
+    } finally {
+        loading.value = false;
+    }
+};
+
+// Initialize checklist when cargo type changes
+watch(() => props.container?.cargo_type, (newType) => {
+    checklist.value = (newType === 'Air Cargo' ? airShipmentSteps : seaShipmentSteps).map(step => ({
+        ...step,
+        checked: false,
+        completed_by: null,
+        completed_at: null
+    }));
+    if (props.container?.id) {
+        loadHandlingProcedures();
+    }
+}, { immediate: true });
+
+const toggleCheck = async (step) => {
+    if (loading.value) return;
+
+    try {
+        loading.value = true;
+        const response = await axios.post(`/containers/${props.container.id}/handling-procedures`, {
+            step_id: step.id,
+            is_completed: !step.checked
+        });
+
+        // Update the step with the response data
+        const updatedProcedure = response.data;
+        step.checked = updatedProcedure.is_completed;
+        step.completed_by = updatedProcedure.completed_by;
+        step.completed_at = updatedProcedure.completed_at;
+    } catch (error) {
+        console.error('Error updating procedure:', error);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const formatDate = (date) => {
+    if (!date) return '';
+    return new Date(date).toLocaleString();
 };
 
 const getProgress = () => {
@@ -50,10 +115,6 @@ const getProgress = () => {
     const completedSteps = checklist.value.filter(step => step.checked).length;
     return Math.round((completedSteps / totalSteps) * 100);
 };
-
-watch(() => props.container?.cargo_type, (newType) => {
-    checklist.value = newType === 'Air Cargo' ? airShipmentSteps : seaShipmentSteps;
-});
 </script>
 
 <template>
@@ -80,7 +141,7 @@ watch(() => props.container?.cargo_type, (newType) => {
                 </p>
             </div>
 
-            <!-- Updated Checklist -->
+            <!-- Updated Checklist with User and Timestamp -->
             <div class="space-y-3">
                 <div v-for="step in checklist"
                      :key="step.id"
@@ -88,8 +149,9 @@ watch(() => props.container?.cargo_type, (newType) => {
                     <button
                         @click="toggleCheck(step)"
                         class="flex-shrink-0 mt-0.5 relative group"
+                        :disabled="loading"
                     >
-                        <Circle 
+                        <Circle
                             v-if="!step.checked"
                             class="w-5 h-5 text-gray-400 group-hover:text-gray-500 transition-colors"
                         />
@@ -98,15 +160,20 @@ watch(() => props.container?.cargo_type, (newType) => {
                             class="w-5 h-5 text-emerald-500 animate-scale-check"
                         />
                     </button>
-                    <span
-                        class="text-sm text-gray-700 dark:text-gray-200 transition-all duration-200"
-                        :class="{
-                            'text-emerald-600 dark:text-emerald-400': step.checked,
-                            'line-through opacity-50': step.checked
-                        }"
-                    >
-                        {{ step.text }}
-                    </span>
+                    <div class="flex flex-col">
+                        <span
+                            class="text-sm text-gray-700 dark:text-gray-200 transition-all duration-200"
+                            :class="{
+                                'text-emerald-600 dark:text-emerald-400': step.checked,
+                                'line-through opacity-50': step.checked
+                            }"
+                        >
+                            {{ step.text }}
+                        </span>
+                        <span v-if="step.checked" class="text-xs text-gray-500 mt-1">
+                            Completed by {{ step.completed_by?.name }} at {{ formatDate(step.completed_at) }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
