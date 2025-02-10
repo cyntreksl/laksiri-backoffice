@@ -410,6 +410,7 @@ const createColumns = () => [
     sort: false,
     hidden: !data.columnVisibility.actions,
     formatter: (_, row) => {
+        console.log(row.cells[17]);
       return h("div", { className: "flex space-x-2 relative group" }, [
         // Popover action button (Hamburger or similar)
         h(
@@ -481,7 +482,7 @@ const createColumns = () => [
             className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
           }, "Barcode"),
 
-          usePage().props.user.permissions.includes("hbls.delete") && h("a", {
+          !row.cells[17].data && usePage().props.user.permissions.includes("hbls.delete") && h("a", {
             href: "#",
             className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
             onClick: () => confirmDeleteHBL(row.cells[0].data.id),
