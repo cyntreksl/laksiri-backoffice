@@ -75,6 +75,7 @@ const data = reactive({
         status: false,
         is_hold: false,
         hbl_number: false,
+        is_released: false,
         view: true,
         actions: true,
     },
@@ -309,6 +310,7 @@ const createColumns = () => [
         },
         sort: false,
     },
+    {name: "Is Released", hidden: !data.columnVisibility.is_released},
     // {
     //     name: "Actions",
     //     sort: false,
@@ -482,7 +484,7 @@ const createColumns = () => [
                         className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
                     }, "Barcode"),
 
-                    usePage().props.user.permissions.includes("hbls.delete") && h("a", {
+                    !row.cells[16].data && usePage().props.user.permissions.includes("hbls.delete") && h("a", {
                         href: "#",
                         className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
                         onClick: () => confirmDeleteHBL(row.cells[0].data),
