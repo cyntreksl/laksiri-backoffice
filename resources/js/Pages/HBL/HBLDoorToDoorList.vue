@@ -410,7 +410,6 @@ const createColumns = () => [
     sort: false,
     hidden: !data.columnVisibility.actions,
     formatter: (_, row) => {
-        console.log(row.cells[17]);
       return h("div", { className: "flex space-x-2 relative group" }, [
         // Popover action button (Hamburger or similar)
         h(
