@@ -199,10 +199,11 @@
                         @endphp
 
                         @foreach ($item[9] as $package)
-                            {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
+                            {{ $package['quantity'] }}-{{ $package['package_type'] }}
                         @endforeach
+                        <br style="margin-bottom:5px;"/>
 
-                        <strong style="vertical-align: top; font-size: 13px;">Total</strong>
+                        <strong style=" font-size: 17px;">TOTAL</strong>
                     </td>
                     <td style="vertical-align: top">
                         @foreach ($item[9] as $package)
