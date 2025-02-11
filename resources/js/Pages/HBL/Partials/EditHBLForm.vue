@@ -98,6 +98,7 @@ const form = useForm({
     freight_charge: props.hbl.freight_charge.toFixed(2),
     bill_charge: props.hbl.bill_charge.toFixed(2),
     other_charge: props.hbl.other_charge.toFixed(2),
+    destination_charge: props.hbl.destination_charge.toFixed(2),
     discount: props.hbl.discount.toFixed(2),
     paid_amount: props.hbl.paid_amount.toFixed(2),
     grand_total: props.hbl.grand_total.toFixed(2),
@@ -300,7 +301,7 @@ watch(
         () => form.vat,
         () => form.additional_charge,
         () => form.bill_charge,
-        () => form.destination_charges,
+        () => form.destination_charge,
         () => form.package_charges,
     ],
     ([newOtherCharge, newDiscount, newFreightCharge]) => {
@@ -309,7 +310,7 @@ watch(
             parseFloat(form.freight_charge) +
             parseFloat(form.bill_charge) +
             parseFloat(form.package_charges) +
-            parseFloat(form.destination_charges) +
+            parseFloat(form.destination_charge) +
             // parseFloat(form.other_charge) +
             parseFloat(form.vat) -
             form.discount +
@@ -383,7 +384,7 @@ const calculatePayment = async () => {
             form.bill_charge = data.bill_charge;
             form.other_charge = data.other_charge;
             form.package_charges = data.package_charges;
-            form.destination_charges = data.destination_charges;
+            form.destination_charge = data.destination_charges;
             isEditable.value = data.is_editable;
             vat.value = data.vat;
         }
@@ -1217,7 +1218,7 @@ const getSelectedPackage = () => {
                             <div>
                                 <span>Destination Charge</span>
                                 <TextInput
-                                    v-model="form.other_charge"
+                                    v-model="form.destination_charge"
                                     :disabled="!isEditable"
                                     class="w-full"
                                     min="0"

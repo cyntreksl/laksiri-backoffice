@@ -31,6 +31,7 @@ class UpdateHBL
             'freight_charge' => $data['freight_charge'],
             'bill_charge' => $data['bill_charge'],
             'other_charge' => $data['other_charge'],
+            'destination_charge' => $data['destination_charge'],
             'discount' => $data['discount'],
             'additional_charge' => $data['additional_charge'],
             'paid_amount' => $data['paid_amount'],
