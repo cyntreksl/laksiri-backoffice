@@ -6,6 +6,7 @@ use App\Actions\User\GetUserCurrentBranch;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Support\Facades\Auth;
 
 class BranchScope implements Scope
 {
@@ -16,7 +17,7 @@ class BranchScope implements Scope
     {
         $currentBranch = GetUserCurrentBranch::run();
         //        $builder->where('branch_id', '=', $currentBranch['branchId']);
-        if ($currentBranch['branchType'] === 'Departure') {
+        if ($currentBranch['branchType'] === 'Departure' || $currentBranch['branchType'] === 'Destination' && Auth::user()->hasRole('admin')) {
             $builder->where('branch_id', '=', $currentBranch['branchId']);
         }
     }
