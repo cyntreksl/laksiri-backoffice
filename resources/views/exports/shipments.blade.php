@@ -144,14 +144,6 @@
                 </th>
             </tr>
 
-{{--            <tr>--}}
-{{--                <th colspan="3" style="height: 3px !important; ">AWB NO {{$container?->awb_number}}</th>--}}
-{{--                <th rowspan="2" colspan="1"><p> TOTAL VOLUME: </p></th>--}}
-{{--                <th rowspan="2" colspan="3"> {{ number_format($total_vtotal, 2) }}</th>--}}
-{{--                <th rowspan="2" colspan="1">TOTAL WEIGHT</th>--}}
-{{--                <th rowspan="2" colspan="2"> {{ number_format($total_gtotal, 2) }}</th>--}}
-
-{{--            </tr>--}}
             <tr>
                 <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
                     <strong>CONTR NO        {{$container?->container_number}}  </strong>
@@ -197,7 +189,7 @@
                     <td style="border-right:none ;vertical-align: top"> {{ $item[0]}} </td>
                     <td style="border-left:none;vertical-align: top">{{ $item[1]}} {{ $item[2]}} <br>  {{ $item[3]}} <br> {{ $item[4]}}</td>
                     <td style="vertical-align: top">{{ $item[5] }} <br> {{ $item[6] }} <br> {{ $item[7] }} <br> {{ $item[8] }} </td>
-                    <td style="vertical-align: top">
+                    <td style="vertical-align: top; font-size: 13px;" >
                         @php
                             $totalQuantity = collect($item[9])->sum('quantity');
                             $totalVolume = collect($item[9])->sum('volume');
@@ -209,6 +201,8 @@
                         @foreach ($item[9] as $package)
                             {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
                         @endforeach
+
+                        <strong style="vertical-align: top; font-size: 13px;">Total</strong>
                     </td>
                     <td style="vertical-align: top">
                         @foreach ($item[9] as $package)
