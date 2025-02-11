@@ -267,6 +267,7 @@ const shipIcon = ref(`
                                         type="text"
                                     />
                                 </div>
+                                <InputError :message="form.errors.contact_number"/>
                             </div>
 
                             <div class="col-span-2">
