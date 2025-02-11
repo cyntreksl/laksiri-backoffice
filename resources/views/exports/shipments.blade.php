@@ -202,6 +202,8 @@
                             $totalQuantity = collect($item[9])->sum('quantity');
                             $totalVolume = collect($item[9])->sum('volume');
                             $totalWeight = collect($item[9])->sum('weight');
+
+                            $hblweight = $total_gtotal/$total_vtotal*$totalVolume;
                         @endphp
 
                         @foreach ($item[9] as $package)
@@ -212,19 +214,19 @@
                         @foreach ($item[9] as $package)
                             {{ $package['quantity'] }}<br>
                         @endforeach
-                        <strong>Total: {{ $totalQuantity }}</strong>
+                        <strong> {{ $totalQuantity }}</strong>
                     </td>
                     <td style="vertical-align: top">
                         @foreach ($item[9] as $package)
                             {{ $package['volume'] }}<br>
                         @endforeach
-                        <strong>Total: {{ $totalVolume }}</strong>
+                        <strong>{{ $totalVolume }}</strong>
                     </td>
                     <td style="vertical-align: top">
                         @foreach ($item[9] as $package)
                             {{ $package['weight'] }}<br>
                         @endforeach
-                        <strong >Total: {{ $totalWeight }}</strong>
+                        <strong > {{ $hblweight }}</strong>
                     </td>
                     <td>  PERSONAL<br>      EFFECT</td>
                     <td>
