@@ -187,7 +187,7 @@
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">GWHT</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">DESCRIPTION OF CARGO</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">    </th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 11px;">REMARKS</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 11px;">REMARKS</th>- New Total Column -->
             </tr>
             </thead>
             <tbody>
@@ -198,6 +198,12 @@
                     <td style="border-left:none;vertical-align: top">{{ $item[1]}} {{ $item[2]}} <br>  {{ $item[3]}} <br> {{ $item[4]}}</td>
                     <td style="vertical-align: top">{{ $item[5] }} <br> {{ $item[6] }} <br> {{ $item[7] }} <br> {{ $item[8] }} </td>
                     <td style="vertical-align: top">
+                        @php
+                            $totalQuantity = collect($item[9])->sum('quantity');
+                            $totalVolume = collect($item[9])->sum('volume');
+                            $totalWeight = collect($item[9])->sum('weight');
+                        @endphp
+
                         @foreach ($item[9] as $package)
                             {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
                         @endforeach
@@ -206,16 +212,19 @@
                         @foreach ($item[9] as $package)
                             {{ $package['quantity'] }}<br>
                         @endforeach
+                        <strong>Total: {{ $totalQuantity }}</strong>
                     </td>
                     <td style="vertical-align: top">
                         @foreach ($item[9] as $package)
                             {{ $package['volume'] }}<br>
                         @endforeach
+                        <strong>Total: {{ $totalVolume }}</strong>
                     </td>
                     <td style="vertical-align: top">
                         @foreach ($item[9] as $package)
                             {{ $package['weight'] }}<br>
                         @endforeach
+                        <strong >Total: {{ $totalWeight }}</strong>
                     </td>
                     <td>  PERSONAL<br>      EFFECT</td>
                     <td>
@@ -223,8 +232,12 @@
                     </td>
 
                     <td style="text-align: center">
-                        <b>{{ $item[11] == 'GIFT' ? $item[11] : '' }}
-                          <p>{{ $item[10]}}</p>
+                        <b >{{ $item[11] == 'GIFT' ? $item[11] : '' }}
+                            @if (!empty($item[12]))
+                                <p>{{ $container?->port_of_loading . '&' . $container?->port_of_discharge }}</p>
+                            @endif
+
+                            <p>{{ $item[10]}}</p>
                         </b>
                     </td>
 
@@ -233,10 +246,11 @@
             @endforeach
             @if ($loop->last)
                 <tr style="border: none;">
-                    <td colspan="6" style="border: none; text-align: right;"></td>
+                    <td colspan="5" style="border: none; text-align: right;"></td>
                     <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_nototal, 0) }}</u></strong></td>
                     <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 2) }}</u></strong></td>
                     <td style="border: none; text-align: center;"><strong><u>  {{ number_format($total_gtotal, 2) }}</u></strong></td>
+                    <td style="border: none;">&nbsp;</td>
                     <td style="border: none;">&nbsp;</td>
                     <td style="border: none;">&nbsp;</td>
                 </tr>
