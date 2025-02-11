@@ -1225,7 +1225,7 @@ const getSelectedPackage = () => {
                                     step="any"
                                     type="number"
                                 />
-                                <InputError :message="form.errors.other_charge"/>
+                                <InputError :message="form.errors.destination_charge"/>
                             </div>
 
                             <div>
