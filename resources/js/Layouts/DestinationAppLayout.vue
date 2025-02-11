@@ -117,6 +117,7 @@
 <!--                            </a>-->
                             <!-- Reception Verifications -->
                             <a
+                                v-if="usePage().props.auth.user.roles[0].name !== 'viewer'"
                                 :class="[
                 activeMenu === 'reception' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -241,7 +242,7 @@
                             </a>
                             <!-- Arrivals -->
                             <a
-                                v-if="usePage().props.auth.user.roles[0].name !== 'call center' && usePage().props.auth.user.roles[0].name !== 'viewer'"
+                                v-if="usePage().props.auth.user.roles[0].name !== 'call center'"
                                 :class="[
                 activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
               ]"
