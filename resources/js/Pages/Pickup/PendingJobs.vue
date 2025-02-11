@@ -53,6 +53,7 @@ const filters = reactive({
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo"],
     createdBy: "",
+    pickupDate: "",
     zoneBy: "",
 });
 
@@ -809,6 +810,7 @@ const resetFilter = () => {
     filters.toDate = toDate;
     filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
     filters.createdBy = "";
+    filters.pickupDate = "";
     filters.zoneBy = "";
     applyFilters();
 };
@@ -1215,7 +1217,7 @@ const shipIcon = ref(`
                 <FilterHeader value="Created By"/>
 
                 <select
-                    v-model="filters.createdBy"
+                    v-model="filters.pickupDate"
                     autocomplete="off"
                     class="w-full"
                     multiple
