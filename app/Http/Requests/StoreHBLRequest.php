@@ -41,6 +41,7 @@ class StoreHBLRequest extends FormRequest
             'freight_charge' => ['required', 'numeric'],
             'bill_charge' => ['required', 'numeric'],
             'other_charge' => ['required', 'numeric'],
+            'destination_charge' => ['required', 'numeric'],
             'discount' => ['required', 'numeric'],
             'paid_amount' => ['required', 'numeric', 'min:0'],
         ];

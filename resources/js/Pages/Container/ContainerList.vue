@@ -559,7 +559,7 @@ const shipIcon = ref(`
 `);
 </script>
 <template>
-    <DestinationAppLayout v-if="$page.props.currentBranch.type === 'Destination'" title="Container List">
+    <DestinationAppLayout v-if="$page.props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Container List">
         <template #header>Container List</template>
 
         <Breadcrumb/>

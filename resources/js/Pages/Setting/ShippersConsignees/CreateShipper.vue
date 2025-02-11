@@ -88,25 +88,29 @@ const createShipper = () => {
         </div>
           <!-- Mobile Number Field -->
           <div >
-              <InputLabel for="mobile_number" value="Mobile Number"/>
-              <div class="flex space-x-px">
-                  <select
-                      v-model="countryCode"
-                      class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                  >
-                      <option v-for="code in countryCodes" :key="code" :value="code">
-                          {{ code }}
-                      </option>
-                  </select>
-                  <TextInput
-                      v-model="contactNumber"
-                      id="mobile_number"
-                      type="text"
-                      class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                      placeholder="123 4567 890"
-                  />
+              <div class="grid grid-cols-1 sm:grid-cols-3">
+                  <InputLabel class="col-span-3" for="mobile_number" value="Mobile Number"/>
+                  <div>
+                      <select
+                          v-model="countryCode"
+                          x-init="$el._tom = new Tom($el)"
+                          class="w-full rounded-r-0"
+                      >
+                          <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                              {{ countryCode }}
+                          </option>
+                      </select>
+                  </div>
+                  <div class="col-span-2">
+                      <input
+                          v-model="contactNumber"
+                          class="form-input rounded-l-lg w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                          placeholder="123 4567 890"
+                          type="text"
+                      />
+                  </div>
+                  <InputError class="col-span-3" :message="form.errors.mobile_number"/>
               </div>
-              <InputError :message="form.errors.mobile_number"/>
           </div>
         <!-- Passport/NIC Field -->
         <div>

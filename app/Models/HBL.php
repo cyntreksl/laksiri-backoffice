@@ -76,6 +76,7 @@ class HBL extends Model
         'freight_charge',
         'bill_charge',
         'other_charge',
+        'destination_charge',
         'discount',
         'additional_charge',
         'paid_amount',

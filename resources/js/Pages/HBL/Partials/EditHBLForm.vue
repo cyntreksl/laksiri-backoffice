@@ -98,6 +98,7 @@ const form = useForm({
     freight_charge: props.hbl.freight_charge.toFixed(2),
     bill_charge: props.hbl.bill_charge.toFixed(2),
     other_charge: props.hbl.other_charge.toFixed(2),
+    destination_charge: props.hbl.destination_charge.toFixed(2),
     discount: props.hbl.discount.toFixed(2),
     paid_amount: props.hbl.paid_amount.toFixed(2),
     grand_total: props.hbl.grand_total.toFixed(2),
@@ -300,7 +301,7 @@ watch(
         () => form.vat,
         () => form.additional_charge,
         () => form.bill_charge,
-        () => form.destination_charges,
+        () => form.destination_charge,
         () => form.package_charges,
     ],
     ([newOtherCharge, newDiscount, newFreightCharge]) => {
@@ -309,7 +310,7 @@ watch(
             parseFloat(form.freight_charge) +
             parseFloat(form.bill_charge) +
             parseFloat(form.package_charges) +
-            parseFloat(form.destination_charges) +
+            parseFloat(form.destination_charge) +
             // parseFloat(form.other_charge) +
             parseFloat(form.vat) -
             form.discount +
@@ -383,7 +384,7 @@ const calculatePayment = async () => {
             form.bill_charge = data.bill_charge;
             form.other_charge = data.other_charge;
             form.package_charges = data.package_charges;
-            form.destination_charges = data.destination_charges;
+            form.destination_charge = data.destination_charges;
             isEditable.value = data.is_editable;
             vat.value = data.vat;
         }
@@ -768,29 +769,29 @@ const getSelectedPackage = () => {
 
                     <div class="grid grid-cols-3 gap-5 mt-3">
                         <div class="col-span-3">
-                            <span>Mobile Number</span>
-                            <div class="flex -space-x-px">
-                                <select
-                                    v-model="countryCode"
-                                    class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                >
-                                    <option
-                                        v-for="(countryCode, index) in countryCodes"
-                                        :key="index"
-                                        :value="countryCode"
+                            <div class="grid grid-cols-1 sm:grid-cols-3">
+                                <InputLabel class="col-span-3" value="Mobile Number"/>
+                                <div>
+                                    <select
+                                        v-model="countryCode"
+                                        x-init="$el._tom = new Tom($el)"
+                                        class="w-full rounded-r-0"
                                     >
-                                        {{ countryCode }}
-                                    </option>
-                                </select>
-
-                                <input
-                                    v-model="contactNumber"
-                                    class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                    placeholder="123 4567 890"
-                                    type="text"
-                                />
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                            {{ countryCode }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <input
+                                        v-model="contactNumber"
+                                        class="form-input rounded-l-lg w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        placeholder="123 4567 890"
+                                        type="text"
+                                    />
+                                </div>
+                                <InputError class="col-span-3" :message="form.errors.contact_number"/>
                             </div>
-                            <InputError :message="form.errors.contact_number"/>
                         </div>
                     </div>
 
@@ -969,29 +970,29 @@ const getSelectedPackage = () => {
                         </div>
 
                         <div class="col-span-2">
-                            <span>Mobile Number</span>
-                            <div class="flex -space-x-px">
-                                <select
-                                    v-model="consigneeCountryCode"
-                                    class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                >
-                                    <option
-                                        v-for="(countryCode, index) in countryCodes"
-                                        :key="index"
-                                        :value="countryCode"
+                            <div class="grid grid-cols-1 sm:grid-cols-3">
+                                <InputLabel class="col-span-3" value="Mobile Number"/>
+                                <div>
+                                    <select
+                                        v-model="consigneeCountryCode"
+                                        x-init="$el._tom = new Tom($el)"
+                                        class="w-full rounded-r-0"
                                     >
-                                        {{ countryCode }}
-                                    </option>
-                                </select>
-
-                                <input
-                                    v-model="consigneeContactNumber"
-                                    class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                    placeholder="123 4567 890"
-                                    type="text"
-                                />
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                            {{ countryCode }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <input
+                                        v-model="consigneeContactNumber"
+                                        class="form-input rounded-l-lg w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        placeholder="123 4567 890"
+                                        type="text"
+                                    />
+                                </div>
+                                <InputError class="col-span-3" :message="form.errors.consignee_contact"/>
                             </div>
-                            <InputError :message="form.errors.consignee_contact"/>
                         </div>
 
                         <div class="col-span-2">
@@ -1217,14 +1218,14 @@ const getSelectedPackage = () => {
                             <div>
                                 <span>Destination Charge</span>
                                 <TextInput
-                                    v-model="form.other_charge"
+                                    v-model="form.destination_charge"
                                     :disabled="!isEditable"
                                     class="w-full"
                                     min="0"
                                     step="any"
                                     type="number"
                                 />
-                                <InputError :message="form.errors.other_charge"/>
+                                <InputError :message="form.errors.destination_charge"/>
                             </div>
 
                             <div>

@@ -1,3 +1,4 @@
+
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
@@ -244,26 +245,24 @@ const shipIcon = ref(`
                                 <InputError :message="form.errors.email"/>
                             </div>
 
-                            <div>
-                                <InputLabel value="Mobile Number"/>
-                                <div class="flex -space-x-px">
+                            <div class="grid grid-cols-1 sm:grid-cols-3">
+                                <InputLabel class="col-span-3" value="Mobile Number"/>
+                                <div>
                                     <select
                                         v-model="countryCode"
-                                        class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        x-init="$el._tom = new Tom($el)"
+                                        class="w-full rounded-r-0"
                                     >
-                                        <option
-                                            v-for="(countryCode, index) in countryCodes"
-                                            :key="index"
-                                            :value="countryCode"
-                                        >
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
                                             {{ countryCode }}
                                         </option>
                                     </select>
-
+                                </div>
+                                <div class="col-span-2">
                                     <input
                                         id="telephone"
                                         v-model="contactNumber"
-                                        class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        class="rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
                                         type="text"
                                     />

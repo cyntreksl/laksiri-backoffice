@@ -117,6 +117,7 @@
 <!--                            </a>-->
                             <!-- Reception Verifications -->
                             <a
+                                v-if="usePage().props.auth.user.roles[0].name !== 'viewer'"
                                 :class="[
                 activeMenu === 'reception' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -144,6 +145,7 @@
                             </a>
                             <!-- Document Verifications -->
                             <a
+                                v-if="usePage().props.auth.user.roles[0].name !== 'viewer'"
                                 :class="[
                 activeMenu === 'verifications' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -158,6 +160,7 @@
                             </a>
                             <!-- Cashier -->
                             <a
+                                v-if="usePage().props.auth.user.roles[0].name !== 'viewer'"
                                 :class="[
                 activeMenu === 'cashier' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -172,6 +175,7 @@
                             </a>
                             <!-- Boned Area Screens -->
                             <a
+                                v-if="usePage().props.auth.user.roles[0].name !== 'viewer'"
                                 :class="[
                 activeMenu === 'package' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -197,6 +201,7 @@
                             </a>
                             <!-- Examination  -->
                             <a
+                                v-if="usePage().props.auth.user.roles[0].name !== 'viewer'"
                                 :class="[
                 activeMenu === 'examination' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -211,6 +216,7 @@
                             </a>
                             <!-- Queue Screen -->
                             <a
+                                v-if="usePage().props.auth.user.roles[0].name !== 'viewer'"
                                 :class="[
                 activeMenu === 'screens' ? 'bg-primary/10 text-primary' : '',
               ]"

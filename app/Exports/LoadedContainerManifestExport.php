@@ -57,7 +57,7 @@ class LoadedContainerManifestExport
                 }
             }
             $data[] = [
-                $mhbl->hbl_number ? $mhbl->reference : '',
+                $mhbl->hbl_number ?: $mhbl->reference,
                 $mhbl->shipper->name ?? '',
                 $mhbl->shipper->address ?? '',
                 $mhbl->shipper->pp_or_nic_no ?? '',
