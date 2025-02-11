@@ -251,7 +251,7 @@ const shipIcon = ref(`
                                     <select
                                         v-model="countryCode"
                                         x-init="$el._tom = new Tom($el)"
-                                        class="w-full"
+                                        class="w-full rounded-r-0"
                                     >
                                         <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
                                             {{ countryCode }}
