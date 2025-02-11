@@ -42,7 +42,7 @@ const props = defineProps({
 
 const wrapperRef = ref(null);
 let grid = null;
-const perPage = ref(10);
+const perPage = ref(50);
 
 const showFilters = ref(false);
 const fromDate = moment(new Date()).subtract(7, "days").format("YYYY-MM-DD");
