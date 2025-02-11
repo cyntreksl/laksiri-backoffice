@@ -122,7 +122,7 @@
                 <th colspan="7" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
                     DATE: <?php echo date('d/m/Y'); ?>
                     <span style="font-family: 'Times New Roman',fantasy; font-size: 16px;">                                
-                                                                 
+                                                                
                                                                    {{$container?->reference}} </span>
                 </th>
             </tr>
