@@ -441,7 +441,7 @@
                                             <ul class="flex flex-1 flex-col px-4 font-inter">
                                                 <li v-for="item in childMenuList">
                                                     <template v-if="$page.props.user.roles.includes('viewer')">
-                                                        <template v-if="$page.props.currentBranch.name === 'Colombo'">
+                                                        <template v-if="$page.props.currentBranch.type === 'Destination'">
                                                             <Link
                                                                 v-if="item.title === 'Shipments Arrivals'"
                                                                 :class="
@@ -1053,14 +1053,14 @@ export default {
                     childMenuList.splice(
                         0,
                         childMenuList.length,
-                        // {
-                        //     title: "Shipments Arrivals",
-                        //     route: "arrival.shipments-arrivals.index",
-                        // },
-                        // {
-                        //     title: "Bonded Warehouse",
-                        //     route: "arrival.bonded-warehouses.index",
-                        // },
+                        {
+                            title: "Shipments Arrivals",
+                            route: "arrival.shipments-arrivals.index",
+                        },
+                        {
+                            title: "Bonded Warehouse",
+                            route: "arrival.bonded-warehouses.index",
+                        },
                         {
                             title: "Unloading Issues",
                             route: "arrival.unloading-issues.index",
