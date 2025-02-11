@@ -12,12 +12,12 @@ class HandlingProcedure extends Model
         'step_id',
         'is_completed',
         'completed_by',
-        'completed_at'
+        'completed_at',
     ];
 
     protected $casts = [
         'is_completed' => 'boolean',
-        'completed_at' => 'datetime'
+        'completed_at' => 'datetime',
     ];
 
     public function container(): BelongsTo
@@ -29,4 +29,4 @@ class HandlingProcedure extends Model
     {
         return $this->belongsTo(User::class, 'completed_by');
     }
-} 
+}

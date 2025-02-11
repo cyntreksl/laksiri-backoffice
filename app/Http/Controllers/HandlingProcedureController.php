@@ -6,7 +6,6 @@ use App\Models\Container;
 use App\Models\HandlingProcedure;
 use App\Models\Scopes\BranchScope;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class HandlingProcedureController extends Controller
 {
@@ -32,7 +31,7 @@ class HandlingProcedureController extends Controller
 
         $validated = $request->validate([
             'step_id' => 'required|integer',
-            'is_completed' => 'required|boolean'
+            'is_completed' => 'required|boolean',
         ]);
 
         // Always create a new record instead of updating
@@ -41,7 +40,7 @@ class HandlingProcedureController extends Controller
             'step_id' => $validated['step_id'],
             'is_completed' => $validated['is_completed'],
             'completed_by' => auth()->id(),
-            'completed_at' => now()
+            'completed_at' => now(),
         ]);
 
         return $procedure->load('completedBy');
