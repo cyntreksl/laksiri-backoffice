@@ -15,6 +15,7 @@ import {push} from "notivue";
 import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
     hblTypes: {
@@ -1023,25 +1024,30 @@ const confirmViewHBL = async (id) => {
 
                         <div class="grid grid-cols-3 gap-5 mt-3">
                             <div class="col-span-3">
-                                <span>Mobile Number</span>
-                                <div class="flex -space-x-px">
-                                    <select
-                                        v-model="countryCode"
-                                        class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    >
-                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                            {{ countryCode }}
-                                        </option>
-                                    </select>
-
-                                    <input
-                                        v-model="contactNumber"
-                                        class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                        placeholder="123 4567 890"
-                                        type="text"
-                                    />
+                                <div class="grid grid-cols-1 sm:grid-cols-3">
+                                    <InputLabel class="col-span-3" value="Mobile Number"/>
+                                    <div>
+                                        <select
+                                            v-model="countryCode"
+                                            x-init="$el._tom = new Tom($el)"
+                                            class="w-full rounded-r-0"
+                                        >
+                                            <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                                {{ countryCode }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <input
+                                            id="telephone"
+                                            v-model="contactNumber"
+                                            class="rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                            placeholder="123 4567 890"
+                                            type="text"
+                                        />
+                                    </div>
                                 </div>
-                                <InputError :message="form.errors.contact_number"/>
+                                <InputError class="col-span-3" :message="form.errors.contact_number"/>
                             </div>
                         </div>
 
@@ -1220,25 +1226,30 @@ const confirmViewHBL = async (id) => {
                             </div>
 
                             <div class="col-span-2">
-                                <span>Mobile Number</span>
-                                <div class="flex -space-x-px">
-                                    <select
-                                        v-model="consignee_countryCode"
-                                        class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    >
-                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                            {{ countryCode }}
-                                        </option>
-                                    </select>
-
-                                    <input
-                                        v-model="consignee_contact"
-                                        class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                        placeholder="123 4567 890"
-                                        type="text"
-                                    />
+                                <div class="grid grid-cols-1 sm:grid-cols-3">
+                                    <InputLabel class="col-span-3" value="Mobile Number"/>
+                                    <div>
+                                        <select
+                                            v-model="consignee_countryCode"
+                                            x-init="$el._tom = new Tom($el)"
+                                            class="w-full rounded-r-0"
+                                        >
+                                            <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                                {{ countryCode }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <input
+                                            id="telephone"
+                                            v-model="consignee_contact"
+                                            class="rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                            placeholder="123 4567 890"
+                                            type="text"
+                                        />
+                                    </div>
                                 </div>
-                                <InputError :message="form.errors.consignee_contact"/>
+                                <InputError class="col-span-3" :message="form.errors.consignee_contact"/>
                             </div>
 
                             <div class="col-span-2">
