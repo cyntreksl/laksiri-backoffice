@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\v1\HBLController;
 use App\Http\Controllers\Api\v1\PackageTypeController;
 use App\Http\Controllers\Api\v1\PickupController;
 use App\Http\Controllers\CallCenter\DeliverController;
+use App\Http\Controllers\HandlingProcedureController;
 use Illuminate\Support\Facades\Route;
 
 Route::domain('api.'.config('app.url'))
@@ -49,6 +50,11 @@ Route::domain('api.'.config('app.url'))
         Route::get('/delivers/{hblDeliver}', [DeliverController::class, 'show']);
 
         Route::post('/release-delivery', [DeliverController::class, 'releaseDeliverOrder']);
+
+
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
+
+Route::get('/containers/{container}/handling-procedures', [HandlingProcedureController::class, 'index'])->middleware(['web']);
+Route::post('/containers/{container}/handling-procedures', [HandlingProcedureController::class, 'store'])->middleware(['web']);
