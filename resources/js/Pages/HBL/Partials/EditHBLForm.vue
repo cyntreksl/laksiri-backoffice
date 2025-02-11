@@ -789,7 +789,7 @@ const getSelectedPackage = () => {
                                         type="text"
                                     />
                                 </div>
-                                <InputError :message="form.errors.contact_number"/>
+                                <InputError class="col-span-3" :message="form.errors.contact_number"/>
                             </div>
                         </div>
                     </div>
@@ -990,7 +990,7 @@ const getSelectedPackage = () => {
                                         type="text"
                                     />
                                 </div>
-                                <InputError :message="form.errors.consignee_contact"/>
+                                <InputError class="col-span-3" :message="form.errors.consignee_contact"/>
                             </div>
                         </div>
 

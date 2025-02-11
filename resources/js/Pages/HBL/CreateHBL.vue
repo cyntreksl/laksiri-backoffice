@@ -1047,7 +1047,7 @@ const confirmViewHBL = async (id) => {
                                         />
                                     </div>
                                 </div>
-                                <InputError :message="form.errors.contact_number"/>
+                                <InputError class="col-span-3" :message="form.errors.contact_number"/>
                             </div>
                         </div>
 
@@ -1249,7 +1249,7 @@ const confirmViewHBL = async (id) => {
                                         />
                                     </div>
                                 </div>
-                                <InputError :message="form.errors.consignee_contact"/>
+                                <InputError class="col-span-3" :message="form.errors.consignee_contact"/>
                             </div>
 
                             <div class="col-span-2">
