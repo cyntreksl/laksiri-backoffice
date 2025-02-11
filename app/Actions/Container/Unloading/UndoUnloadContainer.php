@@ -27,6 +27,11 @@ class UndoUnloadContainer
                 'unloaded_by' => null,
             ]);
 
+            $container->duplicate_hbl_packages()->updateExistingPivot($data['package_id'], [
+                'status' => 'loaded',
+                'unloaded_by' => null,
+            ]);
+
             DB::commit();
 
         } catch (\Exception $e) {

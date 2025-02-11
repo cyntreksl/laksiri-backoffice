@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -43,6 +43,15 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    notificationTypes: {
+        type: Array,
+        default: () => []
+    },
+    countryNames: {
+        type: Array,
+        default: () => []
+    }
+
 })
 
 const form = useForm({
@@ -52,6 +61,7 @@ const form = useForm({
     currency_name: props.branch.currency_name || '',
     currency_symbol: props.branch.currency_symbol || '',
     country_code: props.branch.country_code || '',
+    country: props.branch.country || '',
     email: props.branch.email || '',
     container_delays: props.branch.container_delays,
     cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
@@ -86,6 +96,7 @@ const settingForm = useForm({
     invoice_footer_text: props.settings ? props.settings.invoice_footer_text : '',
     logo: props.settings ? props.settings.logo : null,
     seal: props.settings ? props.settings.seal : null,
+    notification: JSON.parse(props.settings?.notification || '{}'),
 });
 
 const handleSettingUpdate = () => {
@@ -156,6 +167,10 @@ const clearSealFileInput = () => {
     if (sealInput.value?.value) {
         sealInput.value.value = null;
     }
+};
+
+const updateChecked = (notification, isChecked) => {
+    settingForm.notification = { ...settingForm.notification, [notification]: isChecked };
 };
 
 
@@ -277,6 +292,22 @@ const clearSealFileInput = () => {
                                 min="0"
                             />
                             <InputError :message="form.errors.container_delays" />
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block">
+                                <InputLabel value="Country"/>
+                                <select
+                                    v-model="form.country"
+                                    x-init="$el._tom = new Tom($el)"
+                                    class="w-full"
+                                >
+                                    <option v-for="(countryName, index) in countryNames" :key="index" :value="countryName">
+                                        {{ countryName }}
+                                    </option>
+                                </select>
+
+                            </label>
+                            <InputError :message="form.errors.country"/>
                         </div>
 
                         <div class="sm:col-span-4">
@@ -558,6 +589,31 @@ const clearSealFileInput = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="card px-4 py-4 sm:px-5">
+                    <div class="grid grid-cols-2">
+                        <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
+                            Notification
+                        </h2>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 mt-4">
+                        <InputLabel
+                            v-for="(notification, index) in notificationTypes"
+                            :key="index"
+                            class="cursor-pointer"
+                        >
+                            <input
+                                :checked="settingForm.notification[notification] || false"
+                                class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent mr-3"
+                                type="checkbox"
+                                @change="(event) => updateChecked(notification, event.target.checked)"
+                            />
+                            {{ notification }}
+                        </InputLabel>
+                    </div>
+                    <InputError class="mt-1" :message="settingForm.errors.notification" />
                 </div>
             </div>
         </div>

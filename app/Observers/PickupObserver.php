@@ -4,12 +4,21 @@ namespace App\Observers;
 
 use App\Actions\User\CreateUser;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\PickupStatus;
+use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Models\PickUp;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
 class PickupObserver
 {
+    protected $notificationMailRepository;
+
+    public function __construct(NotificationMailRepositoryInterface $notificationMailRepository)
+    {
+        $this->notificationMailRepository = $notificationMailRepository;
+    }
+
     /**
      * Handle the PickUp "created" event.
      */
@@ -29,6 +38,7 @@ class PickupObserver
         ];
 
         $userExists = User::where('username', $data['username'])
+            ->orWhere('email', $pickup->email)
             ->first();
 
         if ($userExists) {
@@ -38,5 +48,18 @@ class PickupObserver
             $pickup->shipper_id = $user->id;
         }
         $pickup->save();
+        $this->notificationMailRepository->sendPickupCreationNotification($pickup);
+    }
+
+    public function updated(PickUp $pickup): void
+    {
+        if ($pickup->wasChanged('driver_id')) {
+            // Send notification email
+            $this->notificationMailRepository->sendAssignDriverNotification($pickup);
+        }
+        if ($pickup->wasChanged('status') && $pickup->status === PickupStatus::PROCESSING->value) {
+            // Send notification email
+            $this->notificationMailRepository->sendCollectedCargoNotification($pickup);
+        }
     }
 }

@@ -12,8 +12,7 @@ class ExceptionNameController extends Controller
 {
     public function __construct(
         private readonly ExceptionNameRepositoryInterface $exceptionNameRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.

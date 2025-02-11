@@ -5,14 +5,17 @@ namespace App\Http\Controllers;
 use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
 use App\Enum\PickupType;
+use App\Events\PickupCreated;
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\UpdatePickupRequest;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
+use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
+use App\Interfaces\SettingRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Models\PickUp;
@@ -31,8 +34,9 @@ class PickupController extends Controller
         private readonly ZoneRepositoryInterface $zoneRepository,
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
         private readonly CountryRepositoryInterface $countryRepository,
-    ) {
-    }
+        private readonly SettingRepositoryInterface $settingRepository,
+        private readonly NotificationMailRepositoryInterface $notificationMailRepository,
+    ) {}
 
     public function index()
     {
@@ -73,7 +77,9 @@ class PickupController extends Controller
 
     public function store(StorePickupRequest $request)
     {
-        $this->pickupRepository->storePickup($request->all());
+        $pickup = $this->pickupRepository->storePickup($request->all());
+
+        PickupCreated::dispatch($pickup);
     }
 
     public function show(PickUp $pickup)

@@ -12,10 +12,10 @@ class UpdateSetting
 
     public function handle(array $data)
     {
-        if ($data['logo'] === null) {
+        if (array_key_exists('logo', $data) && $data['logo'] === null) {
             unset($data['logo']);
         }
-        if ($data['seal'] === null) {
+        if (array_key_exists('seal', $data) && $data['seal'] === null) {
             unset($data['seal']);
         }
         $data['branch_id'] = GetUserCurrentBranchID::run();

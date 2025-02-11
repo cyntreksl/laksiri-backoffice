@@ -31,6 +31,9 @@ class HBLPackage extends Model
         'weight',
         'is_loaded',
         'is_unloaded',
+        'current_warehouse',
+        'is_de_loaded',
+        'is_de_unloaded',
         'remarks',
         'measure_type',
     ];
@@ -43,6 +46,13 @@ class HBLPackage extends Model
     public function containers(): BelongsToMany
     {
         return $this->belongsToMany(Container::class, 'container_hbl_package', 'hbl_package_id', 'container_id')
+            ->withPivot('status', 'loaded_by')
+            ->withTimestamps();
+    }
+
+    public function duplicate_containers(): BelongsToMany
+    {
+        return $this->belongsToMany(Container::class, 'duplicate_container_hbl_package', 'hbl_package_id', 'container_id')
             ->withPivot('status', 'loaded_by')
             ->withTimestamps();
     }

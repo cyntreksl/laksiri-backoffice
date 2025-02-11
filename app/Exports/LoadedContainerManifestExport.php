@@ -16,19 +16,6 @@ class LoadedContainerManifestExport
         $this->container = $container;
     }
 
-    //    public function headings(): array
-    //    {
-    //        return [
-    //            'HBL',
-    //            'Shipper Details',
-    //            'Consignee Details',
-    //            'Type',
-    //            'Quantity',
-    //            'Volume',
-    //            'Weight',
-    //        ];
-    //    }
-
     public function query()
     {
         return Container::query()
@@ -42,21 +29,23 @@ class LoadedContainerManifestExport
     public function prepareData(): array
     {
         $data = [];
-
-        $loadedHBLPackages = [];
         $loadedMHBLPackages = [];
+        $loadedHBLPackages = [];
 
-        foreach ($this->container->hbl_packages->groupBy('hbl_id') as $hblId => $loadedHBLPackages) {
+        // Group packages by HBL
+        foreach ($this->container->hbl_packages->groupBy('hbl_id') as $hblId => $packages) {
             $hbl = HBL::withoutGlobalScope(BranchScope::class)->with('mhbl')->find($hblId);
             if ($hbl->mhbl) {
-                $loadedMHBLPackages[$hbl->mhbl->id][] = $loadedHBLPackages;
+                $loadedMHBLPackages[$hbl->mhbl->id][] = $packages;
             } else {
-                $loadedHBLPackages[] = $loadedHBLPackages;
+                $loadedHBLPackages[$hblId] = [
+                    'hbl' => $hbl,
+                    'packages' => $packages,
+                ];
             }
         }
 
-        $isFirst = true;
-
+        //  MHBL packages
         foreach ($loadedMHBLPackages as $mhblId => $mhblPackage) {
             $mhbl = GetMHBLById::run($mhblId);
             $hblPackages = [];
@@ -68,7 +57,7 @@ class LoadedContainerManifestExport
                 }
             }
             $data[] = [
-                $mhbl->hbl_number ? $mhbl->reference : '',
+                $mhbl->hbl_number ?: $mhbl->reference,
                 $mhbl->shipper->name ?? '',
                 $mhbl->shipper->address ?? '',
                 $mhbl->shipper->pp_or_nic_no ?? '',
@@ -81,22 +70,23 @@ class LoadedContainerManifestExport
                 $mhbl->hbls[0]->paid_amount > 0 ? 'PAID' : 'UNPAID',
             ];
         }
-        foreach ($loadedHBLPackages as $hbl_package) {
-            $data[] = [
-                $isFirst ? $hbl->hbl_number ?: $hbl->reference : '',
-                $isFirst ? $hbl->hbl_name : '',
-                $isFirst ? $hbl->address : '',
-                $isFirst ? $hbl->nic : '',
-                $isFirst ? $hbl->contact_number : '',
-                $isFirst ? $hbl->consignee_name : '',
-                $isFirst ? $hbl->consignee_address : '',
-                $isFirst ? $hbl->consignee_nic : '',
-                $isFirst ? $hbl->consignee_contact : '',
-                $isFirst ? $hbl->packages : [],
-                $isFirst && $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
-            ];
 
-            $isFirst = false;
+        // HBL packages
+        foreach ($loadedHBLPackages as $hblData) {
+            $hbl = $hblData['hbl'];
+            $data[] = [
+                $hbl->hbl_number ?: $hbl->reference,
+                $hbl->hbl_name,
+                $hbl->address,
+                $hbl->nic,
+                $hbl->contact_number,
+                $hbl->consignee_name,
+                $hbl->consignee_address,
+                $hbl->consignee_nic,
+                $hbl->consignee_contact,
+                $hbl->packages,
+                $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
+            ];
         }
 
         return $data;

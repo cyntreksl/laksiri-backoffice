@@ -38,11 +38,19 @@ Route::name('arrival.')->group(function () {
 
     Route::get('bonded-warehouse/list/export', [BondedWarehouseController::class, 'export']);
 
-    //Unloading Issues
+    // Unloading Issues
     Route::get('unloading-issues', [UnloadingIssueController::class, 'index'])
         ->name('unloading-issues.index');
 
     Route::get('unloading-issues-list', [UnloadingIssueController::class, 'list']);
 
     Route::get('/get-unloading-issues-by-hbl/{hbl}', [UnloadingIssueController::class, 'getUnloadingIssuesByHbl']);
+
+    Route::get('/get-unloading-issues-image/{unloadingIssue}', [UnloadingIssueController::class, 'getUnloadingIssuesImage']);
+
+    Route::delete('/get-unloading-issues-image/{unloadingIssueFile}', [UnloadingIssueController::class, 'destroyUnloadingIssueImage'])
+        ->name('unloading-issues.destroy-image');
+
+    Route::get('/get-unloading-issues-image/downloads/{id}', [UnloadingIssueController::class, 'downloadUnloadingIssueFile'])
+        ->name('unloading-issues.downloads.single');
 });

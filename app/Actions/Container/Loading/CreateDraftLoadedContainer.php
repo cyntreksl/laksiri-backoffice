@@ -32,6 +32,10 @@ class CreateDraftLoadedContainer
                     'status' => 'draft',
                     'loaded_by' => auth()->id(),
                 ]);
+                $container->duplicate_hbl_packages()->attach($package['id'], [
+                    'status' => 'draft',
+                    'loaded_by' => auth()->id(),
+                ]);
 
                 $hbl = HBL::find($package['hbl_id']);
 

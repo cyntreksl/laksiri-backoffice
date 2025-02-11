@@ -20,6 +20,7 @@ class UpdateBranch
             'currency_name' => $data['currency_name'],
             'currency_symbol' => $data['currency_symbol'],
             'country_code' => $data['country_code'],
+            'country' => $data['country'],
             'email' => $data['email'],
             'container_delays' => $data['container_delays'],
             'cargo_modes' => json_encode($data['cargo_modes']),

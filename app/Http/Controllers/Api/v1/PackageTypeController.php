@@ -9,8 +9,7 @@ class PackageTypeController extends Controller
 {
     public function __construct(
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Get pending pickups for driver

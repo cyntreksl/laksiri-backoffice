@@ -473,32 +473,37 @@ const initializeGrid = () => {
 };
 
 const applyFilters = () => {
-    showFilters.value = false;
-    const newUrl = constructUrl();
-    const visibleColumns = Object.keys(data.columnVisibility);
-    grid.updateConfig({
-        server: {
-            url: newUrl,
-            then: (data) =>
-                data.data.map((item) => {
-                    const row = [];
-                    row.push({id: item.id});
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
+    getCashSettlementSummary(filters);
+    if (totalRecord.value > 0) {
+        showFilters.value = false;
+        const newUrl = constructUrl();
+        const visibleColumns = Object.keys(data.columnVisibility);
+        grid.updateConfig({
+            server: {
+                url: newUrl,
+                then: (data) =>
+                    data.data.map((item) => {
+                        const row = [];
+                        row.push({id: item.id});
+                        visibleColumns.forEach((column) => {
+                            row.push(item[column]);
+                        });
 
-                    return row;
-                }),
-            total: (response) => {
-                if (response && response.meta) {
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
+                        return row;
+                    }),
+                total: (response) => {
+                    if (response && response.meta) {
+                        return response.meta.total;
+                    } else {
+                        throw new Error("Invalid total count in server response");
+                    }
+                },
             },
-        },
-    });
-    grid.forceRender();
+        });
+        grid.forceRender();
+    } else {
+        console.log("no data");
+    }
 };
 
 const totalRecord = ref(0);
@@ -572,7 +577,7 @@ const paidValueOfSelectedData = computed(() => {
 });
 
 const pageReady = async () => {
-    await getCashSettlementSummary();
+    await getCashSettlementSummary(filters);
     if (totalRecord.value > 0) {
         initializeGrid();
     } else {

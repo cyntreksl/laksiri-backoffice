@@ -7,6 +7,7 @@ use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\HBL\HBLPackage\MarkAsFullyUnloaded;
 use App\Enum\ContainerStatus;
 use App\Models\Container;
+use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -20,7 +21,6 @@ class CreateFullyUnload
      */
     public function handle(array $data)
     {
-
         try {
             DB::beginTransaction();
 
@@ -30,8 +30,21 @@ class CreateFullyUnload
             foreach ($data['packages'] as $package) {
                 $container->hbl_packages()->detach($package['id']);
 
+                $container->duplicate_hbl_packages()->updateExistingPivot($package['id'], [
+                    'status' => 'unloaded',
+                ]);
+
                 // Run the MarkAsUnloaded action for the package ID
                 MarkAsFullyUnloaded::run($package['id']);
+            }
+            $hbls = collect($data['packages'])
+                ->pluck('hbl')
+                ->unique('id')
+                ->values();
+            foreach ($hbls as $hbl) {
+                $hbl = HBL::find($hbl['id']);
+
+                $hbl->addStatus('Container Unloaded in '.session('current_branch_name'));
             }
 
             UpdateContainerStatus::run($container, ContainerStatus::UNLOADED->value);

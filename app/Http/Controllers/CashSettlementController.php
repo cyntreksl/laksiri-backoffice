@@ -17,8 +17,7 @@ class CashSettlementController extends Controller
     public function __construct(
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly CashSettlementRepository $cashSettlementRepository,
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -48,7 +47,7 @@ class CashSettlementController extends Controller
 
     public function getSummery(Request $request)
     {
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'deliveryType', 'upb', 'd2d', 'gift', 'drivers', 'officers', 'paymentStatus']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'deliveryType', 'isHold', 'upb', 'd2d', 'gift', 'drivers', 'officers', 'paymentStatus']);
 
         return $this->cashSettlementRepository->getSummery($filters);
     }

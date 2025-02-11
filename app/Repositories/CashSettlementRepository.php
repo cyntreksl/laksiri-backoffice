@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\HBL\CashSettlement\GetCashSettlementByIds;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\UpdateHBLSystemStatus;
+use App\Events\PickupCollected;
 use App\Exports\CashSettlementsExport;
 use App\Factory\CashSettlement\FilterFactory;
 use App\Http\Resources\CashSettlementCollection;
@@ -28,7 +29,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
             $query->where('hbl', 'like', "%$search%");
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
@@ -54,8 +55,12 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
     {
         $query = HBL::query();
         $query->cashSettlement()->whereHas('packages');
+        // apply filters
 
-        //apply filters
+        $filters['isHold'] ? $filters['isHold'] = 'true' : $filters['isHold'] = 'false';
+
+        count($filters['paymentStatus']) > 0 ? $filters['paymentStatus'] = implode(',', $filters['paymentStatus']) : $filters['paymentStatus'] = null;
+
         FilterFactory::apply($query, $filters);
 
         $records = $query->get();
@@ -79,6 +84,8 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
             UpdateHBLSystemStatus::run($hbl, HBL::SYSTEM_STATUS_CASH_RECEIVED);
             $hbl = HBL::find($hbl->id);
             $hbl->addStatus('Cash Received by Accountant');
+
+            PickupCollected::dispatch($hbl);
         }
 
         return $this->success('Cash Received', []);

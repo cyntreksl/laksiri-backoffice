@@ -13,7 +13,7 @@ class UnloadingIssue extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'hbl_package_id', 'issue', 'type', 'is_damaged', 'rtf', 'is_fixed',
+        'hbl_package_id', 'issue', 'type', 'is_damaged', 'rtf', 'is_fixed', 'note',
     ];
 
     public function hblPackage(): BelongsTo
@@ -24,5 +24,10 @@ class UnloadingIssue extends Model
     public function package(): BelongsTo
     {
         return $this->belongsTo(HBLPackage::class);
+    }
+
+    public function files()
+    {
+        return $this->hasOne(UnloadingIssueFile::class, 'package_id', 'hbl_package_id');
     }
 }

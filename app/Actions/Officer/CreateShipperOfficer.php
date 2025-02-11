@@ -12,7 +12,7 @@ class CreateShipperOfficer
 
     public function handle(array $data): Officer
     {
-        $officer = new Officer();
+        $officer = new Officer;
         $officer->name = $data['name'] ?? null;
         $officer->type = $data['type'];
         $officer->email = $data['email'] ?? null;

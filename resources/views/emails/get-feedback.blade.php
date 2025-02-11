@@ -64,6 +64,5 @@
             feedback help us to create a better experience for you and for all of our customers</h4>
 
         <a href="{{ $feedbackURL }}" class="submit-btn">Tell us how it went</a>
-        </form>
     </div>
 </div>

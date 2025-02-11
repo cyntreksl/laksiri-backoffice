@@ -44,7 +44,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ], 'like', '%'.$search.'%');
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
@@ -100,7 +100,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
             // set customer queue
             $token->customerQueue()->create([
-                'type' => CustomerQueue::DOCUMENT_VERIFICATION_QUEUE,
+                'type' => CustomerQueue::RECEPTION_VERIFICATION_QUEUE,
             ]);
 
             // set queue status log
@@ -158,7 +158,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ], 'like', '%'.$search.'%');
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;

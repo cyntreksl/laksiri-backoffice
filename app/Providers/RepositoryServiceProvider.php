@@ -10,6 +10,7 @@ use App\Interfaces\CallCenter\CashierRepositoryInterface;
 use App\Interfaces\CallCenter\DeliveryRepositoryInterface;
 use App\Interfaces\CallCenter\ExaminationRepositoryInterface;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
+use App\Interfaces\CallCenter\ReceptionRepositoryInterface;
 use App\Interfaces\CallCenter\UserFeedbackRepositoryInterface;
 use App\Interfaces\CallCenter\VerificationRepositoryInterface;
 use App\Interfaces\CashSettlementInterface;
@@ -24,6 +25,7 @@ use App\Interfaces\FileManagerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Interfaces\MHBLRepositoryInterface;
+use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Interfaces\OfficerRepositoryInterface;
 use App\Interfaces\PackagePriceRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
@@ -46,6 +48,7 @@ use App\Repositories\CallCenter\CashierRepository;
 use App\Repositories\CallCenter\DeliveryRepository;
 use App\Repositories\CallCenter\ExaminationRepository;
 use App\Repositories\CallCenter\QueueRepository;
+use App\Repositories\CallCenter\ReceptionRepository;
 use App\Repositories\CallCenter\UserFeedbackRepository;
 use App\Repositories\CallCenter\VerificationRepository;
 use App\Repositories\CashSettlementRepository;
@@ -60,6 +63,7 @@ use App\Repositories\FileManagerRepository;
 use App\Repositories\HBLRepository;
 use App\Repositories\LoadedContainerRepository;
 use App\Repositories\MHBLRepository;
+use App\Repositories\NotificationMailRepository;
 use App\Repositories\OfficerRepository;
 use App\Repositories\PackagePriceRepository;
 use App\Repositories\PackageTypeRepository;
@@ -105,6 +109,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(SettingRepositoryInterface::class, SettingRepository::class);
         $this->app->bind(PackageTypeRepositoryInterface::class, PackageTypeRepository::class);
         $this->app->bind(ShipperConsigneeRepositoryInterface::class, ShipperConsigneeRepository::class);
+        $this->app->bind(NotificationMailRepositoryInterface::class, NotificationMailRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);
@@ -119,9 +124,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(OfficerRepositoryInterface::class, OfficerRepository::class);
         $this->app->bind(MHBLRepositoryInterface::class, MHBLRepository::class);
         $this->app->bind(DeliveryRepositoryInterface::class, DeliveryRepository::class);
+        $this->app->bind(ReceptionRepositoryInterface::class, ReceptionRepository::class);
     }
 
-    public function boot(): void
-    {
-    }
+    public function boot(): void {}
 }

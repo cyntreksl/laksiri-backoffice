@@ -36,8 +36,7 @@ class HBLController extends Controller
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
         private readonly SettingRepositoryInterface $settingRepository,
         private readonly CountryRepositoryInterface $countryRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -369,5 +368,12 @@ class HBLController extends Controller
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus']);
 
         return $this->HBLRepository->getDoorToDoorHBL($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function downloadBaggagePDF(HBL $hbl)
+    {
+        //        $this->authorize('hbls.download.baggage');
+
+        return $this->HBLRepository->downloadBaggagePDF($hbl);
     }
 }

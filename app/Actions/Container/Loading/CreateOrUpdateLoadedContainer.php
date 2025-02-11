@@ -27,9 +27,14 @@ class CreateOrUpdateLoadedContainer
             DB::beginTransaction();
 
             $container = Container::find($data['container_id']);
+            $isDestinationLoading = isset($data['isDestinationLoading']) ? $data['isDestinationLoading'] : false;
 
             foreach ($data['packages'] as $package) {
                 $result = $container->hbl_packages()->updateExistingPivot($package['id'], [
+                    'status' => 'loaded',
+                    'loaded_by' => auth()->id(),
+                ]);
+                $container->duplicate_hbl_packages()->updateExistingPivot($package['id'], [
                     'status' => 'loaded',
                     'loaded_by' => auth()->id(),
                 ]);
@@ -39,10 +44,14 @@ class CreateOrUpdateLoadedContainer
                         'status' => 'loaded',
                         'loaded_by' => auth()->id(),
                     ]);
+                    $container->duplicate_hbl_packages()->attach($package['id'], [
+                        'status' => 'loaded',
+                        'loaded_by' => auth()->id(),
+                    ]);
                 }
 
                 // Run the MarkAsLoaded action for the package ID
-                MarkAsLoaded::run($package['id']);
+                MarkAsLoaded::run($package['id'], $isDestinationLoading);
 
                 $hbl_package = HBLPackage::find($package['id']);
                 $hbl = HBL::find($hbl_package->hbl_id);

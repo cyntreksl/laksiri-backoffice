@@ -9,9 +9,11 @@ use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\DeleteHBL;
+use App\Actions\HBL\DownloadBaggagePDF;
 use App\Actions\HBL\DownloadHBLBarcodePDF;
 use App\Actions\HBL\DownloadHBLInvoicePDF;
 use App\Actions\HBL\DownloadHBLPDF;
+use App\Actions\HBL\GetHBLByCargoTypeWithDestinationUnloadedPackages;
 use App\Actions\HBL\GetHBLByCargoTypeWithDraftLoadedPackages;
 use App\Actions\HBL\GetHBLByCargoTypeWithUnloadedPackages;
 use App\Actions\HBL\GetHBLByReference;
@@ -107,7 +109,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ], 'like', '%'.$search.'%');
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
@@ -155,6 +157,15 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         ]);
     }
 
+    public function getDestinationUnloadedHBLsByCargoType(array $data): JsonResponse
+    {
+        $result = GetHBLByCargoTypeWithDestinationUnloadedPackages::run($data);
+
+        return response()->json([
+            'data' => $result,
+        ]);
+    }
+
     public function getLoadedHBLsByCargoType(Container $container, string $cargoType)
     {
         return GetHBLByCargoTypeWithDraftLoadedPackages::run($container, $cargoType);
@@ -188,7 +199,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             $query->whereAny(['reference', 'hbl_name', 'contact_number'], 'like', '%'.$search.'%');
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
@@ -436,7 +447,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ], 'like', '%'.$search.'%');
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
@@ -456,5 +467,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
+    }
+
+    public function downloadBaggagePDF(HBL $hbl)
+    {
+        return DownloadBaggagePDF::run($hbl);
     }
 }

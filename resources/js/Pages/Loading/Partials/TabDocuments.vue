@@ -607,6 +607,47 @@ const filteredFiles = computed(() => {
 
             </div>
         </div>
+        <div class="my-4">
+            <h2 class="text-base font-medium tracking-wide text-slate-800 line-clamp-1 dark:text-navy-100">
+                Other Attachments
+            </h2>
+
+            <div class="whitespace-nowrap py-3 hover:bg-gray-50 rounded">
+                <div class="flex justify-between items-center space-x-4 px-2">
+                    <div class="flex items-center space-x-4">
+                        <div
+                            class="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 dark:bg-accent">
+                            <svg
+                                class="size-5.5 text-primary dark:text-white icon icon-tabler icons-tabler-outline icon-tabler-pdf"
+                                fill="none" height="24" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                width="24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                <path d="M10 8v8h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-2z"/>
+                                <path d="M3 12h2a2 2 0 1 0 0 -4h-2v8"/>
+                                <path d="M17 12h3"/>
+                                <path d="M21 8h-4v8"/>
+                            </svg>
+                        </div>
+                        <span class="font-medium text-slate-700 dark:text-navy-100">Loading Point Document</span>
+                    </div>
+
+                    <template v-if="$page.props.user.permissions.includes('hbls.download pdf')">
+                        <a :href="route('loading.loaded-containers.download-loading', containerId)">
+                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-download" fill="none" height="24"
+                                 stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                 viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+                                <path d="M7 11l5 5l5 -5"/>
+                                <path d="M12 4l0 12"/>
+                            </svg>
+                        </a>
+                    </template>
+                </div>
+            </div>
+        </div>
         <DeleteDocConfirmationModal :doc-name="docName" :show="showConfirmDeleteDocModal" @close="closeDeleteModal"
                                     @delete-doc="handleDeleteDoc"/>
     </Tab>

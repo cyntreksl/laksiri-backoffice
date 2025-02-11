@@ -19,6 +19,10 @@ use App\Actions\ContainerDocument\UploadDocument;
 use App\Actions\MHBL\GetMHBLById;
 use App\Actions\Setting\GetSettings;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
+use App\Actions\UnloadingIssue\UploadUnloadingIssueImages;
+use App\Actions\UnloadingIssueImages\DeleteUnloadingIssueFile;
+use App\Actions\UnloadingIssueImages\DownloadSingleUnloadingIssueFile;
+use App\Actions\UnloadingIssueImages\GetUnloadingIssueImages;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
 use App\Exports\LoadedShipmentsExport;
@@ -31,6 +35,8 @@ use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
+use App\Models\UnloadingIssue;
+use App\Models\UnloadingIssueFile;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -69,7 +75,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             });
         }
 
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
 
         $countQuery = $query;
@@ -197,14 +203,14 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         if (! File::exists($pdfDirectory)) {
             File::makeDirectory($pdfDirectory, 0755, true);
         } else {
-            $pdfFile = new Filesystem();
+            $pdfFile = new Filesystem;
             $pdfFile->cleanDirectory($pdfDirectory);
         }
 
         $container = GetLoadedContainerById::run($container);
 
         // Initialize a new Dompdf instance with custom options
-        $options = new Options();
+        $options = new Options;
         $options->set('isHtml5ParserEnabled', true);
         $dompdf = new Dompdf($options);
 
@@ -298,6 +304,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function createUnloadingIssue(array $data): void
     {
         CreateUnloadingIssue::run($data);
+        UploadUnloadingIssueImages::run($data);
     }
 
     public function markAsReached($containerId)
@@ -365,11 +372,11 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function getContainerByHBL(HBL $hbl)
     {
         $package = $hbl->packages()
-            ->whereHas('containers') // Ensures only packages with containers are included
-            ->with('containers') // Eager loads the containers
+            ->whereHas('duplicate_containers') // Ensures only packages with containers are included
+            ->with('duplicate_containers') // Eager loads the containers
             ->first();
 
-        $containerDetails = $package ? $package->containers->flatten()->first() : [];
+        $containerDetails = $package ? $package->duplicate_containers->flatten()->first() : [];
 
         return response()->json($containerDetails);
     }
@@ -377,5 +384,29 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function downloadDocument(ContainerDocument $container_document)
     {
         return DownloadDocument::run($container_document);
+    }
+
+    public function downloadUnloadingIssueImages(UnloadingIssue $unloadingIssue)
+    {
+
+        return GetUnloadingIssueImages::run($unloadingIssue);
+    }
+
+    public function deleteUnloadingIssueFile(UnloadingIssueFile $unloadingIssueFile)
+    {
+        try {
+            return DeleteUnloadingIssueFile::run($unloadingIssueFile);
+        } catch (\Exception $exception) {
+            throw new \Exception('Failed to delete file: '.$exception->getMessage());
+        }
+    }
+
+    public function downloadSingleUnloadingIssueFile(string $id)
+    {
+        try {
+            return DownloadSingleUnloadingIssueFile::run($id);
+        } catch (\Exception $exception) {
+            throw new \Exception('Failed to download file: '.$exception->getMessage());
+        }
     }
 }
