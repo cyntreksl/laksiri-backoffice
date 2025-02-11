@@ -186,8 +186,5 @@ Terms and conditions will be provided on request</td>
 		</tr>
 	</tbody>
 </table>
-<div class="footer">
-    <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_footer_title}}</div>
-</div>
 
 @endsection
