@@ -377,7 +377,15 @@ Breadcrumbs::for('setting.package-types.edit', function (BreadcrumbTrail $trail,
 Breadcrumbs::for('setting.shipper-consignees.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');
-    $trail->push('Shipper& Consignees', route('setting.shipper-consignees.index'));
+    $trail->push('Shipper & Consignees', route('setting.shipper-consignees.index'));
+});
+
+// Settings -> Package Type Edit
+Breadcrumbs::for('setting.shipper-consignees.edit', function (BreadcrumbTrail $trail, $id) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Shipper & Consignees', route('setting.shipper-consignees.index'));
+    $trail->push('Edit Officer', route('setting.shipper-consignees.edit', $id));
 });
 
 require_once __DIR__.'/call-center-breadcrumbs.php';
