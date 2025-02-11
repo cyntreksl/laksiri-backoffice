@@ -100,8 +100,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
     public function downloadManifestFile($container)
     {
-
-        $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.pdf';
+        $filename = $container->reference . '_manifest_' . date('Y_m_d_h_i_s') . '.pdf';
 
         $export = new LoadedContainerManifestExport($container);
         $settings = GetSettings::run();
@@ -109,11 +108,18 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $data = array_filter($export->prepareData(), function ($item) {
             return isset($item[0]) && $item[0] !== '';
         });
-        $pdf = PDF::loadView('exports.shipments', ['data' => $data, 'container' => $container, 'settings' => $settings]);
+
+        $cargoType = strtolower(trim($container->cargo_type));
+
+        $view = ($cargoType === 'air cargo') ? 'exports.air_cargo' : 'exports.shipments';
+
+        $pdf = PDF::loadView($view, ['data' => $data, 'container' => $container, 'settings' => $settings]);
         $pdf->setPaper('a3', 'portrait');
 
-        return $pdf->download($filename);
+        return $pdf->stream($filename);
     }
+
+
 
     public function updateVerificationStatus(array $data)
     {

@@ -86,6 +86,7 @@ class LoadedContainerManifestExport
                 $hbl->consignee_contact,
                 $hbl->packages,
                 $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
+                $hbl->hbl_type,
             ];
         }
 
