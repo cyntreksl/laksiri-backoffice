@@ -6,6 +6,7 @@ use App\Actions\Container\Loading\CreateDraftLoadedContainer;
 use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
 use App\Actions\Container\Loading\GetLoadedContainerById;
+use App\Actions\Container\Loading\GetLoadedContainerWithHblsById;
 use App\Actions\Setting\GetSettings;
 use App\Enum\ContainerStatus;
 use App\Exports\DoorToDoorManifestExport;
@@ -160,5 +161,14 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $pdf->setPaper('a4', 'portrait');
 
         return $pdf->download($filename);
+    }
+
+    public function getLoadedContainer(string $id)
+    {
+        try {
+            return GetLoadedContainerWithHblsById::run($id);
+        } catch (\Exception $exception) {
+            throw new \Exception('Failed to get Container');
+        }
     }
 }
