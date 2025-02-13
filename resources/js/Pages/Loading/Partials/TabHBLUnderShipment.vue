@@ -2,7 +2,7 @@
 import Tab from "@/Components/Tab.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import AddHBLModal from "@/Pages/Loading/Partials/AddHBLModal.vue";
 import TableHBLPackages from "@/Pages/Loading/Partials/TableHBLPackages.vue";
 import {usePage} from "@inertiajs/vue3";
@@ -23,14 +23,35 @@ const confirmAddHBLModal = () => {
 
 const closeModal = () => {
     showConfirmAddHBLModal.value = false;
+    fetchLoadedContainer();
 }
 const filteredHBLS = ref([]);
+const containerData = ref({});
 const hblsCount = ref(0)
 const filteredHBLSPackagesCount = ref(0);
 const filteredHBLSPackagesWeight = ref(0);
 const filteredHBLSPackagesVolume = ref(0);
+
+const fetchLoadedContainer = async () => {
+    try {
+        const response = await fetch(`/loaded-containers/get-container/${props.container.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch container ${props.container.id}`);
+        }
+        containerData.value = (await response.json())[0];
+    }catch (error) {
+        console.error("Error:", error);
+    }
+};
+fetchLoadedContainer()
 const hbls = () => {
-    const hbls = props.container.hbls;
+    const hbls = containerData.value.hbls;
     filteredHBLS.value = Object.values(hbls).filter(hbl => hbl.mhbl === null);
     hblsCount.value = filteredHBLS.value.length;
 
@@ -50,12 +71,15 @@ const hbls = () => {
         return sum + (pkg.volume || 0);  // Ensure pkg.weight exists
     }, 0);
 }
-hbls();
+watch(() => containerData.value, () => {
+    hbls();
+    mhbls();
+});
 
 const filteredMHBLS = ref([]);
 const filteredMHBLsLHBL = ref([]);
 const mhbls = () => {
-    const hbls = Object.values(props.container.hbls);
+    const hbls = Object.values(containerData.value.hbls);
     filteredMHBLsLHBL.value = Object.values(hbls).filter(hbl => hbl.mhbl !== null);
 
     //Get hbls count
@@ -94,7 +118,6 @@ const mhbls = () => {
     filteredMHBLS.value = mhblMap;
 
 }
-mhbls();
 </script>
 
 <template>
@@ -190,7 +213,7 @@ mhbls();
             </SimpleOverviewWidget>
         </div>
 
-        <TableHBLPackages :container="container" :containerHBLS="filteredHBLS" :containerMHBLS="filteredMHBLS"/>
+        <TableHBLPackages :container="container" :containerHBLS="filteredHBLS" :containerMHBLS="filteredMHBLS" @fetContainerData="fetchLoadedContainer"/>
     </Tab>
     <AddHBLModal :container="container" :show="showConfirmAddHBLModal" @close="closeModal"/>
 </template>

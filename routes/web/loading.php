@@ -62,6 +62,9 @@ Route::name('loading.')->group(function () {
     Route::get('loaded-containers/download-loading/{container}', [LoadedContainerController::class, 'downloadLoadingPointDoc'])
         ->name('loaded-containers.download-loading');
 
+    Route::get('loaded-containers/get-container/{id}', [LoadedContainerController::class, 'getLoadedContainer'])
+        ->name('loaded-containers.single-container');
+
     Route::put('containers/{container}/unload/hbl', [ContainerController::class, 'unloadHBLFromContainer'])
         ->name('containers.unload.hbl');
 
