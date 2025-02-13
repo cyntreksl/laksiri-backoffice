@@ -29,6 +29,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
     {
         $this->notificationMailRepository = $notificationMailRepository;
     }
+
     /**
      * @throws \Exception
      */
@@ -41,6 +42,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
                 $container = CreateOrUpdateLoadedContainer::run($data);
                 $hblNumbers = array_unique(array_column($data['packages'], 'hbl_id'));
                 $this->notificationMailRepository->sendShipmentDepartureNotification($hblNumbers);
+
                 return $container;
             }
         } catch (\Exception $e) {
