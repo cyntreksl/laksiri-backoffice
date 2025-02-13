@@ -133,4 +133,9 @@ class LoadedContainerController extends Controller
 
         return $this->loadedContainerRepository->downloadUnloadingPointDoc($container);
     }
+
+    public function getLoadedContainer($id)
+    {
+        return $this->loadedContainerRepository->getLoadedContainer($id);
+    }
 }

@@ -15,4 +15,6 @@ interface LoadedContainerRepositoryInterface
     public function downloadDoorToDoorPdf($container);
 
     public function downloadUnloadingPointDoc($container);
+
+    public function getLoadedContainer(string $id);
 }
