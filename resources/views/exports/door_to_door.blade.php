@@ -98,10 +98,10 @@
             @if ($chunkIndex === 0)
                 <thead>
                 <tr>
-                    <th colspan="10" >
-                        <strong>
-                            OBL    {{$container?->bl_number}}                                                                                 UNIVERSAL FREIGHT SERVICES                                                               SHIPMENT NO :602
-                        </strong>
+                    <th colspan="10" style="text-align:center;">
+                        <strong><em>
+                                UNIVERSAL FREIGHT SERVICES
+                            </em></strong>
                     </th>
 
                 </tr>
@@ -112,31 +112,15 @@
                     </th>
                 </tr>
                 <tr>
-                    <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
-
-                        VESSEL: {{$container?->vessel_name}} <br>
+                    <th colspan="2">
 
                     </th>
-
-                    <th colspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
-                        DATE LOADED:   {{$container?->loading_started_at}} <br>
+                    <th colspan="1">
 
                     </th>
-
-                    <th colspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
-                        VOYAGE: <br>
-
-                    </th>
-                    <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
-                        {{$container?->voyage_number}}   <br>
-
-                    </th>
-                    <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
-                        ETA:   <br>
-
-                    </th>
-                    <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
-                        {{$container?->estimated_time_of_arrival}}    <br>
+                    <th colspan="7">DATE: <?php echo date('d/m/Y'); ?>                                                      
+                               
+                                                        SHIPMENT NO :602
 
                     </th>
                 </tr>
@@ -153,24 +137,24 @@
                 </tr>
 
                 <tr>
-                    <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">
-                        <strong>CONTR NO       {{$container?->container_number}} </strong>
+                    <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                        <strong>CONTR NO       {{$item[12] }} </strong>
                     </th>
-                    <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">
-                        <strong>SEAL NO </strong> {{$container?->seal_number}}
+                    <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                        <strong> MHBL </strong> {{$mhbl->hbl_number ?? $mhbl->reference}}
                     </th>
-                    <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">
-                        <strong> CONTAINER TYPE: {{$container?->container_type}}  </strong>
+                    <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                        <strong>    </strong>
                     </th>
                 </tr>
                 <tr>
-                    <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">
+                    <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
                         <strong> NO OF PKG   {{ number_format($total_nototal, 0) }} </strong>
                     </th>
-                    <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">
+                    <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
                         <strong> TOTAL VOLUME  {{ number_format($total_vtotal, 2) }} </strong>
                     </th>
-                    <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">
+                    <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
                         <strong> TOTAL WEIGHT:KG                 {{ number_format($total_gtotal, 2) }} </strong>
                     </th>
                 </tr>
@@ -241,7 +225,7 @@
             @endif
         </table>
         <div style="text-align: right; margin-top: 20px;">
-            @if($settings?->seal_url)
+            @if($settings->seal_url)
                 <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto;">
             @endif
         </div>
