@@ -24,6 +24,6 @@ class SendPickupCollectedNotification
         $hbl = $event->HBL;
         $shipper = $hbl->shipper;
 
-        Notification::send($shipper, new CargoCollectedNotification($hbl));
+//        Notification::send($shipper, new CargoCollectedNotification($hbl));
     }
 }

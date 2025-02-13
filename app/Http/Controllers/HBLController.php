@@ -273,6 +273,13 @@ class HBLController extends Controller
         return $this->HBLRepository->getHBLStatusByReference($reference);
     }
 
+    public function showTracking(Request $request)
+    {
+        return Inertia::render('Tracking',[
+            'reference' => $request->all()['hbl'] ?? null,
+        ]);
+    }
+
     public function getHBLLogs($HBL)
     {
         $hbl = GetHBLByIdWithPackages::run($HBL);
