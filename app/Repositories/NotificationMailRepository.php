@@ -103,7 +103,7 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
                     'customer_name' => $hbl['hbl_name'],
                     'success_message' => 'Cargo departs Qatar.  ',
                     'detail_message' => 'Your shipment has left Qatar and is en route to Sri Lanka. HBL Reference Number: '.$hbl['hbl_number'].' You can track your cargo here:  ',
-                    'tracking_link' => 'https://127.0.0.1:8000/tracking?hbl='.$hbl['hbl_number'],
+                    'tracking_link' => 'https://laksiri.world/tracking/tracking?hbl='.$hbl['hbl_number'],
                 ];
                 Mail::to($hbl['email'])->send(new Notification($email_data));
             }
