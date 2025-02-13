@@ -55,7 +55,16 @@ const fetchContainerDocuments = async () => {
     }
 }
 
-fetchContainerDocuments()
+fetchContainerDocuments();
+
+const onFileUploadComplete = (error, file) => {
+    if (!error) {
+        console.log("File uploaded successfully:", file);
+        fetchContainerDocuments();
+    } else {
+        console.error("File upload failed:", error);
+    }
+};
 
 const blDocumentInput = ref(null);
 const manifestDocumentInput = ref(null);
