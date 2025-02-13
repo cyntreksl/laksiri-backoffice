@@ -525,7 +525,7 @@ const filteredFiles = computed(() => {
                             ref="pond"
                             label-idle="Drop files here or <span class='filepond--label-action'>Browse</span>"
                             allow-multiple="true"
-                            accepted-file-types="image/jpeg, image/png, application/pdf"
+                            accepted-file-types="image/jpeg, image/png, application/pdf, text/csv, application/vnd.ms-excel, text/plain, .csv"
                             :server="{
                                 url: `/any-file-manager/${containerId}`,
                                 process: {
@@ -588,6 +588,21 @@ const filteredFiles = computed(() => {
                                                 />
                                             </svg>
                                         </a>
+                                        <button
+                                            class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
+                                            @click.prevent="confirmDeleteDoc(file.id, file.document_name)"
+                                        >
+                                            <svg
+                                                class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"
+                                                fill="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                <path
+                                                    d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z"/>
+                                                <path
+                                                    d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z"/>
+                                            </svg>
+                                        </button>
                                     </td>
                                 </tr>
                                 <tr v-if="filteredFiles.length === 0">
