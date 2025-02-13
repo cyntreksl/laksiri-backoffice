@@ -24,6 +24,6 @@ class SendShipmentDeparturedNotification
         $hbl = $event->HBL;
         $shipper = $hbl->shipper;
 
-//        Notification::send($shipper, new ShipmentDepartureNotification($hbl));
+        //        Notification::send($shipper, new ShipmentDepartureNotification($hbl));
     }
 }

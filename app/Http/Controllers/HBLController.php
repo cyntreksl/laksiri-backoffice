@@ -275,7 +275,7 @@ class HBLController extends Controller
 
     public function showTracking(Request $request)
     {
-        return Inertia::render('Tracking',[
+        return Inertia::render('Tracking', [
             'reference' => $request->all()['hbl'] ?? null,
         ]);
     }

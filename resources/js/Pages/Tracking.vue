@@ -1,5 +1,5 @@
 <script setup xmlns="http://www.w3.org/1999/html">
-import {onMounted, ref, watch} from "vue";
+import {onMounted, ref} from "vue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {Head, Link} from "@inertiajs/vue3";
@@ -52,7 +52,7 @@ const handleSubmit = async () => {
         isLoading.value = false;
     }
 };
-// Call handleSubmit if a reference is provided initially
+
 onMounted(() => {
     if (reference.value) {
         handleSubmit();
