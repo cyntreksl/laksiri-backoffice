@@ -60,13 +60,12 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
         $driver = GetUserById::run($pickUp['driver_id']);
         $hbl = $pickUp->hbl;
         if ($notification_settings && isset($notification_settings['Email']) && $notification_settings['Email'] === true && $pickUp->email) {
-            //            $tracking_link = 'https://laksiri.world/your-feedback?user='.$data['customerId'].'&hbl='.$data['hblId'].'&token='.$data['tokenId'];
             $email_data = [
                 'subject' => 'Cargo collected successfully',
                 'customer_name' => $pickUp['name'],
                 'success_message' => 'Your cargo has been collected successfully.  ',
                 'detail_message' => 'HBL Reference Number: '.$pickUp->hbl['hbl_number'].' You can track your cargo here:  ',
-                'tracking_link' => 'http://127.0.0.1:8000/tracking?hbl='.$pickUp->hbl['hbl_number'],
+                'tracking_link' => 'https://laksiri.world/tracking?hbl='.$pickUp->hbl['hbl_number'],
             ];
             Mail::to($pickUp['email'])->send(new Notification($email_data));
         }
@@ -83,7 +82,7 @@ class NotificationMailRepository implements NotificationMailRepositoryInterface
                 'customer_name' => $hbl['hbl_name'],
                 'success_message' => 'Cash Received successfully.  ',
                 'detail_message' => 'HBL Reference Number: '.$hbl['hbl_number'].' You can track your cargo here:  ',
-                'tracking_link' => 'http://127.0.0.1:8000/tracking?hbl='.$hbl['hbl_number'],
+                'tracking_link' => 'https://laksiri.world/tracking?hbl='.$hbl['hbl_number'],
             ];
             Mail::to($hbl['email'])->send(new Notification($email_data));
         }
