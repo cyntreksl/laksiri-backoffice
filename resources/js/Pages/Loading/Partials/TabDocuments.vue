@@ -534,7 +534,7 @@ const filteredFiles = computed(() => {
                             ref="pond"
                             label-idle="Drop files here or <span class='filepond--label-action'>Browse</span>"
                             allow-multiple="true"
-                            accepted-file-types="image/jpeg, image/png, application/pdf, text/csv, application/vnd.ms-excel, text/plain"
+                            accepted-file-types="image/jpeg, image/png, application/pdf, text/csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/plain"
                             :server="{
                                 url: `/any-file-manager/${containerId}`,
                                 process: {
