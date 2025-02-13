@@ -43,6 +43,7 @@ class Notification extends Mailable
                 'customer' => $this->email_data['customer_name'],
                 'success_message' => $this->email_data['success_message'],
                 'detail_message' => $this->email_data['detail_message'],
+                'tracking_link' => $this->email_data['tracking_link'] ?? null,
             ],
         );
     }

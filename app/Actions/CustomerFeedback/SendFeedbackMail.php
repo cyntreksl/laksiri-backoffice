@@ -13,7 +13,7 @@ class SendFeedbackMail
 
     public function handle(array $data)
     {
-        $feedbackURL = 'http://127.0.0.1:8000/your-feedback?user='.$data['customerId'].'&hbl='.$data['hblId'].'&token='.$data['tokenId'];
+        $feedbackURL = 'https://laksiri.world/your-feedback?user='.$data['customerId'].'&hbl='.$data['hblId'].'&token='.$data['tokenId'];
         $customer = User::find($data['customerId']);
         Mail::to($customer->email)->later(
             now()->addMinutes(30),
