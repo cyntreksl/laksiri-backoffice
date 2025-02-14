@@ -623,7 +623,7 @@ const createColumns = () => [
                     )
                     : null,
                 usePage().props.user.permissions.includes('pickups.retry') ?
-                    row.cells[11].data ?
+                    (row.cells[8].data && row.cells[8].data !== '-') ?
                         h(
                             "button",
                             {
