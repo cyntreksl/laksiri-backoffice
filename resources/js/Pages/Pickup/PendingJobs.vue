@@ -1174,6 +1174,7 @@ const shipIcon = ref(`
                                 </svg>
                                 Assign Driver ({{ countOfSelectedData }})
                             </PrimaryButton>
+                            <p>          </p>
 
                             <DangerButton
                                 v-if="$page.props.user.permissions.includes('pickups.delete')"

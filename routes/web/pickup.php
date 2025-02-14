@@ -47,6 +47,3 @@ Route::get('pickup-exception-list', [PickupController::class, 'allPickupsExport'
 
 Route::post('pickups/delete', [PickupController::class, 'deletePickups'])
     ->name('pickups.delete');
-
-
-
