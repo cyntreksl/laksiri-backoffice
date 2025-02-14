@@ -139,6 +139,15 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
         return DeletePickup::run($pickup);
     }
 
+    public function deletePickups(array $pickupIds)
+    {
+        $pickupList = GetPickupByIds::run($pickupIds);
+
+        foreach ($pickupList as $pickup) {
+            DeletePickup::run($pickup);
+        }
+    }
+
     public function export(array $filters)
     {
         return Excel::download(new PickupsExport($filters), 'pickups.xlsx');

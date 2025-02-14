@@ -23,5 +23,7 @@ interface PickupRepositoryInterface
 
     public function deletePickup(PickUp $pickup);
 
+    public function deletePickups(array $pickupIds);
+
     public function export(array $filters);
 }

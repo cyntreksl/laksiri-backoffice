@@ -21,6 +21,10 @@ import DeletePickupConfirmationModal from "@/Pages/Pickup/Partials/DeletePickupC
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import RetryPickupConfirmationModal from "@/Pages/Pickup/Partials/RetryPickupConfirmationModal.vue";
+import DangerButton from "@/Components/DangerButton.vue";
+import showConfirmDeleteExceptionModal from "quill/blots/break.js";
+import DeleteExceptionConfirmationModal from "@/Pages/Pickup/Partials/DeleteExceptionConfirmationModal.vue";
+import DeleteMPickupConfirmationModal from "@/Pages/Pickup/Partials/DeleteMPickupConfirmationModal.vue";
 
 const props = defineProps({
     drivers: {
@@ -453,8 +457,8 @@ const createColumns = () => [
         formatter: (cell) => {
             return cell
                 ? cell !== '-' && html(
-                    `<div class="flex item-center"><svg xmlns="http://www.w3.org/2000/svg"  width="18"  height="18"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg> ${cell} </div>`
-                )
+                `<div class="flex item-center"><svg xmlns="http://www.w3.org/2000/svg"  width="18"  height="18"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg> ${cell} </div>`
+            )
                 : null;
         },
     },
@@ -776,6 +780,12 @@ const confirmAssignDriver = () => {
     idList.value = selectedData.value.map((item) => item[0]);
     showConfirmAssignDriverModal.value = true;
 };
+const showConfirmDeletempickupsModal = ref(false);
+const confirmDeletempickups = () => {
+    idList.value = selectedData.value.map((item) => item[0]);
+    showConfirmDeletempickupsModal.value = true;
+};
+
 
 const pickupId = ref(null);
 const showConfirmDeletePickupModal = ref(false);
@@ -783,8 +793,28 @@ const showConfirmDeletePickupModal = ref(false);
 const closeModal = () => {
     showConfirmDeletePickupModal.value = false;
     showConfirmAssignDriverModal.value = false;
+    showConfirmDeletempickupsModal.value = false;
     pickupId.value = null;
     idList.value = [];
+};
+const handleDeletempickups = () => {
+    router.post(
+        route("pickups.delete"),
+        {
+            pickupIds: idList.value,
+        },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                push.success("Pickup  Deleted Successfully!");
+                const currentRoute = route().current();
+                router.visit(route(currentRoute));
+            },
+            onError: () => {
+                push.error("Something went to wrong!");
+            },
+        }
+    );
 };
 
 const confirmDeletePickup = (id) => {
@@ -958,7 +988,9 @@ const shipIcon = ref(`
                             </h2>
 
                             <div class="flex m-3">
-                                <select class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" @change="handlePerPageChange">
+                                <select
+                                    class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    @change="handlePerPageChange">
                                     <option value="10">10</option>
                                     <option value="25">25</option>
                                     <option value="50">50</option>
@@ -1147,6 +1179,36 @@ const shipIcon = ref(`
                                 </svg>
                                 Assign Driver ({{ countOfSelectedData }})
                             </PrimaryButton>
+                            <p>          </p>
+
+                            <DangerButton
+                                v-if="$page.props.user.permissions.includes('pickups.delete')"
+                                :disabled="isDataEmpty"
+                                @click="confirmDeletempickups"
+                            >
+                                <svg
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-trash mr-1"
+                                    fill="none"
+                                    height="18"
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                    width="18"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M4 7l16 0"/>
+                                    <path d="M10 11l0 6"/>
+                                    <path d="M14 11l0 6"/>
+                                    <path
+                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"
+                                    />
+                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
+                                </svg>
+                                Delete ({{ countOfSelectedData }})
+                            </DangerButton>
                         </div>
                     </div>
                 </div>
@@ -1294,5 +1356,14 @@ const shipIcon = ref(`
             @close="closeRetryModal"
             @retry-pickup="handleRetryPickup"
         />
+        <DeleteMPickupConfirmationModal
+            :count-of-selected-data="countOfSelectedData"
+            :show="showConfirmDeletempickupsModal"
+            @close="closeModal"
+            @delete-mpickups="handleDeletempickups"
+        />
+
+
+
     </AppLayout>
 </template>
