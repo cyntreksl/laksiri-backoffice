@@ -14,7 +14,8 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['close', ' deletePickups']);
+const emit = defineEmits(['close', 'delete-mpickups']);
+
 
 </script>
 
@@ -31,12 +32,13 @@ const emit = defineEmits(['close', ' deletePickups']);
         <template #footer>
             <div class="space-x-2">
                 <SecondaryButton @click="$emit('close')">
-                    Nevermind
+                    Cancel
                 </SecondaryButton>
 
-                <DangerButton @click="$emit(' deletePickups')">
-                    Delete Pickup Exceptions
+                <DangerButton @click="$emit('delete-mpickups')">
+                    Delete Pickup
                 </DangerButton>
+
             </div>
         </template>
     </ConfirmationModal>
