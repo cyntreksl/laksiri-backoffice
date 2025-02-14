@@ -2,6 +2,7 @@
 
 namespace App\Actions\PickUps;
 
+use App\Actions\Branch\GetBranchByName;
 use App\Models\PickUp;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -11,7 +12,8 @@ class GeneratePickupReferenceNumber
 
     public function handle(string $branch_name): string
     {
-        $branch_code = session('current_branch_code');
+        $branch = GetBranchByName::run($branch_name);
+        $branch_code = session('current_branch_code') ?? $branch['branch_code'];
 
         $last_pickup = PickUp::latest()->first();
 
