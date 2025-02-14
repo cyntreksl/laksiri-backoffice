@@ -18,7 +18,7 @@ class GetUserCurrentBranch
         $branchCode = session('current_branch_code');
 
         //      For API
-        if (empty($branchId)) {
+        if (empty($branchId) || is_null($branchId)) {
             $primaryBranch = Branch::find(Auth::user()->primary_branch_id);
             $branchId = $primaryBranch->id;
             $branchName = $primaryBranch->name;
