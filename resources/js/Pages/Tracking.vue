@@ -1,12 +1,19 @@
 <script setup xmlns="http://www.w3.org/1999/html">
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {Head, Link} from "@inertiajs/vue3";
 import DashboardMeet from "../../images/illustrations/dashboard-meet.svg";
 import DashboardMeetDark from "../../images/illustrations/dashboard-meet-dark.svg";
 
-const reference = ref(null);
+const props = defineProps({
+    reference: {
+        type: String,
+        required: false,
+    }
+});
+
+const reference = ref(props.reference ?? null);
 const errorMessage = ref('');
 const isLoading = ref(false);
 const hblStatus = ref([]);
@@ -45,6 +52,12 @@ const handleSubmit = async () => {
         isLoading.value = false;
     }
 };
+
+onMounted(() => {
+    if (reference.value) {
+        handleSubmit();
+    }
+});
 
 const hblStatusColor = (status) => {
     switch (status) {

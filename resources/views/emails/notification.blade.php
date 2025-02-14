@@ -68,6 +68,9 @@
         <h1>{{ $customer ? 'Dear '.$customer : 'Hi'}},</h1>
         <h4>{{ $success_message ?? ''}}</h4>
         <h4>{{ $detail_message ?? ''}}</h4>
+        @if (!empty($tracking_link))
+            <a href="{{ $tracking_link }}" class="submit-btn">Track here</a>
+        @endif
 
         <div class="signature">
             Regards,<br>
