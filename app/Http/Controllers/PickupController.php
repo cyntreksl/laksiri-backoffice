@@ -191,4 +191,10 @@ class PickupController extends Controller
 
         return $this->pickupRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
+    public function deletePickups(Request $request)
+    {
+        $this->authorize('pickups.delete');
+
+        $this->pickupRepository->deletePickups($request->pickupIds);
+    }
 }

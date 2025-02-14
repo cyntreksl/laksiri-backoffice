@@ -22,6 +22,8 @@ import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue"
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import RetryPickupConfirmationModal from "@/Pages/Pickup/Partials/RetryPickupConfirmationModal.vue";
 import DeleteButton from "@/Components/DeleteButton.vue";
+import DeleteExceptionConfirmationModal from "@/Pages/Pickup/Partials/DeleteExceptionConfirmationModal.vue";
+import DeletePickupsConfirmationModal from "@/Pages/Pickup/Partials/DeletePickupsConfirmationModal.vue";
 
 const props = defineProps({
     drivers: {
@@ -777,6 +779,7 @@ const confirmAssignDriver = () => {
 
 const pickupId = ref(null);
 const showConfirmDeletePickupModal = ref(false);
+const  showConfirmDeletePickupsModal = ref(false);
 
 const closeModal = () => {
     showConfirmDeletePickupModal.value = false;
@@ -787,8 +790,30 @@ const closeModal = () => {
 
 const confirmDeletePickup = (id) => {
     pickupId.value = id;
-    showConfirmDeletePickupModal.value = true;
+    handleDeletePickups.value = true;
 };
+const handleDeletePickups = () => {
+    router.post(
+        route("pickups.delete"),
+        {
+            pickupIds: idList.value,
+        },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                push.success("Pickup Deleted Successfully!");
+                const currentRoute = route().current();
+                router.visit(route(currentRoute));
+            },
+            onError: () => {
+                push.error("Something went to wrong!");
+            },
+        }
+    );
+};
+
+
+
 
 const handleDeletePickup = () => {
     router.delete(route("pickups.destroy", pickupId.value), {
@@ -1151,7 +1176,7 @@ const shipIcon = ref(`
                                 v-if="$page.props.user.permissions.includes('pickups.delete')"
                                 :disabled="isDataEmpty"
                                 class="flex"
-                                @click="confirmDeletePickup"
+                                @click="handleDeletePickups"
                             >
                                 <svg  xmlns="http://www.w3.org/2000/svg"
                                       width="24"
@@ -1284,6 +1309,14 @@ const shipIcon = ref(`
             @close="closeModal"
             @delete-pickup="handleDeletePickup"
         />
+
+        <DeletePickupsConfirmationModal
+            :count-of-selected-data="countOfSelectedData"
+            :show="showConfirmDeletePickupsModal"
+            @close="closeModal"
+            @delete-exceptions="handleDeletePickups"
+        />
+
 
         <HBLDetailModal
             :pickup-id="pickupId"
