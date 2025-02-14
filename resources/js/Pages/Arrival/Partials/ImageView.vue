@@ -46,6 +46,7 @@ const fetchImages = async () => {
 
 // Watch for changes in `imageIds` prop
 watch(() => props.unloadingIssueID, () => {
+    images.value = [];
     fetchImages();
 });
 

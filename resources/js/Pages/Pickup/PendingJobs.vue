@@ -42,7 +42,7 @@ const props = defineProps({
 
 const wrapperRef = ref(null);
 let grid = null;
-const perPage = ref(10);
+const perPage = ref(50);
 
 const showFilters = ref(false);
 const fromDate = moment(new Date()).subtract(7, "days").format("YYYY-MM-DD");
@@ -53,6 +53,7 @@ const filters = reactive({
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo"],
     createdBy: "",
+    pickupDate: "",
     zoneBy: "",
     driver: "",
 
@@ -625,7 +626,7 @@ const createColumns = () => [
                     )
                     : null,
                 usePage().props.user.permissions.includes('pickups.retry') ?
-                    row.cells[11].data ?
+                    (row.cells[8].data && row.cells[8].data !== '-') ?
                         h(
                             "button",
                             {
@@ -811,6 +812,7 @@ const resetFilter = () => {
     filters.toDate = toDate;
     filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
     filters.createdBy = "";
+    filters.pickupDate = "";
     filters.zoneBy = "";
     filters.driverBy = "";
     applyFilters();
@@ -1218,7 +1220,7 @@ const shipIcon = ref(`
                 <FilterHeader value="Created By"/>
 
                 <select
-                    v-model="filters.createdBy"
+                    v-model="filters.pickupDate"
                     autocomplete="off"
                     class="w-full"
                     multiple

@@ -23,6 +23,7 @@ const props = defineProps({
         default: () => [],
     }
 });
+const emit = defineEmits(['fetContainerData']);
 
 const containerData = ref({});
 const showConfirmDeleteHBLModal = ref(false);
@@ -52,6 +53,8 @@ const handleRemoveHBLFromContainer = () => {
                     ...containerData.value,
                     hbls: Object.values(containerData.value.hbls).filter(hbl => hbl.id !== hblId.value)
                 };
+                emit('fetContainerData');
+                props.containerHBLS = props.containerHBLS.filter(item => item.id !== hblId.value);
                 closeModal();
                 if (containerData.value.hbls.length === 0) {
                     router.visit(route('loading.loaded-containers.index'));
@@ -154,6 +157,7 @@ const handleRemoveMHBLFromContainer = () => {
                         return true;
                     })
                 };
+                emit('fetContainerData');
                 closeConfirmDeleteMHBLModal();
                 if (containerData.value.hbls.length === 0) {
                     router.visit(route('loading.loaded-containers.index'));

@@ -6,6 +6,7 @@ use App\Actions\Container\Loading\CreateDraftLoadedContainer;
 use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
 use App\Actions\Container\Loading\GetLoadedContainerById;
+use App\Actions\Container\Loading\GetLoadedContainerWithHblsById;
 use App\Actions\Setting\GetSettings;
 use App\Enum\ContainerStatus;
 use App\Exports\DoorToDoorManifestExport;
@@ -100,7 +101,6 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
     public function downloadManifestFile($container)
     {
-
         $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.pdf';
 
         $export = new LoadedContainerManifestExport($container);
@@ -109,7 +109,12 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $data = array_filter($export->prepareData(), function ($item) {
             return isset($item[0]) && $item[0] !== '';
         });
-        $pdf = PDF::loadView('exports.shipments', ['data' => $data, 'container' => $container, 'settings' => $settings]);
+
+        $cargoType = strtolower(trim($container->cargo_type));
+
+        $view = ($cargoType === 'air cargo') ? 'exports.air_cargo' : 'exports.shipments';
+
+        $pdf = PDF::loadView($view, ['data' => $data, 'container' => $container, 'settings' => $settings]);
         $pdf->setPaper('a3', 'portrait');
 
         return $pdf->download($filename);
@@ -160,5 +165,14 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $pdf->setPaper('a4', 'portrait');
 
         return $pdf->download($filename);
+    }
+
+    public function getLoadedContainer(string $id)
+    {
+        try {
+            return GetLoadedContainerWithHblsById::run($id);
+        } catch (\Exception $exception) {
+            throw new \Exception('Failed to get Container');
+        }
     }
 }
