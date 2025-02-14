@@ -27,7 +27,7 @@ const emit = defineEmits(['close', 'retryPickup']);
         <template #footer>
             <div class="space-x-2">
                 <SecondaryButton @click="$emit('close')">
-                    Nevermind
+                    Cancel
                 </SecondaryButton>
 
                 <PrimaryButton @click="$emit('retryPickup')">
