@@ -232,9 +232,9 @@ class HBLController extends Controller
         $this->HBLRepository->deleteDocument($hblDocument);
     }
 
-    public function getPickupStatus(HBL $hbl)
+    public function getPickupStatus($id)
     {
-        return $this->HBLRepository->getPickupStatus($hbl);
+        return $this->HBLRepository->getPickupStatus($id);
     }
 
     public function getHBLStatus($HBL)

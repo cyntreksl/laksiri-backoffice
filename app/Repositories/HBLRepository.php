@@ -255,10 +255,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         }
     }
 
-    public function getPickupStatus(HBL $hbl): JsonResponse
+    public function getPickupStatus($id): JsonResponse
     {
-        if ($hbl->pickup_id) {
-            $pickup = PickUp::find($hbl->pickup_id);
+        if ($id) {
+            $pickup = PickUp::find($id);
 
             if ($pickup) {
                 return response()->json([
