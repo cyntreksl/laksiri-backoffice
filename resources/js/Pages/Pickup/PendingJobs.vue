@@ -55,6 +55,8 @@ const filters = reactive({
     createdBy: "",
     pickupDate: "",
     zoneBy: "",
+    driver: "",
+
 });
 
 const data = reactive({
@@ -812,6 +814,7 @@ const resetFilter = () => {
     filters.createdBy = "";
     filters.pickupDate = "";
     filters.zoneBy = "";
+    filters.driverBy = "";
     applyFilters();
 };
 
@@ -1249,6 +1252,25 @@ const shipIcon = ref(`
                 >
                     <option v-for="zone in zones" :value="zone.id">
                         {{ zone.zone_name }}
+                    </option>
+                </select>
+
+                <FilterBorder/>
+                <FilterHeader value="Driver By"/>
+
+                <select
+                    v-model="filters.driverBy"
+                    autocomplete="off"
+                    class="w-full"
+                    multiple
+                    placeholder="Select a User..."
+                    x-init="$el._tom = new Tom($el,{
+            plugins: ['remove_button'],
+            create: true,
+          })"
+                >
+                    <option v-for="driver in drivers" :value="driver.id">
+                        {{ driver.name }}
                     </option>
                 </select>
 

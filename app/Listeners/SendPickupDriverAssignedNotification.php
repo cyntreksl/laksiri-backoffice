@@ -26,6 +26,6 @@ class SendPickupDriverAssignedNotification
         $contact_number = $pickUp->contact_number;
 
         $user = User::where('contact', $contact_number)->first();
-        Notification::send($user, new PickupDriverAssignmentNotification($pickUp));
+        //        Notification::send($user, new PickupDriverAssignmentNotification($pickUp));
     }
 }

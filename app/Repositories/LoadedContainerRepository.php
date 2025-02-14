@@ -23,6 +23,13 @@ use Illuminate\Support\Facades\Auth;
 
 class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepositoryInterface
 {
+    protected $notificationMailRepository;
+
+    public function __construct(NotificationMailRepository $notificationMailRepository)
+    {
+        $this->notificationMailRepository = $notificationMailRepository;
+    }
+
     /**
      * @throws \Exception
      */
@@ -32,7 +39,11 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             if (isset($data['is_draft'])) {
                 return CreateDraftLoadedContainer::run($data);
             } else {
-                return CreateOrUpdateLoadedContainer::run($data);
+                $container = CreateOrUpdateLoadedContainer::run($data);
+                $hblNumbers = array_unique(array_column($data['packages'], 'hbl_id'));
+                $this->notificationMailRepository->sendShipmentDepartureNotification($hblNumbers);
+
+                return $container;
             }
         } catch (\Exception $e) {
             throw new \Exception('Failed to create loaded container: '.$e->getMessage());

@@ -15,9 +15,9 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-Route::get('/tracking', function () {
-    return Inertia::render('Tracking');
-})->name('tracking.page');
+
+Route::get('/tracking', [HBLController::class, 'showTracking'])
+    ->name('tracking.page');
 
 require_once __DIR__.'/web/feedback.php';
 

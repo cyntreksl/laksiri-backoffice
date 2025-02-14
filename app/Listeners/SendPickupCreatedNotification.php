@@ -27,6 +27,6 @@ class SendPickupCreatedNotification
 
         $user = User::where('contact', $contact_number)->first();
 
-        Notification::send($user, new ConfirmPickupNotification($pickUp));
+        //        Notification::send($user, new ConfirmPickupNotification($pickUp));
     }
 }
