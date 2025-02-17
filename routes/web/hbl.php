@@ -53,7 +53,7 @@ Route::get('hbls/get-hbl-documents/{hbl}', [HBLController::class, 'getHBLDocumen
 Route::delete('hbls-documents/{hbl_document}', [HBLController::class, 'destroyHBLDocument'])
     ->name('hbls.destroy.document');
 
-Route::get('get-pickup-status/{hbl}', [HBLController::class, 'getPickupStatus']);
+Route::get('get-pickup-status/{id}', [HBLController::class, 'getPickupStatus']);
 
 Route::get('get-hbl-status/{hbl}', [HBLController::class, 'getHBLStatus']);
 

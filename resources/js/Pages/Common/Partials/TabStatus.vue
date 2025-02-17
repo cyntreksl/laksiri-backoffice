@@ -15,6 +15,10 @@ const props = defineProps({
         default: () => {
         },
     },
+    pickup: {
+        type: Object,
+        default: () => ({}),
+    },
     showAuditDetails: {
         type: Boolean,
         default: true,
@@ -24,6 +28,13 @@ const props = defineProps({
         default: true,
     },
 })
+watch(
+    () => props.pickup,
+    (newVal) => {
+        console.log("Pickup data updated in child:", newVal);
+    },
+    { immediate: true }
+);
 
 const pickupStatus = ref([]);
 const hblStatus = ref([]);
@@ -32,8 +43,12 @@ const isLoadingPickupStatus = ref(false);
 const fetchPickupStatus = async () => {
     isLoadingPickupStatus.value = true;
 
+
     try {
-        const response = await fetch(`get-pickup-status/${props.hbl?.id}`, {
+        const id = props.hbl?.id ? props.hbl.id : props.pickup?.id;
+
+
+        const response = await fetch(`get-pickup-status/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -264,6 +279,7 @@ const fetchCallFlags = async () => {
     }
 }
 
+fetchPickupStatus();
 watch(() => props.hbl, (newVal) => {
     if (newVal !== undefined) {
         fetchPickupStatus();
