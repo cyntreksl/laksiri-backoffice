@@ -43,11 +43,8 @@ const isLoadingPickupStatus = ref(false);
 const fetchPickupStatus = async () => {
     isLoadingPickupStatus.value = true;
 
-
     try {
-        const id = props.hbl?.id ? props.hbl.id : props.pickup?.id;
-
-
+        const id = props.hbl.id ? props.hbl.id : props.pickup?.id;
         const response = await fetch(`get-pickup-status/${id}`, {
             method: "GET",
             headers: {
@@ -279,7 +276,6 @@ const fetchCallFlags = async () => {
     }
 }
 
-fetchPickupStatus();
 watch(() => props.hbl, (newVal) => {
     if (newVal !== undefined) {
         fetchPickupStatus();
@@ -289,6 +285,13 @@ watch(() => props.hbl, (newVal) => {
         fetchCallFlags();
         fetchUnloadingIssues();
         fetchContainer();
+    }
+});
+
+watch(() => props.pickup, (newVal) => {
+    if (newVal !== undefined) {
+        fetchPickupStatus();
+        fetchHBLStatus();
     }
 });
 
@@ -356,7 +359,6 @@ onMounted(() => {
                             </div>
                             <span class="font-medium text-slate-700 dark:text-navy-100">Pickup Status</span>
                         </div>
-
                         <div v-if="pickupStatus.length > 0" class="mt-5">
                             <ol class="timeline max-w-sm">
                                 <li v-for="(log, index) in pickupStatus" class="timeline-item">
