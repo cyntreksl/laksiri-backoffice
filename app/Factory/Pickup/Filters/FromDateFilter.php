@@ -12,6 +12,6 @@ class FromDateFilter implements FilterInterface
     {
         $dateValue = Carbon::parse($value); // Ensure $value is parsed into a date
 
-        return $query->whereDate('created_at', '>=', $dateValue);
+        return $query->whereDate('pickup_date', '>=', $dateValue);
     }
 }
