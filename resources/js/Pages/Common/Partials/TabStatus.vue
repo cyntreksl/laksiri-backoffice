@@ -42,12 +42,11 @@ const isLoadingPickupStatus = ref(false);
 
 const fetchPickupStatus = async () => {
     isLoadingPickupStatus.value = true;
-    console.log(props.pickup?.id);
+
 
     try {
         const id = props.hbl?.id ? props.hbl.id : props.pickup?.id;
 
-        console.log(id);
 
         const response = await fetch(`get-pickup-status/${id}`, {
             method: "GET",
