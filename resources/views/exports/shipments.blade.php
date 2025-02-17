@@ -104,7 +104,7 @@
                 <th colspan="11" >
                     <strong>
                    OBL  {{$container?->bl_number}}                                                   UNIVERSAL FREIGHT SERVICES
-                                                                    {{$container?->reference}}
+                                                  REFERENCE NUMBER {{$container?->reference}}
                     </strong>
                 </th>
             </tr>
@@ -185,10 +185,10 @@
             <tbody>
             @foreach ($chunk as $index => $item)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td style="border-right:none ;vertical-align: top"> {{ $item[0]}} </td>
-                    <td style="border-left:none;vertical-align: top">{{ $item[1]}} {{ $item[2]}} <br>  {{ $item[3]}} <br> {{ $item[4]}}</td>
-                    <td style="vertical-align: top">{{ $item[5] }} <br> {{ $item[6] }} <br> {{ $item[7] }} <br> {{ $item[8] }} </td>
+                    <td rowspan="2">{{ $loop->iteration }}</td>
+                    <td rowspan="2" style="border-right:none ;vertical-align: top"> {{ $item[0]}} </td>
+                    <td rowspan="2" style="border-left:none;vertical-align: top">{{ $item[1]}} {{ $item[2]}} <br>  {{ $item[3]}} <br> {{ $item[4]}}</td>
+                    <td rowspan="2" style="vertical-align: top">{{ $item[5] }} <br> {{ $item[6] }} <br> {{ $item[7] }} <br> {{ $item[8] }} </td>
                     <td style="vertical-align: top; font-size: 13px;" >
                         @php
                             $totalQuantity = collect($item[9])->sum('quantity');
@@ -202,33 +202,31 @@
                             {{ $package['quantity'] }}-{{ $package['package_type'] }}
                         @endforeach
                         <br style="margin-bottom:5px;"/>
-
-                        <strong style=" font-size: 17px;">TOTAL</strong>
                     </td>
                     <td style="vertical-align: top">
                         @foreach ($item[9] as $package)
                             {{ $package['quantity'] }}<br>
                         @endforeach
-                        <strong> {{ $totalQuantity }}</strong>
+
                     </td>
                     <td style="vertical-align: top">
                         @foreach ($item[9] as $package)
                             {{ $package['volume'] }}<br>
                         @endforeach
-                        <strong>{{ $totalVolume }}</strong>
+
                     </td>
                     <td style="vertical-align: top">
                         @foreach ($item[9] as $package)
                             {{ $package['weight'] }}<br>
                         @endforeach
-                        <strong > {{ $hblweight }}</strong>
+
                     </td>
-                    <td>  PERSONAL<br>      EFFECT</td>
-                    <td>
+                    <td rowspan="2">  PERSONAL<br>      EFFECT</td>
+                    <td rowspan="2">
                         {{ $container?->target_warehouse == 2 ? 'CMB' : ($container?->target_warehouse == 3 ? 'NTR' : $container?->target_warehouse) }}
                     </td>
 
-                    <td style="text-align: center">
+                    <td rowspan="2" style="text-align: center">
                         <b >{{ $item[11] == 'GIFT' ? $item[11] : '' }}
                             @if (!empty($item[12]))
                                 <p>{{ $container?->port_of_loading . '&' . $container?->port_of_discharge }}</p>
@@ -237,16 +235,21 @@
                             <p>{{ $item[10]}}</p>
                         </b>
                     </td>
-
-
                 </tr>
+                <tr>
+                    <td style="border: 2px solid"><b>TOTAL</b></td>
+                    <td style="border: 2px solid"><b>  <strong> {{ $totalQuantity }}</strong></b></td>
+                    <td style="border: 2px solid"><b> <strong>{{ $totalVolume }}</strong></b></td>
+                    <td style="border: 2px solid"><b>   <strong > {{ $hblweight }}</strong></b></td>
+                </tr>
+
             @endforeach
             @if ($loop->last)
                 <tr style="border: none;">
                     <td colspan="5" style="border: none; text-align: right;"></td>
                     <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_nototal, 0) }}</u></strong></td>
                     <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 2) }}</u></strong></td>
-                    <td style="border: none; text-align: center;"><strong><u>  {{ number_format($total_gtotal, 2) }}</u></strong></td>
+                    <td style="border: none; text-align: center;"><strong><u> {{ number_format($total_gtotal, 2) }}</u></strong></td>
                     <td style="border: none;">&nbsp;</td>
                     <td style="border: none;">&nbsp;</td>
                     <td style="border: none;">&nbsp;</td>
