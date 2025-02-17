@@ -50,7 +50,7 @@ const filters = reactive({
     toDate: toDate,
     cargoMode: ["Air Cargo", "Sea Cargo"],
     createdBy: "",
-    driver: "",
+    driverBy: "",
     status: "",
     zoneBy: "",
 });
