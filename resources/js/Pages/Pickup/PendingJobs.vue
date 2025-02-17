@@ -546,6 +546,7 @@ const createColumns = () => [
         sort: false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
+            let cell = row.cells[8].data;
             return h("div", {className: "flex space-x-2"}, [
                 usePage().props.user.permissions.includes('pickups.show') ?
                     h(
@@ -630,7 +631,7 @@ const createColumns = () => [
                     )
                     : null,
                 usePage().props.user.permissions.includes('pickups.retry') ?
-                    (row.cells[8].data && row.cells[8].data !== '-') ?
+                    (cell && row.cells[8].data && row.cells[8].data < moment().format('YYYY-MM-DD')) ?
                         h(
                             "button",
                             {
