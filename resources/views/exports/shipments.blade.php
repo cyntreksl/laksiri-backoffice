@@ -114,22 +114,22 @@
                 </th>
             </tr>
             <tr>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
+                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
                     VESSEL: {{$container?->vessel_name}} <br>
                 </th>
-                <th colspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
+                <th colspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
                     DATE LOADED:   {{$container?->loading_started_at}} <br>
                 </th>
-                <th colspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
+                <th colspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
                     VOYAGE: <br>
                 </th>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
+                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
                     {{$container?->voyage_number}}   <br>
                 </th>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
+                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
                     ETA:   <br>
                 </th>
-                <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 10px;">
+                <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
                     {{$container?->estimated_time_of_arrival}}    <br>
                 </th>
             </tr>
