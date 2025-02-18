@@ -100,6 +100,7 @@ class RolePermissionSeeder extends Seeder
                     'hbls.upload documents',
                     'hbls.delete documents',
                     'hbls.issue token',
+                    'hbls.show draft hbls',
                 ],
             ],
 

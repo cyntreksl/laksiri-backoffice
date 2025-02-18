@@ -1063,7 +1063,7 @@ export default {
                             }
                         );
                     }
-                    if (usePage().props.user.permissions.includes("hbls.index")) {
+                    if (usePage().props.user.permissions.includes("hbls.show draft hbls")) {
                         hblMenu.splice(
                             2,
                             0,
