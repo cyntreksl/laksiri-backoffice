@@ -1130,21 +1130,31 @@ export default {
                     changeSidePanelTitle("Back Office");
                     break;
                 case "loading":
+                    let loadingMenu = [];
+                    if (usePage().props.user.permissions.includes("container.index")) {
+                        loadingMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Containers",
+                                route: "loading.loading-containers.index",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("shipment.index")) {
+                        loadingMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Loaded Shipment",
+                                route: "loading.loaded-containers.index",
+                            }
+                        );
+                    }
                     childMenuList.splice(
                         0,
                         childMenuList.length,
-                        {
-                            title: "Containers",
-                            route: "loading.loading-containers.index",
-                        },
-                        // {
-                        //     title: "Manual Loading",
-                        //     route: "loading.manual-loadings.index",
-                        // },
-                        {
-                            title: "Loaded Shipment",
-                            route: "loading.loaded-containers.index",
-                        }
+                        ...loadingMenu
                     );
                     changeSidePanelTitle("Loading");
                     break;
