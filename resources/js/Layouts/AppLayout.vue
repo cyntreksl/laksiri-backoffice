@@ -296,7 +296,7 @@
 <!--                            </a>-->
                             <!-- User Management -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('users')) || $page.props.user.permissions.includes('roles.list')"
                                 :class="[
                 activeMenu === 'users' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -1166,6 +1166,67 @@ export default {
                     );
                     changeSidePanelTitle("Arrivals");
                     break;
+                case "users":
+                    let userMenu = [];
+
+                    if (usePage().props.user.permissions.includes("users.list")) {
+                        userMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "System Users",
+                                route: "users.index",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("users.list")) {
+                        userMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Drivers",
+                                route: "users.drivers.index",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("users.list")) {
+                        userMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Customers",
+                                route: "users.customers.index",
+                            }
+                        );
+                    }
+                    // if (usePage().props.user.permissions.includes("issues.index")) {
+                    //     userMenu.splice(
+                    //         2,
+                    //         0,
+                    //         {
+                    //             title: "Driver Tracking",
+                    //             route: "users.driver-tracings.index",
+                    //         }
+                    //     );
+                    // }
+
+                    if (usePage().props.user.permissions.includes("roles.list")) {
+                        userMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Roles & Permissions",
+                                route: "users.roles.index",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...userMenu
+                    );
+                    changeSidePanelTitle("Users");
+                    break;
                 case "delivery":
                     childMenuList.splice(
                         0,
@@ -1191,33 +1252,6 @@ export default {
                         route: "report.payment-summaries.index",
                     });
                     changeSidePanelTitle("Report");
-                    break;
-                case "users":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "System Users",
-                            route: "users.index",
-                        },
-                        {
-                            title: "Drivers",
-                            route: "users.drivers.index",
-                        },
-                        {
-                            title: "Customers",
-                            route: "users.customers.index",
-                        },
-                        // {
-                        //     title: "Driver Tracking",
-                        //     route: "users.driver-tracings.index",
-                        // },
-                        {
-                            title: "Roles & Permissions",
-                            route: "users.roles.index",
-                        }
-                    );
-                    changeSidePanelTitle("Users");
                     break;
                 case "setting":
                     childMenuList.splice(
