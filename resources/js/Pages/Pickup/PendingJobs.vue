@@ -55,7 +55,7 @@ const filters = reactive({
     createdBy: "",
     pickupDate: "",
     zoneBy: "",
-    driver: "",
+    driverBy: [],
 
 });
 
@@ -814,7 +814,7 @@ const resetFilter = () => {
     filters.createdBy = "";
     filters.pickupDate = "";
     filters.zoneBy = "";
-    filters.driverBy = "";
+    filters.driverBy = [];
     applyFilters();
 };
 

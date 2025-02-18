@@ -9,6 +9,10 @@ class DriverByFilter implements FilterInterface
 {
     public function apply(Builder $query, $value)
     {
-        return $query->where('driver_id', $value);
+        if ($value) {
+            $value = !is_array($value) ? explode(',', $value) : $value;
+
+            return $query->whereIn('driver_id', $value);
+        }
     }
 }
