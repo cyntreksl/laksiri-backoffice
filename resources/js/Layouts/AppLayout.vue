@@ -87,7 +87,7 @@
                             </a>
                             <!-- HBL -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer')"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('hbls'))"
                                 :class="[
                 activeMenu === 'hbls' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -120,7 +120,7 @@
                             </a>
                             <!-- Back Office -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('cash'))"
                                 :class="[
                 activeMenu === 'back-office'
                   ? 'bg-primary/10 text-primary'
@@ -1088,21 +1088,44 @@ export default {
                     changeSidePanelTitle("HBL");
                     break;
                 case "back-office":
+                    let backOfficeMenu = [];
+
+                    if (usePage().props.user.permissions.includes("cash.index")) {
+                        backOfficeMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Cash Settlements",
+                                route: "back-office.cash-settlements.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("warehouse.index")) {
+                        backOfficeMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Warehouse",
+                                route: "back-office.warehouses.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("cash.index")) {
+                        backOfficeMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Due Payments",
+                                route: "back-office.duepayments.duePaymentIndex",
+                            }
+                        );
+                    }
                     childMenuList.splice(
                         0,
                         childMenuList.length,
-                        {
-                            title: "Cash Settlements",
-                            route: "back-office.cash-settlements.index",
-                        },
-                        {
-                            title: "Warehouse",
-                            route: "back-office.warehouses.index",
-                        },
-                        {
-                            title: "Due Payments",
-                            route: "back-office.duepayments.duePaymentIndex",
-                        }
+                        ...backOfficeMenu
                     );
                     changeSidePanelTitle("Back Office");
                     break;
