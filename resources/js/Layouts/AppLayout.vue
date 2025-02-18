@@ -1021,7 +1021,7 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("hbls.show")) {
+                    if (usePage().props.user.permissions.includes("hbls.index")) {
                         hblMenu.splice(
                             2,
                             0,
@@ -1031,26 +1031,60 @@ export default {
                             }
                         );
                     }
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "All MHBL",
-                            route: "mhbls.index",
-                        },
-                        {
-                            title: "Door to Door HBL",
-                            route: "hbls.door-to-door-list",
-                        },
-                        {
-                            title: "Cancelled HBL",
-                            route: "hbls.cancelled-hbls",
-                        },
-                        {
-                            title: "Draft HBL",
-                            route: "hbls.draft-list",
-                        }
-                    );
+
+                    if (usePage().props.user.permissions.includes("mhbls.index")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All MHBL",
+                                route: "mhbls.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("hbls.index")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Door to Door HBL",
+                                route: "hbls.door-to-door-list",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("hbls.show cancelled hbls")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Cancelled HBL",
+                                route: "hbls.cancelled-hbls",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("hbls.index")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Draft HBL",
+                                route: "hbls.draft-list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("delivers.show deliver order")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Deliver Ordering",
+                                route: "delivery.ordering",
+                            }
+                        );
+                    }
+                    childMenuList.splice(0, childMenuList.length, ...hblMenu);
                     changeSidePanelTitle("HBL");
                     break;
                 case "back-office":

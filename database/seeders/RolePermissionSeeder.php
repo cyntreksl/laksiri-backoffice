@@ -79,7 +79,7 @@ class RolePermissionSeeder extends Seeder
                     'pickups.update pickup order',
                     'pickups.show pickup exceptions',
                     'pickups.retry',
-                    'pickups.index'
+                    'pickups.index',
                 ],
             ],
 
@@ -100,6 +100,20 @@ class RolePermissionSeeder extends Seeder
                     'hbls.upload documents',
                     'hbls.delete documents',
                     'hbls.issue token',
+                ],
+            ],
+
+            [
+                'group_name' => 'MHBL',
+                'permissions' => [
+                    'mhbls.index',
+                ],
+            ],
+
+            [
+                'group_name' => 'Delivers',
+                'permissions' => [
+                    'delivers.show deliver order',
                 ],
             ],
 

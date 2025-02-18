@@ -9,11 +9,13 @@ use App\Interfaces\CallCenter\DeliveryRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Models\HBLDeliver;
 use App\Traits\ResponseAPI;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DeliverController extends Controller
 {
+    use AuthorizesRequests;
     use ResponseAPI;
 
     public function __construct(
@@ -38,6 +40,8 @@ class DeliverController extends Controller
 
     public function showDeliverOrder(Request $request)
     {
+        $this->authorize('delivers.show deliver order');
+
         return Inertia::render('CallCenter/Delivery/DeliveryOrder', [
             'filters' => $request->only('fromDate', 'toDate', 'driverId'),
             'drivers' => $this->driverRepository->getAllDrivers(),

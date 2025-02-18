@@ -30,6 +30,8 @@ class MHBLController extends Controller
 
     public function index()
     {
+        $this->authorize('mhbls.index');
+
         return Inertia::render('MHBL/MHBLList');
     }
 
