@@ -191,6 +191,19 @@ class RolePermissionSeeder extends Seeder
                     'issues.index',
                 ],
             ],
+
+            [
+                'group_name' => 'Customer Queue',
+                'permissions' => [
+                    'customer-queue.issue token',
+                    'customer-queue.show reception calling queue',
+                    'customer-queue.show reception verified list',
+                    'customer-queue.show reception calling screen',
+                    'customer-queue.show package calling queue',
+                    'customer-queue.show package released list',
+                    'customer-queue.show package calling screen',
+                ],
+            ],
         ];
     }
 }
