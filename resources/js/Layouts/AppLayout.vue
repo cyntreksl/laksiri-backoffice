@@ -190,6 +190,22 @@
                                 </svg>
                             </a>
 
+                            <!-- Reception Verifications -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show reception'))"
+                                :class="[
+                activeMenu === 'reception' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Reception'"
+                                @click="
+                setMenu('reception');
+                openSideBar();
+              "
+                            >
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-rubber-stamp"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 17.85h-18c0 -4.05 1.421 -4.05 3.79 -4.05c5.21 0 1.21 -4.59 1.21 -6.8a4 4 0 1 1 8 0c0 2.21 -4 6.8 1.21 6.8c2.369 0 3.79 0 3.79 4.05z" /><path d="M5 21h14" /></svg>
+                            </a>
+
                             <!-- Boned Area Screens -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show package'))"
@@ -1154,6 +1170,48 @@ export default {
                         ...backOfficeMenu
                     );
                     changeSidePanelTitle("Back Office");
+                    break;
+                case "reception":
+                    let receptionMenu = [];
+
+                    if (usePage().props.user.permissions.includes("customer-queue.issue token")) {
+                        receptionMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Issue tokens",
+                                route: "call-center.reception.queue.hbl-list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show reception calling queue")) {
+                        receptionMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Receptionist Queue",
+                                route: "call-center.reception.queue.list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show reception verified list")) {
+                        receptionMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Verified List",
+                                route: "call-center.reception.show.verified",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...receptionMenu
+                    );
+                    changeSidePanelTitle("Reception Verifications");
                     break;
                 case "package":
                     let packageMenu = [];
