@@ -192,7 +192,7 @@
                             </a>
                             <!-- Arrivals -->
                             <a
-                                v-if="usePage().props.auth.user.roles[0].name !== 'call center'"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('arrival'))"
                                 :class="[
                 activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -441,53 +441,18 @@
                                         >
                                             <ul class="flex flex-1 flex-col px-4 font-inter">
                                                 <li v-for="item in childMenuList">
-                                                    <template v-if="$page.props.user.roles.includes('viewer')">
-                                                        <template v-if="$page.props.currentBranch.type === 'Destination'">
-                                                            <Link
-                                                                v-if="item.title === 'Shipments Arrivals'"
-                                                                :class="
-                              route().current() === item.route
-                                ? 'font-medium text-primary dark:text-accent-light'
-                                : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50   dark:hover:bg-neutral-500'
-                            "
-                                                                :href="route(item.route)"
-                                                                class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
-                                                            >
-                                                                <sapn class="ml-2"> {{ item.title }}</sapn>
-                                                            </Link>
-                                                        </template>
-                                                    </template>
-                                                    <template v-else>
-                                                        <template
-                                                            v-if="item.title === 'Shipments Arrivals' || item.title === 'Bonded Warehouse'">
-                                                            <template
-                                                                v-if="$page.props.currentBranch.name === 'Colombo'">
-                                                                <Link
-                                                                    :class="
+                                                    <template v-if="true">
+                                                        <Link
+                                                            :class="
                       route().current() === item.route
                         ? 'font-medium text-primary dark:text-accent-light'
                         : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50   dark:hover:bg-neutral-500'
                     "
-                                                                    :href="route(item.route)"
-                                                                    class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
-                                                                >
-                                                                    <span class="ml-2"> {{ item.title }}</span>
-                                                                </Link>
-                                                            </template>
-                                                        </template>
-                                                        <template v-else>
-                                                            <Link
-                                                                :class="
-                  route().current() === item.route
-                    ? 'font-medium text-primary dark:text-accent-light'
-                    : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50   dark:hover:bg-neutral-500'
-                "
-                                                                :href="route(item.route)"
-                                                                class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
-                                                            >
-                                                                <span class="ml-2"> {{ item.title }}</span>
-                                                            </Link>
-                                                        </template>
+                                                            :href="route(item.route)"
+                                                            class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
+                                                        >
+                                                            <span class="ml-2"> {{ item.title }}</span>
+                                                        </Link>
                                                     </template>
                                                 </li>
                                             </ul>
@@ -1159,21 +1124,45 @@ export default {
                     changeSidePanelTitle("Loading");
                     break;
                 case "arrival":
+                    let arrivalMenu = [];
+
+                    if (usePage().props.user.permissions.includes("arrivals.index") && usePage().props.currentBranch.type === 'Destination') {
+                        arrivalMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Shipments Arrivals",
+                                route: "arrival.shipments-arrivals.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("bonded.index") && usePage().props.currentBranch.type === 'Destination') {
+                        arrivalMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Bonded Warehouse",
+                                route: "arrival.bonded-warehouses.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("issues.index")) {
+                        arrivalMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Unloading Issues",
+                                route: "arrival.unloading-issues.index",
+                            }
+                        );
+                    }
+
                     childMenuList.splice(
                         0,
                         childMenuList.length,
-                        {
-                            title: "Shipments Arrivals",
-                            route: "arrival.shipments-arrivals.index",
-                        },
-                        {
-                            title: "Bonded Warehouse",
-                            route: "arrival.bonded-warehouses.index",
-                        },
-                        {
-                            title: "Unloading Issues",
-                            route: "arrival.unloading-issues.index",
-                        }
+                        ...arrivalMenu
                     );
                     changeSidePanelTitle("Arrivals");
                     break;
