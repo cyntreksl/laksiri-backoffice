@@ -965,21 +965,23 @@ export default {
                             2,
                             0,
                             {
-                                title: "Pickup Ordering",
-                                route: "pickups.ordering",
-                            }
-                        );
-                    }
-                    if (usePage().props.user.permissions.includes("pickups.show pickup order")) {
-                        pickupMenu.splice(
-                            2,
-                            0,
-                            {
                                 title: "Pending Jobs",
                                 route: "pickups.index",
                             }
                         );
                     }
+
+                    if (usePage().props.user.permissions.includes("pickups.show pickup order")) {
+                        pickupMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Pickup Ordering",
+                                route: "pickups.ordering",
+                            }
+                        );
+                    }
+
                     if (usePage().props.user.permissions.includes("pickups.show pickup exceptions")) {
                         pickupMenu.splice(
                             2,
@@ -1001,7 +1003,7 @@ export default {
                             }
                         );
                     }
-                    console.log(pickupMenu, usePage().props.user.permissions.includes("pickups.create"));
+
                     childMenuList.splice(0, childMenuList.length, ...pickupMenu);
                     changeSidePanelTitle("Pickups");
                     break;
