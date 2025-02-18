@@ -53,9 +53,8 @@
 
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
                             <!-- Pickup -->
-<!--                            <p>{{usePage().props.user.permissions}}</p>-->
                             <a
-                                v-if="childMenuList.some(menu => menu.route.startsWith('pickups'))"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('pickups'))"
                                 :class="[
                 activeMenu === 'pickups' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -992,7 +991,7 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("pickups.show")) {
+                    if (usePage().props.user.permissions.includes("pickups.index")) {
                         pickupMenu.splice(
                             2,
                             0,
@@ -1007,17 +1006,32 @@ export default {
                     changeSidePanelTitle("Pickups");
                     break;
                 case "hbls":
+                    let hblMenu = [];
+
+                    if (usePage().props.user.permissions.includes("hbls.create")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Create HBL",
+                                route: "hbls.create",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("hbls.show")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All HBL",
+                                route: "hbls.index",
+                            }
+                        );
+                    }
                     childMenuList.splice(
                         0,
                         childMenuList.length,
-                        {
-                            title: "Create HBL",
-                            route: "hbls.create",
-                        },
-                        {
-                            title: "All HBL",
-                            route: "hbls.index",
-                        },
                         {
                             title: "All MHBL",
                             route: "mhbls.index",

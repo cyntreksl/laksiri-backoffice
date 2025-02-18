@@ -79,6 +79,7 @@ class RolePermissionSeeder extends Seeder
                     'pickups.update pickup order',
                     'pickups.show pickup exceptions',
                     'pickups.retry',
+                    'pickups.index'
                 ],
             ],
 
