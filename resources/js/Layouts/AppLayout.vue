@@ -281,6 +281,33 @@
                                 <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-checkup-list"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /><path d="M9 14h.01" /><path d="M9 17h.01" /><path d="M12 16l1 1l3 -3" /></svg>
                             </a>
 
+                            <!-- Queue Screen -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.endsWith('screen'))"
+                                :class="[
+                activeMenu === 'screens' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Queue Screens'"
+                                @click="
+                setMenu('screens');
+                openSideBar();
+              "
+                            >
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-screen-share" fill="none" height="24" stroke="currentColor"
+                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                     width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M21 12v3a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1h9"/>
+                                    <path d="M7 20l10 0"/>
+                                    <path d="M9 16l0 4"/>
+                                    <path d="M15 16l0 4"/>
+                                    <path d="M17 4h4v4"/>
+                                    <path d="M16 9l5 -5"/>
+                                </svg>
+                            </a>
+
                             <!-- Loading -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('container')) || $page.props.user.permissions.some(permission => permission.startsWith('shipment'))"
@@ -1395,6 +1422,48 @@ export default {
                         ...examinationMenu
                     );
                     changeSidePanelTitle("Examination");
+                    break;
+                case "screens":
+                    let screenMenu = [];
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show document verification calling screen")) {
+                        screenMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Document Verification Queue",
+                                route: "call-center.queue.screens.document-verification",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show cashier calling screen")) {
+                        screenMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Cashier Queue",
+                                route: "call-center.queue.screens.cashier",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show examination calling screen")) {
+                        screenMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Examination Queue",
+                                route: "call-center.queue.screens.examination",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...screenMenu
+                    );
+                    changeSidePanelTitle("Queue Screens");
                     break;
                 case "loading":
                     let loadingMenu = [];
