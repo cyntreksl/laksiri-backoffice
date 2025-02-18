@@ -53,8 +53,9 @@
 
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
                             <!-- Pickup -->
+<!--                            <p>{{usePage().props.user.permissions}}</p>-->
                             <a
-                                v-if="usePage().props.user.permissions.includes('pickups.show')"
+                                v-if="childMenuList.some(menu => menu.route.startsWith('pickups'))"
                                 :class="[
                 activeMenu === 'pickups' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -954,31 +955,55 @@ export default {
                     changeSidePanelTitle("Dashboard");
                     break;
                 case "pickups":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Create Job",
-                            route: "pickups.create",
-                        },
-                        {
-                            title: "Pending Jobs",
-                            route: "pickups.index",
-                        },
-                        {
-                            title: "Pickup Ordering",
-                            route: "pickups.ordering",
-                        },
-                        {
-                            title: "Pickup Exceptions",
-                            route: "pickups.exceptions",
-                        },
-                        {
-                            title: "All Pickups",
-                            route: "pickups.all",
-                        }
+                    let pickupMenu = [];
 
-                    );
+                    if (usePage().props.user.permissions.includes("pickups.create")) {
+                        pickupMenu.splice(2, 0, { title: "Create Job", route: "pickups.create" });
+                    }
+
+                    if (usePage().props.user.permissions.includes("pickups.pending pickups")) {
+                        pickupMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Pickup Ordering",
+                                route: "pickups.ordering",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("pickups.show pickup order")) {
+                        pickupMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Pending Jobs",
+                                route: "pickups.index",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("pickups.show pickup exceptions")) {
+                        pickupMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Pickup Exceptions",
+                                route: "pickups.exceptions",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("pickups.show")) {
+                        pickupMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All Pickups",
+                                route: "pickups.all",
+                            }
+                        );
+                    }
+                    console.log(pickupMenu, usePage().props.user.permissions.includes("pickups.create"));
+                    childMenuList.splice(0, childMenuList.length, ...pickupMenu);
                     changeSidePanelTitle("Pickups");
                     break;
                 case "hbls":
