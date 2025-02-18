@@ -206,6 +206,22 @@
                                 <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-rubber-stamp"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 17.85h-18c0 -4.05 1.421 -4.05 3.79 -4.05c5.21 0 1.21 -4.59 1.21 -6.8a4 4 0 1 1 8 0c0 2.21 -4 6.8 1.21 6.8c2.369 0 3.79 0 3.79 4.05z" /><path d="M5 21h14" /></svg>
                             </a>
 
+                            <!-- Document Verifications -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show document'))"
+                                :class="[
+                activeMenu === 'verifications' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Document Verifications'"
+                                @click="
+                setMenu('verifications');
+                openSideBar();
+              "
+                            >
+                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-certificate"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M15 15m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M13 17.5v4.5l2 -1.5l2 1.5v-4.5" /><path d="M10 19h-5a2 2 0 0 1 -2 -2v-10c0 -1.1 .9 -2 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -1 1.73" /><path d="M6 9l12 0" /><path d="M6 12l3 0" /><path d="M6 15l2 0" /></svg>
+                            </a>
+
                             <!-- Boned Area Screens -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show package'))"
@@ -1212,6 +1228,37 @@ export default {
                         ...receptionMenu
                     );
                     changeSidePanelTitle("Reception Verifications");
+                    break;
+                case "verifications":
+                    let verificationMenu = [];
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show document verification queue")) {
+                        verificationMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Document Verification Queue",
+                                route: "call-center.verification.queue.list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show document verified list")) {
+                        verificationMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Verified List",
+                                route: "call-center.verification.show.verified",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...verificationMenu
+                    );
+                    changeSidePanelTitle("Document Verifications");
                     break;
                 case "package":
                     let packageMenu = [];
