@@ -205,6 +205,9 @@ class RolePermissionSeeder extends Seeder
                     'customer-queue.show package calling queue',
                     'customer-queue.show package released list',
                     'customer-queue.show package calling screen',
+                    'customer-queue.show cashier calling queue',
+                    'customer-queue.show cashier paid list',
+                    'customer-queue.show cashier calling screen',
                 ],
             ],
         ];
