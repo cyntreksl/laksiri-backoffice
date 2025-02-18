@@ -265,6 +265,22 @@
                                 </svg>
                             </a>
 
+                            <!-- Examination  -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show examination'))"
+                                :class="[
+                activeMenu === 'examination' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Examination'"
+                                @click="
+                setMenu('examination');
+                openSideBar();
+              "
+                            >
+                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-checkup-list"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /><path d="M9 14h.01" /><path d="M9 17h.01" /><path d="M12 16l1 1l3 -3" /></svg>
+                            </a>
+
                             <!-- Loading -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('container')) || $page.props.user.permissions.some(permission => permission.startsWith('shipment'))"
@@ -1348,6 +1364,37 @@ export default {
                         ...packageMenu
                     );
                     changeSidePanelTitle("Package Queue");
+                    break;
+                case "examination":
+                    let examinationMenu = [];
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show document verification queue")) {
+                        examinationMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Examination Queue",
+                                route: "call-center.examination.queue.list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show document verified list")) {
+                        examinationMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Gate Pass List",
+                                route: "call-center.examination.show.gate-pass",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...examinationMenu
+                    );
+                    changeSidePanelTitle("Examination");
                     break;
                 case "loading":
                     let loadingMenu = [];

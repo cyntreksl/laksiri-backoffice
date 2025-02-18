@@ -208,6 +208,9 @@ class RolePermissionSeeder extends Seeder
                     'customer-queue.show cashier calling queue',
                     'customer-queue.show cashier paid list',
                     'customer-queue.show cashier calling screen',
+                    'customer-queue.show examination calling queue',
+                    'customer-queue.show gate ist',
+                    'customer-queue.show examination calling screen',
                 ],
             ],
         ];
