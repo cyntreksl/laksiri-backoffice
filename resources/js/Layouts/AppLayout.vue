@@ -157,7 +157,7 @@
                                 </svg>
                             </a>
 
-                            <!-- Arrivals -->
+                            <!-- Destination Branch Arrivals -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('arrival')) && $page.props.currentBranch.type === 'Destination'"
                                 :class="[
@@ -189,6 +189,34 @@
                                     <path d="M4 13h3l3 3h4l3 -3h3"/>
                                 </svg>
                             </a>
+
+                            <!-- Boned Area Screens -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show package'))"
+                                :class="[
+                activeMenu === 'package' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Package Queue'"
+                                @click="
+                setMenu('package');
+                openSideBar();
+              "
+                            >
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-screen-share" fill="none" height="24" stroke="currentColor"
+                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                     width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M21 12v3a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1h9"/>
+                                    <path d="M7 20l10 0"/>
+                                    <path d="M9 16l0 4"/>
+                                    <path d="M15 16l0 4"/>
+                                    <path d="M17 4h4v4"/>
+                                    <path d="M16 9l5 -5"/>
+                                </svg>
+                            </a>
+
                             <!-- Loading -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('container')) || $page.props.user.permissions.some(permission => permission.startsWith('shipment'))"
@@ -223,7 +251,7 @@
                                     <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
                                 </svg>
                             </a>
-                            <!-- Arrivals -->
+                            <!-- Departure Branch Arrivals -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('arrival')) && $page.props.currentBranch.type === 'Departure'"
                                 :class="[
@@ -1126,6 +1154,48 @@ export default {
                         ...backOfficeMenu
                     );
                     changeSidePanelTitle("Back Office");
+                    break;
+                case "package":
+                    let packageMenu = [];
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show package calling screen")) {
+                        packageMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Package Calling Screen",
+                                route: "call-center.queue.screens.package",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show package calling queue")) {
+                        packageMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Package Calling Queue",
+                                route: "call-center.package.queue.list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show package released list")) {
+                        packageMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Released List",
+                                route: "call-center.package.show.released.list",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...packageMenu
+                    );
+                    changeSidePanelTitle("Package Queue");
                     break;
                 case "loading":
                     let loadingMenu = [];
