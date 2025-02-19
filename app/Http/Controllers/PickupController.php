@@ -166,7 +166,7 @@ class PickupController extends Controller
 
     public function allPickups()
     {
-        $this->authorize('pickups.allPickups');
+        $this->authorize('pickups.index');
 
         $pickups = $this->pickupRepository->getPickups();
 

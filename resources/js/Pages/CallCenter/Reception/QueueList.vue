@@ -4,6 +4,7 @@ import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { computed } from "vue";
 import DashboardCard from "@/Components/Widgets/DashboardCard.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 
 const props = defineProps({
     receptionQueue: {
@@ -24,7 +25,7 @@ const filteredReceptionQueue = computed(() => {
 </script>
 
 <template>
-    <DestinationAppLayout title="Reception Queue List">
+    <AppLayout title="Reception Queue List">
         <template #header>Reception Queue List</template>
 
         <Breadcrumb/>
@@ -63,5 +64,5 @@ const filteredReceptionQueue = computed(() => {
         <div v-else class="flex justify-center mt-20 w-full">
             <p class="text-xl">No Tokens Available</p>
         </div>
-    </DestinationAppLayout>
+    </AppLayout>
 </template>

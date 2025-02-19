@@ -8,6 +8,7 @@ import {router, usePage} from "@inertiajs/vue3";
 import ActionMessage from "@/Components/ActionMessage.vue";
 import RadioButton from "@/Components/RadioButton.vue";
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 
 const props = defineProps({
     container: {
@@ -246,7 +247,7 @@ const reviewContainer = () => {
 </script>
 
 <template>
-    <DestinationAppLayout title="Loading Points">
+    <AppLayout title="Loading Points">
         <template #header>Loading Points</template>
 
         <main class="kanban-app w-full">
@@ -709,5 +710,5 @@ const reviewContainer = () => {
                      :find-hbl-by-package-id="findHblByPackageId"
                      :show="showReviewModal"
                      @close="showReviewModal = false" :is-destination-loading="true"/>
-    </DestinationAppLayout>
+    </AppLayout>
 </template>
