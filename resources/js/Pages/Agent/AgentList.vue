@@ -5,7 +5,7 @@ import {Link} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 defineProps({
-    branches: {
+    agents: {
         type: Object,
         default: () => {}
     }
@@ -85,52 +85,52 @@ defineProps({
                 </thead>
                 <tbody>
                 <tr
-                    v-for="branch in branches" :key="branch.id"
+                    v-for="agent in agents" :key="agent.id"
                     class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500 last:border-0 bg-white"
                 >
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{branch.name}}
+                        {{agent.name}}
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{branch.type}}
+                        {{agent.type}}
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{branch.branch_code}}
+                        {{agent.branch_code}}
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{branch.currency_name}}
+                        {{agent.currency_name}}
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{branch.currency_symbol}}
+                        {{agent.currency_symbol}}
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        <span v-for="cmode in JSON.parse(branch.cargo_modes)" class="badge bg-info/10 text-info dark:bg-info/15 ml-2">
+                        <span v-for="cmode in JSON.parse(agent.cargo_modes)" class="badge bg-info/10 text-info dark:bg-info/15 ml-2">
                             {{cmode}}
                         </span>
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        <span v-for="dtype in JSON.parse(branch.delivery_types)" class="badge bg-success/10 text-success dark:bg-success/15 ml-2">
+                        <span v-for="dtype in JSON.parse(agent.delivery_types)" class="badge bg-success/10 text-success dark:bg-success/15 ml-2">
                             {{dtype}}
                         </span>
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        <span v-for="ptype in JSON.parse(branch.package_types)" class="badge bg-warning/10 text-warning dark:bg-warning/15 ml-2">
+                        <span v-for="ptype in JSON.parse(agent.package_types)" class="badge bg-warning/10 text-warning dark:bg-warning/15 ml-2">
                             {{ptype}}
                         </span>
                     </td>
