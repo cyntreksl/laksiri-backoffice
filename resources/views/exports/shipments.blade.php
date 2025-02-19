@@ -202,7 +202,7 @@
                         @endphp
 
                         @foreach ($item[9] as $package)
-                            {{ $package['quantity'] }}-{{ $package['package_type'] }}
+                            {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
                         @endforeach
                         <br style="margin-bottom:5px;"/>
                     </td>
