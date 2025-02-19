@@ -73,6 +73,8 @@ class LoadedContainerManifestExport
                 $mhbl->consignee->mobile_number ?? '',
                 $hblPackages ?? [],
                 $mhbl->hbls[0]->paid_amount > 0 ? 'PAID' : 'UNPAID',
+                '',
+                '',
                 $warehouse,
             ];
         }
