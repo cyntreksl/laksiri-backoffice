@@ -559,7 +559,7 @@ const shipIcon = ref(`
 `);
 </script>
 <template>
-    <DestinationAppLayout v-if="$page.props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Container List">
+    <AppLayout v-if="$page.props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Container List">
         <template #header>Container List</template>
 
         <Breadcrumb/>
@@ -1047,7 +1047,7 @@ const shipIcon = ref(`
 
             </template>
         </FilterDrawer>
-    </DestinationAppLayout>
+    </AppLayout>
 
     <AppLayout v-else title="Container List">
         <template #header>Container List</template>

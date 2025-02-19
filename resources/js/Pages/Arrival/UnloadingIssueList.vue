@@ -364,7 +364,7 @@ const handlePerPageChange = (event) => {
 };
 </script>
 <template>
-    <DestinationAppLayout v-if="usePage().props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Unloading Issues">
+    <AppLayout v-if="usePage().props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Unloading Issues">
         <template #header>Unloading Issues</template>
 
         <Breadcrumb/>
@@ -503,7 +503,7 @@ const handlePerPageChange = (event) => {
             :show="imageImageViewModal"
             @close="closeShowHBLModal"
         />
-    </DestinationAppLayout>
+    </AppLayout>
 
     <AppLayout v-else title="Unloading Issues">
         <template #header>Unloading Issues</template>

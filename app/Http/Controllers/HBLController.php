@@ -313,7 +313,7 @@ class HBLController extends Controller
 
     public function showDraftList()
     {
-        $this->authorize('hbls.index');
+        $this->authorize('hbls.show draft hbls');
 
         return Inertia::render('HBL/HBLDraftList', [
             'users' => $this->userRepository->getUsers(),

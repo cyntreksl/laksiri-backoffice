@@ -4,6 +4,7 @@ import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { computed } from "vue";
 import DashboardCard from "@/Components/Widgets/DashboardCard.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 
 const props = defineProps({
     cashierQueue: {
@@ -24,7 +25,7 @@ const filteredCashierQueue = computed(() => {
 </script>
 
 <template>
-    <DestinationAppLayout title="Queue List">
+    <AppLayout title="Queue List">
         <template #header>Queue List</template>
 
         <Breadcrumb />
@@ -57,5 +58,5 @@ const filteredCashierQueue = computed(() => {
         <div v-else class="flex justify-center mt-20 w-full">
             <p class="text-xl">No Tokens Available</p>
         </div>
-    </DestinationAppLayout>
+    </AppLayout>
 </template>

@@ -3,6 +3,7 @@ import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {onMounted, reactive, ref} from "vue";
 import {Grid} from "gridjs";
+import AppLayout from "@/Layouts/AppLayout.vue";
 
 const wrapperRef = ref(null);
 let grid = null;
@@ -119,7 +120,7 @@ const constructUrl = () => {
 </script>
 
 <template>
-    <DestinationAppLayout title="Verified Queue List">
+    <AppLayout title="Verified Queue List">
         <template #header>Verified Queue List</template>
 
         <Breadcrumb />
@@ -145,5 +146,5 @@ const constructUrl = () => {
                 </div>
             </div>
         </div>
-    </DestinationAppLayout>
+    </AppLayout>
 </template>

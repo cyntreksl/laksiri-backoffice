@@ -740,7 +740,7 @@ const shipIcon = ref(`
 `);
 </script>
 <template>
-    <DestinationAppLayout title="Door to Door HBL List">
+    <AppLayout title="Door to Door HBL List">
         <template #header>Door to Door HBL List</template>
 
         <Breadcrumb/>
@@ -1242,5 +1242,5 @@ const shipIcon = ref(`
             :hbl-id="hblId"
             :show="showConfirmViewCallFlagModal"
             @close="closeCallFlagModal"/>
-    </DestinationAppLayout>
+    </AppLayout>
 </template>
