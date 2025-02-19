@@ -53,8 +53,8 @@ class PickupController extends Controller
     {
         $limit = $request->input('limit', 10);
         $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $order = $request->input('order', 'pickup_date');
+        $dir = $request->input('dir', 'desc');
         $search = $request->input('search', null);
 
         $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate']);
