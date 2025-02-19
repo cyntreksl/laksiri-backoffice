@@ -114,7 +114,7 @@
                 </th>
             </tr>
             <tr>
-                <th colspan="1">
+                <th>
                     <strong>VESSEL:</strong>
                 </th>
                 <th colspan="2">
@@ -159,18 +159,21 @@
                 </th>
             </tr>
             <tr>
-                <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px; border-bottom: none">
                     <strong> NO OF PKG   {{ number_format($total_nototal, 0) }} </strong>
                 </th>
-                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px; border-bottom: none">
                     <strong> TOTAL VOLUME  {{ number_format($total_vtotal, 2) }} </strong>
                 </th>
-                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px; border-bottom: none">
                     <strong> TOTAL WEIGHT:KG                 {{ number_format($total_gtotal, 2) }} </strong>
                 </th>
             </tr>
-
+            </thead>
             @endif
+    </table>
+    <table>
+        <thead>
             <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: #D8D8D8  ;">
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">SR NO</th>
                 <th>HBL NO</th>
@@ -192,37 +195,31 @@
                     <td rowspan="2" style="border-right:none ;vertical-align: top"> {{ $item[0]}} </td>
                     <td rowspan="2" style="border-left:none;vertical-align: top">{{ $item[1]}} {{ $item[2]}} <br>  {{ $item[3]}} <br> {{ $item[4]}}</td>
                     <td rowspan="2" style="vertical-align: top">{{ $item[5] }} <br> {{ $item[6] }} <br> {{ $item[7] }} <br> {{ $item[8] }} </td>
-                    <td style="vertical-align: top; font-size: 13px;" >
+                    <td colspan="4" style="vertical-align: top; font-size: 13px; padding: 0 !important;">
                         @php
                             $totalQuantity = collect($item[9])->sum('quantity');
                             $totalVolume = collect($item[9])->sum('volume');
                             $totalWeight = collect($item[9])->sum('weight');
 
-                            $hblweight = $total_gtotal/$total_vtotal*$totalVolume;
+                            $hblweight = $total_gtotal / $total_vtotal * $totalVolume;
                         @endphp
 
-                        @foreach ($item[9] as $package)
-                            {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
-                        @endforeach
-                        <br style="margin-bottom:5px;"/>
-                    </td>
-                    <td style="vertical-align: top">
-                        @foreach ($item[9] as $package)
-                            {{ $package['quantity'] }}<br>
-                        @endforeach
-
-                    </td>
-                    <td style="vertical-align: top">
-                        @foreach ($item[9] as $package)
-                            {{ $package['volume'] }}<br>
-                        @endforeach
-
-                    </td>
-                    <td style="vertical-align: top">
-                        @foreach ($item[9] as $package)
-                            {{ $package['weight'] }}<br>
-                        @endforeach
-
+                        <table style="width: 100%; border-collapse: collapse; border: none; table-layout: fixed;">
+                            @foreach ($item[9] as $package)
+{{--                                <tr>--}}
+{{--                                    <td style="padding-left: 4px; padding-right: 5px;text-align: left; width: 21% !important; border-left: none ; border-top: none; border-bottom: none">{{ $package['quantity'] }}-{{ $package['package_type'] }}</td>--}}
+{{--                                    <td style="text-align: center; width: 17%; border-top: none; border-bottom: none">{{ $package['quantity'] }}</td>--}}
+{{--                                    <td style="text-align: center; width: 22%; border-top: none; border-bottom: none">{{ $package['volume'] }}</td>--}}
+{{--                                    <td style="text-align: center; width: 40%; border-top: none; border-right: none; border-bottom: none">{{ $package['weight'] }}</td>--}}
+{{--                                </tr>--}}
+                                <tr>
+                                    <td style="text-align: left; width: 27% !important; border-left: none; border-top: none; border-bottom: none; padding: 0;">{{ $package['quantity'] }}-{{ $package['package_type'] }}</td>
+                                    <td style="text-align: center; width: 17% !important; border-top: none; border-bottom: none; padding: 0;">{{ $package['quantity'] }}</td>
+                                    <td style="text-align: center; width: 22% !important; border-top: none; border-bottom: none; padding: 0;">{{ $package['volume'] }}</td>
+                                    <td style="text-align: center; width: 34% !important; border-top: none; border-right: none; border-bottom: none; padding: 0;">{{ $package['weight'] }}</td>
+                                </tr>
+                            @endforeach
+                        </table>
                     </td>
                     <td rowspan="2">  PERSONAL<br>      EFFECT</td>
                     <td rowspan="2">
