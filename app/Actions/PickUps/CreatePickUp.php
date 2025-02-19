@@ -25,7 +25,7 @@ class CreatePickUp
             'address' => Str::title($data['address']),
             'location_name' => $data['location'] ?? null,
             'zone_id' => $data['zone_id'] ?? null,
-            'notes' => Str::title($data['notes']),
+            'notes' => json_encode($data['notes']),
             'pickup_date' => $data['pickup_date'],
             'pickup_time_start' => $data['pickup_time_start'],
             'pickup_time_end' => $data['pickup_time_end'],

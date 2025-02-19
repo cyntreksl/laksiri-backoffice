@@ -58,7 +58,7 @@ const form = useForm({
     email: "",
     contact_number: computed(() => countryCode.value + contactNumber.value),
     address: "",
-    note_type: null,
+    note_type: [],
     notes: "",
     pickup_type: "",
     pickup_note: "",
@@ -267,7 +267,7 @@ const shipIcon = ref(`
                                         type="text"
                                     />
                                 </div>
-                                <InputError :message="form.errors.contact_number"/>
+                                <InputError class="col-span-3" :message="form.errors.contact_number"/>
                             </div>
 
                             <div class="col-span-2">
@@ -300,15 +300,15 @@ const shipIcon = ref(`
                                     <span v-if="packageTypes.length === 0" class="text-red-500">Please add at least one package type for create job.</span>
                                     <select
                                         v-model="form.note_type"
-                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        autocomplete="off"
+                                        class="mt-1.5 w-full"
+                                        multiple
+                                        placeholder="Select One..."
+                                        x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
                                     >
-                                        <option :value="null" disabled>Select One</option>
-                                        <option
-                                            v-for="packageType in packageTypes"
-                                            :key="packageType"
-                                            :value="packageType.name"
-                                        >
-                                            {{ packageType.name }}
+                                        <option value="">Select One...</option>
+                                        <option v-for="(packageType, index) in packageTypes" :key="index"
+                                                :value="packageType.name">{{ packageType.name }}
                                         </option>
                                     </select>
                                 </label>
@@ -318,12 +318,13 @@ const shipIcon = ref(`
                             <div class="col-span-2">
                                 <InputLabel value="Packages"/>
                                 <label class="block">
-                  <textarea
-                      v-model="form.notes"
-                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                      placeholder="Type Packages here..."
-                      rows="4"
-                  ></textarea>
+                                  <textarea
+                                      v-model="form.notes"
+                                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                      placeholder="Type Packages here..."
+                                      rows="4"
+                                      disabled
+                                  ></textarea>
                                 </label>
                                 <InputError :message="form.errors.notes"/>
                             </div>
