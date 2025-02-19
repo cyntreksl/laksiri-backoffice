@@ -9,6 +9,7 @@ import ReviewModal from "@/Pages/Arrival/Partials/ReviewModal.vue";
 import WarningButton from "@/Components/WarningButton.vue";
 import CreateUnloadingIssueModal from "@/Pages/Arrival/Partials/CreateUnloadingIssueModal.vue";
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 
 const props = defineProps({
     container: {
@@ -238,7 +239,7 @@ const reviewContainer = () => {
 </script>
 
 <template>
-    <DestinationAppLayout title="Unloading Point">
+    <AppLayout title="Unloading Point">
         <template #header>Unloading Point</template>
 
         <main class="kanban-app w-full">
@@ -1059,7 +1060,7 @@ const reviewContainer = () => {
         />
 
         <CreateUnloadingIssueModal :hbl-package-id="hblPackageId" :show="showUnloadingIssueModal" @close="showUnloadingIssueModal = false"/>
-    </DestinationAppLayout>
+    </AppLayout>
 </template>
 
 <style scoped>

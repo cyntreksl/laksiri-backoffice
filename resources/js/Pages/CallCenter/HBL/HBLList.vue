@@ -12,6 +12,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 
 const props = defineProps({
     users: {
@@ -824,7 +825,7 @@ const shipIcon = ref(`
 </script>
 
 <template>
-    <DestinationAppLayout title="HBL List">
+    <AppLayout title="HBL List">
         <template #header>HBL List</template>
 
         <Breadcrumb />
@@ -1256,5 +1257,5 @@ const shipIcon = ref(`
             :show="showConfirmViewHBLModal"
             @close="closeModal"
         />
-    </DestinationAppLayout>
+    </AppLayout>
 </template>

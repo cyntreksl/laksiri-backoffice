@@ -54,7 +54,7 @@
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
                             <!-- Pickup -->
                             <a
-                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('pickups'))"
+                                v-if="$page.props.user.permissions.includes('pickups.create') || $page.props.user.permissions.includes('pickups.index') || $page.props.user.permissions.includes('pickups.show pickup exceptions') || $page.props.user.permissions.includes('pickups.show pickup order') || $page.props.user.permissions.includes('pickups.pending pickups')"
                                 :class="[
                 activeMenu === 'pickups' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -87,7 +87,7 @@
                             </a>
                             <!-- HBL -->
                             <a
-                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('hbls'))"
+                                v-if="$page.props.user.permissions.includes('delivers.show deliver order') || $page.props.user.permissions.includes('hbls.show draft hbls') || $page.props.user.permissions.includes('hbls.show cancelled hbls') || $page.props.user.permissions.includes('mhbls.index') || $page.props.user.permissions.includes('hbls.index') || $page.props.user.permissions.includes('hbls.create')"
                                 :class="[
                 activeMenu === 'hbls' ? 'bg-primary/10 text-primary' : '',
               ]"

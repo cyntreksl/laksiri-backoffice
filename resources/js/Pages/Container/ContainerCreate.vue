@@ -1,5 +1,5 @@
 <template>
-  <DestinationAppLayout v-if="$page.props.currentBranch.type === 'Destination'" title="Container Create">
+  <AppLayout v-if="$page.props.currentBranch.type === 'Destination'" title="Container Create">
     <template #header>Container Create</template>
     <Breadcrumb></Breadcrumb>
 
@@ -356,7 +356,7 @@
         </div>
       </div>
     </form>
-  </DestinationAppLayout>
+  </AppLayout>
 
     <AppLayout v-else title="Container Create">
         <template #header>Container Create</template>

@@ -371,7 +371,7 @@ const reviewContainer = () => {
 </script>
 
 <template>
-    <DestinationAppLayout v-if="$page.props.currentBranch.type === 'Destination'" title="Loading Points">
+    <AppLayout v-if="$page.props.currentBranch.type === 'Destination'" title="Loading Points">
         <template #header>Loading Points</template>
 
         <main class="kanban-app w-full">
@@ -1174,7 +1174,7 @@ const reviewContainer = () => {
             :loadedMHBLs="loadedMHBLs"
             :show="showReviewModal"
             @close="showReviewModal = false"/>
-    </DestinationAppLayout>
+    </AppLayout>
 
     <AppLayout v-else title="Loading Points">
         <template #header>Loading Points</template>

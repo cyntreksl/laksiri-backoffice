@@ -30,7 +30,9 @@ class HBLController extends Controller
      */
     public function index()
     {
-        $this->authorize('hbls.index');
+        if (! auth()->user()->canAny(['hbls.index', 'customer-queue.issue token'])) {
+            abort(403, 'Unauthorized');
+        }
 
         return Inertia::render('CallCenter/HBL/HBLList', [
             'users' => $this->userRepository->getUsers(['customer']),
