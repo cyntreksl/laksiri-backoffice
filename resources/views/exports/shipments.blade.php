@@ -80,6 +80,7 @@
 <body>
 
 @php
+    $serial_number = 1;
     $itemsPerPage = 6; // Number of rows per page
     $chunks = array_chunk($data, $itemsPerPage); // Split data into chunks of $itemsPerPage
     $total_nototal = 0;
@@ -101,12 +102,11 @@
         @if ($chunkIndex === 0)
             <thead>
             <tr>
-                <th colspan="11" >
-                    <strong>
-                   OBL  {{$container?->bl_number}}                                                   UNIVERSAL FREIGHT SERVICES
-                                                  REFERENCE NUMBER {{$container?->reference}}
-                    </strong>
+                <th colspan="3" style="border-right: none;">
+                    <strong>OBL  {{$container?->bl_number}}</strong>
                 </th>
+                <th colspan="4" style="border-left: none; border-right: none !important; text-align: center">UNIVERSAL FREIGHT SERVICES</th>
+                <th colspan="4" style="border-left: none; text-align: right">SHIPMENT N0 {{$container?->reference}}</th>
             </tr>
             <tr>
                 <th colspan="11" style="background-color: #D8D8D8 ; text-align: center; ">
@@ -114,23 +114,26 @@
                 </th>
             </tr>
             <tr>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    VESSEL: {{$container?->vessel_name}} <br>
+                <th colspan="1">
+                    <strong>VESSEL:</strong>
                 </th>
-                <th colspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    DATE LOADED:   {{$container?->loading_started_at}} <br>
+                <th colspan="2">
+                    <strong>{{$container?->vessel_name}}</strong>
                 </th>
-                <th colspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    VOYAGE: <br>
+                <th colspan="4">
+                    <strong>DATE LOADED:   {{$container?->loading_started_at}} <br></strong>
                 </th>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    {{$container?->voyage_number}}   <br>
+                <th colspan="1">
+                    <strong>VOYAGE: <br></strong>
                 </th>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    ETA:   <br>
+                <th colspan="1">
+                    <strong>{{$container?->voyage_number}}   <br></strong>
                 </th>
-                <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    {{$container?->estimated_time_of_arrival}}    <br>
+                <th colspan="1" >
+                    <strong>ETA:   <br></strong>
+                </th>
+                <th colspan="1">
+                    <strong>{{$container?->estimated_time_of_arrival}}    <br></strong>
                 </th>
             </tr>
 
