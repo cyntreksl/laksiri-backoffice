@@ -15,6 +15,10 @@ const props = defineProps({
         default: () => {
         },
     },
+    pickup: {
+        type: Object,
+        default: () => ({}),
+    },
     showAuditDetails: {
         type: Boolean,
         default: true,
@@ -24,6 +28,13 @@ const props = defineProps({
         default: true,
     },
 })
+watch(
+    () => props.pickup,
+    (newVal) => {
+        console.log("Pickup data updated in child:", newVal);
+    },
+    { immediate: true }
+);
 
 const pickupStatus = ref([]);
 const hblStatus = ref([]);
@@ -33,7 +44,8 @@ const fetchPickupStatus = async () => {
     isLoadingPickupStatus.value = true;
 
     try {
-        const response = await fetch(`get-pickup-status/${props.hbl?.id}`, {
+        const id = props.hbl.id ? props.hbl.id : props.pickup?.id;
+        const response = await fetch(`get-pickup-status/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -276,6 +288,13 @@ watch(() => props.hbl, (newVal) => {
     }
 });
 
+watch(() => props.pickup, (newVal) => {
+    if (newVal !== undefined) {
+        fetchPickupStatus();
+        fetchHBLStatus();
+    }
+});
+
 onMounted(() => {
     if (props.hbl !== null && props.hbl.id !== undefined) {
         fetchPickupStatus();
@@ -340,7 +359,6 @@ onMounted(() => {
                             </div>
                             <span class="font-medium text-slate-700 dark:text-navy-100">Pickup Status</span>
                         </div>
-
                         <div v-if="pickupStatus.length > 0" class="mt-5">
                             <ol class="timeline max-w-sm">
                                 <li v-for="(log, index) in pickupStatus" class="timeline-item">

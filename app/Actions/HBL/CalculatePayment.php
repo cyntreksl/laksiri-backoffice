@@ -72,7 +72,7 @@ class CalculatePayment
                 'per_freight_charge' => 0.0,
                 'freight_operator' => '',
                 'price_mode' => 'Package',
-                'grand_total_without_discount' => 0.0,
+                'grand_total_without_discount' => number_format((float) $package_charges, 3, '.', ''),
             ];
 
         } else {

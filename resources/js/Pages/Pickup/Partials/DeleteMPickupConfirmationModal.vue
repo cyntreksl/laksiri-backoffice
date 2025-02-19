@@ -1,27 +1,32 @@
 <script setup>
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import DangerButton from "@/Components/DangerButton.vue";
 
 const props = defineProps({
     show: {
         type: Boolean,
         default: false,
     },
+    countOfSelectedData: {
+        type: Number,
+        required: true,
+    }
 });
 
-const emit = defineEmits(['close', 'retryPickup']);
+const emit = defineEmits(['close', 'delete-mpickups']);
+
 
 </script>
 
 <template>
     <ConfirmationModal :show="show">
         <template #title>
-            Retry Pickup?
+            {{countOfSelectedData}} Delete Pickup Exceptions?
         </template>
 
         <template #content>
-            Are you sure you want to Retry Job?
+            Would you like to delete this pickup exception record(s)?
         </template>
 
         <template #footer>
@@ -30,9 +35,10 @@ const emit = defineEmits(['close', 'retryPickup']);
                     Cancel
                 </SecondaryButton>
 
-                <PrimaryButton @click="$emit('retryPickup')">
-                    Retry
-                </PrimaryButton>
+                <DangerButton @click="$emit('delete-mpickups')">
+                    Delete Pickup
+                </DangerButton>
+
             </div>
         </template>
     </ConfirmationModal>
