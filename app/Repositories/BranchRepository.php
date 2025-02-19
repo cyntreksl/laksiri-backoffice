@@ -2,7 +2,9 @@
 
 namespace App\Repositories;
 
+use App\Actions\Branch\CreateAgent;
 use App\Actions\Branch\CreateBranch;
+use App\Actions\Branch\GetAgent;
 use App\Actions\Branch\GetBranches;
 use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\Branch\GetUserBranches;
@@ -36,4 +38,16 @@ class BranchRepository implements BranchRepositoryInterface
     {
         return GetUserBranches::run();
     }
+
+    public function getBranchesByType(bool $isAgent)
+    {
+        return GetAgent::run();
+    }
+
+    public function createAgent(array $data)
+    {
+        return CreateAgent::run($data);
+    }
+
+
 }

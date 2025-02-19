@@ -31,6 +31,7 @@ class StoreBranchRequest extends FormRequest
             'cargo_modes' => ['required'],
             'delivery_types' => ['required'],
             'package_types' => ['required'],
+            'is_third_party_agent' => ['boolean','nullable'],
         ];
     }
 }

@@ -387,5 +387,24 @@ Breadcrumbs::for('setting.shipper-consignees.edit', function (BreadcrumbTrail $t
     $trail->push('Shipper & Consignees', route('setting.shipper-consignees.index'));
     $trail->push('Edit Officer', route('setting.shipper-consignees.edit', $id));
 });
+// Agents > index
+Breadcrumbs::for('agents.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Agent');
+    $trail->push('List', route('agents.index'));
+});
+
+// Agents > Create
+Breadcrumbs::for('agents.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('branches.index');
+    $trail->push('Agent');
+    $trail->push('Create', route('agents.create'));
+});
+// Agents > Edit
+Breadcrumbs::for('agents.edit', function (BreadcrumbTrail $trail, Branch $branch) {
+    $trail->parent('dashboard');
+    $trail->push('Agent');
+    $trail->push('Edit', route('agents.edit', $branch->id));
+});
 
 require_once __DIR__.'/call-center-breadcrumbs.php';
