@@ -56,6 +56,11 @@ class LoadedContainerManifestExport
                     }
                 }
             }
+            $warehouse = $mhbl->hbls[0]->warehouse_id
+                ? ($mhbl->hbls[0]->warehouse_id === 2 ? 'CMB' : ($mhbl->hbls[0]->warehouse_id === 3 ? 'NTR' : null))
+                : ($mhbl->hbls[0]->warehouse
+                    ? ($mhbl->hbls[0]->warehouse === 'COLOMBO' ? 'CMB' : ($mhbl->hbls[0]->warehouse === 'NINTAVUR' ? 'NTR' : null))
+                    : null);
             $data[] = [
                 $mhbl->hbl_number ?: $mhbl->reference,
                 $mhbl->shipper->name ?? '',
@@ -68,12 +73,19 @@ class LoadedContainerManifestExport
                 $mhbl->consignee->mobile_number ?? '',
                 $hblPackages ?? [],
                 $mhbl->hbls[0]->paid_amount > 0 ? 'PAID' : 'UNPAID',
+                $warehouse,
             ];
         }
 
         // HBL packages
         foreach ($loadedHBLPackages as $hblData) {
             $hbl = $hblData['hbl'];
+            $warehouse = $hbl->warehouse_id
+                ? ($hbl->warehouse_id === 2 ? 'CMB' : ($hbl->warehouse_id === 3 ? 'NTR' : null))
+                : ($hbl->warehouse
+                    ? ($hbl->warehouse === 'COLOMBO' ? 'CMB' : ($hbl->warehouse === 'NINTAVUR' ? 'NTR' : null))
+                    : null);
+
             $data[] = [
                 $hbl->hbl_number ?: $hbl->reference,
                 $hbl->hbl_name,
@@ -88,6 +100,7 @@ class LoadedContainerManifestExport
                 $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
                 $hbl->hbl_type,
                 $hbl->other_charge,
+                $warehouse,
             ];
         }
 

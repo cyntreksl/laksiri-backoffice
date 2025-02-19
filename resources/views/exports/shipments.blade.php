@@ -226,7 +226,7 @@
                     </td>
                     <td rowspan="2">  PERSONAL<br>      EFFECT</td>
                     <td rowspan="2">
-                        {{ $container?->target_warehouse == 2 ? 'CMB' : ($container?->target_warehouse == 3 ? 'NTR' : $container?->target_warehouse) }}
+                        {{ $item[13] }}
                     </td>
 
                     <td rowspan="2" style="text-align: center">
