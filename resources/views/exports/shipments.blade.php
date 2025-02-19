@@ -80,7 +80,7 @@
 <body>
 
 @php
-    $serial_number = 1;
+    $serialNumber = 1;
     $itemsPerPage = 6; // Number of rows per page
     $chunks = array_chunk($data, $itemsPerPage); // Split data into chunks of $itemsPerPage
     $total_nototal = 0;
@@ -188,7 +188,7 @@
             <tbody>
             @foreach ($chunk as $index => $item)
                 <tr>
-                    <td rowspan="2">{{ $loop->iteration }}</td>
+                    <td rowspan="2">{{ $serialNumber++ }}</td>
                     <td rowspan="2" style="border-right:none ;vertical-align: top"> {{ $item[0]}} </td>
                     <td rowspan="2" style="border-left:none;vertical-align: top">{{ $item[1]}} {{ $item[2]}} <br>  {{ $item[3]}} <br> {{ $item[4]}}</td>
                     <td rowspan="2" style="vertical-align: top">{{ $item[5] }} <br> {{ $item[6] }} <br> {{ $item[7] }} <br> {{ $item[8] }} </td>
