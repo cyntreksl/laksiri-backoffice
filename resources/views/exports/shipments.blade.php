@@ -205,14 +205,30 @@
                         @endphp
 
                         <table style="width: 100%; border-collapse: collapse; border: none; table-layout: fixed;">
-                            @foreach ($item[9] as $package)
+
+                            @if(count($item[9]) === 1)
                                 <tr>
                                     <td style="padding-left: 4px; text-align: left; width: 32% !important; border-left: none; border-top: none; border-bottom: none;">{{ $package['quantity'] }}-{{ $package['package_type'] }}</td>
                                     <td style="text-align: center; width: 21% !important; border-top: none; border-bottom: none; padding: 0;">{{ $package['quantity'] }}</td>
                                     <td style="text-align: center; width: 27% !important; border-top: none; border-bottom: none; padding: 0;">{{ $package['volume'] }}</td>
                                     <td style="text-align: center; width: 19% !important; border-top: none; border-right: none; border-bottom: none; padding: 0;">{{ $package['weight'] }}</td>
                                 </tr>
-                            @endforeach
+                                <tr>
+                                    <td style="padding-left: 4px; text-align: left; width: 32% !important; border-left: none; border-top: none; border-bottom: none;"> </td>
+                                    <td style="text-align: center; width: 21% !important; border-top: none; border-bottom: none; padding: 0;"> </td>
+                                    <td style="text-align: center; width: 27% !important; border-top: none; border-bottom: none; padding: 0;"> </td>
+                                    <td style="text-align: center; width: 19% !important; border-top: none; border-right: none; border-bottom: none; padding: 0;"> </td>
+                                </tr>
+                            @else
+                                @foreach ($item[9] as $package)
+                                    <tr>
+                                        <td style="padding-left: 4px; text-align: left; width: 32% !important; border-left: none; border-top: none; border-bottom: none;">{{ $package['quantity'] }}-{{ $package['package_type'] }}</td>
+                                        <td style="text-align: center; width: 21% !important; border-top: none; border-bottom: none; padding: 0;">{{ $package['quantity'] }}</td>
+                                        <td style="text-align: center; width: 27% !important; border-top: none; border-bottom: none; padding: 0;">{{ $package['volume'] }}</td>
+                                        <td style="text-align: center; width: 19% !important; border-top: none; border-right: none; border-bottom: none; padding: 0;">{{ $package['weight'] }}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
                         </table>
                     </td>
                     <td rowspan="2">  PERSONAL<br>      EFFECT</td>
