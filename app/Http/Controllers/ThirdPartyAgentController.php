@@ -7,6 +7,7 @@ use App\Enum\CargoType;
 use App\Enum\HBLType;
 use App\Enum\NotificationType;
 use App\Enum\PackageType;
+use App\Http\Requests\StoreAgentRequest;
 use App\Http\Requests\StoreBranchRequest;
 use App\Http\Requests\UpdateBranchRequest;
 use App\Interfaces\BranchRepositoryInterface;
@@ -49,16 +50,12 @@ class ThirdPartyAgentController extends Controller
     /**
      * Store a newly created agent in storage.
      */
-    public function store(StoreBranchRequest $request)
+    public function store(StoreAgentRequest $request)
     {
         $data = $request->all();
-        $data['is_third_party_agent'] = true; // Ensure it's marked as an agent
+        $data['is_third_party_agent'] = true;
 
-        // Dump the data
-
-
-        // Create the branch
-        $this->branchRepository->createBranch($data);
+        $this->branchRepository->createAgent($data);
     }
 
     /**

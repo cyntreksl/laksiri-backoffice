@@ -46,6 +46,7 @@ class BranchRepository implements BranchRepositoryInterface
 
     public function createAgent(array $data)
     {
+
         return CreateAgent::run($data);
     }
 

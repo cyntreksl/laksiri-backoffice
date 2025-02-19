@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreBranchRequest extends FormRequest
+class StoreAgentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -31,6 +31,8 @@ class StoreBranchRequest extends FormRequest
             'cargo_modes' => ['required'],
             'delivery_types' => ['required'],
             'package_types' => ['required'],
+            'is_third_party_agent' => ['nullable'],
         ];
     }
 }
+// Compare this snippet from app/Http/Requests/StoreAgentRequest.php:
