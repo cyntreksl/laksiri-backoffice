@@ -50,10 +50,11 @@
                                 <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
                             </svg>
                         </a>
+
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
                             <!-- Pickup -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
+                                v-if="$page.props.user.permissions.includes('pickups.create') || $page.props.user.permissions.includes('pickups.index') || $page.props.user.permissions.includes('pickups.show pickup exceptions') || $page.props.user.permissions.includes('pickups.show pickup order') || $page.props.user.permissions.includes('pickups.pending pickups')"
                                 :class="[
                 activeMenu === 'pickups' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -86,7 +87,7 @@
                             </a>
                             <!-- HBL -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer')"
+                                v-if="$page.props.user.permissions.includes('delivers.show deliver order') || $page.props.user.permissions.includes('hbls.show draft hbls') || $page.props.user.permissions.includes('hbls.show cancelled hbls') || $page.props.user.permissions.includes('mhbls.index') || $page.props.user.permissions.includes('hbls.index') || $page.props.user.permissions.includes('hbls.create')"
                                 :class="[
                 activeMenu === 'hbls' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -119,7 +120,7 @@
                             </a>
                             <!-- Back Office -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('cash'))"
                                 :class="[
                 activeMenu === 'back-office'
                   ? 'bg-primary/10 text-primary'
@@ -155,9 +156,150 @@
                                     <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16"/>
                                 </svg>
                             </a>
+
+                            <!-- Destination Branch Arrivals -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('arrival')) && $page.props.currentBranch.type === 'Destination'"
+                                :class="[
+                activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Arrivals'"
+                                @click="
+                setMenu('arrival');
+                openSideBar();
+              "
+                            >
+                                <svg
+                                    class="icon icon-tabler icon-tabler-inbox"
+                                    fill="none"
+                                    height="24"
+                                    stroke="#2c3e50"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path
+                                        d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"
+                                    />
+                                    <path d="M4 13h3l3 3h4l3 -3h3"/>
+                                </svg>
+                            </a>
+
+                            <!-- Reception Verifications -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show reception'))"
+                                :class="[
+                activeMenu === 'reception' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Reception'"
+                                @click="
+                setMenu('reception');
+                openSideBar();
+              "
+                            >
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-rubber-stamp"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 17.85h-18c0 -4.05 1.421 -4.05 3.79 -4.05c5.21 0 1.21 -4.59 1.21 -6.8a4 4 0 1 1 8 0c0 2.21 -4 6.8 1.21 6.8c2.369 0 3.79 0 3.79 4.05z" /><path d="M5 21h14" /></svg>
+                            </a>
+
+                            <!-- Document Verifications -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show document'))"
+                                :class="[
+                activeMenu === 'verifications' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Document Verifications'"
+                                @click="
+                setMenu('verifications');
+                openSideBar();
+              "
+                            >
+                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-certificate"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M15 15m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M13 17.5v4.5l2 -1.5l2 1.5v-4.5" /><path d="M10 19h-5a2 2 0 0 1 -2 -2v-10c0 -1.1 .9 -2 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -1 1.73" /><path d="M6 9l12 0" /><path d="M6 12l3 0" /><path d="M6 15l2 0" /></svg>
+                            </a>
+
+                            <!-- Cashier -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show cashier'))"
+                                :class="[
+                activeMenu === 'cashier' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Cashier'"
+                                @click="
+                setMenu('cashier');
+                openSideBar();
+              "
+                            >
+                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-cash-register"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M21 15h-2.5c-.398 0 -.779 .158 -1.061 .439c-.281 .281 -.439 .663 -.439 1.061c0 .398 .158 .779 .439 1.061c.281 .281 .663 .439 1.061 .439h1c.398 0 .779 .158 1.061 .439c.281 .281 .439 .663 .439 1.061c0 .398 -.158 .779 -.439 1.061c-.281 .281 -.663 .439 -1.061 .439h-2.5" /><path d="M19 21v1m0 -8v1" /><path d="M13 21h-7c-.53 0 -1.039 -.211 -1.414 -.586c-.375 -.375 -.586 -.884 -.586 -1.414v-10c0 -.53 .211 -1.039 .586 -1.414c.375 -.375 .884 -.586 1.414 -.586h2m12 3.12v-1.12c0 -.53 -.211 -1.039 -.586 -1.414c-.375 -.375 -.884 -.586 -1.414 -.586h-2" /><path d="M16 10v-6c0 -.53 -.211 -1.039 -.586 -1.414c-.375 -.375 -.884 -.586 -1.414 -.586h-4c-.53 0 -1.039 .211 -1.414 .586c-.375 .375 -.586 .884 -.586 1.414v6m8 0h-8m8 0h1m-9 0h-1" /><path d="M8 14v.01" /><path d="M8 17v.01" /><path d="M12 13.99v.01" /><path d="M12 17v.01" /></svg>
+                            </a>
+
+                            <!-- Boned Area Screens -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show package'))"
+                                :class="[
+                activeMenu === 'package' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Package Queue'"
+                                @click="
+                setMenu('package');
+                openSideBar();
+              "
+                            >
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-package"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" /><path d="M12 12l8 -4.5" /><path d="M12 12l0 9" /><path d="M12 12l-8 -4.5" /><path d="M16 5.25l-8 4.5" /></svg>
+                            </a>
+
+                            <!-- Examination  -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show examination'))"
+                                :class="[
+                activeMenu === 'examination' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Examination'"
+                                @click="
+                setMenu('examination');
+                openSideBar();
+              "
+                            >
+                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-checkup-list"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /><path d="M9 14h.01" /><path d="M9 17h.01" /><path d="M12 16l1 1l3 -3" /></svg>
+                            </a>
+
+                            <!-- Queue Screen -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.endsWith('screen'))"
+                                :class="[
+                activeMenu === 'screens' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Queue Screens'"
+                                @click="
+                setMenu('screens');
+                openSideBar();
+              "
+                            >
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-screen-share" fill="none" height="24" stroke="currentColor"
+                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                     width="24"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M21 12v3a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1h9"/>
+                                    <path d="M7 20l10 0"/>
+                                    <path d="M9 16l0 4"/>
+                                    <path d="M15 16l0 4"/>
+                                    <path d="M17 4h4v4"/>
+                                    <path d="M16 9l5 -5"/>
+                                </svg>
+                            </a>
+
                             <!-- Loading -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('container')) || $page.props.user.permissions.some(permission => permission.startsWith('shipment'))"
                                 :class="[
                 activeMenu === 'loading' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -189,9 +331,9 @@
                                     <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
                                 </svg>
                             </a>
-                            <!-- Arrivals -->
+                            <!-- Departure Branch Arrivals -->
                             <a
-                                v-if="usePage().props.auth.user.roles[0].name !== 'call center'"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('arrival')) && $page.props.currentBranch.type === 'Departure'"
                                 :class="[
                 activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -295,7 +437,7 @@
 <!--                            </a>-->
                             <!-- User Management -->
                             <a
-                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('users')) || $page.props.user.permissions.includes('roles.list')"
                                 :class="[
                 activeMenu === 'users' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -440,53 +582,18 @@
                                         >
                                             <ul class="flex flex-1 flex-col px-4 font-inter">
                                                 <li v-for="item in childMenuList">
-                                                    <template v-if="$page.props.user.roles.includes('viewer')">
-                                                        <template v-if="$page.props.currentBranch.type === 'Destination'">
-                                                            <Link
-                                                                v-if="item.title === 'Shipments Arrivals'"
-                                                                :class="
-                              route().current() === item.route
-                                ? 'font-medium text-primary dark:text-accent-light'
-                                : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50   dark:hover:bg-neutral-500'
-                            "
-                                                                :href="route(item.route)"
-                                                                class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
-                                                            >
-                                                                <sapn class="ml-2"> {{ item.title }}</sapn>
-                                                            </Link>
-                                                        </template>
-                                                    </template>
-                                                    <template v-else>
-                                                        <template
-                                                            v-if="item.title === 'Shipments Arrivals' || item.title === 'Bonded Warehouse'">
-                                                            <template
-                                                                v-if="$page.props.currentBranch.name === 'Colombo'">
-                                                                <Link
-                                                                    :class="
+                                                    <template v-if="true">
+                                                        <Link
+                                                            :class="
                       route().current() === item.route
                         ? 'font-medium text-primary dark:text-accent-light'
                         : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50   dark:hover:bg-neutral-500'
                     "
-                                                                    :href="route(item.route)"
-                                                                    class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
-                                                                >
-                                                                    <span class="ml-2"> {{ item.title }}</span>
-                                                                </Link>
-                                                            </template>
-                                                        </template>
-                                                        <template v-else>
-                                                            <Link
-                                                                :class="
-                  route().current() === item.route
-                    ? 'font-medium text-primary dark:text-accent-light'
-                    : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50   dark:hover:bg-neutral-500'
-                "
-                                                                :href="route(item.route)"
-                                                                class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
-                                                            >
-                                                                <span class="ml-2"> {{ item.title }}</span>
-                                                            </Link>
-                                                        </template>
+                                                            :href="route(item.route)"
+                                                            class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
+                                                        >
+                                                            <span class="ml-2"> {{ item.title }}</span>
+                                                        </Link>
                                                     </template>
                                                 </li>
                                             </ul>
@@ -953,120 +1060,532 @@ export default {
                     changeSidePanelTitle("Dashboard");
                     break;
                 case "pickups":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Create Job",
-                            route: "pickups.create",
-                        },
-                        {
-                            title: "Pending Jobs",
-                            route: "pickups.index",
-                        },
-                        {
-                            title: "Pickup Ordering",
-                            route: "pickups.ordering",
-                        },
-                        {
-                            title: "Pickup Exceptions",
-                            route: "pickups.exceptions",
-                        },
-                        {
-                            title: "All Pickups",
-                            route: "pickups.all",
-                        }
+                    let pickupMenu = [];
 
-                    );
+                    if (usePage().props.user.permissions.includes("pickups.create")) {
+                        pickupMenu.splice(2, 0, { title: "Create Job", route: "pickups.create" });
+                    }
+
+                    if (usePage().props.user.permissions.includes("pickups.pending pickups")) {
+                        pickupMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Pending Jobs",
+                                route: "pickups.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("pickups.show pickup order")) {
+                        pickupMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Pickup Ordering",
+                                route: "pickups.ordering",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("pickups.show pickup exceptions")) {
+                        pickupMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Pickup Exceptions",
+                                route: "pickups.exceptions",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("pickups.index")) {
+                        pickupMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All Pickups",
+                                route: "pickups.all",
+                            }
+                        );
+                    }
+
+                    childMenuList.splice(0, childMenuList.length, ...pickupMenu);
                     changeSidePanelTitle("Pickups");
                     break;
                 case "hbls":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "Create HBL",
-                            route: "hbls.create",
-                        },
-                        {
-                            title: "All HBL",
-                            route: "hbls.index",
-                        },
-                        {
-                            title: "All MHBL",
-                            route: "mhbls.index",
-                        },
-                        {
-                            title: "Door to Door HBL",
-                            route: "hbls.door-to-door-list",
-                        },
-                        {
-                            title: "Cancelled HBL",
-                            route: "hbls.cancelled-hbls",
-                        },
-                        {
-                            title: "Draft HBL",
-                            route: "hbls.draft-list",
-                        }
-                    );
+                    let hblMenu = [];
+
+                    if (usePage().props.user.permissions.includes("hbls.create")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Create HBL",
+                                route: "hbls.create",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("hbls.index")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All HBL",
+                                route: "hbls.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("mhbls.index")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All MHBL",
+                                route: "mhbls.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("hbls.index")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Door to Door HBL",
+                                route: "hbls.door-to-door-list",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("hbls.show cancelled hbls")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Cancelled HBL",
+                                route: "hbls.cancelled-hbls",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("hbls.show draft hbls")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Draft HBL",
+                                route: "hbls.draft-list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("delivers.show deliver order")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Deliver Ordering",
+                                route: "delivery.ordering",
+                            }
+                        );
+                    }
+                    childMenuList.splice(0, childMenuList.length, ...hblMenu);
                     changeSidePanelTitle("HBL");
                     break;
                 case "back-office":
+                    let backOfficeMenu = [];
+
+                    if (usePage().props.user.permissions.includes("cash.index")) {
+                        backOfficeMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Cash Settlements",
+                                route: "back-office.cash-settlements.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("warehouse.index")) {
+                        backOfficeMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Warehouse",
+                                route: "back-office.warehouses.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("cash.index")) {
+                        backOfficeMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Due Payments",
+                                route: "back-office.duepayments.duePaymentIndex",
+                            }
+                        );
+                    }
                     childMenuList.splice(
                         0,
                         childMenuList.length,
-                        {
-                            title: "Cash Settlements",
-                            route: "back-office.cash-settlements.index",
-                        },
-                        {
-                            title: "Warehouse",
-                            route: "back-office.warehouses.index",
-                        },
-                        {
-                            title: "Due Payments",
-                            route: "back-office.duepayments.duePaymentIndex",
-                        }
+                        ...backOfficeMenu
                     );
                     changeSidePanelTitle("Back Office");
                     break;
-                case "loading":
+                case "reception":
+                    let receptionMenu = [];
+
+                    if (usePage().props.user.permissions.includes("customer-queue.issue token")) {
+                        receptionMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Issue tokens",
+                                route: "call-center.reception.queue.hbl-list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show reception calling queue")) {
+                        receptionMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Receptionist Queue",
+                                route: "call-center.reception.queue.list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show reception verified list")) {
+                        receptionMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Verified List",
+                                route: "call-center.reception.show.verified",
+                            }
+                        );
+                    }
                     childMenuList.splice(
                         0,
                         childMenuList.length,
-                        {
-                            title: "Containers",
-                            route: "loading.loading-containers.index",
-                        },
-                        // {
-                        //     title: "Manual Loading",
-                        //     route: "loading.manual-loadings.index",
-                        // },
-                        {
-                            title: "Loaded Shipment",
-                            route: "loading.loaded-containers.index",
-                        }
+                        ...receptionMenu
+                    );
+                    changeSidePanelTitle("Reception Verifications");
+                    break;
+                case "verifications":
+                    let verificationMenu = [];
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show document verification queue")) {
+                        verificationMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Document Verification Queue",
+                                route: "call-center.verification.queue.list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show document verified list")) {
+                        verificationMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Verified List",
+                                route: "call-center.verification.show.verified",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...verificationMenu
+                    );
+                    changeSidePanelTitle("Document Verifications");
+                    break;
+                case "cashier":
+                    let cashierMenu = [];
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show cashier calling queue")) {
+                        cashierMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Cashier Queue",
+                                route: "call-center.cashier.queue.list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show cashier paid list")) {
+                        cashierMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Paid List",
+                                route: "call-center.cashier.show.paid",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...cashierMenu
+                    );
+                    changeSidePanelTitle("Cashier");
+                    break;
+                case "package":
+                    let packageMenu = [];
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show package calling screen")) {
+                        packageMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Package Calling Screen",
+                                route: "call-center.queue.screens.package",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show package calling queue")) {
+                        packageMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Package Calling Queue",
+                                route: "call-center.package.queue.list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show package released list")) {
+                        packageMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Released List",
+                                route: "call-center.package.show.released.list",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...packageMenu
+                    );
+                    changeSidePanelTitle("Package Queue");
+                    break;
+                case "examination":
+                    let examinationMenu = [];
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show document verification queue")) {
+                        examinationMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Examination Queue",
+                                route: "call-center.examination.queue.list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show document verified list")) {
+                        examinationMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Gate Pass List",
+                                route: "call-center.examination.show.gate-pass",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...examinationMenu
+                    );
+                    changeSidePanelTitle("Examination");
+                    break;
+                case "screens":
+                    let screenMenu = [];
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show document verification calling screen")) {
+                        screenMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Document Verification Queue",
+                                route: "call-center.queue.screens.document-verification",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show cashier calling screen")) {
+                        screenMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Cashier Queue",
+                                route: "call-center.queue.screens.cashier",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("customer-queue.show examination calling screen")) {
+                        screenMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Examination Queue",
+                                route: "call-center.queue.screens.examination",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...screenMenu
+                    );
+                    changeSidePanelTitle("Queue Screens");
+                    break;
+                case "loading":
+                    let loadingMenu = [];
+                    if (usePage().props.user.permissions.includes("container.index")) {
+                        loadingMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Containers",
+                                route: "loading.loading-containers.index",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("shipment.index")) {
+                        loadingMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Loaded Shipment",
+                                route: "loading.loaded-containers.index",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...loadingMenu
                     );
                     changeSidePanelTitle("Loading");
                     break;
                 case "arrival":
+                    let arrivalMenu = [];
+
+                    if (usePage().props.user.permissions.includes("arrivals.index") && usePage().props.currentBranch.type === 'Destination') {
+                        arrivalMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Shipments Arrivals",
+                                route: "arrival.shipments-arrivals.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("bonded.index") && usePage().props.currentBranch.type === 'Destination') {
+                        arrivalMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Bonded Warehouse",
+                                route: "arrival.bonded-warehouses.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("issues.index")) {
+                        arrivalMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Unloading Issues",
+                                route: "arrival.unloading-issues.index",
+                            }
+                        );
+                    }
+
                     childMenuList.splice(
                         0,
                         childMenuList.length,
-                        {
-                            title: "Shipments Arrivals",
-                            route: "arrival.shipments-arrivals.index",
-                        },
-                        {
-                            title: "Bonded Warehouse",
-                            route: "arrival.bonded-warehouses.index",
-                        },
-                        {
-                            title: "Unloading Issues",
-                            route: "arrival.unloading-issues.index",
-                        }
+                        ...arrivalMenu
                     );
                     changeSidePanelTitle("Arrivals");
+                    break;
+                case "users":
+                    let userMenu = [];
+
+                    if (usePage().props.user.permissions.includes("users.list")) {
+                        userMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "System Users",
+                                route: "users.index",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("users.list")) {
+                        userMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Drivers",
+                                route: "users.drivers.index",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("users.list")) {
+                        userMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Customers",
+                                route: "users.customers.index",
+                            }
+                        );
+                    }
+                    // if (usePage().props.user.permissions.includes("issues.index")) {
+                    //     userMenu.splice(
+                    //         2,
+                    //         0,
+                    //         {
+                    //             title: "Driver Tracking",
+                    //             route: "users.driver-tracings.index",
+                    //         }
+                    //     );
+                    // }
+
+                    if (usePage().props.user.permissions.includes("roles.list")) {
+                        userMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Roles & Permissions",
+                                route: "users.roles.index",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...userMenu
+                    );
+                    changeSidePanelTitle("Users");
                     break;
                 case "delivery":
                     childMenuList.splice(
@@ -1093,33 +1612,6 @@ export default {
                         route: "report.payment-summaries.index",
                     });
                     changeSidePanelTitle("Report");
-                    break;
-                case "users":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        {
-                            title: "System Users",
-                            route: "users.index",
-                        },
-                        {
-                            title: "Drivers",
-                            route: "users.drivers.index",
-                        },
-                        {
-                            title: "Customers",
-                            route: "users.customers.index",
-                        },
-                        // {
-                        //     title: "Driver Tracking",
-                        //     route: "users.driver-tracings.index",
-                        // },
-                        {
-                            title: "Roles & Permissions",
-                            route: "users.roles.index",
-                        }
-                    );
-                    changeSidePanelTitle("Users");
                     break;
                 case "setting":
                     childMenuList.splice(

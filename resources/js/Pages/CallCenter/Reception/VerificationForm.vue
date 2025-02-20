@@ -10,6 +10,7 @@ import {ref} from "vue";
 import {push} from "notivue";
 import moment from "moment";
 import HBLDetailContent from "@/Pages/Common/Partials/HBLDetailContent.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 
 const props = defineProps({
     verificationDocuments: {
@@ -160,7 +161,7 @@ getHBLPayments();
 </script>
 
 <template>
-    <DestinationAppLayout title="Reception Verification">
+    <AppLayout title="Reception Verification">
         <template #header>Reception Verification</template>
 
         <!-- Breadcrumb -->
@@ -297,7 +298,7 @@ getHBLPayments();
 
 
         <VerifyConfirmationModal :show="showConfirmVerifyModal" @close="closeModal" @verify-customer="handleReceptionVerify"/>
-    </DestinationAppLayout>
+    </AppLayout>
 </template>
 
 <style>

@@ -10,6 +10,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {push} from "notivue";
 import InputLabel from "@/Components/InputLabel.vue";
 import HBLDetailContent from "@/Pages/Common/Partials/HBLDetailContent.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 const props = defineProps({
     customerQueue: {
         type: Object,
@@ -153,7 +154,7 @@ const handleUpdatePayment = () => {
 </script>
 
 <template >
-    <DestinationAppLayout title="Settle Payments">
+    <AppLayout title="Settle Payments">
         <template #header>Settle Payments</template>
 
         <!-- Breadcrumb -->
@@ -305,7 +306,7 @@ const handleUpdatePayment = () => {
                 </div>
             </div>
         </div>
-    </DestinationAppLayout>
+    </AppLayout>
 </template>
 
 <style>

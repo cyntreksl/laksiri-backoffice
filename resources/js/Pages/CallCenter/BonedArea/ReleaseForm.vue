@@ -7,6 +7,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {push} from "notivue";
 import InputLabel from "@/Components/InputLabel.vue";
 import {ref} from "vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 
 const props = defineProps({
     packageQueue: {
@@ -71,7 +72,7 @@ const handleUpdateReleasePackages = () => {
 </script>
 
 <template>
-    <DestinationAppLayout title="Package Release">
+    <AppLayout title="Package Release">
         <template #header>Package Release</template>
 
         <!-- Breadcrumb -->
@@ -135,5 +136,5 @@ const handleUpdateReleasePackages = () => {
                 </div>
             </div>
         </div>
-    </DestinationAppLayout>
+    </AppLayout>
 </template>

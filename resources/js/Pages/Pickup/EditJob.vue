@@ -44,7 +44,7 @@ const form = useForm({
     email: props.pickup.email,
     contact_number: props.pickup.contact_number,
     address: props.pickup.address,
-    note_type: props.pickup.notes,
+    note_type: JSON.parse(props.pickup.package_types) || [],
     notes: props.pickup.notes,
     pickup_type: props.pickup.pickup_type,
     pickup_note: props.pickup.pickup_note,
@@ -285,15 +285,15 @@ const shipIcon = ref(`
                                     <InputLabel value="Package Type"/>
                                     <select
                                         v-model="form.note_type"
-                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        autocomplete="off"
+                                        class="mt-1.5 w-full"
+                                        multiple
+                                        placeholder="Select One..."
+                                        x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
                                     >
-                                        <option :value="null" disabled>Select One</option>
-                                        <option
-                                            v-for="packageType in packageTypes"
-                                            :key="packageType"
-                                            :value="packageType.name"
-                                        >
-                                            {{ packageType.name }}
+                                        <option value="">Select One...</option>
+                                        <option v-for="(packageType, index) in packageTypes" :key="index"
+                                                :value="packageType.name">{{ packageType.name }}
                                         </option>
                                     </select>
                                 </label>

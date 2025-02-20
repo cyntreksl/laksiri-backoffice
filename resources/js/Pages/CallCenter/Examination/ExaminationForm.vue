@@ -8,6 +8,7 @@ import {push} from "notivue";
 import InputLabel from "@/Components/InputLabel.vue";
 import { ref } from "vue";
 import HBLDetailContent from "@/Pages/Common/Partials/HBLDetailContent.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 
 const props = defineProps({
     customerQueue: {
@@ -140,7 +141,7 @@ const handleUpdateReleaseHBLPackages = () => {
 </script>
 
 <template>
-    <DestinationAppLayout title="Release HBL Package">
+    <AppLayout title="Release HBL Package">
         <template #header>Release HBL Package</template>
 
         <!-- Breadcrumb -->
@@ -217,7 +218,7 @@ const handleUpdateReleaseHBLPackages = () => {
                 </div>
             </div>
         </div>
-    </DestinationAppLayout>
+    </AppLayout>
 </template>
 
 <style>

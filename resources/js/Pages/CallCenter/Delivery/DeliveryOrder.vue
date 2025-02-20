@@ -128,7 +128,7 @@ const closeModal = () => {
 </script>
 
 <template>
-    <DestinationAppLayout title="Pending Pickups">
+    <AppLayout title="Pending Pickups">
         <template #header>Pending Pickups</template>
 
         <Breadcrumb/>
@@ -364,5 +364,5 @@ const closeModal = () => {
             :show="showConfirmViewHBLModal"
             @close="closeModal"
         />
-    </DestinationAppLayout>
+    </AppLayout>
 </template>

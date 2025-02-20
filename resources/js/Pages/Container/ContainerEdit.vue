@@ -76,7 +76,7 @@ const handleCreate = () => {
 
 </script>
 <template>
-  <DestinationAppLayout v-if="$page.props.currentBranch.type === 'Destination'" title="Container Edit">
+  <AppLayout v-if="$page.props.currentBranch.type === 'Destination'" title="Container Edit">
     <template #header>Container Edit</template>
     <Breadcrumb :container="container"/>
 
@@ -402,7 +402,7 @@ const handleCreate = () => {
         </div>
       </div>
     </form>
-  </DestinationAppLayout>
+  </AppLayout>
 
     <AppLayout v-else title="Container Edit">
         <template #header>Container Edit</template>

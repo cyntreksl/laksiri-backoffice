@@ -12,6 +12,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 
 const props = defineProps({
     users: {
@@ -392,34 +393,26 @@ const createColumns = () => [
                                 "'Download Baggage PDF'",
                         },
                         [
-                            h(
-                                "svg",
+                            h('svg',
                                 {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-download",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2",
-                                    }),
-                                    h("path", {
-                                        d: "M7 11l5 5l5 -5",
-                                    }),
-                                    h("path", {
-                                        d: "M12 4l0 12",
-                                    }),
+                                    xmlns: 'http://www.w3.org/2000/svg',
+                                    width: '24',
+                                    height: '24',
+                                    viewBox: '0 0 24 24',
+                                    fill: 'none',
+                                    stroke: 'currentColor',
+                                    'stroke-width': '2',
+                                    'stroke-linecap': 'round',
+                                    'stroke-linejoin': 'round',
+                                    class: 'icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf'
+                                }, [
+                                    h('path', { stroke: 'none', d: 'M0 0h24v24H0z', fill: 'none' }),
+                                    h('path', { d: 'M14 3v4a1 1 0 0 0 1 1h4' }),
+                                    h('path', { d: 'M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4' }),
+                                    h('path', { d: 'M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6' }),
+                                    h('path', { d: 'M17 18h2' }),
+                                    h('path', { d: 'M20 15h-3v6' }),
+                                    h('path', { d: 'M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z' })
                                 ]
                             ),
                         ]
@@ -824,7 +817,7 @@ const shipIcon = ref(`
 </script>
 
 <template>
-    <DestinationAppLayout title="HBL List">
+    <AppLayout title="HBL List">
         <template #header>HBL List</template>
 
         <Breadcrumb />
@@ -1256,5 +1249,5 @@ const shipIcon = ref(`
             :show="showConfirmViewHBLModal"
             @close="closeModal"
         />
-    </DestinationAppLayout>
+    </AppLayout>
 </template>

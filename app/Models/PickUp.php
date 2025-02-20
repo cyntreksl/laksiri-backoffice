@@ -37,7 +37,7 @@ class PickUp extends Model
     public const SYSTEM_STATUS_CARGO_RETURNED = 1.5;
 
     protected $fillable = [
-        'reference', 'cargo_type', 'name', 'email', 'contact_number', 'address', 'location_name', 'location_longitude', 'location_latitude', 'zone_id', 'notes', 'driver_id', 'driver_assigned_at', 'hbl_id', 'created_by', 'deleted_at', 'branch_id', 'pickup_date', 'pickup_time_start', 'pickup_time_end', 'pickup_order', 'system_status', 'status', 'pickup_type', 'pickup_note', 'retry_attempts', 'shipper_id', 'consignee_id',
+        'reference', 'cargo_type', 'name', 'email', 'contact_number', 'address', 'location_name', 'location_longitude', 'location_latitude', 'zone_id', 'notes', 'package_types', 'driver_id', 'driver_assigned_at', 'hbl_id', 'created_by', 'deleted_at', 'branch_id', 'pickup_date', 'pickup_time_start', 'pickup_time_end', 'pickup_order', 'system_status', 'status', 'pickup_type', 'pickup_note', 'retry_attempts', 'shipper_id', 'consignee_id',
     ];
 
     public function getActivitylogOptions(): LogOptions

@@ -52,7 +52,7 @@ const wrapperRef = ref(null);
 let grid = null;
 const perPage = ref(10);
 const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(1, "month").format("YYYY-MM-DD");
+const fromDate = moment(new Date()).subtract(6, "month").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 
 const filters = reactive({
@@ -706,7 +706,7 @@ const shipIcon = ref(`
 `);
 </script>
 <template>
-    <DestinationAppLayout v-if="$page.props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Loaded Shipments">
+    <AppLayout v-if="$page.props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Loaded Shipments">
         <template #header>Loaded Shipments</template>
 
         <Breadcrumb/>
@@ -1194,7 +1194,7 @@ const shipIcon = ref(`
             :show="showConfirmLoadedShipmentModal"
             @close="closeModal"
         />
-    </DestinationAppLayout>
+    </AppLayout>
 
     <AppLayout v-else title="Loaded Shipments">
         <template #header>Loaded Shipments</template>
