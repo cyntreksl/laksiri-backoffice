@@ -80,6 +80,7 @@
 <body>
 
 @php
+    $serialNumber = 1;
     $itemsPerPage = 6; // Number of rows per page
     $chunks = array_chunk($data, $itemsPerPage); // Split data into chunks of $itemsPerPage
     $total_nototal = 0;
@@ -101,12 +102,11 @@
         @if ($chunkIndex === 0)
             <thead>
             <tr>
-                <th colspan="11" >
-                    <strong>
-                   OBL  {{$container?->bl_number}}                                                   UNIVERSAL FREIGHT SERVICES
-                                                  REFERENCE NUMBER {{$container?->reference}}
-                    </strong>
+                <th colspan="3" style="border-right: none;">
+                    <strong>OBL  {{$container?->bl_number}}</strong>
                 </th>
+                <th colspan="4" style="border-left: none; border-right: none !important; text-align: center">UNIVERSAL FREIGHT SERVICES</th>
+                <th colspan="4" style="border-left: none; text-align: right">SHIPMENT N0 {{$container?->reference}}</th>
             </tr>
             <tr>
                 <th colspan="11" style="background-color: #D8D8D8 ; text-align: center; ">
@@ -114,23 +114,26 @@
                 </th>
             </tr>
             <tr>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    VESSEL: {{$container?->vessel_name}} <br>
+                <th>
+                    <strong>VESSEL:</strong>
                 </th>
-                <th colspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    DATE LOADED:   {{$container?->loading_started_at}} <br>
+                <th colspan="2">
+                    <strong>{{$container?->vessel_name}}</strong>
                 </th>
-                <th colspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    VOYAGE: <br>
+                <th colspan="4">
+                    <strong>DATE LOADED:   {{$container?->loading_started_at}} <br></strong>
                 </th>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    {{$container?->voyage_number}}   <br>
+                <th colspan="1">
+                    <strong>VOYAGE: <br></strong>
                 </th>
-                <th colspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    ETA:   <br>
+                <th colspan="1">
+                    <strong>{{$container?->voyage_number}}   <br></strong>
                 </th>
-                <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    {{$container?->estimated_time_of_arrival}}    <br>
+                <th colspan="1" >
+                    <strong>ETA:   <br></strong>
+                </th>
+                <th colspan="1">
+                    <strong>{{$container?->estimated_time_of_arrival}}    <br></strong>
                 </th>
             </tr>
 
@@ -156,18 +159,21 @@
                 </th>
             </tr>
             <tr>
-                <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 14px; border-bottom: none">
                     <strong> NO OF PKG   {{ number_format($total_nototal, 0) }} </strong>
                 </th>
-                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px; border-bottom: none">
                     <strong> TOTAL VOLUME  {{ number_format($total_vtotal, 2) }} </strong>
                 </th>
-                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px;">
+                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 14px; border-bottom: none">
                     <strong> TOTAL WEIGHT:KG                 {{ number_format($total_gtotal, 2) }} </strong>
                 </th>
             </tr>
-
+            </thead>
             @endif
+    </table>
+    <table>
+        <thead>
             <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: #D8D8D8  ;">
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">SR NO</th>
                 <th>HBL NO</th>
@@ -185,45 +191,49 @@
             <tbody>
             @foreach ($chunk as $index => $item)
                 <tr>
-                    <td rowspan="2">{{ $loop->iteration }}</td>
+                    <td rowspan="2">{{ $serialNumber++ }}</td>
                     <td rowspan="2" style="border-right:none ;vertical-align: top"> {{ $item[0]}} </td>
                     <td rowspan="2" style="border-left:none;vertical-align: top">{{ $item[1]}} {{ $item[2]}} <br>  {{ $item[3]}} <br> {{ $item[4]}}</td>
                     <td rowspan="2" style="vertical-align: top">{{ $item[5] }} <br> {{ $item[6] }} <br> {{ $item[7] }} <br> {{ $item[8] }} </td>
-                    <td style="vertical-align: top; font-size: 13px;" >
+                    <td colspan="4" style="vertical-align: top; font-size: 13px; padding: 0 !important;">
                         @php
                             $totalQuantity = collect($item[9])->sum('quantity');
                             $totalVolume = collect($item[9])->sum('volume');
                             $totalWeight = collect($item[9])->sum('weight');
 
-                            $hblweight = $total_gtotal/$total_vtotal*$totalVolume;
+                            $hblweight = $total_gtotal / $total_vtotal * $totalVolume;
                         @endphp
 
-                        @foreach ($item[9] as $package)
-                            {{ $package['quantity'] }}-{{ $package['package_type'] }}
-                        @endforeach
-                        <br style="margin-bottom:5px;"/>
-                    </td>
-                    <td style="vertical-align: top">
-                        @foreach ($item[9] as $package)
-                            {{ $package['quantity'] }}<br>
-                        @endforeach
+                        <table style="width: 100%; border-collapse: collapse; border: none; table-layout: fixed;">
 
-                    </td>
-                    <td style="vertical-align: top">
-                        @foreach ($item[9] as $package)
-                            {{ $package['volume'] }}<br>
-                        @endforeach
-
-                    </td>
-                    <td style="vertical-align: top">
-                        @foreach ($item[9] as $package)
-                            {{ $package['weight'] }}<br>
-                        @endforeach
-
+                            @if(count($item[9]) === 1)
+                                <tr>
+                                    <td style="padding-left: 4px; text-align: left; width: 32% !important; border-left: none; border-top: none; border-bottom: none;">{{ $package['quantity'] }}-{{ $package['package_type'] }}</td>
+                                    <td style="text-align: center; width: 21% !important; border-top: none; border-bottom: none; padding: 0;">{{ $package['quantity'] }}</td>
+                                    <td style="text-align: center; width: 27% !important; border-top: none; border-bottom: none; padding: 0;">{{ $package['volume'] }}</td>
+                                    <td style="text-align: center; width: 19% !important; border-top: none; border-right: none; border-bottom: none; padding: 0;">{{ $package['weight'] }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left: 4px; text-align: left; width: 32% !important; border-left: none; border-top: none; border-bottom: none;"> </td>
+                                    <td style="text-align: center; width: 21% !important; border-top: none; border-bottom: none; padding: 0;"> </td>
+                                    <td style="text-align: center; width: 27% !important; border-top: none; border-bottom: none; padding: 0;"> </td>
+                                    <td style="text-align: center; width: 19% !important; border-top: none; border-right: none; border-bottom: none; padding: 0;"> </td>
+                                </tr>
+                            @else
+                                @foreach ($item[9] as $package)
+                                    <tr>
+                                        <td style="padding-left: 4px; text-align: left; width: 32% !important; border-left: none; border-top: none; border-bottom: none;">{{ $package['quantity'] }}-{{ $package['package_type'] }}</td>
+                                        <td style="text-align: center; width: 21% !important; border-top: none; border-bottom: none; padding: 0;">{{ $package['quantity'] }}</td>
+                                        <td style="text-align: center; width: 27% !important; border-top: none; border-bottom: none; padding: 0;">{{ $package['volume'] }}</td>
+                                        <td style="text-align: center; width: 19% !important; border-top: none; border-right: none; border-bottom: none; padding: 0;">{{ $package['weight'] }}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </table>
                     </td>
                     <td rowspan="2">  PERSONAL<br>      EFFECT</td>
                     <td rowspan="2">
-                        {{ $container?->target_warehouse == 2 ? 'CMB' : ($container?->target_warehouse == 3 ? 'NTR' : $container?->target_warehouse) }}
+                        {{ $item[13] }}
                     </td>
 
                     <td rowspan="2" style="text-align: center">
