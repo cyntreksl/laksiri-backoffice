@@ -19,10 +19,6 @@ class GetUnloadMHBLWithHBLs
             $query->where('cargo_type', $data['cargoType']);
         }
 
-        if (isset($data['hblType'])) {
-            $query->where('hbl_type', $data['hblType']);
-        }
-
         if (isset($data['warehouse'])) {
             $warehouse = GetBranchByName::run($data['warehouse']);
             $query->where('warehouse', $warehouse->id);
