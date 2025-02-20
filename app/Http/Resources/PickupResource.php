@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class PickupResource extends JsonResource
 {
@@ -44,6 +45,7 @@ class PickupResource extends JsonResource
             'hbl_number' => $this->hbl_number,
             'cr_number' => $this->cr_number,
             'status' => $this->status,
+            'package_types' => Str::title($this->package_types),
         ];
     }
 }

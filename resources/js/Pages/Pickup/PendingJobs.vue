@@ -74,10 +74,11 @@ const data = reactive({
         cargo_type: true,
         driver: true,
         pickup_type: true,
-        packages: false,
+        packages: true,
         exception_note: true,
         status: false,
         actions: true,
+        package_types: true,
     },
 });
 
@@ -486,10 +487,16 @@ const createColumns = () => [
     {
         name: "Packages",
         hidden: !data.columnVisibility.packages,
+    },
+    {
+        name: "Package Types",
+        hidden: !data.columnVisibility.package_types,
         sort: false,
         attributes: (cell, row) => {
             // add these attributes to the td elements only
             if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+
+                console.log(row.cells);
                 return {
                     'data-cell-content': cell,
                     'style': 'background-color: #e0f2fe',
