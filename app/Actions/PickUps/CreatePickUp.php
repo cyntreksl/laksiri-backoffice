@@ -14,6 +14,11 @@ class CreatePickUp
     public function handle(array $data): PickUp
     {
         $pickup_note = isset($data['pickup_note']) ? Str::title($data['pickup_note']) : null;
+        $data['notes'] = is_array($data['notes'])
+            ? Str::title(implode(', ', $data['notes']))
+            : Str::title($data['notes']);
+
+        $package_types = isset($data['package_types']) ? json_encode($data['package_types']) : json_encode($data['note_type']);
 
         $pickup = PickUp::create([
             'reference' => GeneratePickupReferenceNumber::run(GetUserCurrentBranch::run()['branchName']),
@@ -26,7 +31,7 @@ class CreatePickUp
             'location_name' => $data['location'] ?? null,
             'zone_id' => $data['zone_id'] ?? null,
             'notes' => Str::title($data['notes']),
-            'package_types' => json_encode($data['note_type']),
+            'package_types' => $package_types,
             'pickup_date' => $data['pickup_date'],
             'pickup_time_start' => $data['pickup_time_start'],
             'pickup_time_end' => $data['pickup_time_end'],
