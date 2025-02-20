@@ -21,7 +21,7 @@ class GetUnloadMHBLWithHBLs
 
         if (isset($data['warehouse'])) {
             $warehouse = GetBranchByName::run($data['warehouse']);
-            $query->where('warehouse', $warehouse->id);
+            $query->where('warehouse_id', $warehouse->id);
         }
 
         $query->with(['hbls' => function ($query) {
