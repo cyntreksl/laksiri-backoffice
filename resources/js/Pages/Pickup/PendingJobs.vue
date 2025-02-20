@@ -77,8 +77,8 @@ const data = reactive({
         packages: true,
         exception_note: true,
         status: false,
-        actions: true,
         package_types: true,
+        actions: true,
     },
 });
 
@@ -494,20 +494,8 @@ const createColumns = () => [
         sort: false,
         attributes: (cell, row) => {
             // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-
+            if (cell ) {
                 console.log(row.cells);
-                return {
-                    'data-cell-content': cell,
-                    'style': 'background-color: #e0f2fe',
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-                    'style': 'background-color: #ffe4e6',
-                };
             }
         },
         formatter: (cell) => {
