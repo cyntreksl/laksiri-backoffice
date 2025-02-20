@@ -21,8 +21,8 @@ class ThirdPartyAgentController extends Controller
 {
     public function __construct(
         private readonly BranchRepositoryInterface $branchRepository,
-        private readonly SettingRepositoryInterface $settingRepository,
-        private readonly CountryRepositoryInterface $countryRepository,
+//        private readonly SettingRepositoryInterface $settingRepository,
+//        private readonly CountryRepositoryInterface $countryRepository,
     ) {}
 
     /**
@@ -62,8 +62,9 @@ class ThirdPartyAgentController extends Controller
     /**
      * Show the form for editing the specified agent.
      */
-    public function edit(Branch $branch)
+    public function edit($id)
     {
+        $branch = Branch::find($id);
 
         return Inertia::render('Agent/EditAgent', [
             'cargoModes' => CargoType::cases(),

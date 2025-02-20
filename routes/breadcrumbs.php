@@ -401,11 +401,11 @@ Breadcrumbs::for('agents.create', function (BreadcrumbTrail $trail) {
     $trail->push('Create', route('agents.create'));
 });
 // Agents > Edit
-Breadcrumbs::for('agents.edit', function (BreadcrumbTrail $trail, $id) {
+Breadcrumbs::for('agent.agents.edit', function (BreadcrumbTrail $trail, $id) {
     $branch = Branch::find($id);
     $trail->parent('dashboard');
     $trail->push('Agent');
-    $trail->push('Edit', route('agents.edit', $branch->id));
+    $trail->push('Edit', route('agent.agents.edit', $branch->id));
 });
 
 require_once __DIR__.'/call-center-breadcrumbs.php';

@@ -46,7 +46,7 @@ const handleBranchCreate = () => {
         onSuccess: () => {
             form.reset();
             router.visit(route("agents.index"));
-            push.success('Branch added successfully!');
+            push.success('Agent added successfully!');
         },
         onError: () => {
             push.error('Something went to wrong!');

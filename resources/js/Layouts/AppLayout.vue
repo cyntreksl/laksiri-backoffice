@@ -1157,6 +1157,10 @@ export default {
                             title: "Shipper & Consignee",
                             route: "setting.shipper-consignees.index",
                         },
+                        {
+                            title: "Third Party Agents",
+                            route: "agents.index",
+                        }
 
                     );
                     changeSidePanelTitle("Setting");
