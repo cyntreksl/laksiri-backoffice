@@ -26,7 +26,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         $query->cashSettlement()->whereHas('packages');
 
         if (! empty($search)) {
-            $query->where('hbl', 'like', "%$search%");
+            $query->where('hbl_number', 'like', "%$search%");
         }
 
         // apply filters
