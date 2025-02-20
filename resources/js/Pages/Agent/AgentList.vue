@@ -14,19 +14,19 @@ defineProps({
 </script>
 
 <template>
-    <AppLayout title="Branches">
-        <template #header>Branches</template>
+    <AppLayout title="Agents">
+        <template #header>Agents</template>
 
         <Breadcrumb/>
 
         <div class="flex items-center justify-between p-2 my-5">
             <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                Branches
+                Agents
             </h2>
 
             <Link :href="route('agents.create')">
                 <PrimaryButton>
-                    Create New Branch
+                    Create New Agent
                 </PrimaryButton>
             </Link>
         </div>

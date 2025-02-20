@@ -59,15 +59,15 @@ const handleBranchCreate = () => {
 </script>
 
 <template>
-    <AppLayout title="Create Branch">
-        <template #header>Branches</template>
+    <AppLayout title="Create Agent">
+        <template #header>Agents</template>
 
         <Breadcrumb/>
         <form @submit.prevent="handleBranchCreate">
 
             <div class="flex items-center justify-between p-2 my-5">
                 <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                    Create New Branch
+                    Create New Agent
                 </h2>
 
                 <div class="flex justify-end bottom-0 space-x-5">
@@ -76,7 +76,7 @@ const handleBranchCreate = () => {
                                    class="space-x-2"
                                    type="submit"
                     >
-                        <span>Create a Branch</span>
+                        <span>Create a Agent</span>
                         <svg
                             class="size-5"
                             fill="none"
