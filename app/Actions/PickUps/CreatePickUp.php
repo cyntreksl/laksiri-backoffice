@@ -13,7 +13,6 @@ class CreatePickUp
 
     public function handle(array $data): PickUp
     {
-        dd($data);
         $pickup_note = isset($data['pickup_note']) ? Str::title($data['pickup_note']) : null;
 
         $pickup = PickUp::create([
@@ -26,7 +25,8 @@ class CreatePickUp
             'address' => Str::title($data['address']),
             'location_name' => $data['location'] ?? null,
             'zone_id' => $data['zone_id'] ?? null,
-            'notes' => json_encode($data['notes']),
+            'notes' => Str::title($data['notes']),
+            'pickup_types' => json_encode($data['note_type']),
             'pickup_date' => $data['pickup_date'],
             'pickup_time_start' => $data['pickup_time_start'],
             'pickup_time_end' => $data['pickup_time_end'],
