@@ -13,6 +13,7 @@ class CreatePickUp
 
     public function handle(array $data): PickUp
     {
+        dd($data);
         $pickup_note = isset($data['pickup_note']) ? Str::title($data['pickup_note']) : null;
 
         $pickup = PickUp::create([
