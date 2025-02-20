@@ -9,6 +9,7 @@ use App\Enum\NotificationType;
 use App\Enum\PackageType;
 use App\Http\Requests\StoreAgentRequest;
 use App\Http\Requests\StoreBranchRequest;
+use App\Http\Requests\UpdateAgentRequest;
 use App\Http\Requests\UpdateBranchRequest;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
@@ -63,28 +64,25 @@ class ThirdPartyAgentController extends Controller
      */
     public function edit(Branch $branch)
     {
+
         return Inertia::render('Agent/EditAgent', [
             'cargoModes' => CargoType::cases(),
             'deliveryTypes' => HBLType::cases(),
             'packageTypes' => PackageType::cases(),
             'branchTypes' => BranchType::cases(),
             'agent' => $branch,
-            'settings' => $this->settingRepository->getSettings(),
-            'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
-            'countryNames' => $this->countryRepository->getAllCountries(),
-            'notificationTypes' => NotificationType::cases(),
         ]);
     }
 
     /**
      * Update the specified agent in storage.
      */
-    public function update(UpdateBranchRequest $request, Branch $branch)
+    public function update(UpdateAgentRequest $request, Branch $branch)
     {
         $data = $request->all();
         $data['is_third_party_agent'] = true; // Ensure it remains an agent
 
-        $this->branchRepository->updateBranch($data, $branch);
+        $this->branchRepository->updateAgent($data, $branch);
     }
 
     /**

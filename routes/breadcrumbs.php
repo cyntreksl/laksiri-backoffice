@@ -401,7 +401,8 @@ Breadcrumbs::for('agents.create', function (BreadcrumbTrail $trail) {
     $trail->push('Create', route('agents.create'));
 });
 // Agents > Edit
-Breadcrumbs::for('agents.edit', function (BreadcrumbTrail $trail, Branch $branch) {
+Breadcrumbs::for('agents.edit', function (BreadcrumbTrail $trail, $id) {
+    $branch = Branch::find($id);
     $trail->parent('dashboard');
     $trail->push('Agent');
     $trail->push('Edit', route('agents.edit', $branch->id));
