@@ -4,10 +4,10 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {Link, router} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {br} from "../../../../public/build/assets/app-C19FfuHH.js";
-import DeleteOfficerConfirmationModal
-    from "@/Pages/Setting/ShippersConsignees/Partials/DeleteOfficerConfirmationModal.vue";
+
 import {push} from "notivue";
 import {ref} from "vue";
+import DeleteAgentConfirmationModal from "@/Pages/Agent/Partials/DeleteAgentConfirmationModal.vue";
 
 defineProps({
     agents: {
@@ -204,11 +204,10 @@ const handleDeleteAgent = () => {
                 </tbody>
             </table>
         </div>
-        <DeleteOfficerConfirmationModal
+        <DeleteAgentConfirmationModal
             :show="showDeleteAgentConfirmationModal"
             @close="closeModal"
-            @delete-Agent="handleDeleteAgent"
-
+            @deleteAgent="handleDeleteAgent"
         />
     </AppLayout>
 </template>

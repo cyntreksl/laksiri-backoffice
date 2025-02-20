@@ -90,8 +90,10 @@ class ThirdPartyAgentController extends Controller
     /**
      * Remove the specified agent from storage (soft delete).
      */
-    public function destroy(Branch $branch)
+    public function destroy( $branch)
     {
+
+        $branch = Branch::find($branch);
         $branch->delete();
     }
 }

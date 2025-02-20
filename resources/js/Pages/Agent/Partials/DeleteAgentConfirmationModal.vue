@@ -10,7 +10,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['close', 'deleteAgent']);
+const emit = defineEmits(['close', 'deleteAgent']);  // Changed to camelCase
 
 </script>
 
@@ -27,7 +27,7 @@ const emit = defineEmits(['close', 'deleteAgent']);
         <template #footer>
             <div class="space-x-2">
                 <SecondaryButton @click="$emit('close')">
-                    Nevermind
+                    Close
                 </SecondaryButton>
 
                 <DangerButton @click="$emit('deleteAgent')">
