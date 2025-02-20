@@ -74,7 +74,7 @@ const data = reactive({
         cargo_type: true,
         driver: true,
         pickup_type: true,
-        packages: true,
+        packages: false,
         exception_note: true,
         status: false,
         package_types: true,
@@ -491,22 +491,34 @@ const createColumns = () => [
     {
         name: "Package Types",
         hidden: !data.columnVisibility.package_types,
-        sort: false,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell ) {
-                console.log(row.cells);
+        formatter: (_, row) => {
+            let packageTypes = [];
+
+            try {
+                const cellData = row?.cells?.[13]?.data; // Safe access
+                packageTypes = cellData ? JSON.parse(cellData) : [];
+                return h(
+                    "div",
+                    {className: "flex gap-2"},
+                    packageTypes.length > 0
+                        ? packageTypes.map((type, index) =>
+                            h(
+                                "span",
+                                {
+                                    key: index,
+                                    className: "badge space-x-2.5 bg-red-100 text-red-500 dark:bg-red-100",
+                                },
+                                type
+                            ),
+                            h("br")
+                        )
+                        : h("span", {className: "text-gray-400"}, "No Packages")
+                );
+            } catch (error) {
+                console.error("Error parsing package types:", error);
             }
         },
-        formatter: (cell) => {
-            if (!cell) return '';
-            let value = cell.toString();
-
-            if (value.length < 20) {
-                return value;
-            }
-            return value.substring(0, 20) + '...';
-        }
+        sort: false,
     },
     {
         name: "Exception",
@@ -1110,6 +1122,14 @@ const shipIcon = ref(`
                                         @change="toggleColumnVisibility('pickup_date', $event)"
                                     />
                                     <span class="hover:cursor-pointer">Pickup Date</span>
+                                </label>
+
+                                <label class="inline-flex items-center space-x-2">
+                                    <Checkbox
+                                        :checked="data.columnVisibility.package_types"
+                                        @change="toggleColumnVisibility('package_types', $event)"
+                                    />
+                                    <span class="hover:cursor-pointer">Pakage Types</span>
                                 </label>
 
                                 <label class="inline-flex items-center space-x-2">
