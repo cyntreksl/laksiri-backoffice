@@ -487,6 +487,22 @@ const createColumns = () => [
     {
         name: "Packages",
         hidden: !data.columnVisibility.packages,
+        sort: false,
+        attributes: (cell, row) => {
+            // add these attributes to the td elements only
+            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #e0f2fe',
+                };
+            }
+            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
+                return {
+                    'data-cell-content': cell,
+                    'style': 'background-color: #ffe4e6',
+                };
+            }
+        }
     },
     {
         name: "Package Types",
