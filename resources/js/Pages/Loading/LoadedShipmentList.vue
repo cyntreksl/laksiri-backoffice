@@ -706,7 +706,7 @@ const shipIcon = ref(`
 `);
 </script>
 <template>
-    <DestinationAppLayout v-if="$page.props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Loaded Shipments">
+    <AppLayout v-if="$page.props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Loaded Shipments">
         <template #header>Loaded Shipments</template>
 
         <Breadcrumb/>
@@ -1194,7 +1194,7 @@ const shipIcon = ref(`
             :show="showConfirmLoadedShipmentModal"
             @close="closeModal"
         />
-    </DestinationAppLayout>
+    </AppLayout>
 
     <AppLayout v-else title="Loaded Shipments">
         <template #header>Loaded Shipments</template>

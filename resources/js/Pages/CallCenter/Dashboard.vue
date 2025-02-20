@@ -1,9 +1,10 @@
 <script setup>
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 </script>
 
 <template>
-    <DestinationAppLayout title="Home">
+    <AppLayout title="Home">
         <template #header>Dashboard</template>
-    </DestinationAppLayout>
+    </AppLayout>
 </template>

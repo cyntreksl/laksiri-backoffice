@@ -79,6 +79,7 @@ class RolePermissionSeeder extends Seeder
                     'pickups.update pickup order',
                     'pickups.show pickup exceptions',
                     'pickups.retry',
+                    'pickups.index',
                 ],
             ],
 
@@ -99,6 +100,21 @@ class RolePermissionSeeder extends Seeder
                     'hbls.upload documents',
                     'hbls.delete documents',
                     'hbls.issue token',
+                    'hbls.show draft hbls',
+                ],
+            ],
+
+            [
+                'group_name' => 'MHBL',
+                'permissions' => [
+                    'mhbls.index',
+                ],
+            ],
+
+            [
+                'group_name' => 'Delivers',
+                'permissions' => [
+                    'delivers.show deliver order',
                 ],
             ],
 
@@ -173,6 +189,28 @@ class RolePermissionSeeder extends Seeder
                 'group_name' => 'Unloading Issues',
                 'permissions' => [
                     'issues.index',
+                ],
+            ],
+
+            [
+                'group_name' => 'Customer Queue',
+                'permissions' => [
+                    'customer-queue.issue token',
+                    'customer-queue.show reception calling queue',
+                    'customer-queue.show reception verified list',
+                    'customer-queue.show reception calling screen',
+                    'customer-queue.show document verification queue',
+                    'customer-queue.show document verified list',
+                    'customer-queue.show document verification calling screen',
+                    'customer-queue.show package calling queue',
+                    'customer-queue.show package released list',
+                    'customer-queue.show package calling screen',
+                    'customer-queue.show cashier calling queue',
+                    'customer-queue.show cashier paid list',
+                    'customer-queue.show cashier calling screen',
+                    'customer-queue.show examination calling queue',
+                    'customer-queue.show gate ist',
+                    'customer-queue.show examination calling screen',
                 ],
             ],
         ];

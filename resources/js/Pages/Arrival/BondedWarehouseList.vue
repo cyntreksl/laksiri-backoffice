@@ -433,7 +433,7 @@ const handlePerPageChange = (event) => {
 };
 </script>
 <template>
-    <DestinationAppLayout title="Bonded Warehouse">
+    <AppLayout title="Bonded Warehouse">
         <template #header>Bonded Warehouse</template>
 
         <Breadcrumb/>
@@ -606,5 +606,5 @@ const handlePerPageChange = (event) => {
             :show="showConfirmViewHBLModal"
             @close="closeShowHBLModal"
         />
-    </DestinationAppLayout>
+    </AppLayout>
 </template>
