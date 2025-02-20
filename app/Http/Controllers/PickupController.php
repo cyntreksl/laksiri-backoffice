@@ -57,7 +57,9 @@ class PickupController extends Controller
         $dir = $request->input('dir', 'desc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate']);
+        $filters = $request->input('pickupDate')
+            ? $request->only(['userData', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate'])
+            : $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate']);
 
         return $this->pickupRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }

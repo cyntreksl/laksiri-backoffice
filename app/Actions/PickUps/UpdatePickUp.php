@@ -12,7 +12,9 @@ class UpdatePickUp
 
     public function handle(array $data, PickUp $pickup)
     {
-        $data['notes'] = Str::title(implode(', ', $data['notes']));
+        $data['notes'] = is_array($data['notes'])
+            ? Str::title(implode(', ', $data['notes']))
+            : Str::title($data['notes']);
         $data['package_types'] = json_encode($data['note_type']);
         $pickup->update($data);
     }

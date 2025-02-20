@@ -60,8 +60,14 @@ const filters = reactive({
     pickupDate: "",
     zoneBy: "",
     driverBy: [],
-
 });
+
+// Function to get formatted date based on days from today
+const getFormattedDate = (daysFromToday) => {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromToday);
+    return date.toISOString().split("T")[0]; // Formats as YYYY-MM-DD
+};
 
 const data = reactive({
     columnVisibility: {
@@ -1246,6 +1252,23 @@ const shipIcon = ref(`
                         <span>Reset Filters</span>
                     </SoftPrimaryButton>
                 </div>
+
+                <FilterHeader value="Pickup Date"/>
+
+                <select
+                    v-model="filters.pickupDate"
+                    autocomplete="off"
+                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                    placeholder="Select a date..."
+                >
+                    <option value="">Select a date...</option>
+                    <option :value="getFormattedDate(1)">Tomorrow</option>
+                    <option :value="getFormattedDate(2)">Day after Tomorrow</option>
+                    <option :value="getFormattedDate(7)">One Week Later</option>
+                </select>
+
+                <FilterBorder/>
+
                 <div>
                     <InputLabel value="From"/>
                     <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
@@ -1283,7 +1306,7 @@ const shipIcon = ref(`
                 <FilterHeader value="Created By"/>
 
                 <select
-                    v-model="filters.pickupDate"
+                    v-model="filters.createdBy"
                     autocomplete="off"
                     class="w-full"
                     multiple
