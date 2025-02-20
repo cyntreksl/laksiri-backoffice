@@ -496,12 +496,21 @@ const createColumns = () => [
                     'style': 'background-color: #e0f2fe',
                 };
             }
+
             if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
                 return {
                     'data-cell-content': cell,
                     'style': 'background-color: #ffe4e6',
                 };
             }
+        },
+        formatter: (cell) => {
+            if (!cell) return '';
+            let value = cell.toString();
+            if (value.length < 20) {
+                return value;
+            }
+            return value.substring(0, 20) + '...';
         }
     },
     {
