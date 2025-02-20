@@ -78,8 +78,9 @@ class ThirdPartyAgentController extends Controller
     /**
      * Update the specified agent in storage.
      */
-    public function update(UpdateAgentRequest $request, Branch $branch)
+    public function update(UpdateAgentRequest $request,  $branch)
     {
+        $branch = Branch::find($branch);
         $data = $request->all();
         $data['is_third_party_agent'] = true; // Ensure it remains an agent
 

@@ -53,6 +53,7 @@ class BranchRepository implements BranchRepositoryInterface
 
     public function updateAgent(array $data, Branch $branch)
     {
+
         return UpdateAgent::run($data, $branch);
     }
 

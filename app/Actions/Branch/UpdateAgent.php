@@ -12,6 +12,7 @@ class UpdateAgent
 
     public function handle(array $data, Branch $branch)
     {
+
         return $branch->update([
             'name' => $data['name'],
             'branch_code' => $data['branch_code'],

@@ -45,7 +45,7 @@ const form = useForm({
 });
 
 const handleBranchUpdate = () => {
-    form.put(route("agents.edit", props.agent.id), {
+    form.put(route("agents.update", props.agent.id), {
         onSuccess: () => {
             push.success('Branch updated successfully!');
         },
