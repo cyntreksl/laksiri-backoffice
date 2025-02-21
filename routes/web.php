@@ -47,7 +47,6 @@ Route::middleware([
     require_once __DIR__.'/web/agent.php';
     require_once __DIR__.'/web/courier.php';
 
-
     // call center routes
     Route::name('call-center.')->prefix('call-center')->group(function () {
         require_once __DIR__.'/web/call-center/hbl.php';

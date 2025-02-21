@@ -56,6 +56,4 @@ class BranchRepository implements BranchRepositoryInterface
 
         return UpdateAgent::run($data, $branch);
     }
-
-
 }

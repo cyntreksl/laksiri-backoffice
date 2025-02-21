@@ -5,4 +5,3 @@ use Illuminate\Support\Facades\Route;
 
 Route::resource('agents', ThirdPartyAgentController::class)
     ->except('show');
-

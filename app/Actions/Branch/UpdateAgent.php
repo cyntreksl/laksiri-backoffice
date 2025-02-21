@@ -26,5 +26,4 @@ class UpdateAgent
             'is_third_party_agent' => $data['is_third_party_agent'],
         ]);
     }
-
 }

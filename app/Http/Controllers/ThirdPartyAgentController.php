@@ -5,12 +5,9 @@ namespace App\Http\Controllers;
 use App\Enum\BranchType;
 use App\Enum\CargoType;
 use App\Enum\HBLType;
-use App\Enum\NotificationType;
 use App\Enum\PackageType;
 use App\Http\Requests\StoreAgentRequest;
-use App\Http\Requests\StoreBranchRequest;
 use App\Http\Requests\UpdateAgentRequest;
-use App\Http\Requests\UpdateBranchRequest;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\SettingRepositoryInterface;
@@ -21,8 +18,8 @@ class ThirdPartyAgentController extends Controller
 {
     public function __construct(
         private readonly BranchRepositoryInterface $branchRepository,
-//        private readonly SettingRepositoryInterface $settingRepository,
-//        private readonly CountryRepositoryInterface $countryRepository,
+        //        private readonly SettingRepositoryInterface $settingRepository,
+        //        private readonly CountryRepositoryInterface $countryRepository,
     ) {}
 
     /**
@@ -78,7 +75,7 @@ class ThirdPartyAgentController extends Controller
     /**
      * Update the specified agent in storage.
      */
-    public function update(UpdateAgentRequest $request,  $branch)
+    public function update(UpdateAgentRequest $request, $branch)
     {
         $branch = Branch::find($branch);
         $data = $request->all();
@@ -90,7 +87,7 @@ class ThirdPartyAgentController extends Controller
     /**
      * Remove the specified agent from storage (soft delete).
      */
-    public function destroy( $branch)
+    public function destroy($branch)
     {
 
         $branch = Branch::find($branch);

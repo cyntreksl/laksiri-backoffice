@@ -408,9 +408,9 @@ Breadcrumbs::for('agent.agents.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->push('Edit', route('agent.agents.edit', $branch->id));
 });
 
-//Courier
+// Courier
 
-Breadcrumbs::for('couriers.index',function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('couriers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Courier');
     $trail->push('List', route('couriers.index'));

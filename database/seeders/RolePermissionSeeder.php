@@ -221,7 +221,7 @@ class RolePermissionSeeder extends Seeder
                     'third-party-agents.edit',
                     'third-party-agents.delete',
                 ],
-            ]
+            ],
         ];
     }
 }
