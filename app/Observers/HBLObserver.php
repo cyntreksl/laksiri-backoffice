@@ -49,6 +49,7 @@ class HBLObserver
         ];
 
         $shipperUserExists = User::where('username', $shipperData['username'])
+            ->orWhere('email', $shipperData['email'])
             ->first();
 
         if ($shipperUserExists) {

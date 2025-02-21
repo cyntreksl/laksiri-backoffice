@@ -44,7 +44,7 @@ const fetchPickupStatus = async () => {
     isLoadingPickupStatus.value = true;
 
     try {
-        const id = props.hbl.id ? props.hbl.id : props.pickup?.id;
+        const id = props.hbl.pickup_id ? props.hbl.pickup_id : props.pickup?.id;
         const response = await fetch(`get-pickup-status/${id}`, {
             method: "GET",
             headers: {
@@ -74,6 +74,32 @@ const fetchHBLStatus = async () => {
 
     try {
         const response = await fetch(`/get-hbl-status/${props.hbl?.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            hblStatus.value = data.status;
+        }
+
+    } catch (error) {
+        console.log(error);
+    } finally {
+        isLoadingHBLStatus.value = false;
+    }
+}
+
+const fetchHBLStatusByPickup = async () => {
+    isLoadingHBLStatus.value = true;
+
+    try {
+        const response = await fetch(`/get-hbl-status-by-pickup/${props.pickup?.id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -291,7 +317,9 @@ watch(() => props.hbl, (newVal) => {
 watch(() => props.pickup, (newVal) => {
     if (newVal !== undefined) {
         fetchPickupStatus();
-        fetchHBLStatus();
+        if(props.hbl.id){
+            fetchHBLStatus()
+        }else fetchHBLStatusByPickup();
     }
 });
 
