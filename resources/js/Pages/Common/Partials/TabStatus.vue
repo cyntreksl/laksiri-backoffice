@@ -128,6 +128,10 @@ const hblStatusColor = (status) => {
             return 'bg-amber-400';
         case 'Container Unloaded in Colombo':
             return 'bg-gray-400';
+        case 'Container Loading in Colombo':
+            return 'bg-success';
+        case 'Container Unloaded in Nintavur':
+            return 'bg-red-600';
     }
 };
 
