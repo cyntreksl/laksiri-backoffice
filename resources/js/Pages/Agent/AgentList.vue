@@ -115,7 +115,7 @@ const handleDeleteAgent = () => {
                 </thead>
                 <tbody>
                 <tr
-                    v-for="agent in agents" :key="agent.id"
+                    v-for="agent in agents" :key="agent?.id"
                     class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500 last:border-0 bg-white"
                 >
                     <td
