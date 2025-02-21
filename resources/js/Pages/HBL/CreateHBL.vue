@@ -154,6 +154,47 @@ const packageItem = reactive({
 const grandTotalWeight = ref(0);
 const grandTotalVolume = ref(0);
 
+const isPackageRuleSelected = ref(false);
+const packageRulesData = ref([]);
+const priceRulesData = ref([]);
+const selectedPackage = ref("");
+const isExistsRules = ref(false);
+
+const hblRules = async () => {
+    try {
+        const response = await fetch(`/get-hbl-rules`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+                // "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify({
+                cargo_type: form.cargo_type,
+                hbl_type: form.hbl_type,
+                warehouse: form.warehouse,
+            })
+        });
+        const data = await response.json();
+        if ((!data.package_rules || data.package_rules.length === 0) &&
+            (!data.price_rules || data.price_rules.length === 0)) {
+            push.error('Please add price rules');
+            isExistsRules.value = false;
+        }else{
+            isExistsRules.value = true;
+        }
+        if (data.package_rules) {
+            packageRulesData.value = data.package_rules;
+        }
+        if (data.price_rules) {
+            priceRulesData.value = data.price_rules;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 const addPackageData = () => {
     if (
         !packageItem.type ||
@@ -177,6 +218,11 @@ const addPackageData = () => {
             push.error("Please fill the total weight");
             return;
         }
+    }
+
+    if(priceRulesData.value.length === 0 && !form.is_active_package){
+        push.error("Please fill all required data");
+        return;
     }
 
     if (editMode.value) {
@@ -651,47 +697,6 @@ const shipIcon = ref(`
   <path d="M7 7v-4h-1" />
 </svg>
 `);
-
-const isPackageRuleSelected = ref(false);
-const packageRulesData = ref([]);
-const priceRulesData = ref([]);
-const selectedPackage = ref("");
-const isExistsRules = ref(false);
-
-const hblRules = async () => {
-    try {
-        const response = await fetch(`/get-hbl-rules`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-                // "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            },
-            body: JSON.stringify({
-                cargo_type: form.cargo_type,
-                hbl_type: form.hbl_type,
-                warehouse: form.warehouse,
-            })
-        });
-        const data = await response.json();
-        if ((!data.package_rules || data.package_rules.length === 0) &&
-            (!data.price_rules || data.price_rules.length === 0)) {
-            push.error('Please add price rules');
-            isExistsRules.value = false;
-        }else{
-            isExistsRules.value = true;
-        }
-        if (data.package_rules) {
-            packageRulesData.value = data.package_rules;
-        }
-        if (data.price_rules) {
-            priceRulesData.value = data.price_rules;
-        }
-
-    } catch (error) {
-        console.log(error);
-    }
-};
 
 const getSelectedPackage = () => {
     // Find the selected package from the packages array based on the selected ID
@@ -1860,7 +1865,7 @@ const confirmViewHBL = async (id) => {
                                 <label class="block">
                                     <span>
                                         Package
-                                        <span v-if="form.is_active_package" class="text-red-500 text-sm">*</span>
+                                        <span v-if="form.is_active_package || priceRulesData.length === 0" class="text-red-500 text-sm">*</span>
                                     </span>
                                     <select
                                         v-model="packageItem.packageRule"
