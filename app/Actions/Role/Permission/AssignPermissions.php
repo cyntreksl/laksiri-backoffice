@@ -17,5 +17,10 @@ class AssignPermissions
         if (! empty($permissions)) {
             $role->syncPermissions($permissionsNames);
         }
+        activity('role_permissions')
+            ->causedBy(auth()->user())
+            ->performedOn($role)
+            ->withProperties(['permissions' => $permissions])
+            ->log("Updated permissions for role: {$role->name}");
     }
 }
