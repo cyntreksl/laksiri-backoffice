@@ -216,10 +216,10 @@ class RolePermissionSeeder extends Seeder
             [
                 'group_name' => 'Third Party Agent',
                 'permissions' => [
-                    'agent.index',
-                    'agent.create',
-                    'agent.edit',
-                    'agent.delete',
+                    'third-party-agents.index',
+                    'third-party-agents.create',
+                    'third-party-agents.edit',
+                    'third-party-agents.delete',
                 ],
             ]
         ];
