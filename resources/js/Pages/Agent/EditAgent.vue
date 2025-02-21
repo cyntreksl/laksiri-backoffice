@@ -8,7 +8,7 @@ import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { push } from "notivue";
-
+import {ref} from "vue";
 const props = defineProps({
     agent: {
         type: Object,
@@ -38,9 +38,9 @@ const form = useForm({
     type: props.agent.type,
     currency_name: props.agent.currency_name,
     currency_symbol: props.agent.currency_symbol,
-    cargo_modes: props.agent.cargo_modes,
-    delivery_types: props.agent.delivery_types,
-    package_types: props.agent.package_types,
+    cargo_modes: JSON.parse(props.agent.cargo_modes) || [],
+    delivery_types: JSON.parse(props.agent.delivery_types) || [],
+    package_types: JSON.parse(props.agent.package_types) || [],
     is_third_party_agent: props.agent.is_third_party_agent,
 });
 
@@ -179,9 +179,16 @@ const handleBranchUpdate = () => {
                             <div class="space-x-5">
                                 <label class="block">
                                     <span>Select Package Types</span>
-                                    <select autocomplete="off" class="mt-1.5 w-full" multiple placeholder="Select a Package Type..." v-model="form.package_types" x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})">
+                                    <select
+                                        autocomplete="off"
+                                        class="mt-1.5 w-full"
+                                        multiple placeholder="Select a Package Type..."
+                                        v-model="form.package_types"
+                                        x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
+                                    >
                                         <option value="">Select a Package Type...</option>
-                                        <option v-for="(packageType, index) in packageTypes" :key="index" :value="packageType">{{ packageType }}</option>
+                                        <option v-for="(packageType, index) in packageTypes" :key="index"
+                                                :value="packageType">{{ packageType }}</option>
                                     </select>
                                 </label>
                             </div>
