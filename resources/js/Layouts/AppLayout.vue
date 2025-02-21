@@ -1621,19 +1621,6 @@ export default {
                     changeSidePanelTitle("Users");
                     break;
                 case "Courier":
-              //       let courierMenu = [];
-              // if (usePage().props.user.permissions.includes("third-party-agents.index"))
-              //       {
-              //           courierMenu.splice(
-              //               0,
-              //               2,
-              //               {
-              //                   title: "Third Party Agents",
-              //                   route: "agents.index",
-              //               }
-              //
-              //           );
-              //       }
                     childMenuList.splice(
                         0,
                         childMenuList.length,
@@ -1641,6 +1628,14 @@ export default {
                             title: "Third Party Agents",
                             route: "agents.index",
                         },
+                        {
+                            title: "Create Courier ",
+                            route: "couriers.create",
+                        },
+                        {
+                            title: "All Couriers ",
+                            route: "couriers.index",
+                        }
 
 
                     );

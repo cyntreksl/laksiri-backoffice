@@ -408,4 +408,18 @@ Breadcrumbs::for('agent.agents.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->push('Edit', route('agent.agents.edit', $branch->id));
 });
 
+//Courier
+
+Breadcrumbs::for('couriers.index',function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Courier');
+    $trail->push('List', route('couriers.index'));
+
+});
+Breadcrumbs::for('couriers.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('couriers.index');
+    $trail->push('Courier');
+    $trail->push('Create', route('couriers.create'));
+});
+
 require_once __DIR__.'/call-center-breadcrumbs.php';
