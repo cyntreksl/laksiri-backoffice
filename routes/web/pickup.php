@@ -47,3 +47,5 @@ Route::get('pickup-exception-list', [PickupController::class, 'allPickupsExport'
 
 Route::post('pickups/delete', [PickupController::class, 'deletePickups'])
     ->name('pickups.delete');
+
+Route::get('get-hbl-status-by-pickup/{pickup}', [PickupController::class, 'getHBLStatusByPickup']);

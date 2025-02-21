@@ -12,6 +12,7 @@ use App\Http\Requests\UpdatePickupRequest;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
+use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
@@ -36,6 +37,7 @@ class PickupController extends Controller
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly SettingRepositoryInterface $settingRepository,
         private readonly NotificationMailRepositoryInterface $notificationMailRepository,
+        private readonly HBLRepositoryInterface $HBLRepository,
     ) {}
 
     public function index()
@@ -57,7 +59,9 @@ class PickupController extends Controller
         $dir = $request->input('dir', 'desc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate']);
+        $filters = $request->input('pickupDate')
+            ? $request->only(['userData', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate'])
+            : $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate']);
 
         return $this->pickupRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
@@ -197,5 +201,14 @@ class PickupController extends Controller
         $this->authorize('pickups.delete');
 
         $this->pickupRepository->deletePickups($request->pickupIds);
+    }
+
+    public function getHBLStatusByPickup(PickUp $pickup)
+    {
+        $hbl = $pickup->hbl()->latest()->first();
+
+        if ($hbl) {
+            return $this->HBLRepository->getHBLStatus($hbl);
+        }
     }
 }

@@ -60,8 +60,14 @@ const filters = reactive({
     pickupDate: "",
     zoneBy: "",
     driverBy: [],
-
 });
+
+// Function to get formatted date based on days from today
+const getFormattedDate = (daysFromToday) => {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromToday);
+    return date.toISOString().split("T")[0]; // Formats as YYYY-MM-DD
+};
 
 const data = reactive({
     columnVisibility: {
@@ -77,6 +83,7 @@ const data = reactive({
         packages: false,
         exception_note: true,
         status: false,
+        package_types: true,
         actions: true,
     },
 });
@@ -506,12 +513,43 @@ const createColumns = () => [
         formatter: (cell) => {
             if (!cell) return '';
             let value = cell.toString();
-
             if (value.length < 20) {
                 return value;
             }
             return value.substring(0, 20) + '...';
         }
+    },
+    {
+        name: "Package Types",
+        hidden: !data.columnVisibility.package_types,
+        formatter: (_, row) => {
+            let packageTypes = [];
+
+            try {
+                const cellData = row?.cells?.[13]?.data; // Safe access
+                packageTypes = cellData ? JSON.parse(cellData) : [];
+                return h(
+                    "div",
+                    {className: "flex gap-2"},
+                    packageTypes.length > 0
+                        ? packageTypes.map((type, index) =>
+                            h(
+                                "span",
+                                {
+                                    key: index,
+                                    className: "badge space-x-2.5 bg-red-100 text-red-500 dark:bg-red-100",
+                                },
+                                type
+                            ),
+                            h("br")
+                        )
+                        : h("span", {className: "text-gray-400"}, "No Packages")
+                );
+            } catch (error) {
+                console.error("Error parsing package types:", error);
+            }
+        },
+        sort: false,
     },
     {
         name: "Exception",
@@ -1119,6 +1157,14 @@ const shipIcon = ref(`
 
                                 <label class="inline-flex items-center space-x-2">
                                     <Checkbox
+                                        :checked="data.columnVisibility.package_types"
+                                        @change="toggleColumnVisibility('package_types', $event)"
+                                    />
+                                    <span class="hover:cursor-pointer">Pakage Types</span>
+                                </label>
+
+                                <label class="inline-flex items-center space-x-2">
+                                    <Checkbox
                                         :checked="data.columnVisibility.pickup_time_start"
                                         @change="
                       toggleColumnVisibility('pickup_time_start', $event)
@@ -1246,6 +1292,23 @@ const shipIcon = ref(`
                         <span>Reset Filters</span>
                     </SoftPrimaryButton>
                 </div>
+
+                <FilterHeader value="Pickup Date"/>
+
+                <select
+                    v-model="filters.pickupDate"
+                    autocomplete="off"
+                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                    placeholder="Select a date..."
+                >
+                    <option value="">Select a date...</option>
+                    <option :value="getFormattedDate(1)">Tomorrow</option>
+                    <option :value="getFormattedDate(2)">Day after Tomorrow</option>
+                    <option :value="getFormattedDate(7)">One Week Later</option>
+                </select>
+
+                <FilterBorder/>
+
                 <div>
                     <InputLabel value="From"/>
                     <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
@@ -1283,7 +1346,7 @@ const shipIcon = ref(`
                 <FilterHeader value="Created By"/>
 
                 <select
-                    v-model="filters.pickupDate"
+                    v-model="filters.createdBy"
                     autocomplete="off"
                     class="w-full"
                     multiple
