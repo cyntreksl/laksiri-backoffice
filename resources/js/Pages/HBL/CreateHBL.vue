@@ -326,17 +326,23 @@ watch(
 
 watch([() => form.cargo_type], ([newCargoType]) => {
     calculatePayment();
-    hblRules();
+    if(form.cargo_type && form.hbl_type && form.warehouse){
+        hblRules();
+    }
 });
 
 watch([() => form.hbl_type], ([newHBLType]) => {
     calculatePayment();
-    hblRules();
+    if(form.cargo_type && form.hbl_type && form.warehouse){
+        hblRules();
+    }
 });
 
 watch([() => form.warehouse], ([newHBLType]) => {
     calculatePayment();
-    hblRules();
+    if(form.cargo_type && form.hbl_type && form.warehouse){
+        hblRules();
+    }
 });
 
 const selectedType = ref("");
