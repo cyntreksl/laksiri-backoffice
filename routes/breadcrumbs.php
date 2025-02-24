@@ -421,5 +421,12 @@ Breadcrumbs::for('couriers.create', function (BreadcrumbTrail $trail) {
     $trail->push('Courier');
     $trail->push('Create', route('couriers.create'));
 });
+//CourierAgents
+Breadcrumbs::for('courier-agents.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Courier');
+    $trail->push('Courier Agents', route('courier-agents.index'));
+});
+
 
 require_once __DIR__.'/call-center-breadcrumbs.php';
