@@ -400,7 +400,7 @@ const initializeGrid = () => {
         search: {
             debounceTimeout: 1000,
             server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`,
+                url: (prev, keyword) => `${prev}&search=${keyword}`,
             },
         },
         sort: {
@@ -698,8 +698,8 @@ const shipIcon = ref(`
 `);
 </script>
 <template>
-    <AppLayout title="Cash Settlements">
-        <template #header>Cash Settlements</template>
+    <AppLayout title="Due Payments">
+        <template #header>Due Payments</template>
 
         <Breadcrumb />
 
