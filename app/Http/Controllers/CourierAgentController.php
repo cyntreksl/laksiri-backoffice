@@ -27,7 +27,9 @@ class CourierAgentController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('CourierAgent/CreateCourierAgent',
+
+        );
     }
 
     /**
@@ -35,7 +37,7 @@ class CourierAgentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->courierAgentRepository->storeCourierAgent($request->all());
     }
 
     /**

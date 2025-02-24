@@ -6,4 +6,6 @@ interface CourierAgentRepositoryInterface
 {
     public function getAllCourierAgents();
 
+    public function storeCourierAgent(array $data);
+
 }

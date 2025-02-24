@@ -3,7 +3,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {Link, router} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {br} from "../../../../public/build/assets/app-C19FfuHH.js";
+
 
 import {push} from "notivue";
 import {ref} from "vue";
@@ -44,7 +44,7 @@ const handleDeleteAgent = () => {
 </script>
 
 <template>
-    <AppLayout title="Agents">
+    <AppLayout title="Courier Agents">
         <template #header> Courier Agents</template>
 
         <Breadcrumb/>
@@ -54,7 +54,7 @@ const handleDeleteAgent = () => {
                 Courier  Agents
             </h2>
 
-            <Link :href="route('agents.create')">
+            <Link :href="route('courier-agents.create')">
                 <PrimaryButton>
                     Create New Courier Agent
                 </PrimaryButton>
@@ -106,11 +106,13 @@ const handleDeleteAgent = () => {
                     >
                         Invoice Header
                     </th>
+
                     <th
-                        class="whitespace-nowrap rounded-tr-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
-                        Invoice Footer
+                        Action
                     </th>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -126,28 +128,45 @@ const handleDeleteAgent = () => {
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{courierAgent.type}}
+                        {{courierAgent.website}}
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{courierAgent.branch_code}}
+                        {{courierAgent.contact_number_1}}
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{courierAgent.currency_name}}
+                        {{courierAgent.contact_number_2}}
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        {{courierAgent.currency_symbol}}
+                        {{courierAgent.email}}
                     </td>
+                    <td
+                        class="whitespace-nowrap px-4 py-3 sm:px-5"
+                    >
+                        {{courierAgent.address}}
+                    </td>
+                    <td
+                        class="whitespace-nowrap px-4 py-3 sm:px-5"
+                    >
+                        {{courierAgent.logo}}
+                    </td>
+                    <td
+                        class="whitespace-nowrap px-4 py-3 sm:px-5"
+                    >
+                        {{courierAgent.invoice_header}}
+                    </td>
+
+
 
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                         <div class="flex space-x-2">
                             <Link
-                                :href="route('agents.edit', agent.id)"
+                                :href="route('courier-agents.edit', courierAgent.id)"
                                 class="btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25"
                             >
                                 <svg
@@ -164,7 +183,7 @@ const handleDeleteAgent = () => {
                             </Link>
                             <button
                                 class="btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
-                                @click="confirmDeleteAgent(agent.id)"
+                                @click="confirmDeleteAgent(courierAgent.id)"
                             >
                                 <svg
                                     class="size-4.5"
