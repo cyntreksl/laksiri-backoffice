@@ -1160,13 +1160,22 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("hbls.index")) {
+                    if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'admin') {
                         hblMenu.splice(
                             2,
                             0,
                             {
                                 title: "All HBL",
                                 route: "hbls.index",
+                            }
+                        );
+                    }else{
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All HBL",
+                                route: "call-center.hbls.index",
                             }
                         );
                     }
@@ -1182,7 +1191,7 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("hbls.index")) {
+                    if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'admin') {
                         hblMenu.splice(
                             2,
                             0,
