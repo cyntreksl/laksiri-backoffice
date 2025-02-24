@@ -23,7 +23,6 @@ return new class extends Migration
     {
         Schema::table('branches', function (Blueprint $table) {
             $table->dropColumn('is_third_party_agent');
-            $table->dropSoftDeletes();
         });
     }
 };
