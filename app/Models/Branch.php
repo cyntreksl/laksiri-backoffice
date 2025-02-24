@@ -31,6 +31,7 @@ class Branch extends Model
         'email',
         'container_delays',
         'country',
+        'is_third_party_agent',
     ];
 
     public function getActivitylogOptions(): LogOptions

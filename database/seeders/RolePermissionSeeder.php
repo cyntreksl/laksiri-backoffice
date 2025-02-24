@@ -215,6 +215,15 @@ class RolePermissionSeeder extends Seeder
                     'customer-queue.show examination calling screen',
                 ],
             ],
+            [
+                'group_name' => 'Third Party Agent',
+                'permissions' => [
+                    'third-party-agents.index',
+                    'third-party-agents.create',
+                    'third-party-agents.edit',
+                    'third-party-agents.delete',
+                ],
+            ],
         ];
     }
 }
