@@ -387,5 +387,42 @@ Breadcrumbs::for('setting.shipper-consignees.edit', function (BreadcrumbTrail $t
     $trail->push('Shipper & Consignees', route('setting.shipper-consignees.index'));
     $trail->push('Edit Officer', route('setting.shipper-consignees.edit', $id));
 });
+// Agents > index
+Breadcrumbs::for('agents.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Courier');
+    $trail->push('Agent');
+    $trail->push('List', route('agents.index'));
+});
+
+// Agents > Create
+Breadcrumbs::for('agents.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Courier');
+    $trail->push('Agent');
+    $trail->push('Create', route('agents.create'));
+});
+// Agents > Edit
+Breadcrumbs::for('agents.edit', function (BreadcrumbTrail $trail, $id) {
+    $branch = Branch::find($id);
+    $trail->parent('dashboard');
+    $trail->push('Courier');
+    $trail->push('Agent');
+    $trail->push('Edit', route('agents.edit', $branch->id));
+});
+
+// Courier
+
+Breadcrumbs::for('couriers.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Courier');
+    $trail->push('List', route('couriers.index'));
+
+});
+Breadcrumbs::for('couriers.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('couriers.index');
+    $trail->push('Courier');
+    $trail->push('Create', route('couriers.create'));
+});
 
 require_once __DIR__.'/call-center-breadcrumbs.php';

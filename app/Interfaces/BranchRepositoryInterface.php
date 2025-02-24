@@ -15,4 +15,10 @@ interface BranchRepositoryInterface
     public function updateBranch(array $data, Branch $branch);
 
     public function getUserBranches();
+
+    public function getBranchesByType();
+
+    public function createAgent(array $data);
+
+    public function updateAgent(array $data, Branch $branch);
 }
