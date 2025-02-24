@@ -1192,6 +1192,18 @@ export default {
                             }
                         );
                     }
+
+                    if (usePage().props.user.permissions.includes("delivers.assign release to driver")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Door to Door HBL",
+                                route: "call-center.hbls.door-to-door-list",
+                            }
+                        );
+                    }
+
                     if (usePage().props.user.permissions.includes("hbls.show cancelled hbls")) {
                         hblMenu.splice(
                             2,

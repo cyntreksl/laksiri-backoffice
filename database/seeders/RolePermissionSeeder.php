@@ -116,6 +116,7 @@ class RolePermissionSeeder extends Seeder
             [
                 'group_name' => 'Delivers',
                 'permissions' => [
+                    'delivers.assign release to driver',
                     'delivers.show deliver order',
                 ],
             ],
