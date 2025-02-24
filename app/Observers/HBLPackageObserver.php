@@ -42,28 +42,4 @@ class HBLPackageObserver
             $package_rule_data = UpdateHBLPackageRuleData::run($hBLPackage, $data);
         }
     }
-
-    /**
-     * Handle the HBLPackage "deleted" event.
-     */
-    public function deleted(HBLPackage $hBLPackage): void
-    {
-        //
-    }
-
-    /**
-     * Handle the HBLPackage "restored" event.
-     */
-    public function restored(HBLPackage $hBLPackage): void
-    {
-        //
-    }
-
-    /**
-     * Handle the HBLPackage "force deleted" event.
-     */
-    public function forceDeleted(HBLPackage $hBLPackage): void
-    {
-        //
-    }
 }
