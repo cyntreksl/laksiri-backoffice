@@ -8,16 +8,24 @@ import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import {push} from "notivue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import {computed, ref} from "vue";
 
 defineProps({
-
+    countryCodes: {
+        type: Array,
+        default: () => [],
+    }
 })
+const countryCode = ref('+94');
+const contactNumber1 = ref("");
+const contactNumber2 = ref("");
 
 const form = useForm({
     company_name: "",
     website: "",
-    contact_number_1: "",
-    contact_number_2: "",
+    contact_number_1: computed(() => countryCode.value + contactNumber1.value),
+    contact_number_2: computed(() => countryCode.value + contactNumber2.value),
     email: "",
     address: "",
     logo: null,
@@ -40,6 +48,31 @@ const handleBranchCreate = () => {
         preserveState: true,
     });
 }
+const logoInput = ref(null);
+const logoPreview = ref(null);
+
+const selectNewLogo = () => {
+    logoInput.value.click();
+};
+const updatelogoPreview = () => {
+    const logo = logoInput.value.files[0];
+
+    if (!logo) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        logoPreview.value = e.target.result;
+    };
+
+    reader.readAsDataURL(logo);
+};
+const clearLogoFileInput = () => {
+    logoInput.value.value = "";
+    logoPreview.value = null;
+};
+
+
 
 </script>
 
@@ -56,7 +89,7 @@ const handleBranchCreate = () => {
                 </h2>
 
                 <div class="flex justify-end bottom-0 space-x-5">
-                    <DangerOutlineButton @click="router.visit(route('agents.index'))">Cancel</DangerOutlineButton>
+                    <DangerOutlineButton @click="router.visit(route('courier-agents.index'))">Cancel</DangerOutlineButton>
                     <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
                                    class="space-x-2"
                                    type="submit"
@@ -100,36 +133,57 @@ const handleBranchCreate = () => {
                                 <TextInput v-model="form.website" class="w-full"/>
                                 <InputError :message="form.errors.website"/>
                             </div>
-
-<!--                            <div class="sm:col-span-1">-->
-<!--                                <label class="block">-->
-<!--                                    <InputLabel value="Type"/>-->
-<!--                                    <select-->
-<!--                                        v-model="form.type"-->
-<!--                                        class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"-->
-<!--                                    >-->
-<!--                                        <option :value="null" disabled>-->
-<!--                                            Select Type-->
-<!--                                        </option>-->
-<!--                                        <option v-for="(branchType, index) in branchTypes" :key="index"-->
-<!--                                                :value="branchType">-->
-<!--                                            {{ branchType }}-->
-<!--                                        </option>-->
-<!--                                    </select>-->
-<!--                                </label>-->
-<!--                                <InputError :message="form.errors.type"/>-->
-<!--                            </div>-->
-
+                            <!-- Mobile Number 1 -->
                             <div class="sm:col-span-2">
-                                <InputLabel value="Contact Number 1"/>
-                                <TextInput v-model="form.contact_number_1" class="w-full"/>
-                                <InputError :message="form.errors.contact_number_1"/>
+                                <div class="grid grid-cols-1 sm:grid-cols-3">
+                                    <InputLabel class="col-span-3" for="mobile_number" value="Mobile Number"/>
+                                    <div>
+                                        <select
+                                            v-model="countryCode"
+                                            x-init="$el._tom = new Tom($el)"
+                                            class="w-full rounded-r-0"
+                                        >
+                                            <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                                {{ countryCode }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <input
+                                            v-model="contactNumber1"
+                                            class="form-input rounded-l-lg w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                            placeholder="123 4567 890"
+                                            type="text"
+                                        />
+                                    </div>
+                                    <InputError class="col-span-3" :message="form.errors.contact_number_1"/>
+                                </div>
                             </div>
-
+                        <!-- Mobile Number 2 -->
                             <div class="sm:col-span-2">
-                                <InputLabel value="Contact Number 2"/>
-                                <TextInput v-model="form.contact_number_2" class="w-full"/>
-                                <InputError :message="form.errors.contact_number_2"/>
+                                <div class="grid grid-cols-1 sm:grid-cols-3">
+                                    <InputLabel class="col-span-3" for="mobile_number" value="Mobile Number"/>
+                                    <div>
+                                        <select
+                                            v-model="countryCode"
+                                            x-init="$el._tom = new Tom($el)"
+                                            class="w-full rounded-r-0"
+                                        >
+                                            <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                                {{ countryCode }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <input
+                                            v-model="contactNumber2"
+                                            class="form-input rounded-l-lg w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                            placeholder="123 4567 890"
+                                            type="text"
+                                        />
+                                    </div>
+                                    <InputError class="col-span-3" :message="form.errors.contact_number_2"/>
+                                </div>
                             </div>
                             <div class="sm:col-span-2">
                                 <InputLabel value="Email"/>
@@ -144,6 +198,7 @@ const handleBranchCreate = () => {
                         </div>
                     </div>
                 </div>
+                <!-- other Part -->
                 <div class="sm:col-span-2 space-y-5">
                     <div class="card px-4 py-4 sm:px-5">
                         <div class="grid grid-cols-2">
@@ -184,35 +239,44 @@ const handleBranchCreate = () => {
                             <InputError :message="form.errors.invoice_footer"/>
                         </div>
                     </div>
-
+                    <!-- image Upload -->
                     <div class="card px-4 py-4 sm:px-5">
                         <div class="grid grid-cols-2">
                             <h2
                                 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                Package Types
+                                Invoice Footer
                             </h2>
                         </div>
-                        <div class="my-5">
-                            <div class="space-x-5">
-                                <label class="block">
-                                    <span>Select Package Types</span>
-                                    <select
-                                        autocomplete="off"
-                                        class="mt-1.5 w-full"
-                                        multiple
-                                        placeholder="Select a Package Type..."
-                                        v-model="form.package_types"
-                                        x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
-                                    >
-                                        <option value="">Select a Package Type...</option>
-                                        <option v-for="(packageType, index) in packageTypes" :key="index"
-                                                :value="packageType">{{ packageType }}
-                                        </option>
-                                    </select>
-                                </label>
+                        <div class="sm:col-span-4">
+                            <div>
+                                <input
+                                    id="logo"
+                                    ref="logoInput"
+                                    class="hidden"
+                                    type="file"
+                                    @change="updatelogoPreview"
+                                >
+
+                                <!-- Current  Photo -->
+                                <div v-show="!logoPreview" class="mt-2">
+                                    <img v-if="form && form.logo" :src="form.logo" alt="seal" class="rounded-full h-20 w-20 object-cover">
+                                </div>
+
+                                <!-- New Photo Preview -->
+                                <div v-show="logoPreview" class="mt-2">
+                          <span
+                              :style="'background-image: url(\'' + logoPreview + '\');'"
+                              class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"
+                          />
+                                </div>
+
+                                <SecondaryButton class="mt-2 me-2" type="button" @click.prevent="selectNewLogo">
+                                    Select A New Logo
+                                </SecondaryButton>
+
+                                <InputError :message="form.errors.logo" class="mt-2" />
                             </div>
-                            <InputError :message="form.errors.package_types"/>
                         </div>
                     </div>
                 </div>

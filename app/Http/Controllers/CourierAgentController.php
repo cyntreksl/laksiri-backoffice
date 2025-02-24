@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCourierAgentRequest;
+use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\CourierAgentRepositoryInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -10,6 +12,7 @@ class CourierAgentController extends Controller
 {
     public function __construct  (
         private readonly CourierAgentRepositoryInterface $courierAgentRepository,
+        private readonly CountryRepositoryInterface $countryRepository,
     )
     {}
     /**
@@ -28,6 +31,9 @@ class CourierAgentController extends Controller
     public function create()
     {
         return Inertia::render('CourierAgent/CreateCourierAgent',
+            [
+                'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
+            ]
 
         );
     }
@@ -35,7 +41,7 @@ class CourierAgentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCourierAgentRequest $request)
     {
         $this->courierAgentRepository->storeCourierAgent($request->all());
     }
