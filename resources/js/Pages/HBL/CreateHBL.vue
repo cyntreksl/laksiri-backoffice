@@ -116,7 +116,7 @@ const handleHBLCreate = () => {
     form.post(route("hbls.store"), {
         onSuccess: (page) => {
             confirmViewHBL(page.props.hbl_id)
-            form.reset();
+            // form.reset();
             push.success("HBL Created Successfully!");
         },
         onError: () => console.log("error"),

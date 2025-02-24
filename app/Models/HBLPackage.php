@@ -3,14 +3,17 @@
 namespace App\Models;
 
 use App\Models\Scopes\BranchScope;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Observers\HBLPackageObserver;
 
 #[ScopedBy(BranchScope::class)]
+#[ObservedBy([HBLPackageObserver::class])]
 class HBLPackage extends Model
 {
     use HasFactory;
@@ -60,5 +63,10 @@ class HBLPackage extends Model
     public function unloadingIssue()
     {
         return $this->hasMany(UnloadingIssue::class, 'hbl_package_id', 'id');
+    }
+
+    public function packageRuleData()
+    {
+        return $this->hasOne(HBLPackageRuleData::class, 'package_id', 'id');
     }
 }
