@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('branches', function (Blueprint $table) {
-            $table->boolean('is_third_party_agent')->default(false);
-            $table->softDeletes();
+            $table->boolean('is_third_party_agent')->default(false)->after('do_charge');
         });
     }
 
