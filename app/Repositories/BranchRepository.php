@@ -40,7 +40,7 @@ class BranchRepository implements BranchRepositoryInterface
         return GetUserBranches::run();
     }
 
-    public function getBranchesByType(bool $isAgent)
+    public function getBranchesByType()
     {
         return GetAgent::run();
     }

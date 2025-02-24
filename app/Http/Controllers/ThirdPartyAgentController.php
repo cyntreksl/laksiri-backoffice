@@ -24,7 +24,7 @@ class ThirdPartyAgentController extends Controller
     public function index()
     {
         return Inertia::render('Agent/AgentList', [
-            'agents' => $this->branchRepository->getBranchesByType(true),
+            'agents' => $this->branchRepository->getBranchesByType(),
         ]);
     }
 

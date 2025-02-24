@@ -16,7 +16,7 @@ interface BranchRepositoryInterface
 
     public function getUserBranches();
 
-    public function getBranchesByType(bool $isAgent);
+    public function getBranchesByType();
 
     public function createAgent(array $data);
 
