@@ -7,7 +7,8 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 import {push} from "notivue";
 import {ref} from "vue";
-import DeleteAgentConfirmationModal from "@/Pages/Agent/Partials/DeleteAgentConfirmationModal.vue";
+import DeleteCourierAgentConfirmationModal from "@/Pages/CourierAgent/Partials/DeleteCourierAgentConfirmationModal.vue";
+
 
 defineProps({
     courierAgents: {
@@ -17,25 +18,26 @@ defineProps({
 
 })
 
-const showDeleteAgentConfirmationModal = ref(false);
-const AgentId = ref(null);
+const showDeleteCourierAgentConfirmationModal = ref(false);
+const  CourierAgentId = ref(null);
 
 const confirmDeleteAgent = (id) => {
-    AgentId.value = id;
-    showDeleteAgentConfirmationModal.value = true;
+    CourierAgentId.value = id;
+    showDeleteCourierAgentConfirmationModal.value = true;
 };
 const closeModal = () => {
-    showDeleteAgentConfirmationModal.value = false;
-    AgentId.value = null;
+    showDeleteCourierAgentConfirmationModal.value = false;
+    showDeleteCourierAgentConfirmationModal.value = false;
+    CourierAgentId.value = null;
 };
 
-const handleDeleteAgent = () => {
-    router.delete(route("agents.destroy", AgentId.value), {
+const handleDeleteCourierAgent = () => {
+    router.delete(route("courier-agents.destroy", CourierAgentId.value), {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
             push.success("Officer Deleted Successfully!");
-            router.visit(route("agents.index"));
+            router.visit(route("courier-agents.index"));
         },
     });
 };
@@ -187,10 +189,10 @@ const handleDeleteAgent = () => {
                 </tbody>
             </table>
         </div>
-        <DeleteAgentConfirmationModal
-            :show="showDeleteAgentConfirmationModal"
+        <DeleteCourierAgentConfirmationModal
+            :show="showDeleteCourierAgentConfirmationModal"
             @close="closeModal"
-            @deleteAgent="handleDeleteAgent"
+            @deleteCourierAgent="handleDeleteCourierAgent"
         />
     </AppLayout>
 </template>

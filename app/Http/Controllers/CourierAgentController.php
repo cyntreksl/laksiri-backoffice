@@ -83,6 +83,6 @@ class CourierAgentController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $this ->courierAgentRepository->destroyCourierAgent($id);
     }
 }

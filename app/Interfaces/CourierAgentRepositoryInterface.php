@@ -10,4 +10,6 @@ interface CourierAgentRepositoryInterface
 
     public function updateCourierAgent(array $data, $id);
 
+    public function destroyCourierAgent($id);
+
 }
