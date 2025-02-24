@@ -3,7 +3,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {Link, router} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {br} from "../../../../public/build/assets/app-C19FfuHH.js";
+
 
 import {push} from "notivue";
 import {ref} from "vue";
