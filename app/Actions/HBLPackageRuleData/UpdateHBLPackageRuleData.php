@@ -3,8 +3,6 @@
 namespace App\Actions\HBLPackageRuleData;
 
 use App\Models\HBLPackage;
-use App\Models\HBLPackageRuleData;
-use App\Models\Officer;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class UpdateHBLPackageRuleData

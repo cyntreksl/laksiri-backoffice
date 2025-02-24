@@ -108,7 +108,7 @@ class HBLObserver
         if ($hbl->wasChanged('cargo_type') || $hbl->wasChanged('hbl_type') || $hbl->wasChanged('warehouse_id')) {
             $hblPackages = $hbl->packages;
             foreach ($hblPackages as $hblPackage) {
-                if(!$hblPackage['package_rule'] && $hblPackage['package_rule'] <= 0) {
+                if (! $hblPackage['package_rule'] && $hblPackage['package_rule'] <= 0) {
                     $rules = GetPriceRulesByCargoModeAndHBLType::run($hbl['cargo_type'], $hbl['hbl_type'], $hbl['warehouse_id']);
                     $data['rules'] = json_encode($rules);
                     UpdateHBLPackageRuleData::run($hblPackage, $data);
