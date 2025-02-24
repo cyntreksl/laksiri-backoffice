@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCourierAgentRequest;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\CourierAgentRepositoryInterface;
+use App\Models\CourierAgent;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -59,7 +60,14 @@ class CourierAgentController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $courierAgent = CourierAgent::findOrFail($id);
+        return Inertia::render('CourierAgent/EditCourierAgent',
+            [
+                'courierAgent' => $courierAgent,
+                'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
+            ]
+
+        );
     }
 
     /**
@@ -67,7 +75,7 @@ class CourierAgentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+       $this->courierAgentRepository->updateCourierAgent($request->all(), $id);
     }
 
     /**

@@ -82,30 +82,17 @@ const handleDeleteAgent = () => {
                     >
                         Contact Number-1
                     </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Contact Number-2
-                    </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Currency Symbol
-                    </th>
+
                     <th
                         class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
                         Email
                     </th>
+
                     <th
                         class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
-                        Logo
-                    </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Invoice Header
+                        Address
                     </th>
 
                     <th
@@ -136,11 +123,11 @@ const handleDeleteAgent = () => {
                     >
                         {{courierAgent.contact_number_1}}
                     </td>
-                    <td
-                        class="whitespace-nowrap px-4 py-3 sm:px-5"
-                    >
-                        {{courierAgent.contact_number_2}}
-                    </td>
+<!--                    <td-->
+<!--                        class="whitespace-nowrap px-4 py-3 sm:px-5"-->
+<!--                    >-->
+<!--                        {{courierAgent.contact_number_2}}-->
+<!--                    </td>-->
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
@@ -151,16 +138,12 @@ const handleDeleteAgent = () => {
                     >
                         {{courierAgent.address}}
                     </td>
-                    <td
-                        class="whitespace-nowrap px-4 py-3 sm:px-5"
-                    >
-                        {{courierAgent.logo}}
-                    </td>
-                    <td
-                        class="whitespace-nowrap px-4 py-3 sm:px-5"
-                    >
-                        {{courierAgent.invoice_header}}
-                    </td>
+<!--                    <td-->
+<!--                        class="whitespace-nowrap px-4 py-3 sm:px-5"-->
+<!--                    >-->
+<!--                        {{courierAgent.logo}}-->
+<!--                    </td>-->
+
 
 
 
