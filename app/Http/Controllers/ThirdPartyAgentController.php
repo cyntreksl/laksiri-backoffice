@@ -75,7 +75,6 @@ class ThirdPartyAgentController extends Controller
     {
         $branch = Branch::find($branch);
         $data = $request->all();
-        $data['is_third_party_agent'] = true;
 
         $this->branchRepository->updateAgent($data, $branch);
     }
