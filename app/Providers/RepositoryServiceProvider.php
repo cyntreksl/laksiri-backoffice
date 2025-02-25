@@ -16,6 +16,7 @@ use App\Interfaces\CallCenter\VerificationRepositoryInterface;
 use App\Interfaces\CashSettlementInterface;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
+use App\Interfaces\CourierAgentRepositoryInterface;
 use App\Interfaces\CustomerRepositoryInterface;
 use App\Interfaces\DashboardRepositoryInterface;
 use App\Interfaces\DriverAreasRepositoryInterface;
@@ -54,6 +55,7 @@ use App\Repositories\CallCenter\VerificationRepository;
 use App\Repositories\CashSettlementRepository;
 use App\Repositories\ContainerRepositories;
 use App\Repositories\CountryRepository;
+use App\Repositories\CourierAgentRepository;
 use App\Repositories\CustomerRepository;
 use App\Repositories\DashboardRepository;
 use App\Repositories\DriverAreasRepository;
@@ -110,6 +112,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PackageTypeRepositoryInterface::class, PackageTypeRepository::class);
         $this->app->bind(ShipperConsigneeRepositoryInterface::class, ShipperConsigneeRepository::class);
         $this->app->bind(NotificationMailRepositoryInterface::class, NotificationMailRepository::class);
+        $this->app->bind(CourierAgentRepositoryInterface::class, CourierAgentRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);
