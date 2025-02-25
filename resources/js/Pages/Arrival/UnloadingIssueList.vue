@@ -605,7 +605,8 @@ const handlePerPageChange = (event) => {
 
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
+                        <div v-show="isData" ref="wrapperRef"></div>
+                        <NoRecordsFound v-show="!isData"/>
                     </div>
                 </div>
             </div>
