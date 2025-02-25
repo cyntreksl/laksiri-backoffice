@@ -390,22 +390,25 @@ Breadcrumbs::for('setting.shipper-consignees.edit', function (BreadcrumbTrail $t
 // Agents > index
 Breadcrumbs::for('agents.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
+    $trail->push('Courier');
     $trail->push('Agent');
     $trail->push('List', route('agents.index'));
 });
 
 // Agents > Create
 Breadcrumbs::for('agents.create', function (BreadcrumbTrail $trail) {
-    $trail->parent('branches.index');
+    $trail->parent('dashboard');
+    $trail->push('Courier');
     $trail->push('Agent');
     $trail->push('Create', route('agents.create'));
 });
 // Agents > Edit
-Breadcrumbs::for('agent.agents.edit', function (BreadcrumbTrail $trail, $id) {
+Breadcrumbs::for('agents.edit', function (BreadcrumbTrail $trail, $id) {
     $branch = Branch::find($id);
     $trail->parent('dashboard');
+    $trail->push('Courier');
     $trail->push('Agent');
-    $trail->push('Edit', route('agent.agents.edit', $branch->id));
+    $trail->push('Edit', route('agents.edit', $branch->id));
 });
 
 // Courier

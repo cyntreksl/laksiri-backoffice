@@ -6,7 +6,6 @@ use App\Actions\PickUps\ConvertPickupToHBL;
 use App\Actions\PickUps\CreatePickUp;
 use App\Actions\PickUps\Exception\CreatePickUpException;
 use App\Actions\PickUps\Exception\GetPickupExceptionsByDriver;
-use App\Actions\PickUps\GetPickupsByDriver;
 use App\Enum\PickupStatus;
 use App\Http\Resources\PickupExceptionResource;
 use App\Http\Resources\PickupResource;
@@ -20,38 +19,62 @@ class PickupRepository implements PickupRepositoryInterface
 {
     use ResponseAPI;
 
+    private function buildPendingPickupsQuery(array $data)
+    {
+        $query = PickUp::query()->assignedToDriver();
+
+        $this->applyDateFilter($query, $data);
+        $this->applyStatusFilter($query);
+        $this->applyReferenceNumberFilter($query, $data);
+        $this->applyMobileNumberFilter($query, $data);
+        $this->applyNameFilter($query, $data);
+
+        $query->whereDoesntHave('pickupException');
+
+        return $query;
+    }
+
+    private function applyDateFilter($query, array $data)
+    {
+        if (isset($data['start_date']) && isset($data['end_date'])) {
+            $query->whereBetween('pickup_date', [$data['start_date'], $data['end_date']]);
+        }
+    }
+
+    private function applyStatusFilter($query)
+    {
+        $query->whereIn('system_status', [
+            PickUp::SYSTEM_STATUS_PICKUP_CREATED,
+            PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
+        ]);
+    }
+
+    private function applyReferenceNumberFilter($query, array $data)
+    {
+        if (isset($data['reference_number'])) {
+            $query->where('reference_number', $data['reference_number']);
+        }
+    }
+
+    private function applyMobileNumberFilter($query, array $data)
+    {
+        if (isset($data['mobile_number'])) {
+            $query->where('mobile_number', $data['mobile_number']);
+        }
+    }
+
+    private function applyNameFilter($query, array $data)
+    {
+        if (isset($data['name'])) {
+            $query->where('name', 'like', '%'.$data['name'].'%');
+        }
+    }
+
     public function getPendingPickupsForDriver(array $data): JsonResponse
     {
         try {
-            //            $query = GetPickupsByDriver::run($data);
-            //            TODO Proper fix
-            $query = PickUp::query()->assignedToDriver();
-
-            if (isset($data['start_date']) && isset($data['end_date'])) {
-                $query->whereBetween('pickup_date', [$data['start_date'], $data['end_date']]);
-            }
-
-            $query->whereIn('system_status', [
-                PickUp::SYSTEM_STATUS_PICKUP_CREATED,
-                PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
-            ]);
-
-            if (isset($data['reference_number'])) {
-                $query->where('reference_number', $data['reference_number']);
-            }
-
-            if (isset($data['mobile_number'])) {
-                $query->where('mobile_number', $data['mobile_number']);
-            }
-
-            if (isset($data['name'])) {
-                $query->where('name', 'like', '%'.$data['name'].'%');
-            }
-
-            $query->whereDoesntHave('pickupException');
-
+            $query = $this->buildPendingPickupsQuery($data);
             $pickups = $query->orderBy('pickup_order')->get();
-
             $pendingPickupsResource = PickupResource::collection($pickups);
 
             return $this->success('Pending pickup list received successfully!', $pendingPickupsResource);

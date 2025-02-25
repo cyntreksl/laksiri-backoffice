@@ -39,7 +39,11 @@ class CreateDraftLoadedContainer
 
                 $hbl = HBL::find($package['hbl_id']);
 
-                $hbl->addStatus('Container Loading');
+                if ($package['is_unloaded']) {
+                    $hbl->addStatus('Container Loading in '.session('current_branch_name'));
+                } else {
+                    $hbl->addStatus('Container Loading');
+                }
 
                 UpdateHBLSystemStatus::run($hbl, 4.2);
 

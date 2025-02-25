@@ -9,8 +9,6 @@ use App\Enum\PackageType;
 use App\Http\Requests\StoreAgentRequest;
 use App\Http\Requests\UpdateAgentRequest;
 use App\Interfaces\BranchRepositoryInterface;
-use App\Interfaces\CountryRepositoryInterface;
-use App\Interfaces\SettingRepositoryInterface;
 use App\Models\Branch;
 use Inertia\Inertia;
 
@@ -18,8 +16,6 @@ class ThirdPartyAgentController extends Controller
 {
     public function __construct(
         private readonly BranchRepositoryInterface $branchRepository,
-        //        private readonly SettingRepositoryInterface $settingRepository,
-        //        private readonly CountryRepositoryInterface $countryRepository,
     ) {}
 
     /**
@@ -28,7 +24,7 @@ class ThirdPartyAgentController extends Controller
     public function index()
     {
         return Inertia::render('Agent/AgentList', [
-            'agents' => $this->branchRepository->getBranchesByType(true), // Fetch only agents
+            'agents' => $this->branchRepository->getBranchesByType(),
         ]);
     }
 
@@ -79,7 +75,6 @@ class ThirdPartyAgentController extends Controller
     {
         $branch = Branch::find($branch);
         $data = $request->all();
-        $data['is_third_party_agent'] = true; // Ensure it remains an agent
 
         $this->branchRepository->updateAgent($data, $branch);
     }

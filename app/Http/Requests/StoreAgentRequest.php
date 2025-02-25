@@ -31,8 +31,7 @@ class StoreAgentRequest extends FormRequest
             'cargo_modes' => ['required'],
             'delivery_types' => ['required'],
             'package_types' => ['required'],
-            'is_third_party_agent' => ['nullable'],
+
         ];
     }
 }
-// Compare this snippet from app/Http/Requests/StoreAgentRequest.php:

@@ -149,6 +149,6 @@ const handleDeletePackageType = () => {
         </div>
 
         <DeletePackageTypeConfirmationModal :show="showConfirmDeletePackageTypeModal"
-                                            @delete-package-type="handleDeletePackageType"/>
+                                            @delete-package-type="handleDeletePackageType" @close="closeModal"/>
     </AppLayout>
 </template>
