@@ -49,6 +49,7 @@ const fromDate = moment(new Date()).subtract(6, "month").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 const wrapperRef = ref(null);
 let grid = null;
+const isData = ref(false)
 const perPage = ref(10);
 const filters = reactive({
     fromDate: fromDate,
@@ -561,6 +562,7 @@ const initializeGrid = () => {
                 }),
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -593,6 +595,7 @@ const applyFilters = () => {
                 }),
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -1101,8 +1104,8 @@ const shipIcon = ref(`
                 </div>
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto p-3">
-                        <div ref="wrapperRef"></div>
-                        <!--                        <NoRecordsFound v-else/>-->
+                        <div v-show="isData" ref="wrapperRef"></div>
+                        <NoRecordsFound v-show="!isData"/>
                     </div>
                 </div>
             </div>

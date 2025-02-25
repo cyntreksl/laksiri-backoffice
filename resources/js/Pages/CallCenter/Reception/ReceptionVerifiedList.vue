@@ -4,6 +4,7 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {onMounted, reactive, ref} from "vue";
 import {Grid} from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const wrapperRef = ref(null);
 let grid = null;

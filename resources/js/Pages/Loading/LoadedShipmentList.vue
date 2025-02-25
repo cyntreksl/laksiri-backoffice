@@ -17,6 +17,7 @@ import FilterHeader from "@/Components/FilterHeader.vue";
 import RadioButton from "@/Components/RadioButton.vue";
 import LoadedShipmentDetailModal from "@/Pages/Loading/Partials/LoadedShipmentDetailModal.vue";
 import {router, usePage} from "@inertiajs/vue3";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const props = defineProps({
     cargoTypes: {
@@ -50,6 +51,7 @@ const props = defineProps({
 
 const wrapperRef = ref(null);
 let grid = null;
+const isData = ref(false)
 const perPage = ref(10);
 const showFilters = ref(false);
 const fromDate = moment(new Date()).subtract(6, "month").format("YYYY-MM-DD");
@@ -158,6 +160,7 @@ const initializeGrid = () => {
                 }),
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -603,6 +606,7 @@ const applyFilters = () => {
             },
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -1034,7 +1038,8 @@ const shipIcon = ref(`
 
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
+                        <div v-show="isData" ref="wrapperRef"></div>
+                        <NoRecordsFound v-show="!isData"/>
                     </div>
                 </div>
             </div>
