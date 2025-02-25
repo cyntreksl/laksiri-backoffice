@@ -37,7 +37,6 @@ const props = defineProps({
 });
 const wrapperRef = ref(null);
 let grid = null;
-const isData = ref(false)
 
 const data = reactive({
     UserData: {},
@@ -110,7 +109,6 @@ const initializeGrid = () => {
                     item.secondary_branch_names,
                 ]),
             total: (data) => {
-                data.meta.total > 0 ? isData.value = true : isData.value = false;
                 return data.meta.total
             },
         },
@@ -379,8 +377,7 @@ const handleDeleteUser = () => {
 
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div v-show="isData" ref="wrapperRef"></div>
-                        <NoRecordsFound v-show="!isData"/>
+                        <div ref="wrapperRef"></div>
                     </div>
                 </div>
             </div>
