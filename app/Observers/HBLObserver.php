@@ -9,6 +9,7 @@ use App\Actions\User\GetUserCurrentBranchID;
 use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Models\HBL;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 
 class HBLObserver
@@ -113,6 +114,13 @@ class HBLObserver
                     $data['rules'] = json_encode($rules);
                     UpdateHBLPackageRuleData::run($hblPackage, $data);
                 }
+            }
+        }
+        if ($hbl->wasChanged('is_released')) {
+            $driver_delivery = $hbl->assignedDriver->get();
+            if (count($driver_delivery) > 0 && Auth::user()->hasRole('driver')) {
+                // Send notification email
+                $this->notificationMailRepository->sendHBLReleasedNotification($hbl);
             }
         }
     }
