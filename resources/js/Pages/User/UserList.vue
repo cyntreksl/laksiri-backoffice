@@ -9,6 +9,7 @@ import notification from "@/magics/notification.js";
 import DeleteUserConfirmationModal from "@/Pages/User/Partials/DeleteUserConfirmationModal.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {push} from "notivue";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const props = defineProps({
     roles: {
@@ -36,6 +37,7 @@ const props = defineProps({
 });
 const wrapperRef = ref(null);
 let grid = null;
+const isData = ref(false)
 
 const data = reactive({
     UserData: {},
@@ -107,7 +109,10 @@ const initializeGrid = () => {
                     item.last_logout_at,
                     item.secondary_branch_names,
                 ]),
-            total: (data) => data.meta.total,
+            total: (data) => {
+                data.meta.total > 0 ? isData.value = true : isData.value = false;
+                return data.meta.total
+            },
         },
     });
 
@@ -374,7 +379,8 @@ const handleDeleteUser = () => {
 
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
+                        <div v-show="isData" ref="wrapperRef"></div>
+                        <NoRecordsFound v-show="!isData"/>
                     </div>
                 </div>
             </div>
