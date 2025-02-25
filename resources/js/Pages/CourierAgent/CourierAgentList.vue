@@ -33,7 +33,7 @@ const handleDeleteCourierAgent = () => {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
-            push.success("Officer Deleted Successfully!");
+            push.success("Courier Agent Deleted Successfully!");
             router.visit(route("courier-agents.index"));
         },
     });
