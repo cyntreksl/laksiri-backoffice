@@ -551,6 +551,7 @@ const applyFilters = () => {
             },
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
