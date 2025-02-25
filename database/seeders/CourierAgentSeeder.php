@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\CourierAgent;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class CourierAgentSeeder extends Seeder
@@ -46,7 +45,7 @@ class CourierAgentSeeder extends Seeder
                 'logo' => null,
                 'invoice_header' => 'Reliable Couriers Invoice',
                 'invoice_footer' => 'Fast, Secure, and Reliable.',
-            ]
+            ],
 
         ];
         foreach ($courierAgents as $courierAgent) {

@@ -15,5 +15,4 @@ class UpdateCourierAgent
 
         return $courierAgent->update($data);
     }
-
 }

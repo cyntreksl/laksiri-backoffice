@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('courier_agents', function (Blueprint $table) {
-            $table->id(); //auto increment
+            $table->id(); // auto increment
             $table->string('company_name')->unique();
             $table->string('website')->nullable();
             $table->string('contact_number_1')->nullable();

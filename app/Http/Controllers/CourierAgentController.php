@@ -11,11 +11,11 @@ use Inertia\Inertia;
 
 class CourierAgentController extends Controller
 {
-    public function __construct  (
+    public function __construct(
         private readonly CourierAgentRepositoryInterface $courierAgentRepository,
         private readonly CountryRepositoryInterface $countryRepository,
-    )
-    {}
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -61,6 +61,7 @@ class CourierAgentController extends Controller
     public function edit(string $id)
     {
         $courierAgent = CourierAgent::findOrFail($id);
+
         return Inertia::render('CourierAgent/EditCourierAgent',
             [
                 'courierAgent' => $courierAgent,
@@ -75,7 +76,7 @@ class CourierAgentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-       $this->courierAgentRepository->updateCourierAgent($request->all(), $id);
+        $this->courierAgentRepository->updateCourierAgent($request->all(), $id);
     }
 
     /**
@@ -83,6 +84,6 @@ class CourierAgentController extends Controller
      */
     public function destroy(string $id)
     {
-        $this ->courierAgentRepository->destroyCourierAgent($id);
+        $this->courierAgentRepository->destroyCourierAgent($id);
     }
 }

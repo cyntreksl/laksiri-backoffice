@@ -8,7 +8,7 @@ use App\Actions\CourierAgent\GetCourierAgent;
 use App\Actions\CourierAgent\UpdateCourierAgent;
 use App\Interfaces\CourierAgentRepositoryInterface;
 
-class CourierAgentRepository  implements CourierAgentRepositoryInterface
+class CourierAgentRepository implements CourierAgentRepositoryInterface
 {
     public function getAllCourierAgents()
     {
@@ -32,6 +32,7 @@ class CourierAgentRepository  implements CourierAgentRepositoryInterface
             throw new \Exception('Failed to update Courier Agent: '.$e->getMessage());
         }
     }
+
     public function destroyCourierAgent($id)
     {
         try {
@@ -40,5 +41,4 @@ class CourierAgentRepository  implements CourierAgentRepositoryInterface
             throw new \Exception('Failed to delete Courier Agent: '.$e->getMessage());
         }
     }
-
 }

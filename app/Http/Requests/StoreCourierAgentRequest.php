@@ -10,7 +10,8 @@ class StoreCourierAgentRequest extends FormRequest
     {
         return true;
     }
-    public function rules (): array
+
+    public function rules(): array
     {
         return [
             'company_name' => ['required', 'string', 'max:254'],
@@ -23,10 +24,7 @@ class StoreCourierAgentRequest extends FormRequest
             'invoice_header' => ['nullable', 'string', 'max:254'],
             'invoice_footer' => ['nullable', 'string', 'max:254'],
 
-
         ];
 
     }
-
-
 }

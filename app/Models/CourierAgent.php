@@ -10,6 +10,7 @@ use Spatie\Activitylog\LogOptions;
 class CourierAgent extends Model
 {
     use HasFactory, SoftDeletes;
+
     protected $table = 'courier_agents';
 
     protected $fillable = [
@@ -23,6 +24,7 @@ class CourierAgent extends Model
         'invoice_header',
         'invoice_footer',
     ];
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->logOnlyDirty();

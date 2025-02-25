@@ -8,10 +8,10 @@ use Lorisleiva\Actions\Concerns\AsAction;
 class DeleteCourierAgent
 {
     use AsAction;
+
     public function handle($id): void
     {
         $courierAgent = CourierAgent::findOrFail($id);
         $courierAgent->delete();
     }
-
 }
