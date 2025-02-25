@@ -89,7 +89,7 @@ const clearLogoFileInput = () => {
 </script>
 
 <template>
-    <AppLayout title="Edit Agent">
+    <AppLayout title="Edit Courier Agent">
         <template #header>Courier Agent</template>
 
         <Breadcrumb/>
