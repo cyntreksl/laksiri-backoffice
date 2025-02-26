@@ -61,8 +61,7 @@ const handleDeleteAgent = () => {
             </Link>
         </div>
 
-        <div class="is-scrollbar-hidden min-w-full overflow-x-auto"
-        >
+        <div v-if="agents.length > 0" class="is-scrollbar-hidden min-w-full overflow-x-auto">
             <table class="is-hoverable w-full text-left">
                 <thead>
                 <tr>
@@ -204,6 +203,9 @@ const handleDeleteAgent = () => {
                 </tbody>
             </table>
         </div>
+        <div v-else class="text-center p-4">
+            <p>No agents found.</p>
+        </div>
         <DeleteAgentConfirmationModal
             :show="showDeleteAgentConfirmationModal"
             @close="closeModal"
@@ -211,3 +213,4 @@ const handleDeleteAgent = () => {
         />
     </AppLayout>
 </template>
+
