@@ -42,9 +42,9 @@ class CreateSLInvoice
             'storage_charge_amount' => $storage_charge['amount'],
             'dmg_charge_rate' => $dmg_charge['rate'],
             'dmg_charge_amount' => $dmg_charge['amount'],
-            'total' => $service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount'],
+            'total' => $service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge($arrivalDatesCount, $grand_volume, $grand_weight)['amount'],
             'do_charge' => $hbl->do_charge,
-            'stamp_charge' => ($service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge(28, $grand_volume, $grand_weight)['amount']) > 25000 ? 25.00 : 00.00,
+            'stamp_charge' => ($service->portCharge($grand_volume)['amount'] + $service->handlingCharge($hbl->packages()->count())['amount'] + $service->bondCharge($grand_volume, $grand_weight)['amount'] + $service->demurrageCharge($arrivalDatesCount, $grand_volume, $grand_weight)['amount']) > 25000 ? 25.00 : 00.00,
             'created_by' => Auth::id(),
         ];
 
