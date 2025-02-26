@@ -1654,7 +1654,7 @@ export default {
                             }
                         );
                     }
-                    if (usePage().props.user.permissions.includes("couriers.create")){
+                    if (usePage().props.user.permissions.includes("courier.create")){
 
                         courierMenu.splice(
                             2,
@@ -1665,7 +1665,7 @@ export default {
                             }
                         );
                     }
-                    if (usePage().props.user.permissions.includes("couriers.index")){
+                    if (usePage().props.user.permissions.includes("courier.index")){
                         courierMenu.splice(
                             2,
                             0,
