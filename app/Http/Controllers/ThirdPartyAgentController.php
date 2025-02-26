@@ -23,8 +23,9 @@ class ThirdPartyAgentController extends Controller
      */
     public function index()
     {
+        $searchQuery  = request()->query('search', '');
         return Inertia::render('Agent/AgentList', [
-            'agents' => $this->branchRepository->getBranchesByType(),
+            'agents' => $this->branchRepository->getBranchesByType($searchQuery),
         ]);
     }
 

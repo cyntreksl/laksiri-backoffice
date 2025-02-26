@@ -3,6 +3,7 @@
 namespace App\Interfaces;
 
 use App\Models\Branch;
+use Illuminate\Database\Eloquent\Collection;
 
 interface BranchRepositoryInterface
 {
@@ -16,7 +17,7 @@ interface BranchRepositoryInterface
 
     public function getUserBranches();
 
-    public function getBranchesByType();
+    public function getBranchesByType(string $searchQuery = ''): Collection;
 
     public function createAgent(array $data);
 

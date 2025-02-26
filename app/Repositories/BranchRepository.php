@@ -40,9 +40,9 @@ class BranchRepository implements BranchRepositoryInterface
         return GetUserBranches::run();
     }
 
-    public function getBranchesByType()
+    public function getBranchesByType(string $searchQuery = ''): \Illuminate\Database\Eloquent\Collection
     {
-        return GetAgent::run();
+        return GetAgent::run($searchQuery);
     }
 
     public function createAgent(array $data)
