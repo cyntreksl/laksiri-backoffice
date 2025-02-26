@@ -2,11 +2,14 @@
 
 namespace App\Observers;
 
+use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
+use App\Actions\HBLPackageRuleData\UpdateHBLPackageRuleData;
 use App\Actions\User\CreateUser;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Models\HBL;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 
 class HBLObserver
@@ -49,6 +52,7 @@ class HBLObserver
         ];
 
         $shipperUserExists = User::where('username', $shipperData['username'])
+            ->orWhere('email', $shipperData['email'])
             ->first();
 
         if ($shipperUserExists) {
@@ -101,6 +105,23 @@ class HBLObserver
         if ($hbl->wasChanged('system_status') && $hbl->system_status === HBL::SYSTEM_STATUS_CASH_RECEIVED) {
             // Send notification email
             $this->notificationMailRepository->sendCashReceivedNotification($hbl);
+        }
+        if ($hbl->wasChanged('cargo_type') || $hbl->wasChanged('hbl_type') || $hbl->wasChanged('warehouse_id')) {
+            $hblPackages = $hbl->packages;
+            foreach ($hblPackages as $hblPackage) {
+                if (! $hblPackage['package_rule'] && $hblPackage['package_rule'] <= 0) {
+                    $rules = GetPriceRulesByCargoModeAndHBLType::run($hbl['cargo_type'], $hbl['hbl_type'], $hbl['warehouse_id']);
+                    $data['rules'] = json_encode($rules);
+                    UpdateHBLPackageRuleData::run($hblPackage, $data);
+                }
+            }
+        }
+        if ($hbl->wasChanged('is_released')) {
+            $driver_delivery = $hbl->assignedDriver->get();
+            if (count($driver_delivery) > 0 && Auth::user()->hasRole('driver')) {
+                // Send notification email
+                $this->notificationMailRepository->sendHBLReleasedNotification($hbl);
+            }
         }
     }
 }

@@ -27,7 +27,7 @@ const emit = defineEmits(['close', 'deletePackageType']);
         <template #footer>
             <div class="space-x-2">
                 <SecondaryButton @click="$emit('close')">
-                    Nevermind
+                    Close
                 </SecondaryButton>
 
                 <DangerButton @click="$emit('deletePackageType')">

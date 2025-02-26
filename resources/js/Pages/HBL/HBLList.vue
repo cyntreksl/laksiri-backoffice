@@ -20,6 +20,7 @@ import {push} from "notivue";
 import HoldConfirmationModal from "@/Pages/HBL/Partials/HoldConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const props = defineProps({
     users: {
@@ -41,6 +42,7 @@ const props = defineProps({
 
 const wrapperRef = ref(null);
 let grid = null;
+const isData = ref(false)
 const perPage = ref(10);
 const showFilters = ref(false);
 const fromDate = moment("2023-01-01").format("YYYY-MM-DD");
@@ -132,6 +134,7 @@ const initializeGrid = () => {
                 }),
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -548,6 +551,7 @@ const applyFilters = () => {
             },
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -1052,7 +1056,8 @@ const shipIcon = ref(`
 
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
+                        <div v-show="isData" ref="wrapperRef"></div>
+                        <NoRecordsFound v-show="!isData"/>
                     </div>
                 </div>
             </div>

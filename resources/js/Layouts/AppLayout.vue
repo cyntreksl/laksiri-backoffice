@@ -1160,13 +1160,22 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("hbls.index")) {
+                    if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'admin') {
                         hblMenu.splice(
                             2,
                             0,
                             {
                                 title: "All HBL",
                                 route: "hbls.index",
+                            }
+                        );
+                    }else{
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All HBL",
+                                route: "call-center.hbls.index",
                             }
                         );
                     }
@@ -1182,7 +1191,7 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("hbls.index")) {
+                    if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'admin') {
                         hblMenu.splice(
                             2,
                             0,
@@ -1192,6 +1201,18 @@ export default {
                             }
                         );
                     }
+
+                    if (usePage().props.user.permissions.includes("delivers.assign release to driver")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Door to Door HBL",
+                                route: "call-center.hbls.door-to-door-list",
+                            }
+                        );
+                    }
+
                     if (usePage().props.user.permissions.includes("hbls.show cancelled hbls")) {
                         hblMenu.splice(
                             2,
@@ -1635,8 +1656,11 @@ export default {
                         {
                             title: "All Couriers ",
                             route: "couriers.index",
-                        }
-
+                        },
+                        {
+                            title: "Courier Agents ",
+                            route: "courier-agents.index",
+                        },
 
                     );
                     changeSidePanelTitle("Courier");
