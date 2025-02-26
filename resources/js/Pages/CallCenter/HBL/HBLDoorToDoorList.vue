@@ -141,27 +141,57 @@ const createColumns = () => [
         name: "#",
         sort: false,
         formatter: (_, row) => {
-            return h("input", {
-                type: "checkbox",
-                className:
-                    "form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent",
-                onChange: (event) => {
-                    const isChecked = event.target.checked;
-                    if (isChecked) {
-                        const rowData = row.cells.map((cell) => cell.data); // Extract data from cells array
-                        selectedData.value.push(rowData); // Push extracted data into selectedData
-                    } else {
-                        // Remove the specific row from selectedData (assuming uniqueness of rows)
-                        const index = selectedData.value.findIndex((selectedRow) => {
-                            const rowData = row.cells.map((cell) => cell.data);
-                            return JSON.stringify(selectedRow) === JSON.stringify(rowData);
-                        });
-                        if (index !== -1) {
-                            selectedData.value.splice(index, 1);
+            console.log(row.cells, row.cells[19].data === 0 && row.cells[15].data === 'reached');
+            if (row.cells[19].data === 0 && row.cells[15].data === 'reached') {
+                return h("input", {
+                    type: "checkbox",
+                    className:
+                        "form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent",
+                    onChange: (event) => {
+                        const isChecked = event.target.checked;
+                        if (isChecked) {
+                            const rowData = row.cells.map((cell) => cell.data); // Extract data from cells array
+                            selectedData.value.push(rowData); // Push extracted data into selectedData
+                        } else {
+                            // Remove the specific row from selectedData (assuming uniqueness of rows)
+                            const index = selectedData.value.findIndex((selectedRow) => {
+                                const rowData = row.cells.map((cell) => cell.data);
+                                return JSON.stringify(selectedRow) === JSON.stringify(rowData);
+                            });
+                            if (index !== -1) {
+                                selectedData.value.splice(index, 1);
+                            }
                         }
-                    }
+                    },
+                });
+            }
+            return h("a", {
+                title: `Not reach yet.`,
+                style: {
+                    cursor: "pointer", // Pointer on hover
+                    fontSize: "1.25rem", // Adjust the size of the icon
+                    display: "inline-flex", // Ensures proper alignment
+                    alignItems: "center",
                 },
-            });
+            }, [
+                h("svg", {
+                    xmlns: "http://www.w3.org/2000/svg",
+                    viewBox: "0 0 24 24", // Set the viewbox for scaling
+                    fill: "currentColor", // Matches the color to text-primary
+                    style: {
+                        width: "1.25rem", // Adjust width
+                        height: "1.25rem", // Adjust height
+                        color: "var(--primary-color)", // Use your primary color variable
+                    },
+                }, [
+                    h("path", {
+                        d: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z",
+                    }),
+                    h("path", {
+                        d: "M11 10h2v6h-2zm0-4h2v2h-2z",
+                    }),
+                ]),
+            ]);
         },
     },
     {name: "ID", hidden: !data.columnVisibility.id},
@@ -386,7 +416,7 @@ const createColumns = () => [
         sort: false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
-            return h("div", { className: "flex space-x-2 relative group" }, [
+            return h("div", {className: "flex space-x-2 relative group"}, [
                 // Popover action button (Hamburger or similar)
                 h(
                     "a",
@@ -694,13 +724,13 @@ const isDataEmpty = computed(() => selectedData.value.length === 0);
 const idList = ref([]);
 const showConfirmAssignDriverModal = ref(false);
 const confirmAssignDriver = () => {
-  idList.value = selectedData.value.map((item) => item[0]);
-  showConfirmAssignDriverModal.value = true;
+    idList.value = selectedData.value.map((item) => item[0]);
+    showConfirmAssignDriverModal.value = true;
 };
 
 const closeAssignDriverModal = () => {
-  showConfirmAssignDriverModal.value = false;
-  idList.value = [];
+    showConfirmAssignDriverModal.value = false;
+    idList.value = [];
 };
 
 const planeIcon = ref(`
@@ -760,7 +790,9 @@ const shipIcon = ref(`
                             </h2>
 
                             <div class="flex m-3">
-                                <select class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" @change="handlePerPageChange">
+                                <select
+                                    class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                    @change="handlePerPageChange">
                                     <option value="10">10</option>
                                     <option value="25">25</option>
                                     <option value="50">50</option>
@@ -1041,32 +1073,32 @@ const shipIcon = ref(`
                             </a>
                         </div>
                         <div>
-                          <PrimaryButton
-                              :disabled="isDataEmpty"
-                              class="flex"
-                              @click="confirmAssignDriver"
-                          >
-                            <svg
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
-                                fill="none"
-                                height="18"
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                viewBox="0 0 24 24"
-                                width="18"
-                                xmlns="http://www.w3.org/2000/svg"
+                            <PrimaryButton
+                                :disabled="isDataEmpty"
+                                class="flex"
+                                @click="confirmAssignDriver"
                             >
-                              <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                              <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
-                              <path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                              <path d="M12 14l0 7"/>
-                              <path d="M10 12l-6.75 -2"/>
-                              <path d="M14 12l6.75 -2"/>
-                            </svg>
-                            Assign Driver ({{ countOfSelectedData }})
-                          </PrimaryButton>
+                                <svg
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
+                                    fill="none"
+                                    height="18"
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                    width="18"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
+                                    <path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                    <path d="M12 14l0 7"/>
+                                    <path d="M10 12l-6.75 -2"/>
+                                    <path d="M14 12l6.75 -2"/>
+                                </svg>
+                                Assign Driver ({{ countOfSelectedData }})
+                            </PrimaryButton>
                         </div>
                     </div>
                 </div>
@@ -1079,12 +1111,12 @@ const shipIcon = ref(`
             </div>
         </div>
 
-      <AssignDriverModal
-          :drivers="drivers"
-          :id-list="idList"
-          :show="showConfirmAssignDriverModal"
-          @close="closeAssignDriverModal"
-      />
+        <AssignDriverModal
+            :drivers="drivers"
+            :id-list="idList"
+            :show="showConfirmAssignDriverModal"
+            @close="closeAssignDriverModal"
+        />
 
         <FilterDrawer :show="showFilters" @close="showFilters = false">
             <template #title> Filter HBL</template>
@@ -1098,7 +1130,9 @@ const shipIcon = ref(`
                         <span>Reset</span>
                     </SoftPrimaryButton>
                     <!--Filter Now Action Button-->
-                    <button class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90 dark:border-accent dark:text-accent-light dark:hover:bg-accent dark:hover:text-white dark:focus:bg-accent dark:focus:text-white dark:active:bg-accent/90" @click="applyFilters">
+                    <button
+                        class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90 dark:border-accent dark:text-accent-light dark:hover:bg-accent dark:hover:text-white dark:focus:bg-accent dark:focus:text-white dark:active:bg-accent/90"
+                        @click="applyFilters">
                         <i class="fa-solid fa-filter"></i>
                         <span>Apply</span>
                     </button>

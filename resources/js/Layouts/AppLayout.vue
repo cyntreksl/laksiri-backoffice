@@ -1656,8 +1656,11 @@ export default {
                         {
                             title: "All Couriers ",
                             route: "couriers.index",
-                        }
-
+                        },
+                        {
+                            title: "Courier Agents ",
+                            route: "courier-agents.index",
+                        },
 
                     );
                     changeSidePanelTitle("Courier");

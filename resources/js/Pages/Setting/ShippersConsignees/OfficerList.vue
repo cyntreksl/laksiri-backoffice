@@ -48,7 +48,7 @@ const handleDeleteOfficer = () => {
 </script>
 
 <template>
-  <AppLayout title="Officerss">
+  <AppLayout title="Officers">
     <template #header>Officers</template>
 
     <Breadcrumb/>
