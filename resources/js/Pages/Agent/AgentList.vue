@@ -43,8 +43,6 @@ const searchQuery = ref('');
 const handleSearch = () => {
     router.get(route('agents.index'), { search: searchQuery.value }, { preserveState: true, replace: true });
 };
-
-
 </script>
 
 <template>
@@ -158,21 +156,21 @@ const handleSearch = () => {
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        <span v-for="cmode in JSON.parse(agent.cargo_modes)" class="badge bg-info/10 text-info dark:bg-info/15 ml-2">
+                        <span v-for="cmode in JSON.parse(agent.cargo_modes)" :key="cmode" class="badge bg-info/10 text-info dark:bg-info/15 ml-2">
                             {{cmode}}
                         </span>
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        <span v-for="dtype in JSON.parse(agent.delivery_types)" class="badge bg-success/10 text-success dark:bg-success/15 ml-2">
+                        <span v-for="dtype in JSON.parse(agent.delivery_types)" :key="dtype" class="badge bg-success/10 text-success dark:bg-success/15 ml-2">
                             {{dtype}}
                         </span>
                     </td>
                     <td
                         class="whitespace-nowrap px-4 py-3 sm:px-5"
                     >
-                        <span v-for="ptype in JSON.parse(agent.package_types)" class="badge bg-warning/10 text-warning dark:bg-warning/15 ml-2">
+                        <span v-for="ptype in JSON.parse(agent.package_types)" :key="ptype" class="badge bg-warning/10 text-warning dark:bg-warning/15 ml-2">
                             {{ptype}}
                         </span>
                     </td>
@@ -185,13 +183,11 @@ const handleSearch = () => {
                                 <svg
                                     class="size-4.5"
                                     fill="none"
-                                    viewBox="0 0 512 512"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
                                     xmlns="http://www.w3.org/2000/svg"
                                 >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M5 12l-2 0l9 -9l9 9l-2 0"/>
-                                    <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/>
-                                    <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                 </svg>
                             </Link>
                             <button
@@ -200,11 +196,11 @@ const handleSearch = () => {
                             >
                                 <svg
                                     class="size-4.5"
-                                    fill="none"
-                                    viewBox="0 0 448 512"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg"
                                 >
-                                    <path d="M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z"/>
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                 </svg>
                             </button>
                         </div>
@@ -223,4 +219,3 @@ const handleSearch = () => {
         />
     </AppLayout>
 </template>
-
