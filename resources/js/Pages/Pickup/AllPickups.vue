@@ -73,7 +73,7 @@ const data = reactive({
     },
 });
 
-const baseUrl = ref("/pickup-exception-list");
+const baseUrl = ref("/pickup-export-list");
 const totalPickups = ref(0);
 
 const toggleColumnVisibility = (columnName) => {
