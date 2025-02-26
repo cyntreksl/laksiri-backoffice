@@ -39,7 +39,6 @@ const filters = reactive({
 
 const data = reactive({
     columnVisibility: {
-        id: false,
         name: true,
         type: true,
         branch_code: true,
@@ -118,7 +117,6 @@ const initializeGrid = () => {
 };
 
 const createColumns = () => [
-    {name: "ID", hidden: !data.columnVisibility.id},
     {name: "Name", hidden: !data.columnVisibility.name},
     {name: "Type", hidden: !data.columnVisibility.type},
     {name: "Branch Code", hidden: !data.columnVisibility.branch_code},
@@ -371,15 +369,6 @@ const exportURL = computed(() => {
                                                 Choose which columns you want to see
                                             </p>
                                             <div class="mt-4 flex flex-col space-y-4 text-slate-600 dark:text-navy-100">
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.id"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="toggleColumnVisibility('id')"
-                                                    />
-                                                    <p>ID</p>
-                                                </label>
 
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
@@ -466,23 +455,6 @@ const exportURL = computed(() => {
                                 </div>
                             </template>
                         </Popper>
-
-                        <button
-                            class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 ml-2"
-                            x-tooltip.placement.top="'Filter result'"
-                            @click="showFilters = true"
-                        >
-                            <i class="fa-solid fa-filter"></i>
-                        </button>
-
-                        <a :href="exportURL" class="ml-2">
-                            <button
-                                class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.top="'Download CSV'"
-                            >
-                                <i class="fa-solid fa-cloud-arrow-down"></i>
-                            </button>
-                        </a>
 
                         <a :href="route('agents.create')" class="ml-2">
                             <PrimaryButton>

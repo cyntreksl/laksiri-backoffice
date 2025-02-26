@@ -16,7 +16,7 @@ use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\Branch;
 
-class BranchRepository implements BranchRepositoryInterface ,GridJsInterface
+class BranchRepository implements BranchRepositoryInterface, GridJsInterface
 {
     public function getBranches()
     {
@@ -59,13 +59,16 @@ class BranchRepository implements BranchRepositoryInterface ,GridJsInterface
 
         return UpdateAgent::run($data, $branch);
     }
-    public function dataset (int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
         $query = Branch::query();
 
         if (! empty($search)) {
             $query->where('name', 'like', '%'.$search.'%');
         }
+
+        $query->where('is_third_party_agent', true);
 
         // apply filters
         FilterFactory::apply($query, $filters);
@@ -87,7 +90,6 @@ class BranchRepository implements BranchRepositoryInterface ,GridJsInterface
                 'lastPage' => ceil($totalRecords / $limit),
             ],
         ]);
-
 
     }
 }

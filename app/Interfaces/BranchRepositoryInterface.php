@@ -3,7 +3,6 @@
 namespace App\Interfaces;
 
 use App\Models\Branch;
-use Illuminate\Database\Eloquent\Collection;
 
 interface BranchRepositoryInterface
 {

@@ -21,5 +21,4 @@ class AgentCollection extends JsonResource
 
         ];
     }
-
 }
