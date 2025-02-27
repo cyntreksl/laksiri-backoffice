@@ -121,7 +121,7 @@ const handlePickupCreate = () => {
     if(form.additional_mobile_number === additionalMobileCountryCode.value){
         form.additional_mobile_number = "";
     }
-    if(form.whatsapp_number === additionalMobileCountryCode.value){
+    if(form.whatsapp_number === whatsappNumberCountryCode.value){
         form.whatsapp_number = "";
     }
 
@@ -339,7 +339,7 @@ const shipIcon = ref(`
                             </div>
 
                             <div v-if="!isSameContactNumber" class="grid grid-cols-1 sm:grid-cols-3">
-                                <InputLabel class="col-span-3" value="Whatsapp Mobile Number"/>
+                                <InputLabel class="col-span-3" value="Whatsapp Number"/>
                                 <div>
                                     <select
                                         v-model="whatsappNumberCountryCode"

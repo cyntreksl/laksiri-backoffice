@@ -45,6 +45,8 @@ class User extends Authenticatable
         'last_login_at',
         'last_logout_at',
         'contact',
+        'additional_mobile_number',
+        'whatsapp_number',
         'working_hours_end',
         'working_hours_start',
         'preferred_zone',
