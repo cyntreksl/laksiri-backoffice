@@ -1685,29 +1685,6 @@ export default {
                             }
                         );
                     }
-
-                    // childMenuList.splice(
-                    //     0,
-                    //     childMenuList.length,
-                    //     {
-                    //         title: "Third Party Agents",
-                    //         route: "agents.index",
-                    //     },
-                    //     {
-                    //         title: "Create Courier ",
-                    //         route: "couriers.create",
-                    //     },
-                    //     {
-                    //         title: "All Couriers ",
-                    //         route: "couriers.index",
-                    //     },
-                    //     {
-                    //         title: "Courier Agents ",
-                    //         route: "courier-agents.index",
-                    //     },
-                    //
-                    // );
-
                     childMenuList.splice(
                         0,
                         childMenuList.length,
