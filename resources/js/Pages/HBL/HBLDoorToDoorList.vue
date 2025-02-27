@@ -39,6 +39,11 @@ const props = defineProps({
         default: () => {
         },
     },
+    warehouses: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const showFilters = ref(false);
@@ -54,7 +59,7 @@ const filters = reactive({
   cargoMode: ["Air Cargo", "Sea Cargo"],
   hblType: ["Door to Door"],
   isHold: false,
-  warehouse: ["COLOMBO", "NINTAVUR", "OTHER"],
+  warehouse: props.warehouses.map(warehouse => warehouse.name),
   createdBy: "",
   paymentStatus: [],
 });
@@ -1219,29 +1224,17 @@ const shipIcon = ref(`
 
           <FilterHeader value="Warehouse"/>
 
-          <label class="inline-flex items-center space-x-2 mt-2">
+        <label
+            v-for="warehouse in warehouses"
+            :key="warehouse.id"
+            class="inline-flex items-center space-x-2 mt-2"
+        >
             <Switch
                 v-model="filters.warehouse"
-                label="COLOMBO"
-                value="COLOMBO"
+                :label="warehouse.name"
+                :value="warehouse.name"
             />
-          </label>
-
-          <label class="inline-flex items-center space-x-2 mt-2">
-            <Switch
-                v-model="filters.warehouse"
-                label="NINTAVUR"
-                value="NINTAVUR"
-            />
-          </label>
-
-          <label class="inline-flex items-center space-x-2 mt-2">
-            <Switch
-                v-model="filters.warehouse"
-                label="OTHER"
-                value="OTHER"
-            />
-          </label>
+        </label>
 
           <FilterBorder/>
 
