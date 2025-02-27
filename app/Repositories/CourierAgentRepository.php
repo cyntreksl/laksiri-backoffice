@@ -12,7 +12,7 @@ use App\Interfaces\CourierAgentRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\CourierAgent;
 
-class CourierAgentRepository implements CourierAgentRepositoryInterface ,GridJsInterface
+class CourierAgentRepository implements CourierAgentRepositoryInterface, GridJsInterface
 {
     public function getAllCourierAgents()
     {
@@ -24,10 +24,11 @@ class CourierAgentRepository implements CourierAgentRepositoryInterface ,GridJsI
         $query = CourierAgent::query();
 
         if ($search) {
-            $query->where('company_name', 'like', '%' . $search . '%');
+            $query->where('company_name', 'like', '%'.$search.'%');
+            $query->orWhere('website', 'like', '%'.$search.'%');
 
         }
-        //apply filters
+        // apply filters
         FilterFactory::apply($query, $filters);
         $countQuery = $query;
         $totalRecords = $countQuery->count();
@@ -36,7 +37,8 @@ class CourierAgentRepository implements CourierAgentRepositoryInterface ,GridJsI
             ->skip($offset)
             ->take($limit)
             ->get();
-          return response()->json([
+
+        return response()->json([
             'data' => CourierAgentCollection::collection($users),
             'meta' => [
                 'total' => $totalRecords,

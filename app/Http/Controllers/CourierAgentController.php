@@ -40,6 +40,7 @@ class CourierAgentController extends Controller
 
         return $dataset;
     }
+
     /**
      * Show the form for creating a new resource.
      */

@@ -20,8 +20,6 @@ class CourierAgentCollection extends JsonResource
             'invoice_header' => $this->invoice_header,
             'invoice_footer' => $this->invoice_footer,
 
-
         ];
     }
-
 }

@@ -59,9 +59,7 @@ const toggleColumnVisibility = (columnName) => {
 };
 
 const initializeGrid = () => {
-    const visibleColumns = Object.keys(data.columnVisibility).filter(
-        (key) => data.columnVisibility[key] && key !== 'actions'
-    );
+    const visibleColumns = Object.keys(data.columnVisibility);
 
     grid = new Grid({
         columns: createColumns(),
@@ -78,7 +76,9 @@ const initializeGrid = () => {
                     if (!columns.length) return prev;
                     const col = columns[0];
                     const dir = col.direction === 1 ? "asc" : "desc";
-                    let colName = visibleColumns[col.index];
+                    let colName = Object.keys(data.columnVisibility).filter(
+                        (key) => data.columnVisibility[key]
+                    )[col.index];
 
                     return `${prev}&order=${colName}&dir=${dir}`;
                 },
@@ -99,11 +99,6 @@ const initializeGrid = () => {
                     visibleColumns.forEach((column) => {
                         row.push(item[column]);
                     });
-                    // Add the actions column with the ID for reference
-                    if (data?.columnVisibility?.actions) {
-                        row.push(item.id);
-                    }
-
                     return row;
                 }),
             total: (response) => {
@@ -131,7 +126,8 @@ const createColumns = () => [
         name: "Actions",
         sort: false,
         hidden: !data.columnVisibility.actions,
-        formatter: (id) => {
+        formatter: (_, row) => {
+            console.log(row)
             return h("div", {
                 className: "flex space-x-2"
             }, [
@@ -139,7 +135,7 @@ const createColumns = () => [
                     "a",
                     {
                         className: "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25",
-                        href: route("courier-agents.edit", id),
+                        href: route("courier-agents.edit", row.cells[0].data),
                     },
                     [
                         h(
@@ -162,7 +158,7 @@ const createColumns = () => [
                     "button",
                     {
                         className: "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                        onClick: () => confirmDeleteAgent(id),
+                        onClick: () => confirmDeleteAgent(row.cells[0].data),
                     },
                     [
                         h(
@@ -249,7 +245,6 @@ const applyFilters = () => {
                         [...visibleColumns.map(() => "No matching data found"), ""]
                     ];
                 }
-
                 // Map the data to visible columns
                 return data.data.map((item) => {
                     const row = [];
@@ -286,15 +281,6 @@ const resetFilter = () => {
     applyFilters();
 };
 
-const exportURL = computed(() => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
-        }
-    }
-    return '/courier-agents/list/export' + "?" + params.toString();
-});
 </script>
 
 <template>
@@ -311,21 +297,6 @@ const exportURL = computed(() => {
                     </h2>
 
                     <div class="flex">
-                        <!-- Filter Button -->
-                        <button
-                            class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            @click="showFilters = true"
-                        >
-                            <i class="fa-solid fa-filter"></i>
-                        </button>
-
-                        <!-- Export Button -->
-                        <a
-                            :href="exportURL"
-                            class="btn size-8 ml-2 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        >
-                            <i class="fa-solid fa-download"></i>
-                        </a>
 
                         <!-- Column Selector -->
                         <Popper>
