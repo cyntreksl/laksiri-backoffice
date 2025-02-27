@@ -391,23 +391,23 @@ Breadcrumbs::for('setting.shipper-consignees.edit', function (BreadcrumbTrail $t
 Breadcrumbs::for('agents.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Courier');
-    $trail->push('Agent');
+    $trail->push('Third Party Agent');
     $trail->push('List', route('agents.index'));
 });
 
-// Agents > Create
+//Third-Party Agents > Create
 Breadcrumbs::for('agents.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Courier');
-    $trail->push('Agent');
+    $trail->push('Third Party Agent');
     $trail->push('Create', route('agents.create'));
 });
-// Agents > Edit
+//Third-Party Agents > Edit
 Breadcrumbs::for('agents.edit', function (BreadcrumbTrail $trail, $id) {
     $branch = Branch::find($id);
     $trail->parent('dashboard');
     $trail->push('Courier');
-    $trail->push('Agent');
+    $trail->push('Third Party Agent');
     $trail->push('Edit', route('agents.edit', $branch->id));
 });
 
@@ -419,6 +419,7 @@ Breadcrumbs::for('couriers.index', function (BreadcrumbTrail $trail) {
     $trail->push('List', route('couriers.index'));
 
 });
+// CourierAgents > Create
 Breadcrumbs::for('couriers.create', function (BreadcrumbTrail $trail) {
     $trail->parent('couriers.index');
     $trail->push('Courier');
