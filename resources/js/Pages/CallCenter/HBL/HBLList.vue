@@ -28,6 +28,11 @@ const props = defineProps({
         type: Object,
         default: () => {},
     },
+    warehouses: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const wrapperRef = ref(null);
@@ -1035,19 +1040,15 @@ const shipIcon = ref(`
                         Warehouse
                     </h2>
 
-                    <label class="block items-center space-x-2 mt-2">
+                    <label
+                        v-for="warehouse in warehouses"
+                        :key="warehouse.id"
+                        class="block items-center space-x-2 mt-2"
+                    >
                         <Switch
                             v-model="filters.warehouse"
-                            label="COLOMBO"
-                            value="COLOMBO"
-                        />
-                    </label>
-
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <Switch
-                            v-model="filters.warehouse"
-                            label="NINTAVUR"
-                            value="NINTAVUR"
+                            :label="warehouse.name"
+                            :value="warehouse.name"
                         />
                     </label>
                 </div>

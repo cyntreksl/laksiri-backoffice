@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\CallCenter;
 
+use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Enum\HBLPaymentStatus;
 use App\Http\Controllers\Controller;
@@ -38,6 +39,7 @@ class HBLController extends Controller
             'users' => $this->userRepository->getUsers(['customer']),
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
+            'warehouses' => GetDestinationBranches::run(),
         ]);
     }
 

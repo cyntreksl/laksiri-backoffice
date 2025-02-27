@@ -18,6 +18,7 @@ import {push} from "notivue";
 import DeletePickupConfirmationModal from "@/Pages/Pickup/Partials/DeletePickupConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import RetryPickupConfirmationModal from "@/Pages/Pickup/Partials/RetryPickupConfirmationModal.vue";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const props = defineProps({
     drivers: {
@@ -39,6 +40,7 @@ const props = defineProps({
 
 const wrapperRef = ref(null);
 let grid = null;
+const isData = ref(false)
 const perPage = ref(10);
 
 const showFilters = ref(false);
@@ -73,7 +75,7 @@ const data = reactive({
     },
 });
 
-const baseUrl = ref("/pickup-exception-list");
+const baseUrl = ref("/pickup-export-list");
 const totalPickups = ref(0);
 
 const toggleColumnVisibility = (columnName) => {
@@ -126,6 +128,7 @@ const initializeGrid = () => {
             total: (response) => {
                 if (response && response.meta) {
                     totalPickups.value = response.meta.total;
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -775,6 +778,7 @@ const applyFilters = () => {
             },
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -1111,7 +1115,8 @@ const shipIcon = ref(`
 
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
+                        <div v-show="isData" ref="wrapperRef"></div>
+                        <NoRecordsFound v-show="!isData"/>
                     </div>
                 </div>
             </div>

@@ -10,6 +10,7 @@ use App\Http\Requests\StoreAgentRequest;
 use App\Http\Requests\UpdateAgentRequest;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Models\Branch;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ThirdPartyAgentController extends Controller
@@ -26,6 +27,20 @@ class ThirdPartyAgentController extends Controller
         return Inertia::render('Agent/AgentList', [
             'agents' => $this->branchRepository->getBranchesByType(),
         ]);
+    }
+
+    public function list(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('offset', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate', 'toDate']);
+
+        return $this->branchRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+
     }
 
     /**
