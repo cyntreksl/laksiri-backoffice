@@ -4,26 +4,24 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {Link, router} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {push} from "notivue";
-import {ref, computed, watch} from "vue";
+import {ref} from "vue";
 import DeleteCourierAgentConfirmationModal from "@/Pages/CourierAgent/Partials/DeleteCourierAgentConfirmationModal.vue";
 
-const props = defineProps({
+defineProps({
     courierAgents: {
         type: Object,
         default: () => {}
     }
-});
 
-// Delete functionality
+})
 const showDeleteCourierAgentConfirmationModal = ref(false);
-const CourierAgentId = ref(null);
-
+const  CourierAgentId = ref(null);
 const confirmDeleteAgent = (id) => {
     CourierAgentId.value = id;
     showDeleteCourierAgentConfirmationModal.value = true;
 };
-
 const closeModal = () => {
+    showDeleteCourierAgentConfirmationModal.value = false;
     showDeleteCourierAgentConfirmationModal.value = false;
     CourierAgentId.value = null;
 };
@@ -33,59 +31,14 @@ const handleDeleteCourierAgent = () => {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
-            push.success("Courier Agent Deleted Successfully!");
+            push.success("Officer Deleted Successfully!");
             router.visit(route("courier-agents.index"));
         },
     });
 };
 
-// Search functionality
-const searchQuery = ref('');
-const filteredAgents = computed(() => {
-    if (!searchQuery.value) return props.courierAgents;
 
-    const query = searchQuery.value.toLowerCase();
-    return props.courierAgents.filter(agent =>
-        agent.company_name.toLowerCase().includes(query) ||
-        (agent.website && agent.website.toLowerCase().includes(query)) ||
-        (agent.contact_number_1 && agent.contact_number_1.toLowerCase().includes(query)) ||
-        (agent.email && agent.email.toLowerCase().includes(query)) ||
-        (agent.address && agent.address.toLowerCase().includes(query))
-    );
-});
 
-// Sort functionality
-const sortField = ref('company_name');
-const sortDirection = ref('asc');
-
-const sortBy = (field) => {
-    if (sortField.value === field) {
-        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortField.value = field;
-        sortDirection.value = 'asc';
-    }
-};
-
-const sortedAgents = computed(() => {
-    return [...filteredAgents.value].sort((a, b) => {
-        const fieldA = a[sortField.value] ? a[sortField.value].toString().toLowerCase() : '';
-        const fieldB = b[sortField.value] ? b[sortField.value].toString().toLowerCase() : '';
-
-        if (sortDirection.value === 'asc') {
-            return fieldA.localeCompare(fieldB);
-        } else {
-            return fieldB.localeCompare(fieldA);
-        }
-    });
-});
-
-// Reset search and sort
-const resetFilters = () => {
-    searchQuery.value = '';
-    sortField.value = 'company_name';
-    sortDirection.value = 'asc';
-};
 </script>
 
 <template>
@@ -96,7 +49,7 @@ const resetFilters = () => {
 
         <div class="flex items-center justify-between p-2 my-5">
             <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                Courier Agents
+                Courier  Agents
             </h2>
 
             <Link :href="route('courier-agents.create')">
@@ -106,152 +59,75 @@ const resetFilters = () => {
             </Link>
         </div>
 
-        <!-- Search and Filter Controls -->
-        <div class="mb-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div class="relative w-full sm:w-64">
-                <input
-                    type="text"
-                    v-model="searchQuery"
-                    placeholder="Search agents..."
-                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-                <button
-                    v-if="searchQuery"
-                    @click="searchQuery = ''"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-600">{{ sortedAgents.length }} agents found</span>
-                <button
-                    @click="resetFilters"
-                    class="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
-                >
-                    Reset Filters
-                </button>
-            </div>
-        </div>
-
-        <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
+        <div class="is-scrollbar-hidden min-w-full overflow-x-auto"
+        >
             <table class="is-hoverable w-full text-left">
                 <thead>
                 <tr>
                     <th
-                        @click="sortBy('company_name')"
-                        class="whitespace-nowrap rounded-tl-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 cursor-pointer select-none"
+                        class="whitespace-nowrap rounded-tl-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
-                        <div class="flex items-center">
-                            Company Name
-                            <span v-if="sortField === 'company_name'" class="ml-1">
-                                    <svg v-if="sortDirection === 'asc'" xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </span>
-                        </div>
+                        Company Name
                     </th>
                     <th
-                        @click="sortBy('website')"
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 cursor-pointer select-none"
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
-                        <div class="flex items-center">
-                            Website
-                            <span v-if="sortField === 'website'" class="ml-1">
-                                    <svg v-if="sortDirection === 'asc'" xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </span>
-                        </div>
+                        Website
                     </th>
                     <th
-                        @click="sortBy('contact_number_1')"
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 cursor-pointer select-none"
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
-                        <div class="flex items-center">
-                            Contact Number-1
-                            <span v-if="sortField === 'contact_number_1'" class="ml-1">
-                                    <svg v-if="sortDirection === 'asc'" xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </span>
-                        </div>
+                        Contact Number-1
                     </th>
+
                     <th
-                        @click="sortBy('email')"
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 cursor-pointer select-none"
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
-                        <div class="flex items-center">
-                            Email
-                            <span v-if="sortField === 'email'" class="ml-1">
-                                    <svg v-if="sortDirection === 'asc'" xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </span>
-                        </div>
+                        Email
                     </th>
+
                     <th
-                        @click="sortBy('address')"
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 cursor-pointer select-none"
+                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
-                        <div class="flex items-center">
-                            Address
-                            <span v-if="sortField === 'address'" class="ml-1">
-                                    <svg v-if="sortDirection === 'asc'" xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </span>
-                        </div>
+                        Address
                     </th>
+
                     <th
                         class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                     >
                         Action
                     </th>
+
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-if="sortedAgents.length === 0">
-                    <td colspan="6" class="px-4 py-8 text-center text-gray-500">
-                        No courier agents found matching your search criteria.
-                    </td>
-                </tr>
                 <tr
-                    v-else
-                    v-for="courierAgent in sortedAgents"
-                    :key="courierAgent?.id"
+                    v-for="courierAgent in courierAgents" :key="courierAgent?.id"
                     class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500 last:border-0 bg-white"
                 >
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                    <td
+                        class="whitespace-nowrap px-4 py-3 sm:px-5"
+                    >
                         {{courierAgent.company_name}}
                     </td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                    <td
+                        class="whitespace-nowrap px-4 py-3 sm:px-5"
+                    >
                         {{courierAgent.website}}
                     </td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                    <td
+                        class="whitespace-nowrap px-4 py-3 sm:px-5"
+                    >
                         {{courierAgent.contact_number_1}}
                     </td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                    <td
+                        class="whitespace-nowrap px-4 py-3 sm:px-5"
+                    >
                         {{courierAgent.email}}
                     </td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                    <td
+                        class="whitespace-nowrap px-4 py-3 sm:px-5"
+                    >
                         {{courierAgent.address}}
                     </td>
                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
@@ -294,7 +170,6 @@ const resetFilters = () => {
                 </tbody>
             </table>
         </div>
-
         <DeleteCourierAgentConfirmationModal
             :show="showDeleteCourierAgentConfirmationModal"
             @close="closeModal"
