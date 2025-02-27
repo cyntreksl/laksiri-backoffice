@@ -11,6 +11,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import {push} from "notivue";
 import TextInput from "@/Components/TextInput.vue";
+import Checkbox from "@/Components/Checkbox.vue";
 
 const props = defineProps({
     packageTypes: {
@@ -53,10 +54,20 @@ const contactNumber = ref("");
 const today = new Date();
 const formattedToday = today.toISOString().split("T")[0];
 
+const isSameContactNumber = ref(false);
+
+const additionalMobileCountryCode = ref(findCountryCodeByBranch());
+const additionalMobileNumber = ref("");
+
+const whatsappNumberCountryCode = ref(findCountryCodeByBranch());
+const whatsappNumber = ref("");
+
 const form = useForm({
     name: "",
     email: "",
     contact_number: computed(() => countryCode.value + contactNumber.value),
+    additional_mobile_number: "",
+    whatsapp_number: "",
     address: "",
     note_type: [],
     notes: "",
@@ -69,6 +80,20 @@ const form = useForm({
     pickup_time_start: "",
     pickup_time_end: "",
 });
+
+const addContactToWhatsapp = () => {
+    if (isSameContactNumber.value) {
+        whatsappNumberCountryCode.value = countryCode.value;
+        whatsappNumber.value = contactNumber.value;
+    } else {
+        resetWhatsappNumber();
+    }
+};
+
+const resetWhatsappNumber = () => {
+    whatsappNumberCountryCode.value = findCountryCodeByBranch();
+    whatsappNumber.value = "";
+};
 
 // Method to find zone ID based on address
 const findZoneIdByAddress = (address) => {
@@ -91,6 +116,15 @@ watch(
 );
 
 const handlePickupCreate = () => {
+    form.additional_mobile_number = additionalMobileCountryCode.value + additionalMobileNumber.value;
+    form.whatsapp_number = whatsappNumberCountryCode.value + whatsappNumber.value;
+    if(form.additional_mobile_number === additionalMobileCountryCode.value){
+        form.additional_mobile_number = "";
+    }
+    if(form.whatsapp_number === additionalMobileCountryCode.value){
+        form.whatsapp_number = "";
+    }
+
     form.post(route("pickups.store"), {
         onSuccess: () => {
             form.reset();
@@ -214,7 +248,7 @@ const shipIcon = ref(`
                                 <InputError :message="form.errors.name"/>
                             </div>
 
-                            <div>
+                            <div class="col-span-2">
                                 <InputLabel value="Email"/>
                                 <label class="relative flex">
                                     <input
@@ -262,12 +296,71 @@ const shipIcon = ref(`
                                     <input
                                         id="telephone"
                                         v-model="contactNumber"
-                                        class="rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        class="h-[38px] rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
                                         type="text"
                                     />
                                 </div>
                                 <InputError class="col-span-3" :message="form.errors.contact_number"/>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3">
+                                <InputLabel class="col-span-3" value="Additional Mobile Number"/>
+                                <div>
+                                    <select
+                                        v-model="additionalMobileCountryCode"
+                                        x-init="$el._tom = new Tom($el)"
+                                        class="w-full rounded-r-0"
+                                    >
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                            {{ countryCode }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <input
+                                        id="telephone"
+                                        v-model="additionalMobileNumber"
+                                        class="h-[38px] rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        placeholder="123 4567 890"
+                                        type="text"
+                                    />
+                                </div>
+                                <InputError class="col-span-3" :message="form.errors.additional_mobile_number"/>
+                            </div>
+
+                            <div class="col-span-2">
+                                <Checkbox
+                                    v-model="isSameContactNumber"
+                                    @change="addContactToWhatsapp"
+                                ></Checkbox>
+
+                                <span class="ml-5">Use mobile number as whatsapp number</span>
+                            </div>
+
+                            <div v-if="!isSameContactNumber" class="grid grid-cols-1 sm:grid-cols-3">
+                                <InputLabel class="col-span-3" value="Whatsapp Mobile Number"/>
+                                <div>
+                                    <select
+                                        v-model="whatsappNumberCountryCode"
+                                        x-init="$el._tom = new Tom($el)"
+                                        class="w-full rounded-r-0"
+                                    >
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                            {{ countryCode }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <input
+                                        id="telephone"
+                                        v-model="whatsappNumber"
+                                        class="h-[38px] rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        placeholder="123 4567 890"
+                                        type="text"
+                                    />
+                                </div>
+                                <InputError class="col-span-3" :message="form.errors.whatsapp_number"/>
                             </div>
 
                             <div class="col-span-2">
