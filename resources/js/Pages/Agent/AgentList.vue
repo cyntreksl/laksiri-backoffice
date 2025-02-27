@@ -39,6 +39,7 @@ const filters = reactive({
 
 const data = reactive({
     columnVisibility: {
+        id: false,
         name: true,
         type: true,
         branch_code: true,
@@ -117,6 +118,7 @@ const initializeGrid = () => {
 };
 
 const createColumns = () => [
+    {name: "ID", hidden: true},
     {name: "Name", hidden: !data.columnVisibility.name},
     {name: "Type", hidden: !data.columnVisibility.type},
     {name: "Branch Code", hidden: !data.columnVisibility.branch_code},
