@@ -46,7 +46,7 @@ class GatePassChargesService
         $this->vat = $vat;
         $this->cargo_mode = $cargo_mode;
         $this->setCharges($cargo_mode);
-        $this->branch_demurrage_charge_discount = GetBranchById::run(Auth::user()->primary_branch_id)['demurrage_discount'];
+        $this->branch_demurrage_charge_discount = GetBranchById::run(Auth::user()->primary_branch_id)['maximum_demurrage_discount'];
     }
 
     /**
