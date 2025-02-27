@@ -26,6 +26,20 @@ class CourierAgentController extends Controller
         ]);
     }
 
+    public function list(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate', 'toDate']);
+
+        $dataset = $this->courierAgentRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+
+        return $dataset;
+    }
     /**
      * Show the form for creating a new resource.
      */

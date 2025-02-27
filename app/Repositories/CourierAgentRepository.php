@@ -6,13 +6,46 @@ use App\Actions\CourierAgent\CreateCourierAgent;
 use App\Actions\CourierAgent\DeleteCourierAgent;
 use App\Actions\CourierAgent\GetCourierAgent;
 use App\Actions\CourierAgent\UpdateCourierAgent;
+use App\Factory\User\FilterFactory;
+use App\Http\Resources\CourierAgentCollection;
 use App\Interfaces\CourierAgentRepositoryInterface;
+use App\Interfaces\GridJsInterface;
+use App\Models\CourierAgent;
 
-class CourierAgentRepository implements CourierAgentRepositoryInterface
+class CourierAgentRepository implements CourierAgentRepositoryInterface ,GridJsInterface
 {
     public function getAllCourierAgents()
     {
         return GetCourierAgent::run();
+    }
+
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        $query = CourierAgent::query();
+
+        if ($search) {
+            $query->where('company_name', 'like', '%' . $search . '%');
+
+        }
+        //apply filters
+        FilterFactory::apply($query, $filters);
+        $countQuery = $query;
+        $totalRecords = $countQuery->count();
+
+        $users = $query->orderBy($order, $direction)
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+          return response()->json([
+            'data' => CourierAgentCollection::collection($users),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
+
     }
 
     public function storeCourierAgent(array $data)
