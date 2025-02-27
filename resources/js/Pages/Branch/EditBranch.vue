@@ -64,7 +64,7 @@ const form = useForm({
     country: props.branch.country || '',
     email: props.branch.email || '',
     container_delays: props.branch.container_delays,
-    demurrage_discount: props.branch.demurrage_discount,
+    maximum_demurrage_discount: props.branch.maximum_demurrage_discount,
     cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
     delivery_types: JSON.parse(props.branch.delivery_types) || [],
     package_types: JSON.parse(props.branch.package_types) || [],
@@ -333,12 +333,12 @@ const updateChecked = (notification, isChecked) => {
                         <div v-if="usePage().props.currentBranch.type === 'Destination'" class="sm:col-span-2">
                             <InputLabel value="Maximum Demurrage Discount (%)" />
                             <TextInput
-                                v-model="form.demurrage_discount"
+                                v-model="form.maximum_demurrage_discount"
                                 class="w-full"
                                 type="number"
                                 min="0"
                             />
-                            <InputError :message="form.errors.demurrage_discount" />
+                            <InputError :message="form.errors.maximum_demurrage_discount" />
                         </div>
                   </div>
                 </div>

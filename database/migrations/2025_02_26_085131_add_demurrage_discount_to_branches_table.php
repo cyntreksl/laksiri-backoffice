@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('branches', function (Blueprint $table) {
-            $table->integer('demurrage_discount')->default(0)->after('container_delays');
+            $table->integer('maximum_demurrage_discount')->default(0)->after('container_delays');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('branches', function (Blueprint $table) {
-            $table->dropColumn('demurrage_discount');
+            $table->dropColumn('maximum_demurrage_discount');
         });
     }
 };

@@ -30,7 +30,7 @@ class Branch extends Model
         'do_charge',
         'email',
         'container_delays',
-        'demurrage_discount',
+        'maximum_demurrage_discount',
         'country',
         'is_third_party_agent',
     ];
