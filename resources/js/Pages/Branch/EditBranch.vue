@@ -330,8 +330,8 @@ const updateChecked = (notification, isChecked) => {
                             <InputError :message="form.errors.container_delays" />
                         </div>
 
-                        <div class="sm:col-span-2">
-                            <InputLabel value="Demurrage Discount (%)" />
+                        <div v-if="usePage().props.currentBranch.type === 'Destination'" class="sm:col-span-2">
+                            <InputLabel value="Maximum Demurrage Discount (%)" />
                             <TextInput
                                 v-model="form.demurrage_discount"
                                 class="w-full"
