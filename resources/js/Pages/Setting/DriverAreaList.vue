@@ -9,6 +9,7 @@ import CreateDriverAreasForm from "@/Pages/Setting/DriverAreas/CreateDriverAreas
 import DeleteDriverAreasConfirmationModal from "@/Pages/Setting/DriverAreas/DeleteDriverAreasConfirmationModal.vue";
 import moment from "moment";
 import {push} from "notivue";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const props = defineProps({
     zones: {
@@ -20,6 +21,7 @@ const props = defineProps({
 
 const wrapperRef = ref(null);
 let grid = null;
+const isData = ref(false)
 
 const showFilters = ref(false);
 const fromDate = moment(new Date()).subtract(1, "months").format("YYYY-MM-DD");
@@ -103,6 +105,7 @@ const initializeGrid = () => {
                 ]),
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -254,6 +257,7 @@ const applyFilters = () => {
                 }),
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -360,7 +364,8 @@ const applyFilters = () => {
 
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
+                        <div v-show="isData" ref="wrapperRef"></div>
+                        <NoRecordsFound v-show="!isData"/>
                     </div>
                 </div>
             </div>
