@@ -39,6 +39,7 @@ const filters = reactive({
 
 const data = reactive({
     columnVisibility: {
+        id: false,
         name: true,
         type: true,
         branch_code: true,
@@ -117,6 +118,7 @@ const initializeGrid = () => {
 };
 
 const createColumns = () => [
+    {name: "ID", hidden: true},
     {name: "Name", hidden: !data.columnVisibility.name},
     {name: "Type", hidden: !data.columnVisibility.type},
     {name: "Branch Code", hidden: !data.columnVisibility.branch_code},
@@ -267,7 +269,7 @@ const handleDeleteAgent = () => {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
-            push.success("Agent Deleted Successfully!");
+            push.success("Third Party Agent Deleted Successfully!");
             router.visit(route("agents.index"));
         },
     });
@@ -350,7 +352,7 @@ const exportURL = computed(() => {
             <div>
                 <div class="flex items-center justify-between p-2">
                     <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                        Agent Management
+                      Third Party Agents
                     </h2>
 
                     <div class="flex">

@@ -47,7 +47,8 @@ const form = useForm({
 const handleBranchUpdate = () => {
     form.put(route("agents.update", props.agent.id), {
         onSuccess: () => {
-            push.success('Branch updated successfully!');
+            router.visit(route("agents.index"));
+            push.success('Third Party Agent updated successfully!');
         },
         onError: () => {
             push.error('Something went wrong!');
@@ -59,20 +60,20 @@ const handleBranchUpdate = () => {
 </script>
 
 <template>
-    <AppLayout title="Edit Agent">
-        <template #header>Agents</template>
+    <AppLayout title="Edit Third Party Agent">
+        <template #header>Third PartyAgents</template>
 
         <Breadcrumb />
         <form @submit.prevent="handleBranchUpdate">
             <div class="flex items-center justify-between p-2 my-5">
                 <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                    Edit Agent
+                     Edit Third Party Agent
                 </h2>
 
                 <div class="flex justify-end bottom-0 space-x-5">
                     <DangerOutlineButton @click="router.visit(route('agents.index'))">Cancel</DangerOutlineButton>
                     <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing" class="space-x-2" type="submit">
-                        <span>Update Agent</span>
+                        <span>Update Third Party Agent</span>
                         <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
