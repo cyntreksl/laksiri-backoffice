@@ -47,7 +47,7 @@ class ConvertPickupToHBL
             'system_status' => HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
             'packages' => $request->packages,
             'is_completed' => $request->is_completed,
-            'hbl_number' => isset($data['is_completed']) && $data['is_completed'] ? GenerateHBLNumber::run(GetUserCurrentBranchID::run()) : null,
+            'hbl_number' => isset($request->is_completed) && $request->is_completed ? GenerateHBLNumber::run(GetUserCurrentBranchID::run()) : null,
             'cr_number' => GenerateCRNumber::run(),
         ];
 
