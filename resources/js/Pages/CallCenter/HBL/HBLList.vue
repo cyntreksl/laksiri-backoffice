@@ -575,26 +575,67 @@ const createColumns = () => [
             ]);
         },
     },
-    { name: "ID", hidden: !data.columnVisibility.id },
-    { name: "HBL", hidden: !data.columnVisibility.hbl_number },
+    {
+        name: "ID",
+        hidden: !data.columnVisibility.id,
+        formatter: (_, row) => {
+            return row.cells[0].data;
+        }
+    },
+    {
+        name: "HBL",
+        hidden: !data.columnVisibility.hbl_number,
+        formatter: (_, row) => {
+            return row.cells[1].data;
+        }
+    },
     { name: "HBL Name", hidden: !data.columnVisibility.hbl_name },
-    { name: "Consignee Name", hidden: !data.columnVisibility.consignee_name },
+    {
+        name: "Consignee Name",
+        hidden: !data.columnVisibility.consignee_name,
+        formatter: (_, row) => {
+            return row.cells[3].data;
+        }
+    },
     {
         name: "Consignee Address",
         hidden: !data.columnVisibility.consignee_address,
         sort: false,
+        formatter: (_, row) => {
+            return row.cells[4].data;
+        }
     },
     {
         name: "Consignee Contact",
         hidden: !data.columnVisibility.consignee_contact,
         sort: false,
+        formatter: (_, row) => {
+            return row.cells[5].data;
+        }
     },
-    { name: "Email", hidden: !data.columnVisibility.email, sort: false },
-    { name: "Address", hidden: !data.columnVisibility.address, sort: false },
+    {
+        name: "Email",
+        hidden: !data.columnVisibility.email,
+        sort: false,
+        formatter: (_, row) => {
+            return row.cells[6].data;
+        }
+    },
+    {
+        name: "Address",
+        hidden: !data.columnVisibility.address,
+        sort: false,
+        formatter: (_, row) => {
+            return row.cells[7].data;
+        } },
     {
         name: "Contact",
         hidden: !data.columnVisibility.contact_number,
         sort: false,
+        formatter: (_, row) => {
+            console.log(row.cells);
+            return row.cells[8].data;
+        }
     },
     {
         name: "Cargo Mode",
@@ -672,9 +713,27 @@ const createColumns = () => [
                   ])
                 : row.cells[9].data,
     },
-    { name: "HBL Type", hidden: !data.columnVisibility.hbl_type },
-    { name: "Warehouse", hidden: !data.columnVisibility.warehouse },
-    { name: "Status", hidden: !data.columnVisibility.status },
+    {
+        name: "HBL Type",
+        hidden: !data.columnVisibility.hbl_type,
+        formatter: (_, row) => {
+            return row.cells[10].data;
+        }
+        },
+    {
+        name: "Warehouse",
+        hidden: !data.columnVisibility.warehouse,
+        formatter: (_, row) => {
+            return row.cells[11].data;
+        }
+    },
+    {
+        name: "Status",
+        hidden: !data.columnVisibility.status,
+        formatter: (_, row) => {
+            return row.cells[12].data;
+        }
+    },
     {
         name: "Is Hold",
         hidden: !data.columnVisibility.is_hold,
@@ -691,10 +750,16 @@ const createColumns = () => [
         name: "Issued Token",
         hidden: !data.columnVisibility.tokens,
         sort: false,
+        formatter: (_, row) => {
+            return row.cells[14].data;
+        }
     },
     {
         name: "System Status",
         hidden: !data.columnVisibility.system_status,
+        formatter: (_, row) => {
+            return row.cells[15].data;
+        }
     },
 ];
 
