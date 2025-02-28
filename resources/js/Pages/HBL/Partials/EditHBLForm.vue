@@ -70,18 +70,8 @@ const splitContactNumber = (fullNumber) => {
     }
 }
 
-const isSameContactNumber = ref(false);
-const isSameConsigneeContactNumber = ref(false);
-
-onMounted(() => {
-    if(props.hbl.contact_number === props.hbl.whatsapp_number){
-        isSameConsigneeContactNumber.value = true;
-    }
-
-    if(props.hbl.consignee_contact === props.hbl.consignee_whatsapp_number){
-        isSameContactNumber.value = true;
-    }
-});
+const isSameContactNumber = ref(props.hbl.contact_number === props.hbl.whatsapp_number);
+const isSameConsigneeContactNumber = ref(props.hbl.consignee_contact === props.hbl.consignee_whatsapp_number);
 
 const countryCode = ref(splitCountryCode(props.hbl.contact_number));
 const contactNumber = ref(splitContactNumber(props.hbl.contact_number));
@@ -608,6 +598,38 @@ const getSelectedPackage = () => {
         packageItem.height = 0;
     }
 };
+
+const isChecked = ref(false);
+
+const addToConsigneeDetails = () => {
+    if (isChecked.value) {
+        form.consignee_name = form.hbl_name;
+        consigneeCountryCode.value = countryCode.value;
+        consigneeContactNumber.value = contactNumber.value;
+        form.consignee_nic = form.nic;
+        form.consignee_address = form.address;
+        isSameConsigneeContactNumber.value = isSameContactNumber.value;
+        consigneeWhatsappNumberCountryCode.value = whatsappNumberCountryCode.value;
+        consigneeWhatsappNumber.value = whatsappNumber.value;
+        consigneeAdditionalMobileCountryCode.value = additionalMobileCountryCode.value;
+        consigneeAdditionalMobileNumber.value = additionalMobileNumber.value;
+    } else {
+        resetConsigneeDetails();
+    }
+};
+
+const resetConsigneeDetails = () => {
+    form.consignee_name = props.hbl.hbl_name;
+    consigneeCountryCode.value = splitCountryCode(props.hbl.consignee_contact);
+    consigneeContactNumber.value = splitContactNumber(props.hbl.consignee_contact);
+    form.consignee_nic = props.hbl.nic;
+    form.consignee_address = props.hbl.address;
+    isSameConsigneeContactNumber.value = (props.hbl.consignee_contact === props.hbl.consignee_whatsapp_number);
+    consigneeWhatsappNumberCountryCode.value = splitCountryCode(props.hbl.consignee_whatsapp_number);
+    consigneeWhatsappNumber.value = splitContactNumber(props.hbl.consignee_whatsapp_number);
+    consigneeAdditionalMobileCountryCode.value = splitCountryCode(props.hbl.consignee_additional_mobile_number);
+    consigneeAdditionalMobileNumber.value = splitContactNumber(props.hbl.consignee_additional_mobile_number);
+};
 </script>
 
 <template>
@@ -871,10 +893,11 @@ const getSelectedPackage = () => {
 
                     <div class="grid grid-cols-3 gap-5 mt-3">
                         <div class="col-span-3">
-                            <Checkbox
+                            <input
                                 v-model="isSameContactNumber"
                                 @change="addContactToWhatsapp"
-                            ></Checkbox>
+                                type="checkbox"
+                            />
 
                             <span class="ml-5">Use mobile number as whatsapp number</span>
                         </div>
@@ -1141,10 +1164,11 @@ const getSelectedPackage = () => {
                         <div class="col-span-2">
                             <div class="grid grid-cols-1 sm:grid-cols-3">
                                 <div class="col-span-3">
-                                    <Checkbox
+                                    <input
                                         v-model="isSameConsigneeContactNumber"
                                         @change="addConsigneeContactToWhatsapp"
-                                    ></Checkbox>
+                                        type="checkbox"
+                                    />
 
                                     <span class="ml-5">Use consignee mobile number as whatsapp number</span>
                                 </div>
