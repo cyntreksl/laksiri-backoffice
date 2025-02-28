@@ -1693,7 +1693,7 @@ const confirmViewHBL = async (id) => {
                                     <div class="flex justify-between">
                                         <p class="line-clamp-1">Volume</p>
                                         <p class="text-slate-700 dark:text-navy-100">
-                                            {{ grandTotalVolume.toFixed(2) }}
+                                            {{ grandTotalVolume.toFixed(3) }}
                                         </p>
                                     </div>
                                 </div>
