@@ -436,6 +436,7 @@ const resetConsigneeDetails = () => {
     consignee_contact.value = "";
     form.consignee_nic = "";
     form.consignee_address = "";
+    consigneeAdditionalMobileNumber.value = "";
 };
 
 const updateTypeDescription = () => {
@@ -1135,11 +1136,11 @@ const confirmViewHBL = async (id) => {
 
                         <div class="grid grid-cols-3 gap-5 mt-3">
                             <div class="col-span-3">
-                                <Checkbox
+                                <input
                                     v-model="isSameContactNumber"
                                     @change="addContactToWhatsapp"
-                                ></Checkbox>
-
+                                    type="checkbox"
+                                />
                                 <span class="ml-5">Use mobile number as whatsapp number</span>
                             </div>
                         </div>
@@ -1408,11 +1409,11 @@ const confirmViewHBL = async (id) => {
                             <div class="col-span-2 ml-1">
                                 <div class="grid grid-cols-3 gap-5">
                                     <div class="col-span-3">
-                                        <Checkbox
+                                        <input
                                             v-model="isSameConsigneeContactNumber"
                                             @change="addConsigneeContactToWhatsapp"
-                                        ></Checkbox>
-
+                                            type="checkbox"
+                                        />
                                         <span class="ml-5">Use mobile number as whatsapp number</span>
                                     </div>
                                 </div>
