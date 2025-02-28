@@ -64,6 +64,7 @@ const form = useForm({
     country: props.branch.country || '',
     email: props.branch.email || '',
     container_delays: props.branch.container_delays,
+    maximum_demurrage_discount: props.branch.maximum_demurrage_discount,
     cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
     delivery_types: JSON.parse(props.branch.delivery_types) || [],
     package_types: JSON.parse(props.branch.package_types) || [],
@@ -283,17 +284,6 @@ const updateChecked = (notification, isChecked) => {
                         </div>
 
                         <div class="sm:col-span-2">
-                            <InputLabel value="Container Delay Dates" />
-                            <TextInput
-                                v-model="form.container_delays"
-                                class="w-full"
-                                placeholder="Enter No of Days"
-                                type="number"
-                                min="0"
-                            />
-                            <InputError :message="form.errors.container_delays" />
-                        </div>
-                        <div class="sm:col-span-2">
                             <label class="block">
                                 <InputLabel value="Country"/>
                                 <select
@@ -316,6 +306,41 @@ const updateChecked = (notification, isChecked) => {
                             <InputError :message="form.errors.email"/>
                         </div>
                     </div>
+                </div>
+
+                <div class="card px-4 py-4 sm:px-5">
+                    <div class="grid grid-cols-2">
+                        <h2
+                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                        >
+                            Shipments
+                        </h2>
+                    </div>
+
+                    <div class="grid sm:grid-cols-4 gap-5 mt-3">
+                        <div class="sm:col-span-2">
+                            <InputLabel value="Container Delay Dates" />
+                            <TextInput
+                                v-model="form.container_delays"
+                                class="w-full"
+                                placeholder="Enter No of Days"
+                                type="number"
+                                min="0"
+                            />
+                            <InputError :message="form.errors.container_delays" />
+                        </div>
+
+                        <div v-if="usePage().props.currentBranch.type === 'Destination'" class="sm:col-span-2">
+                            <InputLabel value="Maximum Demurrage Discount (%)" />
+                            <TextInput
+                                v-model="form.maximum_demurrage_discount"
+                                class="w-full"
+                                type="number"
+                                min="0"
+                            />
+                            <InputError :message="form.errors.maximum_demurrage_discount" />
+                        </div>
+                  </div>
                 </div>
 
                 <div class="card px-4 py-4 sm:px-5">

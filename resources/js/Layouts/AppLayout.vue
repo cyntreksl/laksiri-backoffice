@@ -469,7 +469,7 @@
                             </a>
                             <!-- Courier Management -->
                             <a
-                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('Courier')) || $page.props.user.permissions.includes('third-party-agents.index')"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('Courier')) || $page.props.user.permissions.includes('third-party-agents.index') || $page.props.user.permissions.includes('couriers.index') || $page.props.user.permissions.includes('couriers.create') || $page.props.user.permissions.includes('courier-agents.create')"
                                 :class="[
                 activeMenu === 'Courier' ? 'bg-primary/10 text-primary' : '',
               ]"
@@ -1642,26 +1642,53 @@ export default {
                     changeSidePanelTitle("Users");
                     break;
                 case "Courier":
+                    let courierMenu = [];
+                    if (usePage().props.user.permissions.includes("third-party-agents.index")){
+
+                        courierMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Third Party Agents",
+                                route: "agents.index",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("courier.create")){
+
+                        courierMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Create Courier ",
+                                route: "couriers.create",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("courier.index")){
+                        courierMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All Couriers ",
+                                route: "couriers.index",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("courier-agents.index")){
+                        courierMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Courier Agents ",
+                                route: "courier-agents.index",
+                            }
+                        );
+                    }
                     childMenuList.splice(
                         0,
                         childMenuList.length,
-                        {
-                            title: "Third Party Agents",
-                            route: "agents.index",
-                        },
-                        {
-                            title: "Create Courier ",
-                            route: "couriers.create",
-                        },
-                        {
-                            title: "All Couriers ",
-                            route: "couriers.index",
-                        },
-                        {
-                            title: "Courier Agents ",
-                            route: "courier-agents.index",
-                        },
-
+                        ...courierMenu
                     );
                     changeSidePanelTitle("Courier");
                     break;

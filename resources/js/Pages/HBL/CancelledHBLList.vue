@@ -33,6 +33,11 @@ const props = defineProps({
         type: Object,
         default: () => {},
     },
+    warehouses: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const wrapperRef = ref(null);
@@ -49,7 +54,7 @@ const filters = reactive({
     cargoMode: ["Air Cargo", "Sea Cargo"],
     hblType: ["UPB", "Gift", "Door to Door"],
     isHold: false,
-    warehouse: ["COLOMBO", "NINTAVUR", "OTHER"],
+    warehouse: props.warehouses.map(warehouse => warehouse.name),
     createdBy: "",
     paymentStatus: [],
 });
@@ -515,7 +520,7 @@ const resetFilter = () => {
     filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
     filters.hblType = ["UPB", "Gift", "Door to Door"];
     filters.isHold = false;
-    filters.warehouse = ["COLOMBO", "NINTAVUR", "OTHER"];
+    filters.warehouse = props.warehouses.map(warehouse => warehouse.name);
     filters.createdBy = "";
     filters.paymentStatus = [];
     applyFilters();
@@ -1033,27 +1038,15 @@ const shipIcon = ref(`
 
                 <FilterHeader value="Warehouse" />
 
-                <label class="inline-flex items-center space-x-2 mt-2">
+                <label
+                    v-for="warehouse in warehouses"
+                    :key="warehouse.id"
+                    class="inline-flex items-center space-x-2 mt-2"
+                >
                     <Switch
                         v-model="filters.warehouse"
-                        label="COLOMBO"
-                        value="COLOMBO"
-                    />
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.warehouse"
-                        label="NINTAVUR"
-                        value="NINTAVUR"
-                    />
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.warehouse"
-                        label="OTHER"
-                        value="OTHER"
+                        :label="warehouse.name"
+                        :value="warehouse.name"
                     />
                 </label>
 
