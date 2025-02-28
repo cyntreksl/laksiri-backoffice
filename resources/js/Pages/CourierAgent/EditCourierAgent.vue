@@ -22,26 +22,32 @@ const props = defineProps({
     }
 });
 
-// Extract country code and phone numbers from existing data
-const extractPhoneDetails = (fullNumber) => {
-    const countryCodeMatch = fullNumber.match(/^\+\d{2,3}/);
-    const countryCode = countryCodeMatch ? countryCodeMatch[0] : '+94';
-    const number = fullNumber.replace(countryCode, '');
-    return { countryCode, number };
+const splitCountryCode = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            return code;
+        }
+    }
+};
+const splitContactNumber = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            return fullNumber.slice(code.length);
+        }
+    }
 };
 
-const phone1Details = extractPhoneDetails(props.courierAgent.contact_number_1 || '');
-const phone2Details = extractPhoneDetails(props.courierAgent.contact_number_2 || '');
+const countryCode1 = ref(splitCountryCode(props.courierAgent.contact_number_1));
+const contactNumber1 = ref(splitContactNumber(props.courierAgent.contact_number_2));
 
-const countryCode = ref(phone1Details.countryCode);
-const contactNumber1 = ref(phone1Details.number);
-const contactNumber2 = ref(phone2Details.number);
+const countryCode2 = ref(splitCountryCode(props.courierAgent.contact_number_2));
+const contactNumber2 = ref(splitContactNumber(props.courierAgent.contact_number_2));
 
 const form = useForm({
     company_name: props.courierAgent.company_name,
     website: props.courierAgent.website,
-    contact_number_1: computed(() => countryCode.value + contactNumber1.value),
-    contact_number_2: computed(() => countryCode.value + contactNumber2.value),
+    contact_number_1: computed(() => countryCode1.value + contactNumber1.value),
+    contact_number_2: computed(() => countryCode2.value + contactNumber2.value),
     email: props.courierAgent.email,
     address: props.courierAgent.address,
     logo: props.courierAgent.logo,
@@ -150,7 +156,7 @@ const clearLogoFileInput = () => {
                                     <InputLabel class="col-span-3" for="mobile_number" value="Mobile Number"/>
                                     <div>
                                         <select
-                                            v-model="countryCode"
+                                            v-model="countryCode1"
                                             x-init="$el._tom = new Tom($el)"
                                             class="w-full rounded-r-0"
                                         >
@@ -176,7 +182,7 @@ const clearLogoFileInput = () => {
                                     <InputLabel class="col-span-3" for="mobile_number" value="Mobile Number"/>
                                     <div>
                                         <select
-                                            v-model="countryCode"
+                                            v-model="countryCode2"
                                             x-init="$el._tom = new Tom($el)"
                                             class="w-full rounded-r-0"
                                         >
