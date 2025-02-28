@@ -59,13 +59,8 @@ const form = useForm({
     pickup_time_end: props.pickup.pickup_time_end,
 });
 
-const isSameContactNumber = ref(false);
+const isSameContactNumber = ref(props.pickup.contact_number === props.pickup.whatsapp_number);
 
-onMounted(() => {
-    if (String(form.contact_number) === String(form.whatsapp_number)) {
-        isSameContactNumber.value = true;;
-    }
-});
 
 const addContactToWhatsapp = () => {
     if (isSameContactNumber.value) {
@@ -305,11 +300,11 @@ const shipIcon = ref(`
                             </div>
 
                             <div class="col-span-2">
-                                <Checkbox
+                                <input
                                     v-model="isSameContactNumber"
+                                    type="checkbox"
                                     @change="addContactToWhatsapp"
-                                ></Checkbox>
-
+                                >
                                 <span class="ml-5">Use mobile number as whatsapp number</span>
                             </div>
 
