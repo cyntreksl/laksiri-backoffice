@@ -392,23 +392,23 @@ Breadcrumbs::for('agents.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Courier');
     $trail->push('Third Party Agent');
-    $trail->push('List', route('agents.index'));
+    $trail->push(' All Third Party Agents', route('agents.index'));
 });
 
-//Third-Party Agents > Create
+// Third-Party Agents > Create
 Breadcrumbs::for('agents.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Courier');
-    $trail->push('Third Party Agent');
-    $trail->push('Create', route('agents.create'));
+    $trail->push('Third Party Agent', route('agents.index'));
+    $trail->push('Create Third Party Agents', route('agents.create'));
 });
-//Third-Party Agents > Edit
+// Third-Party Agents > Edit
 Breadcrumbs::for('agents.edit', function (BreadcrumbTrail $trail, $id) {
     $branch = Branch::find($id);
     $trail->parent('dashboard');
     $trail->push('Courier');
-    $trail->push('Third Party Agent');
-    $trail->push('Edit', route('agents.edit', $branch->id));
+    $trail->push('Third Party Agent', route('agents.index'));
+    $trail->push('Edit Third Party Agents', route('agents.edit', $branch->id));
 });
 
 // Courier

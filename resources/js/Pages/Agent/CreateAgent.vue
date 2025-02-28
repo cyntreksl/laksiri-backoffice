@@ -46,7 +46,7 @@ const handleBranchCreate = () => {
         onSuccess: () => {
             form.reset();
             router.visit(route("agents.index"));
-            push.success('Agent added successfully!');
+            push.success('Third Party Agent added successfully!');
         },
         onError: () => {
             push.error('Something went to wrong!');
@@ -60,14 +60,14 @@ const handleBranchCreate = () => {
 
 <template>
     <AppLayout title="Create Agent">
-        <template #header>Agents</template>
+        <template #header>Third Party Agent</template>
 
         <Breadcrumb/>
         <form @submit.prevent="handleBranchCreate">
 
             <div class="flex items-center justify-between p-2 my-5">
                 <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                    Create New Agent
+                    Create New Third Party Agent
                 </h2>
 
                 <div class="flex justify-end bottom-0 space-x-5">

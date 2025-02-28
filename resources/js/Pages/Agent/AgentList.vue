@@ -269,7 +269,7 @@ const handleDeleteAgent = () => {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
-            push.success("Agent Deleted Successfully!");
+            push.success("Third Party Agent Deleted Successfully!");
             router.visit(route("agents.index"));
         },
     });
@@ -352,7 +352,7 @@ const exportURL = computed(() => {
             <div>
                 <div class="flex items-center justify-between p-2">
                     <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                        Agent Management
+                      Third Party Agents
                     </h2>
 
                     <div class="flex">
