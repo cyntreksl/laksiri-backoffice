@@ -23,6 +23,7 @@ class UpdateBranch
             'country' => $data['country'],
             'email' => $data['email'],
             'container_delays' => $data['container_delays'],
+            'maximum_demurrage_discount' => $data['maximum_demurrage_discount'],
             'cargo_modes' => json_encode($data['cargo_modes']),
             'delivery_types' => json_encode($data['delivery_types']),
             'package_types' => json_encode($data['package_types']),
