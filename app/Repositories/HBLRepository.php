@@ -22,6 +22,7 @@ use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLStatusByReference;
 use App\Actions\HBL\GetHBLsWithPackages;
 use App\Actions\HBL\GetHBLsWithUnloadedPackagesByReference;
+use App\Actions\HBL\GetHBLTotalSummary;
 use App\Actions\HBL\HBLPackage\GetPackagesByReference;
 use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
@@ -472,5 +473,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function downloadBaggagePDF(HBL $hbl)
     {
         return DownloadBaggagePDF::run($hbl);
+    }
+
+    public function getHBLTotalSummary(HBL $hbl)
+    {
+        return GetHBLTotalSummary::run($hbl);
     }
 }

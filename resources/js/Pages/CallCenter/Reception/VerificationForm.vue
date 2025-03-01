@@ -6,7 +6,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import VerifyConfirmationModal from "@/Pages/CallCenter/Reception/Partials/VerifyConfirmModal.vue";
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import {push} from "notivue";
 import moment from "moment";
 import HBLDetailContent from "@/Pages/Common/Partials/HBLDetailContent.vue";
@@ -87,8 +87,33 @@ const fetchPickup = async () => {
     }
 }
 
+const getHBLTotalSummary = async () => {
+    try {
+        console.log('2222222222222222222',props.hblId);
+        const response = await fetch(`/hbls/get-total-summary/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    } finally {
+        // isLoading.value = false;
+    }
+};
+
 if (props.hblId !== null) {
+    console.log('1111111111111', props.hblId)
     fetchHBL();
+    getHBLTotalSummary();
 }
 
 const form = useForm({
