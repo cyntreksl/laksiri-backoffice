@@ -171,11 +171,12 @@ const handleHBLCreate = () => {
         form.whatsapp_number = "";
     }
 
-    if(form.consignee_additional_mobile_number === additionalMobileCountryCode.value){
-        form.additional_mobile_number = "";
+    if(form.consignee_additional_mobile_number === consigneeAdditionalMobileCountryCode.value){
+        form.consignee_additional_mobile_number = "";
     }
+
     if(form.consignee_whatsapp_number === consigneeWhatsappNumberCountryCode.value){
-        form.whatsapp_number = "";
+        form.consignee_whatsapp_number = "";
     }
 
     form.post(route("hbls.store"), {
