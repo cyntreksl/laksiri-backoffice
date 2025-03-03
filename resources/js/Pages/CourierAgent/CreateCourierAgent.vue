@@ -248,7 +248,7 @@ const clearLogoFileInput = () => {
                             <h2
                                 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                Invoice Footer
+                                Company Logo
                             </h2>
                         </div>
                         <div class="sm:col-span-4">

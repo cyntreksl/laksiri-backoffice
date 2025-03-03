@@ -95,6 +95,9 @@ const clearLogoFileInput = () => {
     logoInput.value.value = "";
     logoPreview.value = null;
 };
+
+// console.log(props.courierAgent.logo)
+console.log(form.logo)
 </script>
 
 <template>
@@ -278,7 +281,7 @@ const clearLogoFileInput = () => {
 
                                 <!-- Current Photo -->
                                 <div v-show="!logoPreview" class="mt-2">
-                                    <img v-if="form.logo" :src="form.logo" alt="logo" class="rounded-full h-20 w-20 object-cover">
+                                    <img v-if="form && form.logo"  :src="form.logo" alt="logo" class="rounded-full h-20 w-20 object-cover">
                                 </div>
 
                                 <!-- New Photo Preview -->
