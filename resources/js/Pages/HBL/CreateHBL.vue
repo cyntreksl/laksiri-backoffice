@@ -185,6 +185,7 @@ const hblRules = async () => {
         }
         if (data.package_rules) {
             packageRulesData.value = data.package_rules;
+            console.log(packageRulesData.value);
         }
         if (data.price_rules) {
             priceRulesData.value = data.price_rules;
@@ -205,7 +206,7 @@ const addPackageData = () => {
         packageItem.volume <= 0 ||
         (form.is_active_package && !packageItem.packageRule)
     ) {
-        push.error("Please fill all required data");
+        push.error("Please fill all required data1");
         return;
     }
     packageItem.length = packageItemLength.value;
@@ -215,13 +216,13 @@ const addPackageData = () => {
 
     if (form.cargo_type === 'Air Cargo') {
         if (packageItem.totalWeight <= 0) {
-            push.error("Please fill the total weight");
+            push.error("Please fill the total weight2");
             return;
         }
     }
 
-    if(priceRulesData.value.length === 0 && !form.is_active_package){
-        push.error("Please fill all required data");
+    if(priceRulesData.value.length === 0 && !packageItem.packageRule){
+        push.error("Please fill all required data3");
         return;
     }
 
