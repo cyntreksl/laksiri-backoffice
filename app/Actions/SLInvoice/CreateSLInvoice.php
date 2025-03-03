@@ -31,7 +31,7 @@ class CreateSLInvoice
 
     private function getContainer($hbl)
     {
-        return $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
+        return $hbl->packages[0]->containers()->withoutGlobalScopes()->first() ?? $hbl->packages[0]->duplicate_containers()->withoutGlobalScopes()->first();
     }
 
     private function calculateArrivalDatesCount($container): int
