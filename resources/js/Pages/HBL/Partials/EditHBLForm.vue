@@ -70,15 +70,32 @@ const splitContactNumber = (fullNumber) => {
     }
 }
 
+const isSameContactNumber = ref(props.hbl.contact_number === props.hbl.whatsapp_number);
+const isSameConsigneeContactNumber = ref(props.hbl.consignee_contact === props.hbl.consignee_whatsapp_number);
+
 const countryCode = ref(splitCountryCode(props.hbl.contact_number));
 const contactNumber = ref(splitContactNumber(props.hbl.contact_number));
 const consigneeCountryCode = ref(splitCountryCode(props.hbl.consignee_contact));
 const consigneeContactNumber = ref(splitContactNumber(props.hbl.consignee_contact));
 
+const additionalMobileCountryCode = ref(splitCountryCode(props.hbl.additional_mobile_number));
+const additionalMobileNumber = ref(splitContactNumber(props.hbl.additional_mobile_number));
+
+const whatsappNumberCountryCode = ref(splitCountryCode(props.hbl.whatsapp_number));
+const whatsappNumber = ref(splitContactNumber(props.hbl.whatsapp_number));
+
+const consigneeAdditionalMobileCountryCode = ref(splitCountryCode(props.hbl.consignee_additional_mobile_number));
+const consigneeAdditionalMobileNumber = ref(splitContactNumber(props.hbl.consignee_additional_mobile_number));
+
+const consigneeWhatsappNumberCountryCode = ref(splitCountryCode(props.hbl.consignee_whatsapp_number));
+const consigneeWhatsappNumber = ref(splitContactNumber(props.hbl.consignee_whatsapp_number));
+
 const form = useForm({
     hbl_name: props.hbl.hbl_name,
     email: props.hbl.email,
     contact_number: computed(() => countryCode.value + contactNumber.value),
+    additional_mobile_number: props.hbl.additional_mobile_number || "",
+    whatsapp_number: props.hbl.whatsapp_number || "",
     nic: props.hbl.nic,
     iq_number: props.hbl.iq_number,
     address: props.hbl.address,
@@ -87,6 +104,8 @@ const form = useForm({
     consignee_contact: computed(
         () => consigneeCountryCode.value + consigneeContactNumber.value
     ),
+    consignee_additional_mobile_number: props.hbl.consignee_additional_mobile_number || "",
+    consignee_whatsapp_number: props.hbl.consignee_whatsapp_number || "",
     consignee_address: props.hbl.consignee_address,
     consignee_note: props.hbl.consignee_note,
     cargo_type: props.hbl.cargo_type,
@@ -113,7 +132,52 @@ onMounted(() => {
     hblRules();
 });
 
+const addContactToWhatsapp = () => {
+    if (isSameContactNumber.value) {
+        whatsappNumberCountryCode.value = countryCode.value;
+        whatsappNumber.value = contactNumber.value;
+    } else {
+        resetWhatsappNumber();
+    }
+};
+
+const resetWhatsappNumber = () => {
+    whatsappNumberCountryCode.value = splitCountryCode(props.hbl.whatsapp_number)
+    whatsappNumber.value = splitContactNumber(props.hbl.whatsapp_number)
+};
+
+const addConsigneeContactToWhatsapp = () => {
+    if (isSameContactNumber.value) {
+        consigneeWhatsappNumberCountryCode.value = consigneeCountryCode.value;
+        consigneeWhatsappNumber.value = consigneeContactNumber.value;
+    } else {
+        resetConsigneeWhatsappNumber();
+    }
+};
+
+const resetConsigneeWhatsappNumber = () => {
+    consigneeWhatsappNumberCountryCode.value = splitCountryCode(props.hbl.consignee_whatsapp_number)
+    consigneeWhatsappNumber.value = splitContactNumber(props.hbl.consignee_whatsapp_number);
+};
+
 const handleHBLUpdate = () => {
+    form.additional_mobile_number = additionalMobileCountryCode.value + additionalMobileNumber.value;
+    form.whatsapp_number = whatsappNumberCountryCode.value + whatsappNumber.value;
+    form.consignee_additional_mobile_number = consigneeAdditionalMobileCountryCode.value + consigneeAdditionalMobileNumber.value;
+    form.consignee_whatsapp_number = consigneeWhatsappNumberCountryCode.value + consigneeWhatsappNumber.value;
+    if(form.additional_mobile_number === additionalMobileCountryCode.value){
+        form.additional_mobile_number = "";
+    }
+    if(form.whatsapp_number === whatsappNumberCountryCode.value){
+        form.whatsapp_number = "";
+    }
+
+    if(form.consignee_additional_mobile_number === additionalMobileCountryCode.value){
+        form.additional_mobile_number = "";
+    }
+    if(form.consignee_whatsapp_number === consigneeWhatsappNumberCountryCode.value){
+        form.whatsapp_number = "";
+    }
     form.put(route("hbls.update", props.hbl.id), {
         onSuccess: () => {
             push.success("HBL Updated Successfully!");
@@ -534,6 +598,38 @@ const getSelectedPackage = () => {
         packageItem.height = 0;
     }
 };
+
+const isChecked = ref(false);
+
+const addToConsigneeDetails = () => {
+    if (isChecked.value) {
+        form.consignee_name = form.hbl_name;
+        consigneeCountryCode.value = countryCode.value;
+        consigneeContactNumber.value = contactNumber.value;
+        form.consignee_nic = form.nic;
+        form.consignee_address = form.address;
+        isSameConsigneeContactNumber.value = isSameContactNumber.value;
+        consigneeWhatsappNumberCountryCode.value = whatsappNumberCountryCode.value;
+        consigneeWhatsappNumber.value = whatsappNumber.value;
+        consigneeAdditionalMobileCountryCode.value = additionalMobileCountryCode.value;
+        consigneeAdditionalMobileNumber.value = additionalMobileNumber.value;
+    } else {
+        resetConsigneeDetails();
+    }
+};
+
+const resetConsigneeDetails = () => {
+    form.consignee_name = props.hbl.hbl_name;
+    consigneeCountryCode.value = splitCountryCode(props.hbl.consignee_contact);
+    consigneeContactNumber.value = splitContactNumber(props.hbl.consignee_contact);
+    form.consignee_nic = props.hbl.nic;
+    form.consignee_address = props.hbl.address;
+    isSameConsigneeContactNumber.value = (props.hbl.consignee_contact === props.hbl.consignee_whatsapp_number);
+    consigneeWhatsappNumberCountryCode.value = splitCountryCode(props.hbl.consignee_whatsapp_number);
+    consigneeWhatsappNumber.value = splitContactNumber(props.hbl.consignee_whatsapp_number);
+    consigneeAdditionalMobileCountryCode.value = splitCountryCode(props.hbl.consignee_additional_mobile_number);
+    consigneeAdditionalMobileNumber.value = splitContactNumber(props.hbl.consignee_additional_mobile_number);
+};
 </script>
 
 <template>
@@ -797,6 +893,76 @@ const getSelectedPackage = () => {
 
                     <div class="grid grid-cols-3 gap-5 mt-3">
                         <div class="col-span-3">
+                            <input
+                                v-model="isSameContactNumber"
+                                @change="addContactToWhatsapp"
+                                type="checkbox"
+                            />
+
+                            <span class="ml-5">Use mobile number as whatsapp number</span>
+                        </div>
+                    </div>
+
+                    <div v-show="!isSameContactNumber" class="grid grid-cols-3 gap-5 mt-3">
+                        <div class="col-span-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-3">
+                                <InputLabel class="col-span-3" value="Whatsapp Number"/>
+                                <div>
+                                    <select
+                                        v-model="whatsappNumberCountryCode"
+                                        x-init="$el._tom = new Tom($el)"
+                                        class="w-full rounded-r-0"
+                                    >
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                            {{ countryCode }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <input
+                                        id="telephone"
+                                        v-model="whatsappNumber"
+                                        class="h-[38px] rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        placeholder="123 4567 890"
+                                        type="text"
+                                    />
+                                </div>
+                            </div>
+                            <InputError class="col-span-3" :message="form.errors.whatsapp_number"/>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-5 mt-3">
+                        <div class="col-span-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-3">
+                                <InputLabel class="col-span-3" value="Additional Mobile Number"/>
+                                <div>
+                                    <select
+                                        v-model="additionalMobileCountryCode"
+                                        x-init="$el._tom = new Tom($el)"
+                                        class="w-full rounded-r-0"
+                                    >
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                            {{ countryCode }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <input
+                                        id="telephone"
+                                        v-model="additionalMobileNumber"
+                                        class="h-[38px] rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        placeholder="123 4567 890"
+                                        type="text"
+                                    />
+                                </div>
+                            </div>
+                            <InputError class="col-span-3" :message="form.errors.whatsapp_number"/>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-5 mt-3">
+                        <div class="col-span-3">
                             <span>PP or NIC No</span>
                             <label class="relative flex">
                                 <input
@@ -986,6 +1152,72 @@ const getSelectedPackage = () => {
                                 <div class="col-span-2">
                                     <input
                                         v-model="consigneeContactNumber"
+                                        class="form-input rounded-l-lg w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        placeholder="123 4567 890"
+                                        type="text"
+                                    />
+                                </div>
+                                <InputError class="col-span-3" :message="form.errors.consignee_contact"/>
+                            </div>
+                        </div>
+
+                        <div class="col-span-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-3">
+                                <div class="col-span-3">
+                                    <input
+                                        v-model="isSameConsigneeContactNumber"
+                                        @change="addConsigneeContactToWhatsapp"
+                                        type="checkbox"
+                                    />
+
+                                    <span class="ml-5">Use consignee mobile number as whatsapp number</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-show="!isSameConsigneeContactNumber" class="col-span-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-3">
+                                <InputLabel class="col-span-3" value="Whatsapp Number"/>
+                                <div>
+                                    <select
+                                        v-model="consigneeWhatsappNumberCountryCode"
+                                        x-init="$el._tom = new Tom($el)"
+                                        class="w-full rounded-r-0"
+                                    >
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                            {{ countryCode }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <input
+                                        v-model="consigneeWhatsappNumber"
+                                        class="form-input rounded-l-lg w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
+                                        placeholder="123 4567 890"
+                                        type="text"
+                                    />
+                                </div>
+                                <InputError class="col-span-3" :message="form.errors.consignee_contact"/>
+                            </div>
+                        </div>
+
+                        <div class="col-span-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-3">
+                                <InputLabel class="col-span-3" value="Additional Mobile Number"/>
+                                <div>
+                                    <select
+                                        v-model="consigneeAdditionalMobileCountryCode"
+                                        x-init="$el._tom = new Tom($el)"
+                                        class="w-full rounded-r-0"
+                                    >
+                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
+                                            {{ countryCode }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <input
+                                        v-model="consigneeAdditionalMobileNumber"
                                         class="form-input rounded-l-lg w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                         placeholder="123 4567 890"
                                         type="text"
