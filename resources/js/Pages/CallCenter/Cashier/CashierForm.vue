@@ -32,6 +32,7 @@ const props = defineProps({
 
 const hbl = ref({});
 const pickup = ref({});
+const hblTotalSummary = ref({});
 const isLoadingHbl = ref(false);
 
 const fetchHBL = async () => {
@@ -86,8 +87,33 @@ const fetchPickup = async () => {
     }
 }
 
+const getHBLTotalSummary = async () => {
+    try {
+        const response = await fetch(`/hbls/get-total-summary/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok.");
+        }else{
+            hblTotalSummary.value = await response.json();
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    } finally {
+        // isLoading.value = false;
+    }
+};
+
 if (props.hblId !== null) {
     fetchHBL();
+    getHBLTotalSummary();
 }
 
 const paymentRecord = ref([]);
@@ -165,7 +191,7 @@ const handleUpdatePayment = () => {
                 <div class="grid grid-cols-1 mt-4 gap-4">
                     <div class="sm:col-span-3 space-y-5">
                         <div class="card px-4 py-4 sm:px-5">
-                            <HBLDetailContent :hbl="hbl" :isLoading="isLoadingHbl" :showAuditDetails="false" :editPermission="false"/>
+                            <HBLDetailContent :hbl="hbl" :isLoading="isLoadingHbl" :showAuditDetails="false" :editPermission="false" :hbl-total-summary="hblTotalSummary"/>
                         </div>
                     </div>
                 </div>

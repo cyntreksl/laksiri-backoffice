@@ -1674,7 +1674,7 @@ const confirmViewHBL = async (id) => {
                                         step="any"
                                         type="number"
                                     />
-                                    <InputError :message="form.errors.additional_charges"/>
+                                    <InputError :message="form.errors.additional_charge"/>
                                 </div>
 
                                 <div class="col-start-2 mt-20 space-y-2.5 font-bold">

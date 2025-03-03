@@ -12,10 +12,9 @@ class GetHBLTotalSummary
 {
     use AsAction;
 
-    public function handle($hbl): HBL
+    public function handle($hbl)
     {
         $totalSummary = new PriceCalculationService();
-        $summary = $totalSummary->hblPriceSummary($hbl);
-        dd($summary);
+        return $totalSummary->hblPriceSummary($hbl);
     }
 }
