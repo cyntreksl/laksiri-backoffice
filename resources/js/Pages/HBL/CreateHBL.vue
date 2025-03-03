@@ -205,7 +205,7 @@ const addPackageData = () => {
         packageItem.volume <= 0 ||
         (form.is_active_package && !packageItem.packageRule)
     ) {
-        push.error("Please fill all required data1");
+        push.error("Please fill all required data");
         return;
     }
     packageItem.length = packageItemLength.value;
@@ -215,13 +215,13 @@ const addPackageData = () => {
 
     if (form.cargo_type === 'Air Cargo') {
         if (packageItem.totalWeight <= 0) {
-            push.error("Please fill the total weight2");
+            push.error("Please fill the total weight");
             return;
         }
     }
 
     if(priceRulesData.value.length === 0 && !packageItem.packageRule){
-        push.error("Please fill all required data3");
+        push.error("Please fill all required data");
         return;
     }
 
@@ -887,7 +887,8 @@ const confirmViewHBL = async (id) => {
                         </div>
                         <div class="my-5">
                             <div class="space-x-5">
-                                <label
+                                <div class="grid grid-cols-3 gap-4">
+                                    <label
                                     v-for="warehouse in warehouses"
                                     :key="warehouse.id"
                                     class="inline-flex items-center space-x-2"
@@ -902,6 +903,7 @@ const confirmViewHBL = async (id) => {
                                     />
                                     <p>{{ warehouse.name }}</p>
                                 </label>
+                                </div>
                             </div>
                             <InputError :message="form.errors.warehouse"/>
                         </div>
