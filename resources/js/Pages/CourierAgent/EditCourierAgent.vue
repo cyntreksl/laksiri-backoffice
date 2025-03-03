@@ -57,6 +57,9 @@ const form = useForm({
 });
 
 const handleAgentUpdate = () => {
+    if (logoInput.value) {
+        form.logo = logoInput.value.files[0];
+    }
     form.post(route("courier-agents.update", props.courierAgent.id), {
         onSuccess: () => {
             router.visit(route("courier-agents.index"));

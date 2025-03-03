@@ -35,6 +35,9 @@ const form = useForm({
 });
 
 const handleBranchCreate = () => {
+    if (logoInput.value) {
+        form.logo = logoInput.value.files[0];
+    }
     form.post(route("courier-agents.store"), {
         onSuccess: () => {
             form.reset();

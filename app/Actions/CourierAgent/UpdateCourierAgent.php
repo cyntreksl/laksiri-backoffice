@@ -13,6 +13,11 @@ class UpdateCourierAgent
     {
         $courierAgent = CourierAgent::find($id);
 
-        return $courierAgent->update($data);
+        if ($courierAgent) {
+            $courierAgent->update($data);
+            return $courierAgent;
+        }
+
+        throw new \Exception('Courier Agent not found.');
     }
 }
