@@ -123,7 +123,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
             $filename = $hbl->hbl_number.'.pdf';
 
-            return $pdf->stream($filename);
+            return $pdf->download($filename);
         }
     }
 

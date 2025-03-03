@@ -138,7 +138,7 @@ hbls();
                 </svg>
             </SimpleOverviewWidget>
 
-            <SimpleOverviewWidget :count="filteredHBLSPackagesVolume.toFixed(2)" title="Volume">
+            <SimpleOverviewWidget :count="filteredHBLSPackagesVolume.toFixed(3)" title="Volume">
                 <svg class="icon icon-tabler icons-tabler-outline icon-tabler-scale text-info"
                      fill="none"
                      height="24" stroke="currentColor" stroke-linecap="round"

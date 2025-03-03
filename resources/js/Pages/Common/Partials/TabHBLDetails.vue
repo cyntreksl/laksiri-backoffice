@@ -189,7 +189,7 @@ watch(
                     </svg>
                 </SimpleOverviewWidget>
 
-                <SimpleOverviewWidget :count="hbl?.packages_sum_volume != null ? hbl.packages_sum_volume.toFixed(2) : '0.00'" title="Volume">
+                <SimpleOverviewWidget :count="hbl?.packages_sum_volume != null ? hbl.packages_sum_volume.toFixed(3) : '0.00'" title="Volume">
                     <svg class="icon icon-tabler icons-tabler-outline icon-tabler-scale text-info"
                          fill="none"
                          height="24" stroke="currentColor" stroke-linecap="round"
@@ -282,7 +282,7 @@ watch(
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.height ?? 0 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.quantity ?? 0 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.weight.toFixed(2) ?? 0 }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume.toFixed(2) ?? 0 }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ item.volume.toFixed(3) ?? 0 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                             {{ item.remarks ?? '-' }}
                         </td>
