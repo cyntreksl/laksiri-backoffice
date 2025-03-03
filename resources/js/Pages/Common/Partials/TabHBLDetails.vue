@@ -18,7 +18,11 @@ const props = defineProps({
     isLoading: {
         type: Boolean,
         required: true,
-    }
+    },
+    hblTotalSummary: {
+        type: Object,
+        default: () => ({}),
+    },
 });
 
 watch(
@@ -322,6 +326,72 @@ watch(
                     </svg>
                 </div>
             </template>
+            <div v-if="hblTotalSummary"
+                 class="is-scrollbar-hidden min-w-full overflow-x-auto my-5">
+                <table class="is-hoverable w-full text-left">
+                    <thead>
+                        <tr>
+                        <th
+                            class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
+                            Description
+                        </th>
+                        <th
+                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
+
+                        </th>
+                        <th
+                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
+                            Amount
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="hblTotalSummary.freight_charge" >
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">Freight Charge</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
+                                <span v-for="(charge, index) in hblTotalSummary.freight_charge_operations"
+                                      :key="index">
+                                    {{ charge }} <br>
+                                </span>
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.freight_charge).toFixed(2)}}</td>
+                        </tr>
+                        <tr v-if="hblTotalSummary.destination_charges" >
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">Destination Charge</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.destination_charges).toFixed(2)}}</td>
+                        </tr>
+                        <tr v-if="hblTotalSummary.package_charges" >
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">Package Charge</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.package_charges).toFixed(2)}}</td>
+                        </tr>
+                        <tr v-if="hblTotalSummary.bill_charge" >
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">Bill Charge</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.bill_charge).toFixed(2)}}</td>
+                        </tr>
+                        <tr v-if="hblTotalSummary.additional_charge" >
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">Additional Charge</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.additional_charge).toFixed(2)}}</td>
+                        </tr>
+                        <tr v-if="hblTotalSummary.vat" >
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">Vat</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.vat).toFixed(2)}}</td>
+                        </tr>
+                        <tr v-if="hblTotalSummary.discount" >
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">Discount</td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
+                            <td class="whitespace-nowrap px-4 py-3 sm:px-5">-{{parseFloat(hblTotalSummary.discount).toFixed(2)}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <div class="px-4 py-4 sm:px-5">
                 <div class="grid grid-cols-3 gap-x-4 gap-y-8">
 

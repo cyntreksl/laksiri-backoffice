@@ -387,4 +387,9 @@ class HBLController extends Controller
 
         return $this->HBLRepository->downloadBaggagePDF($hbl);
     }
+
+    public function getHBLTotalSummary(HBL $hbl)
+    {
+        return $this->HBLRepository->getHBLTotalSummary($hbl);
+    }
 }

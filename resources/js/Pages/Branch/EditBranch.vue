@@ -71,6 +71,10 @@ const form = useForm({
 });
 
 const handleBranchUpdate = () => {
+    if(form.maximum_demurrage_discount < 0){
+        push.error("Maximum Demurrage Discount cannot be a negative value.");
+        return;
+    }
     form.put(route("branches.update", props.branch.id), {
         onSuccess: () => {
             router.visit(route("branches.edit", props.branch.id));
