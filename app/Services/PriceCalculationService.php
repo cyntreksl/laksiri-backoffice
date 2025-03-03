@@ -2,24 +2,25 @@
 
 namespace App\Services;
 
+use App\Actions\Branch\GetBranchByName;
 use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
+use App\Actions\PackagePrice\GetPackagePriceRule;
 use App\Models\HBL;
 use Illuminate\Support\Collection; // Changed from Eloquent Collection
 
-class PriceCalculationService {
-
-    public function __construct()
-    {
-    }
+class PriceCalculationService
+{
+    public function __construct() {}
 
     public function hblPriceSummary(HBL $hbl): array
     {
         $priceRuleData = $hbl->packages[0]->packageRuleData ?? null;
-        $data_rules = GetPriceRulesByCargoModeAndHBLType::run($hbl['cargo_type'] ?? '', $hbl['hbl_type'] ?? '', $hbl['warehouse_id'])->filter(function($rule) use ($hbl) {
+        $warehouse_id = $hbl['warehouse_id'] ?? GetBranchByName::run($hbl['warehouse'])['id'];
+        $data_rules = GetPriceRulesByCargoModeAndHBLType::run($hbl['cargo_type'] ?? '', $hbl['hbl_type'] ?? '', $warehouse_id)->filter(function ($rule) use ($hbl) {
             return $rule['branch_id'] == $hbl['branch_id'];
         });
 
-        if ($priceRuleData && !$priceRuleData['is_package_rule']) {
+        if ($priceRuleData && ! $priceRuleData['is_package_rule']) {
             $appliedRules = collect(json_decode($priceRuleData['rules'] ?? '[]', true));
             $totalVolume = $hbl->packages->sum('volume');
             $measuredData = [
@@ -28,22 +29,79 @@ class PriceCalculationService {
                 'grand_total_weight' => $hbl->packages->sum('weight'),
                 'package_list_length' => count($hbl->packages),
             ];
-            $data =  $this->calculateTotalWithPriceRule($appliedRules, $measuredData);
-        }else if (!$priceRuleData && !$hbl->packages[0]['package_rule']){
+            $data = $this->calculateTotalWithPriceRule($appliedRules, $measuredData);
+        } elseif (! $priceRuleData && ! $hbl->packages[0]['package_rule']) {
             $measuredData = [
                 'cargo_type' => $hbl['cargo_type'],
                 'grand_total_volume' => $hbl->packages->sum('volume'),
                 'grand_total_weight' => $hbl->packages->sum('weight'),
                 'package_list_length' => count($hbl->packages),
             ];
-            $data =  $this->calculateTotalWithPriceRule($data_rules, $measuredData);
-        } else{
+            $data = $this->calculateTotalWithPriceRule($data_rules, $measuredData);
+        } elseif ($priceRuleData && $priceRuleData['is_package_rule']) {
+            $appliedRules = collect(json_decode($priceRuleData['rules'] ?? '[]', true));
+            $measuredData = [
+                'cargo_type' => $hbl['cargo_type'],
+                'grand_total_volume' => $hbl->packages->sum('volume'),
+                'grand_total_weight' => $hbl->packages->sum('weight'),
+                'packages' => $hbl->packages,
+            ];
+            $data = $this->calculateHBLTotalWithPackageRule($measuredData);
+        } elseif (! $priceRuleData && $hbl->packages[0]['package_rule']) {
+            $measuredData = [
+                'cargo_type' => $hbl['cargo_type'],
+                'grand_total_volume' => $hbl->packages->sum('volume'),
+                'grand_total_weight' => $hbl->packages->sum('weight'),
+                'packages' => $hbl->packages,
+            ];
+            $data = $this->calculateHBLTotalWithPackageRule($measuredData);
+        } else {
             $data = [];
         }
         $data['additional_charge'] = $hbl['additional_charge'] ?? 0;
         $data['discount'] = $hbl['discount'] ?? 0;
 
         return $data;
+    }
+
+    private function calculateHBLTotalWithPackageRule(array $measuredData)
+    {
+        $freight_charge = 0;
+        $bill_charge = 0;
+        $destination_charges = 0;
+        $package_charges = 0;
+        $vat = 0;
+        $is_editable = false;
+        $other_charge = 0;
+
+        foreach ($measuredData['packages'] as $package) {
+            $package_Price_Rule = $package->packageRuleData && $package->packageRuleData['rules'] ? json_decode($package->packageRuleData['rules'], true)[0] : GetPackagePriceRule::run($package['package_rule']);
+            $package_charges += ($package_Price_Rule['per_package_charge']) * $package['quantity'];
+        }
+
+        if ($measuredData['cargo_type'] === 'Sea Cargo') {
+            $destination_charges = $package_Price_Rule['volume_charges'] * $measuredData['grand_total_volume'];
+        } else {
+            $destination_charges = $package_Price_Rule['volume_charges'];
+        }
+        $other_charge = $destination_charges;
+        $vat = $package_Price_Rule['bill_vat'] ? $package_Price_Rule['bill_vat'] / 100 : 0;
+
+        return [
+            'freight_charge' => 0,
+            'bill_charge' => number_format((float) $package_Price_Rule['bill_price'], 3, '.', ''),
+            'other_charge' => number_format((float) $other_charge, 3, '.', ''),
+            'package_charges' => number_format((float) $package_charges, 3, '.', ''),
+            'destination_charges' => number_format((float) $destination_charges, 3, '.', ''),
+            'is_editable' => 'true',
+            'vat' => $vat,
+            'per_package_charge' => 0.0,
+            'per_volume_charge' => 0.0,
+            'per_freight_charge' => 0.0,
+            'freight_operator' => '',
+            'price_mode' => 'Package',
+            'grand_total_without_discount' => number_format((float) $package_charges, 3, '.', ''),
+        ];
     }
 
     private function calculateTotalWithPriceRule(Collection $rules, array $measuredData): array
@@ -62,6 +120,7 @@ class PriceCalculationService {
         $grand_total_quantity = $measuredData['cargo_type'] === 'Sea Cargo' ? $measuredData['grand_total_volume'] : $measuredData['grand_total_weight'];
         $operations = array_values(array_filter($operations, function ($operation) use ($grand_total_quantity) {
             $number = floatval(substr($operation, 1));
+
             return $number < $grand_total_quantity;
         }));
 

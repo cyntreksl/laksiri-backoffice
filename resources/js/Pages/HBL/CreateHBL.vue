@@ -185,7 +185,6 @@ const hblRules = async () => {
         }
         if (data.package_rules) {
             packageRulesData.value = data.package_rules;
-            console.log(packageRulesData.value);
         }
         if (data.price_rules) {
             priceRulesData.value = data.price_rules;
