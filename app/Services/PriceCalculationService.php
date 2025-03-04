@@ -58,8 +58,10 @@ class PriceCalculationService
         } else {
             $data = [];
         }
-        $data['additional_charge'] = $hbl['additional_charge'] ?? 0;
-        $data['discount'] = $hbl['discount'] ?? 0;
+        if (count($data) > 0) {
+            $data['additional_charge'] = $hbl['additional_charge'] ?? 0;
+            $data['discount'] = $hbl['discount'] ?? 0;
+        }
 
         return $data;
     }
@@ -98,7 +100,7 @@ class PriceCalculationService
             'per_package_charge' => 0.0,
             'per_volume_charge' => 0.0,
             'per_freight_charge' => 0.0,
-            'freight_operator' => '',
+            'freight_charge_operations' => '',
             'price_mode' => 'Package',
             'grand_total_without_discount' => number_format((float) $package_charges, 3, '.', ''),
         ];
@@ -106,6 +108,9 @@ class PriceCalculationService
 
     private function calculateTotalWithPriceRule(Collection $rules, array $measuredData): array
     {
+        if ($rules->count() === 0) {
+            return [];
+        }
         $groupedPriceRules = $rules->groupBy('condition');
         $latestPriceRules = $groupedPriceRules->map(function (Collection $group) {
             return $group->sortByDesc('updated_at')->first();
@@ -165,7 +170,8 @@ class PriceCalculationService
                 default:
                     return ['error' => 'Unsupported operation'];
             }
-            $freight_charge_operations[] = "{$quantity_after_operation} ".($operator !== '' ? $operator : '=>').' '.number_format((float) $value, 2);
+            $measureType = $measuredData['cargo_type'] === 'Sea Cargo' ? '(V) ' : '(W) ';
+            $freight_charge_operations[] = "{$quantity_after_operation} ".$measureType.($operator !== '' ? $operator : '=>').' '.number_format((float) $value, 2);
             $grand_total_quantity = $operation_quantity;
         }
         $billing_rule = $latestPriceRules[$operations[0]];
