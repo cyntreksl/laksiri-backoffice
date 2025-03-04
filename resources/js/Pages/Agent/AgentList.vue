@@ -252,20 +252,20 @@ onMounted(() => {
 });
 
 const showDeleteAgentConfirmationModal = ref(false);
-const AgentId = ref(null);
+const agentId = ref(null);
 
 const confirmDeleteAgent = (id) => {
-    AgentId.value = id;
+    agentId.value = id;
     showDeleteAgentConfirmationModal.value = true;
 };
 
 const closeModal = () => {
     showDeleteAgentConfirmationModal.value = false;
-    AgentId.value = null;
+    agentId.value = null;
 };
 
 const handleDeleteAgent = () => {
-    router.delete(route("third-party-agents.destroy", AgentId.value), {
+    router.delete(route("third-party-agents.destroy", agentId.value), {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
