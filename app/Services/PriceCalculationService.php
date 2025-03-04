@@ -58,8 +58,10 @@ class PriceCalculationService
         } else {
             $data = [];
         }
-        $data['additional_charge'] = $hbl['additional_charge'] ?? 0;
-        $data['discount'] = $hbl['discount'] ?? 0;
+        if (count($data) > 0) {
+            $data['additional_charge'] = $hbl['additional_charge'] ?? 0;
+            $data['discount'] = $hbl['discount'] ?? 0;
+        }
 
         return $data;
     }
@@ -106,6 +108,9 @@ class PriceCalculationService
 
     private function calculateTotalWithPriceRule(Collection $rules, array $measuredData): array
     {
+        if ($rules->count() === 0) {
+            return [];
+        }
         $groupedPriceRules = $rules->groupBy('condition');
         $latestPriceRules = $groupedPriceRules->map(function (Collection $group) {
             return $group->sortByDesc('updated_at')->first();

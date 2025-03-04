@@ -326,7 +326,7 @@ watch(
                     </svg>
                 </div>
             </template>
-            <div v-if="hblTotalSummary"
+            <div v-if="Object.keys(hblTotalSummary).length > 0"
                  class="is-scrollbar-hidden min-w-full overflow-x-auto my-5">
                 <table class="is-hoverable w-full text-left">
                     <thead>

@@ -269,12 +269,12 @@
             </tbody>
     </table>
 
-    <div style="text-align: right; margin-top: 20px;">
-        @if($settings?->seal_url)
-            <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto;">
-        @endif
-    </div>
     <div class="footer">
+        <div style="text-align: right; margin-top: 20px; margin-right: 50px !important;">
+            @if($settings?->seal_url)
+                <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto;">
+            @endif
+        </div>
         <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_footer_title}}</div>
         <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_header_address}}</div>
         <span class="page-number">Page: </span>
