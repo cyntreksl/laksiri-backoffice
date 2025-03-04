@@ -100,7 +100,7 @@ class PriceCalculationService
             'per_package_charge' => 0.0,
             'per_volume_charge' => 0.0,
             'per_freight_charge' => 0.0,
-            'freight_operator' => '',
+            'freight_charge_operations' => '',
             'price_mode' => 'Package',
             'grand_total_without_discount' => number_format((float) $package_charges, 3, '.', ''),
         ];
@@ -170,7 +170,8 @@ class PriceCalculationService
                 default:
                     return ['error' => 'Unsupported operation'];
             }
-            $freight_charge_operations[] = "{$quantity_after_operation} ".($operator !== '' ? $operator : '=>').' '.number_format((float) $value, 2);
+            $measureType = $measuredData['cargo_type'] === 'Sea Cargo' ? '(V) ' : '(W) ';
+            $freight_charge_operations[] = "{$quantity_after_operation} ".$measureType.($operator !== '' ? $operator : '=>').' '.number_format((float) $value, 2);
             $grand_total_quantity = $operation_quantity;
         }
         $billing_rule = $latestPriceRules[$operations[0]];
