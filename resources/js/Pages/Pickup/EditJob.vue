@@ -2,7 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
@@ -10,6 +10,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import {push} from "notivue";
 import TextInput from "@/Components/TextInput.vue";
+import Checkbox from "@/Components/Checkbox.vue";
 
 const props = defineProps({
     packageTypes: {
@@ -43,6 +44,8 @@ const form = useForm({
     name: props.pickup.name,
     email: props.pickup.email,
     contact_number: props.pickup.contact_number,
+    additional_mobile_number: props.pickup.additional_mobile_number,
+    whatsapp_number: props.pickup.whatsapp_number,
     address: props.pickup.address,
     note_type: JSON.parse(props.pickup.package_types) || [],
     notes: props.pickup.notes,
@@ -55,6 +58,21 @@ const form = useForm({
     pickup_time_start: props.pickup.pickup_time_start,
     pickup_time_end: props.pickup.pickup_time_end,
 });
+
+const isSameContactNumber = ref(props.pickup.contact_number === props.pickup.whatsapp_number);
+
+
+const addContactToWhatsapp = () => {
+    if (isSameContactNumber.value) {
+        form.whatsapp_number = form.contact_number;
+    } else {
+        resetWhatsappNumber();
+    }
+};
+
+const resetWhatsappNumber = () => {
+    form.whatsapp_number = props.pickup.whatsapp_number
+};
 
 // Method to find zone ID based on address
 const findZoneIdByAddress = (address) => {
@@ -200,7 +218,7 @@ const shipIcon = ref(`
                                 <InputError :message="form.errors.name"/>
                             </div>
 
-                            <div>
+                            <div class="col-span-2">
                                 <InputLabel value="Email"/>
                                 <label class="relative flex">
                                     <input
@@ -254,6 +272,65 @@ const shipIcon = ref(`
                                     </div>
                                 </label>
                                 <InputError :message="form.errors.contact_number"/>
+                            </div>
+
+                            <div>
+                                <InputLabel value="Additional Mobile Number"/>
+                                <label class="relative flex">
+                                    <input
+                                        v-model="form.additional_mobile_number"
+                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="Contact Number"
+                                        type="text"
+                                    />
+                                    <div
+                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                                    >
+                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-phone" fill="none" height="24"
+                                             stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                                             viewBox="0 0 24 24" width="24"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                            <path
+                                                d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2"/>
+                                        </svg>
+                                    </div>
+                                </label>
+                                <InputError :message="form.errors.additional_mobile_number"/>
+                            </div>
+
+                            <div class="col-span-2">
+                                <input
+                                    v-model="isSameContactNumber"
+                                    type="checkbox"
+                                    @change="addContactToWhatsapp"
+                                >
+                                <span class="ml-5">Use mobile number as whatsapp number</span>
+                            </div>
+
+                            <div v-if="!isSameContactNumber">
+                                <InputLabel value="Whatsapp Mobile Number"/>
+                                <label class="relative flex">
+                                    <input
+                                        v-model="form.whatsapp_number"
+                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                        placeholder="Contact Number"
+                                        type="text"
+                                    />
+                                    <div
+                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
+                                    >
+                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-phone" fill="none" height="24"
+                                             stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                                             viewBox="0 0 24 24" width="24"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                            <path
+                                                d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2"/>
+                                        </svg>
+                                    </div>
+                                </label>
+                                <InputError :message="form.errors.whatsapp_number"/>
                             </div>
 
                             <div class="col-span-2">
