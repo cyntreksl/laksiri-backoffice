@@ -14,9 +14,11 @@ import Checkbox from "@/Components/Checkbox.vue";
 import {usePage} from "@inertiajs/vue3";
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import ImageViewModal from "@/Pages/Arrival/Partials/ImageView.vue";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const wrapperRef = ref(null);
 let grid = null;
+const isData = ref(false)
 const perPage = ref(10);
 const showFilters = ref(false);
 const fromDate = moment(new Date()).subtract(30, "days").format("YYYY-MM-DD");
@@ -98,6 +100,7 @@ const initializeGrid = () => {
                 }),
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -313,6 +316,7 @@ const applyFilters = () => {
             },
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -459,7 +463,8 @@ const handlePerPageChange = (event) => {
 
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
+                        <div v-show="isData" ref="wrapperRef"></div>
+                        <NoRecordsFound v-show="!isData"/>
                     </div>
                 </div>
             </div>

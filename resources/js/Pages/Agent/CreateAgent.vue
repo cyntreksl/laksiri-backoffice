@@ -42,11 +42,11 @@ const form = useForm({
 });
 
 const handleBranchCreate = () => {
-    form.post(route("agents.store"), {
+    form.post(route("third-party-agents.store"), {
         onSuccess: () => {
             form.reset();
-            router.visit(route("agents.index"));
-            push.success('Agent added successfully!');
+            router.visit(route("third-party-agents.index"));
+            push.success('Third Party Agent added successfully!');
         },
         onError: () => {
             push.error('Something went to wrong!');
@@ -59,19 +59,19 @@ const handleBranchCreate = () => {
 </script>
 
 <template>
-    <AppLayout title="Create Agent">
-        <template #header>Agents</template>
+    <AppLayout title="Create Third Party Agent">
+        <template #header>Create Third Party Agent</template>
 
         <Breadcrumb/>
         <form @submit.prevent="handleBranchCreate">
 
             <div class="flex items-center justify-between p-2 my-5">
                 <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                    Create New Agent
+                    Create New Third Party Agent
                 </h2>
 
                 <div class="flex justify-end bottom-0 space-x-5">
-                    <DangerOutlineButton @click="router.visit(route('agents.index'))">Cancel</DangerOutlineButton>
+                    <DangerOutlineButton @click="router.visit(route('third-party-agents.index'))">Cancel</DangerOutlineButton>
                     <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
                                    class="space-x-2"
                                    type="submit"

@@ -388,27 +388,27 @@ Breadcrumbs::for('setting.shipper-consignees.edit', function (BreadcrumbTrail $t
     $trail->push('Edit Officer', route('setting.shipper-consignees.edit', $id));
 });
 // Agents > index
-Breadcrumbs::for('agents.index', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('third-party-agents.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Courier');
-    $trail->push('Agent');
-    $trail->push('List', route('agents.index'));
+    $trail->push('Third Party Agents');
+    $trail->push('Third Party Agents List', route('third-party-agents.index'));
 });
 
-// Agents > Create
-Breadcrumbs::for('agents.create', function (BreadcrumbTrail $trail) {
+// Third-Party Agents > Create
+Breadcrumbs::for('third-party-agents.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Courier');
-    $trail->push('Agent');
-    $trail->push('Create', route('agents.create'));
+    $trail->push('Third Party Agents', route('third-party-agents.index'));
+    $trail->push('Third Party Agent Create ', route('third-party-agents.create'));
 });
-// Agents > Edit
-Breadcrumbs::for('agents.edit', function (BreadcrumbTrail $trail, $id) {
+// Third-Party Agents > Edit
+Breadcrumbs::for('third-party-agents.edit', function (BreadcrumbTrail $trail, $id) {
     $branch = Branch::find($id);
     $trail->parent('dashboard');
     $trail->push('Courier');
-    $trail->push('Agent');
-    $trail->push('Edit', route('agents.edit', $branch->id));
+    $trail->push('Third Party Agents', route('third-party-agents.index'));
+    $trail->push('Edit Third Party Agent', route('third-party-agents.edit', $branch->id));
 });
 
 // Courier
@@ -419,6 +419,7 @@ Breadcrumbs::for('couriers.index', function (BreadcrumbTrail $trail) {
     $trail->push('List', route('couriers.index'));
 
 });
+// CourierAgents > Create
 Breadcrumbs::for('couriers.create', function (BreadcrumbTrail $trail) {
     $trail->parent('couriers.index');
     $trail->push('Courier');

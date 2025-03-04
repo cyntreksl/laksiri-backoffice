@@ -92,7 +92,9 @@ class DeliveryRepository implements DeliveryRepositoryInterface
             return $this->error('HBL not found.', [], 404);
         }
 
-        if (! empty(array_diff($data['released_packages'], $hbl->packages->pluck('id')->toArray()))) {
+        $releasedPackageIds = collect($data['released_packages'])->pluck('id')->toArray();
+
+        if (! empty(array_diff($releasedPackageIds, $hbl->packages->pluck('id')->toArray()))) {
             return $this->error('Invalid package(s) detected.', [], 422);
         }
 

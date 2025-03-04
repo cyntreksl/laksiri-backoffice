@@ -225,6 +225,24 @@ class RolePermissionSeeder extends Seeder
                     'third-party-agents.delete',
                 ],
             ],
+            [
+                'group_name' => 'Courier',
+                'permissions' => [
+                    'courier.index',
+                    'courier.create',
+                    'courier.edit',
+                    'courier.delete',
+                ],
+            ],
+            [
+                'group_name' => 'Courier Agents',
+                'permissions' => [
+                    'courier-agents.index',
+                    'courier-agents.create',
+                    'courier-agents.edit',
+                    'courier-agents.delete',
+                ],
+            ],
         ];
     }
 }
