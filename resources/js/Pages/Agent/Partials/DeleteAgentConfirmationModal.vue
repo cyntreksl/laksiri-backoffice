@@ -17,7 +17,7 @@ const emit = defineEmits(['close', 'deleteAgent']);  // Changed to camelCase
 <template>
     <ConfirmationModal :show="show">
         <template #title>
-            Delete Agent?
+            Delete Third Party Agent ?
         </template>
 
         <template #content>

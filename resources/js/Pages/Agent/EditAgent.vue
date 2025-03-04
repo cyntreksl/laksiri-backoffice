@@ -45,9 +45,9 @@ const form = useForm({
 });
 
 const handleBranchUpdate = () => {
-    form.put(route("agents.update", props.agent.id), {
+    form.put(route("third-party-agents.update", props.agent.id), {
         onSuccess: () => {
-            router.visit(route("agents.index"));
+            router.visit(route("third-party-agents.index"));
             push.success('Third Party Agent updated successfully!');
         },
         onError: () => {
@@ -71,7 +71,7 @@ const handleBranchUpdate = () => {
                 </h2>
 
                 <div class="flex justify-end bottom-0 space-x-5">
-                    <DangerOutlineButton @click="router.visit(route('agents.index'))">Cancel</DangerOutlineButton>
+                    <DangerOutlineButton @click="router.visit(route('third-party-agents.index'))">Cancel</DangerOutlineButton>
                     <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing" class="space-x-2" type="submit">
                         <span>Update Third Party Agent</span>
                         <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

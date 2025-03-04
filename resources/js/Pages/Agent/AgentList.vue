@@ -52,7 +52,7 @@ const data = reactive({
     },
 });
 
-const baseUrl = ref("/agents/list");
+const baseUrl = ref("/third-party-agents/list");
 
 const toggleColumnVisibility = (columnName) => {
     data.columnVisibility[columnName] = !data.columnVisibility[columnName];
@@ -190,7 +190,7 @@ const createColumns = () => [
                     "a",
                     {
                         className: "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25",
-                        href: route("agents.edit", row.cells[0].data),
+                        href: route("third-party-agents.edit", row.cells[0].data),
                     },
                     [
                         h(
@@ -252,25 +252,25 @@ onMounted(() => {
 });
 
 const showDeleteAgentConfirmationModal = ref(false);
-const AgentId = ref(null);
+const agentId = ref(null);
 
 const confirmDeleteAgent = (id) => {
-    AgentId.value = id;
+    agentId.value = id;
     showDeleteAgentConfirmationModal.value = true;
 };
 
 const closeModal = () => {
     showDeleteAgentConfirmationModal.value = false;
-    AgentId.value = null;
+    agentId.value = null;
 };
 
 const handleDeleteAgent = () => {
-    router.delete(route("agents.destroy", AgentId.value), {
+    router.delete(route("third-party-agents.destroy", agentId.value), {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
             push.success("Third Party Agent Deleted Successfully!");
-            router.visit(route("agents.index"));
+            router.visit(route("third-party-agents.index"));
         },
     });
 };
@@ -458,7 +458,7 @@ const exportURL = computed(() => {
                             </template>
                         </Popper>
 
-                        <a :href="route('agents.create')" class="ml-2">
+                        <a :href="route('third-party-agents.create')" class="ml-2">
                             <PrimaryButton>
                                 Create New Agent
                             </PrimaryButton>

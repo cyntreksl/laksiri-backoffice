@@ -435,38 +435,7 @@
 <!--                                    <path d="M9 16h6"/>-->
 <!--                                </svg>-->
 <!--                            </a>-->
-                            <!-- User Management -->
-                            <a
-                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('users')) || $page.props.user.permissions.includes('roles.list')"
-                                :class="[
-                activeMenu === 'users' ? 'bg-primary/10 text-primary' : '',
-              ]"
-                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.right="'User Management'"
-                                @click="
-                setMenu('users');
-                openSideBar();
-              "
-                            >
-                                <svg
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-users"
-                                    fill="none"
-                                    height="24"
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    viewBox="0 0 24 24"
-                                    width="24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
-                                    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                    <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
-                                </svg>
-                            </a>
+
                             <!-- Courier Management -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('Courier')) || $page.props.user.permissions.includes('third-party-agents.index') || $page.props.user.permissions.includes('couriers.index') || $page.props.user.permissions.includes('couriers.create') || $page.props.user.permissions.includes('courier-agents.create')"
@@ -497,6 +466,38 @@
                                     <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
                                     <path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" />
                                     <path d="M3 9l4 0" />
+                                </svg>
+                            </a>
+                            <!-- User Management -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('users')) || $page.props.user.permissions.includes('roles.list')"
+                                :class="[
+                activeMenu === 'users' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'User Management'"
+                                @click="
+                setMenu('users');
+                openSideBar();
+              "
+                            >
+                                <svg
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-users"
+                                    fill="none"
+                                    height="24"
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                    width="24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+                                    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
                                 </svg>
                             </a>
                         </template>
@@ -1650,7 +1651,7 @@ export default {
                             0,
                             {
                                 title: "Third Party Agents",
-                                route: "agents.index",
+                                route: "third-party-agents.index",
                             }
                         );
                     }
