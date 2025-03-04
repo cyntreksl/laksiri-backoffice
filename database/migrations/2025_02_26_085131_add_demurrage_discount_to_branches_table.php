@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('branches', function (Blueprint $table) {
-            $table->json('maximum_demurrage_discount')->default(0)->after('container_delays');
+            $table->float('maximum_demurrage_discount')->default(0)->after('container_delays');
         });
     }
 
