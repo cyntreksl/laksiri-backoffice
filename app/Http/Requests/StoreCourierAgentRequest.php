@@ -27,4 +27,13 @@ class StoreCourierAgentRequest extends FormRequest
         ];
 
     }
+
+    public function messages(): array
+    {
+        return [
+            'contact_number_1.required' => 'Mobile Number is required.',
+            'contact_number_1.phone' => 'The Mobile Number field must be a valid number.',
+            'contact_number_2.phone' => 'The Additional Mobile Number field must be a valid number.',
+        ];
+    }
 }
