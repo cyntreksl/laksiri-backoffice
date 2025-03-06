@@ -13,6 +13,6 @@ class GetDestinationBranches
 
     public function handle(): Collection|array
     {
-        return Branch::whereType(BranchType::DESTINATION)->get();
+        return Branch::whereType(BranchType::DESTINATION)->where('is_third_party_agent', false)->get();
     }
 }

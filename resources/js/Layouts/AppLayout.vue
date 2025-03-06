@@ -435,6 +435,39 @@
 <!--                                    <path d="M9 16h6"/>-->
 <!--                                </svg>-->
 <!--                            </a>-->
+
+                            <!-- Courier Management -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('Courier')) || $page.props.user.permissions.includes('third-party-agents.index') || $page.props.user.permissions.includes('couriers.index') || $page.props.user.permissions.includes('couriers.create') || $page.props.user.permissions.includes('courier-agents.create')"
+                                :class="[
+                activeMenu === 'Courier' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Courier'"
+                                @click="
+                setMenu('Courier');
+                openSideBar();
+              "
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-truck-delivery"
+                                >
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                    <path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" />
+                                    <path d="M3 9l4 0" />
+                                </svg>
+                            </a>
                             <!-- User Management -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('users')) || $page.props.user.permissions.includes('roles.list')"
@@ -465,38 +498,6 @@
                                     <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                                     <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
-                                </svg>
-                            </a>
-                            <!-- Courier Management -->
-                            <a
-                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('Courier')) || $page.props.user.permissions.includes('third-party-agents.index')"
-                                :class="[
-                activeMenu === 'Courier' ? 'bg-primary/10 text-primary' : '',
-              ]"
-                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.right="'Courier'"
-                                @click="
-                setMenu('Courier');
-                openSideBar();
-              "
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-truck-delivery"
-                                >
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                    <path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" />
-                                    <path d="M3 9l4 0" />
                                 </svg>
                             </a>
                         </template>
@@ -1642,26 +1643,53 @@ export default {
                     changeSidePanelTitle("Users");
                     break;
                 case "Courier":
+                    let courierMenu = [];
+                    if (usePage().props.user.permissions.includes("third-party-agents.index")){
+
+                        courierMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Third Party Agents",
+                                route: "third-party-agents.index",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("courier.create")){
+
+                        courierMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Create Courier ",
+                                route: "couriers.create",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("courier.index")){
+                        courierMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All Couriers ",
+                                route: "couriers.index",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("courier-agents.index")){
+                        courierMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Courier Agents ",
+                                route: "courier-agents.index",
+                            }
+                        );
+                    }
                     childMenuList.splice(
                         0,
                         childMenuList.length,
-                        {
-                            title: "Third Party Agents",
-                            route: "agents.index",
-                        },
-                        {
-                            title: "Create Courier ",
-                            route: "couriers.create",
-                        },
-                        {
-                            title: "All Couriers ",
-                            route: "couriers.index",
-                        },
-                        {
-                            title: "Courier Agents ",
-                            route: "courier-agents.index",
-                        },
-
+                        ...courierMenu
                     );
                     changeSidePanelTitle("Courier");
                     break;

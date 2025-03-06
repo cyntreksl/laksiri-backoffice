@@ -9,6 +9,7 @@ use App\Actions\User\GetUserCurrentBranchID;
 use App\Interfaces\NotificationMailRepositoryInterface;
 use App\Models\HBL;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 
 class HBLObserver
@@ -35,6 +36,8 @@ class HBLObserver
             'email' => $hbl->email,
             'username' => $hbl->contact_number,
             'contact' => $hbl->contact_number,
+            'additional_mobile_number' => $hbl->additional_mobile_number,
+            'whatsapp_number' => $hbl->whatsapp_number,
             'password' => bcrypt('password'),
             'primary_branch_id' => GetUserCurrentBranchID::run(),
             'is_shipper' => true,
@@ -45,11 +48,12 @@ class HBLObserver
             'name' => $hbl->consignee_name,
             'username' => $hbl->consignee_contact,
             'contact' => $hbl->consignee_contact,
+            'additional_mobile_number' => $hbl->consignee_additional_mobile_number,
+            'whatsapp_number' => $hbl->consignee_whatsapp_number,
             'password' => bcrypt('password'),
             'primary_branch_id' => GetUserCurrentBranchID::run(),
             'is_consignee' => true,
         ];
-
         $shipperUserExists = User::where('username', $shipperData['username'])
             ->orWhere('email', $shipperData['email'])
             ->first();
@@ -113,6 +117,13 @@ class HBLObserver
                     $data['rules'] = json_encode($rules);
                     UpdateHBLPackageRuleData::run($hblPackage, $data);
                 }
+            }
+        }
+        if ($hbl->wasChanged('is_released')) {
+            $driver_delivery = $hbl->assignedDriver->get();
+            if (count($driver_delivery) > 0 && Auth::user()->hasRole('driver')) {
+                // Send notification email
+                $this->notificationMailRepository->sendHBLReleasedNotification($hbl);
             }
         }
     }

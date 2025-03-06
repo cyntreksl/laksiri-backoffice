@@ -18,9 +18,12 @@ class ConvertPickupToHBL
 
     public function handle($pickup, $request): HBL
     {
+        $hbl_type = $request->hbl_type === 'D2D'
+            ? 'Door to Door'
+            : ($request->hbl_type ?? $pickup->hbl_type);
         $data = [
             'cargo_type' => $request->cargo_type ?: $pickup->cargo_type,
-            'hbl_type' => $request->hbl_type ?: $pickup->hbl_type,
+            'hbl_type' => $hbl_type,
             'hbl_name' => $request->hbl_name ?: $pickup->name,
             'email' => $request->email ?: $pickup->email,
             'contact_number' => $request->contact_number ?: $pickup->contact_number,
@@ -44,7 +47,7 @@ class ConvertPickupToHBL
             'system_status' => HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
             'packages' => $request->packages,
             'is_completed' => $request->is_completed,
-            'hbl_number' => GenerateHBLNumber::run(GetUserCurrentBranchID::run()),
+            'hbl_number' => isset($request->is_completed) && $request->is_completed ? GenerateHBLNumber::run(GetUserCurrentBranchID::run()) : null,
             'cr_number' => GenerateCRNumber::run(),
         ];
 

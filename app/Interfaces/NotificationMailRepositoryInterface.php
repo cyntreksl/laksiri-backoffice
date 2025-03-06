@@ -16,4 +16,6 @@ interface NotificationMailRepositoryInterface
     public function sendCashReceivedNotification(HBL $hbl);
 
     public function sendShipmentDepartureNotification(array $data);
+
+    public function sendHBLReleasedNotification(HBL $hbl);
 }

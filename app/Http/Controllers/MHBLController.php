@@ -32,7 +32,9 @@ class MHBLController extends Controller
     {
         $this->authorize('mhbls.index');
 
-        return Inertia::render('MHBL/MHBLList');
+        return Inertia::render('MHBL/MHBLList', [
+            'warehouses' => GetDestinationBranches::run(),
+        ]);
     }
 
     public function list(Request $request)

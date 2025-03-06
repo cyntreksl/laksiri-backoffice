@@ -9,6 +9,7 @@ import notification from "@/magics/notification.js";
 import DeleteUserConfirmationModal from "@/Pages/User/Partials/DeleteUserConfirmationModal.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {push} from "notivue";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const props = defineProps({
     roles: {
@@ -107,7 +108,9 @@ const initializeGrid = () => {
                     item.last_logout_at,
                     item.secondary_branch_names,
                 ]),
-            total: (data) => data.meta.total,
+            total: (data) => {
+                return data.meta.total
+            },
         },
     });
 

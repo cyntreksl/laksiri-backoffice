@@ -21,6 +21,7 @@ import HoldConfirmationModal from "@/Pages/HBL/Partials/HoldConfirmationModal.vu
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 import MHBLDetailModal from "@/Pages/Common/MHBLDetailModal.vue";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const props = defineProps({
     users: {
@@ -38,10 +39,16 @@ const props = defineProps({
         default: () => {
         },
     },
+    warehouses: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const wrapperRef = ref(null);
 let grid = null;
+const isData = ref(false)
 const perPage = ref(10);
 const showFilters = ref(false);
 const fromDate = moment("2023-01-01").format("YYYY-MM-DD");
@@ -53,7 +60,7 @@ const filters = reactive({
     cargoMode: ["Air Cargo", "Sea Cargo"],
     hblType: ["Gift", "Door to Door"],
     isHold: false,
-    warehouse: ["COLOMBO", "NINTAVUR", "OTHER"],
+    warehouse: props.warehouses.map(warehouse => warehouse.name),
     createdBy: "",
     paymentStatus: [],
 });
@@ -135,6 +142,7 @@ const initializeGrid = () => {
             },
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -318,6 +326,7 @@ const applyFilters = () => {
             },
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -401,7 +410,7 @@ const resetFilter = () => {
     filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
     filters.hblType = ["UPB", "Gift", "Door to Door"];
     filters.isHold = false;
-    filters.warehouse = ["COLOMBO", "NINTAVUR", "OTHER"];
+    filters.warehouse = props.warehouses.map(warehouse => warehouse.name),
     filters.createdBy = "";
     filters.paymentStatus = [];
     applyFilters();
@@ -861,7 +870,8 @@ const shipIcon = ref(`
 
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
+                        <div v-show="isData" ref="wrapperRef"></div>
+                        <NoRecordsFound v-show="!isData"/>
                     </div>
                 </div>
             </div>
@@ -956,27 +966,15 @@ const shipIcon = ref(`
 
                 <FilterHeader value="Warehouse"/>
 
-                <label class="inline-flex items-center space-x-2 mt-2">
+                <label
+                    v-for="warehouse in warehouses"
+                    :key="warehouse.id"
+                    class="inline-flex items-center space-x-2 mt-2"
+                >
                     <Switch
                         v-model="filters.warehouse"
-                        label="COLOMBO"
-                        value="COLOMBO"
-                    />
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.warehouse"
-                        label="NINTAVUR"
-                        value="NINTAVUR"
-                    />
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.warehouse"
-                        label="OTHER"
-                        value="OTHER"
+                        :label="warehouse.name"
+                        :value="warehouse.name"
                     />
                 </label>
 

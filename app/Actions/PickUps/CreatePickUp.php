@@ -27,6 +27,8 @@ class CreatePickUp
             'name' => Str::title($data['name']),
             'email' => $data['email'],
             'contact_number' => $data['contact_number'],
+            'additional_mobile_number' => $data['additional_mobile_number'],
+            'whatsapp_number' => $data['whatsapp_number'],
             'address' => Str::title($data['address']),
             'location_name' => $data['location'] ?? null,
             'zone_id' => $data['zone_id'] ?? null,

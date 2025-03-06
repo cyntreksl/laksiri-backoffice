@@ -39,6 +39,11 @@ const props = defineProps({
         default: () => {
         },
     },
+    warehouses: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const showFilters = ref(false);
@@ -46,6 +51,7 @@ const fromDate = moment(new Date()).subtract(1, "month").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 const wrapperRef = ref(null);
 let grid = null;
+const isData = ref(false)
 const perPage = ref(10);
 const filters = reactive({
   fromDate: fromDate,
@@ -53,7 +59,7 @@ const filters = reactive({
   cargoMode: ["Air Cargo", "Sea Cargo"],
   hblType: ["Door to Door"],
   isHold: false,
-  warehouse: ["COLOMBO", "NINTAVUR", "OTHER"],
+  warehouse: props.warehouses.map(warehouse => warehouse.name),
   createdBy: "",
   paymentStatus: [],
 });
@@ -556,6 +562,7 @@ const initializeGrid = () => {
                 }),
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -588,6 +595,7 @@ const applyFilters = () => {
           }),
       total: (response) => {
         if (response && response.meta) {
+            response.meta.total > 0 ? isData.value = true : isData.value = false;
           return response.meta.total;
         } else {
           throw new Error("Invalid total count in server response");
@@ -1110,8 +1118,8 @@ const shipIcon = ref(`
                 </div>
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto p-3">
-                        <div ref="wrapperRef"></div>
-<!--                        <NoRecordsFound v-else/>-->
+                        <div v-show="isData" ref="wrapperRef"></div>
+                        <NoRecordsFound v-show="!isData"/>
                     </div>
                 </div>
             </div>
@@ -1216,29 +1224,17 @@ const shipIcon = ref(`
 
           <FilterHeader value="Warehouse"/>
 
-          <label class="inline-flex items-center space-x-2 mt-2">
+        <label
+            v-for="warehouse in warehouses"
+            :key="warehouse.id"
+            class="inline-flex items-center space-x-2 mt-2"
+        >
             <Switch
                 v-model="filters.warehouse"
-                label="COLOMBO"
-                value="COLOMBO"
+                :label="warehouse.name"
+                :value="warehouse.name"
             />
-          </label>
-
-          <label class="inline-flex items-center space-x-2 mt-2">
-            <Switch
-                v-model="filters.warehouse"
-                label="NINTAVUR"
-                value="NINTAVUR"
-            />
-          </label>
-
-          <label class="inline-flex items-center space-x-2 mt-2">
-            <Switch
-                v-model="filters.warehouse"
-                label="OTHER"
-                value="OTHER"
-            />
-          </label>
+        </label>
 
           <FilterBorder/>
 

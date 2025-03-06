@@ -13,6 +13,7 @@ import Switch from "@/Components/Switch.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const props = defineProps({
     users: {
@@ -27,10 +28,16 @@ const props = defineProps({
         type: Object,
         default: () => {},
     },
+    warehouses: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const wrapperRef = ref(null);
 let grid = null;
+const isData = ref(false)
 
 const showFilters = ref(false);
 
@@ -119,6 +126,7 @@ const initializeGrid = () => {
                 }),
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -567,26 +575,67 @@ const createColumns = () => [
             ]);
         },
     },
-    { name: "ID", hidden: !data.columnVisibility.id },
-    { name: "HBL", hidden: !data.columnVisibility.hbl_number },
+    {
+        name: "ID",
+        hidden: !data.columnVisibility.id,
+        formatter: (_, row) => {
+            return row.cells[0].data;
+        }
+    },
+    {
+        name: "HBL",
+        hidden: !data.columnVisibility.hbl_number,
+        formatter: (_, row) => {
+            return row.cells[1].data;
+        }
+    },
     { name: "HBL Name", hidden: !data.columnVisibility.hbl_name },
-    { name: "Consignee Name", hidden: !data.columnVisibility.consignee_name },
+    {
+        name: "Consignee Name",
+        hidden: !data.columnVisibility.consignee_name,
+        formatter: (_, row) => {
+            return row.cells[3].data;
+        }
+    },
     {
         name: "Consignee Address",
         hidden: !data.columnVisibility.consignee_address,
         sort: false,
+        formatter: (_, row) => {
+            return row.cells[4].data;
+        }
     },
     {
         name: "Consignee Contact",
         hidden: !data.columnVisibility.consignee_contact,
         sort: false,
+        formatter: (_, row) => {
+            return row.cells[5].data;
+        }
     },
-    { name: "Email", hidden: !data.columnVisibility.email, sort: false },
-    { name: "Address", hidden: !data.columnVisibility.address, sort: false },
+    {
+        name: "Email",
+        hidden: !data.columnVisibility.email,
+        sort: false,
+        formatter: (_, row) => {
+            return row.cells[6].data;
+        }
+    },
+    {
+        name: "Address",
+        hidden: !data.columnVisibility.address,
+        sort: false,
+        formatter: (_, row) => {
+            return row.cells[7].data;
+        } },
     {
         name: "Contact",
         hidden: !data.columnVisibility.contact_number,
         sort: false,
+        formatter: (_, row) => {
+            console.log(row.cells);
+            return row.cells[8].data;
+        }
     },
     {
         name: "Cargo Mode",
@@ -664,9 +713,27 @@ const createColumns = () => [
                   ])
                 : row.cells[9].data,
     },
-    { name: "HBL Type", hidden: !data.columnVisibility.hbl_type },
-    { name: "Warehouse", hidden: !data.columnVisibility.warehouse },
-    { name: "Status", hidden: !data.columnVisibility.status },
+    {
+        name: "HBL Type",
+        hidden: !data.columnVisibility.hbl_type,
+        formatter: (_, row) => {
+            return row.cells[10].data;
+        }
+        },
+    {
+        name: "Warehouse",
+        hidden: !data.columnVisibility.warehouse,
+        formatter: (_, row) => {
+            return row.cells[11].data;
+        }
+    },
+    {
+        name: "Status",
+        hidden: !data.columnVisibility.status,
+        formatter: (_, row) => {
+            return row.cells[12].data;
+        }
+    },
     {
         name: "Is Hold",
         hidden: !data.columnVisibility.is_hold,
@@ -683,10 +750,16 @@ const createColumns = () => [
         name: "Issued Token",
         hidden: !data.columnVisibility.tokens,
         sort: false,
+        formatter: (_, row) => {
+            return row.cells[14].data;
+        }
     },
     {
         name: "System Status",
         hidden: !data.columnVisibility.system_status,
+        formatter: (_, row) => {
+            return row.cells[15].data;
+        }
     },
 ];
 
@@ -728,6 +801,7 @@ const applyFilters = () => {
                 }),
             total: (response) => {
                 if (response && response.meta) {
+                    response.meta.total > 0 ? isData.value = true : isData.value = false;
                     return response.meta.total;
                 } else {
                     throw new Error("Invalid total count in server response");
@@ -966,19 +1040,15 @@ const shipIcon = ref(`
                         Warehouse
                     </h2>
 
-                    <label class="block items-center space-x-2 mt-2">
+                    <label
+                        v-for="warehouse in warehouses"
+                        :key="warehouse.id"
+                        class="block items-center space-x-2 mt-2"
+                    >
                         <Switch
                             v-model="filters.warehouse"
-                            label="COLOMBO"
-                            value="COLOMBO"
-                        />
-                    </label>
-
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <Switch
-                            v-model="filters.warehouse"
-                            label="NINTAVUR"
-                            value="NINTAVUR"
+                            :label="warehouse.name"
+                            :value="warehouse.name"
                         />
                     </label>
                 </div>
@@ -1238,7 +1308,8 @@ const shipIcon = ref(`
 
                 <div class="mt-3">
                     <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
+                        <div v-show="isData" ref="wrapperRef"></div>
+                        <NoRecordsFound v-show="!isData"/>
                     </div>
                 </div>
             </div>
