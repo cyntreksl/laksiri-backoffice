@@ -54,10 +54,11 @@ class CourierAgentRepository implements CourierAgentRepositoryInterface, GridJsI
     {
 
         try {
-            $courierAgent =  CreateCourierAgent::run($data);
+            $courierAgent = CreateCourierAgent::run($data);
             if (isset($data['logo'])) {
                 $courierAgent->updateFile($data['logo'], 'logo', 'courier_agents/logo');
             }
+
             return $courierAgent;
 
         } catch (\Exception $e) {
@@ -67,13 +68,14 @@ class CourierAgentRepository implements CourierAgentRepositoryInterface, GridJsI
 
     public function updateCourierAgent(array $data, $id)
     {
-        try{
-        $courierAgent = UpdateCourierAgent::run($data, $id);
+        try {
+            $courierAgent = UpdateCourierAgent::run($data, $id);
 
-        if (isset($data['logo'])) {
-            $courierAgent->updateFile($data['logo'], 'logo', 'courier_agents/logo');
-        }
-        return $courierAgent;
+            if (isset($data['logo'])) {
+                $courierAgent->updateFile($data['logo'], 'logo', 'courier_agents/logo');
+            }
+
+            return $courierAgent;
 
         } catch (\Exception $e) {
             throw new \Exception('Failed to update Courier Agent: '.$e->getMessage());

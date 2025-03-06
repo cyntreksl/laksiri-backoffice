@@ -13,7 +13,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class CourierAgent extends Model
 {
-    use HasFactory, SoftDeletes, HasFile,LogsActivity ;
+    use HasFactory, HasFile, LogsActivity,SoftDeletes;
 
     protected $table = 'courier_agents';
 
@@ -28,6 +28,7 @@ class CourierAgent extends Model
         'invoice_header',
         'invoice_footer',
     ];
+
     protected $appends = ['logo_url'];
 
     public function logoUrl(): Attribute

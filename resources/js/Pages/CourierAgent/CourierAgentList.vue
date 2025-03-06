@@ -40,7 +40,7 @@ const filters = reactive({
 
 const data = reactive({
     columnVisibility: {
-        id: true,
+        id: false,
         company_name: true,
         website: true,
         contact_number_1: true,
@@ -293,11 +293,10 @@ const resetFilter = () => {
             <div>
                 <div class="flex items-center justify-between p-2">
                     <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                        Courier Agent Management
+                        Courier Agents
                     </h2>
 
                     <div class="flex">
-
                         <!-- Column Selector -->
                         <Popper>
                             <button class="btn size-8 ml-2 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">

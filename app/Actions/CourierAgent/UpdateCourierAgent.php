@@ -15,6 +15,7 @@ class UpdateCourierAgent
 
         if ($courierAgent) {
             $courierAgent->update($data);
+
             return $courierAgent;
         }
 
