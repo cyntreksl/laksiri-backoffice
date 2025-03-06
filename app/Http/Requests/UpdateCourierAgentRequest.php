@@ -20,7 +20,7 @@ class UpdateCourierAgentRequest extends FormRequest
             'contact_number_2' => ['nullable', 'phone:INTERNATIONAL'],
             'email' => ['nullable', 'email', 'max:254'],
             'address' => ['required', 'max:254'],
-            'logo' => ['required', 'image', 'max:2048'],
+            'logo' => ['nullable', 'image', 'max:2048'],
             'invoice_header' => ['nullable', 'string', 'max:254'],
             'invoice_footer' => ['nullable', 'string', 'max:254'],
 

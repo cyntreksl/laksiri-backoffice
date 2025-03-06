@@ -492,6 +492,7 @@ const updateChecked = (notification, isChecked) => {
 
                                 <!-- Current Profile Photo -->
                                 <div v-show="!photoPreview" class="mt-2">
+                                    <p></p>
                                     <img v-if="settings && settings.logo_url" :src="settings.logo_url" alt="logo" class="rounded-full h-20 w-20 object-cover">
                                 </div>
 

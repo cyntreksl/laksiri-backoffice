@@ -30,6 +30,13 @@ class CourierAgent extends Model
     ];
     protected $appends = ['logo_url'];
 
+    public function logoUrl(): Attribute
+    {
+        return Attribute::get(function (): string {
+            return $this->logo ? Storage::disk('s3')->url($this->logo) : '';
+        });
+    }
+
     public function getLogoUrlAttribute(): string
     {
         return $this->logo ? Storage::disk('s3')->url($this->logo) : '';
