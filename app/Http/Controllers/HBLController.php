@@ -49,6 +49,7 @@ class HBLController extends Controller
             'users' => $this->userRepository->getUsers(['customer']),
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
+            'warehouses' => GetDestinationBranches::run(),
         ]);
     }
 
@@ -169,6 +170,7 @@ class HBLController extends Controller
             'users' => $this->userRepository->getUsers(),
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
+            'warehouses' => GetDestinationBranches::run(),
         ]);
     }
 
@@ -362,7 +364,9 @@ class HBLController extends Controller
     {
         $this->authorize('hbls.index');
 
-        return Inertia::render('HBL/HBLDoorToDoorList', []);
+        return Inertia::render('HBL/HBLDoorToDoorList', [
+            'warehouses' => GetDestinationBranches::run(),
+        ]);
     }
 
     public function getDoorToDoorList(Request $request): JsonResponse
@@ -372,7 +376,7 @@ class HBLController extends Controller
         $order = $request->input('order', 'id');
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'warehouse']);
 
         return $this->HBLRepository->getDoorToDoorHBL($limit, $page, $order, $dir, $search, $filters);
     }
@@ -382,5 +386,10 @@ class HBLController extends Controller
         //        $this->authorize('hbls.download.baggage');
 
         return $this->HBLRepository->downloadBaggagePDF($hbl);
+    }
+
+    public function getHBLTotalSummary(HBL $hbl)
+    {
+        return $this->HBLRepository->getHBLTotalSummary($hbl);
     }
 }

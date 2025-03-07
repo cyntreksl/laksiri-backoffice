@@ -32,6 +32,8 @@ class StorePickupRequest extends FormRequest
             'name' => ['required', 'max:50'],
             'email' => ['nullable', 'email', 'max:50'],
             'contact_number' => ['required', 'phone:INTERNATIONAL'],
+            'additional_mobile_number' => ['phone:INTERNATIONAL', 'nullable'],
+            'whatsapp_number' => ['nullable', 'phone:INTERNATIONAL'],
             'address' => ['required', 'max:255'],
             'location' => ['nullable'],
             'zone_id' => ['nullable', 'integer'],

@@ -26,7 +26,7 @@ class HBLPackageObserver
 
         $package_rule_data = new HBLPackageRuleData;
         $package_rule_data->package_id = $hBLPackage['id'];
-        $package_rule_data->is_package_rule = (bool) $hbl['package_rule'];
+        $package_rule_data->is_package_rule = $hBLPackage['package_rule'] ? true : false;
         $package_rule_data->rules = json_encode($rules);
         $package_rule_data->save();
     }

@@ -76,4 +76,6 @@ interface HBLRepositoryInterface
     public function downloadBaggagePDF(HBL $hbl);
 
     public function getDestinationUnloadedHBLsByCargoType(array $data);
+
+    public function getHBLTotalSummary(HBL $hbl);
 }

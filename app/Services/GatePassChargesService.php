@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Actions\Branch\GetBranchById;
+use Illuminate\Support\Facades\Auth;
+
 class GatePassChargesService
 {
     private float $vat;
@@ -33,6 +36,8 @@ class GatePassChargesService
         ],
     ];
 
+    private int $branch_demurrage_charge_discount;
+
     /**
      * Create a new instance with VAT and cargo mode.
      */
@@ -41,6 +46,7 @@ class GatePassChargesService
         $this->vat = $vat;
         $this->cargo_mode = $cargo_mode;
         $this->setCharges($cargo_mode);
+        $this->branch_demurrage_charge_discount = GetBranchById::run(Auth::user()->primary_branch_id)['maximum_demurrage_discount'];
     }
 
     /**
@@ -130,9 +136,10 @@ class GatePassChargesService
         }
 
         $amount = $rate * (1 + $this->vat / 100);
+        $discounted_rate = $rate * (100 - $this->branch_demurrage_charge_discount) / 100;
 
         return [
-            'rate' => round($rate, 2),
+            'rate' => round($discounted_rate, 2),
             'amount' => round($amount, 2),
         ];
     }

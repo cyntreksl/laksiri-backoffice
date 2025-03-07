@@ -22,7 +22,12 @@ const props = defineProps({
     editPermission: {
         type: Boolean,
         default: true,
-    }, 
+    },
+    hblTotalSummary: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 </script>
 
@@ -57,7 +62,7 @@ const props = defineProps({
             </svg>
         </template>
 
-        <TabHBLDetails :hbl="props.hbl" :is-loading="isLoadingHbl" :pickup="pickup"/>
+        <TabHBLDetails :hbl="props.hbl" :is-loading="isLoadingHbl" :pickup="pickup" :hbl-total-summary="props.hblTotalSummary"/>
 
         <TabStatus v-if="props.hbl" :hbl="props.hbl" :showAuditDetails="props.showAuditDetails"/>
 

@@ -25,6 +25,7 @@ const props = defineProps({
 
 const hbl = ref({});
 const pickup = ref({});
+const hblTotalSummary = ref({});
 const isLoading = ref(false);
 
 const fetchHBL = async () => {
@@ -52,6 +53,30 @@ const fetchHBL = async () => {
         isLoading.value = false;
     }
 }
+
+const getHBLTotalSummary = async () => {
+    try {
+        const response = await fetch(`/hbls/get-total-summary/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok.");
+        }else{
+            hblTotalSummary.value = await response.json();
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    } finally {
+        // isLoading.value = false;
+    }
+};
 
 const fetchPickup = async () => {
     isLoading.value = true;
@@ -83,6 +108,7 @@ const fetchPickup = async () => {
 watch(() => props.hblId, (newVal) => {
     if (newVal !== undefined) {
         fetchHBL();
+        getHBLTotalSummary();
     }
 });
 
@@ -154,7 +180,7 @@ const emit = defineEmits(['close']);
                     </svg>
                 </template>
 
-                <TabHBLDetails :hbl="hbl" :is-loading="isLoading" :pickup="pickup"/>
+                <TabHBLDetails :hbl="hbl" :is-loading="isLoading" :pickup="pickup" :hbl-total-summary="hblTotalSummary"/>
 
                 <TabStatus v-if="hbl" :hbl="hbl" :pickup="pickup" />
 
