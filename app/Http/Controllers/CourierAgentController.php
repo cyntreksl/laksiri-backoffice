@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCourierAgentRequest;
+use App\Http\Requests\UpdateCourierAgentRequest;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\CourierAgentRepositoryInterface;
 use App\Models\CourierAgent;
@@ -26,6 +27,21 @@ class CourierAgentController extends Controller
         ]);
     }
 
+    public function list(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('order', 'id');
+        $dir = $request->input('dir', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate', 'toDate']);
+
+        $dataset = $this->courierAgentRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+
+        return $dataset;
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -44,6 +60,7 @@ class CourierAgentController extends Controller
      */
     public function store(StoreCourierAgentRequest $request)
     {
+
         $this->courierAgentRepository->storeCourierAgent($request->all());
     }
 
@@ -66,7 +83,7 @@ class CourierAgentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCourierAgentRequest $request, string $id)
     {
         $this->courierAgentRepository->updateCourierAgent($request->all(), $id);
     }
