@@ -59,7 +59,7 @@ const splitCountryCode = (fullNumber) => {
         for (let code of props.countryCodes) {
             if (fullNumber.startsWith(code)) {
                 return code;
-            }
+            }else return '+94';
         }
     }else return '+94';
 }
