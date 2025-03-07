@@ -183,9 +183,9 @@ const createColumns = () => [
         sort: false,
         hidden: !data.columnVisibility.actions,
         formatter: (_, row) => {
-            return h("div", {
-                className: "flex space-x-2"
-            }, [
+            return h("div", { className: "flex space-x-2" }, [
+                // Show Edit button if user has 'third-party-agents.edit' permission
+                usePage().props.user.permissions.includes("third-party-agents.edit") &&
                 h(
                     "a",
                     {
@@ -213,6 +213,9 @@ const createColumns = () => [
                         ),
                     ]
                 ),
+
+                // Show Delete button if user has 'third-party-agents.delete' permission
+                usePage().props.user.permissions.includes("third-party-agents.delete") &&
                 h(
                     "button",
                     {
@@ -458,7 +461,7 @@ const exportURL = computed(() => {
                             </template>
                         </Popper>
 
-                        <a :href="route('third-party-agents.create')" class="ml-2">
+                        <a v-if="usePage().props.user.permissions.includes('third-party-agents.create')" :href="route('third-party-agents.create')" class="ml-2">
                             <PrimaryButton>
                                 Create New Agent
                             </PrimaryButton>
