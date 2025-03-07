@@ -55,17 +55,21 @@ const errors = ref([]);
 
 
 const splitCountryCode = (fullNumber) => {
-    for (let code of props.countryCodes) {
-        if (fullNumber.startsWith(code)) {
-            return code;
+    if(fullNumber){
+        for (let code of props.countryCodes) {
+            if (fullNumber.startsWith(code)) {
+                return code;
+            }
         }
-    }
+    }else return '+94';
 }
 
 const splitContactNumber = (fullNumber) => {
-    for (let code of props.countryCodes) {
-        if (fullNumber.startsWith(code)) {
-            return fullNumber.slice(code.length);
+    if(fullNumber) {
+        for (let code of props.countryCodes) {
+            if (fullNumber.startsWith(code)) {
+                return fullNumber.slice(code.length);
+            }
         }
     }
 }
