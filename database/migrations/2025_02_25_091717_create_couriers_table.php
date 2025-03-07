@@ -15,17 +15,12 @@ return new class extends Migration
     {
         Schema::create('couriers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('shipper_id')->nullable();
-            $table->unsignedBigInteger('consignee_id')->nullable();
-            $table->foreign('shipper_id')->references('id')->on('users');
-            $table->foreign('consignee_id')->references('id')->on('users');
-            $table->string('reference', 20);
-            $table->unsignedBigInteger('warehouse_zone_id')->nullable();
-            $table->integer('branch_id')->nullable();
+            $table->unsignedBigInteger('branch_id');
+            $table->string('courier_number');
             $table->enum('cargo_type', [CargoType::SEA_CARGO->value, CargoType::AIR_CARGO->value])->nullable();
             $table->enum('hbl_type', [HBLType::UPB->value, HBLType::GIFT->value])->nullable();
-            $table->string('hbl', 256);
-            $table->string('hbl_name', 256);
+            $table->unsignedBigInteger('courier_agent');
+            $table->string('name', 256);
             $table->string('email')->nullable();
             $table->string('contact_number', 20)->nullable();
             $table->string('nic')->nullable();
@@ -36,11 +31,8 @@ return new class extends Migration
             $table->string('consignee_contact', 20)->nullable();
             $table->text('consignee_address')->nullable();
             $table->text('consignee_note')->nullable();
-            $table->decimal('paid_amount', 10, 2);
-            $table->decimal('discount', 10, 2);
-            $table->decimal('total_amount', 10, 2);
-            $table->string('status', 255)->nullable();
-            $table->double('system_status')->default(3);
+            $table->unsignedBigInteger('created_by');
+            $table->string('status', 255)->default('pending');
             $table->softDeletes();
             $table->timestamps();
         });

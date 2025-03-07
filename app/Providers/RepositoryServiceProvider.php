@@ -115,7 +115,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ShipperConsigneeRepositoryInterface::class, ShipperConsigneeRepository::class);
         $this->app->bind(NotificationMailRepositoryInterface::class, NotificationMailRepository::class);
         $this->app->bind(CourierAgentRepositoryInterface::class, CourierAgentRepository::class);
-        $this->app->bind(CourierRepositoryInterface::class, CourierRepository::class );
+        $this->app->bind(CourierRepositoryInterface::class, CourierRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);

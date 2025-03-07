@@ -2,7 +2,7 @@
 
 namespace App\Actions\Courier;
 
-use App\Actions\HBL\GenerateHBLReferenceNumber;
+use App\Actions\HBL\GenerateCourierNumber;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\Courier;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -10,16 +10,16 @@ use Lorisleiva\Actions\Concerns\AsAction;
 class CreateCourier
 {
     use AsAction;
-    public function handle( array $data)
+
+    public function handle(array $data)
     {
-        $reference = GenerateHBLReferenceNumber::run();
         $courier = Courier::create([
-            'reference_number' => $reference,
             'branch_id' => GetUserCurrentBranchID::run(),
             'cargo_type' => $data['cargo_type'],
             'hbl_type' => $data['hbl_type'],
-            'hbl' => $reference,
-            'hbl_name' => $data['hbl_name'],
+            'courier_agent' => $data['courier_agent'],
+            'courier_number' => GenerateCourierNumber::run(GetUserCurrentBranchID::run()),
+            'name' => $data['name'],
             'email' => $data['email'],
             'contact_number' => $data['contact_number'],
             'nic' => $data['nic'],
@@ -30,14 +30,10 @@ class CreateCourier
             'consignee_contact' => $data['consignee_contact'],
             'consignee_address' => $data['consignee_address'],
             'consignee_note' => $data['consignee_note'],
-            'paid_amount' => $data['paid_amount'],
-            'discount' => $data['discount'],
-            'total_amount' => $data['total_amount'],
             'status' => $data['status'],
-            'system_status' => $data['system_status'],
+            'created_by' => auth()->id(),
         ]);
+
         return $courier;
     }
-
-
 }

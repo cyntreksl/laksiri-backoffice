@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\BranchScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 
+#[ScopedBy(BranchScope::class)]
 class CourierAgent extends Model
 {
     use HasFactory, SoftDeletes;
@@ -14,6 +17,7 @@ class CourierAgent extends Model
     protected $table = 'courier_agents';
 
     protected $fillable = [
+        'branch_id',
         'company_name',
         'website',
         'contact_number_1',

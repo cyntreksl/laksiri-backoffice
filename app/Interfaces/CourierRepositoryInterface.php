@@ -4,6 +4,5 @@ namespace App\Interfaces;
 
 interface CourierRepositoryInterface
 {
-    public function  storeCourier(array $data);
-
+    public function storeCourier(array $data);
 }
