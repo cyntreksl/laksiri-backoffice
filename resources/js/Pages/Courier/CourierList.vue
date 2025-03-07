@@ -17,6 +17,8 @@ import moment from "moment";
 import {push} from "notivue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import Switch from "@/Components/Switch.vue";
+import FilterHeader from "@/Components/FilterHeader.vue";
 
 defineProps({
     zones: {
@@ -37,27 +39,30 @@ const toDate = moment(new Date()).format("YYYY-MM-DD");
 const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
+    cargoMode: ["Air Cargo", "Sea Cargo"],
+    hblType: ["UPB", "Gift", "Door to Door"],
+    status: ["pending", "on courier", "delivered"],
 });
 
 const data = reactive({
     columnVisibility: {
         courier_number: true,
         name: true,
-        email: true,
+        email: false,
         contact_number: true,
-        nic: true,
-        iq_number: true,
-        address: true,
+        nic: false,
+        iq_number: false,
+        address: false,
         consignee_name: true,
-        consignee_nic: true,
+        consignee_nic: false,
         consignee_contact: true,
-        consignee_address: true,
-        consignee_note: true,
+        consignee_address: false,
+        consignee_note: false,
         courier_agent: true,
         cargo_type: true,
         hbl_type: true,
         status: true,
-        created_at: true,
+        created_at: false,
     },
 });
 
@@ -130,28 +135,103 @@ const initializeGrid = () => {
 const createColumns = () => [
     { name: "Courier Number", hidden: !data.columnVisibility.courier_number },
     { name: "Name", hidden: !data.columnVisibility.name },
-    { name: "Email", hidden: !data.columnVisibility.email },
-    { name: "Contact Number", hidden: !data.columnVisibility.contact_number },
-    { name: "NIC", hidden: !data.columnVisibility.nic },
-    { name: "IQ Number", hidden: !data.columnVisibility.iq_number },
-    { name: "Address", hidden: !data.columnVisibility.address },
+    { name: "Email", hidden: !data.columnVisibility.email, sort: false },
+    { name: "Contact Number", hidden: !data.columnVisibility.contact_number, sort: false  },
+    { name: "NIC", hidden: !data.columnVisibility.nic, sort: false  },
+    { name: "IQ Number", hidden: !data.columnVisibility.iq_number, sort: false  },
+    { name: "Address", hidden: !data.columnVisibility.address, sort: false  },
     { name: "Consignee Name", hidden: !data.columnVisibility.consignee_name },
-    { name: "Consignee NIC", hidden: !data.columnVisibility.consignee_nic },
-    { name: "Consignee Contact", hidden: !data.columnVisibility.consignee_contact },
-    { name: "Consignee Address", hidden: !data.columnVisibility.consignee_address },
-    { name: "Consignee Note", hidden: !data.columnVisibility.consignee_note },
-    { name: "Courier Agent", hidden: !data.columnVisibility.courier_agent },
-    { name: "Cargo Type", hidden: !data.columnVisibility.cargo_type },
-    { name: "HBL Type", hidden: !data.columnVisibility.hbl_type },
+    { name: "Consignee NIC", hidden: !data.columnVisibility.consignee_nic, sort: false  },
+    { name: "Consignee Contact", hidden: !data.columnVisibility.consignee_contact, sort: false  },
+    { name: "Consignee Address", hidden: !data.columnVisibility.consignee_address, sort: false  },
+    { name: "Consignee Note", hidden: !data.columnVisibility.consignee_note, sort: false  },
+    { name: "Courier Agent", hidden: !data.columnVisibility.courier_agent, sort: false  },
+    {
+        name: "Cargo Type",
+        hidden: !data.columnVisibility.cargo_type,
+        sort: false,
+        formatter: (_, row) =>
+            row.cells[13].data == "Sea Cargo"
+                ? h(
+                    "span",
+                    {className: "flex"},
+                    h(
+                        "svg",
+                        {
+                            xmlns: "http://www.w3.org/2000/svg",
+                            viewBox: "0 0 24 24",
+                            class: "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
+                            fill: "none",
+                            height: 24,
+                            width: 24,
+                            stroke: "currentColor",
+                            strokeLinecap: "round",
+                            strokeLinejoin: "round",
+                            strokeWidth: 2,
+                        },
+                        [
+                            h("path", {
+                                stroke: "none",
+                                d: "M0 0h24v24H0z",
+                                fill: "none",
+                            }),
+                            h("path", {
+                                d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
+                            }),
+                            h("path", {
+                                d: "M4 18l-1 -5h18l-2 4",
+                            }),
+                            h("path", {
+                                d: "M5 13v-6h8l4 6",
+                            }),
+                            h("path", {
+                                d: "M7 7v-4h-1",
+                            }),
+                        ]
+                    ),
+                    row.cells[13].data
+                )
+                : row.cells[13].data == "Air Cargo"
+                    ? h("span", {className: "flex space-x-2"}, [
+                        h(
+                            "svg",
+                            {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                viewBox: "0 0 24 24",
+                                class: "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
+                                fill: "none",
+                                height: 24,
+                                width: 24,
+                                stroke: "currentColor",
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                                strokeWidth: 2,
+                            },
+                            [
+                                h("path", {
+                                    stroke: "none",
+                                    d: "M0 0h24v24H0z",
+                                    fill: "none",
+                                }),
+                                h("path", {
+                                    d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
+                                }),
+                            ]
+                        ),
+                        row.cells[13].data,
+                    ])
+                    : row.cells[13].data,
+    },
+    { name: "HBL Type", hidden: !data.columnVisibility.hbl_type  },
     {
         name: "Status",
         hidden: !data.columnVisibility.status,
         formatter: (cell) =>
             html(`<div class="${resolveStatus(cell)}">${cell}</div>`),
-        sort: false,
     },
     {
         name: "Created At",
+        sort: false,
         hidden: !data.columnVisibility.created_at,
         formatter: (cell) => moment(cell).format("MMMM Do YYYY, h:mm:ss A"),
     },
@@ -357,27 +437,15 @@ const exportURL = computed(() => {
                                             <p class="mt-1 text-xs+">
                                                 Choose which columns you want to see
                                             </p>
-                                            <div
-                                                class="mt-4 flex flex-col space-y-4 text-slate-600 dark:text-navy-100"
-                                            >
+                                            <div class="mt-4 flex flex-col space-y-4 text-slate-600 dark:text-navy-100">
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
-                                                        :checked="data.columnVisibility.id"
+                                                        :checked="data.columnVisibility.courier_number"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
-                                                        @change="toggleColumnVisibility('id', $event)"
+                                                        @change="toggleColumnVisibility('courier_number', $event)"
                                                     />
-                                                    <p>ID</p>
-                                                </label>
-
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.username"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="toggleColumnVisibility('username', $event)"
-                                                    />
-                                                    <p>Username</p>
+                                                    <p>Courier Number</p>
                                                 </label>
 
                                                 <label class="inline-flex items-center space-x-2">
@@ -392,29 +460,132 @@ const exportURL = computed(() => {
 
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
-                                                        :checked="data.columnVisibility.primary_branch_name"
+                                                        :checked="data.columnVisibility.email"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
-                                                        @change="
-                              toggleColumnVisibility(
-                                'primary_branch_name',
-                                $event
-                              )
-                            "
+                                                        @change="toggleColumnVisibility('email', $event)"
                                                     />
-                                                    <p>Primary Branch</p>
+                                                    <p>Email</p>
                                                 </label>
 
                                                 <label class="inline-flex items-center space-x-2">
                                                     <input
-                                                        :checked="data.columnVisibility.created_at"
+                                                        :checked="data.columnVisibility.contact_number"
                                                         class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
                                                         type="checkbox"
-                                                        @change="
-                              toggleColumnVisibility('created_at', $event)
-                            "
+                                                        @change="toggleColumnVisibility('contact_number', $event)"
                                                     />
-                                                    <p>Created At</p>
+                                                    <p>Contact Number</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.nic"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('nic', $event)"
+                                                    />
+                                                    <p>NIC</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.iq_number"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('iq_number', $event)"
+                                                    />
+                                                    <p>IQ Number</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.address"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('address', $event)"
+                                                    />
+                                                    <p>Address</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.consignee_name"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('consignee_name', $event)"
+                                                    />
+                                                    <p>Consignee Name</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.consignee_nic"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('consignee_nic', $event)"
+                                                    />
+                                                    <p>Consignee NIC</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.consignee_contact"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('consignee_contact', $event)"
+                                                    />
+                                                    <p>Consignee Contact</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.consignee_address"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('consignee_address', $event)"
+                                                    />
+                                                    <p>Consignee Address</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.consignee_note"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('consignee_note', $event)"
+                                                    />
+                                                    <p>Consignee Note</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.courier_agent"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('courier_agent', $event)"
+                                                    />
+                                                    <p>Courier Agent</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.cargo_type"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('cargo_type', $event)"
+                                                    />
+                                                    <p>Cargo Type</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.hbl_type"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('hbl_type', $event)"
+                                                    />
+                                                    <p>HBL Type</p>
                                                 </label>
 
                                                 <label class="inline-flex items-center space-x-2">
@@ -425,6 +596,16 @@ const exportURL = computed(() => {
                                                         @change="toggleColumnVisibility('status', $event)"
                                                     />
                                                     <p>Status</p>
+                                                </label>
+
+                                                <label class="inline-flex items-center space-x-2">
+                                                    <input
+                                                        :checked="data.columnVisibility.created_at"
+                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
+                                                        type="checkbox"
+                                                        @change="toggleColumnVisibility('created_at', $event)"
+                                                    />
+                                                    <p>Created At</p>
                                                 </label>
                                             </div>
                                         </div>
@@ -468,7 +649,7 @@ const exportURL = computed(() => {
         />
 
         <FilterDrawer :show="showFilters" @close="showFilters = false">
-            <template #title> Filter Drivers</template>
+            <template #title> Filter Couriers</template>
 
             <template #content>
 
@@ -493,6 +674,78 @@ const exportURL = computed(() => {
                     <InputLabel value="To"/>
                     <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
                 </div>
+
+                <FilterBorder/>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Cargo Mode"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch
+                        v-model="filters.cargoMode"
+                        label="Air Cargo"
+                        value="Air Cargo"
+                    />
+                    <div v-html="planeIcon"></div>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch
+                        v-model="filters.cargoMode"
+                        label="Sea Cargo"
+                        value="Sea Cargo"
+                    />
+                    <div v-html="shipIcon"></div>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="HBL Type"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.hblType" label="UPB" value="UPB"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch
+                        v-model="filters.hblType"
+                        label="Gift"
+                        value="Gift"
+                    />
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch
+                        v-model="filters.hblType"
+                        label="Door to Door"
+                        value="Door to Door"
+                    />
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Status"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.status" label="Pending" value="pending"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch
+                        v-model="filters.status"
+                        label="On Courier"
+                        value="on courier"
+                    />
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch
+                        v-model="filters.status"
+                        label="Delivered"
+                        value="delivered"
+                    />
+                </label>
 
                 <FilterBorder/>
 
