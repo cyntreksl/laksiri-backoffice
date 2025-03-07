@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -59,5 +60,10 @@ class Courier extends Model
     public function packages(): HasMany
     {
         return $this->hasMany(CourierPackage::class, 'courier_id', 'id');
+    }
+
+    public function courierAgent(): HasOne
+    {
+        return $this->hasOne(CourierAgent::class, 'id', 'courier_agent');
     }
 }
