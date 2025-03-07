@@ -78,7 +78,7 @@ const splitNumberConsignee = (fullNumber) => {
 const form = useForm({
     cargo_type: "",
     hbl_type: "",
-    courier_agent: "",
+    courier_agent: null,
     name: "",
     email: "",
     contact_number: computed(() => countryCode.value + contactNumber.value),
