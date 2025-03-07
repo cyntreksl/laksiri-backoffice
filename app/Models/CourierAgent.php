@@ -34,13 +34,13 @@ class CourierAgent extends Model
     public function logoUrl(): Attribute
     {
         return Attribute::get(function (): string {
-            return $this->logo ? Storage::disk('s3')->url($this->logo) : '';
+            return $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : '';
         });
     }
 
     public function getLogoUrlAttribute(): string
     {
-        return $this->logo ? Storage::disk('s3')->url($this->logo) : '';
+        return $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : '';
     }
 
     public function getActivitylogOptions(): LogOptions

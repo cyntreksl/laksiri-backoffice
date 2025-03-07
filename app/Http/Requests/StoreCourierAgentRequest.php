@@ -15,7 +15,7 @@ class StoreCourierAgentRequest extends FormRequest
     {
         return [
             'company_name' => ['unique:courier_agents', 'required', 'string', 'max:254'],
-            'website' => ['required', 'url', 'max:254'],
+            'website' => ['nullable', 'url', 'max:254'],
             'contact_number_1' => ['required', 'phone:INTERNATIONAL'],
             'contact_number_2' => ['nullable', 'phone:INTERNATIONAL'],
             'email' => ['nullable', 'email', 'max:254'],
