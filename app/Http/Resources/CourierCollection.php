@@ -12,6 +12,8 @@ class CourierCollection extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'select_couriers' =>true,
+            'id' => $this->courier_number,
             'courier_number' => $this->courier_number,
             'name' => $this->name,
             'email' => $this->email,

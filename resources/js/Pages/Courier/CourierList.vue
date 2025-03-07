@@ -46,6 +46,8 @@ const filters = reactive({
 
 const data = reactive({
     columnVisibility: {
+        select_couriers: true,
+        id: false,
         courier_number: true,
         name: true,
         email: false,
@@ -132,10 +134,13 @@ const initializeGrid = () => {
     grid.render(wrapperRef.value);
 };
 
+const selectedData = ref([]);
+
 const createColumns = () => [
     {
         name: "#",
         sort: false,
+        hidden: !data.columnVisibility.select_couriers,
         formatter: (_, row) => {
             return h("input", {
                 type: "checkbox",
@@ -160,6 +165,7 @@ const createColumns = () => [
             });
         },
     },
+    { name: "ID", hidden: !data.columnVisibility.id },
     { name: "Courier Number", hidden: !data.columnVisibility.courier_number },
     { name: "Name", hidden: !data.columnVisibility.name },
     { name: "Email", hidden: !data.columnVisibility.email, sort: false },
