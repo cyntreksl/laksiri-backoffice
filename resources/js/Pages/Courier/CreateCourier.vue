@@ -96,16 +96,30 @@ const form = useForm({
     is_active_package: false,
 });
 
+const resetCreateForm = () => {
+    packageList.value = [];
+    countryCode.value = findCountryCodeByBranch(currentBranch);
+    consignee_countryCode.value = '+94';
+    contactNumber.value = "";
+     consignee_contact.value = "";
+}
+
 const handleCourierCreate = () => {
-    form.post(route("couriers.store"), {
-        onSuccess: (page) => {
-            form.reset();
-            push.success("Courier Created Successfully!");
-        },
-        onError: () => console.log("error"),
-        preserveScroll: true,
-        preserveState: true,
-    });
+    if(Object.keys(form.packages).length <= 0){
+        push.error("Please add at least one package.");
+        return;
+    }else{
+        form.post(route("couriers.store"), {
+            onSuccess: (page) => {
+                form.reset();
+                resetCreateForm();
+                push.success("Courier Created Successfully!");
+            },
+            onError: () => console.log("error"),
+            preserveScroll: true,
+            preserveState: true,
+        });
+    }
 };
 
 const showAddNewPackageDialog = ref(false);
@@ -223,47 +237,9 @@ watch(
 
 const vat = ref(0);
 
-watch(
-    [
-        () => form.other_charge,
-        () => form.discount,
-        () => form.freight_charge,
-        () => vat,
-        () => form.additional_charge,
-        () => form.bill_charge,
-        () => form.destination_charge,
-        () => form.package_charges,
-    ],
-    ([newOtherCharge, newDiscount, newFreightCharge]) => {
-        // Convert dimensions from cm to meters
-        hblTotal.value =
-            parseFloat(form.freight_charge) +
-            parseFloat(form.bill_charge) +
-            parseFloat(form.package_charges) +
-            parseFloat(form.destination_charge) +
-            // parseFloat(form.other_charge) +
-            parseFloat(vat.value) -
-            form.discount +
-            parseFloat(form.additional_charge);
-        hblTotal.value = Number(hblTotal.value.toFixed(2))
-        form.grand_total = hblTotal.value;
-    }
-);
-
 const selectedType = ref("");
 
 const isChecked = ref(false);
-
-const addToConsigneeDetails = () => {
-    if (isChecked.value) {
-        form.consignee_name = form.hbl_name;
-        consignee_contact.value = contactNumber.value;
-        form.consignee_nic = form.nic;
-        form.consignee_address = form.address;
-    } else {
-        resetConsigneeDetails();
-    }
-};
 
 const resetConsigneeDetails = () => {
     form.consignee_name = "";
@@ -275,17 +251,7 @@ const resetConsigneeDetails = () => {
 const updateTypeDescription = () => {
     packageItem.type = (packageItem.type ? " " : "") + selectedType.value;
 };
-
-const hblTotal = ref(0);
 const currency = ref(usePage().props.currentBranch.currency_symbol || "SAR");
-const isEditable = ref(false);
-const perPackageCharge = ref(0);
-const perVolumeCharge = ref(0);
-const perFreightCharge = ref(0);
-const freightOperator = ref('');
-const priceMode = ref('');
-
-const freight_charge_operations = ref([]);
 
 const showConfirmRemovePackageModal = ref(false);
 const packageIndex = ref(null);
@@ -354,15 +320,6 @@ const openEditModal = (index) => {
 const copyFromHBLToShipperModalShow = ref(false);
 
 const reference = ref(null);
-
-const confirmShowingCopyFromHBLToShipperModal = () => {
-    copyFromHBLToShipperModalShow.value = true;
-}
-
-const closeCopyFromHBLToShipperModal = () => {
-    reference.value = null;
-    copyFromHBLToShipperModalShow.value = false;
-}
 
 const volumeMeasurements = {
     cm: 'cm.cu',
@@ -503,8 +460,8 @@ const confirmViewHBL = async (id) => {
 </script>
 
 <template>
-    <AppLayout title="HBL Create">
-        <template #header>HBL - Create</template>
+    <AppLayout title="Courier Create">
+        <template #header>Courier Create</template>
 
         <!-- Breadcrumb -->
         <Breadcrumb/>
