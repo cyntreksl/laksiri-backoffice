@@ -18,14 +18,15 @@ defineProps({
     }
 })
 const countryCode = ref('+94');
+const additionalNumberCountryCode = ref('+94');
 const contactNumber1 = ref("");
-const contactNumber2 = ref("");
+const additionalNumber = ref("");
 
 const form = useForm({
     company_name: "",
     website: "",
-    contact_number_1: computed(() => countryCode.value + contactNumber1.value),
-    contact_number_2: computed(() => countryCode.value + contactNumber2.value),
+    contact_number_1: "",
+    contact_number_2: "",
     email: "",
     address: "",
     logo: null,
@@ -35,6 +36,16 @@ const form = useForm({
 });
 
 const handleBranchCreate = () => {
+    if (logoInput.value) {
+        form.logo = logoInput.value.files[0];
+    }
+
+    form.contact_number_1 = countryCode.value + contactNumber1.value;
+
+    if(additionalNumber.value){
+        form.contact_number_2 = additionalNumberCountryCode.value + additionalNumber.value;
+    }
+
     form.post(route("courier-agents.store"), {
         onSuccess: () => {
             form.reset();
@@ -162,10 +173,10 @@ const clearLogoFileInput = () => {
                         <!-- Mobile Number 2 -->
                             <div class="sm:col-span-2">
                                 <div class="grid grid-cols-1 sm:grid-cols-3">
-                                    <InputLabel class="col-span-3" for="mobile_number" value="Mobile Number"/>
+                                    <InputLabel class="col-span-3" for="mobile_number" value="Additional Number"/>
                                     <div>
                                         <select
-                                            v-model="countryCode"
+                                            v-model="additionalNumberCountryCode"
                                             x-init="$el._tom = new Tom($el)"
                                             class="w-full rounded-r-0"
                                         >
@@ -176,7 +187,7 @@ const clearLogoFileInput = () => {
                                     </div>
                                     <div class="col-span-2">
                                         <input
-                                            v-model="contactNumber2"
+                                            v-model="additionalNumber"
                                             class="form-input rounded-l-lg w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
                                             placeholder="123 4567 890"
                                             type="text"
@@ -245,7 +256,7 @@ const clearLogoFileInput = () => {
                             <h2
                                 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                             >
-                                Invoice Footer
+                                Company Logo
                             </h2>
                         </div>
                         <div class="sm:col-span-4">
