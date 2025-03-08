@@ -17,7 +17,7 @@ const emit = defineEmits(['close', 'deleteCourier']);
 <template>
     <ConfirmationModal :show="show">
         <template #title>
-            Delete Coourier?
+            Delete Courier?
         </template>
 
         <template #content>
