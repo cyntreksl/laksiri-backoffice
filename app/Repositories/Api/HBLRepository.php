@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Api;
 
+use App\Actions\Branch\GetBranchByName;
 use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
 use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
@@ -32,6 +33,8 @@ class HBLRepository implements HBLRepositoryInterface
 
     public function storeHBL(array $data): JsonResponse
     {
+        $warehouse = GetBranchByName::run($data['warehouse']);
+        $data['warehouse_id'] = $warehouse->id;
         try {
             $hbl = null;
             DB::transaction(function () use ($data, &$hbl) {
@@ -39,6 +42,8 @@ class HBLRepository implements HBLRepositoryInterface
                 $packagesData = $data['packages'];
                 CreateHBLPackages::run($hbl, $packagesData);
             });
+
+            $hbl->addStatus('HBL Preparation by driver');
 
             return $this->success('HBL created successfully!', $hbl->load('packages'));
 
