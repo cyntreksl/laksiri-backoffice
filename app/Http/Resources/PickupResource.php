@@ -22,6 +22,8 @@ class PickupResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'contact_number' => $this->contact_number,
+            'additional_mobile_number' => $this->additional_mobile_number,
+            'whatsapp_number' => $this->whatsapp_number,
             'address' => $this->address,
             'location_name' => $this->location_name,
             'location_longitude' => $this->location_longitude,

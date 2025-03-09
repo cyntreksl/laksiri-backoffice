@@ -139,7 +139,7 @@ class PickupRepository implements PickupRepositoryInterface
 
             $pickups = $query->where('driver_id', auth()->id())
                 ->with('hbl')
-                ->orderBy('id', 'desc')
+                ->orderBy('pickup_time_end', 'desc')
                 ->get();
 
             // Transform pickups into resource format
