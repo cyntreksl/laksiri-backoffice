@@ -76,9 +76,9 @@ class CourierController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function changeCourierStatus(Request $request)
     {
-        //
+        $this->CourierRepository->changeStatus($request['couriers'], $request['status']);
     }
 
     /**
