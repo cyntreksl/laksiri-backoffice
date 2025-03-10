@@ -1,6 +1,5 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";

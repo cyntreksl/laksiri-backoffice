@@ -184,7 +184,6 @@ const emit = defineEmits(['close']);
 
                 <TabStatus v-if="hbl" :hbl="hbl" :pickup="pickup" />
 
-
                 <TabDocuments v-if="hbl" :hbl-id="hbl.id"/>
             </Tabs>
         </template>
