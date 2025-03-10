@@ -85,6 +85,7 @@ const data = reactive({
         is_hold: true,
         status: true,
         zone: true,
+        packages_counts: true,
         actions: true,
     },
 });
@@ -325,6 +326,7 @@ const createColumns = () => [
             ]);
         }
     },
+    {name: "Packages", hidden: !data.columnVisibility.packages_counts},
     {
         name: "Actions",
         hidden: !data.columnVisibility.actions,
