@@ -70,6 +70,7 @@ const data = reactive({
         officer: false,
         is_hold: true,
         status: true,
+        packages_counts: true,
         actions: true,
     },
     selectedData: {},
@@ -256,6 +257,7 @@ const createColumns = () => [
             }
         },
     },
+    {name: "Packages", hidden: !data.columnVisibility.packages_counts},
     {name: "Officer", hidden: !data.columnVisibility.officer},
     {
         name: "Actions",
@@ -520,7 +522,10 @@ const getCashSettlementSummary = async (filters) => {
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content"),
             },
-            body: JSON.stringify(filters),
+            body: JSON.stringify({
+                ...filters,
+                type: "cash-settlements",
+            }),
         });
 
         if (!response.ok) {

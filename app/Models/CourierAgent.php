@@ -4,15 +4,19 @@ namespace App\Models;
 
 use App\Models\Scopes\BranchScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use App\Traits\HasFile;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ScopedBy(BranchScope::class)]
 class CourierAgent extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasFile, LogsActivity,SoftDeletes;
 
     protected $table = 'courier_agents';
 
@@ -28,6 +32,20 @@ class CourierAgent extends Model
         'invoice_header',
         'invoice_footer',
     ];
+
+    protected $appends = ['logo_url'];
+
+    public function logoUrl(): Attribute
+    {
+        return Attribute::get(function (): string {
+            return $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : '';
+        });
+    }
+
+    public function getLogoUrlAttribute(): string
+    {
+        return $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : '';
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

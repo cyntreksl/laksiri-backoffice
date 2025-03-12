@@ -2,6 +2,7 @@
 
 namespace App\Actions\PickUps;
 
+use App\Actions\Branch\GetBranchByName;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\GenerateCRNumber;
 use App\Actions\HBL\GenerateHBLNumber;
@@ -21,6 +22,8 @@ class ConvertPickupToHBL
         $hbl_type = $request->hbl_type === 'D2D'
             ? 'Door to Door'
             : ($request->hbl_type ?? $pickup->hbl_type);
+
+        $warehouse = GetBranchByName::run($request->warehouse);
         $data = [
             'cargo_type' => $request->cargo_type ?: $pickup->cargo_type,
             'hbl_type' => $hbl_type,
@@ -36,7 +39,7 @@ class ConvertPickupToHBL
             'consignee_address' => $request->consignee_address,
             'consignee_note' => $request->consignee_note,
             'warehouse' => $request->warehouse,
-            'warehouse_id' => $request->warehouse_id ?? null,
+            'warehouse_id' => $request->warehouse_id ?? $warehouse['id'],
             'freight_charge' => $request->freight_charge,
             'bill_charge' => $request->bill_charge,
             'other_charge' => $request->other_charge,

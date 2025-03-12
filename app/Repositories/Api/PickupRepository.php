@@ -74,7 +74,7 @@ class PickupRepository implements PickupRepositoryInterface
     {
         try {
             $query = $this->buildPendingPickupsQuery($data);
-            $pickups = $query->orderBy('pickup_order')->get();
+            $pickups = $query->orderBy('id', 'desc')->orderBy('pickup_order')->get();
             $pendingPickupsResource = PickupResource::collection($pickups);
 
             return $this->success('Pending pickup list received successfully!', $pendingPickupsResource);
@@ -139,7 +139,7 @@ class PickupRepository implements PickupRepositoryInterface
 
             $pickups = $query->where('driver_id', auth()->id())
                 ->with('hbl')
-                ->orderBy('pickup_date', 'desc')
+                ->orderBy('pickup_time_end', 'desc')
                 ->get();
 
             // Transform pickups into resource format
