@@ -290,8 +290,8 @@ const shipIcon = ref(`
 </script>
 
 <template>
-    <AppLayout title="HBL Create">
-        <template #header>HBL - Create</template>
+    <AppLayout title="MHBL Create">
+        <template #header>MHBL - Create</template>
 
         <!-- Breadcrumb -->
         <Breadcrumb/>
@@ -387,7 +387,8 @@ const shipIcon = ref(`
                         </div>
                         <div class="my-5">
                             <div class="space-x-5">
-                                <label
+                                <div class="grid grid-cols-3 gap-4">
+                                    <label
                                     v-for="warehouse in warehouses"
                                     :key="warehouse.id"
                                     class="inline-flex items-center space-x-2"
@@ -403,6 +404,7 @@ const shipIcon = ref(`
                                     />
                                     <p>{{ warehouse.name }}</p>
                                 </label>
+                                </div>
                             </div>
                             <InputError :message="form.errors.warehouse"/>
                         </div>

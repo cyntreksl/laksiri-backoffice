@@ -2,19 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\CargoType;
+use App\Enum\HBLType;
+use App\Http\Requests\StoreCourierRequest;
+use App\Interfaces\CountryRepositoryInterface;
+use App\Interfaces\CourierAgentRepositoryInterface;
+use App\Interfaces\CourierRepositoryInterface;
+use App\Interfaces\PackageTypeRepositoryInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CourierController extends Controller
 {
+    public function __construct(
+        private readonly PackageTypeRepositoryInterface $packageTypeRepository,
+        private readonly CountryRepositoryInterface $countryRepository,
+        private readonly CourierRepositoryInterface $CourierRepository,
+        private readonly CourierAgentRepositoryInterface $CourierAgentRepository,
+
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Inertia::render('Courier/CourierList', [
+        return Inertia::render('Courier/CourierList',
 
-        ]);
+        );
     }
 
     /**
@@ -22,8 +37,13 @@ class CourierController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Courier/CreateCourier', [
 
+        return Inertia::render('Courier/CreateCourier', [
+            'cargoTypes' => CargoType::cases(),
+            'hblTypes' => HBLType::cases(),
+            'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
+            'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
+            'courierAgents' => $this->CourierAgentRepository->getAllCourierAgents(),
         ]);
 
     }
@@ -31,9 +51,9 @@ class CourierController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCourierRequest $request)
     {
-        //
+        $courier = $this->CourierRepository->storeCourier($request->all());
     }
 
     /**

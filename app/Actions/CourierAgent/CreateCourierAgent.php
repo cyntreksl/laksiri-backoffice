@@ -2,6 +2,7 @@
 
 namespace App\Actions\CourierAgent;
 
+use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\CourierAgent;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -13,6 +14,7 @@ class CreateCourierAgent
     {
         $courierAgent = new CourierAgent;
 
+        $courierAgent->branch_id = GetUserCurrentBranchID::run();
         $courierAgent->company_name = $data['company_name'] ?? null;
         $courierAgent->website = $data['website'] ?? null;
         $courierAgent->contact_number_1 = $data['contact_number_1'] ?? null;
