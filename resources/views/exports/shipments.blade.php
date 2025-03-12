@@ -82,7 +82,7 @@
 @php
     $serialNumber = 1;
     $itemsPerPageFirst = 3;
-    $itemsPerPageRest = 4;
+    $itemsPerPageRest = 5;
 
     $firstChunk = array_slice($data, 0, $itemsPerPageFirst);
 
@@ -252,11 +252,11 @@
                         </b>
                     </td>
                 </tr>
-                <tr style="height: 5px !important;">
-                    <td style="font-size: 13px; border: 2px solid; margin-top: -10px"><b>TOTAL</b></td>
-                    <td style="text-align: center; font-size: 13px; border: 2px solid"><b>  <strong> {{ $totalQuantity }}</strong></b></td>
-                    <td style="text-align: right; font-size: 13px; border: 2px solid"><b> <strong>{{ $totalVolume }}</strong></b></td>
-                    <td style="text-align: right; font-size: 13px; border: 2px solid"><b>   <strong > {{ $hblweight }}</strong></b></td>
+                <tr>
+                    <td style="font-size: 13px; border: 2px solid;"><b>TOTAL</b></td>
+                    <td style="text-align: center; font-size: 13px; border: 2px solid; "><b>  <strong> {{ $totalQuantity }}</strong></b></td>
+                    <td style="text-align: right; font-size: 13px; border: 2px solid; "><b> <strong>{{ $totalVolume }}</strong></b></td>
+                    <td style="text-align: right; font-size: 13px; border: 2px solid; "><b>   <strong > {{ $hblweight }}</strong></b></td>
                 </tr>
 
             @endforeach
