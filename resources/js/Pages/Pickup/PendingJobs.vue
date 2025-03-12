@@ -82,10 +82,8 @@ const data = reactive({
         cargo_type: true,
         driver: true,
         pickup_type: true,
-        packages: false,
-        exception_note: true,
         status: false,
-        package_types: true,
+        packages: true,
         actions: true,
     },
 });
@@ -220,7 +218,8 @@ const createColumns = () => [
             }
         },
         formatter: (cell, row) => {
-            return html(`<span>${cell}</span> <br> <span style="color: dodgerblue">${row.cells[12].data}</span>`)
+            return html(`<span>${cell}</span> <br> <span style="color: dodgerblue">${row.cells[10].data}</span>`)
+
         }
     },
     {
@@ -496,91 +495,35 @@ const createColumns = () => [
     {
         name: "Packages",
         hidden: !data.columnVisibility.packages,
-        sort: false,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-                    'style': 'background-color: #e0f2fe',
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-                    'style': 'background-color: #ffe4e6',
-                };
-            }
-        },
-        formatter: (cell) => {
-            if (!cell) return '';
-            let value = cell.toString();
-            if (value.length < 20) {
-                return value;
-            }
-            return value.substring(0, 20) + '...';
-        }
-    },
-    {
-        name: "Package Types",
-        hidden: !data.columnVisibility.package_types,
         formatter: (_, row) => {
             let packageTypes = [];
 
             try {
-                const cellData = row?.cells?.[13]?.data; // Safe access
-                packageTypes = cellData ? JSON.parse(cellData) : [];
+                const cellData = row?.cells?.[11]?.data; // Safe access
+                packageTypes = cellData ? cellData.split(",").map(type => type.trim()) : [];
+
                 return h(
                     "div",
-                    {className: "flex gap-2"},
+                    { className: "flex gap-2 flex-wrap" },
                     packageTypes.length > 0
                         ? packageTypes.map((type, index) =>
                             h(
                                 "span",
                                 {
                                     key: index,
-                                    className: "badge space-x-2.5 bg-red-100 text-red-500 dark:bg-red-100",
+                                    className: "badge bg-green-100 text-green-500 dark:bg-red-100 px-2 py-1 rounded",
                                 },
                                 type
-                            ),
-                            h("br")
+                            )
                         )
-                        : h("span", {className: "text-gray-400"}, "No Packages")
+                        : h("span", { className: "text-gray-400" }, "No Packages")
                 );
             } catch (error) {
-                console.error("Error parsing package types:", error);
+                console.error("Error processing package types:", error);
+                return h("span", { className: "text-gray-400" }, "Invalid Data");
             }
         },
         sort: false,
-    },
-    {
-        name: "Exception",
-        hidden: !data.columnVisibility.exception_note,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-                    'style': 'background-color: #e0f2fe',
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-                    'style': 'background-color: #ffe4e6',
-                };
-            }
-        },
-        sort: false,
-        formatter: (cell) => {
-            return cell
-                ? cell !== '-' && html(
-                `<div class="badge space-x-2.5 bg-red-100 text-red-500 dark:bg-red-100"> ${cell}</div>`
-            )
-                : null;
-        }
     },
     {
         name: "Actions",
