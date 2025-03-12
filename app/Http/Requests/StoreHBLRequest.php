@@ -30,7 +30,7 @@ class StoreHBLRequest extends FormRequest
             'hbl_name' => ['required'],
             'contact_number' => ['phone:INTERNATIONAL'],
             'additional_mobile_number' => ['nullable', 'phone:INTERNATIONAL'],
-            'whatsapp_number' => ['nullable', 'phone:INTERNATIONAL'],
+            'whatsapp_number' => ['required', 'phone:INTERNATIONAL'],
             'nic' => ['nullable'],
             'iq_number' => ['nullable'],
             'address' => ['nullable'],

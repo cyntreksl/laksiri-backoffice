@@ -37,6 +37,11 @@ const props = defineProps({
         default: () => {
         },
     },
+    warehouses: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const showFilters = ref(false);
@@ -44,7 +49,7 @@ const fromDate = moment(new Date()).subtract(1, "month").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 const wrapperRef = ref(null);
 let grid = null;
-const perPage = ref(10);
+const perPage = ref(100);
 const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
@@ -53,6 +58,8 @@ const filters = reactive({
     officers: {},
     cargoMode: ["Air Cargo", "Sea Cargo"],
     paymentStatus: [],
+    warehouse: props.warehouses.map(warehouse => warehouse.name),
+    hblType: ["UPB", "Gift", "Door to Door"],
 });
 
 const data = reactive({
@@ -648,6 +655,8 @@ const resetFilter = () => {
     filters.officers = {};
     filters.cargoMode = ["Air Cargo", "Sea Cargo"];
     filters.paymentStatus = [];
+    filters.hblType = ["UPB", "Gift", "Door to Door"];
+    filters.warehouse = props.warehouses.map(warehouse => warehouse.name);
     applyFilters();
 };
 
@@ -775,27 +784,27 @@ const shipIcon = ref(`
                             class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
                         >
                             <div
-                                class="mr-4 cursor-pointer"
+                                class="mr-4 cursor-pointer self-start"
                                 x-tooltip.info.placement.bottom="'Applied Filters'"
                             >
                                 Filter Options:
                             </div>
-                            <div class="flex -space-x-px">
+                            <div class="flex">
                                 <div>
                                     <div
-                                        class="tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                                        class="mb-1 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                                     >
                                         From Date
                                     </div>
                                     <div
-                                        class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+                                        class="mb-1 tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                                     >
                                         {{ filters.fromDate }}
                                     </div>
                                 </div>
                                 <div>
                                     <div
-                                        class="ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                                        class="mb-1 ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
                                     >
                                         To Date
                                     </div>
@@ -805,28 +814,45 @@ const shipIcon = ref(`
                                         {{ filters.toDate }}
                                     </div>
                                 </div>
-                                <div>
+                                <div
+                                    class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
+                                >
                                     <div
-                                        v-for="(mode, index) in filters.cargoMode"
+                                        v-for="(
+                                            mode, index
+                                        ) in filters.cargoMode"
                                         v-if="filters.cargoMode"
                                         :key="index"
-                                        class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
+                                        class="mb-1 badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
                                     >
-                    <span v-if="mode == 'Sea Cargo'">
-                      <div v-html="shipIcon"></div>
-                    </span>
+                                        <span v-if="mode == 'Sea Cargo'">
+                                            <div v-html="shipIcon"></div>
+                                        </span>
                                         <span v-if="mode == 'Air Cargo'">
-                      <div v-html="planeIcon"></div>
-                    </span>
+                                            <div v-html="planeIcon"></div>
+                                        </span>
+
                                         {{ mode }}
                                     </div>
+
                                     <div
-                                        v-for="(type, index) in filters.deliveryType"
-                                        v-if="filters.deliveryType"
+                                        v-for="(type, index) in filters.hblType"
+                                        v-if="filters.hblType"
                                         :key="index"
-                                        class="badge bg-success text-white ml-2"
+                                        class="mb-1 badge bg-fuchsia-600 text-white dark:bg-fuchsia-600 ml-2"
                                     >
                                         {{ type }}
+                                    </div>
+
+                                    <div
+                                        v-for="(
+                                            item, index
+                                        ) in filters.warehouse"
+                                        v-if="filters.warehouse"
+                                        :key="index"
+                                        class="mb-1 badge bg-pink-600 text-white dark:bg-pink-600 ml-2"
+                                    >
+                                        {{ item }}
                                     </div>
                                 </div>
                             </div>
@@ -961,6 +987,46 @@ const shipIcon = ref(`
                         value="Sea Cargo"
                     />
                     <div v-html="shipIcon"></div>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="HBL Type"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.hblType" label="UPB" value="UPB"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch
+                        v-model="filters.hblType"
+                        label="Gift"
+                        value="Gift"
+                    />
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch
+                        v-model="filters.hblType"
+                        label="Door to Door"
+                        value="Door to Door"
+                    />
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Warehouse"/>
+
+                <label
+                    v-for="warehouse in warehouses"
+                    :key="warehouse.id"
+                    class="inline-flex items-center space-x-2 mt-2"
+                >
+                    <Switch
+                        v-model="filters.warehouse"
+                        :label="warehouse.name"
+                        :value="warehouse.name"
+                    />
                 </label>
 
                 <FilterBorder/>

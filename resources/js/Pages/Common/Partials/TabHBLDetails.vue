@@ -161,6 +161,10 @@ watch(
 
                     <InfoDisplay :value="hbl?.consignee_nic" label="Nic/PP No"/>
 
+                    <InfoDisplay :value="hbl?.consignee_additional_mobile_number" label="Additional Contact Number"/>
+
+                    <InfoDisplay :value="hbl?.consignee_whatsapp_number" label="Whatsapp Number"/>
+
                 </div>
             </div>
         </AccordionPanel>
