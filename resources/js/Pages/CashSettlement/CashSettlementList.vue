@@ -49,7 +49,7 @@ const fromDate = moment(new Date()).subtract(1, "month").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 const wrapperRef = ref(null);
 let grid = null;
-const perPage = ref(10);
+const perPage = ref(100);
 const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
