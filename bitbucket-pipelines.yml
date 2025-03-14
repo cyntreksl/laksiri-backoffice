@@ -103,7 +103,7 @@ definitions:
         name: Build Frontend Assets
         image: node:18
         script:
-          - npm ci
+          - npm install
           - npm run build
         artifacts:
           - public/build/assets/*
