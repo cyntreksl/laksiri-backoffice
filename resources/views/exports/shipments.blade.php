@@ -60,7 +60,7 @@
 
 @php
     $serialNumber = 1;
-    $itemsPerPageFirst = 3;
+    $itemsPerPageFirst = 4;
     $itemsPerPageRest = 5;
 
     $firstChunk = array_slice($data, 0, $itemsPerPageFirst);
@@ -87,11 +87,11 @@
         @if ($chunkIndex === 0)
             <thead>
             <tr>
-                <th colspan="3" style="border-right: none;">
-                    <strong>OBL  {{$container?->bl_number}}</strong>
+                <th colspan="2" style="border-right: none;">
+                    <strong>  OBL  {{$container?->bl_number}}</strong>
                 </th>
                 <th colspan="4" style="border-left: none; border-right: none !important; text-align: center">UNIVERSAL FREIGHT SERVICES</th>
-                <th colspan="4" style="border-left: none; text-align: right">SHIPMENT N0 {{$container?->reference}}</th>
+                <th colspan="5" style="border-left: none; text-align: right">SHIPMENT NO {{$container?->reference}}</th>
             </tr>
             <tr>
                 <th colspan="11" style="background-color: #D8D8D8 ; text-align: center; ">
@@ -103,31 +103,31 @@
                     <strong style="font-size: 12px;">VESSEL:</strong>
                 </th>
                 <th colspan="2">
-                    <strong style="font-size: 12px">{{$container?->vessel_name}}</strong>
+                    <strong style="font-size: 12px">  {{$container?->vessel_name}}</strong>
                 </th>
                 <th colspan="4">
-                    <strong style="font-size: 12px">DATE LOADED:   {{$container?->loading_started_at}} <br></strong>
+                    <strong style="font-size: 12px">DATE LOADED:   {{ \Carbon\Carbon::parse($container?->loading_started_at)->format('Y-m-d') }} <br></strong>
                 </th>
                 <th colspan="1">
                     <strong style="font-size: 12px">VOYAGE: <br></strong>
                 </th>
                 <th colspan="1">
-                    <strong style="font-size: 12px">{{$container?->voyage_number}}   <br></strong>
+                    <strong style="font-size: 12px">  {{$container?->voyage_number}}   <br></strong>
                 </th>
                 <th colspan="1" >
                     <strong style="font-size: 12px">ETA:   <br></strong>
                 </th>
                 <th colspan="1">
-                    <strong style="font-size: 12px">{{$container?->estimated_time_of_arrival}}    <br></strong>
+                    <strong style="font-size: 12px">  {{$container?->estimated_time_of_arrival}}    <br></strong>
                 </th>
             </tr>
 
             <tr>
                 <th colspan="11" style="font-size: 12px; font-family: 'Times New Roman',fantasy; ">
-                    SHIPPER : {{$settings?->invoice_header_title}}, {{$settings?->invoice_header_address}}.
+                    SHIPPER         : {{$settings?->invoice_header_title}}, {{$settings?->invoice_header_address}}.
                     TEL: {{$settings?->invoice_header_telephone}} <br>
-                    CONSIGNEE: LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA <br>
-                    NOTIFY : LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94
+                    CONSIGNEE  : LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA <br>
+                    NOTIFY           : LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94
                     11-47722800
                 </th>
             </tr>
@@ -136,21 +136,21 @@
                 <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">
                     <strong>CONTR NO        {{$container?->container_number}}  </strong>
                 </th>
-                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">
+                <th colspan="4" style="text-align: center;font-family: 'Times New Roman',fantasy; font-size: 12px;">
                     <strong> SEAL NO:    {{$container?->seal_number}} </strong>
                 </th>
-                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">
-                    <strong>CONTAINER TYPE {{$container?->container_type}} </strong>
+                <th colspan="4" style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 12px;">
+                    <strong>CONTAINER TYPE: {{$container?->container_type}} </strong>
                 </th>
             </tr>
             <tr>
                 <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 12px; border-bottom: none">
                     <strong> NO OF PKG   {{ number_format($total_nototal, 0) }} </strong>
                 </th>
-                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 12px; border-bottom: none">
+                <th colspan="4" style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 12px; border-bottom: none">
                     <strong> TOTAL VOLUME  {{ number_format($total_vtotal, 2) }} </strong>
                 </th>
-                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 12px; border-bottom: none">
+                <th colspan="4" style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 12px; border-bottom: none">
                     <strong> TOTAL WEIGHT:KG                 {{ number_format($total_gtotal, 2) }} </strong>
                 </th>
             </tr>
@@ -160,17 +160,17 @@
     <table>
         <thead style="padding: 0; margin: 0">
             <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: #D8D8D8  ;">
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">SR <br>NO</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">HBL NO</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;"> NAME OF SHIPPER</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">NAME OF CONSIGNEES</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">TYPE OF PKGS</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">NO.OF PKGS</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">VOLUME CBM</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">GWHT</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">DESCRIPTION OF CARGO</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">    </th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 11px;">REMARKS</th>- New Total Column -->
+                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">SR <br>NO</th>
+                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">HBL NO</th>
+                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;"> NAME OF SHIPPER</th>
+                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">NAME OF CONSIGNEES</th>
+                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">TYPE OF PKGS</th>
+                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">NO.OF PKGS</th>
+                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">VOLUME CBM</th>
+                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">GWHT</th>
+                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">DESCRIPTION OF CARGO</th>
+                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">DELIVERY</th>
+                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 11px;">REMARKS</th>- New Total Column -->
             </tr>
         </thead>
             <tbody>
@@ -190,22 +190,15 @@
                     <td rowspan="1" style="border-bottom: 0; font-size: 12px; border-left:none;vertical-align: top">{{ $item[1]}}</td>
                     <td rowspan="1" style="border-bottom: 0; font-size: 12px; vertical-align: top; border-bottom: 0">{{ $item[5] }} </td>
                     <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0">{{ $item[9][0]['package_type'] }}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0">{{ $item[9][0]['quantity'] }}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0">{{ $item[9][0]['volume'] }}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0">{{ $item[9][0]['weight'] }}</td>
+                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['quantity'] }}</td>
+                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['volume'] }}</td>
+                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['weight'] }}</td>
                     <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px">  PERSONAL<br>      EFFECT</td>
                     <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px">
                         {{ $item[13] }}
                     </td>
-
-                    <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px; text-align: center">
-                        <b >{{ $item[11] == 'GIFT' ? $item[11] : '' }}
-                            @if (!empty($item[12]))
-                                <p>{{ $container?->port_of_loading . '&' . $container?->port_of_discharge }}</p>
-                            @endif
-
-                            <p>{{ $item[10]}}</p>
-                        </b>
+                    <td rowspan="1" style="font-size: 12px; text-align: center; border-bottom: 0">
+                        <b >{{ $item[11] == 'GIFT' ||  $item[11] == 'Gift'? 'GIFT CARGO' : '' }}</b>
                     </td>
                 </tr>
 
@@ -213,24 +206,32 @@
                     <td style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">{{ $item[2] }}</td>
                     <td rowspan="2" style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">{{ $item[6] }}</td>
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][1]) ? $item[9][1]['package_type'] : ' ' }}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][1]) ? $item[9][1]['quantity'] : ' ' }}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][1]) ? $item[9][1]['volume'] : ' '}}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][1]) ? $item[9][1]['weight'] : ' ' }}</td>
+                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['quantity'] : ' ' }}</td>
+                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['volume'] : ' '}}</td>
+                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['weight'] : ' ' }}</td>
+                    <td rowspan="1" style="font-size: 12px; text-align: center; border-top: 0; border-bottom: 0">
+                            @if (!empty($item[12]))
+                                <b>{{ $container?->port_of_loading . '&' . $container?->port_of_discharge }}</b> <br>
+                            @endif
+                    </td>
                 </tr>
                 <tr>
                     <td style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">P.O.BOX: {{ $item[14] }}</td>
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][2]) ? $item[9][2]['package_type'] : ' ' }}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][2]) ? $item[9][2]['quantity'] : ' ' }}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][2]) ? $item[9][2]['volume'] : ' '}}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][2]) ? $item[9][2]['weight'] : ' ' }}</td>
+                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['quantity'] : ' ' }}</td>
+                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['volume'] : ' '}}</td>
+                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['weight'] : ' ' }}</td>
+                    <td rowspan="{{ $packageCount > 4 ? $packageCount - 1 : 3 }}" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top;">
+                        <b>{{ $item[10]}}</b>
+                    </td>
                 </tr>
                 <tr>
                     <td rowspan="{{ $packageCount > 4 ? $packageCount - 3 : 1 }}" style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0">{{ $item[4] }}</td>
                     <td rowspan="{{ $packageCount > 4 ? $packageCount - 3 : 1 }}" style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">{{ $item[7] }}</td>
                     <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][3]) ? $item[9][3]['package_type'] : ' ' }}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][3]) ? $item[9][3]['quantity'] : ' ' }}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][3]) ? $item[9][3]['volume'] : ' '}}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][3]) ? $item[9][3]['weight'] : ' ' }}</td>
+                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][3]) ? $item[9][3]['quantity'] : ' ' }}</td>
+                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][3]) ? $item[9][3]['volume'] : ' '}}</td>
+                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][3]) ? $item[9][3]['weight'] : ' ' }}</td>
                 </tr>
 
                 @if(count($item[9])  > 4)
@@ -240,9 +241,9 @@
                     @foreach($restPackages as $restPkg)
                         <tr>
                             <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ $restPkg['package_type'] }}</td>
-                            <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ $restPkg['quantity'] }}</td>
-                            <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ $restPkg['volume'] }}</td>
-                            <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ $restPkg['weight'] }}</td>
+                            <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ $restPkg['quantity'] }}</td>
+                            <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ $restPkg['volume'] }}</td>
+                            <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ $restPkg['weight'] }}</td>
                         </tr>
                     @endforeach
                 @endif
