@@ -17,6 +17,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
 import DeleteCourierConfirmationModal from "@/Pages/Courier/Partials/DeleteCourierConfirmationModal.vue";
+import ChangeStatusModal from "@/Pages/Courier/Partials/ChangeStatusModal.vue";
 
 defineProps({
     zones: {
@@ -132,7 +133,9 @@ const initializeGrid = () => {
     grid.render(wrapperRef.value);
 };
 
-const selectedData = ref([]);
+const selectedCourierData = ref([]);
+const isChangeStatus = ref(false);
+const showChangeStatusModal = ref(false);
 
 const createColumns = () => [
     {
@@ -147,18 +150,20 @@ const createColumns = () => [
                 onChange: (event) => {
                     const isChecked = event.target.checked;
                     if (isChecked) {
-                        const rowData = row.cells.map((cell) => cell.data); // Extract data from cells array
-                        selectedData.value.push(rowData); // Push extracted data into selectedData
+                        const rowData = row.cells.map((cell) => cell.data);
+                        selectedCourierData.value.push(rowData);
                     } else {
-                        // Remove the specific row from selectedData (assuming uniqueness of rows)
-                        const index = selectedData.value.findIndex((selectedRow) => {
+                        const index = selectedCourierData.value.findIndex((selectedRow) => {
                             const rowData = row.cells.map((cell) => cell.data);
                             return JSON.stringify(selectedRow) === JSON.stringify(rowData);
                         });
                         if (index !== -1) {
-                            selectedData.value.splice(index, 1);
+                            selectedCourierData.value.splice(index, 1);
                         }
                     }
+                    if(selectedCourierData.value.length > 0 ){
+                        isChangeStatus.value = true;
+                    }else isChangeStatus.value = false;
                 },
             });
         },
@@ -258,7 +263,7 @@ const createColumns = () => [
         name: "Status",
         hidden: !data.columnVisibility.status,
         formatter: (cell) =>
-            html(`<div class="${resolveStatus(cell)}">${cell}</div>`),
+            html(`<div class="${resolveStatus(cell.replace(/\s+/g, ''))}">${cell}</div>`),
     },
     {
         name: "Created At",
@@ -316,9 +321,8 @@ const createColumns = () => [
 const resolveStatus = (status) =>
     ({
         pending: "badge bg-success/10 text-success dark:bg-success/15",
-        DEACTIVATE: "badge bg-error/10 text-error dark:bg-error/15",
-        INACTIVE: "badge bg-warning/10 text-warning dark:bg-warning/15",
-        INVITED: "badge bg-info/10 text-info dark:bg-info/15",
+        oncourier: "badge bg-error/10 text-error dark:bg-error/15",
+        delivered: "badge bg-info/10 text-info dark:bg-info/15",
     }[status]);
 
 const updateGridConfig = () => {
@@ -662,6 +666,20 @@ const exportURL = computed(() => {
                             </button>
                         </a>
                     </div>
+                    <div>
+                        <button
+                            :class="{
+                                  'bg-primary hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90':
+                                    isChangeStatus,
+                                  'bg-gray-300 cursor-not-allowed': !isChangeStatus,
+                                }"
+                            :disabled="!isChangeStatus"
+                            class="btn font-medium text-white"
+                            @click="showChangeStatusModal = true"
+                        >
+                            Change Status
+                        </button>
+                    </div>
                 </div>
 
                 <div class="mt-3">
@@ -677,6 +695,12 @@ const exportURL = computed(() => {
             :show="showConfirmDeleteCourierModal"
             @close="closeModal"
             @delete-courier="handleDeleteCourier"
+        />
+
+        <ChangeStatusModal
+            :show="showChangeStatusModal"
+            :selectedCouriers="selectedCourierData"
+            @close="showChangeStatusModal = false"
         />
 
         <FilterDrawer :show="showFilters" @close="showFilters = false">
