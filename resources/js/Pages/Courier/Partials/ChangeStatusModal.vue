@@ -135,7 +135,6 @@ const handleChangeStatus = () => {
                             </select>
 
                         </div>
-                        <InputError :message="form.errors.status"/>
                     </div>
                     <InputError :message="form.errors.status"/>
                 </div>

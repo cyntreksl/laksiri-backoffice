@@ -86,6 +86,8 @@ class HBL extends Model
         'paid_amount',
         'grand_total',
         'do_charge',
+        'is_departure_charges_paid',
+        'is_destination_charges_paid',
         'status',
         'created_by',
         'branch_id',

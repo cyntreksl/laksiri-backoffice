@@ -76,6 +76,9 @@ class LoadedContainerManifestExport
                 '',
                 '',
                 $warehouse,
+                '',
+                false,
+                false,
             ];
         }
 
@@ -98,11 +101,14 @@ class LoadedContainerManifestExport
                 $hbl->consignee_address,
                 $hbl->consignee_nic,
                 $hbl->consignee_contact,
-                $hbl->packages,
+                $loadedHBLPackages[$hbl->id]['packages'],
                 $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
                 $hbl->hbl_type,
                 $hbl->other_charge,
                 $warehouse,
+                $hbl->iq_number,
+                $hbl->is_departure_charges_paid,
+                $hbl->is_destination_charges_paid,
             ];
         }
 

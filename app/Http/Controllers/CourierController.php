@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enum\CargoType;
 use App\Enum\HBLType;
 use App\Http\Requests\StoreCourierRequest;
+use App\Http\Requests\UpdateCourierStatusRequest;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\CourierAgentRepositoryInterface;
 use App\Interfaces\CourierRepositoryInterface;
@@ -76,7 +77,7 @@ class CourierController extends Controller
     /**
      * Display the specified resource.
      */
-    public function changeCourierStatus(Request $request)
+    public function changeCourierStatus(UpdateCourierStatusRequest $request)
     {
         $this->CourierRepository->changeStatus($request['couriers'], $request['status']);
     }
