@@ -103,7 +103,7 @@ definitions:
         name: Build Frontend Assets
         image: node:16.18.1
         script:
-          - npm ci
+          - npm ci --legacy-peer-deps
           - npm run build
         artifacts:
           - public/build/assets/*
