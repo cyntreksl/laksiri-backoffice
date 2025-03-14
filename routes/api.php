@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\v1\Auth\LoginController;
+use App\Http\Controllers\Api\v1\DashboardController;
 use App\Http\Controllers\Api\v1\DriverController;
 use App\Http\Controllers\Api\v1\ExceptionNameController;
 use App\Http\Controllers\Api\v1\HBLController;
@@ -50,6 +51,8 @@ Route::domain('api.'.config('app.url'))
         Route::get('/delivers/{hblDeliver}', [DeliverController::class, 'show']);
 
         Route::post('/release-delivery', [DeliverController::class, 'releaseDeliverOrder']);
+
+        Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
 
     });
 

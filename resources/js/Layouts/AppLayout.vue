@@ -1203,7 +1203,7 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("delivers.assign release to driver")) {
+                    if (usePage().props.user.permissions.includes("delivers.assign release to driver") && usePage().props.currentBranch.type === 'Destination') {
                         hblMenu.splice(
                             2,
                             0,
@@ -1235,7 +1235,7 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("delivers.show deliver order")) {
+                    if (usePage().props.user.permissions.includes("delivers.show deliver order") && usePage().props.currentBranch.type === 'Destination') {
                         hblMenu.splice(
                             2,
                             0,

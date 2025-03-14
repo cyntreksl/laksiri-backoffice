@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\WarehouseZone\GetWarehouseZones;
 use App\Enum\HBLPaymentStatus;
 use App\Http\Requests\AssignZoneRequest;
@@ -35,6 +36,7 @@ class WarehouseController extends Controller
             'officers' => $officers,
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouseZones' => GetWarehouseZones::run(),
+            'warehouses' => GetDestinationBranches::run(),
         ]);
     }
 
@@ -46,7 +48,7 @@ class WarehouseController extends Controller
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'hblType', 'warehouse']);
 
         return $this->warehouseRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }

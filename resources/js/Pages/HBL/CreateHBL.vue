@@ -89,10 +89,10 @@ const additionalMobileNumber = ref("");
 const whatsappNumberCountryCode = ref(findCountryCodeByBranch());
 const whatsappNumber = ref("");
 
-const consigneeAdditionalMobileCountryCode = ref(findCountryCodeByBranch());
+const consigneeAdditionalMobileCountryCode = ref('+94');
 const consigneeAdditionalMobileNumber = ref("");
 
-const consigneeWhatsappNumberCountryCode = ref(findCountryCodeByBranch());
+const consigneeWhatsappNumberCountryCode = ref('+94');
 const consigneeWhatsappNumber = ref("");
 
 const form = useForm({

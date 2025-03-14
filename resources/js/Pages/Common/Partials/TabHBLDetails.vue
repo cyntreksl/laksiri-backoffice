@@ -67,7 +67,11 @@ watch(
 
                     <InfoDisplay :value="hbl?.hbl_name" label="Name"/>
 
-                    <InfoDisplay :value="hbl?.contact_number" label="Contact"/>
+                    <InfoDisplay :value="hbl?.contact_number" label="Contact Number"/>
+
+                    <InfoDisplay :value="hbl?.additional_mobile_number" label="Additional Contact Number"/>
+
+                    <InfoDisplay :value="hbl?.whatsapp_number" label="Whatsapp Number"/>
 
                     <InfoDisplay :value="hbl?.address" label="Address"/>
 
@@ -91,7 +95,11 @@ watch(
 
                     <InfoDisplay :value="pickup?.email" label="Email"/>
 
-                    <InfoDisplay :value="pickup?.contact_number" label="Contact"/>
+                    <InfoDisplay :value="pickup?.contact_number" label="Contact Number"/>
+
+                    <InfoDisplay :value="pickup?.additional_mobile_number" label="Additional Contact Number"/>
+
+                    <InfoDisplay :value="pickup?.whatsapp_number" label="Whatsapp Number"/>
 
                     <InfoDisplay :value="pickup?.address" label="Address"/>
 
@@ -152,6 +160,10 @@ watch(
                     <InfoDisplay :value="hbl?.consignee_contact" label="Contact"/>
 
                     <InfoDisplay :value="hbl?.consignee_nic" label="Nic/PP No"/>
+
+                    <InfoDisplay :value="hbl?.consignee_additional_mobile_number" label="Additional Contact Number"/>
+
+                    <InfoDisplay :value="hbl?.consignee_whatsapp_number" label="Whatsapp Number"/>
 
                 </div>
             </div>

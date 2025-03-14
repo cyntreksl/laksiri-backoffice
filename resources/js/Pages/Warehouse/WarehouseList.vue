@@ -43,6 +43,11 @@ const props = defineProps({
         default: () => {
         },
     },
+    warehouses: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const showFilters = ref(false);
@@ -60,6 +65,8 @@ const filters = reactive({
     officers: {},
     cargoMode: ["Air Cargo", "Sea Cargo"],
     paymentStatus: [],
+    warehouse: props.warehouses.map(warehouse => warehouse.name),
+    hblType: ["UPB", "Gift", "Door to Door"],
 });
 
 const data = reactive({
@@ -78,6 +85,7 @@ const data = reactive({
         is_hold: true,
         status: true,
         zone: true,
+        packages_counts: true,
         actions: true,
     },
 });
@@ -318,6 +326,7 @@ const createColumns = () => [
             ]);
         }
     },
+    {name: "Packages", hidden: !data.columnVisibility.packages_counts},
     {
         name: "Actions",
         hidden: !data.columnVisibility.actions,
@@ -671,6 +680,8 @@ const resetFilter = () => {
     filters.drivers = {};
     filters.officers = {};
     filters.cargoMode = ["Air Cargo", "Sea Cargo"];
+    filters.hblType = ["UPB", "Gift", "Door to Door"];
+    filters.warehouse = props.warehouses.map(warehouse => warehouse.name);
     filters.paymentStatus = [];
     applyFilters();
 };
@@ -891,6 +902,26 @@ const shipIcon = ref(`
                     </span>
                                         {{ mode }}
                                     </div>
+
+                                    <div
+                                        v-for="(type, index) in filters.hblType"
+                                        v-if="filters.hblType"
+                                        :key="index"
+                                        class="mb-1 badge bg-fuchsia-600 text-white dark:bg-fuchsia-600 ml-2"
+                                    >
+                                        {{ type }}
+                                    </div>
+
+                                    <div
+                                        v-for="(
+                                            item, index
+                                        ) in filters.warehouse"
+                                        v-if="filters.warehouse"
+                                        :key="index"
+                                        class="mb-1 badge bg-pink-600 text-white dark:bg-pink-600 ml-2"
+                                    >
+                                        {{ item }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1005,6 +1036,46 @@ const shipIcon = ref(`
                         value="Sea Cargo"
                     />
                     <div v-html="shipIcon"></div>
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="HBL Type"/>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch v-model="filters.hblType" label="UPB" value="UPB"/>
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch
+                        v-model="filters.hblType"
+                        label="Gift"
+                        value="Gift"
+                    />
+                </label>
+
+                <label class="inline-flex items-center space-x-2 mt-2">
+                    <Switch
+                        v-model="filters.hblType"
+                        label="Door to Door"
+                        value="Door to Door"
+                    />
+                </label>
+
+                <FilterBorder/>
+
+                <FilterHeader value="Warehouse"/>
+
+                <label
+                    v-for="warehouse in warehouses"
+                    :key="warehouse.id"
+                    class="inline-flex items-center space-x-2 mt-2"
+                >
+                    <Switch
+                        v-model="filters.warehouse"
+                        :label="warehouse.name"
+                        :value="warehouse.name"
+                    />
                 </label>
 
                 <FilterBorder/>
