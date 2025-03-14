@@ -9,11 +9,15 @@ use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\CourierAgentRepositoryInterface;
 use App\Interfaces\CourierRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
+use App\Models\Courier;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CourierController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
         private readonly CountryRepositoryInterface $countryRepository,
@@ -66,15 +70,15 @@ class CourierController extends Controller
      */
     public function store(StoreCourierRequest $request)
     {
-        $courier = $this->CourierRepository->storeCourier($request->all());
+        $this->CourierRepository->storeCourier($request->all());
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function changeCourierStatus(Request $request)
     {
-        //
+        $this->CourierRepository->changeStatus($request['couriers'], $request['status']);
     }
 
     /**
@@ -96,8 +100,10 @@ class CourierController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Courier $courier)
     {
-        //
+        $this->authorize('courier.delete');
+
+        $this->CourierRepository->deleteCourier($courier);
     }
 }
