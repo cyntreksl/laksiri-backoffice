@@ -101,9 +101,9 @@ definitions:
 
     - step: &frontend
         name: Build Frontend Assets
-        image: node:16.18.1
+        image: node:18
         script:
-          - npm ci --legacy-peer-deps
+          - npm ci
           - npm run build
         artifacts:
           - public/build/assets/*
