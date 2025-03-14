@@ -119,30 +119,31 @@
                 <th colspan="1">
 
                 </th>
-                <th colspan="7" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">
+                <th colspan="4" style="font-family: 'Times New Roman',fantasy; font-size: 12px; border-right: 0">
                     DATE: <?php echo date('d/m/Y'); ?>
-                    <span style="font-family: 'Times New Roman',fantasy; font-size: 12px;">                                
-                                                                
-                                                                   {{$container?->reference}} </span>
+                    <span style="font-family: 'Times New Roman',fantasy; font-size: 12px; text-align: right"> SHIPMENT NO.: {{$container?->reference}} </span>
+                </th>
+                <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 12px; text-align: right; border-left: 0">
+                    SHIPMENT NO.: {{$container?->reference}}
                 </th>
             </tr>
 
             <tr>
                 <th colspan="10" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">
-                    SHIPPER : {{$settings?->invoice_header_title}}, {{$settings?->invoice_header_address}}.
+                    SHIPPER         : {{$settings?->invoice_header_title}}, {{$settings?->invoice_header_address}}.
                     TEL: {{$settings?->invoice_header_telephone}} <br>
-                    CONSIGNEE: LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA <br>
-                    NOTIFY : LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94
+                    CONSIGNEE : LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA <br>
+                    NOTIFY           : LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94
                     11-47722800
                 </th>
             </tr>
 
             <tr>
-                <th colspan="3" style="height: 3px !important; font-size: 12px;">AWB NO {{$container?->awb_number}}</th>
-                <th rowspan="2" colspan="1" style="font-size: 12px;"><p> TOTAL VOLUME: </p></th>
-                <th rowspan="2" colspan="3" style="font-size: 12px;"> {{ number_format($total_vtotal, 2) }}</th>
-                <th rowspan="2" colspan="1" style="font-size: 12px;">TOTAL WEIGHT</th>
-                <th rowspan="2" colspan="2" style="font-size: 12px;"> {{ number_format($total_gtotal, 2) }}</th>
+                <th colspan="3" style="height: 3px !important; font-size: 12px; text-align: center">AWB NO {{$container?->awb_number}}</th>
+                <th rowspan="2" colspan="1" style="font-size: 12px; text-align: center"><p> TOTAL VOLUME: </p></th>
+                <th rowspan="2" colspan="3" style="font-size: 12px; text-align: center"> {{ number_format($total_vtotal, 2) }}</th>
+                <th rowspan="2" colspan="1" style="font-size: 12px; text-align: center">TOTAL WEIGHT</th>
+                <th rowspan="2" colspan="2" style="font-size: 12px; text-align: center"> {{ number_format($total_gtotal, 2) }}</th>
 
             </tr>
             <tr>
@@ -159,18 +160,7 @@
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 12px;">VOLUME CBM</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 12px;">GWHT</th>
                 <th style="font-family: 'Times New Roman',fantasy; font-size: 12px;">DESCRIPTION OF CARGO</th>
-                <th rowspan="2" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">REMARKS</th>
-            </tr>
-            <tr style="font-family: 'Times New Roman',fantasy; font-size: 10px; background-color: #D8D8D8  ;">
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">S.</th>
-                <th>HBL NO</th>
-                <th>SHIPPER</th>
-                <th>CONSIGNEES</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">CARGO TYPE</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">NO.OF</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">CMB</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">KGS</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 10px;">DESCRIPTION</th>
+                <th rowspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">REMARKS</th>
             </tr>
             </thead>
             <tbody>
@@ -185,23 +175,33 @@
                             {{ $package['quantity'] }}-{{ $package['package_type'] }}<br>
                         @endforeach
                     </td>
-                    <td style="vertical-align: top">
-                        @foreach ($item[9] as $package)
-                            {{ $package['quantity'] }}<br>
-                        @endforeach
+                    <td style="vertical-align: top; text-align: center">
+                        {{ $item[9]->sum('quantity') }}
                     </td>
-                    <td style="vertical-align: top">
-                        @foreach ($item[9] as $package)
-                            {{ $package['volume'] }}<br>
-                        @endforeach
+                    <td style="vertical-align: top; text-align: center">
+                        {{ $item[9]->sum('volume') }}
                     </td>
-                    <td style="vertical-align: top">
-                        @foreach ($item[9] as $package)
-                            {{ $package['weight'] }}<br>
-                        @endforeach
+                    <td style="vertical-align: top; text-align: center">
+                        {{ number_format((($total_gtotal/$total_vtotal)*$item[9]->sum('volume')),2) }}
                     </td>
                     <td>  PERSONAL<br>      EFFECT</td>
-                    <td style="text-align: center"><b>     {{$item[10]}}</b></td>
+                    <td style="text-align: center; vertical-align: auto">
+                        <b >{{ $item[11] == 'GIFT' ||  $item[11] == 'Gift'? 'GIFT CARGO' : '' }}</b>
+                        <br>
+                        @if($item[15] && $item[16])
+                            <b>
+                                DOHA & {{ $item[13] }}
+                                <br>
+                                PAID
+                            </b>
+                        @elseif($item[15])
+                            <b>
+                                PAID
+                            </b>
+                        @else
+                            <b>PLEASE COLLECT QAR AMOUNT/-</b>
+                        @endif
+                    </td>
 
                 </tr>
             @endforeach
