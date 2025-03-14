@@ -151,16 +151,16 @@
             </tr>
             @endif
             <tr style="font-family: 'Times New Roman',fantasy; font-size: 12px; background-color: #D8D8D8  ;">
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px;">SR NO</th>
-                <th>HBL NO</th>
-                <th> NAME OF SHIPPER</th>
-                <th>NAME OF CONSIGNEES</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px;">TYPE OF PKGS</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px;">NO.OF PKGS</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px;">VOLUME CBM</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px;">GWHT</th>
-                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px;">DESCRIPTION OF CARGO</th>
-                <th rowspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 12px;">REMARKS</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px; text-align: center">SR NO</th>
+                <th style="text-align: center">HBL NO</th>
+                <th style="text-align: center"> NAME OF SHIPPER</th>
+                <th style="text-align: center">NAME OF CONSIGNEES</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px; text-align: center">TYPE OF PKGS</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px; text-align: center">NO.OF PKGS</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px; text-align: center">VOLUME CBM</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px; text-align: center">GWHT</th>
+                <th style="font-family: 'Times New Roman',fantasy; font-size: 12px; text-align: center">DESCRIPTION OF CARGO</th>
+                <th rowspan="1" style="font-family: 'Times New Roman',fantasy; font-size: 12px; text-align: center">REMARKS</th>
             </tr>
             </thead>
             <tbody>
@@ -184,7 +184,7 @@
                     <td style="vertical-align: top; text-align: center">
                         {{ number_format((($total_gtotal/$total_vtotal)*$item[9]->sum('volume')),2) }}
                     </td>
-                    <td>  PERSONAL<br>      EFFECT</td>
+                    <td style="text-align: center">  PERSONAL<br>      EFFECT</td>
                     <td style="text-align: center; vertical-align: auto">
                         <b >{{ $item[11] == 'GIFT' ||  $item[11] == 'Gift'? 'GIFT CARGO' : '' }}</b>
                         <br>
