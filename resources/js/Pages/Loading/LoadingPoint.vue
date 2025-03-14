@@ -592,7 +592,7 @@ const reviewContainer = () => {
                                                                         <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                                         <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                                     </svg>
-                                                                    <span>Volume {{ element.volume.toFixed(3) }}</span>
+                                                                    <span>Volume {{ (element.volume ?? 0).toFixed(3) }}</span>
                                                                 </div>
 
                                                                 <div
@@ -609,7 +609,7 @@ const reviewContainer = () => {
                                                                         <path
                                                                             d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                                     </svg>
-                                                                    <span>Weight {{ element.weight.toFixed(2) }}</span>
+                                                                    <span>Weight {{ (element.weight ?? 0).toFixed(2) }}</span>
                                                                 </div>
 
                                                                 <div
@@ -792,7 +792,7 @@ const reviewContainer = () => {
                                                                         <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0" />
                                                                         <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0" />
                                                                     </svg>
-                                                                    <span>Volume {{ element.volume.toFixed(3) }}</span>
+                                                                    <span>Volume {{ (element.volume ?? 0).toFixed(3) }}</span>
                                                                 </div>
                                                                 <div
                                                                     class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15"
@@ -815,7 +815,7 @@ const reviewContainer = () => {
                                                                             d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"
                                                                         />
                                                                     </svg>
-                                                                    <span>Weight {{ element.weight.toFixed(2) }}</span>
+                                                                    <span>Weight {{ (element.weight ?? 0).toFixed(2) }}</span>
                                                                 </div>
                                                                 <div
                                                                     class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15"
@@ -935,7 +935,7 @@ const reviewContainer = () => {
                                                             <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                             <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                         </svg>
-                                                        <span>Volume {{ element.volume.toFixed(3) }}</span>
+                                                        <span>Volume {{( element.volume ?? 0).toFixed(3) }}</span>
                                                     </div>
 
                                                     <div
@@ -1094,7 +1094,7 @@ const reviewContainer = () => {
                                                                                 <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                                                 <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                                             </svg>
-                                                                            <span>Volume {{ element.volume.toFixed(3) }}</span>
+                                                                            <span>Volume {{ (element.volume ?? 0).toFixed(3) }}</span>
                                                                         </div>
 
                                                                         <div
@@ -1111,7 +1111,7 @@ const reviewContainer = () => {
                                                                                 <path
                                                                                     d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                                             </svg>
-                                                                            <span>Weight {{ element.weight.toFixed(2) }}</span>
+                                                                            <span>Weight {{ (element.weight ?? 0).toFixed(2) }}</span>
                                                                         </div>
 
                                                                         <div
@@ -1415,7 +1415,7 @@ const reviewContainer = () => {
                                                                         <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                                         <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                                     </svg>
-                                                                    <span>Volume {{ element.volume.toFixed(3) }}</span>
+                                                                    <span>Volume {{ (element.volume ?? 0).toFixed(3) }}</span>
                                                                 </div>
 
                                                                 <div
@@ -1432,7 +1432,7 @@ const reviewContainer = () => {
                                                                         <path
                                                                             d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                                     </svg>
-                                                                    <span>Weight {{ element.weight.toFixed(2) }}</span>
+                                                                    <span>Weight {{ (element.weight ?? 0).toFixed(2) }}</span>
                                                                 </div>
 
                                                                 <div
@@ -1615,7 +1615,7 @@ const reviewContainer = () => {
                                                                         <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0" />
                                                                         <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0" />
                                                                     </svg>
-                                                                    <span>Volume {{ element.volume.toFixed(3) }}</span>
+                                                                    <span>Volume {{ (element.volume ?? 0).toFixed(3) }}</span>
                                                                 </div>
                                                                 <div
                                                                     class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15"
@@ -1638,7 +1638,7 @@ const reviewContainer = () => {
                                                                             d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"
                                                                         />
                                                                     </svg>
-                                                                    <span>Weight {{ element.weight.toFixed(2) }}</span>
+                                                                    <span>Weight {{ (element.weight ?? 0).toFixed(2) }}</span>
                                                                 </div>
                                                                 <div
                                                                     class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15"
@@ -1758,7 +1758,7 @@ const reviewContainer = () => {
                                                             <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                             <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                         </svg>
-                                                        <span>Volume {{ element.volume.toFixed(3) }}</span>
+                                                        <span>Volume {{ (element.volume ?? 0).toFixed(3) }}</span>
                                                     </div>
 
                                                     <div
@@ -1775,7 +1775,7 @@ const reviewContainer = () => {
                                                             <path
                                                                 d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                         </svg>
-                                                        <span>Weight {{ element.weight.toFixed(2) }}</span>
+                                                        <span>Weight {{ (element.weight ?? 0).toFixed(2) }}</span>
                                                     </div>
 
                                                     <div
@@ -1917,7 +1917,7 @@ const reviewContainer = () => {
                                                                                 <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                                                 <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
                                                                             </svg>
-                                                                            <span>Volume {{ element.volume.toFixed(3) }}</span>
+                                                                            <span>Volume {{ (element.volume ?? 0).toFixed(3) }}</span>
                                                                         </div>
 
                                                                         <div
@@ -1934,7 +1934,7 @@ const reviewContainer = () => {
                                                                                 <path
                                                                                     d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                                             </svg>
-                                                                            <span>Weight {{ element.weight.toFixed(2) }}</span>
+                                                                            <span>Weight {{ (element.weight ?? 0).toFixed(2) }}</span>
                                                                         </div>
 
                                                                         <div

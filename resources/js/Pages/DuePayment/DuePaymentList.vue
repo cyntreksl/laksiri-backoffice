@@ -41,7 +41,7 @@ const fromDate = moment(new Date()).subtract(1, "month").format("YYYY-MM-DD");
 const toDate = moment(new Date()).format("YYYY-MM-DD");
 const wrapperRef = ref(null);
 let grid = null;
-const perPage = ref(10);
+const perPage = ref(100);
 const filters = reactive({
     fromDate: fromDate,
     toDate: toDate,
@@ -492,7 +492,10 @@ const getCashSettlementSummary = async (filters) => {
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content"),
             },
-            body: JSON.stringify(filters),
+            body: JSON.stringify({
+                ...filters,
+                type: "duepayments",
+            }),
         });
 
         if (!response.ok) {

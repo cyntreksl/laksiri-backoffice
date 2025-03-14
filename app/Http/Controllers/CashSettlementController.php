@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Branch\GetDestinationBranches;
 use App\Enum\HBLPaymentStatus;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Models\HBL;
@@ -30,6 +31,7 @@ class CashSettlementController extends Controller
             'drivers' => $drivers,
             'officers' => $officers,
             'paymentStatus' => HBLPaymentStatus::cases(),
+            'warehouses' => GetDestinationBranches::run(),
         ]);
     }
 
@@ -40,7 +42,7 @@ class CashSettlementController extends Controller
         $order = $request->input('order', 'id');
         $dir = $request->input('dir', 'asc');
         $search = $request->input('search', null);
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'hblType', 'warehouse']);
 
         return $this->cashSettlementRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
