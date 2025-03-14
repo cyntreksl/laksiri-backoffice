@@ -71,7 +71,7 @@ const splitContactNumber = (fullNumber) => {
                 return fullNumber.slice(code.length);
             }
         }
-    }
+    } else return "";
 }
 
 const isSameContactNumber = ref(props.hbl.contact_number === props.hbl.whatsapp_number);
@@ -177,7 +177,7 @@ const handleHBLUpdate = () => {
     }
 
     if(form.consignee_additional_mobile_number === additionalMobileCountryCode.value){
-        form.additional_mobile_number = "";
+        form.consignee_additional_mobile_number = "";
     }
     if(form.consignee_whatsapp_number === consigneeWhatsappNumberCountryCode.value){
         form.whatsapp_number = "";
