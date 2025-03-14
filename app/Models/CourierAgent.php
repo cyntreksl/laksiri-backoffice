@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\BranchScope;
 use App\Traits\HasFile;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+#[ScopedBy(BranchScope::class)]
 class CourierAgent extends Model
 {
     use HasFactory, HasFile, LogsActivity,SoftDeletes;
@@ -18,6 +21,7 @@ class CourierAgent extends Model
     protected $table = 'courier_agents';
 
     protected $fillable = [
+        'branch_id',
         'company_name',
         'website',
         'contact_number_1',

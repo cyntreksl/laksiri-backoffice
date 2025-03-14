@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreHBLRequest extends FormRequest
+class StoreCourierRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,29 +25,18 @@ class StoreHBLRequest extends FormRequest
         return [
             'cargo_type' => ['required'],
             'hbl_type' => ['required'],
-            //            'hbl' => ['required'],
+            'courier_agent' => ['required'],
             'email' => ['nullable', 'email', 'max:254'],
-            'hbl_name' => ['required'],
+            'name' => ['required'],
             'contact_number' => ['phone:INTERNATIONAL'],
-            'additional_mobile_number' => ['nullable', 'phone:INTERNATIONAL'],
-            'whatsapp_number' => ['required', 'phone:INTERNATIONAL'],
             'nic' => ['nullable'],
             'iq_number' => ['nullable'],
             'address' => ['nullable'],
             'consignee_name' => ['required'],
             'consignee_nic' => ['required'],
             'consignee_contact' => ['required', 'phone:INTERNATIONAL'],
-            'consignee_additional_mobile_number' => ['nullable', 'phone:INTERNATIONAL'],
-            'consignee_whatsapp_number' => ['nullable', 'phone:INTERNATIONAL'],
             'consignee_address' => ['required'],
             'consignee_note' => ['nullable'],
-            'warehouse' => ['required'],
-            'freight_charge' => ['required', 'numeric'],
-            'bill_charge' => ['required', 'numeric'],
-            'other_charge' => ['required', 'numeric'],
-            'destination_charge' => ['required', 'numeric'],
-            'discount' => ['required', 'numeric'],
-            'paid_amount' => ['required', 'numeric', 'min:0'],
         ];
     }
 }

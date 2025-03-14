@@ -28,7 +28,7 @@ class UpdateHBLRequest extends FormRequest
             'email' => ['email', 'max:254', 'nullable'],
             'contact_number' => ['nullable'],
             'additional_mobile_number' => ['nullable', 'phone:INTERNATIONAL'],
-            'whatsapp_number' => ['nullable', 'phone:INTERNATIONAL'],
+            'whatsapp_number' => ['required', 'phone:INTERNATIONAL'],
             'nic' => ['nullable'],
             'iq_number' => ['nullable'],
             'address' => ['nullable'],
