@@ -4,10 +4,7 @@ import {computed, onMounted, reactive, ref} from "vue";
 import {Grid, h, html} from "gridjs";
 import Popper from "vue3-popper";
 import {Link, router, usePage} from "@inertiajs/vue3";
-import notification from "@/magics/notification.js";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import CreateDriverForm from "@/Pages/Driver/Partials/CreateDriverForm.vue";
-import DeleteDriverConfirmationModal from "@/Pages/Driver/Partials/DeleteDriverConfirmationModal.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
@@ -19,6 +16,7 @@ import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
+import DeleteCourierConfirmationModal from "@/Pages/Courier/Partials/DeleteCourierConfirmationModal.vue";
 
 defineProps({
     zones: {
@@ -46,6 +44,8 @@ const filters = reactive({
 
 const data = reactive({
     columnVisibility: {
+        select_couriers: true,
+        id: false,
         courier_number: true,
         name: true,
         email: false,
@@ -132,7 +132,38 @@ const initializeGrid = () => {
     grid.render(wrapperRef.value);
 };
 
+const selectedData = ref([]);
+
 const createColumns = () => [
+    {
+        name: "#",
+        sort: false,
+        hidden: !data.columnVisibility.select_couriers,
+        formatter: (_, row) => {
+            return h("input", {
+                type: "checkbox",
+                className:
+                    "form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent",
+                onChange: (event) => {
+                    const isChecked = event.target.checked;
+                    if (isChecked) {
+                        const rowData = row.cells.map((cell) => cell.data); // Extract data from cells array
+                        selectedData.value.push(rowData); // Push extracted data into selectedData
+                    } else {
+                        // Remove the specific row from selectedData (assuming uniqueness of rows)
+                        const index = selectedData.value.findIndex((selectedRow) => {
+                            const rowData = row.cells.map((cell) => cell.data);
+                            return JSON.stringify(selectedRow) === JSON.stringify(rowData);
+                        });
+                        if (index !== -1) {
+                            selectedData.value.splice(index, 1);
+                        }
+                    }
+                },
+            });
+        },
+    },
+    { name: "ID", hidden: !data.columnVisibility.id },
     { name: "Courier Number", hidden: !data.columnVisibility.courier_number },
     { name: "Name", hidden: !data.columnVisibility.name },
     { name: "Email", hidden: !data.columnVisibility.email, sort: false },
@@ -150,8 +181,8 @@ const createColumns = () => [
         name: "Cargo Type",
         hidden: !data.columnVisibility.cargo_type,
         sort: false,
-        formatter: (_, row) =>
-            row.cells[13].data == "Sea Cargo"
+        formatter: (cell, row) =>
+            cell == "Sea Cargo"
                 ? h(
                     "span",
                     {className: "flex"},
@@ -189,9 +220,9 @@ const createColumns = () => [
                             }),
                         ]
                     ),
-                    row.cells[13].data
+                    cell
                 )
-                : row.cells[13].data == "Air Cargo"
+                : cell == "Air Cargo"
                     ? h("span", {className: "flex space-x-2"}, [
                         h(
                             "svg",
@@ -218,9 +249,9 @@ const createColumns = () => [
                                 }),
                             ]
                         ),
-                        row.cells[13].data,
+                        cell,
                     ])
-                    : row.cells[13].data,
+                    : cell,
     },
     { name: "HBL Type", hidden: !data.columnVisibility.hbl_type  },
     {
@@ -246,7 +277,7 @@ const createColumns = () => [
                         {
                             className:
                                 "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25",
-                            href: route("users.drivers.edit", row.cells[0].data),
+                            // href: route("couriers.edit", row.cells[0].data),
                         },
                         [
                             h("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 512 512", class: "size-4.5", fill: "none" }, [
@@ -264,7 +295,7 @@ const createColumns = () => [
                         {
                             className:
                                 "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                            onClick: () => confirmDeleteDriver(row.cells[0].data),
+                            onClick: () => confirmDeleteCourier(row.cells[1].data),
                         },
                         [
                             h("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 448 512", class: "size-4.5", fill: "none" }, [
@@ -284,7 +315,7 @@ const createColumns = () => [
 
 const resolveStatus = (status) =>
     ({
-        ACTIVE: "badge bg-success/10 text-success dark:bg-success/15",
+        pending: "badge bg-success/10 text-success dark:bg-success/15",
         DEACTIVATE: "badge bg-error/10 text-error dark:bg-error/15",
         INACTIVE: "badge bg-warning/10 text-warning dark:bg-warning/15",
         INVITED: "badge bg-info/10 text-info dark:bg-info/15",
@@ -300,26 +331,26 @@ onMounted(() => {
     initializeGrid();
 });
 
-const showConfirmDeleteDriverModal = ref(false);
-const driverId = ref(null);
+const showConfirmDeleteCourierModal = ref(false);
+const courierId = ref(null);
 
-const confirmDeleteDriver = (id) => {
-    driverId.value = id;
-    showConfirmDeleteDriverModal.value = true;
+const confirmDeleteCourier = (id) => {
+    courierId.value = id;
+    showConfirmDeleteCourierModal.value = true;
 };
 
 const closeModal = () => {
-    showConfirmDeleteDriverModal.value = false;
+    showConfirmDeleteCourierModal.value = false;
 };
 
-const handleDeleteDriver = () => {
-    router.delete(route("users.drivers.destroy", driverId.value), {
+const handleDeleteCourier = () => {
+    router.delete(route("couriers.destroy", courierId.value), {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
-            push.success("Driver Deleted Successfully!");
-            driverId.value = null;
-            router.visit(route("users.drivers.index"), {only: ["users"]});
+            push.success("Courier Deleted Successfully!");
+            courierId.value = null;
+            router.visit(route("couriers.index"), {only: ["users"]});
         },
     });
 };
@@ -642,10 +673,10 @@ const exportURL = computed(() => {
             </div>
         </div>
 
-        <DeleteDriverConfirmationModal
-            :show="showConfirmDeleteDriverModal"
+        <DeleteCourierConfirmationModal
+            :show="showConfirmDeleteCourierModal"
             @close="closeModal"
-            @delete-driver="handleDeleteDriver"
+            @delete-courier="handleDeleteCourier"
         />
 
         <FilterDrawer :show="showFilters" @close="showFilters = false">

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Actions\Courier\CreateCourier;
 use App\Actions\Courier\CreateCourierPackages;
+use App\Actions\Courier\DeleteCourier;
 use App\Factory\Courier\FilterFactory;
 use App\Http\Resources\CourierCollection;
 use App\Interfaces\CourierRepositoryInterface;
@@ -53,5 +54,10 @@ class CourierRepository implements CourierRepositoryInterface, GridJsInterface
             ],
         ]);
 
+    }
+
+    public function deleteCourier(Courier $courier)
+    {
+        DeleteCourier::run($courier);
     }
 }

@@ -107,10 +107,18 @@ class HBL extends Model
 
     public function scopeCashSettlement(Builder $query): void
     {
-        $query->whereIn('system_status', [
-            self::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
-            self::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE,
-        ]);
+        if (request()->routeIs('back-office.duepayments.duePaymentList') || request()?->type == 'duepayments') {
+            $query->whereIn('system_status', [
+                self::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
+                self::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE,
+                self::SYSTEM_STATUS_CASH_RECEIVED,
+            ]);
+        } else {
+            $query->whereIn('system_status', [
+                self::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
+                self::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE,
+            ]);
+        }
     }
 
     public function status(): HasMany
