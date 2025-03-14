@@ -76,7 +76,9 @@ class LoadedContainerManifestExport
                 '',
                 '',
                 $warehouse,
-                ''
+                '',
+                false,
+                false,
             ];
         }
 
@@ -105,6 +107,8 @@ class LoadedContainerManifestExport
                 $hbl->other_charge,
                 $warehouse,
                 $hbl->iq_number,
+                $hbl->is_departure_charges_paid,
+                $hbl->is_destination_charges_paid,
             ];
         }
 

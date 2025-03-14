@@ -181,8 +181,7 @@
                     $totalWeight = collect($item[9])->sum('weight');
                     $packageCount = $item[9]->count() ? $item[9]->count() :  0;
 
-
-                    $hblweight = number_format(($total_gtotal / $total_vtotal * $totalVolume), 2);
+                    $hblweight = number_format((($total_gtotal / $total_vtotal) * $totalVolume), 2);
                 @endphp
                 <tr>
                     <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px;">{{ $serialNumber++ }}</td>
@@ -209,10 +208,20 @@
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['quantity'] : ' ' }}</td>
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['volume'] : ' '}}</td>
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['weight'] : ' ' }}</td>
-                    <td rowspan="1" style="font-size: 12px; text-align: center; border-top: 0; border-bottom: 0">
-                            @if (!empty($item[12]))
-                                <b>{{ $container?->port_of_loading . '&' . $container?->port_of_discharge }}</b> <br>
-                            @endif
+                    <td rowspan="{{ $packageCount > 4 ? $packageCount : 4 }}" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top">
+                        @if($item[15] && $item[16])
+                            <b>
+                                DOHA & {{ $item[13] }}
+                                <br>
+                                PAID
+                            </b>
+                        @elseif($item[15])
+                            <b>
+                                PAID
+                            </b>
+                        @else
+                            <b>PLEASE COLLECT QAR AMOUNT/-</b>
+                        @endif
                     </td>
                 </tr>
                 <tr>
@@ -221,9 +230,6 @@
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['quantity'] : ' ' }}</td>
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['volume'] : ' '}}</td>
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['weight'] : ' ' }}</td>
-                    <td rowspan="{{ $packageCount > 4 ? $packageCount - 1 : 3 }}" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top;">
-                        <b>{{ $item[10]}}</b>
-                    </td>
                 </tr>
                 <tr>
                     <td rowspan="{{ $packageCount > 4 ? $packageCount - 3 : 1 }}" style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0">{{ $item[4] }}</td>
