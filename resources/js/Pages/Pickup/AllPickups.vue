@@ -251,12 +251,10 @@ const confirmPickupDelete = (pickup) => {
             router.delete(route("pickups.destroy", selectedPickupID.value), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    closeModal();
                     push.success("Pickup record Deleted Successfully!");
-                    router.visit(route("pickups.index"), {only: ["pickups"]});
+                    router.visit(route("pickups.all"), {only: ["pickups"]});
                 },
                 onError: () => {
-                    closeModal();
                     push.error("Something went to wrong!");
                 },
             });
@@ -337,7 +335,7 @@ const confirmPickupRetry = (pickup) => {
                 preserveScroll: true,
                 onSuccess: () => {
                     push.success("Added into Pending Jobs!");
-                    router.visit(route("pickups.index"), {only: ["pickups"]});
+                    router.visit(route("pickups.all"), {only: ["pickups"]});
                 },
                 onError: () => {
                     push.error("Something went to wrong!");

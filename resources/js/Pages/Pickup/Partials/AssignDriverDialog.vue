@@ -42,7 +42,9 @@ const handleAssignDriver = () => {
         routeName = 'pickups.driver.assign';
     } else if(route().current() === 'call-center.hbls.door-to-door-list'){
         routeName = 'delivery.driver.assign';
-    }else {
+    } else if(route().current() === 'pickups.all'){
+        routeName = 'pickups.driver.assign';
+    } else {
         routeName = 'pickups.exceptions.driver.assign'
     }
 

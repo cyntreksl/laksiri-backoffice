@@ -270,12 +270,10 @@ const confirmPickupDelete = (pickup) => {
             router.delete(route("pickups.destroy", selectedPickupID.value), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    closeModal();
                     push.success("Pickup record Deleted Successfully!");
                     router.visit(route("pickups.index"), {only: ["pickups"]});
                 },
                 onError: () => {
-                    closeModal();
                     push.error("Something went to wrong!");
                 },
             });
