@@ -29,9 +29,6 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
 
     public function storePickup(array $data)
     {
-        // assign location longitude, latitude and name
-
-        // store pickup
         return CreatePickUp::run($data);
     }
 

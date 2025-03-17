@@ -27,7 +27,6 @@ class CreatePickUp
             $package_types = isset($data['package_types']) ? json_encode($data['package_types']) : json_encode($data['note_type']);
         }
 
-        //        try {
         $pickup = PickUp::create([
             'reference' => GeneratePickupReferenceNumber::run(GetUserCurrentBranch::run()['branchName']),
             'branch_id' => GetUserCurrentBranch::run()['branchId'],
@@ -54,9 +53,5 @@ class CreatePickUp
         $pickup->addStatus('Pickup Created');
 
         return $pickup;
-        //        } catch (\Exception $e) {
-        //            Log::error($e->getMessage());
-        //            throw new \Exception('Failed to create pickup');
-        //        }
     }
 }

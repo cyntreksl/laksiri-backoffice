@@ -134,10 +134,6 @@ const handlePickupCreate = () => {
 
     form.pickup_date = moment(form.pickup_date).format("YYYY-MM-DD");
 
-    form.pickup_time_start = moment(form.pickup_time_start).format("HH:mm");
-
-    form.pickup_time_end = moment(form.pickup_time_end).format("HH:mm");
-
     form.post(route("pickups.store"), {
         onSuccess: () => {
             form.reset();
@@ -314,7 +310,7 @@ watch(isUrgentPickup, (newValue) => {
 
                             <div>
                                 <InputLabel value="Pickup Date"/>
-                                <DatePicker v-model="form.pickup_date" class="w-full mt-1" date-format="yy-mm-dd" inline @update:modelValue="adjustDate"/>
+                                <DatePicker v-model="form.pickup_date" class="w-full mt-1" date-format="yy-mm-dd" inline />
                                 <InputError :message="form.errors.pickup_date"/>
                             </div>
                             </div>
@@ -322,13 +318,31 @@ watch(isUrgentPickup, (newValue) => {
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <InputLabel value="Start Pickup Time"/>
-                                        <DatePicker v-model="form.pickup_time_start" class="mt-1" fluid hour-format="24" inline time-only/>
+                                        <label class="relative flex">
+                                            <input
+                                                v-model="form.pickup_time_start"
+                                                class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                                placeholder="Choose time..."
+                                                type="text"
+                                                x-init="$el._x_flatpickr = flatpickr($el,{enableTime: true,noCalendar: true,dateFormat: 'H:i',time_24hr:true})"
+                                            />
+                                            <span class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent ti ti-clock text-lg" />
+                                        </label>
                                         <InputError :message="form.errors.pickup_time_start"/>
                                     </div>
 
                                     <div>
                                         <InputLabel value="End Pickup Time"/>
-                                        <DatePicker v-model="form.pickup_time_end" class="mt-1" fluid hour-format="24" inline time-only/>
+                                        <label class="relative flex">
+                                            <input
+                                                v-model="form.pickup_time_end"
+                                                class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+                                                placeholder="Choose time..."
+                                                type="text"
+                                                x-init="$el._x_flatpickr = flatpickr($el,{enableTime: true,noCalendar: true,dateFormat: 'H:i',time_24hr:true})"
+                                            />
+                                            <span class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent ti ti-clock text-lg" />
+                                        </label>
                                         <InputError :message="form.errors.pickup_time_end"/>
                                     </div>
                                 </div>
