@@ -4,7 +4,6 @@ namespace App\Actions\PickUps;
 
 use App\Actions\User\GetUserCurrentBranch;
 use App\Models\PickUp;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Lorisleiva\Actions\Concerns\AsAction;
 
