@@ -101,7 +101,7 @@ definitions:
 
     - step: &frontend
         name: Build Frontend Assets
-        image: node:16.18.1
+        image: node:20.17.0
         script:
           - npm ci
           - npm run build
