@@ -1,24 +1,31 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {computed, onMounted, reactive, ref} from "vue";
-import {Grid, h, html} from "gridjs";
+import {onMounted, ref, watch} from "vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import moment from "moment";
-import FilterDrawer from "@/Components/FilterDrawer.vue";
-import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import DatePicker from "@/Components/DatePicker.vue";
-import FilterBorder from "@/Components/FilterBorder.vue";
-import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
-import Checkbox from "@/Components/Checkbox.vue";
-import Switch from "@/Components/Switch.vue";
-import FilterHeader from "@/Components/FilterHeader.vue";
-import {Link, router, usePage} from "@inertiajs/vue3";
+import FloatLabel from 'primevue/floatlabel';
+import {useConfirm} from "primevue/useconfirm";
+import Select from 'primevue/select';
+import Chip from 'primevue/chip';
+import InputText from 'primevue/inputtext';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+import Card from "primevue/card";
+import ContextMenu from 'primevue/contextmenu';
+import Panel from 'primevue/panel';
+import DatePicker from 'primevue/datepicker';
+import Button from "primevue/button";
+import Tag from 'primevue/tag';
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import axios from "axios";
+import {FilterMatchMode} from '@primevue/core/api';
+import {debounce} from "lodash";
+import {router, Link, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
-import DeletePickupConfirmationModal from "@/Pages/Pickup/Partials/DeletePickupConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-import RetryPickupConfirmationModal from "@/Pages/Pickup/Partials/RetryPickupConfirmationModal.vue";
-import NoRecordsFound from "@/Components/NoRecordsFound.vue";
+import moment from "moment";
+import AssignDriverDialog from "@/Pages/Pickup/Partials/AssignDriverDialog.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const props = defineProps({
     drivers: {
@@ -38,1216 +45,521 @@ const props = defineProps({
     },
 });
 
-const wrapperRef = ref(null);
-let grid = null;
-const isData = ref(false)
-const perPage = ref(100);
-
-const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(12, "months").format("YYYY-MM-DD");
-const toDate = moment(new Date()).format("YYYY-MM-DD");
-
-const filters = reactive({
-    fromDate: fromDate,
-    toDate: toDate,
-    cargoMode: ["Air Cargo", "Sea Cargo"],
-    createdBy: "",
-    driverBy: "",
-    status: "",
-    zoneBy: "",
-});
-
-const data = reactive({
-    columnVisibility: {
-        reference: true,
-        name: true,
-        email: false,
-        address: true,
-        contact_number: true,
-        pickup_date: true,
-        cargo_type: true,
-        driver: true,
-        pickup_type: true,
-        packages: false,
-        exception_note: true,
-        status: true,
-        actions: true,
-    },
-});
-
 const baseUrl = ref("/pickup-export-list");
-const totalPickups = ref(0);
+const loading = ref(true);
+const pickups = ref([]);
+const totalRecords = ref(0);
+const perPage = ref(100);
+const currentPage = ref(1);
+const showConfirmViewPickupModal = ref(false);
+const cm = ref();
+const selectedPickup = ref([]);
+const selectedPickups = ref([]);
+const selectedPickupID = ref(null);
+const confirm = useConfirm();
+const showAssignDriverDialog = ref(false);
+const dt = ref();
 
-const toggleColumnVisibility = (columnName) => {
-    data.columnVisibility[columnName] = !data.columnVisibility[columnName];
-    updateGridConfig();
-    grid.forceRender();
+const filters = ref({
+    global: {value: null, matchMode: FilterMatchMode.CONTAINS},
+    cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
+    driver: {value: null, matchMode: FilterMatchMode.EQUALS},
+    user: {value: null, matchMode: FilterMatchMode.EQUALS},
+    zone: {value: null, matchMode: FilterMatchMode.EQUALS},
+});
+
+const menuModel = ref([
+    {
+        label: 'View',
+        icon: 'pi pi-fw pi-search',
+        command: () => confirmViewPickup(selectedPickup),
+        disabled: !usePage().props.user.permissions.includes('pickups.show'),
+    },
+    {
+        label: 'Edit',
+        icon: 'pi pi-fw pi-pencil',
+        command: () => router.visit(route("pickups.edit", selectedPickup.value.id)),
+        disabled: !usePage().props.user.permissions.includes('pickups.edit'),
+    },
+    {
+        label: 'Retry',
+        icon: 'pi pi-fw pi-refresh',
+        command: () => confirmPickupRetry(selectedPickup),
+        disabled: !usePage().props.user.permissions.includes('pickups.retry'),
+    },
+    {
+        label: 'Delete',
+        icon: 'pi pi-fw pi-times',
+        command: () => confirmPickupDelete(selectedPickup),
+        disabled: !usePage().props.user.permissions.includes('pickups.delete'),
+    },
+]);
+
+const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
+const fromDate = ref(moment(new Date()).subtract(12, "months").toISOString().split("T")[0]);
+const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
+
+const fetchPickups = async (page = 1, search = "", sortField = 'id', sortOrder = 1) => {
+    loading.value = true;
+    try {
+        const response = await axios.get(baseUrl.value, {
+            params: {
+                page,
+                per_page: perPage.value,
+                search,
+                cargoMode: filters.value.cargo_type.value || "",
+                sort_field: sortField,
+                sort_order: sortOrder === 1 ? "asc" : "desc",
+                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+                toDate: moment(toDate.value).format("YYYY-MM-DD"),
+                createdBy: filters.value.user.value || "",
+                zoneBy: filters.value.zone.value || "",
+                driverBy: filters.value.driver.value || [],
+            }
+        });
+        pickups.value = response.data.data;
+        totalRecords.value = response.data.meta.total; // Correct total count
+        currentPage.value = response.data.meta.current_page; // Correct current page
+    } catch (error) {
+        console.error("Error fetching Pickups:", error);
+    } finally {
+        loading.value = false;
+    }
 };
 
-const initializeGrid = () => {
-    const visibleColumns = Object.keys(data.columnVisibility);
+const debouncedFetchPickups = debounce((searchValue) => {
+    fetchPickups(1, searchValue);
+}, 1000);
 
-    grid = new Grid({
-        columns: createColumns(),
-        search: {
-            debounceTimeout: 1000,
-            server: {
-                url: (prev, keyword) => `${prev}&search=${keyword}`,
-            },
-        },
-        sort: {
-            multiColumn: false,
-            server: {
-                url: (prev, columns) => {
-                    if (!columns.length) return prev;
-                    const col = columns[0];
-                    const dir = col.direction === 1 ? "asc" : "desc";
-                    let colName = visibleColumns[col.index];
-                    return `${prev}&order=${colName}&dir=${dir}`;
-                },
-            },
-        },
-        pagination: {
-            limit: perPage.value,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
-        },
-        server: {
-            url: constructUrl(),
-            then: (data) =>
-                data.data.map((item) => {
-                    const row = [];
-                    row.push({id: item.id});
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                }),
-            total: (response) => {
-                if (response && response.meta) {
-                    totalPickups.value = response.meta.total;
-                    response.meta.total > 0 ? isData.value = true : isData.value = false;
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
+watch(() => filters.value.global.value, (newValue) => {
+    if (newValue !== null) {
+        debouncedFetchPickups(newValue);
+    }
+});
 
-    grid.render(wrapperRef.value);
+watch(() => filters.value.cargo_type.value, (newValue) => {
+    fetchPickups(1, filters.value.global.value);
+});
+
+watch(() => filters.value.driver.value, (newValue) => {
+    fetchPickups(1, filters.value.global.value);
+});
+
+watch(() => filters.value.user.value, (newValue) => {
+    fetchPickups(1, filters.value.global.value);
+});
+
+watch(() => filters.value.zone.value, (newValue) => {
+    fetchPickups(1, filters.value.global.value);
+});
+
+watch(() => fromDate.value, (newValue) => {
+    fetchPickups(1, filters.value.global.value);
+});
+
+watch(() => toDate.value, (newValue) => {
+    fetchPickups(1, filters.value.global.value);
+});
+
+const onPageChange = (event) => {
+    currentPage.value = event.page + 1;
+    fetchPickups(currentPage.value);
 };
 
-const selectedData = ref([]);
-
-const createColumns = () => [
-    {
-        name: "#",
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-                    'style': 'background-color: #e0f2fe',
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-                    'style': 'background-color: #ffe4e6',
-                };
-            }
-        },
-        formatter: (_, row) => {
-            return h("input", {
-                type: "checkbox",
-                className:
-                    "form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent",
-                onChange: (event) => {
-                    const isChecked = event.target.checked;
-                    if (isChecked) {
-                        const rowData = row.cells.map((cell) => cell.data); // Extract data from cells array
-                        selectedData.value.push(rowData); // Push extracted data into selectedData
-                    } else {
-                        // Remove the specific row from selectedData (assuming uniqueness of rows)
-                        const index = selectedData.value.findIndex((selectedRow) => {
-                            const rowData = row.cells.map((cell) => cell.data);
-                            return JSON.stringify(selectedRow) === JSON.stringify(rowData);
-                        });
-                        if (index !== -1) {
-                            selectedData.value.splice(index, 1);
-                        }
-                    }
-                },
-            });
-        },
-    },
-    {
-        name: "Reference",
-        hidden: !data.columnVisibility.reference,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        },
-        formatter: (cell, row) => {
-            return html(`<span>${cell}</span> <br> <span style="color: dodgerblue">${row.cells[12].data}</span>`)
-        }
-    },
-    {
-        name: "Name",
-        hidden: !data.columnVisibility.name,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        },
-        formatter: (cell) => {
-            if (!cell) return '';
-            let value = cell.toString();
-
-            if (value.length < 20) {
-                return html(`<a style="text-decoration: underline; color: blue" href="pickups/get-pending-jobs-by-user/${cell}">${value}</a>`);
-            }
-
-            return html(`<a style="text-decoration: underline; color: blue" href="pickups/get-pending-jobs-by-user/${cell}">${value.substring(0, 20) + '...'}</a>`);
-        }
-    },
-    {
-        name: "Email",
-        hidden: !data.columnVisibility.email,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        },
-    },
-    {
-        name: "Address",
-        hidden: !data.columnVisibility.address,
-        sort: false,
-        formatter: (cell) => {
-            if (!cell) return '';
-            let value = cell.toString();
-
-            if (value.length < 20) {
-                return value;
-            }
-            return value.substring(0, 20) + '...';
-        },
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        },
-    },
-    {
-        name: "Contact",
-        hidden: !data.columnVisibility.contact_number,
-        sort: true,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        },
-        formatter: (cell) => {
-            if (!cell) return '';
-
-            return html(`<a style="text-decoration: underline; color: blue" href="pickups/get-pending-jobs-by-user/${cell}">${cell}</a>`);
-        }
-    },
-    {
-        name: "Pickup Date",
-        hidden: !data.columnVisibility.pickup_date,
-        sort: true,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        }
-    },
-    {
-        name: "Cargo Mode",
-        sort: false,
-        hidden: !data.columnVisibility.cargo_type,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        },
-        formatter: (_, row) =>
-            row.cells[7].data == "Sea Cargo"
-                ? h(
-                    "span",
-                    {className: "flex"},
-                    h(
-                        "svg",
-                        {
-                            xmlns: "http://www.w3.org/2000/svg",
-                            viewBox: "0 0 24 24",
-                            class:
-                                "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
-                            fill: "none",
-                            height: 24,
-                            width: 24,
-                            stroke: "currentColor",
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                            strokeWidth: 2,
-                        },
-                        [
-                            h("path", {
-                                stroke: "none",
-                                d: "M0 0h24v24H0z",
-                                fill: "none",
-                            }),
-                            h("path", {
-                                d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
-                            }),
-                            h("path", {
-                                d: "M4 18l-1 -5h18l-2 4",
-                            }),
-                            h("path", {
-                                d: "M5 13v-6h8l4 6",
-                            }),
-                            h("path", {
-                                d: "M7 7v-4h-1",
-                            }),
-                        ]
-                    ),
-                    row.cells[7].data
-                )
-                : row.cells[7].data == "Air Cargo"
-                    ? h("span", {className: "flex space-x-2"}, [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class:
-                                    "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                                strokeWidth: 2,
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
-                                }),
-                            ]
-                        ),
-                        row.cells[7].data,
-                    ])
-                    : row.cells[7].data,
-    },
-
-    {
-        name: "Driver",
-        hidden: !data.columnVisibility.driver,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        },
-        formatter: (cell) => {
-            return cell
-                ? cell !== '-' && html(
-                `<div class="flex item-center"><svg xmlns="http://www.w3.org/2000/svg"  width="18"  height="18"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg> ${cell} </div>`
-            )
-                : null;
-        },
-    },
-    {
-        name: "Pickup Type",
-        sort: false,
-        hidden: !data.columnVisibility.pickup_type,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        }
-    },
-    {
-        name: "Packages",
-        hidden: !data.columnVisibility.packages,
-        sort: false,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        },
-        formatter: (cell) => {
-            if (!cell) return '';
-            let value = cell.toString();
-
-            if (value.length < 20) {
-                return value;
-            }
-            return value.substring(0, 20) + '...';
-        }
-    },
-    {
-        name: "Exception",
-        hidden: !data.columnVisibility.exception_note,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        },
-        sort: false,
-        formatter: (cell) => {
-            return cell
-                ? cell !== '-' && html(
-                `<div class="badge space-x-2.5 bg-red-100 text-red-500 dark:bg-red-100"> ${cell}</div>`
-            )
-                : null;
-        }
-    },
-    {
-        name: "Status",
-        hidden: !data.columnVisibility.status,
-        attributes: (cell, row) => {
-            // add these attributes to the td elements only
-            if (cell && row.cells[8].data && row.cells[8].data !== '-') {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-
-            if (cell && (row.cells[6].data < moment().format('YYYY-MM-DD'))) {
-                return {
-                    'data-cell-content': cell,
-
-                };
-            }
-        },
-        sort: false,
-        formatter: (cell) => {
-            return cell
-                ? cell !== '-' && html(
-                `<div class="badge space-x-2.5 bg-blue-100 text-blue-500 dark:bg-blue-100"> ${cell}</div>`
-            )
-                : null;
-        }
-    },
-    {
-        name: "Actions",
-        sort: false,
-        hidden: !data.columnVisibility.actions,
-        formatter: (_, row) => {
-            return h("div", {className: "flex space-x-2"}, [
-                usePage().props.user.permissions.includes('pickups.show') ?
-                    h(
-                        "a",
-                        {
-                            className:
-                                "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                            onClick: () => confirmViewPickup(row.cells[0].data?.id),
-                            "x-tooltip..placement.bottom.primary": "'View Pickup'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                    }),
-                                    h("path", {
-                                        d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
-                usePage().props.user.permissions.includes('pickups.edit') ?
-                    h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
-                            onClick: () => router.visit(route("pickups.edit", row.cells[0].data?.id)),
-                            "x-tooltip..placement.bottom.primary": "'Edit Pending Job'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-edit",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1",
-                                    }),
-                                    h("path", {
-                                        d: "M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z",
-                                    }),
-                                    h("path", {
-                                        d: "M16 5l3 3",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    )
-                    : null,
-                usePage().props.user.permissions.includes('pickups.retry') ?
-                    row.cells[11].data ?
-                        h(
-                            "button",
-                            {
-                                className:
-                                    "btn size-8 p-0 text-secondary hover:bg-secondary/20 focus:bg-secondary/20 active:bg-secondary/25 mr-2",
-                                onClick: () => confirmRetry(row.cells[0].data?.id),
-                                "x-tooltip..placement.bottom.primary": "'Retry'",
-                            },
-                            [
-                                h(
-                                    "svg",
-                                    {
-                                        xmlns: "http://www.w3.org/2000/svg",
-                                        viewBox: "0 0 24 24",
-                                        class: "size-4.5",
-                                        fill: "none",
-                                        stroke: "currentColor",
-                                        strokeWidth: 1.5,
-                                    },
-                                    [
-                                        h("path", {
-                                            strokeLinecap: "round",
-                                            strokeLinejoin: "round",
-                                            d: "M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99",
-                                        }),
-                                    ]
-                                ),
-                            ]
-                        ) : null
-                    : null,
-                usePage().props.user.permissions.includes('pickups.delete') ?
-                    h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                            onClick: () => confirmDeletePickup(row.cells[0].data?.id),
-                            "x-tooltip..placement.bottom.error": "'Delete HBL'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class:
-                                        "icon icon-tabler icons-tabler-outline icon-tabler-trash",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M4 7l16 0",
-                                    }),
-                                    h("path", {
-                                        d: "M10 11l0 6",
-                                    }),
-                                    h("path", {
-                                        d: "M14 11l0 6",
-                                    }),
-                                    h("path", {
-                                        d: "M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12",
-                                    }),
-                                    h("path", {
-                                        d: "M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
-            ]);
-        },
-    },
-];
-
-const updateGridConfig = () => {
-    grid.updateConfig({
-        columns: createColumns(),
-    });
+const onSort = (event) => {
+    fetchPickups(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
+
+
+const rowClass = (data) => {
+    if (data.driver !== '-') {
+        return '!bg-blue-100'
+    }
+
+    if (data.pickup_date < moment().format('YYYY-MM-DD')) {
+        return '!bg-red-100'
+    }
+}
 
 onMounted(() => {
-    initializeGrid();
+    fetchPickups();
 });
 
-const constructUrl = () => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
-        }
-    }
-    return baseUrl.value + "?" + params.toString();
+const onRowContextMenu = (event) => {
+    cm.value.show(event.originalEvent);
 };
 
-const applyFilters = () => {
-    showFilters.value = false;
-    const newUrl = constructUrl();
-    const visibleColumns = Object.keys(data.columnVisibility);
-    grid.updateConfig({
-        server: {
-            url: newUrl,
-            then: (data) => {
-                totalPickups.value = data.meta.total;
-                return data.data.map((item) => {
-                    const row = [];
-                    row.push({id: item.id});
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                })
-            },
-            total: (response) => {
-                if (response && response.meta) {
-                    response.meta.total > 0 ? isData.value = true : isData.value = false;
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
-
-    grid.forceRender();
-};
-const showConfirmAssignDriverModal = ref(false);
-const isDataEmpty = computed(() => selectedData.value.length === 0);
-const countOfSelectedData = computed(() => selectedData.value.length);
-const idList = ref([]);
-
-const confirmAssignDriver = () => {
-    idList.value = selectedData.value.map((item) => item[0]);
-    showConfirmAssignDriverModal.value = true;
-};
-
-const pickupId = ref(null);
-const showConfirmDeletePickupModal = ref(false);
-
-const closeModal = () => {
-    showConfirmDeletePickupModal.value = false;
-    showConfirmAssignDriverModal.value = false;
-    pickupId.value = null;
-    idList.value = [];
-};
-
-const confirmDeletePickup = (id) => {
-    pickupId.value = id;
-    showConfirmDeletePickupModal.value = true;
-};
-
-const handleDeletePickup = () => {
-    router.delete(route("pickups.destroy", pickupId.value), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            push.success("Pickup record Deleted Successfully!");
-            router.visit(route("pickups.index"), {only: ["pickups"]});
-        },
-        onError: () => {
-            closeModal();
-            push.error("Something went to wrong!");
-        },
-    });
-};
-
-const resetFilter = () => {
-    filters.fromDate = fromDate;
-    filters.toDate = toDate;
-    filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
-    filters.createdBy = "";
-    filters.driverBy = "";
-    filters.statusBy = "";
-    filters.zoneBy = "";
-    applyFilters();
-};
-
-const exportURL = computed(() => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
-        }
-    }
-    return '/pickups/list/export' + "?" + params.toString();
-});
-
-const showConfirmViewPickupModal = ref(false);
-
-const confirmViewPickup = async (id) => {
-    pickupId.value = id;
+const confirmViewPickup = (hbl) => {
+    selectedPickupID.value = hbl.value.id;
     showConfirmViewPickupModal.value = true;
 };
 
-const closeViewModal = () => {
+const closeModal = () => {
     showConfirmViewPickupModal.value = false;
-    pickupId.value = null;
+    selectedPickupID.value = null;
 };
 
-const showConfirmRetryModal = ref(false);
-
-const confirmRetry = async (id) => {
-    pickupId.value = id;
-    showConfirmRetryModal.value = true;
+const clearFilter = () => {
+    filters.value = {
+        global: {value: null, matchMode: FilterMatchMode.CONTAINS},
+        cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
+        driver: {value: [], matchMode: FilterMatchMode.EQUALS},
+        user: {value: null, matchMode: FilterMatchMode.EQUALS},
+        zone: {value: null, matchMode: FilterMatchMode.EQUALS},
+    };
+    fetchPickups(currentPage.value);
 };
 
-const closeRetryModal = () => {
-    showConfirmRetryModal.value = false;
-    pickupId.value = null;
+const resolveCargoType = (pickup) => {
+    switch (pickup.cargo_type) {
+        case 'Sea Cargo':
+            return {
+                icon: "ti ti-sailboat",
+                color: "success",
+            };
+        case 'Air Cargo':
+            return {
+                icon: "ti ti-plane-tilt",
+                color: "info",
+            };
+        default:
+            return null;
+    }
 };
 
-const handlePerPageChange = (event) => {
-    perPage.value = parseInt(event.target.value);
+const exportCSV = () => {
+    dt.value.exportCSV();
+};
 
-    grid.updateConfig({
-        pagination: {
-            limit: perPage.value,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
+const confirmPickupDelete = (pickup) => {
+    selectedPickupID.value = pickup.value.id;
+    confirm.require({
+        message: 'Would you like to delete this pickup record?',
+        header: 'Delete Pickup?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
         },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            router.delete(route("pickups.destroy", selectedPickupID.value), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    closeModal();
+                    push.success("Pickup record Deleted Successfully!");
+                    router.visit(route("pickups.index"), {only: ["pickups"]});
+                },
+                onError: () => {
+                    closeModal();
+                    push.error("Something went to wrong!");
+                },
+            });
+            selectedPickupID.value = null;
+        },
+        reject: () => {
+            selectedPickupID.value = null;
+        }
     });
-
-    grid.forceRender()
 };
 
-const planeIcon = ref(`
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="15"
-  height="15"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  class="icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2"
->
-  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-  <path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" />
-</svg>
-`);
+const confirmPickupsDelete = () => {
+    const idList = selectedPickups.value.map((item) => item.id);
 
-const shipIcon = ref(`
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="15"
-  height="15"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
->
-  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-  <path d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1" />
-  <path d="M4 18l-1 -5h18l-2 4" />
-  <path d="M5 13v-6h8l4 6" />
-  <path d="M7 7v-4h-1" />
-</svg>
-`);
+    confirm.require({
+        message: 'Would you like to delete this pickup records?',
+        header: `${idList.length} Delete Pickups?`,
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            router.post(
+                route("pickups.delete"),
+                {
+                    pickupIds: idList,
+                },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success("Pickups Deleted Successfully!");
+                        const currentRoute = route().current();
+                        router.visit(route(currentRoute));
+                    },
+                    onError: () => {
+                        push.error("Something went to wrong!");
+                    },
+                }
+            );
+            selectedPickups.value = [];
+        },
+        reject: () => {
+            selectedPickups.value = [];
+        }
+    });
+};
+
+const closeAssignDriverModal = () => {
+    showAssignDriverDialog.value = false;
+    selectedPickups.value = [];
+};
+
+const confirmPickupRetry = (pickup) => {
+    selectedPickupID.value = pickup.value.id;
+    confirm.require({
+        message: 'Are you sure you want to Retry Job?',
+        header: 'Retry Pickup?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Retry',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.get(route("pickups.exceptions.retry", selectedPickupID.value), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("Added into Pending Jobs!");
+                    router.visit(route("pickups.index"), {only: ["pickups"]});
+                },
+                onError: () => {
+                    push.error("Something went to wrong!");
+                },
+            });
+            selectedPickupID.value = null;
+        },
+        reject: () => {
+            selectedPickupID.value = null;
+        }
+    });
+};
 </script>
 <template>
-    <AppLayout title="All Pickups">
-        <template #header>All Pickups</template>
+    <AppLayout title="Pending Pickups">
+        <template #header>Pending Pickups</template>
 
         <Breadcrumb/>
 
-        <div class="card mt-4">
-            <div>
-                <div class="flex items-center justify-between p-2">
-                    <div class="">
-                        <div class="flex items-center">
-                            <h2
-                                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                All Pickups
-                            </h2>
+        <div>
+            <Panel :collapsed="true" class="mt-5 !border-none" header="Advance Filters" toggleable>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="fromDate" class="w-full" date-format="yy-mm-dd" input-id="from-date"/>
+                        <label for="from-date">From Date</label>
+                    </FloatLabel>
 
-                            <div class="flex m-3">
-                                <select
-                                    class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    @change="handlePerPageChange">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                        </div>
-                        <br/>
-                        <div
-                            class="mr-4 cursor-pointer"
-                            x-tooltip.info.placement.bottom="'Applied Filters'"
-                        >
-                            Filter Options:
-                        </div>
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="toDate" class="w-full" date-format="yy-mm-dd" input-id="to-date"/>
+                        <label for="to-date">To Date</label>
+                    </FloatLabel>
 
-                        <div
-                            class="grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
-                        >
-                            <div class="flex space-x-px">
-                                <div>
-                                    <div
-                                        class="mb-1 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        <i class="mr-1 fas fa-calendar-alt"></i>
-                                        From Date
-                                    </div>
-                                    <div
-                                        class="tag badge bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.fromDate }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div
-                                        class="mb-1 ml-1 badge bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        <i class="mr-1 far fa-calendar-alt"></i>
-                                        To &nbsp;Date
-                                    </div>
-                                    <div
-                                        class="tag badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.toDate }}
-                                    </div>
-                                </div>
-                                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-                                    <div
-                                        v-for="(mode, index) in filters.cargoMode"
-                                        v-if="filters.cargoMode"
-                                        :key="index"
-                                        class="mb-1 badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
-                                    >
-                    <span v-if="mode == 'Sea Cargo'">
-                      <div v-html="shipIcon"></div>
-                    </span>
-                                        <span v-if="mode == 'Air Cargo'">
-                      <div v-html="planeIcon"></div>
-                    </span>
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.user.value" :options="users" :showClear="true" class="w-full" input-id="user" option-label="name" option-value="id"/>
+                        <label for="user">Select User</label>
+                    </FloatLabel>
 
-                                        {{ mode }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-1 ml-1 grid sm:grid-cols-2 md:grid-cols-2">
-                        <div class="flex ml-5">
-                            <ColumnVisibilityPopover>
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.reference"
-                                        @change="toggleColumnVisibility('reference', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Reference</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.name"
-                                        @change="toggleColumnVisibility('name', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Name</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.email"
-                                        @change="toggleColumnVisibility('email', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Email</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.address"
-                                        @change="toggleColumnVisibility('address', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Address</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.contact_number"
-                                        @change="toggleColumnVisibility('contact_number', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Contact</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.cargo_type"
-                                        @change="toggleColumnVisibility('cargo_type', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Cargo Mode</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.pickup_date"
-                                        @change="toggleColumnVisibility('pickup_date', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Pickup Date</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.pickup_time_start"
-                                        @change="
-                          toggleColumnVisibility('pickup_time_start', $event)
-                     "
-                                    />
-                                    <span class="hover:cursor-pointer">Pickup Time Start</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.pickup_time_end"
-                                        @change="toggleColumnVisibility('pickup_time_end', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Pickup Time End</span>
-                                </label>
-                            </ColumnVisibilityPopover>
-
-                            <button
-                                class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.top="'Filters'"
-                                @click="showFilters = true"
-                            >
-                                <i class="fa-solid fa-filter"></i>
-                            </button>
-                            <a :href="exportURL">
-                                <button
-                                    class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                    x-tooltip.placement.top="'Download CSV'"
-                                >
-                                    <i class="fa-solid fa-cloud-arrow-down"></i>
-                                </button>
-                            </a>
-                        </div>
-                    </div>
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.zone.value" :options="zones" :showClear="true" class="w-full" input-id="zone" option-label="name" option-value="id" />
+                        <label for="zone">Select Zone</label>
+                    </FloatLabel>
                 </div>
+            </Panel>
 
-                <div class="mt-3">
-                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div v-show="isData" ref="wrapperRef"></div>
-                        <NoRecordsFound v-show="!isData"/>
-                    </div>
-                </div>
-            </div>
+            <Card class="my-5">
+                <template #content>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedPickup.length < 1"/>
+                    <DataTable
+                        ref="dt"
+                        v-model:contextMenuSelection="selectedPickup"
+                        v-model:filters="filters"
+                        v-model:selection="selectedPickups"
+                        :globalFilterFields="['name']"
+                        :loading="loading"
+                        :row-class="rowClass"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="totalRecords"
+                        :value="pickups"
+                        context-menu
+                        data-key="id"
+                        filter-display="menu"
+                        lazy
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
+                        @page="onPageChange"
+                        @rowContextmenu="onRowContextMenu"
+                        @sort="onSort">
+
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-end my-2">
+                                <Link v-if="$page.props.user.permissions.includes('pickups.create')" :href="route('pickups.create')">
+                                    <PrimaryButton class="w-full">Create New Pending Job</PrimaryButton>
+                                </Link>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Button Group -->
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        v-if="$page.props.user.permissions.includes('pickups.assign driver')"
+                                        :disabled="selectedPickups.length === 0"
+                                        icon="ti ti-steering-wheel"
+                                        label="Assign Driver"
+                                        severity="primary"
+                                        size="small"
+                                        type="button"
+                                        @click="showAssignDriverDialog = !showAssignDriverDialog"
+                                    />
+
+                                    <Button
+                                        v-if="$page.props.user.permissions.includes('pickups.delete')"
+                                        :disabled="selectedPickups.length === 0"
+                                        icon="pi pi-trash"
+                                        label="Delete"
+                                        severity="danger"
+                                        size="small"
+                                        type="button"
+                                        @click="confirmPickupsDelete()"
+                                    />
+
+                                    <Button
+                                        icon="pi pi-filter-slash"
+                                        label="Clear Filters"
+                                        outlined
+                                        severity="contrast"
+                                        size="small"
+                                        type="button"
+                                        @click="clearFilter()"
+                                    />
+
+                                    <Button
+                                        icon="pi pi-external-link"
+                                        label="Export"
+                                        severity="contrast"
+                                        size="small"
+                                        @click="exportCSV($event)"
+                                    />
+                                </div>
+
+                                <!-- Search Field -->
+                                <IconField class="w-full sm:w-auto">
+                                    <InputIcon>
+                                        <i class="pi pi-search" />
+                                    </InputIcon>
+                                    <InputText
+                                        v-model="filters.global.value"
+                                        class="w-full"
+                                        placeholder="Keyword Search"
+                                        size="small"
+                                    />
+                                </IconField>
+                            </div>
+                        </template>
+
+                        <template #empty> No pickups found.</template>
+
+                        <template #loading> Loading pickups data. Please wait.</template>
+
+                        <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
+
+                        <Column field="reference" header="Reference" sortable>
+                            <template #body="slotProps">
+                                <div>{{ slotProps.data.reference }}</div>
+                                <div class="text-blue-400 text-sm">{{ slotProps.data.status }}</div>
+                            </template>
+                        </Column>
+
+                        <Column field="name" header="Name">
+                            <template #body="slotProps">
+                                <Link :href="`pickups/get-pending-jobs-by-user/${slotProps.data.name}`"
+                                      class="text-blue-600 underline">
+                                    {{ slotProps.data.name }}
+                                </Link>
+                                <div class="text-gray-500 text-sm">{{ slotProps.data.address }}</div>
+                                <Link :href="`pickups/get-pending-jobs-by-user/${slotProps.data.contact_number}`"
+                                      class="text-blue-600 underline text-sm">
+                                    {{ slotProps.data.contact_number }}
+                                </Link>
+                            </template>
+                        </Column>
+
+                        <Column field="pickup_date" header="Pickup Date" sortable></Column>
+
+                        <Column field="cargo_type" header="Cargo Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :icon="resolveCargoType(slotProps.data).icon"
+                                     :severity="resolveCargoType(slotProps.data).color"
+                                     :value="slotProps.data.cargo_type" class="text-sm"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true"
+                                        placeholder="Select One" style="min-width: 12rem" @change="filterCallback()" />
+                            </template>
+                        </Column>
+
+                        <Column field="driver" header="Driver">
+                            <template #body="slotProps">
+                                <Chip v-if="slotProps.data.driver !== '-'" :label="slotProps.data.driver" class="!bg-blue-100" icon="ti ti-steering-wheel"/>
+                            </template>
+
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="drivers" :showClear="true" option-label="name" option-value="id"
+                                        placeholder="Select One" style="min-width: 12rem" @change="filterCallback()" />
+                            </template>
+                        </Column>
+
+                        <Column field="pickup_type" header="Pickup Type"></Column>
+
+                        <Column field="packages" header="Packages">
+                            <template #body="slotProps">
+                                <div v-if="Array.isArray(slotProps.data.packages)" class="flex flex-wrap mb-1 gap-2">
+                                    <Chip v-for="(type, index) in slotProps.data.packages" :key="index" :label="type.package_type" icon="pi pi-box"/>
+                                </div>
+                                <div v-else-if="typeof slotProps.data.packages === 'string'" class="flex flex-wrap mb-1 gap-2">
+                                    <Chip v-for="(type, index) in slotProps.data.packages.split(',').map(type => type.trim())" :key="index" :label="type" icon="pi pi-box"/>
+                                </div>
+                                <div v-else>
+                                    {{ slotProps.data.packages || '-' }}
+                                </div>
+                            </template>
+                        </Column>
+
+                        <template #footer> In total there are {{ pickups ? pickups.length : 0 }} pickups. </template>
+                    </DataTable>
+                </template>
+            </Card>
         </div>
-
-        <FilterDrawer :show="showFilters" @close="showFilters = false">
-            <template #title> Filter All Pickups</template>
-
-            <template #content>
-                <div class="flex justify-between space-x-2">
-                    <!--Filter Now Action Button-->
-                    <SoftPrimaryButton class="space-x-2" @click="applyFilters">
-                        <i class="fa-solid fa-filter"></i>
-                        <span>Apply Filters</span>
-                    </SoftPrimaryButton>
-                    <!--Filter Reset Button-->
-                    <SoftPrimaryButton class="space-x-2" @click="resetFilter">
-                        <i class="fa-solid fa-refresh"></i>
-                        <span>Reset Filters</span>
-                    </SoftPrimaryButton>
-                </div>
-
-                <div>
-                    <InputLabel value="From"/>
-                    <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
-                </div>
-
-                <div>
-                    <InputLabel value="To"/>
-                    <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
-                </div>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Cargo Mode"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.cargoMode"
-                        label="Air Cargo"
-                        value="Air Cargo"
-                    />
-                    <div v-html="planeIcon"></div>
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.cargoMode"
-                        label="Sea Cargo"
-                        value="Sea Cargo"
-                    />
-                    <div v-html="shipIcon"></div>
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Created By"/>
-
-                <select
-                    v-model="filters.createdBy"
-                    autocomplete="off"
-                    class="w-full"
-                    multiple
-                    placeholder="Select a User..."
-                    x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                >
-                    <option v-for="user in users" :value="user.id">
-                        {{ user.name }}
-                    </option>
-                </select>
-
-                <FilterBorder/>
-                <FilterHeader value="Driver"/>
-
-                <select
-                    v-model="filters.driverBy"
-                    autocomplete="off"
-                    class="w-full"
-                    multiple
-                    placeholder="Select a Driver..."
-                    x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                >
-                    <option v-for="driver in drivers" :value="driver.id">
-                        {{ driver.name }}
-                    </option>
-                </select>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Zone"/>
-
-                <select
-                    v-model="filters.zoneBy"
-                    autocomplete="off"
-                    class="w-full"
-                    multiple
-                    placeholder="Select a Zone..."
-                    x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                >
-                    <option v-for="zone in zones" :value="zone.id">
-                        {{ zone.zone_name }}
-                    </option>
-                </select>
-            </template>
-        </FilterDrawer>
-
-        <DeletePickupConfirmationModal
-            :show="showConfirmDeletePickupModal"
-            @close="closeModal"
-            @delete-pickup="handleDeletePickup"
-        />
-
-        <HBLDetailModal
-            :pickup-id="pickupId"
-            :show="showConfirmViewPickupModal"
-            @close="closeViewModal"
-        />
-
-        <RetryPickupConfirmationModal
-            :show="showConfirmRetryModal"
-            @close="closeRetryModal"
-            @retry-pickup="handleRetryPickup"
-        />
     </AppLayout>
+
+    <HBLDetailModal
+        :pickup-id="selectedPickupID"
+        :show="showConfirmViewPickupModal"
+        @close="closeModal"
+    />
+
+    <AssignDriverDialog
+        :drivers="drivers"
+        :selected-pickups="selectedPickups"
+        :visible="showAssignDriverDialog"
+        @close="closeAssignDriverModal"
+        @update:visible="showAssignDriverDialog = $event"
+    />
 </template>

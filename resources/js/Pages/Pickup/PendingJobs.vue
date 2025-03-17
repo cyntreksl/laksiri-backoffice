@@ -217,8 +217,8 @@ const clearFilter = () => {
     fetchPickups(currentPage.value);
 };
 
-const resolveCargoType = (hbl) => {
-    switch (hbl.cargo_type) {
+const resolveCargoType = (pickup) => {
+    switch (pickup.cargo_type) {
         case 'Sea Cargo':
             return {
                 icon: "ti ti-sailboat",
@@ -558,10 +558,14 @@ const confirmPickupRetry = (pickup) => {
 
                         <Column field="packages" header="Packages">
                             <template #body="slotProps">
-                                <div
-                                    v-for="(type, index) in slotProps.data.packages.split(',').map(type => type.trim())"
-                                    :key="index" class="flex flex-wrap mb-1 gap-2">
-                                    <Chip :label="type" icon="pi pi-box"/>
+                                <div v-if="Array.isArray(slotProps.data.packages)" class="flex flex-wrap mb-1 gap-2">
+                                    <Chip v-for="(type, index) in slotProps.data.packages" :key="index" :label="type.package_type" icon="pi pi-box"/>
+                                </div>
+                                <div v-else-if="typeof slotProps.data.packages === 'string'" class="flex flex-wrap mb-1 gap-2">
+                                    <Chip v-for="(type, index) in slotProps.data.packages.split(',').map(type => type.trim())" :key="index" :label="type" icon="pi pi-box"/>
+                                </div>
+                                <div v-else>
+                                    {{ slotProps.data.packages || '-' }}
                                 </div>
                             </template>
                         </Column>
