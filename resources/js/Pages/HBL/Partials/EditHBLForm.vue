@@ -180,7 +180,7 @@ const handleHBLUpdate = () => {
         form.consignee_additional_mobile_number = "";
     }
     if(form.consignee_whatsapp_number === consigneeWhatsappNumberCountryCode.value){
-        form.whatsapp_number = "";
+        form.consignee_whatsapp_number = "";
     }
     form.put(route("hbls.update", props.hbl.id), {
         onSuccess: () => {
@@ -219,7 +219,7 @@ const showPackageDialog = () => {
 const packageList = ref(form.packages ?? []);
 
 const packageItem = reactive({
-    package_rule: "",
+    package_rule: 0,
     type: props.packageTypes.find(
         type => type.name.toLowerCase() === 'carton'.toLowerCase()
     )?.name || "",
