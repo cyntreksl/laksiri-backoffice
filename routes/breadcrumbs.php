@@ -444,4 +444,11 @@ Breadcrumbs::for('courier-agents.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->push('Edit', route('courier-agents.edit', $id));
 });
 
+// Settings -> Exception Name
+Breadcrumbs::for('setting.pickup-types.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Pickup Types', route('setting.pickup-types.index'));
+});
+
 require_once __DIR__.'/call-center-breadcrumbs.php';

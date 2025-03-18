@@ -33,6 +33,7 @@ use App\Interfaces\PackagePriceRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
+use App\Interfaces\PickupTypeRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\SettingRepositoryInterface;
@@ -73,6 +74,7 @@ use App\Repositories\PackagePriceRepository;
 use App\Repositories\PackageTypeRepository;
 use App\Repositories\PickupExceptionRepository;
 use App\Repositories\PickupRepository;
+use App\Repositories\PickupTypeRepository;
 use App\Repositories\PriceRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\SettingRepository;
@@ -116,6 +118,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(NotificationMailRepositoryInterface::class, NotificationMailRepository::class);
         $this->app->bind(CourierAgentRepositoryInterface::class, CourierAgentRepository::class);
         $this->app->bind(CourierRepositoryInterface::class, CourierRepository::class);
+        $this->app->bind(PickupTypeRepositoryInterface::class, PickupTypeRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);

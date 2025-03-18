@@ -86,6 +86,17 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'Pickup Type',
+                'permissions' => [
+                    'pickup-type.create',
+                    'pickup-type.show',
+                    'pickup-type.edit',
+                    'pickup-type.delete',
+                    'pickup-type.index',
+                ],
+            ],
+
+            [
                 'group_name' => 'HBL',
                 'permissions' => [
                     'hbls.index',

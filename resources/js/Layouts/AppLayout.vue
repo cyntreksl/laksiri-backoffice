@@ -1721,7 +1721,8 @@ export default {
                     changeSidePanelTitle("Report");
                     break;
                 case "setting":
-                    childMenuList.splice(
+                    let settingMenu = [];
+                    settingMenu.splice(
                         0,
                         childMenuList.length,
                         {
@@ -1757,6 +1758,22 @@ export default {
                             route: "setting.shipper-consignees.index",
                         },
 
+                    );
+                    if (usePage().props.user.permissions.includes("pickup-type.index")){
+
+                        settingMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Pickup Types",
+                                route: "setting.pickup-types.index",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...settingMenu
                     );
                     changeSidePanelTitle("Setting");
                     break;

@@ -5,6 +5,7 @@ use App\Http\Controllers\ExceptionNameController;
 use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\PackagePriceController;
 use App\Http\Controllers\PackageTypeController;
+use App\Http\Controllers\PickupTypeController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\WarehouseZoneController;
@@ -70,4 +71,6 @@ Route::name('setting.')->group(function () {
         ->name('shipper-consignees.update');
     Route::delete('shipper-consignees/{id}', [OfficerController::class, 'destroy'])
         ->name('shipper-consignees.destroy');
+
+    Route::resource('pickup-types', PickupTypeController::class);
 });
