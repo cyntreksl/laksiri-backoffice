@@ -61,7 +61,7 @@ class PickupController extends Controller
 
         $filters = $request->input('pickupDate')
             ? $request->only(['userData', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate'])
-            : $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate']);
+            : $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy']);
 
         return $this->pickupRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
@@ -192,7 +192,7 @@ class PickupController extends Controller
 
         $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'zoneBy', 'driverBy', 'statusBy']);
 
-        return $this->pickupRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+        return $this->pickupRepository->exportDataset($limit, $page, $order, $dir, $search, $filters);
     }
 
     public function deletePickups(Request $request)

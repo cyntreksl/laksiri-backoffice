@@ -142,4 +142,48 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     {
         return Excel::download(new PickupsExport($filters), 'pickups.xlsx');
     }
+
+    public function exportDataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        if (isset($filters['userData'])) {
+            $query = PickUp::query()
+                ->where('name', $filters['userData'])
+                ->orWhere('contact_number', $filters['userData'])
+                ->with('pickupException')
+                ->whereIn('system_status', [
+                    PickUp::SYSTEM_STATUS_PICKUP_CREATED,
+                    PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
+                ]);
+        } else {
+            $query = PickUp::query()
+                ->with('pickupException')
+                ->whereIn('system_status', [
+                    PickUp::SYSTEM_STATUS_PICKUP_CREATED,
+                    PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED,
+                ]);
+        }
+
+        if (! empty($search)) {
+            $query->where(function ($query) use ($search) {
+                $query->where('reference', 'like', '%'.$search.'%')
+                    ->orWhere('name', 'like', '%'.$search.'%')
+                    ->orWhere('contact_number', 'like', '%'.$search.'%');
+            });
+        }
+
+        // apply filters
+        FilterFactory::apply($query, $filters);
+
+        $pickups = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
+
+        return response()->json([
+            'data' => PickupResource::collection($pickups),
+            'meta' => [
+                'total' => $pickups->total(),
+                'current_page' => $pickups->currentPage(),
+                'perPage' => $pickups->perPage(),
+                'lastPage' => $pickups->lastPage(),
+            ],
+        ]);
+    }
 }

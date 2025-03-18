@@ -53,7 +53,7 @@ const perPage = ref(100);
 const currentPage = ref(1);
 const showConfirmViewPickupModal = ref(false);
 const cm = ref();
-const selectedPickup = ref([]);
+const selectedPickup = ref(null);
 const selectedPickups = ref([]);
 const selectedPickupID = ref(null);
 const confirm = useConfirm();
@@ -383,7 +383,7 @@ const confirmPickupRetry = (pickup) => {
             <Card class="my-5">
                 <template #title>All Pickups</template>
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedPickup.length < 1"/>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedPickup = null"/>
                     <DataTable
                         ref="dt"
                         v-model:contextMenuSelection="selectedPickup"

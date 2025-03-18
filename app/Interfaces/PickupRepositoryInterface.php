@@ -26,4 +26,6 @@ interface PickupRepositoryInterface
     public function deletePickups(array $pickupIds);
 
     public function export(array $filters);
+
+    public function exportDataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []);
 }
