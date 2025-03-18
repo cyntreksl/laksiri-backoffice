@@ -79,7 +79,7 @@ class LoadedContainerManifestExport
                 '',
                 1,
                 0,
-                NULL,
+                null,
             ];
         }
 
@@ -122,7 +122,7 @@ class LoadedContainerManifestExport
                 $hbl->is_departure_charges_paid,
                 $hbl->is_destination_charges_paid,
                 $isShortLoad
-                    ? ($referencesString ? "SHORT LOADED SHIP REF. $referencesString" : "SHORT LOADED")
+                    ? ($referencesString ? "SHORT LOADED SHIP REF. $referencesString" : 'SHORT LOADED')
                     : null,
             ];
         }
