@@ -236,7 +236,7 @@ const handleRemoveMHBLFromContainer = () => {
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                     {{ hbl.hbl_name || '-' }}
                 </td>
-                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.nic || '-' }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.address || '-' }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.contact_number || '-' }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.consignee_name || '-' }}</td>

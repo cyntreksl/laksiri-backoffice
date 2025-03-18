@@ -192,7 +192,7 @@
                     <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['quantity'] }}</td>
                     <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['volume'] }}</td>
                     <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['weight'] }}</td>
-                    <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px">  PERSONAL<br>      EFFECT</td>
+                    <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px; text-align: center">PERSONAL<br> EFFECT</td>
                     <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px">
                         {{ $item[13] }}
                     </td>
@@ -208,7 +208,7 @@
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['quantity'] : ' ' }}</td>
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['volume'] : ' '}}</td>
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['weight'] : ' ' }}</td>
-                    <td rowspan="{{ $packageCount > 4 ? $packageCount : 4 }}" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top">
+                    <td rowspan="1" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top; border-bottom: 0">
                         @if($item[15] && $item[16])
                             <b>
                                 DOHA & {{ $item[13] }}
@@ -230,6 +230,13 @@
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['quantity'] : ' ' }}</td>
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['volume'] : ' '}}</td>
                     <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['weight'] : ' ' }}</td>
+                    <td rowspan="{{ $packageCount > 4 ? $packageCount-1 : 3 }}" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top">
+                        @if(isset($item[17]) && $item[17])
+                            <b>
+                                {{$item[17]}}
+                            </b>
+                        @endif
+                    </td>
                 </tr>
                 <tr>
                     <td rowspan="{{ $packageCount > 4 ? $packageCount - 3 : 1 }}" style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0">{{ $item[4] }}</td>

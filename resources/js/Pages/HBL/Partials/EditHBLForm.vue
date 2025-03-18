@@ -55,14 +55,15 @@ const errors = ref([]);
 
 
 const splitCountryCode = (fullNumber) => {
-    if(fullNumber){
+    if (fullNumber) {
         for (let code of props.countryCodes) {
             if (fullNumber.startsWith(code)) {
                 return code;
-            }else return '+94';
+            }
         }
-    }else return '+94';
-}
+    }
+    return '+94';
+};
 
 const splitContactNumber = (fullNumber) => {
     if(fullNumber) {
