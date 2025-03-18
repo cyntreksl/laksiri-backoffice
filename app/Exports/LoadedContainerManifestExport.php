@@ -71,14 +71,14 @@ class LoadedContainerManifestExport
                 $mhbl->consignee->address ?? '',
                 $mhbl->consignee->pp_or_nic_no ?? '',
                 $mhbl->consignee->mobile_number ?? '',
-                $hblPackages ?? [],
+                collect($hblPackages ?? []),
                 $mhbl->hbls[0]->paid_amount > 0 ? 'PAID' : 'UNPAID',
                 '',
                 '',
                 $warehouse,
                 '',
-                false,
-                false,
+                0,
+                0,
             ];
         }
 
