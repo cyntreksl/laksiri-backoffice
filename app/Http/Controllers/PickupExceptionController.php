@@ -29,7 +29,7 @@ class PickupExceptionController extends Controller
 
         return Inertia::render('Pickup/Exceptions', [
             'drivers' => $this->driverRepository->getAllDrivers(),
-            'users' => $this->userRepository->getUsers(),
+            'users' => $this->userRepository->getUsers(['customer']),
             'zones' => $this->zoneRepository->getZones(),
         ]);
     }
