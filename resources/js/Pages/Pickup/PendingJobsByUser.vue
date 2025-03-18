@@ -257,7 +257,8 @@ const confirmPickupDelete = (pickup) => {
                 preserveScroll: true,
                 onSuccess: () => {
                     push.success("Pickup record Deleted Successfully!");
-                    router.visit(route("pickups.all"), {only: ["pickups"]});
+                    const currentRoute = route().current();
+                    router.visit(route(currentRoute, route().params));
                 },
                 onError: () => {
                     push.error("Something went to wrong!");
@@ -299,7 +300,7 @@ const confirmPickupsDelete = () => {
                     onSuccess: () => {
                         push.success("Pickups Deleted Successfully!");
                         const currentRoute = route().current();
-                        router.visit(route(currentRoute));
+                        router.visit(route(currentRoute, route().params));
                     },
                     onError: () => {
                         push.error("Something went to wrong!");
@@ -340,7 +341,8 @@ const confirmPickupRetry = (pickup) => {
                 preserveScroll: true,
                 onSuccess: () => {
                     push.success("Added into Pending Jobs!");
-                    router.visit(route("pickups.all"), {only: ["pickups"]});
+                    const currentRoute = route().current();
+                    router.visit(route(currentRoute, route().params));
                 },
                 onError: () => {
                     push.error("Something went to wrong!");
@@ -386,7 +388,6 @@ const confirmPickupRetry = (pickup) => {
             </Panel>
 
             <Card class="my-5">
-                <template #title>{{userData}}'s Pickups</template>
                 <template #content>
                     <ContextMenu ref="cm" :model="menuModel" @hide="selectedPickup = null"/>
                     <DataTable
@@ -414,11 +415,15 @@ const confirmPickupRetry = (pickup) => {
                         @sort="onSort">
 
                         <template #header>
-                            <div class="flex flex-col sm:flex-row justify-end my-2">
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    {{userData}}'s Pickups
+                                </div>
                                 <Link v-if="$page.props.user.permissions.includes('pickups.create')" :href="route('pickups.create')">
                                     <PrimaryButton class="w-full">Create New Pending Job</PrimaryButton>
                                 </Link>
                             </div>
+
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Button Group -->
                                 <div class="flex flex-col sm:flex-row gap-2">

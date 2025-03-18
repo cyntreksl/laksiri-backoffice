@@ -381,7 +381,6 @@ const confirmPickupRetry = (pickup) => {
             </Panel>
 
             <Card class="my-5">
-                <template #title>All Pickups</template>
                 <template #content>
                     <ContextMenu ref="cm" :model="menuModel" @hide="selectedPickup = null"/>
                     <DataTable
@@ -409,7 +408,10 @@ const confirmPickupRetry = (pickup) => {
                         @sort="onSort">
 
                         <template #header>
-                            <div class="flex flex-col sm:flex-row justify-end my-2">
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    All Pickups
+                                </div>
                                 <Link v-if="$page.props.user.permissions.includes('pickups.create')" :href="route('pickups.create')">
                                     <PrimaryButton class="w-full">Create New Pending Job</PrimaryButton>
                                 </Link>

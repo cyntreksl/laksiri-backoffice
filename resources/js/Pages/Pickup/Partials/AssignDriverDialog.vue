@@ -37,15 +37,21 @@ watchEffect(() => {
 
 const handleAssignDriver = () => {
     let routeName = '';
+    let params = {};
 
-    if (route().current() === 'pickups.index') {
+    const currentRoute = route().current();
+
+    if (currentRoute === 'pickups.index') {
         routeName = 'pickups.driver.assign';
-    } else if(route().current() === 'call-center.hbls.door-to-door-list'){
+    } else if (currentRoute === 'call-center.hbls.door-to-door-list') {
         routeName = 'delivery.driver.assign';
-    } else if(route().current() === 'pickups.all'){
+    } else if (currentRoute === 'pickups.all') {
         routeName = 'pickups.driver.assign';
+    } else if ( currentRoute === 'pickups.get-pending-jobs-by-user') {
+        routeName = 'pickups.driver.assign';
+        params = route().params;
     } else {
-        routeName = 'pickups.exceptions.driver.assign'
+        routeName = 'pickups.exceptions.driver.assign';
     }
 
     form.post(route(routeName), {
@@ -53,8 +59,7 @@ const handleAssignDriver = () => {
         onSuccess: () => {
             emit('close');
             push.success('Driver Assigned!')
-            const currentRoute = route().current();
-            router.visit(route(currentRoute));
+            router.visit(route(currentRoute, params));
         },
     })
 }

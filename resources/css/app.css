@@ -10,3 +10,7 @@
 [x-cloak] {
     display: none;
 }
+
+.p-datatable-header {
+    padding: 10px 0 10px 0 !important;
+}
