@@ -28,6 +28,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputNumber from 'primevue/inputnumber';
 import IftaLabel from 'primevue/iftalabel';
+import Dialog from 'primevue/dialog';
 
 const props = defineProps({
     hblTypes: {
@@ -1660,97 +1661,37 @@ const confirmViewHBL = async (id) => {
             @close="closeViewModal"
         />
 
-        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToShipperModalShow"
-                     @close="closeCopyFromHBLToShipperModal">
-            <template #title>
-                Copy
-            </template>
+        <Dialog v-model:visible="copyFromHBLToShipperModalShow" :style="{ width: '25rem' }" header="Copy From HBL" modal>
+            <div class="flex items-center gap-4 mb-4">
+                <label class="font-semibold w-24" for="reference">HBL Reference</label>
+                <InputText id="reference" v-model="reference" autocomplete="off" class="flex-auto" placeholder="Enter HBL Reference" required="true" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <Button label="Cancel" severity="secondary" type="button" @click="closeCopyFromHBLToShipperModal"></Button>
+                <Button label="Copy" type="button" @click.prevent="handleCopyFromHBLToShipper"></Button>
+            </div>
+        </Dialog>
 
-            <template #content>
-                <div class="mt-4">
-                    <TextInput
-                        v-model="reference"
-                        class="w-full"
-                        placeholder="Enter HBL Reference"
-                        required
-                        type="text"
-                    />
-                </div>
-            </template>
+        <Dialog v-model:visible="copyFromHBLToConsigneeModalShow" :style="{ width: '25rem' }" header="Copy From HBL" modal>
+            <div class="flex items-center gap-4 mb-4">
+                <label class="font-semibold w-24" for="reference">HBL Reference</label>
+                <InputText id="reference" v-model="reference" autocomplete="off" class="flex-auto" placeholder="Enter HBL Reference" required="true" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <Button label="Cancel" severity="secondary" type="button" @click="closeCopyFromHBLToConsigneeModal"></Button>
+                <Button label="Copy" type="button" @click.prevent="handleCopyFromHBLToConsignee"></Button>
+            </div>
+        </Dialog>
 
-            <template #footer>
-                <SecondaryButton @click="closeCopyFromHBLToShipperModal">
-                    Cancel
-                </SecondaryButton>
-                <PrimaryButton
-                    class="ms-3"
-                    @click.prevent="handleCopyFromHBLToShipper"
-                >
-                    Copy From HBL
-                </PrimaryButton>
-            </template>
-        </DialogModal>
-
-        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToConsigneeModalShow"
-                     @close="closeCopyFromHBLToConsigneeModal">
-            <template #title>
-                Copy
-            </template>
-
-            <template #content>
-                <div class="mt-4">
-                    <TextInput
-                        v-model="reference"
-                        class="w-full"
-                        placeholder="Enter HBL Reference"
-                        required
-                        type="text"
-                    />
-                </div>
-            </template>
-
-            <template #footer>
-                <SecondaryButton @click="closeCopyFromHBLToConsigneeModal">
-                    Cancel
-                </SecondaryButton>
-                <PrimaryButton
-                    class="ms-3"
-                    @click.prevent="handleCopyFromHBLToConsignee"
-                >
-                    Copy From HBL
-                </PrimaryButton>
-            </template>
-        </DialogModal>
-
-        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToPackageModalShow"
-                     @close="closeCopyFromHBLToPackageModal">
-            <template #title>
-                Copy
-            </template>
-
-            <template #content>
-                <div class="mt-4">
-                    <TextInput
-                        v-model="reference"
-                        class="w-full"
-                        placeholder="Enter HBL Reference"
-                        required
-                        type="text"
-                    />
-                </div>
-            </template>
-
-            <template #footer>
-                <SecondaryButton @click="closeCopyFromHBLToPackageModal">
-                    Cancel
-                </SecondaryButton>
-                <PrimaryButton
-                    class="ms-3"
-                    @click.prevent="handleCopyFromHBLToPackage"
-                >
-                    Copy From HBL
-                </PrimaryButton>
-            </template>
-        </DialogModal>
+        <Dialog v-model:visible="copyFromHBLToPackageModalShow" :style="{ width: '25rem' }" header="Copy From HBL" modal>
+            <div class="flex items-center gap-4 mb-4">
+                <label class="font-semibold w-24" for="reference">HBL Reference</label>
+                <InputText id="reference" v-model="reference" autocomplete="off" class="flex-auto" placeholder="Enter HBL Reference" required="true" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <Button label="Cancel" severity="secondary" type="button" @click="closeCopyFromHBLToPackageModal"></Button>
+                <Button label="Copy" severity="help" type="button" @click.prevent="handleCopyFromHBLToPackage"></Button>
+            </div>
+        </Dialog>
     </AppLayout>
 </template>
