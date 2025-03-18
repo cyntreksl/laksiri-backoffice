@@ -73,12 +73,13 @@ class LoadedContainerManifestExport
                 $mhbl->consignee->mobile_number ?? '',
                 collect($hblPackages ?? []),
                 $mhbl->hbls[0]->paid_amount > 0 ? 'PAID' : 'UNPAID',
-                '',
+                'Gift',
                 '',
                 $warehouse,
                 '',
+                1,
                 0,
-                0,
+                NULL,
             ];
         }
 
@@ -90,6 +91,17 @@ class LoadedContainerManifestExport
                 : ($hbl->warehouse
                     ? ($hbl->warehouse === 'COLOMBO' ? 'CMB' : ($hbl->warehouse === 'NINTAVUR' ? 'NTR' : null))
                     : null);
+
+            $isShortLoad = count($hbl->packages) > count($loadedHBLPackages[$hbl->id]['packages']);
+            $loadedContainerReferences = $hbl->packages->load('duplicate_containers')
+                ->pluck('duplicate_containers')
+                ->flatten()
+                ->pluck('reference')
+                ->unique();
+            $filteredReferences = $loadedContainerReferences->reject(function ($ref) {
+                return $ref == $this->container['reference'];
+            });
+            $referencesString = $filteredReferences->implode(',');
 
             $data[] = [
                 $hbl->hbl_number ?: $hbl->reference,
@@ -109,6 +121,9 @@ class LoadedContainerManifestExport
                 $hbl->iq_number,
                 $hbl->is_departure_charges_paid,
                 $hbl->is_destination_charges_paid,
+                $isShortLoad
+                    ? ($referencesString ? "SHORT LOADED SHIP REF. $referencesString" : "SHORT LOADED")
+                    : null,
             ];
         }
 

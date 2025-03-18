@@ -170,7 +170,7 @@ const filteredPackages = computed(() => {
         return unloadedHBLs.value;
     }
     return unloadedHBLs.value.filter(hbl => {
-        return hbl?.hbl.toLowerCase().includes(searchQuery.value.toLowerCase());
+        return hbl?.hbl_number.toLowerCase().includes(searchQuery.value.toLowerCase());
     });
 })
 
@@ -640,7 +640,7 @@ const reviewContainer = () => {
                                                                 fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                                                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                                                 width="24"
-                                                                x-tooltip.placement.top.success="'Click to Load'"
+                                                                x-tooltip.placement.top.success="'Click to Load1'"
                                                                 xmlns="http://www.w3.org/2000/svg"
                                                                 @click.prevent="handleLoad(index, element.id)">
                                                                 <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
@@ -726,7 +726,7 @@ const reviewContainer = () => {
                                                 fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                                 width="24"
-                                                x-tooltip.placement.top.success="'Click to Load'"
+                                                x-tooltip.placement.top.success="'Click to Load2'"
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 @click.prevent="handleLoadMHBL(mhbl.id,mhbl.hbls)">
                                                 <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
@@ -1463,7 +1463,7 @@ const reviewContainer = () => {
                                                                 fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                                                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                                                 width="24"
-                                                                x-tooltip.placement.top.success="'Click to Load'"
+                                                                x-tooltip.placement.top.success="'Click to Load3'"
                                                                 xmlns="http://www.w3.org/2000/svg"
                                                                 @click.prevent="handleLoad(index, element.id)">
                                                                 <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
@@ -1549,7 +1549,7 @@ const reviewContainer = () => {
                                                 fill="none" height="24" stroke="currentColor" stroke-linecap="round"
                                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
                                                 width="24"
-                                                x-tooltip.placement.top.success="'Click to Load'"
+                                                x-tooltip.placement.top.success="'Click to Load4'"
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 @click.prevent="handleLoadMHBL(mhbl.id,mhbl.hbls)">
                                                 <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
