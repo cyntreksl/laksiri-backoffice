@@ -356,7 +356,7 @@ const confirmPickupRetry = (pickup) => {
         <Breadcrumb/>
 
         <div>
-            <Panel :collapsed="true" class="mt-5 !border-none" header="Advance Filters" toggleable>
+            <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     <FloatLabel class="w-full" variant="in">
                         <DatePicker v-model="fromDate" class="w-full" date-format="yy-mm-dd" input-id="from-date"/>
