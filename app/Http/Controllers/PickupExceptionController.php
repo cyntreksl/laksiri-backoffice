@@ -29,17 +29,17 @@ class PickupExceptionController extends Controller
 
         return Inertia::render('Pickup/Exceptions', [
             'drivers' => $this->driverRepository->getAllDrivers(),
-            'users' => $this->userRepository->getUsers(),
+            'users' => $this->userRepository->getUsers(['customer']),
             'zones' => $this->zoneRepository->getZones(),
         ]);
     }
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
         $filters = $request->only(['fromDate', 'toDate', 'createdBy', 'zoneBy']);

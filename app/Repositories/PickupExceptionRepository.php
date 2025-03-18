@@ -31,21 +31,15 @@ class PickupExceptionRepository implements GridJsInterface, PickupExceptionRepos
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $exceptions = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $exceptions = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => PickupExceptionResource::collection($exceptions),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $exceptions->total(),
+                'current_page' => $exceptions->currentPage(),
+                'perPage' => $exceptions->perPage(),
+                'lastPage' => $exceptions->lastPage(),
             ],
         ]);
     }
