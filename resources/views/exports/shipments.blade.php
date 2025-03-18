@@ -192,7 +192,7 @@
                     <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['quantity'] }}</td>
                     <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['volume'] }}</td>
                     <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['weight'] }}</td>
-                    <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px">  PERSONAL<br>      EFFECT</td>
+                    <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px; text-align: center">PERSONAL<br> EFFECT</td>
                     <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px">
                         {{ $item[13] }}
                     </td>
