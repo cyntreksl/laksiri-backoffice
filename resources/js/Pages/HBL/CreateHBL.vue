@@ -6,16 +6,28 @@ import {computed, reactive, ref, watch} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
-import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import TextInput from "@/Components/TextInput.vue";
-import Checkbox from "@/Components/Checkbox.vue";
 import {push} from "notivue";
 import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import InputLabel from "@/Components/InputLabel.vue";
+import Card from 'primevue/card';
+import InputText from 'primevue/inputtext';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+import Select from 'primevue/select';
+import Checkbox from 'primevue/checkbox';
+import Textarea from 'primevue/textarea';
+import SelectButton from 'primevue/selectbutton';
+import Button from 'primevue/button';
+import Fieldset from 'primevue/fieldset';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import InputNumber from 'primevue/inputnumber';
+import IftaLabel from 'primevue/iftalabel';
 
 const props = defineProps({
     hblTypes: {
@@ -738,45 +750,6 @@ const handleCopyShipper = () => {
 
 const isShowedPaymentSummery = ref(false);
 
-const planeIcon = ref(`
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  class="icon icon-tabler icons-tabler-outline icon-tabler-plane"
->
-  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-  <path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" />
-</svg>
-`);
-
-const shipIcon = ref(`
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  class="icon icon-tabler icons-tabler-outline icon-tabler-ship"
->
-  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-  <path d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1" />
-  <path d="M4 18l-1 -5h18l-2 4" />
-  <path d="M5 13v-6h8l4 6" />
-  <path d="M7 7v-4h-1" />
-</svg>
-`);
-
 const getSelectedPackage = () => {
     // Find the selected package from the packages array based on the selected ID
     const selectedRule = packageRulesData.value.find(pkg => pkg.id === packageItem.packageRule);
@@ -845,6 +818,10 @@ watch(
     }
 );
 
+watch(() => form.warehouse, (newValue) => {
+    form.warehouse_id = newValue;
+});
+
 const volumeUnit = computed(() => {
     const units = {
         cm: 'CM.CU',
@@ -871,1129 +848,510 @@ const confirmViewHBL = async (id) => {
         <!-- Breadcrumb -->
         <Breadcrumb/>
 
-        <!-- Create Pickup Form -->
         <form @submit.prevent="handleHBLCreate">
             <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
                 <div class="sm:col-span-2 grid grid-rows gap-4">
+                    <Card>
+                        <template #title>Primary Details</template>
+                        <template #content>
+                            <Fieldset legend="Cargo Type">
+                                <SelectButton v-model="form.cargo_type" :options="cargoTypes" name="Cargo Type">
+                                    <template #option="slotProps">
+                                        <div class="flex items-center">
+                                            <i v-if="slotProps.option === 'Sea Cargo'" class="ti ti-ship mr-2"></i>
+                                            <i v-else class="ti ti-plane mr-2"></i>
+                                            <span>{{ slotProps.option }}</span>
+                                        </div>
+                                    </template>
+                                </SelectButton>
+                                <InputError :message="form.errors.cargo_type"/>
+                            </Fieldset>
 
-                    <div class="card px-4 py-4 sm:px-5">
-                        <!-- Primary Details -->
-                        <div>
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Primary Details
-                            </h2>
-                        </div>
+                            <Fieldset legend="Type">
+                                <SelectButton v-model="form.hbl_type" :options="hblTypes" name="HBL Type" />
+                                <InputError :message="form.errors.hbl_type"/>
+                            </Fieldset>
 
-                        <!-- Cargo Type -->
-                        <div>
-                            <h2
-                                class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-5"
-                            >
-                                Cargo Type
-                            </h2>
-                        </div>
-                        <div class="my-5">
-                            <div class="space-x-5">
-                                <label
-                                    v-for="cargoType in cargoTypes"
-                                    class="inline-flex items-center space-x-2"
-                                >
-                                    <input
-                                        v-model="form.cargo_type"
-                                        :value="cargoType"
-                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        name="cargo_type"
-                                        type="radio"
-                                    />
-                                    <p>{{ cargoType }}</p>
-                                    <span v-if="cargoType == 'Sea Cargo'">
-                    <div v-html="shipIcon"></div>
-                  </span>
-                                    <span v-if="cargoType == 'Air Cargo'">
-                    <div v-html="planeIcon"></div>
-                  </span>
-                                </label>
+                            <Fieldset legend="Warehouse">
+                                <SelectButton v-model="form.warehouse" :options="warehouses" name="HBL Type" option-label="name" option-value="name" />
+                                <InputError :message="form.errors.warehouse"/>
+                            </Fieldset>
+
+                            <div class="flex justify-center">
+                                <img :src="hblImage" alt="hbl-image" class="w-auto">
                             </div>
-                            <InputError :message="form.errors.cargo_type"/>
-                        </div>
-
-                        <hr class="my-4 border-t border-slate-200 dark:border-navy-600">
-
-                        <!-- Type -->
-                        <div>
-                            <h2
-                                class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-0"
-                            >
-                                Type
-                            </h2>
-                        </div>
-                        <div class="my-5">
-                            <div class="space-x-5">
-                                <label
-                                    v-for="hblType in hblTypes"
-                                    class="inline-flex items-center space-x-2"
-                                >
-                                    <input
-                                        v-model="form.hbl_type"
-                                        :value="hblType"
-                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        name="hbl_type"
-                                        type="radio"
-                                    />
-                                    <p>{{ hblType }}</p>
-                                </label>
-                            </div>
-                            <InputError :message="form.errors.hbl_type"/>
-                        </div>
-
-                        <hr class="my-4 border-t border-slate-200 dark:border-navy-600">
-
-                        <!-- Warehouse -->
-                        <div>
-                            <h2
-                                class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-0"
-                            >
-                                Warehouse
-                            </h2>
-                        </div>
-                        <div class="my-5">
-                            <div class="space-x-5">
-                                <div class="grid grid-cols-3 gap-4">
-                                    <label
-                                    v-for="warehouse in warehouses"
-                                    :key="warehouse.id"
-                                    class="inline-flex items-center space-x-2"
-                                    >
-                                        <input
-                                            v-model="form.warehouse"
-                                            :value="warehouse.name"
-                                            class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                            name="warehouse"
-                                            type="radio"
-                                            @change="form.warehouse_id = warehouse.id"
-                                        />
-                                        <p>{{ warehouse.name }}</p>
-                                    </label>
-                                </div>
-                            </div>
-                            <InputError :message="form.errors.warehouse"/>
-                        </div>
-
-                        <div class="flex justify-center">
-                            <img :src="hblImage" class="mx-auto" style="width: 50%;">
-                        </div>
-
-                    </div>
+                        </template>
+                    </Card>
                 </div>
 
                 <div class="sm:col-span-2">
-                    <div class="card px-4 py-4 sm:px-5">
-                        <div class="flex justify-between items-center">
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Shipper Details
-                            </h2>
-
-                            <a @click.prevent="confirmShowingCopyFromHBLToShipperModal"
-                               x-tooltip.placement.bottom="'Copy from HBL'">
-                                <svg class="icon icon-paste text-[#64748b]" fill="none" stroke="#64748b"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" height="24"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <!-- Clipboard shape -->
-                                    <path
-                                        d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h1v-1a2 2 0 0 1 2 -2z"/>
-                                    <!-- Horizontal line representing pasted content -->
-                                    <path d="M9 7h6"/>
-                                </svg>
-                            </a>
-                        </div>
-
-                        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToShipperModalShow"
-                                     @close="closeCopyFromHBLToShipperModal">
-                            <template #title>
-                                Copy
-                            </template>
-
-                            <template #content>
-                                <div class="mt-4">
-                                    <TextInput
-                                        v-model="reference"
-                                        class="w-full"
-                                        placeholder="Enter HBL Reference"
-                                        required
-                                        type="text"
-                                    />
+                    <Card>
+                        <template #title>
+                            <div class="flex justify-between items-center">
+                                <span>Shipper Details</span>
+                                <Button aria-label="Copy from HBL" icon="pi pi-clipboard" rounded size="large" variant="text" x-tooltip.placement.bottom="'Copy from HBL'" @click.prevent="confirmShowingCopyFromHBLToShipperModal" />
+                            </div>
+                        </template>
+                        <template #content>
+                            <div class="grid grid-cols-3 gap-5 mt-3">
+                                <div class="col-span-3">
+                                    <InputLabel value="Name"/>
+                                    <IconField>
+                                        <InputIcon class="pi pi-user" />
+                                        <InputText v-model="form.hbl_name" class="w-full" placeholder="Name" />
+                                    </IconField>
+                                    <InputError :message="form.errors.hbl_name"/>
                                 </div>
-                            </template>
 
-                            <template #footer>
-                                <SecondaryButton @click="closeCopyFromHBLToShipperModal">
-                                    Cancel
-                                </SecondaryButton>
-                                <PrimaryButton
-                                    class="ms-3"
-                                    @click.prevent="handleCopyFromHBLToShipper"
-                                >
-                                    Copy From HBL
-                                </PrimaryButton>
-                            </template>
-                        </DialogModal>
+                                <div class="col-span-3">
+                                    <InputLabel value="Email"/>
+                                    <IconField>
+                                        <InputIcon class="pi pi-envelope" />
+                                        <InputText v-model="form.email" class="w-full"
+                                                   placeholder="Email" type="email" />
+                                    </IconField>
+                                    <InputError :message="form.errors.email"/>
+                                </div>
 
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <span>Name</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.hbl_name"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Name"
-                                        type="text"
-                                    />
-                                    <div
-                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                    >
-                                        <svg
-                                            class="size-4.5 transition-colors duration-200"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                            />
-                                        </svg>
+                                <div class="col-span-3">
+                                    <InputLabel value="Mobile Number"/>
+                                    <div class="flex flex-row">
+                                        <Select v-model="countryCode" :options="countryCodes" class="w-25 !rounded-r-none !border-r-0" filter placeholder="Select a Country Code" />
+                                        <InputText v-model="contactNumber" class="!rounded-l-none w-full" placeholder="123 4567 890"/>
                                     </div>
-                                </label>
-                                <InputError :message="form.errors.hbl_name"/>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <span>Email</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.email"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Email"
-                                        type="email"
-                                    />
-                                    <div
-                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                    >
-                                        <svg
-                                            class="size-4.5 transition-colors duration-200"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                            />
-                                        </svg>
-                                    </div>
-                                </label>
-                                <InputError :message="form.errors.email"/>
-                            </div>
-                        </div>
+                                    <InputError :message="form.errors.contact_number" class="col-span-1"/>
+                                </div>
 
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <div class="grid grid-cols-1 sm:grid-cols-3">
-                                    <InputLabel class="col-span-3" value="Mobile Number"/>
-                                    <div>
-                                        <select
-                                            v-model="countryCode"
-                                            x-init="$el._tom = new Tom($el)"
-                                            class="w-full rounded-r-0"
-                                        >
-                                            <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                                {{ countryCode }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-span-2">
-                                        <input
-                                            id="telephone"
-                                            v-model="contactNumber"
-                                            class="h-[38px] rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                            placeholder="123 4567 890"
-                                            type="text"
-                                        />
+                                <div class="col-span-3">
+                                    <div class="flex items-center gap-2">
+                                        <Checkbox v-model="isSameContactNumber"
+                                                  binary inputId="whatsapp" @change="addContactToWhatsapp" />
+                                        <label for="whatsapp"> Use mobile number as whatsapp number</label>
                                     </div>
                                 </div>
-                                <InputError class="col-span-3" :message="form.errors.contact_number"/>
-                            </div>
-                        </div>
 
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <input
-                                    v-model="isSameContactNumber"
-                                    @change="addContactToWhatsapp"
-                                    type="checkbox"
-                                />
-                                <span class="ml-5">Use mobile number as whatsapp number</span>
-                            </div>
-                        </div>
-
-
-                        <div v-if="!isSameContactNumber" class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <div class="grid grid-cols-1 sm:grid-cols-3">
-                                    <InputLabel class="col-span-3" value="Whatsapp Number"/>
-                                    <div>
-                                        <select
-                                            v-model="whatsappNumberCountryCode"
-                                            x-init="$el._tom = new Tom($el)"
-                                            class="w-full rounded-r-0"
-                                        >
-                                            <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                                {{ countryCode }}
-                                            </option>
-                                        </select>
+                                <div v-if="!isSameContactNumber" class="col-span-3">
+                                    <InputLabel value="Whatsapp Number"/>
+                                    <div class="flex flex-row">
+                                        <Select v-model="whatsappNumberCountryCode" :options="countryCodes" class="w-25 !rounded-r-none !border-r-0" filter placeholder="Select a Country Code" />
+                                        <InputText v-model="whatsappNumber" class="!rounded-l-none w-full" placeholder="123 4567 890"/>
                                     </div>
-                                    <div class="col-span-2">
-                                        <input
-                                            id="telephone"
-                                            v-model="whatsappNumber"
-                                            class="h-[38px] rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                            placeholder="123 4567 890"
-                                            type="text"
-                                        />
+                                    <InputError :message="form.errors.whatsapp_number" class="col-span-1"/>
+                                </div>
+
+                                <div class="col-span-3">
+                                    <InputLabel value="Additional Mobile Number"/>
+                                    <div class="flex flex-row">
+                                        <Select v-model="additionalMobileCountryCode" :options="countryCodes" class="w-25 !rounded-r-none !border-r-0" filter placeholder="Select a Country Code" />
+                                        <InputText v-model="additionalMobileNumber" class="!rounded-l-none w-full" placeholder="123 4567 890"/>
+                                    </div>
+                                    <InputError :message="form.errors.additional_mobile_number" class="col-span-1"/>
+                                </div>
+
+                                <div class="col-span-3">
+                                    <InputLabel value="PP or NIC No"/>
+                                    <IconField>
+                                        <InputIcon class="pi pi-tag" />
+                                        <InputText v-model="form.nic" class="w-full"
+                                                   placeholder="PP or NIC No" />
+                                    </IconField>
+                                    <InputError :message="form.errors.nic"/>
+                                </div>
+
+                                <div class="col-span-3">
+                                    <InputLabel value="Residency No"/>
+                                    <IconField>
+                                        <InputIcon class="pi pi-home" />
+                                        <InputText v-model="form.iq_number" class="w-full"
+                                                   placeholder="Residency No" />
+                                    </IconField>
+                                    <InputError :message="form.errors.iq_number"/>
+                                </div>
+
+                                <div class="col-span-3">
+                                    <InputLabel value="Address"/>
+                                    <Textarea v-model="form.address" class="w-full" cols="30" placeholder="Type address here..." rows="5" />
+                                    <InputError :message="form.errors.address"/>
+                                </div>
+
+                                <div v-if="form.hbl_type === 'Door to Door'" class="col-span-3">
+                                    <div class="flex items-center gap-2">
+                                        <Checkbox v-model="isChecked"
+                                                  binary inputId="consignee-same" @change="addToConsigneeDetails" />
+                                        <label for="consignee-same">Same as Consignee Details</label>
                                     </div>
                                 </div>
-                                <InputError class="col-span-3" :message="form.errors.whatsapp_number"/>
                             </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <div class="grid grid-cols-1 sm:grid-cols-3">
-                                    <InputLabel class="col-span-3" value="Additional Mobile Number"/>
-                                    <div>
-                                        <select
-                                            v-model="additionalMobileCountryCode"
-                                            x-init="$el._tom = new Tom($el)"
-                                            class="w-full rounded-r-0"
-                                        >
-                                            <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                                {{ countryCode }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-span-2">
-                                        <input
-                                            id="telephone"
-                                            v-model="additionalMobileNumber"
-                                            class="h-[38px] rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                            placeholder="123 4567 890"
-                                            type="text"
-                                        />
-                                    </div>
-                                </div>
-                                <InputError class="col-span-3" :message="form.errors.contact_number"/>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <span>PP or NIC No</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.nic"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="PP or NIC No"
-                                        type="text"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.nic"/>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <span>Residency No</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.iq_number"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Residency No"
-                                        type="text"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.iq_number"/>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <span>Address</span>
-                                <label class="block">
-                  <textarea
-                      v-model="form.address"
-                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                      placeholder="Type address here..."
-                      rows="4"
-                  ></textarea>
-                                </label>
-                                <InputError :message="form.errors.address"/>
-                            </div>
-                        </div>
-                        <div v-if="form.hbl_type === 'Door to Door'" class="col-span-2">
-                            <Checkbox
-                                v-model="isChecked"
-                                @change="addToConsigneeDetails"
-                            ></Checkbox>
-
-                            <span class="ml-5">Same as Consignee Details</span>
-                        </div>
-                    </div>
+                        </template>
+                    </Card>
                 </div>
 
                 <div class="sm:col-span-2 grid grid-rows">
-                    <div class="card px-4 sm:px-5 p-4">
-                        <div class="flex justify-between items-center">
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Consignee Details
-                            </h2>
-
-                            <div class="flex space-x-1">
-                                <a  v-if="form.hbl_name"  @click.prevent="handleCopyShipper"
-                                    x-tooltip.placement.bottom="'Copy Shippier'"
-                                    class="relative inline-flex items-center">
-                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-copy mr-2" fill="none"
-                                         height="24" stroke="currentColor" stroke-linecap="round"
-                                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                        <path
-                                            d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
-                                        <path
-                                            d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/>
-                                    </svg>
-                                </a>
-
-                                <a
-                                    @click.prevent="confirmShowingCopyFromHBLToConsigneeModal"
-                                    x-tooltip.placement.bottom="'Copy from HBL'"
-                                >
-                                    <svg class="icon icon-paste text-[#64748b] ml-1" fill="none" stroke="#64748b"
-                                         stroke-linecap="round"
-                                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" height="24"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <!-- Clipboard shape -->
-                                        <path
-                                            d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h1v-1a2 2 0 0 1 2 -2z"/>
-                                        <!-- Horizontal line representing pasted content -->
-                                        <path d="M9 7h6"/>
-                                    </svg>
-
-                                </a>
-                            </div>
-
-                            <DialogModal :maxWidth="'xl'" :show="copyFromHBLToConsigneeModalShow"
-                                         @close="closeCopyFromHBLToConsigneeModal">
-                                <template #title>
-                                    Copy
-                                </template>
-
-                                <template #content>
-                                    <div class="mt-4">
-                                        <TextInput
-                                            v-model="reference"
-                                            class="w-full"
-                                            placeholder="Enter HBL Reference"
-                                            required
-                                            type="text"
-                                        />
-                                    </div>
-                                </template>
-
-                                <template #footer>
-                                    <SecondaryButton @click="closeCopyFromHBLToConsigneeModal">
-                                        Cancel
-                                    </SecondaryButton>
-                                    <PrimaryButton
-                                        class="ms-3"
-                                        @click.prevent="handleCopyFromHBLToConsignee"
-                                    >
-                                        Copy From HBL
-                                    </PrimaryButton>
-                                </template>
-                            </DialogModal>
-                        </div>
-                        <div class="grid grid-cols-2 gap-5 mt-3">
-                            <div class="col-span-2">
-                                <span>Name</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.consignee_name"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Name"
-                                        type="text"
-                                    />
-                                    <div
-                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                    >
-                                        <svg
-                                            class="size-4.5 transition-colors duration-200"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                            />
-                                        </svg>
-                                    </div>
-                                </label>
-                                <InputError :message="form.errors.consignee_name"/>
-                            </div>
-
-                            <div class="col-span-2">
-                                <span>PP or NIC No</span>
-                                <label class="relative flex">
-                                    <input
-                                        v-model="form.consignee_nic"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="PP or NIC No"
-                                        type="text"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.consignee_nic"/>
-                            </div>
-
-                            <div class="col-span-2">
-                                <div class="grid grid-cols-1 sm:grid-cols-3">
-                                    <InputLabel class="col-span-3" value="Mobile Number"/>
-                                    <div>
-                                        <select
-                                            v-model="consignee_countryCode"
-                                            x-init="$el._tom = new Tom($el)"
-                                            class="w-full rounded-r-0"
-                                        >
-                                            <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                                {{ countryCode }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-span-2">
-                                        <input
-                                            id="telephone"
-                                            v-model="consignee_contact"
-                                            class="rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                            placeholder="123 4567 890"
-                                            type="text"
-                                        />
-                                    </div>
-                                </div>
-                                <InputError class="col-span-3" :message="form.errors.consignee_contact"/>
-                            </div>
-
-
-                            <div class="col-span-2 ml-1">
-                                <div class="grid grid-cols-3 gap-5">
-                                    <div class="col-span-3">
-                                        <input
-                                            v-model="isSameConsigneeContactNumber"
-                                            @change="addConsigneeContactToWhatsapp"
-                                            type="checkbox"
-                                        />
-                                        <span class="ml-5">Use mobile number as whatsapp number</span>
-                                    </div>
+                    <Card>
+                        <template #title>
+                            <div class="flex justify-between items-center">
+                                <span>Consignee Details</span>
+                                <div class="flex space-x-1">
+                                    <Button v-if="form.hbl_name" aria-label="Copy Shipper" icon="pi pi-clone" rounded size="large" variant="text"  x-tooltip.placement.bottom="'Copy Shipper'"
+                                            @click.prevent="handleCopyShipper" />
+                                    <Button aria-label="Copy from HBL" icon="pi pi-clipboard" rounded size="large" variant="text"  x-tooltip.placement.bottom="'Copy from HBL'"
+                                            @click.prevent="confirmShowingCopyFromHBLToConsigneeModal" />
                                 </div>
                             </div>
+                        </template>
+                        <template #content>
+                            <div class="grid grid-cols-3 gap-5 mt-3">
+                                <div class="col-span-3">
+                                    <InputLabel value="Name"/>
+                                    <IconField>
+                                        <InputIcon class="pi pi-user" />
+                                        <InputText v-model="form.consignee_name" class="w-full" placeholder="Name" />
+                                    </IconField>
+                                    <InputError :message="form.errors.consignee_name"/>
+                                </div>
 
-                            <div v-if="!isSameConsigneeContactNumber" class="col-span-2">
-                                <div class="grid grid-cols-1 sm:grid-cols-3">
-                                    <InputLabel class="col-span-3" value="Whatsapp Number"/>
-                                    <div>
-                                        <select
-                                            v-model="consigneeWhatsappNumberCountryCode"
-                                            x-init="$el._tom = new Tom($el)"
-                                            class="w-full rounded-r-0"
-                                        >
-                                            <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                                {{ countryCode }}
-                                            </option>
-                                        </select>
+                                <div class="col-span-3">
+                                    <InputLabel value="PP or NIC No"/>
+                                    <IconField>
+                                        <InputIcon class="pi pi-tag" />
+                                        <InputText v-model="form.consignee_nic" class="w-full"
+                                                   placeholder="PP or NIC No" />
+                                    </IconField>
+                                    <InputError :message="form.errors.consignee_nic"/>
+                                </div>
+
+                                <div class="col-span-3">
+                                    <InputLabel value="Mobile Number"/>
+                                    <div class="flex flex-row">
+                                        <Select v-model="consignee_countryCode" :options="countryCodes" class="w-25 !rounded-r-none !border-r-0" filter placeholder="Select a Country Code" />
+                                        <InputText v-model="consignee_contact" class="!rounded-l-none w-full" placeholder="123 4567 890"/>
                                     </div>
-                                    <div class="col-span-2">
-                                        <input
-                                            id="telephone"
-                                            v-model="consigneeWhatsappNumber"
-                                            class="rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                            placeholder="123 4567 890"
-                                            type="text"
-                                        />
+                                    <InputError :message="form.errors.consignee_contact" class="col-span-1"/>
+                                </div>
+
+                                <div class="col-span-3">
+                                    <div class="flex items-center gap-2">
+                                        <Checkbox v-model="isSameConsigneeContactNumber"
+                                                  binary inputId="consignee-whatsapp" @change="addConsigneeContactToWhatsapp" />
+                                        <label for="consignee-whatsapp">Use mobile number as whatsapp number</label>
                                     </div>
                                 </div>
-                                <InputError class="col-span-3" :message="form.errors.consignee_contact"/>
-                            </div>
 
-                            <div class="col-span-2">
-                                <div class="grid grid-cols-1 sm:grid-cols-3">
-                                    <InputLabel class="col-span-3" value="Additional Mobile Number"/>
-                                    <div>
-                                        <select
-                                            v-model="consigneeAdditionalMobileCountryCode"
-                                            x-init="$el._tom = new Tom($el)"
-                                            class="w-full rounded-r-0"
-                                        >
-                                            <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                                {{ countryCode }}
-                                            </option>
-                                        </select>
+                                <div v-if="!isSameConsigneeContactNumber" class="col-span-3">
+                                    <InputLabel value="Whatsapp Number"/>
+                                    <div class="flex flex-row">
+                                        <Select v-model="consigneeWhatsappNumberCountryCode" :options="countryCodes" class="w-25 !rounded-r-none !border-r-0" filter placeholder="Select a Country Code" />
+                                        <InputText v-model="consigneeWhatsappNumber" class="!rounded-l-none w-full" placeholder="123 4567 890"/>
                                     </div>
-                                    <div class="col-span-2">
-                                        <input
-                                            id="telephone"
-                                            v-model="consigneeAdditionalMobileNumber"
-                                            class="rounded-l-lg form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                            placeholder="123 4567 890"
-                                            type="text"
-                                        />
-                                    </div>
+                                    <InputError :message="form.errors.consignee_whatsapp_number" class="col-span-1"/>
                                 </div>
-                                <InputError class="col-span-3" :message="form.errors.consignee_contact"/>
-                            </div>
 
-                            <div class="col-span-2">
-                                <span>Address</span>
-                                <label class="block">
-                                  <textarea
-                                      v-model="form.consignee_address"
-                                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                      placeholder="Type address here..."
-                                      rows="4"
-                                  ></textarea>
-                                </label>
-                                <InputError :message="form.errors.consignee_address"/>
-                            </div>
+                                <div class="col-span-3">
+                                    <InputLabel value="Additional Mobile Number"/>
+                                    <div class="flex flex-row">
+                                        <Select v-model="consigneeAdditionalMobileCountryCode" :options="countryCodes" class="w-25 !rounded-r-none !border-r-0" filter placeholder="Select a Country Code" />
+                                        <InputText v-model="consigneeAdditionalMobileNumber" class="!rounded-l-none w-full" placeholder="123 4567 890"/>
+                                    </div>
+                                    <InputError :message="form.errors.consignee_additional_mobile_number" class="col-span-1"/>
+                                </div>
 
-                            <div class="col-span-2">
-                                <span>Note</span>
-                                <label class="block">
-                                  <textarea
-                                      v-model="form.consignee_note"
-                                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                      placeholder="Type note here..."
-                                      rows="2"
-                                  ></textarea>
-                                </label>
-                                <InputError :message="form.errors.consignee_note"/>
+                                <div class="col-span-3">
+                                    <InputLabel value="Address"/>
+                                    <Textarea v-model="form.consignee_address" class="w-full" cols="30" placeholder="Type address here..." rows="5" />
+                                    <InputError :message="form.errors.consignee_address"/>
+                                </div>
+
+                                <div class="col-span-3">
+                                    <InputLabel value="Note"/>
+                                    <Textarea v-model="form.consignee_note" class="w-full" cols="30" placeholder="Type note here..." rows="3" />
+                                    <InputError :message="form.errors.consignee_note"/>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </template>
+                    </Card>
                 </div>
-
             </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
                 <div class="sm:col-span-4">
-                    <div class="card p-1" style="height: 100%">
-                        <div class="mt-4 flex justify-between items-center">
-                            <div class="flex items-center space-x-2">
-                                <h2
-                                    class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                                >
-                                    Package Details
-                                </h2>
-                                <a v-if="Object.values(copiedPackages).length === 0"
-                                   @click.prevent="confirmShowingCopyFromHBLToPackageModal"
-                                   x-tooltip.placement.bottom="'Copy from HBL'"
-                                >
-                                    <svg class="icon icon-paste text-[#64748b] ml-5" fill="none" stroke="#64748b"
-                                         stroke-linecap="round"
-                                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" height="24"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <!-- Clipboard shape -->
-                                        <path
-                                            d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h1v-1a2 2 0 0 1 2 -2z"/>
-                                        <!-- Horizontal line representing pasted content -->
-                                        <path d="M9 7h6"/>
-                                    </svg>
-
-                                </a>
-                                <DangerOutlineButton v-if="Object.values(copiedPackages).length > 0"
-                                                     @click.prevent="handleRemoveCopiedPackages">
-                                    Remove Copied Packages
-                                </DangerOutlineButton>
-                            </div>
-                            <PrimaryOutlineButton v-if="Object.values(copiedPackages).length === 0" type="button" :disabled="!isExistsRules"
-                                                  @click="showPackageDialog">
-                                New Package <i class="fas fa-plus fa-fw fa-fw"></i>
-                            </PrimaryOutlineButton>
-                        </div>
-
-                        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToPackageModalShow"
-                                     @close="closeCopyFromHBLToPackageModal">
-                            <template #title>
-                                Copy
-                            </template>
-
-                            <template #content>
-                                <div class="mt-4">
-                                    <TextInput
-                                        v-model="reference"
-                                        class="w-full"
-                                        placeholder="Enter HBL Reference"
-                                        required
-                                        type="text"
-                                    />
+                    <Card>
+                        <template #title>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center space-x-2">
+                                    <span>Package Details</span>
+                                    <Button v-if="Object.values(copiedPackages).length === 0" aria-label="Copy from HBL" icon="pi pi-clipboard" rounded size="large" variant="text"
+                                            x-tooltip.placement.bottom="'Copy from HBL'"
+                                            @click.prevent="confirmShowingCopyFromHBLToPackageModal" />
+                                    <Button v-if="Object.values(copiedPackages).length > 0" label="Remove Copied Packages" severity="danger" variant="text"
+                                            @click.prevent="handleRemoveCopiedPackages" />
                                 </div>
-                            </template>
-
-                            <template #footer>
-                                <SecondaryButton @click="closeCopyFromHBLToPackageModal">
-                                    Cancel
-                                </SecondaryButton>
-                                <PrimaryButton
-                                    class="ms-3"
-                                    @click.prevent="handleCopyFromHBLToPackage"
-                                >
-                                    Copy From HBL
-                                </PrimaryButton>
-                            </template>
-                        </DialogModal>
-
-                        <div class="mt-5">
-                            <div
-                                v-if="packageList.length > 0"
-                                class="is-scrollbar-hidden min-w-full overflow-x-auto"
-                            >
-                                <table class="is-zebra w-full text-left">
-                                    <thead>
-                                    <tr>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 text-center"
-                                        >
-                                            <span class="hidden">Actions</span>
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Type
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Length (CM)
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Width
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Height
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Quantity
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Weight
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Volume (M.CU)
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Remark
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr v-for="(item, index) in packageList">
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
-                                            <button
-                                                class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
-                                                @click.prevent="confirmRemovePackage(index)"
-                                            >
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-
-                                            <button
-                                                class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
-                                                @click.prevent="openEditModal(index)"
-                                            >
-                                                <i class="fa-solid fa-edit"></i>
-                                            </button>
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.type }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.length.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.width.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.height.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.quantity }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.totalWeight.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.volume }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.remarks }}
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                                <Button v-if="Object.values(copiedPackages).length === 0" :disabled="!isExistsRules" icon="pi pi-plus" label="New Package" severity="help" type="button" variant="outlined"
+                                        @click="showPackageDialog" />
                             </div>
-                            <div
-                                v-if="Object.keys(copiedPackages).length > 0"
-                                class="is-scrollbar-hidden min-w-full overflow-x-auto"
-                            >
-                                <table class="is-zebra w-full text-left">
-                                    <thead>
-                                    <tr>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Type
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Length (CM)
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Width
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Height
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Quantity
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Weight
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Volume (M.CU)
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Remark
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr v-for="(item, index) in copiedPackages">
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.package_type }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.length }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.width }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.height }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.quantity }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.weight.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.volume.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.remarks }}
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                        </template>
+                        <template #content>
+                            <DataTable v-if="packageList.length > 0" :value="packageList" tableStyle="min-width: 50rem">
+                                <Column header="Actions">
+                                    <template #body="slotProps">
+                                        <Button icon="pi pi-times" rounded size="small" variant="text" @click.prevent="confirmRemovePackage(slotProps.index)" />
+
+                                        <Button icon="pi pi-pencil" rounded size="small" variant="text" @click.prevent="openEditModal(slotProps.index)"  />
+                                    </template>
+                                </Column>
+                                <Column field="type" header="Type"></Column>
+                                <Column field="length" header="Length (CM)">
+                                    <template #body="slotProps">
+                                        {{ slotProps.data.length.toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="width" header="Width">
+                                    <template #body="slotProps">
+                                        {{ slotProps.data.width.toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="height" header="Height">
+                                    <template #body="slotProps">
+                                        {{ slotProps.data.height.toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="quantity" header="Quantity"></Column>
+                                <Column field="totalWeight" header="Weight">
+                                    <template #body="slotProps">
+                                        {{ slotProps.data.totalWeight.toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="volume" header="Volume (M.CU)"></Column>
+                                <Column field="remarks" header="Remark"></Column>
+                            </DataTable>
+
+                            <DataTable v-if="Object.keys(copiedPackages).length > 0" :value="copiedPackages" tableStyle="min-width: 50rem">
+                                <Column field="package_type" header="Type"></Column>
+                                <Column field="length" header="Length (CM)"></Column>
+                                <Column field="width" header="Width"></Column>
+                                <Column field="height" header="Height"></Column>
+                                <Column field="quantity" header="Quantity"></Column>
+                                <Column field="weight" header="Weight">
+                                    <template #body="slotProps">
+                                        {{ slotProps.data.weight.toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="volume" header="Volume (M.CU)">
+                                    <template #body="slotProps">
+                                        {{ slotProps.data.volume.toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="remarks" header="Remark"></Column>
+                            </DataTable>
+
                             <div v-if="packageList.length === 0 && Object.values(copiedPackages).length === 0"
                                  class="text-center">
-                                <div class="text-center mb-8">
-                                    <svg
-                                        class="w-24 h-24 mx-auto mb-4 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M12 9l-2 2-2-2m4 2h4a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2h4m4-2l2 2 2-2"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                        ></path>
-                                    </svg>
+                                <div class="text-center mb-4">
+                                    <i class="pi pi-box text-purple-300 animate-slow-bounce" style="font-size: 8rem"></i>
                                     <p class="text-gray-600">
                                         No packages. Please add packages to view data.
                                     </p>
                                 </div>
-                                <PrimaryOutlineButton type="button" @click="showPackageDialog" :disabled="!isExistsRules">
-                                    New Package <i class="fas fa-plus fa-fw fa-fw"></i>
-                                </PrimaryOutlineButton>
+                                <Button v-if="Object.values(copiedPackages).length === 0" :disabled="!isExistsRules" icon="pi pi-plus" label="New Package" severity="help" type="button" variant="outlined"
+                                        @click="showPackageDialog" />
                             </div>
-                        </div>
-                    </div>
-
+                        </template>
+                    </Card>
                 </div>
 
                 <div class="sm:col-span-2 grid-cols-2 grid gap-4 space-y-5">
                     <!-- Price & Payment -->
                     <div class="sm:col-span-2 space-y-5">
-                        <div class="card px-4 sm:px-5 p-5">
-                            <div class="flex justify-between items-center">
-                                <h2
-                                    class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                                >
-                                    Price and Payment
-                                </h2>
-                                <button
-                                    class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90"
-                                    type="button"
-                                    @click="calculatePayment"
-                                >
-                                    Calculate
-                                </button>
-                            </div>
-                            <div class="grid grid-cols-2 gap-5 mt-5">
-                                <div>
-                                    <span>Freight Charge</span>
-                                    <TextInput
-                                        v-model="form.freight_charge"
-                                        :disabled="!isEditable"
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.freight_charge"/>
+                        <Card>
+                            <template #title>
+                                <div class="flex justify-between items-center">
+                                    <span>Price and Payment</span>
+                                    <Button icon="pi pi-calculator" label="Calculate" severity="help" variant="outlined" @click="calculatePayment" />
                                 </div>
-
-                                <div>
-                                    <span>Bill Charge</span>
-                                    <TextInput
-                                        v-model="form.bill_charge"
-                                        :disabled="!isEditable"
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.bill_charge"/>
-                                </div>
-
-                                <div>
-                                    <span>Destination Charges</span>
-                                    <TextInput
-                                        v-model="form.destination_charge"
-                                        :disabled="!isEditable"
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                </div>
-
-                                <div>
-                                    <span>Package Charges</span>
-                                    <TextInput
-                                        v-model="form.package_charges"
-                                        :disabled="!isEditable"
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                </div>
-
-                                <div>
-                                    <span>Discount</span>
-                                    <TextInput
-                                        v-model="form.discount"
-                                        :disabled="!isEditable"
-                                        class="w-full"
-                                        placeholder="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.discount"/>
-                                </div>
-
-                                <div>
-                                    <span>Paid Amount</span>
-                                    <TextInput
-                                        v-model="form.paid_amount"
-                                        class="w-full"
-                                        min="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.paid_amount"/>
-                                </div>
-
-                                <div>
-                                    <span>Additional Charges</span>
-                                    <TextInput
-                                        v-model="form.additional_charge"
-                                        :disabled="!isEditable"
-                                        class="w-full"
-                                        placeholder="0"
-                                        step="any"
-                                        type="number"
-                                    />
-                                    <InputError :message="form.errors.additional_charge"/>
-                                </div>
-
-                                <div class="col-start-2 mt-20 space-y-2.5 font-bold">
-                                    <div class="flex justify-between">
-                                        <p class="line-clamp-1">Packages</p>
-                                        <p class="text-slate-700 dark:text-navy-100">
-                                            {{ packageList.length }}
-                                        </p>
+                            </template>
+                            <template #content>
+                                <div class="grid grid-cols-2 gap-5 mt-5">
+                                    <div>
+                                        <IftaLabel>
+                                            <InputNumber v-model="form.freight_charge" :disabled="!isEditable" class="w-full" inputId="freight-charge" locale="en-US" min="0" step="any" variant="filled" />
+                                            <label for="freight-charge">Freight Charge</label>
+                                        </IftaLabel>
+                                        <InputError :message="form.errors.freight_charge"/>
                                     </div>
-                                    <div class="flex justify-between">
-                                        <p class="line-clamp-1">Weight</p>
-                                        <p class="text-slate-700 dark:text-navy-100">
-                                            {{ grandTotalWeight.toFixed(2) }}
-                                        </p>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <p class="line-clamp-1">Volume</p>
-                                        <p class="text-slate-700 dark:text-navy-100">
-                                            {{ grandTotalVolume.toFixed(3) }}
-                                        </p>
-                                    </div>
-                                </div>
 
-                                <div class="col-span-2">
-                                    <div
-                                        class="flex justify-between text-2xl text-success font-bold"
-                                    >
-                                        <p class="line-clamp-1">Grand Total</p>
-                                        <div class="flex items-center">
-                                            <svg v-if="packageList.length > 0"
-                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle mr-3 text-info hover:cursor-pointer"
-                                                 fill="none" height="24" stroke="currentColor" stroke-linecap="round"
-                                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
-                                                 xmlns="http://www.w3.org/2000/svg"
-                                                 @click="isShowedPaymentSummery = !isShowedPaymentSummery">
-                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
-                                                <path d="M12 9h.01"/>
-                                                <path d="M11 12h1v4h1"/>
-                                            </svg>
-                                            <p>{{ hblTotal ? hblTotal.toFixed(2) : 0.00 }} {{ currency }}</p>
+                                    <div>
+                                        <IftaLabel>
+                                            <InputNumber v-model="form.bill_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
+                                            <label for="bill-charge">Bill Charge</label>
+                                        </IftaLabel>
+                                        <InputError :message="form.errors.bill_charge"/>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputNumber v-model="form.destination_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
+                                            <label for="bill-charge">Destination Charges</label>
+                                        </IftaLabel>
+                                        <InputError :message="form.errors.destination_charge"/>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputNumber v-model="form.package_charges" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
+                                            <label for="bill-charge">Package Charges</label>
+                                        </IftaLabel>
+                                        <InputError :message="form.errors.package_charges"/>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputNumber v-model="form.discount" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
+                                            <label for="bill-charge">Discount</label>
+                                        </IftaLabel>
+                                        <InputError :message="form.errors.discount"/>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputNumber v-model="form.additional_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
+                                            <label for="bill-charge">Additional Charges</label>
+                                        </IftaLabel>
+                                        <InputError :message="form.errors.additional_charge"/>
+                                    </div>
+
+                                    <div class="col-span-2">
+                                        <IftaLabel>
+                                            <InputNumber v-model="form.paid_amount" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
+                                            <label for="bill-charge">Paid Amount</label>
+                                        </IftaLabel>
+                                        <InputError :message="form.errors.paid_amount"/>
+                                    </div>
+
+                                    <div class="flow-root col-span-2 my-3">
+                                        <ul class="-my-6" role="list">
+                                            <li class="flex py-3">
+                                                <div class="flex flex-1 flex-col">
+                                                    <div>
+                                                        <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                            <h3>
+                                                                Packages
+                                                            </h3>
+                                                            <p class="ml-4">{{ packageList.length }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="flex py-3">
+                                                <div class="flex flex-1 flex-col">
+                                                    <div>
+                                                        <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                            <h3>
+                                                                Weight
+                                                            </h3>
+                                                            <p class="ml-4">{{ grandTotalWeight.toFixed(2) }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="flex py-3">
+                                                <div class="flex flex-1 flex-col">
+                                                    <div>
+                                                        <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                            <h3>
+                                                                Volume
+                                                            </h3>
+                                                            <p class="ml-4">{{ grandTotalVolume.toFixed(3) }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="col-span-2">
+                                        <div
+                                            class="flex justify-between text-2xl text-success font-bold"
+                                        >
+                                            <p class="line-clamp-1">Grand Total</p>
+                                            <div class="flex items-center">
+                                                <svg v-if="packageList.length > 0"
+                                                     class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle mr-3 text-info hover:cursor-pointer"
+                                                     fill="none" height="24" stroke="currentColor" stroke-linecap="round"
+                                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
+                                                     xmlns="http://www.w3.org/2000/svg"
+                                                     @click="isShowedPaymentSummery = !isShowedPaymentSummery">
+                                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                    <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+                                                    <path d="M12 9h.01"/>
+                                                    <path d="M11 12h1v4h1"/>
+                                                </svg>
+                                                <p>{{ hblTotal ? hblTotal.toFixed(2) : 0.00 }} {{ currency }}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <template v-if="isShowedPaymentSummery">
-                                        <div v-if="packageList.length > 0" class="p-2 bg-slate-100 rounded-lg mt-2">
-                                            <table class="italic w-full">
-                                                <tr v-if="!form.is_active_package">
-                                                    <td colspan="2">Freight Charges</td>
-                                                    <td colspan="2">
+                                        <template v-if="isShowedPaymentSummery">
+                                            <div v-if="packageList.length > 0" class="p-2 bg-slate-100 rounded-lg mt-2">
+                                                <table class="italic w-full">
+                                                    <tr v-if="!form.is_active_package">
+                                                        <td colspan="2">Freight Charges</td>
+                                                        <td colspan="2">
                                                     <span v-for="(charge, index) in freight_charge_operations"
                                                           :key="index">
                                                         {{ charge }} <br>
                                                     </span>
-                                                    </td>
-                                                    <td class="text-right">{{
-                                                        parseFloat(form.freight_charge).toFixed(2)
-                                                        }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Destination Charge</td>
-                                                    <td class="text-right">
-                                                        {{ parseFloat(form.destination_charge).toFixed(2) }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Package Charge</td>
-                                                    <td class="text-right">
-                                                        {{ parseFloat(form.package_charges).toFixed(2) }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Bill Charges</td>
-                                                    <td class="text-right">{{ parseFloat(form.bill_charge).toFixed(2) }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Discount</td>
-                                                    <td class="text-right">- {{
-                                                        parseFloat(form.discount).toFixed(2)
-                                                        }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Additional Charge</td>
-                                                    <td class="text-right">+
-                                                        {{ parseFloat(form.additional_charge).toFixed(2) }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4">Vat</td>
-                                                    <td class="text-right">+
-                                                        {{ parseFloat(vat).toFixed(2) }}
-                                                    </td>
-                                                </tr>
-                                                <tr class="font-bold">
-                                                    <td colspan="4">Total</td>
-                                                    <td class="text-right">{{ hblTotal.toFixed(2) }}</td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </template>
+                                                        </td>
+                                                        <td class="text-right">{{
+                                                                parseFloat(form.freight_charge).toFixed(2)
+                                                            }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4">Destination Charge</td>
+                                                        <td class="text-right">
+                                                            {{ parseFloat(form.destination_charge).toFixed(2) }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4">Package Charge</td>
+                                                        <td class="text-right">
+                                                            {{ parseFloat(form.package_charges).toFixed(2) }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4">Bill Charges</td>
+                                                        <td class="text-right">{{ parseFloat(form.bill_charge).toFixed(2) }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4">Discount</td>
+                                                        <td class="text-right">- {{
+                                                                parseFloat(form.discount).toFixed(2)
+                                                            }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4">Additional Charge</td>
+                                                        <td class="text-right">+
+                                                            {{ parseFloat(form.additional_charge).toFixed(2) }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4">Vat</td>
+                                                        <td class="text-right">+
+                                                            {{ parseFloat(vat).toFixed(2) }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="font-bold">
+                                                        <td colspan="4">Total</td>
+                                                        <td class="text-right">{{ hblTotal.toFixed(2) }}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
-                                <!-- -->
-                            </div>
-                        </div>
+                            </template>
+                        </Card>
                     </div>
                 </div>
             </div>
@@ -2301,5 +1659,98 @@ const confirmViewHBL = async (id) => {
             :show="showConfirmViewHBLModal"
             @close="closeViewModal"
         />
+
+        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToShipperModalShow"
+                     @close="closeCopyFromHBLToShipperModal">
+            <template #title>
+                Copy
+            </template>
+
+            <template #content>
+                <div class="mt-4">
+                    <TextInput
+                        v-model="reference"
+                        class="w-full"
+                        placeholder="Enter HBL Reference"
+                        required
+                        type="text"
+                    />
+                </div>
+            </template>
+
+            <template #footer>
+                <SecondaryButton @click="closeCopyFromHBLToShipperModal">
+                    Cancel
+                </SecondaryButton>
+                <PrimaryButton
+                    class="ms-3"
+                    @click.prevent="handleCopyFromHBLToShipper"
+                >
+                    Copy From HBL
+                </PrimaryButton>
+            </template>
+        </DialogModal>
+
+        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToConsigneeModalShow"
+                     @close="closeCopyFromHBLToConsigneeModal">
+            <template #title>
+                Copy
+            </template>
+
+            <template #content>
+                <div class="mt-4">
+                    <TextInput
+                        v-model="reference"
+                        class="w-full"
+                        placeholder="Enter HBL Reference"
+                        required
+                        type="text"
+                    />
+                </div>
+            </template>
+
+            <template #footer>
+                <SecondaryButton @click="closeCopyFromHBLToConsigneeModal">
+                    Cancel
+                </SecondaryButton>
+                <PrimaryButton
+                    class="ms-3"
+                    @click.prevent="handleCopyFromHBLToConsignee"
+                >
+                    Copy From HBL
+                </PrimaryButton>
+            </template>
+        </DialogModal>
+
+        <DialogModal :maxWidth="'xl'" :show="copyFromHBLToPackageModalShow"
+                     @close="closeCopyFromHBLToPackageModal">
+            <template #title>
+                Copy
+            </template>
+
+            <template #content>
+                <div class="mt-4">
+                    <TextInput
+                        v-model="reference"
+                        class="w-full"
+                        placeholder="Enter HBL Reference"
+                        required
+                        type="text"
+                    />
+                </div>
+            </template>
+
+            <template #footer>
+                <SecondaryButton @click="closeCopyFromHBLToPackageModal">
+                    Cancel
+                </SecondaryButton>
+                <PrimaryButton
+                    class="ms-3"
+                    @click.prevent="handleCopyFromHBLToPackage"
+                >
+                    Copy From HBL
+                </PrimaryButton>
+            </template>
+        </DialogModal>
     </AppLayout>
 </template>
