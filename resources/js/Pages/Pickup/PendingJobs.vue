@@ -405,6 +405,7 @@ const confirmPickupRetry = (pickup) => {
             </Panel>
 
             <Card class="my-5">
+                <template #title>Pending Jobs</template>
                 <template #content>
                     <ContextMenu ref="cm" :model="menuModel" @hide="selectedPickup.length < 1"/>
                     <DataTable

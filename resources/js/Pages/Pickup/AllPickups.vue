@@ -118,8 +118,8 @@ const fetchPickups = async (page = 1, search = "", sortField = 'id', sortOrder =
             }
         });
         pickups.value = response.data.data;
-        totalRecords.value = response.data.meta.total; // Correct total count
-        currentPage.value = response.data.meta.current_page; // Correct current page
+        totalRecords.value = response.data.meta.total;
+        currentPage.value = response.data.meta.current_page;
     } catch (error) {
         console.error("Error fetching Pickups:", error);
     } finally {
@@ -350,8 +350,8 @@ const confirmPickupRetry = (pickup) => {
 };
 </script>
 <template>
-    <AppLayout title="Pending Pickups">
-        <template #header>Pending Pickups</template>
+    <AppLayout title="All Pickups">
+        <template #header>All Pickups</template>
 
         <Breadcrumb/>
 
@@ -381,6 +381,7 @@ const confirmPickupRetry = (pickup) => {
             </Panel>
 
             <Card class="my-5">
+                <template #title>All Pickups</template>
                 <template #content>
                     <ContextMenu ref="cm" :model="menuModel" @hide="selectedPickup.length < 1"/>
                     <DataTable
