@@ -85,4 +85,9 @@ class DashboardRepository implements DashboardRepositoryInterface
             return [$month => $data->get($month, 0)];
         })->collapse();
     }
+
+    public function countTotalPickups():int
+    {
+        return PickUp::count();
+    }
 }

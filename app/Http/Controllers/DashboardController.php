@@ -25,6 +25,7 @@ class DashboardController extends Controller
             'totalDrivers' => $this->dashboardRepository->countTotalDrivers(),
             'driverAssignedJobs' => $this->dashboardRepository->countDriverAssignedJobs(),
             'driverChartData' => $this->dashboardRepository->getTotalDriverAssignedJobsByMonth(),
+            'totalPickups'=>$this ->dashboardRepository->countTotalPickups(),
         ]);
     }
 }

@@ -48,7 +48,12 @@ const props = defineProps({
     driverChartData: {
         type: Array,
         default: () => [],
-    }
+    },
+    totalPickups: {
+        type: Number,
+        default: 0,
+    },
+
 })
 
 const driverChartOptions = computed(() => {
@@ -121,14 +126,15 @@ const driverChartOptions = computed(() => {
         <template #header>Dashboard</template>
 
         <div v-if="usePage().props.auth.user.roles[0].name !== 'customer'" class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5 lg:grid-cols-6 lg:gap-6">
-            <DashboardCard :count="assignedJobs" icon="briefcase" icon-color="secondary" title="Assigned Job"/>
-            <DashboardCard :count="pickedJobs" icon="person-biking" icon-color="success" title="Picked"/>
-            <DashboardCard :count="pendingJobs" icon="hourglass-half" icon-color="warning" title="Pending Job"/>
+<!--            <DashboardCard :count="assignedJobs" icon="briefcase" icon-color="secondary" title="Assigned Job"/>-->
+<!--            <DashboardCard :count="pickedJobs" icon="person-biking" icon-color="success" title="Picked"/>-->
+<!--            <DashboardCard :count="pendingJobs" icon="hourglass-half" icon-color="warning" title="Pending Job"/>-->
             <DashboardCard :count="totalHBLs" icon="box" icon-color="info" title="Total HBL"/>
             <DashboardCard :count="loadedShipments" icon="truck-ramp-box" icon-color="error" title="Loaded Shipment"/>
             <DashboardCard :count="totalContainers" icon="truck-moving" icon-color="primary" title="Total Containers"/>
-            <DashboardCard :count="warehouses" icon="warehouse" icon-color="dark" title="Warehouse"/>
-            <DashboardCard :count="cashSettlements" icon="cash-register" icon-color="warning" title="Cash Settlements"/>
+<!--            <DashboardCard :count="warehouses" icon="warehouse" icon-color="dark" title="Warehouse"/>-->
+<!--            <DashboardCard :count="cashSettlements" icon="cash-register" icon-color="warning" title="Cash Settlements"/>-->
+            <DashboardCard :count="totalPickups" icon="person-biking" icon-color="primary" title="Total Pickups"/>
         </div>
 
 
@@ -163,6 +169,7 @@ const driverChartOptions = computed(() => {
                     <apexchart :options="driverChartOptions" :series="driverChartOptions.series"></apexchart>
                 </div>
             </div>
+
         </div>
     </AppLayout>
 </template>
