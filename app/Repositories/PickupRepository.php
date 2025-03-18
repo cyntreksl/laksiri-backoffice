@@ -79,22 +79,15 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-
-        $pickups = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
-
-        $totalRecords = $countQuery->count();
+        $pickups = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => PickupResource::collection($pickups),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $pickups->total(),
+                'current_page' => $pickups->currentPage(),
+                'perPage' => $pickups->perPage(),
+                'lastPage' => $pickups->lastPage(),
             ],
         ]);
     }
