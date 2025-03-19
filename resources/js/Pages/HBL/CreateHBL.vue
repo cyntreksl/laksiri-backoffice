@@ -848,6 +848,20 @@ const confirmRemovePackage = (index) => {
         }
     });
 };
+
+const onDialogShow = () => {
+    const bodyElement = document.querySelector('body');
+    if (bodyElement) {
+        bodyElement.style.overflow = '';
+    }
+};
+
+const onDialogHide = () => {
+    const bodyElement = document.querySelector('body');
+    if (bodyElement) {
+        bodyElement.style.overflow = 'hidden';
+    }
+};
 </script>
 
 <template>
@@ -1372,7 +1386,7 @@ const confirmRemovePackage = (index) => {
             @close="closeViewModal"
         />
 
-        <Dialog v-model:visible="showAddNewPackageDialog" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :header="editMode ? `Edit Package` : `Add New Package`" :style="{ width: '60rem' }" block-scroll maximizable modal position="bottom">
+        <Dialog v-model:visible="showAddNewPackageDialog" :header="editMode ? `Edit Package` : `Add New Package`" :style="{ width: '60rem' }" block-scroll maximizable modal position="bottom" @hide="onDialogHide" @show="onDialogShow">
 
             <span class="text-surface-500 dark:text-surface-400 block mb-4">{{ !editMode ? "Add new package to HBL" : "" }}</span>
 
