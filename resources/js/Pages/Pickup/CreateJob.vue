@@ -298,7 +298,7 @@ watch(isUrgentPickup, (newValue) => {
                         </template>
                     </Card>
 
-                    <Card>
+                    <Card class="!pb-4">
                         <template #title>Additional Details</template>
                         <template #content>
                             <div class="grid grid-cols-1 gap-5 mt-3">
