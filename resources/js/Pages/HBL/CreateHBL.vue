@@ -886,8 +886,8 @@ const confirmRemovePackage = (index) => {
                                 <InputError :message="form.errors.warehouse"/>
                             </Fieldset>
 
-                            <div class="flex justify-center">
-                                <img :src="hblImage" alt="hbl-image" class="w-auto">
+                            <div class="flex justify-center mt-36">
+                                <img :src="hblImage" alt="hbl-image" class="w-3/4">
                             </div>
                         </template>
                     </Card>
