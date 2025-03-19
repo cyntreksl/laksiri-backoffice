@@ -6,11 +6,8 @@ import {computed, reactive, ref, watch} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
-import TextInput from "@/Components/TextInput.vue";
 import {push} from "notivue";
-import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -29,6 +26,7 @@ import Column from 'primevue/column';
 import InputNumber from 'primevue/inputnumber';
 import IftaLabel from 'primevue/iftalabel';
 import Dialog from 'primevue/dialog';
+import Message from 'primevue/message';
 
 const props = defineProps({
     hblTypes: {
@@ -60,6 +58,8 @@ const props = defineProps({
         default: () => [],
     },
 });
+
+const measureTypes = ref(['cm', 'm', 'in', 'ft']);
 
 //branch set
 const currentBranch = usePage().props?.auth.user.active_branch_name;
@@ -1392,263 +1392,6 @@ const confirmViewHBL = async (id) => {
 
         </form>
 
-        <div
-            v-if="showAddNewPackageDialog"
-            class="fixed px-2 inset-0 z-[100] flex flex-col items-center justify-center overflow-y-auto"
-            role="dialog"
-        >
-            <div
-                class="absolute inset-0 bg-slate-900/60 transition-opacity duration-300"
-                x-show="true"
-                @click="false"
-            ></div>
-
-            <div
-                class="relative w-auto sm:w-1/2 h-auto sm:h-1/5 md:h-fit lg:h-fit rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
-            >
-                <div
-                    class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5"
-                >
-                    <h3 class="text-base font-medium text-slate-700 dark:text-navy-100">
-                        {{ editMode ? "Edit Package" : "Add New Package" }}
-                    </h3>
-                    <button
-                        class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        @click="closeAddPackageModal"
-                    >
-                        <svg
-                            class="size-4.5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M6 18L18 6M6 6l12 12"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            ></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="px-4 py-4 sm:px-5">
-                    <p class="text-base">
-                        {{ !editMode ? "Add new package to HBL" : "" }}
-                    </p>
-
-                    <div class="mt-4 space-y-4">
-                        <div class="grid grid-cols-4 gap-4">
-                            <div class="col-span-4" v-if="packageRulesData.length > 0" >
-                                <label class="block">
-                                    <span>
-                                        Package
-                                        <span v-if="form.is_active_package || priceRulesData.length === 0" class="text-red-500 text-sm">*</span>
-                                    </span>
-                                    <select
-                                        v-model="packageItem.packageRule"
-                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        @change="getSelectedPackage"
-                                        :required="form.is_active_package"
-                                        :disabled="!form.is_active_package && packageList.length > 0"
-                                    >
-                                        <option value="0">Choose Package</option>
-                                        <option
-                                            v-for="pkg in packageRulesData"
-                                            :key="pkg.id"
-                                            :value="pkg.id"
-                                        >
-                                            {{ getPackageRuleTitle(pkg.rule_title,pkg.length, pkg.width, pkg.height, pkg.measure_type)}}
-                                        </option>
-                                    </select>
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                                    <span>Type </span>
-                                    <select
-                                        v-model="selectedType"
-                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        @change="updateTypeDescription"
-                                    >
-                                        <option value="">Choose one</option>
-                                        <option v-for="type in packageTypes" :key="type.name">
-                                            {{ type.name }}
-                                        </option>
-                                    </select>
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-2">
-                                <label class="block">
-                                  <span
-                                  >Type Description
-                                    <span class="text-red-500 text-sm">*</span></span
-                                  >
-                                    <input
-                                        v-model="packageItem.type"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Sofa set"
-                                        type="text"
-                                    />
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                                  <span
-                                  >Measure Type <span class="text-red-500 text-sm"
-                                  >*<br/></span
-                                  ></span>
-                                    <select
-                                        v-model="packageItem.measure_type"
-                                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    >
-                                        <option value="cm">cm</option>
-                                        <option value="m">m</option>
-                                        <option value="in">in</option>
-                                        <option value="ft">ft</option>
-                                    </select>
-                                </label>
-                            </div>
-
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                                  <span
-                                  >Length (cm) <br/>
-                                    <span class="text-red-500 text-sm">*</span></span
-                                  >
-                                    <input
-                                        v-model="packageItem.length"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0.00"
-                                        placeholder="1.00"
-                                        step="0.01"
-                                        type="number"
-                                    />
-                                    <span class="ml-2 text-red-500 text-sm">{{packageItemLength.toFixed(2)}} cm</span>
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                                  <span
-                                  >Width <br/><span class="text-red-500 text-sm">*</span>
-                                  </span>
-
-                                    <input
-                                        v-model="packageItem.width"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0.00"
-                                        placeholder="1.00"
-                                        step="0.01"
-                                        type="number"
-                                    />
-                                    <span class="ml-2 text-red-500 text-sm">{{packageItemWidth.toFixed(2)}} cm</span>
-                                </label>
-                            </div>
-
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                  <span
-                  >Height <br/><span class="text-red-500 text-sm"
-                  >*<br/></span
-                  ></span>
-                                    <input
-                                        v-model="packageItem.height"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0.00"
-                                        placeholder="1.00"
-                                        step="0.01"
-                                        type="number"
-                                    />
-                                    <span class="ml-2 text-red-500 text-sm">{{packageItemHeight.toFixed(2)}} cm</span>
-                                </label>
-                            </div>
-
-                            <!--                            <div class="col-span-4 md:col-span-1">-->
-                            <!--                                -->
-                            <!--                            </div>-->
-
-                            <div class="col-span-4 md:col-span-1">
-                                <label class="block">
-                  <span
-                  >Quantity <br/><span class="text-red-500 text-sm"
-                  >*<br/></span
-                  ></span>
-                                    <input
-                                        v-model="packageItem.quantity"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0"
-                                        placeholder="1"
-                                        step="1"
-                                        type="number"
-                                    />
-                                </label>
-                            </div>
-
-                            <div class="col-span-4 md:col-span-3"></div>
-
-                            <div class="col-span-2">
-                                <label class="block">
-                  <span
-                  >Volume ({{volumeUnit }})
-                    <span class="text-red-500 text-sm">*</span></span
-                  >
-                                    <input
-                                        v-model="packageItem.volume"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="1.00"
-                                        step="0.001"
-                                        type="number"
-                                    />
-                                    <span class="ml-2 text-red-500 text-sm">{{packageItemVolume}} M.CU</span>
-                                </label>
-                            </div>
-                            <div class="col-span-2">
-                                <label class="block">
-                                    <span>Total Weight</span>
-                                    <input
-                                        v-model="packageItem.totalWeight"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0"
-                                        placeholder="1"
-                                        step="1"
-                                        type="number"
-                                    />
-                                </label>
-                            </div>
-
-                            <div class="col-span-4">
-                                <label class="block">
-                                    <span>Remarks</span>
-                                    <textarea
-                                        v-model="packageItem.remarks"
-                                        class="form-textarea mt-1.5 w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Enter Text"
-                                        rows="4"
-                                    ></textarea>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="space-x-2 text-right">
-                            <SecondaryButton
-                                class="min-w-[7rem]"
-                                @click="closeAddPackageModal"
-                            >
-                                Cancel
-                            </SecondaryButton>
-                            <PrimaryButton
-                                class="min-w-[7rem]"
-                                type="button"
-                                @click="addPackageData"
-                            >
-                                {{ editMode ? "Edit" : "Add" }}
-                            </PrimaryButton>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <RemovePackageConfirmationModal
             :show="showConfirmRemovePackageModal"
             @close="closeModal"
@@ -1660,6 +1403,111 @@ const confirmViewHBL = async (id) => {
             :show="showConfirmViewHBLModal"
             @close="closeViewModal"
         />
+
+        <Dialog v-model:visible="showAddNewPackageDialog" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :header="editMode ? `Edit Package` : `Add New Package`" :style="{ width: '60rem' }" block-scroll maximizable modal position="bottom">
+
+            <span class="text-surface-500 dark:text-surface-400 block mb-4">{{ !editMode ? "Add new package to HBL" : "" }}</span>
+
+            <div class="grid grid-cols-4 gap-4">
+                <div v-if="packageRulesData.length > 0" class="col-span-4" >
+                    <InputLabel>
+                        Package
+                        <span v-if="form.is_active_package || priceRulesData.length === 0" class="text-red-500 text-sm">*</span>
+                    </InputLabel>
+                    <Select v-model="packageItem.packageRule" :disabled="!form.is_active_package && packageList.length > 0" :options="packageRulesData" :required="form.is_active_package" class="w-25" filter option-value="id" placeholder="Choose Package"
+                            @change="getSelectedPackage" >
+                        <template #option="slotProps">
+                            <div class="flex items-center">
+                                <div>
+                                    {{ getPackageRuleTitle(slotProps.option.rule_title,slotProps.option.length, slotProps.option.width, slotProps.option.height, slotProps.option.measure_type) }}
+                                </div>
+                            </div>
+                        </template>
+                    </Select>
+                </div>
+
+                <div class="col-span-4 md:col-span-1">
+                    <InputLabel value="Type"/>
+                    <Select v-model="selectedType" :options="packageTypes" class="w-full" filter option-label="name" option-value="name" placeholder="Choose One" @change="updateTypeDescription" />
+                </div>
+
+                <div class="col-span-4 md:col-span-2">
+                    <InputLabel>
+                        Type Description
+                        <span class="text-red-500 text-sm">*</span>
+                    </InputLabel>
+                    <InputText v-model="packageItem.type" class="w-full" placeholder="Sofa set"/>
+                </div>
+
+                <div class="col-span-4 md:col-span-1">
+                    <InputLabel>
+                        Measure Type
+                        <span class="text-red-500 text-sm">*</span>
+                    </InputLabel>
+                    <Select v-model="packageItem.measure_type" :options="measureTypes" class="w-full" placeholder="Choose One"/>
+                </div>
+
+                <div class="col-span-4 md:col-span-1">
+                    <InputLabel>
+                        Length (cm)
+                        <span class="text-red-500 text-sm">*</span>
+                    </InputLabel>
+                    <InputNumber v-model="packageItem.length" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
+                    <Message severity="secondary" size="small" variant="simple">{{ packageItemLength.toFixed(2) }} cm</Message>
+                </div>
+
+                <div class="col-span-4 md:col-span-1">
+                    <InputLabel>
+                        Width
+                        <span class="text-red-500 text-sm">*</span>
+                    </InputLabel>
+                    <InputNumber v-model="packageItem.width" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
+                    <Message severity="secondary" size="small" variant="simple">{{ packageItemWidth.toFixed(2) }} cm</Message>
+                </div>
+
+                <div class="col-span-4 md:col-span-1">
+                    <InputLabel>
+                        Height
+                        <span class="text-red-500 text-sm">*</span>
+                    </InputLabel>
+                    <InputNumber v-model="packageItem.height" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
+                    <Message severity="secondary" size="small" variant="simple">{{ packageItemHeight.toFixed(2) }} cm</Message>
+                </div>
+
+                <div class="col-span-4 md:col-span-1">
+                    <InputLabel>
+                        Quantity
+                        <span class="text-red-500 text-sm">*</span>
+                    </InputLabel>
+                    <InputNumber v-model="packageItem.quantity" class="w-full" min="0" placeholder="1" step="1"/>
+                </div>
+
+                <div class="col-span-2">
+                    <InputLabel>
+                        Volume ({{volumeUnit }})
+                        <span class="text-red-500 text-sm">*</span>
+                    </InputLabel>
+                    <InputNumber v-model="packageItem.volume" class="w-full" placeholder="1.00" step="0.001"/>
+                    <Message severity="secondary" size="small" variant="simple">{{packageItemVolume}} M.CU</Message>
+                </div>
+
+                <div class="col-span-2">
+                    <InputLabel value="Total Weight" />
+                    <InputNumber v-model="packageItem.totalWeight" class="w-full" min="0" placeholder="1" step="1"/>
+                </div>
+
+                <div class="col-span-4">
+                    <InputLabel value="Remarks" />
+                    <Textarea v-model="packageItem.remarks" class="w-full" cols="30" placeholder="Type Remarks..." rows="4" />
+                </div>
+            </div>
+
+            <template #footer>
+                <Button label="Cancel" severity="secondary" text @click="closeAddPackageModal" />
+                <Button :label="editMode ? `Edit Package` : `Add Package`" severity="help" @click="addPackageData" />
+            </template>
+
+        </Dialog>
 
         <Dialog v-model:visible="copyFromHBLToShipperModalShow" :style="{ width: '25rem' }" header="Copy From HBL" modal>
             <div class="flex items-center gap-4 mb-4">
