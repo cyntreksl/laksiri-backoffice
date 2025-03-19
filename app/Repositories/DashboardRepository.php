@@ -7,6 +7,7 @@ use App\Interfaces\DashboardRepositoryInterface;
 use App\Models\Container;
 use App\Models\HBL;
 use App\Models\PickUp;
+use App\Models\PickupException;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -86,8 +87,79 @@ class DashboardRepository implements DashboardRepositoryInterface
         })->collapse();
     }
 
-    public function countTotalPickups():int
+    public function countTotalPickups(): int
     {
         return PickUp::count();
+    }
+
+    public function getTotalJobsByMonth(): Collection
+    {
+        $allMonths = collect([
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        ]);
+
+        $data = PickUp::where('driver_id', '<>', null)
+            ->where('driver_assigned_at', '>=', Carbon::now()->subMonths(12))
+            ->selectRaw('DATE_FORMAT(driver_assigned_at, "%b") as month_name, COUNT(driver_id) as count')
+            ->groupBy('month_name')
+            ->orderByRaw('FIELD(month_name, "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")')
+            ->pluck('count', 'month_name');
+
+        return $allMonths->map(function ($month) use ($data) {
+            return [$month => $data->get($month, 0)];
+        })->collapse();
+    }
+
+    public function getExceptionJobsByMonth(): Collection
+    {
+        $allMonths = collect([
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        ]);
+
+        $data = PickupException::where('driver_assigned_at', '>=', Carbon::now()->subMonths(12))
+            ->selectRaw('DATE_FORMAT(driver_assigned_at, "%b") as month_name, COUNT(driver_id) as count')
+            ->groupBy('month_name')
+            ->orderByRaw('FIELD(month_name, "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")')
+            ->pluck('count', 'month_name');
+
+        return $allMonths->map(function ($month) use ($data) {
+            return [$month => $data->get($month, 0)];
+        })->collapse();
+    }
+
+    public function getCollectedJobsByMonth(): Collection
+    {
+        $allMonths = collect([
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        ]);
+
+        $data = PickUp::where('system_status', PickUp::SYSTEM_STATUS_CARGO_COLLECTED)
+            ->where('driver_id', '<>', null)
+            ->where('driver_assigned_at', '>=', Carbon::now()->subMonths(12))
+            ->selectRaw('DATE_FORMAT(driver_assigned_at, "%b") as month_name, COUNT(driver_id) as count')
+            ->groupBy('month_name')
+            ->orderByRaw('FIELD(month_name, "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")')
+            ->pluck('count', 'month_name');
+
+        return $allMonths->map(function ($month) use ($data) {
+            return [$month => $data->get($month, 0)];
+        })->collapse();
+    }
+
+    public function getTotalHBLCountByMonth(): Collection
+    {
+        $allMonths = collect([
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        ]);
+        $data = HBL::where('created_at', '>=', Carbon::now()->subMonths(12))
+            ->selectRaw('DATE_FORMAT(created_at, "%b") as month_name, COUNT(*) as count')
+            ->groupBy('month_name')
+            ->orderByRaw('FIELD(month_name, "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")')
+            ->pluck('count', 'month_name');
+
+        return $allMonths->map(function ($month) use ($data) {
+            return [$month => $data->get($month, 0)];
+        })->collapse();
+
     }
 }

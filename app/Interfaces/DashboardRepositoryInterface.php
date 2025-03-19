@@ -28,5 +28,13 @@ interface DashboardRepositoryInterface
 
     public function getTotalDriverAssignedJobsByMonth(): Collection;
 
-    public function countTotalPickups():int;
+    public function countTotalPickups(): int;
+
+    public function getTotalJobsByMonth(): Collection;
+
+    public function getExceptionJobsByMonth(): Collection;
+
+    public function getCollectedJobsByMonth(): Collection;
+
+    public function getTotalHBLCountByMonth(): Collection;
 }
