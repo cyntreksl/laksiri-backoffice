@@ -81,6 +81,9 @@ export default {
                 4: "4",
                 5: "5",
             },
+            animation: {
+                'slow-bounce': 'slow-bounce 2s infinite',
+            },
             keyframes: {
                 "fade-out": {
                     "0%": {
@@ -90,6 +93,14 @@ export default {
                     "100%": {
                         opacity: 0,
                         visibility: "hidden",
+                    },
+                },
+                'slow-bounce': {
+                    '0%, 100%': {
+                        transform: 'translateY(0)',
+                    },
+                    '50%': {
+                        transform: 'translateY(-20px)',
                     },
                 },
             },
