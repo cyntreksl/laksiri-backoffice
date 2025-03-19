@@ -170,7 +170,7 @@ const filteredPackages = computed(() => {
         return unloadedHBLs.value;
     }
     return unloadedHBLs.value.filter(hbl => {
-        return hbl?.hbl.toLowerCase().includes(searchQuery.value.toLowerCase());
+        return hbl?.hbl_number.toLowerCase().includes(searchQuery.value.toLowerCase());
     });
 })
 

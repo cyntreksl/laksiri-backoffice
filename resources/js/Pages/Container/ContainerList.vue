@@ -571,7 +571,7 @@ const shipIcon = ref(`
         <div class="flex justify-end mt-4">
             <Link v-if="$page.props.user.permissions.includes('container.create')"
                   :href="route('loading.loading-containers.create')">
-                <PrimaryButton> Create New Container</PrimaryButton>
+                <PrimaryButton> Create New Shipment</PrimaryButton>
             </Link>
         </div>
 
@@ -1062,7 +1062,7 @@ const shipIcon = ref(`
         <div class="flex justify-end mt-4">
             <Link v-if="$page.props.user.permissions.includes('container.create')"
                   :href="route('loading.loading-containers.create')">
-                <PrimaryButton> Create New Container</PrimaryButton>
+                <PrimaryButton> Create New Shipment</PrimaryButton>
             </Link>
         </div>
 

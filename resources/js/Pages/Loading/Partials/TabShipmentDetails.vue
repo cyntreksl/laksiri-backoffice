@@ -94,6 +94,7 @@ const handleUpdateContainer = () => {
         preserveState: true,
         onSuccess: () => {
             emit('close');
+            router.visit(route("loading.loaded-containers.index"));
             push.success('Container Updated Successfully!');
         },
         onError: () => {
@@ -236,12 +237,12 @@ watchEffect(() => {
                         <InputError :message="form.errors.port_of_discharge" />
                     </div>
                     <div>
-                        <InputLabel value="Loaded Started Time"/>
+                        <InputLabel value="Loading Started Time"/>
                         <TextInput v-model="form.loading_started_at" class="w-full"  :disabled="true" />
                         <InputError :message="form.errors.loading_started_at" />
                     </div>
                     <div>
-                        <InputLabel value="Loaded End Time"/>
+                        <InputLabel value="Loading End Time"/>
                         <TextInput v-model="form.loading_ended_at" class="w-full"  :disabled="true" />
                         <InputError :message="form.errors.loading_ended_at" />
                     </div>

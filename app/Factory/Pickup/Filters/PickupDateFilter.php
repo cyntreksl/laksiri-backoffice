@@ -10,7 +10,7 @@ class PickupDateFilter implements FilterInterface
 {
     public function apply(Builder $query, $value)
     {
-        $dateValue = Carbon::parse($value); // Ensure $value is parsed into a date
+        $dateValue = Carbon::parse($value);
 
         return $query->whereDate('pickup_date', '>=', $dateValue);
     }
