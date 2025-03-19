@@ -298,40 +298,90 @@ const exportCSV = () => {
                         @page="onPageChange"
                         @rowContextmenu="onRowContextMenu"
                         @sort="onSort">
+
                         <template #header>
-                            <div class="flex justify-between">
-                                <Button icon="pi pi-filter-slash" label="Clear" outlined severity="contrast" size="small" type="button" @click="clearFilter()" />
-                                <IconField>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    All HBLs
+                                </div>
+                                <Link v-if="$page.props.user.permissions.includes('hbls.create')" :href="route('hbls.create')">
+                                    <PrimaryButton class="w-full">Create New HBL</PrimaryButton>
+                                </Link>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Button Group -->
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        icon="pi pi-filter-slash"
+                                        label="Clear Filters"
+                                        outlined
+                                        severity="contrast"
+                                        size="small"
+                                        type="button"
+                                        @click="clearFilter()"
+                                    />
+
+                                    <Button
+                                        icon="pi pi-external-link"
+                                        label="Export"
+                                        severity="contrast"
+                                        size="small"
+                                        @click="exportCSV($event)"
+                                    />
+                                </div>
+
+                                <!-- Search Field -->
+                                <IconField class="w-full sm:w-auto">
                                     <InputIcon>
                                         <i class="pi pi-search" />
                                     </InputIcon>
-                                    <InputText v-model="filters.global.value" placeholder="Keyword Search" size="small" />
+                                    <InputText
+                                        v-model="filters.global.value"
+                                        class="w-full"
+                                        placeholder="Keyword Search"
+                                        size="small"
+                                    />
                                 </IconField>
                             </div>
                         </template>
+
                         <template #empty> No hbls found. </template>
-                        <template #loading> Loading hbl data. Please wait. </template>
+
+                        <template #loading> Loading hbl data. Please wait.</template>
+
                         <Column field="reference" header="Reference" hidden sortable></Column>
-                        <Column field="hbl" header="HBL" sortable></Column>
+
+                        <Column field="hbl_number" header="HBL" sortable>
+                            <template #body="slotProps">
+                                <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
+                            </template>
+                        </Column>
+
                         <Column field="cargo_type" header="Cargo Type" sortable>
                             <template #body="slotProps">
                                 <Tag :icon="resolveCargoType(slotProps.data).icon" :severity="resolveCargoType(slotProps.data).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" @change="filterCallback()">
-                                    <template #option="slotProps">
-                                        <Tag :value="slotProps.option" />
-                                    </template>
-                                </Select>
+                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" @change="filterCallback()" />
                             </template>
                         </Column>
+
                         <Column field="hbl_name" header="HBL Name">
                             <template #body="slotProps">
-                                <div>{{ slotProps.data.hbl_name }}</div>
+                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.hbl_name}`"
+                                      class="hover:underline" target="_blank">
+                                    <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
+                                    {{ slotProps.data.hbl_name }}
+                                </a>
                                 <div class="text-gray-500 text-sm">{{slotProps.data.email}}</div>
-                                <div class="text-gray-500 text-sm">{{slotProps.data.contact_number}}</div>
+                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.contact_number}`"
+                                   class="text-gray-500 hover:underline text-sm" target="_blank">
+                                    <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
+                                    {{ slotProps.data.contact_number }}
+                                </a>
                             </template>
                         </Column>
+
                         <Column field="address" header="Address"></Column>
                         <Column field="warehouse" header="Warehouse" sortable>
                             <template #body="slotProps">
