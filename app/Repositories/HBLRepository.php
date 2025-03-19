@@ -352,21 +352,17 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ], 'like', '%'.$search.'%');
         }
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
+        FilterFactory::apply($query, $filters);
 
-        $hbls = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $hbls = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => HBLResource::collection($hbls),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $hbls->total(),
+                'current_page' => $hbls->currentPage(),
+                'perPage' => $hbls->perPage(),
+                'lastPage' => $hbls->lastPage(),
             ],
         ]);
     }
