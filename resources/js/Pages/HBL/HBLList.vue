@@ -6,7 +6,7 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import FloatLabel from 'primevue/floatlabel';
 import {useConfirm} from "primevue/useconfirm";
 import Select from 'primevue/select';
-import Chip from 'primevue/chip';
+import Checkbox from 'primevue/checkbox';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
@@ -23,6 +23,7 @@ import {FilterMatchMode} from '@primevue/core/api';
 import moment from "moment";
 import {debounce} from "lodash";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 
 const props = defineProps({
     users: {
@@ -36,9 +37,8 @@ const props = defineProps({
         },
     },
     paymentStatus: {
-        type: Object,
-        default: () => {
-        },
+        type: Array,
+        default: () => [],
     },
     warehouses: {
         type: Object,
@@ -46,7 +46,6 @@ const props = defineProps({
         },
     },
 });
-
 const baseUrl = ref("/hbl-list");
 const loading = ref(true);
 const hbls = ref([]);
@@ -56,11 +55,9 @@ const currentPage = ref(1);
 const showConfirmViewHBLModal = ref(false);
 const cm = ref();
 const selectedHBL = ref(null);
-const selectedHBLs = ref([]);
 const selectedHBLID = ref(null);
 const showConfirmViewPickupModal = ref(false);
 const confirm = useConfirm();
-const showAssignDriverDialog = ref(false);
 const dt = ref();
 const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
@@ -70,11 +67,12 @@ const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    reference: { value: null, matchMode: FilterMatchMode.CONTAINS },
     warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
     hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
     cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
     is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
+    user: {value: null, matchMode: FilterMatchMode.EQUALS},
+    payments: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const menuModel = ref([
@@ -88,7 +86,7 @@ const menuModel = ref([
     {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => confirmHBLDelete(selectedHBL)},
 ]);
 
-const fetchHBLs = async (page = 1, search = "", sortField = 'id', sortOrder = 1) => {
+const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
     loading.value = true;
     try {
         const response = await axios.get(baseUrl.value, {
@@ -102,11 +100,15 @@ const fetchHBLs = async (page = 1, search = "", sortField = 'id', sortOrder = 1)
                 isHold: filters.value.is_hold.value || false,
                 sort_field: sortField,
                 sort_order: sortOrder === 1 ? "asc" : "desc",
+                createdBy: filters.value.user.value || "",
+                paymentStatus: filters.value.payments.value || [],
+                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+                toDate: moment(toDate.value).format("YYYY-MM-DD"),
             }
         });
         hbls.value = response.data.data;
-        totalRecords.value = response.data.meta.total; // Correct total count
-        currentPage.value = response.data.meta.current_page; // Correct current page
+        totalRecords.value = response.data.meta.total;
+        currentPage.value = response.data.meta.current_page;
     } catch (error) {
         console.error("Error fetching HBLs:", error);
     } finally {
@@ -117,33 +119,58 @@ const fetchHBLs = async (page = 1, search = "", sortField = 'id', sortOrder = 1)
 const debouncedFetchHBLs = debounce((searchValue) => {
     fetchHBLs(1, searchValue);
 }, 1000);
+
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
         debouncedFetchHBLs(newValue);
     }
 });
+
 watch(() => filters.value.warehouse.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
 });
+
 watch(() => filters.value.hbl_type.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
 });
+
 watch(() => filters.value.cargo_type.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
 });
+
 watch(() => filters.value.is_hold.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
 });
+
+watch(() => filters.value.user.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.payments.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => fromDate.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => toDate.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
 const onPageChange = (event) => {
     currentPage.value = event.page + 1;
     fetchHBLs(currentPage.value);
 };
+
 const onSort = (event) => {
     fetchHBLs(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
+
 onMounted(() => {
     fetchHBLs();
 });
+
 const resolveHBLType = (hbl) => {
     switch (hbl.hbl_type) {
         case 'UPB':
@@ -156,6 +183,7 @@ const resolveHBLType = (hbl) => {
             return null;
     }
 };
+
 const resolveCargoType = (hbl) => {
     switch (hbl.cargo_type) {
         case 'Sea Cargo':
@@ -172,6 +200,7 @@ const resolveCargoType = (hbl) => {
             return null;
     }
 };
+
 const resolveWarehouse = (hbl) => {
     switch (hbl.warehouse.toUpperCase()) {
         case 'COLOMBO':
@@ -186,25 +215,32 @@ const resolveWarehouse = (hbl) => {
 const onRowContextMenu = (event) => {
     cm.value.show(event.originalEvent);
 };
+
 const confirmViewHBL = (hbl) => {
     selectedHBLID.value = hbl.value.id;
     showConfirmViewHBLModal.value = true;
 };
+
 const closeModal = () => {
     showConfirmViewHBLModal.value = false;
     selectedHBLID.value = null;
 };
+
 const clearFilter = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        reference: { value: null, matchMode: FilterMatchMode.CONTAINS },
         warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
         hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
         cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
         is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
+        user: {value: null, matchMode: FilterMatchMode.EQUALS},
+        payments: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
+    fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
+    toDate.value = moment(new Date()).toISOString().split("T")[0];
     fetchHBLs(currentPage.value);
 };
+
 const confirmHBLDelete = (hbl) => {
     selectedHBLID.value = hbl.value.id;
     confirm.require({
@@ -263,15 +299,15 @@ const exportCSV = () => {
                         <label for="to-date">To Date</label>
                     </FloatLabel>
 
-<!--                    <FloatLabel class="w-full" variant="in">-->
-<!--                        <Select v-model="filters.user.value" :options="users" :showClear="true" class="w-full" input-id="user" option-label="name" option-value="id"/>-->
-<!--                        <label for="user">Select User</label>-->
-<!--                    </FloatLabel>-->
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.payments.value" :options="paymentStatus" :showClear="true" class="w-full" input-id="payment-status" />
+                        <label for="payment-status">Payment Status</label>
+                    </FloatLabel>
 
-<!--                    <FloatLabel class="w-full" variant="in">-->
-<!--                        <Select v-model="filters.zone.value" :options="zones" :showClear="true" class="w-full" input-id="zone" option-label="name" option-value="id" />-->
-<!--                        <label for="zone">Select Zone</label>-->
-<!--                    </FloatLabel>-->
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.user.value" :options="users" :showClear="true" class="w-full" input-id="user" option-label="name" option-value="id" />
+                        <label for="user">Created By</label>
+                    </FloatLabel>
                 </div>
             </Panel>
 
@@ -279,12 +315,13 @@ const exportCSV = () => {
                 <template #content>
                     <ContextMenu ref="cm" :model="menuModel" @hide="selectedHBL = null" />
                     <DataTable
+                        ref="dt"
                         v-model:contextMenuSelection="selectedHBL"
                         v-model:filters="filters"
                         :globalFilterFields="['reference', 'hbl', 'hbl_name', 'email', 'address', 'contact_number', 'consignee_name', 'consignee_address', 'consignee_contact', 'cargo_type', 'hbl_type', 'warehouse', 'status', 'hbl_number']"
                         :loading="loading"
                         :rows="perPage"
-                        :rowsPerPageOptions="[5, 10, 20, 50]"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                         :totalRecords="totalRecords"
                         :value="hbls"
                         context-menu
@@ -383,18 +420,16 @@ const exportCSV = () => {
                         </Column>
 
                         <Column field="address" header="Address"></Column>
+
                         <Column field="warehouse" header="Warehouse" sortable>
                             <template #body="slotProps">
                                 <Tag :severity="resolveWarehouse(slotProps.data)" :value="slotProps.data.warehouse.toUpperCase()"></Tag>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" @change="filterCallback()">
-                                    <template #option="slotProps">
-                                        <Tag :value="slotProps.option" />
-                                    </template>
-                                </Select>
+                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" @change="filterCallback()" />
                             </template>
                         </Column>
+
                         <Column field="consignee_name" header="Consignee">
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.hbl_name }}</div>
@@ -402,20 +437,20 @@ const exportCSV = () => {
                                 <div class="text-gray-500 text-sm">{{slotProps.data.consignee_contact}}</div>
                             </template>
                         </Column>
+
                         <Column field="consignee_address" header="Consignee Address"></Column>
+
                         <Column field="hbl_type" header="HBL Type" sortable>
                             <template #body="slotProps">
                                 <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" @change="filterCallback()">
-                                    <template #option="slotProps">
-                                        <Tag :value="slotProps.option" />
-                                    </template>
-                                </Select>
+                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" @change="filterCallback()"/>
                             </template>
                         </Column>
+
                         <Column field="status" header="Status" hidden></Column>
+
                         <Column field="is_hold" header="Hold">
                             <template #body="{ data }">
                                 <i :class="{ 'pi-pause-circle text-yellow-500': data.is_hold, 'pi-play-circle text-green-400': !data.is_hold }" class="pi"></i>
@@ -424,13 +459,23 @@ const exportCSV = () => {
                                 <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary @change="filterCallback()" />
                             </template>
                         </Column>
+
                         <Column field="hbl_number" header="HBL Number" hidden sortable></Column>
+
                         <Column field="is_released" header="Released" hidden></Column>
+
+                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs. </template>
                     </DataTable>
                 </template>
             </Card>
         </div>
     </AppLayout>
+
+    <HBLDetailModal
+        :hbl-id="selectedHBLID"
+        :show="showConfirmViewHBLModal"
+        @close="closeModal"
+    />
 </template>
 
 <style>

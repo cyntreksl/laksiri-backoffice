@@ -207,6 +207,8 @@ const clearFilter = () => {
         user: {value: null, matchMode: FilterMatchMode.EQUALS},
         zone: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
+    fromDate.value = moment(new Date()).subtract(12, "months").toISOString().split("T")[0];
+    toDate.value = moment(new Date()).toISOString().split("T")[0];
     fetchPickups(currentPage.value);
 };
 
