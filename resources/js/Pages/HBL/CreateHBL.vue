@@ -235,7 +235,6 @@ const grandTotalVolume = ref(0);
 const isPackageRuleSelected = ref(false);
 const packageRulesData = ref([]);
 const priceRulesData = ref([]);
-const selectedPackage = ref("");
 const isExistsRules = ref(false);
 
 const hblRules = async () => {
@@ -850,17 +849,11 @@ const confirmRemovePackage = (index) => {
 };
 
 const onDialogShow = () => {
-    const bodyElement = document.querySelector('body');
-    if (bodyElement) {
-        bodyElement.style.overflow = '';
-    }
+    document.body.classList.add('p-overflow-hidden');
 };
 
 const onDialogHide = () => {
-    const bodyElement = document.querySelector('body');
-    if (bodyElement) {
-        bodyElement.style.overflow = 'hidden';
-    }
+    document.body.classList.remove('p-overflow-hidden');
 };
 </script>
 
