@@ -155,142 +155,142 @@
                 </th>
             </tr>
             </thead>
-            @endif
+        @endif
     </table>
     <table>
         <thead style="padding: 0; margin: 0">
-            <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: #D8D8D8  ;">
-                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">SR <br>NO</th>
-                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">HBL NO</th>
-                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;"> NAME OF SHIPPER</th>
-                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">NAME OF CONSIGNEES</th>
-                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">TYPE OF PKGS</th>
-                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">NO.OF PKGS</th>
-                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">VOLUME CBM</th>
-                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">GWHT</th>
-                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">DESCRIPTION OF CARGO</th>
-                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">DELIVERY</th>
-                <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 11px;">REMARKS</th>- New Total Column -->
-            </tr>
+        <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: #D8D8D8  ;">
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">SR <br>NO</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">HBL NO</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;"> NAME OF SHIPPER</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">NAME OF CONSIGNEES</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">TYPE OF PKGS</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">NO.OF PKGS</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">VOLUME CBM</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">GWHT</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">DESCRIPTION OF CARGO</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">DELIVERY</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 11px;">REMARKS</th>- New Total Column -->
+        </tr>
         </thead>
-            <tbody>
-            @foreach ($chunk as $index => $item)
+        <tbody>
+        @foreach ($chunk as $index => $item)
+            @php
+                $totalQuantity = collect($item[9])->sum('quantity');
+                $totalVolume = collect($item[9])->sum('volume');
+                $totalWeight = collect($item[9])->sum('weight');
+                $packageCount = $item[9]->count() ? $item[9]->count() :  0;
+
+                $hblweight = number_format((($total_gtotal / $total_vtotal) * $totalVolume), 2);
+            @endphp
+            <tr>
+                <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                <td rowspan="{{$packageCount > 4 ? $packageCount : 4}}" style="font-size: 12px; vertical-align: top"> {{ $item[0]}} </td>
+                <td rowspan="1" style="border-bottom: 0; font-size: 12px; border-left:none;vertical-align: top">{{ $item[1]}}</td>
+                <td rowspan="1" style="border-bottom: 0; font-size: 12px; vertical-align: top; border-bottom: 0">{{ $item[5] }} </td>
+                <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0">{{ $item[9][0]['package_type'] }}</td>
+                <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['quantity'] }}</td>
+                <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['volume'] }}</td>
+                <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['weight'] }}</td>
+                <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px; text-align: center">PERSONAL<br> EFFECT</td>
+                <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px; text-align: center">
+                    {{ $item[13] }}
+                </td>
+                <td rowspan="1" style="font-size: 12px; text-align: center; border-bottom: 0">
+                    <b >{{ $item[17] ? $item[17] : '' }}</b>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">{{ $item[2] }}</td>
+                <td rowspan="2" style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">{{ $item[6] }}</td>
+                <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][1]) ? $item[9][1]['package_type'] : ' ' }}</td>
+                <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['quantity'] : ' ' }}</td>
+                <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['volume'] : ' '}}</td>
+                <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['weight'] : ' ' }}</td>
+                <td rowspan="1" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top; border-bottom: 0">
+                    <b>{{ $item[18] ? $item[18] : '' }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">P.O.BOX: {{ $item[14] }}</td>
+                <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][2]) ? $item[9][2]['package_type'] : ' ' }}</td>
+                <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['quantity'] : ' ' }}</td>
+                <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['volume'] : ' '}}</td>
+                <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['weight'] : ' ' }}</td>
+                <td rowspan="1" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top; border-bottom: 0">
+                    <b >{{ $item[11] == 'GIFT' ||  $item[11] == 'Gift'? 'GIFT CARGO' : '' }}</b>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="{{ $packageCount > 4 ? $packageCount - 3 : 1 }}" style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0">{{ $item[4] }}</td>
+                <td rowspan="{{ $packageCount > 4 ? $packageCount - 3 : 1 }}" style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">{{ $item[7] }}</td>
+                <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][3]) ? $item[9][3]['package_type'] : ' ' }}</td>
+                <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][3]) ? $item[9][3]['quantity'] : ' ' }}</td>
+                <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][3]) ? $item[9][3]['volume'] : ' '}}</td>
+                <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][3]) ? $item[9][3]['weight'] : ' ' }}</td>
+                <td rowspan="{{ $packageCount > 4 ? $packageCount-2 : 2 }}" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top">
+                    @if($item[15] && $item[16])
+                        <b>
+                            DOHA & {{ $item[13] }}
+                            <br>
+                            PAID
+                        </b>
+                    @elseif($item[15])
+                        <b>
+                            PAID
+                        </b>
+                    @else
+                        <b>NOT PAID <br>PLEASE COLLECT <br>QAR AMOUNT/-</b>
+                    @endif
+                </td>
+            </tr>
+
+            @if(count($item[9])  > 4)
                 @php
-                    $totalQuantity = collect($item[9])->sum('quantity');
-                    $totalVolume = collect($item[9])->sum('volume');
-                    $totalWeight = collect($item[9])->sum('weight');
-                    $packageCount = $item[9]->count() ? $item[9]->count() :  0;
-
-                    $hblweight = number_format((($total_gtotal / $total_vtotal) * $totalVolume), 2);
+                    $restPackages = $item[9]->slice(4);
                 @endphp
-                <tr>
-                    <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                    <td rowspan="{{$packageCount > 4 ? $packageCount : 4}}" style="font-size: 12px; vertical-align: top"> {{ $item[0]}} </td>
-                    <td rowspan="1" style="border-bottom: 0; font-size: 12px; border-left:none;vertical-align: top">{{ $item[1]}}</td>
-                    <td rowspan="1" style="border-bottom: 0; font-size: 12px; vertical-align: top; border-bottom: 0">{{ $item[5] }} </td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0">{{ $item[9][0]['package_type'] }}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['quantity'] }}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['volume'] }}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['weight'] }}</td>
-                    <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px; text-align: center">PERSONAL<br> EFFECT</td>
-                    <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 12px">
-                        {{ $item[13] }}
-                    </td>
-                    <td rowspan="1" style="font-size: 12px; text-align: center; border-bottom: 0">
-                        <b >{{ $item[17] ? $item[17] : '' }}</b>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">{{ $item[2] }}</td>
-                    <td rowspan="2" style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">{{ $item[6] }}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][1]) ? $item[9][1]['package_type'] : ' ' }}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['quantity'] : ' ' }}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['volume'] : ' '}}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][1]) ? $item[9][1]['weight'] : ' ' }}</td>
-                    <td rowspan="1" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top; border-bottom: 0">
-                        <b>{{ $item[18] ? $item[18] : '' }}</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">P.O.BOX: {{ $item[14] }}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][2]) ? $item[9][2]['package_type'] : ' ' }}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['quantity'] : ' ' }}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['volume'] : ' '}}</td>
-                    <td style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][2]) ? $item[9][2]['weight'] : ' ' }}</td>
-                    <td rowspan="1" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top; border-bottom: 0">
-                        <b >{{ $item[11] == 'GIFT' ||  $item[11] == 'Gift'? 'GIFT CARGO' : '' }}</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td rowspan="{{ $packageCount > 4 ? $packageCount - 3 : 1 }}" style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0">{{ $item[4] }}</td>
-                    <td rowspan="{{ $packageCount > 4 ? $packageCount - 3 : 1 }}" style="font-size: 12px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">{{ $item[7] }}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][3]) ? $item[9][3]['package_type'] : ' ' }}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][3]) ? $item[9][3]['quantity'] : ' ' }}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][3]) ? $item[9][3]['volume'] : ' '}}</td>
-                    <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][3]) ? $item[9][3]['weight'] : ' ' }}</td>
-                    <td rowspan="{{ $packageCount > 4 ? $packageCount-2 : 2 }}" style="font-size: 12px; text-align: center; border-top: 0; vertical-align: top">
-                        @if($item[15] && $item[16])
-                            <b>
-                                DOHA & {{ $item[13] }}
-                                <br>
-                                PAID
-                            </b>
-                        @elseif($item[15])
-                            <b>
-                                PAID
-                            </b>
-                        @else
-                            <b>NOT PAID <br>PLEASE COLLECT <br>QAR AMOUNT/-</b>
-                        @endif
-                    </td>
-                </tr>
-
-                @if(count($item[9])  > 4)
-                    @php
-                        $restPackages = $item[9]->slice(4);
-                    @endphp
-                    @foreach($restPackages as $restPkg)
-                        <tr>
-                            <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ $restPkg['package_type'] }}</td>
-                            <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ $restPkg['quantity'] }}</td>
-                            <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ $restPkg['volume'] }}</td>
-                            <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ $restPkg['weight'] }}</td>
-                        </tr>
-                    @endforeach
-                @endif
-
-
-                <tr>
-                    <td style="font-size: 12px; border-left:none; vertical-align: middle; border-top: 0">PP No</td>
-                    <td style="font-size: 12px; border-left:none;vertical-align: middle; border-top: 0">{{ $item[3] }}</td>
-                    <td style="font-size: 12px; border-left:none; vertical-align: middle; border-top: 0"></td>
-                    <td style="height: 2px !important; font-size: 12px; border: 2px solid;"><b>TOTAL</b></td>
-                    <td style="height: 2px !important; text-align: center; font-size: 12px; border: 2px solid; "><b>  <strong> {{ $totalQuantity }}</strong></b></td>
-                    <td style="height: 2px !important; text-align: right; font-size: 12px; border: 2px solid; "><b> <strong>{{ number_format($totalVolume,2) }}</strong></b></td>
-                    <td style="height: 2px !important; text-align: right; font-size: 12px; border: 2px solid; "><b>   <strong > {{ $hblweight }}</strong></b></td>
-                </tr>
-
-            @endforeach
-            @if ($loop->last)
-                <tr style="border: none;">
-                    <td colspan="5" style="border: none; text-align: right;"></td>
-                    <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_nototal, 0) }}</u></strong></td>
-                    <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 2) }}</u></strong></td>
-                    <td style="border: none; text-align: center;"><strong><u> {{ number_format($total_gtotal, 2) }}</u></strong></td>
-                    <td style="border: none;">&nbsp;</td>
-                    <td style="border: none;">&nbsp;</td>
-                    <td style="border: none;">&nbsp;</td>
-                </tr>
-
+                @foreach($restPackages as $restPkg)
+                    <tr>
+                        <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0">{{ $restPkg['package_type'] }}</td>
+                        <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ $restPkg['quantity'] }}</td>
+                        <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ $restPkg['volume'] }}</td>
+                        <td rowspan="1" style="font-size: 12px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ $restPkg['weight'] }}</td>
+                    </tr>
+                @endforeach
             @endif
-            </tbody>
+
+
+            <tr>
+                <td style="font-size: 12px; border-left:none; vertical-align: middle; border-top: 0">PP No</td>
+                <td style="font-size: 12px; border-left:none;vertical-align: middle; border-top: 0">{{ $item[3] }}</td>
+                <td style="font-size: 12px; border-left:none; vertical-align: middle; border-top: 0"></td>
+                <td style="height: 2px !important; font-size: 12px; border: 2px solid;"><b>TOTAL</b></td>
+                <td style="height: 2px !important; text-align: center; font-size: 12px; border: 2px solid; "><b>  <strong> {{ $totalQuantity }}</strong></b></td>
+                <td style="height: 2px !important; text-align: right; font-size: 12px; border: 2px solid; "><b> <strong>{{ number_format($totalVolume,2) }}</strong></b></td>
+                <td style="height: 2px !important; text-align: right; font-size: 12px; border: 2px solid; "><b>   <strong > {{ $hblweight }}</strong></b></td>
+            </tr>
+
+        @endforeach
+        @if ($loop->last)
+            <tr style="border: none;">
+                <td colspan="5" style="border: none; text-align: right;"></td>
+                <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_nototal, 0) }}</u></strong></td>
+                <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 2) }}</u></strong></td>
+                <td style="border: none; text-align: center;"><strong><u> {{ number_format($total_gtotal, 2) }}</u></strong></td>
+                <td style="border: none;">&nbsp;</td>
+                <td style="border: none;">&nbsp;</td>
+                <td style="border: none;">&nbsp;</td>
+            </tr>
+
+        @endif
+        </tbody>
     </table>
 
     <div class="footer">
         <div style="text-align: right; margin-top: 20px; margin-right: 50px !important;">
             @if($settings?->seal_url)
-                <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto;">
+                <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto; opacity: 0.5;">
             @endif
         </div>
         <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_footer_title}}</div>
