@@ -3,10 +3,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {computed, reactive, ref, watch} from "vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
-import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
+import {useConfirm} from "primevue/useconfirm";
 import {push} from "notivue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
@@ -60,6 +58,7 @@ const props = defineProps({
 });
 
 const measureTypes = ref(['cm', 'm', 'in', 'ft']);
+const confirm = useConfirm();
 
 //branch set
 const currentBranch = usePage().props?.auth.user.active_branch_name;
@@ -520,32 +519,18 @@ const calculatePayment = async () => {
     }
 }
 
-const showConfirmRemovePackageModal = ref(false);
-const packageIndex = ref(null);
-
-// remove package
-const confirmRemovePackage = (index) => {
-    packageIndex.value = index;
-    showConfirmRemovePackageModal.value = true;
-};
-
-const closeModal = () => {
-    showConfirmRemovePackageModal.value = false;
-};
-
 const closeViewModal = () => {
     showConfirmViewHBLModal.value = false;
     hblId.value = null;
     router.visit(route("hbls.create"));
 };
 
-const handleRemovePackage = () => {
-    if (packageIndex.value !== null) {
-        grandTotalVolume.value -= packageList.value[packageIndex.value].volume;
-        grandTotalWeight.value -= packageList.value[packageIndex.value].totalWeight;
-        packageList.value.splice(packageIndex.value, 1);
+const handleRemovePackage = (index) => {
+    if (index !== null) {
+        grandTotalVolume.value -= packageList.value[index].volume;
+        grandTotalWeight.value -= packageList.value[index].totalWeight;
+        packageList.value.splice(index, 1);
         calculatePayment();
-        closeModal();
     }
 };
 
@@ -840,6 +825,29 @@ const confirmViewHBL = async (id) => {
     hblId.value = id;
     showConfirmViewHBLModal.value = true;
 };
+
+const confirmRemovePackage = (index) => {
+    confirm.require({
+        message: 'Would you like to remove this hbl package record?',
+        header: 'Remove Package?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Remove Package',
+            severity: 'danger'
+        },
+        accept: () => {
+            handleRemovePackage(index)
+        },
+        reject: () => {
+        }
+    });
+};
 </script>
 
 <template>
@@ -1094,7 +1102,7 @@ const confirmViewHBL = async (id) => {
                             <DataTable v-if="packageList.length > 0" :value="packageList" tableStyle="min-width: 50rem">
                                 <Column header="Actions">
                                     <template #body="slotProps">
-                                        <Button icon="pi pi-times" rounded size="small" variant="text" @click.prevent="confirmRemovePackage(slotProps.index)" />
+                                        <Button icon="pi pi-times" rounded severity="danger" size="small" variant="text" @click.prevent="confirmRemovePackage(slotProps.index)" />
 
                                         <Button icon="pi pi-pencil" rounded size="small" variant="text" @click.prevent="openEditModal(slotProps.index)"  />
                                     </template>
@@ -1159,244 +1167,204 @@ const confirmViewHBL = async (id) => {
                     </Card>
                 </div>
 
-                <div class="sm:col-span-2 grid-cols-2 grid gap-4 space-y-5">
-                    <!-- Price & Payment -->
-                    <div class="sm:col-span-2 space-y-5">
-                        <Card>
-                            <template #title>
-                                <div class="flex justify-between items-center">
-                                    <span>Price and Payment</span>
-                                    <Button icon="pi pi-calculator" label="Calculate" severity="help" variant="outlined" @click="calculatePayment" />
+                <div class="sm:col-span-2">
+                    <Card>
+                        <template #title>
+                            <div class="flex justify-between items-center">
+                                <span>Price and Payment</span>
+                                <Button icon="pi pi-calculator" label="Calculate" severity="help" variant="outlined" @click="calculatePayment" />
+                            </div>
+                        </template>
+                        <template #content>
+                            <div class="grid grid-cols-2 gap-5 mt-5">
+                                <div class="col-span-2">
+                                    <IftaLabel>
+                                        <InputNumber v-model="form.freight_charge" :disabled="!isEditable" class="w-full" inputId="freight-charge" min="0" step="any" variant="filled" />
+                                        <label for="freight-charge">Freight Charge</label>
+                                    </IftaLabel>
+                                    <InputError :message="form.errors.freight_charge"/>
                                 </div>
-                            </template>
-                            <template #content>
-                                <div class="grid grid-cols-2 gap-5 mt-5">
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.freight_charge" :disabled="!isEditable" class="w-full" inputId="freight-charge" locale="en-US" min="0" step="any" variant="filled" />
-                                            <label for="freight-charge">Freight Charge</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.freight_charge"/>
-                                    </div>
 
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.bill_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
-                                            <label for="bill-charge">Bill Charge</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.bill_charge"/>
-                                    </div>
+                                <div class="col-span-2">
+                                    <IftaLabel>
+                                        <InputNumber v-model="form.bill_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <label for="bill-charge">Bill Charge</label>
+                                    </IftaLabel>
+                                    <InputError :message="form.errors.bill_charge"/>
+                                </div>
 
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.destination_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
-                                            <label for="bill-charge">Destination Charges</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.destination_charge"/>
-                                    </div>
+                                <div class="col-span-2">
+                                    <IftaLabel>
+                                        <InputNumber v-model="form.destination_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <label for="bill-charge">Destination Charges</label>
+                                    </IftaLabel>
+                                    <InputError :message="form.errors.destination_charge"/>
+                                </div>
 
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.package_charges" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
-                                            <label for="bill-charge">Package Charges</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.package_charges"/>
-                                    </div>
+                                <div class="col-span-2">
+                                    <IftaLabel>
+                                        <InputNumber v-model="form.package_charges" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <label for="bill-charge">Package Charges</label>
+                                    </IftaLabel>
+                                    <InputError :message="form.errors.package_charges"/>
+                                </div>
 
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.discount" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
-                                            <label for="bill-charge">Discount</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.discount"/>
-                                    </div>
+                                <div class="col-span-2">
+                                    <IftaLabel>
+                                        <InputNumber v-model="form.discount" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <label for="bill-charge">Discount</label>
+                                    </IftaLabel>
+                                    <InputError :message="form.errors.discount"/>
+                                </div>
 
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.additional_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
-                                            <label for="bill-charge">Additional Charges</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.additional_charge"/>
-                                    </div>
+                                <div class="col-span-2">
+                                    <IftaLabel>
+                                        <InputNumber v-model="form.additional_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <label for="bill-charge">Additional Charges</label>
+                                    </IftaLabel>
+                                    <InputError :message="form.errors.additional_charge"/>
+                                </div>
 
-                                    <div class="col-span-2">
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.paid_amount" :disabled="!isEditable" class="w-full" inputId="bill-charge" locale="en-US" min="0" step="any" variant="filled" />
-                                            <label for="bill-charge">Paid Amount</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.paid_amount"/>
-                                    </div>
+                                <div class="col-span-2">
+                                    <IftaLabel>
+                                        <InputNumber v-model="form.paid_amount" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <label for="bill-charge">Paid Amount</label>
+                                    </IftaLabel>
+                                    <InputError :message="form.errors.paid_amount"/>
+                                </div>
 
-                                    <div class="flow-root col-span-2 my-3">
-                                        <ul class="-my-6" role="list">
-                                            <li class="flex py-3">
-                                                <div class="flex flex-1 flex-col">
-                                                    <div>
-                                                        <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
-                                                            <h3>
-                                                                Packages
-                                                            </h3>
-                                                            <p class="ml-4">{{ packageList.length }}</p>
-                                                        </div>
+                                <div class="flow-root col-span-2 my-3">
+                                    <ul class="-my-6" role="list">
+                                        <li class="flex py-3">
+                                            <div class="flex flex-1 flex-col">
+                                                <div>
+                                                    <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                        <h3>
+                                                            Packages
+                                                        </h3>
+                                                        <p class="ml-4">{{ packageList.length }}</p>
                                                     </div>
                                                 </div>
-                                            </li>
-
-                                            <li class="flex py-3">
-                                                <div class="flex flex-1 flex-col">
-                                                    <div>
-                                                        <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
-                                                            <h3>
-                                                                Weight
-                                                            </h3>
-                                                            <p class="ml-4">{{ grandTotalWeight.toFixed(2) }}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>
-
-                                            <li class="flex py-3">
-                                                <div class="flex flex-1 flex-col">
-                                                    <div>
-                                                        <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
-                                                            <h3>
-                                                                Volume
-                                                            </h3>
-                                                            <p class="ml-4">{{ grandTotalVolume.toFixed(3) }}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <div class="col-span-2">
-                                        <div
-                                            class="flex justify-between text-2xl text-success font-bold"
-                                        >
-                                            <p class="line-clamp-1">Grand Total</p>
-                                            <div class="flex items-center">
-                                                <svg v-if="packageList.length > 0"
-                                                     class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle mr-3 text-info hover:cursor-pointer"
-                                                     fill="none" height="24" stroke="currentColor" stroke-linecap="round"
-                                                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
-                                                     xmlns="http://www.w3.org/2000/svg"
-                                                     @click="isShowedPaymentSummery = !isShowedPaymentSummery">
-                                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                    <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
-                                                    <path d="M12 9h.01"/>
-                                                    <path d="M11 12h1v4h1"/>
-                                                </svg>
-                                                <p>{{ hblTotal ? hblTotal.toFixed(2) : 0.00 }} {{ currency }}</p>
                                             </div>
+                                        </li>
+
+                                        <li class="flex py-3">
+                                            <div class="flex flex-1 flex-col">
+                                                <div>
+                                                    <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                        <h3>
+                                                            Weight
+                                                        </h3>
+                                                        <p class="ml-4">{{ grandTotalWeight.toFixed(2) }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li class="flex py-3">
+                                            <div class="flex flex-1 flex-col">
+                                                <div>
+                                                    <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                        <h3>
+                                                            Volume
+                                                        </h3>
+                                                        <p class="ml-4">{{ grandTotalVolume.toFixed(3) }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="col-span-2">
+                                    <div
+                                        class="flex justify-between text-2xl text-success font-bold"
+                                    >
+                                        <p class="line-clamp-1">Grand Total</p>
+                                        <div class="flex items-center">
+                                            <i v-if="packageList.length > 0" class="pi pi-info-circle text-info hover:cursor-pointer mr-2" style="font-size: 1.2rem" @click="isShowedPaymentSummery = !isShowedPaymentSummery"></i>
+                                            <p>{{ hblTotal ? hblTotal.toFixed(2) : 0.00 }} {{ currency }}</p>
                                         </div>
-                                        <template v-if="isShowedPaymentSummery">
-                                            <div v-if="packageList.length > 0" class="p-2 bg-slate-100 rounded-lg mt-2">
-                                                <table class="italic w-full">
-                                                    <tr v-if="!form.is_active_package">
-                                                        <td colspan="2">Freight Charges</td>
-                                                        <td colspan="2">
+                                    </div>
+                                    <template v-if="isShowedPaymentSummery">
+                                        <div v-if="packageList.length > 0" class="p-2 bg-slate-100 rounded-lg mt-2">
+                                            <table class="italic w-full">
+                                                <tr v-if="!form.is_active_package">
+                                                    <td colspan="2">Freight Charges</td>
+                                                    <td colspan="2">
                                                     <span v-for="(charge, index) in freight_charge_operations"
                                                           :key="index">
                                                         {{ charge }} <br>
                                                     </span>
-                                                        </td>
-                                                        <td class="text-right">{{
-                                                                parseFloat(form.freight_charge).toFixed(2)
-                                                            }}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="4">Destination Charge</td>
-                                                        <td class="text-right">
-                                                            {{ parseFloat(form.destination_charge).toFixed(2) }}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="4">Package Charge</td>
-                                                        <td class="text-right">
-                                                            {{ parseFloat(form.package_charges).toFixed(2) }}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="4">Bill Charges</td>
-                                                        <td class="text-right">{{ parseFloat(form.bill_charge).toFixed(2) }}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="4">Discount</td>
-                                                        <td class="text-right">- {{
-                                                                parseFloat(form.discount).toFixed(2)
-                                                            }}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="4">Additional Charge</td>
-                                                        <td class="text-right">+
-                                                            {{ parseFloat(form.additional_charge).toFixed(2) }}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="4">Vat</td>
-                                                        <td class="text-right">+
-                                                            {{ parseFloat(vat).toFixed(2) }}
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="font-bold">
-                                                        <td colspan="4">Total</td>
-                                                        <td class="text-right">{{ hblTotal.toFixed(2) }}</td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                        </template>
-                                    </div>
+                                                    </td>
+                                                    <td class="text-right">{{
+                                                            parseFloat(form.freight_charge).toFixed(2)
+                                                        }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="4">Destination Charge</td>
+                                                    <td class="text-right">
+                                                        {{ parseFloat(form.destination_charge).toFixed(2) }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="4">Package Charge</td>
+                                                    <td class="text-right">
+                                                        {{ parseFloat(form.package_charges).toFixed(2) }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="4">Bill Charges</td>
+                                                    <td class="text-right">{{ parseFloat(form.bill_charge).toFixed(2) }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="4">Discount</td>
+                                                    <td class="text-right">- {{
+                                                            parseFloat(form.discount).toFixed(2)
+                                                        }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="4">Additional Charge</td>
+                                                    <td class="text-right">+
+                                                        {{ parseFloat(form.additional_charge).toFixed(2) }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="4">Vat</td>
+                                                    <td class="text-right">+
+                                                        {{ parseFloat(vat).toFixed(2) }}
+                                                    </td>
+                                                </tr>
+                                                <tr class="font-bold">
+                                                    <td colspan="4">Total</td>
+                                                    <td class="text-right">{{ hblTotal.toFixed(2) }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </template>
                                 </div>
-                            </template>
-                        </Card>
-                    </div>
+                            </div>
+                        </template>
+                    </Card>
                 </div>
             </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-6 my-6 gap-4">
                 <!-- Empty grid columns for spacing -->
                 <div class="col-span-4"></div>
 
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-5 col-span-2">
-                    <DangerOutlineButton @click="router.visit(route('hbls.index'))">
-                        Cancel
-                    </DangerOutlineButton>
-                    <PrimaryButton
-                        :class="{ 'opacity-50': form.processing }"
-                        :disabled="form.processing || !isExistsRules"
-                        class="space-x-2"
-                        type="submit"
-                    >
-                        <span>Create a HBL</span>
-                        <svg
-                            class="size-5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </PrimaryButton>
+                    <Button label="Cancel" severity="danger" variant="outlined"  @click="router.visit(route('hbls.index'))" />
+
+                    <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing || !isExistsRules" icon="pi pi-arrow-right" iconPos="right" label="Create a HBL" type="submit" />
                 </div>
             </div>
 
         </form>
-
-        <RemovePackageConfirmationModal
-            :show="showConfirmRemovePackageModal"
-            @close="closeModal"
-            @remove-package="handleRemovePackage"
-        />
 
         <HBLDetailModal
             :hbl-id="hblId"
@@ -1404,7 +1372,7 @@ const confirmViewHBL = async (id) => {
             @close="closeViewModal"
         />
 
-        <Dialog v-model:visible="showAddNewPackageDialog" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :header="editMode ? `Edit Package` : `Add New Package`" :style="{ width: '60rem' }" block-scroll maximizable modal position="bottom">
+        <Dialog v-model:visible="showAddNewPackageDialog" :block-scroll="true" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :header="editMode ? `Edit Package` : `Add New Package`" :style="{ width: '60rem' }" maximizable modal position="bottom">
 
             <span class="text-surface-500 dark:text-surface-400 block mb-4">{{ !editMode ? "Add new package to HBL" : "" }}</span>
 
