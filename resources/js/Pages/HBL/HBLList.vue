@@ -24,6 +24,7 @@ import moment from "moment";
 import {debounce} from "lodash";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import {push} from "notivue";
 
 const props = defineProps({
     users: {
@@ -46,6 +47,7 @@ const props = defineProps({
         },
     },
 });
+
 const baseUrl = ref("/hbl-list");
 const loading = ref(true);
 const hbls = ref([]);
@@ -56,7 +58,6 @@ const showConfirmViewHBLModal = ref(false);
 const cm = ref();
 const selectedHBL = ref(null);
 const selectedHBLID = ref(null);
-const showConfirmViewPickupModal = ref(false);
 const confirm = useConfirm();
 const dt = ref();
 const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
@@ -76,14 +77,54 @@ const filters = ref({
 });
 
 const menuModel = ref([
-    {label: 'View', icon: 'pi pi-fw pi-search', command: () => confirmViewHBL(selectedHBL)},
-    {label: 'Call Flag', icon: 'pi pi-fw pi-flag', command: () => confirmViewHBL(selectedHBL)},
-    {label: 'Edit', icon: 'pi pi-fw pi-pencil', command: () => router.visit(route("hbls.edit", selectedHBL.value.id))},
-    {label: 'Hold', icon: 'pi pi-fw pi-pause-circle', command: () => confirmViewHBL(selectedHBL)},
-    {label: 'Download', icon: 'pi pi-fw pi-download', url: () => route("hbls.download", selectedHBL.value.id)},
-    {label: 'Invoice', icon: 'pi pi-fw pi-receipt', url: () => route("hbls.download.invoice", selectedHBL.value.id)},
-    {label: 'Barcode', icon: 'pi pi-fw pi-barcode', url: () => route("hbls.download.barcode", selectedHBL.value.id)},
-    {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => confirmHBLDelete(selectedHBL)},
+    {
+        label: "View",
+        icon: "pi pi-fw pi-search",
+        command: () => confirmViewHBL(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.show"),
+    },
+    {
+        label: "Call Flag",
+        icon: "pi pi-fw pi-flag",
+        command: () => confirmViewHBL(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
+    },
+    {
+        label: "Edit",
+        icon: "pi pi-fw pi-pencil",
+        command: () => router.visit(route("hbls.edit", selectedHBL.value.id)),
+        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
+    },
+    {
+        label: computed(() => (selectedHBL.value?.is_hold ? 'Release' : 'Hold')),
+        icon: computed(() => (selectedHBL.value?.is_hold ? 'pi pi-fw pi-play-circle' : 'pi pi-fw pi-pause-circle')) ,
+        command: () => confirmHBLHold(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.hold and release"),
+    },
+    {
+        label: "Download",
+        icon: "pi pi-fw pi-download",
+        url: () => route("hbls.download", selectedHBL.value.id),
+        disabled: !usePage().props.user.permissions.includes("hbls.download pdf"),
+    },
+    {
+        label: "Invoice",
+        icon: "pi pi-fw pi-receipt",
+        url: () => route("hbls.download.invoice", selectedHBL.value.id),
+        disabled: !usePage().props.user.permissions.includes("hbls.download invoice"),
+    },
+    {
+        label: "Barcode",
+        icon: "pi pi-fw pi-barcode",
+        url: () => route("hbls.download.barcode", selectedHBL.value.id),
+        disabled: !usePage().props.user.permissions.includes("hbls.download barcode"),
+    },
+    {
+        label: "Delete",
+        icon: "pi pi-fw pi-times",
+        command: () => confirmHBLDelete(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.delete"),
+    },
 ]);
 
 const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
@@ -268,6 +309,44 @@ const confirmHBLDelete = (hbl) => {
                     push.error("Something went to wrong!");
                 },
             });
+            selectedHBLID.value = null;
+        },
+        reject: () => {
+        }
+    });
+};
+
+const confirmHBLHold = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    confirm.require({
+        message: `Would you like to ${hbl.value.is_hold ? 'Release' : 'Hold'} this hbl?`,
+        header: `${hbl.value.is_hold ? 'Release' : 'Hold'} HBL?`,
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: `${hbl.value.is_hold ? 'Release' : 'Hold'}`,
+            severity: 'warn'
+        },
+        accept: () => {
+            router.put(
+                route("hbls.toggle-hold", selectedHBLID.value),
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success(`Operation Successfully!`);
+                        fetchHBLs(currentPage.value);
+                    },
+                    onError: () => {
+                        push.error("Something went to wrong!");
+                    },
+                }
+            );
             selectedHBLID.value = null;
         },
         reject: () => {
