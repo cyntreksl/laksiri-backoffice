@@ -638,7 +638,7 @@ const volumeMeasurements = {
 function getPackageRuleTitle(title, length, width , height, measureType) {
     const volumeMeasurement = volumeMeasurements[measureType] || 'cm.cu';
 
-    return title + ' (' + convertMeasurements(measureType,length).toFixed(2) + '*' + convertMeasurements(measureType,width).toFixed(2) + '*' + convertMeasurements(measureType,height).toFixed(2) + ')'+volumeMeasurement;
+    return title + ' (' + convertMeasurements(measureType,length).toFixed(2) + ' * ' + convertMeasurements(measureType,width).toFixed(2) + ' * ' + convertMeasurements(measureType,height).toFixed(2) + ')'+ volumeMeasurement;
 }
 
 const handleCopyFromHBLToConsignee = async () => {
@@ -1372,7 +1372,7 @@ const confirmRemovePackage = (index) => {
             @close="closeViewModal"
         />
 
-        <Dialog v-model:visible="showAddNewPackageDialog" :block-scroll="true" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :header="editMode ? `Edit Package` : `Add New Package`" :style="{ width: '60rem' }" maximizable modal position="bottom">
+        <Dialog v-model:visible="showAddNewPackageDialog" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :header="editMode ? `Edit Package` : `Add New Package`" :style="{ width: '60rem' }" block-scroll maximizable modal position="bottom">
 
             <span class="text-surface-500 dark:text-surface-400 block mb-4">{{ !editMode ? "Add new package to HBL" : "" }}</span>
 
@@ -1382,16 +1382,18 @@ const confirmRemovePackage = (index) => {
                         Package
                         <span v-if="form.is_active_package || priceRulesData.length === 0" class="text-red-500 text-sm">*</span>
                     </InputLabel>
-                    <Select v-model="packageItem.packageRule" :disabled="!form.is_active_package && packageList.length > 0" :options="packageRulesData" :required="form.is_active_package" class="w-25" filter option-value="id" placeholder="Choose Package"
-                            @change="getSelectedPackage" >
-                        <template #option="slotProps">
-                            <div class="flex items-center">
-                                <div>
-                                    {{ getPackageRuleTitle(slotProps.option.rule_title,slotProps.option.length, slotProps.option.width, slotProps.option.height, slotProps.option.measure_type) }}
-                                </div>
-                            </div>
-                        </template>
-                    </Select>
+                    <Select
+                        v-model="packageItem.packageRule"
+                        :disabled="!form.is_active_package && packageList.length > 0"
+                        :option-label="(option) => getPackageRuleTitle(option.rule_title, option.length, option.width, option.height, option.measure_type)"
+                        :options="packageRulesData"
+                        :required="!!form.is_active_package"
+                        class="w-full"
+                        filter
+                        option-value="id"
+                        placeholder="Choose Package"
+                        @change="getSelectedPackage"
+                    />
                 </div>
 
                 <div class="col-span-4 md:col-span-1">
