@@ -25,6 +25,7 @@ import {debounce} from "lodash";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import {push} from "notivue";
+import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 
 const props = defineProps({
     users: {
@@ -65,6 +66,8 @@ const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
 const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
+const showConfirmViewCallFlagModal = ref(false);
+const hblName = ref("");
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -86,7 +89,7 @@ const menuModel = ref([
     {
         label: "Call Flag",
         icon: "pi pi-fw pi-flag",
-        command: () => confirmViewHBL(selectedHBL),
+        command: () => confirmViewCallFlagModal(selectedHBL),
         disabled: !usePage().props.user.permissions.includes("hbls.edit"),
     },
     {
@@ -354,6 +357,18 @@ const confirmHBLHold = (hbl) => {
     });
 };
 
+const confirmViewCallFlagModal = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    hblName.value = hbl.value.hbl_name;
+    showConfirmViewCallFlagModal.value = true;
+};
+
+const closeCallFlagModal = () => {
+    showConfirmViewCallFlagModal.value = false;
+    selectedHBLID.value = null;
+    hblName.value = "";
+};
+
 const exportCSV = () => {
     dt.value.exportCSV();
 };
@@ -555,6 +570,13 @@ const exportCSV = () => {
         :show="showConfirmViewHBLModal"
         @close="closeModal"
     />
+
+    <CallFlagModal
+        :caller-name="hblName"
+        :hbl-id="selectedHBLID"
+        :visible="showConfirmViewCallFlagModal"
+        @close="closeCallFlagModal"
+        @update:visible="showConfirmViewCallFlagModal = $event"/>
 </template>
 
 <style>
