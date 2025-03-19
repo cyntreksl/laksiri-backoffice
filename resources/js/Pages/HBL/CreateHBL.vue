@@ -849,12 +849,10 @@ const confirmRemovePackage = (index) => {
 };
 
 const onDialogShow = () => {
-    console.log('showed');
     document.body.classList.add('p-overflow-hidden');
 };
 
 const onDialogHide = () => {
-    console.log('closed');
     document.body.classList.remove('p-overflow-hidden');
 };
 </script>
