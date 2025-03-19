@@ -241,7 +241,7 @@
                                 PAID
                             </b>
                         @else
-                            <b>PLEASE COLLECT <br>QAR AMOUNT/-</b>
+                            <b>NOT PAID <br>PLEASE COLLECT <br>QAR AMOUNT/-</b>
                         @endif
                     </td>
                 </tr>
