@@ -53,14 +53,17 @@ class MHBLController extends Controller
     public function create(Request $request)
     {
         $this->authorize('hbls.create');
+
         $data = $request->all();
-        $hblIds = array_column($data['hbls'], 'id');
 
-        $grand_total = HBL::whereIn('id', $hblIds)->get()->sum('grand_total');
+        $grand_total = HBL::whereIn('id', $data['hbls'])->get()->sum('grand_total');
 
-        $hblPackages = HblPackage::whereIn('hbl_id', $hblIds)->get();
+        $hblPackages = HblPackage::whereIn('hbl_id', $data['hbls'])->get();
+
         $grand_volume = $hblPackages->sum('volume');
+
         $grand_weight = $hblPackages->sum('weight');
+
         $packages = $hblPackages->map(function ($package) {
             return [
                 'id' => $package->id,
@@ -83,12 +86,12 @@ class MHBLController extends Controller
             'warehouses' => GetDestinationBranches::run(),
             'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
             'selectedCargoType' => $data['cargo_type'],
-            'selectedHblType' => 'Gift',
+            'selectedHblType' => HBLType::GIFT->value,
             'selectedWarehouse' => ucfirst(strtolower($data['warehouse'])),
             'shippers' => $this->officerRepository->getShippers(),
             'consignees' => $this->officerRepository->getConsignees(),
             'packages' => $packages,
-            'hblIds' => $hblIds,
+            'hblIds' => $data['hbls'],
             'grandVolume' => $grand_volume,
             'grandWeight' => $grand_weight,
             'grandTotal' => $grand_total,
