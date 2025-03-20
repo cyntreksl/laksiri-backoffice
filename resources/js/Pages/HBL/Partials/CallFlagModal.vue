@@ -1,17 +1,18 @@
 <script setup>
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import DialogModal from "@/Components/DialogModal.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import {useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
 import InputError from "@/Components/InputError.vue";
-import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import {watch} from "vue";
 import moment from "moment";
+import Dialog from "primevue/dialog";
+import Button from "primevue/button";
+import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
+import DatePicker from 'primevue/datepicker';
 
 const props = defineProps({
-    show: {
+    visible: {
         type: Boolean,
         default: false,
     },
@@ -39,6 +40,10 @@ watch(() => props.callerName, (newVal) => {
 })
 
 const handleCreateCallFlag = () => {
+    form.date = moment(form.date).format("YYYY-MM-DD");
+
+    form.followup_date = moment(form.followup_date).format("YYYY-MM-DD");
+
     form.post(route("hbls.create-call-flag", props.hblId), {
         preserveScroll: true,
         onSuccess: () => {
@@ -54,70 +59,38 @@ const handleCreateCallFlag = () => {
 </script>
 
 <template>
-    <DialogModal :maxWidth="'xl'" :show="show" @close="$emit('close')">
-        <template #title>
-            Add Call Flag
-        </template>
-
-        <template #content>
-            <div class="mt-4">
+    <Dialog :style="{ width: '25rem' }" :visible="visible" header="New Call Flag" modal @update:visible="(newValue) => $emit('update:visible', newValue)">
+        <div class="grid grid-cols-1 gap-5">
+            <div>
                 <InputLabel value="Caller Name"/>
-                <TextInput
-                    v-model="form.caller"
-                    class="w-full"
-                    placeholder="Enter Caller Name"
-                    required
-                />
+                <InputText v-model="form.caller" class="w-full"
+                           placeholder="Enter Caller Name" required />
                 <InputError :message="form.errors.caller"/>
             </div>
 
-            <div class="mt-4">
+            <div>
                 <InputLabel value="Date"/>
-                <TextInput
-                    v-model="form.date"
-                    class="w-full"
-                    required
-                    type="date"
-                />
+                <DatePicker v-model="form.date" class="w-full" date-format="yy-mm-dd" input-id="from-date" required/>
                 <InputError :message="form.errors.date"/>
             </div>
 
-            <div class="mt-4">
+            <div>
                 <InputLabel value="Notes"/>
-                <label class="block">
-                  <textarea
-                      v-model="form.notes"
-                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                      placeholder="Type something here..."
-                      rows="4"
-                  ></textarea>
-                </label>
+                <Textarea v-model="form.notes" class="w-full" cols="30" placeholder="Type something here..." rows="5" />
                 <InputError :message="form.errors.notes"/>
             </div>
 
-            <div class="mt-4">
+            <div>
                 <InputLabel value="Next Followup Date"/>
-                <TextInput
-                    v-model="form.followup_date"
-                    class="w-full"
-                    type="date"
-                />
+                <DatePicker v-model="form.followup_date" class="w-full" date-format="yy-mm-dd" input-id="followup-date" placeholder="Set Followup Date" required/>
                 <InputError :message="form.errors.followup_date"/>
             </div>
-        </template>
 
-        <template #footer>
-            <SecondaryButton @click="$emit('close')">
-                Cancel
-            </SecondaryButton>
-            <PrimaryButton
-                :class="{ 'opacity-25': form.processing }"
-                :disabled="form.processing"
-                class="ms-3"
-                @click="handleCreateCallFlag"
-            >
-                Add Call Flag
-            </PrimaryButton>
-        </template>
-    </DialogModal>
+            <div class="flex justify-end gap-2">
+                <Button label="Cancel" severity="secondary" type="button" @click="emit('close')"></Button>
+                <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" label="Add Call Flag" type="button"
+                        @click="handleCreateCallFlag"></Button>
+            </div>
+        </div>
+    </Dialog>
 </template>

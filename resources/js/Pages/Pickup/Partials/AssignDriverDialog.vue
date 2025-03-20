@@ -66,7 +66,7 @@ const handleAssignDriver = () => {
 </script>
 
 <template>
-    <Dialog :style="{ width: '25rem' }"  :visible="visible" header="Assign Driver" modal @update:visible="(newValue) => $emit('update:visible', newValue)">
+    <Dialog :style="{ width: '25rem' }" :visible="visible" header="Assign Driver" modal @update:visible="(newValue) => $emit('update:visible', newValue)">
 
         <span class="text-surface-500 dark:text-surface-400 block mb-8">Assign Driver to Pickup(s).</span>
 

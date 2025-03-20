@@ -55,10 +55,10 @@ class HBLController extends Controller
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
         $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold', 'paymentStatus']);
@@ -167,7 +167,7 @@ class HBLController extends Controller
         $this->authorize('hbls.show cancelled hbls');
 
         return Inertia::render('HBL/CancelledHBLList', [
-            'users' => $this->userRepository->getUsers(),
+            'users' => $this->userRepository->getUsers(['customer']),
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
@@ -176,10 +176,10 @@ class HBLController extends Controller
 
     public function cancelledList(Request $request): JsonResponse
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold', 'paymentStatus']);
@@ -318,7 +318,7 @@ class HBLController extends Controller
         $this->authorize('hbls.show draft hbls');
 
         return Inertia::render('HBL/HBLDraftList', [
-            'users' => $this->userRepository->getUsers(),
+            'users' => $this->userRepository->getUsers(['customer']),
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
         ]);
@@ -326,13 +326,15 @@ class HBLController extends Controller
 
     public function getDraftList(Request $request): JsonResponse
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        return $this->HBLRepository->getDraftList($limit, $page, $order, $dir, $search);
+        $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'paymentStatus']);
+
+        return $this->HBLRepository->getDraftList($limit, $page, $order, $dir, $search, $filters);
     }
 
     public function createCallFlag(StoreCallFlagRequest $request, HBL $hbl)

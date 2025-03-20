@@ -803,9 +803,10 @@ watch(
     }
 );
 
-watch(() => form.warehouse, (newValue) => {
-    form.warehouse_id = newValue;
-});
+const updateWarehouseId = () => {
+    const selectedWarehouse = props.warehouses.find(w => w.name === form.warehouse);
+    form.warehouse_id = selectedWarehouse ? selectedWarehouse.id : null;
+}
 
 const volumeUnit = computed(() => {
     const units = {
@@ -889,8 +890,8 @@ const onDialogHide = () => {
                             </Fieldset>
 
                             <Fieldset legend="Warehouse">
-                                <SelectButton v-model="form.warehouse" :options="warehouses" name="HBL Type" option-label="name" option-value="name" />
-                                <InputError :message="form.errors.warehouse"/>
+                                <SelectButton v-model="form.warehouse" :options="warehouses" name="HBL Type" option-label="name" option-value="name" @change="updateWarehouseId"/>
+                                <InputError :message="form.errors.warehouse" />
                             </Fieldset>
 
                             <div class="flex justify-center mt-36">
