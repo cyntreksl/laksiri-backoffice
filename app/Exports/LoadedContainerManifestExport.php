@@ -33,7 +33,7 @@ class LoadedContainerManifestExport
         $loadedHBLPackages = [];
 
         // Group packages by HBL
-        foreach ($this->container->hbl_packages->groupBy('hbl_id') as $hblId => $packages) {
+        foreach ($this->container->duplicate_hbl_packages->groupBy('hbl_id') as $hblId => $packages) {
             $hbl = HBL::withoutGlobalScope(BranchScope::class)->with('mhbl')->find($hblId);
             if ($hbl->mhbl) {
                 $loadedMHBLPackages[$hbl->mhbl->id][] = $packages;
@@ -80,6 +80,7 @@ class LoadedContainerManifestExport
                 1,
                 0,
                 null,
+                null,
             ];
         }
 
@@ -92,7 +93,15 @@ class LoadedContainerManifestExport
                     ? ($hbl->warehouse === 'COLOMBO' ? 'CMB' : ($hbl->warehouse === 'NINTAVUR' ? 'NTR' : null))
                     : null);
 
-            $isShortLoad = count($hbl->packages) > count($loadedHBLPackages[$hbl->id]['packages']);
+            $isHBLFullLoad = $hbl->packages->every(fn ($package) => $package->duplicate_containers->isNotEmpty());
+            $hblLoadedLatestContainer = $hbl->packages
+                ->load('duplicate_containers')
+                ->pluck('duplicate_containers')
+                ->flatten()
+                ->unique('id')
+                ->sortByDesc('created_at')
+                ->first();
+            $status = $hblLoadedLatestContainer['id'] === $this->container['id'] && $isHBLFullLoad ? 'BALANCE' : 'SHORT LOADED';
             $loadedContainerReferences = $hbl->packages->load('duplicate_containers')
                 ->pluck('duplicate_containers')
                 ->flatten()
@@ -121,9 +130,8 @@ class LoadedContainerManifestExport
                 $hbl->iq_number,
                 $hbl->is_departure_charges_paid,
                 $hbl->is_destination_charges_paid,
-                $isShortLoad
-                    ? ($referencesString ? "SHORT LOADED SHIP REF. $referencesString" : 'SHORT LOADED')
-                    : null,
+                $status,
+                $referencesString ? "SHIP NO. $referencesString" : null,
             ];
         }
 

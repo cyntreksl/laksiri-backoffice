@@ -16,6 +16,7 @@ use App\Http\Requests\StoreUnloadingIssue;
 use App\Http\Requests\UpdateContainerRequest;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
+use App\Interfaces\MHBLRepositoryInterface;
 use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\HBL;
@@ -31,6 +32,7 @@ class ContainerController extends Controller
     public function __construct(
         private readonly ContainerRepositoryInterface $containerRepository,
         private readonly HBLRepositoryInterface $HBLRepository,
+        private readonly MHBLRepositoryInterface $MHBLRepository,
     ) {}
 
     public function index()
@@ -278,5 +280,10 @@ class ContainerController extends Controller
     public function getDestinationUnloadedHBLs(Request $request)
     {
         return $this->HBLRepository->getDestinationUnloadedHBLsByCargoType($request->all());
+    }
+
+    public function getUnloadedMHBLHBL(Request $request)
+    {
+        return $this->MHBLRepository->getUnloadedMHBLHBL($request->all()['reference']);
     }
 }

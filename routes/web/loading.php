@@ -51,6 +51,9 @@ Route::name('loading.')->group(function () {
     Route::post('/loaded-containers/remove', [LoadedContainerController::class, 'destroyDraft'])
         ->name('loaded-containers.remove');
 
+    Route::post('/loaded-containers/add-mhbl', [LoadedContainerController::class, 'loadMHBL'])
+        ->name('loaded-containers.add-mhbl');
+
     Route::get('loaded-container-list', [LoadedContainerController::class, 'list']);
 
     Route::get('/loaded-containers/{container}/manifest/export', [LoadedContainerController::class, 'exportManifest'])
@@ -81,6 +84,9 @@ Route::name('loading.')->group(function () {
 
     Route::post('loaded-containers/verify', [LoadedContainerController::class, 'verifyDocument'])
         ->name('loaded-containers.verify');
+
+    Route::post('containers/get-unloaded-mhbl-hbl', [ContainerController::class, 'getUnloadedMHBLHBL'])
+        ->name('get-unloaded-mhbls-hbl');
 
     // Manual Loadings
     Route::get('manual-loadings', function () {

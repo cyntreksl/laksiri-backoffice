@@ -18,4 +18,6 @@ interface MHBLRepositoryInterface
     public function getUnloadedMHBLs(array $data);
 
     public function getContainerLoadedMHBLs(array $data);
+
+    public function getUnloadedMHBLHBL(string $reference);
 }

@@ -2,10 +2,11 @@
 import Tab from "@/Components/Tab.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import AddHBLModal from "@/Pages/Loading/Partials/AddHBLModal.vue";
 import {usePage} from "@inertiajs/vue3";
 import TableMHBLPackages from "@/Pages/Loading/Partials/TableMHBLPackages.vue";
+import AddMHBLModal from "@/Pages/Loading/Partials/AddMHBLModal.vue";
 
 const props = defineProps({
     container: {
@@ -15,23 +16,43 @@ const props = defineProps({
     }
 });
 
-const showConfirmAddHBLModal = ref(false);
+const showConfirmAddMHBLModal = ref(false);
 
-const confirmAddHBLModal = () => {
-    showConfirmAddHBLModal.value = true;
+const confirmAddMHBLModal = () => {
+    showConfirmAddMHBLModal.value = true;
 };
 
 const closeModal = () => {
-    showConfirmAddHBLModal.value = false;
+    showConfirmAddMHBLModal.value = false;
 }
 const filteredHBLS = ref([]);
+const containerData = ref({});
 const hblsCount = ref(0)
 const mhblsCount = ref(0);
 const filteredHBLSPackagesCount = ref(0);
 const filteredHBLSPackagesWeight = ref(0);
 const filteredHBLSPackagesVolume = ref(0);
+
+const fetchLoadedContainer = async () => {
+    try {
+        const response = await fetch(`/loaded-containers/get-container/${props.container.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch container ${props.container.id}`);
+        }
+        containerData.value = (await response.json())[0];
+    }catch (error) {
+        console.error("Error:", error);
+    }
+};
+fetchLoadedContainer()
 const hbls = () => {
-    const hbls = props.container.hbls;
+    const hbls = containerData.value.hbls;
     filteredHBLS.value = Object.values(hbls).filter(hbl => hbl.mhbl !== null);
     hblsCount.value = filteredHBLS.value.length;
 
@@ -54,7 +75,11 @@ const hbls = () => {
     const mhblSet = new Set(filteredHBLS.value.map(hbl => hbl.mhbl));
     mhblsCount.value = mhblSet.size;
 }
-hbls();
+
+watch(() => containerData.value, () => {
+    hbls();
+});
+// hbls();
 </script>
 
 <template>
@@ -68,6 +93,15 @@ hbls();
                 <p class="mt-1 hidden sm:block">{{ container.reference }}</p>
             </div>
             <div class="flex items-center space-x-2">
+                <PrimaryOutlineButton :disabled="usePage().props.user?.roles[0] !== 'admin'" @click.prevent="confirmAddMHBLModal">
+                    <svg class="size-5 mr-2" fill="none" stroke="currentColor"
+                         stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke-linecap="round"
+                              stroke-linejoin="round"/>
+                    </svg>
+
+                    Add MHBL To Shipment
+                </PrimaryOutlineButton>
                 <a :href="route('loading.loaded-containers.doorToDoor.export', container.id)">
                 <PrimaryOutlineButton v-if="filteredHBLSPackagesCount > 0">
                     <svg class="size-5 mr-2" fill="none" stroke="currentColor"
@@ -156,5 +190,5 @@ hbls();
 
         <TableMHBLPackages :container="container" :containerHBLS="filteredHBLS"/>
     </Tab>
-    <AddHBLModal :container="container" :show="showConfirmAddHBLModal" @close="closeModal"/>
+    <AddMHBLModal :container="container" :show="showConfirmAddMHBLModal" @close="closeModal" @fetchContainer="fetchLoadedContainer"/>
 </template>

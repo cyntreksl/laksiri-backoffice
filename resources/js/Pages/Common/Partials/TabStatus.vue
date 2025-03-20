@@ -158,6 +158,10 @@ const hblStatusColor = (status) => {
             return 'bg-success';
         case 'Container Unloaded in Nintavur':
             return 'bg-red-600';
+        case 'Container In Transit':
+            return 'bg-cyan-600';
+        case 'Container Reached Destination ':
+            return 'bg-emerald-600';
     }
 };
 
