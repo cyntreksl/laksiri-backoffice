@@ -67,7 +67,7 @@ const props = defineProps({
 
 const driverChartOptions = computed(() => {
     return {
-        colors: ["#0EA5E9", "#EF4444", "#34D399", "#FBBF24"],
+        colors: ["#0EA5E9", "#34D399", "#EF4444", "#FBBF24"],
         series: [
             {
                 name: "Assigned",
