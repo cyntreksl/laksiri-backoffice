@@ -368,16 +368,19 @@ class HBLController extends Controller
 
         return Inertia::render('HBL/HBLDoorToDoorList', [
             'warehouses' => GetDestinationBranches::run(),
+            'paymentStatus' => HBLPaymentStatus::cases(),
+            'users' => $this->userRepository->getUsers(['customer']),
         ]);
     }
 
     public function getDoorToDoorList(Request $request): JsonResponse
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
+
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'warehouse']);
 
         return $this->HBLRepository->getDoorToDoorHBL($limit, $page, $order, $dir, $search, $filters);
