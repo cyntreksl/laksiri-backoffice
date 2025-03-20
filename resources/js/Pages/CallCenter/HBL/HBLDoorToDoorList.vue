@@ -16,13 +16,10 @@ import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
-import HoldConfirmationModal from "@/Pages/CashSettlement/Partials/HoldConfirmationModal.vue";
+// import HoldConfirmationModal from "@/Pages/CashSettlement/Partials/HoldConfirmationModal.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
-import {forEach} from "vuedraggable/dist/vuedraggable.common.js";
 import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
-import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
 
