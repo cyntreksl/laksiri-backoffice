@@ -367,7 +367,7 @@ const closeCallFlagModal = () => {
     hblName.value = "";
 };
 
-const mhblFrom = useForm({
+const form = useForm({
     hbls: [],
     cargo_type: '',
     hbl_type: '',
@@ -397,16 +397,16 @@ watch(
 
         isCreateMHBL.value = !!(checkEqualCargoMode && checkEqualHBLType && checkEqualWarehouse);
 
-        mhblFrom.cargo_type = cargo_type;
-        mhblFrom.hbl_type = hbl_type;
-        mhblFrom.warehouse = warehouse;
+        form.cargo_type = cargo_type;
+        form.hbl_type = hbl_type;
+        form.warehouse = warehouse;
     }
 );
 
 const createMHBL = () => {
-    mhblFrom.hbls = selectedHBLs.value.map((item) => item.id);
+    form.hbls = selectedHBLs.value.map((item) => item.id);
 
-    mhblFrom.get(route("mhbls.create"), {
+    form.get(route("mhbls.create"), {
         onError: () => {
             push.error('Something went to wrong!');
         },
