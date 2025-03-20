@@ -19,12 +19,14 @@ import InputIcon from "primevue/inputicon";
 import Select from "primevue/select";
 import ContextMenu from "primevue/contextmenu";
 import Button from "primevue/button";
-import {Link, router, usePage} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import IconField from "primevue/iconfield";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {useConfirm} from "primevue/useconfirm";
 import axios from "axios";
 import {debounce} from "lodash";
+import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 
 const props = defineProps({
     drivers: {
@@ -53,7 +55,7 @@ const baseUrl = ref("/cash-settlement-list");
 const loading = ref(true);
 const hbls = ref([]);
 const totalRecords = ref(0);
-const perPage = ref(10);
+const perPage = ref(100);
 const currentPage = ref(1);
 const showConfirmViewHBLModal = ref(false);
 const cm = ref();
@@ -69,6 +71,8 @@ const totalGrandAmount = ref(0);
 const totalPaidAmount = ref(0);
 const fromDate = ref(moment(new Date()).subtract(1, "month").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
+const showConfirmPaymentModal = ref(false);
+const hbl = ref(null);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -85,49 +89,19 @@ const menuModel = ref([
         label: "View",
         icon: "pi pi-fw pi-search",
         command: () => confirmViewHBL(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.show"),
+        disabled: !usePage().props.user.permissions.includes('cash.show'),
     },
     {
-        label: "Call Flag",
-        icon: "pi pi-fw pi-flag",
-        command: () => confirmViewCallFlagModal(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
-    },
-    {
-        label: "Edit",
-        icon: "pi pi-fw pi-pencil",
-        command: () => router.visit(route("hbls.edit", selectedHBL.value.id)),
-        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
+        label: "Update Payment",
+        icon: "pi pi-fw pi-dollar",
+        command: () => confirmPayment(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes('cash.update payment'),
     },
     {
         label: computed(() => (selectedHBL.value?.is_hold ? 'Release' : 'Hold')),
         icon: computed(() => (selectedHBL.value?.is_hold ? 'pi pi-fw pi-play-circle' : 'pi pi-fw pi-pause-circle')) ,
         command: () => confirmHBLHold(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.hold and release"),
-    },
-    {
-        label: "Download",
-        icon: "pi pi-fw pi-download",
-        url: () => route("hbls.download", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download pdf"),
-    },
-    {
-        label: "Invoice",
-        icon: "pi pi-fw pi-receipt",
-        url: () => route("hbls.download.invoice", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download invoice"),
-    },
-    {
-        label: "Barcode",
-        icon: "pi pi-fw pi-barcode",
-        url: () => route("hbls.download.barcode", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download barcode"),
-    },
-    {
-        label: "Delete",
-        icon: "pi pi-fw pi-times",
-        command: () => confirmHBLDelete(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.delete"),
+        disabled: !usePage().props.user.permissions.includes('cash.hold and release'),
     },
 ]);
 
@@ -348,6 +322,55 @@ const clearFilter = () => {
     fetchCashSettlements(currentPage.value);
 };
 
+const confirmHBLHold = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    confirm.require({
+        message: `Would you like to ${hbl.value.is_hold ? 'Release' : 'Hold'} this hbl?`,
+        header: `${hbl.value.is_hold ? 'Release' : 'Hold'} HBL?`,
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: `${hbl.value.is_hold ? 'Release' : 'Hold'}`,
+            severity: 'warn'
+        },
+        accept: () => {
+            router.put(
+                route("hbls.toggle-hold", selectedHBLID.value),
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success(`Operation Successfully!`);
+                        fetchCashSettlements(currentPage.value);
+                    },
+                    onError: () => {
+                        push.error("Something went to wrong!");
+                    },
+                }
+            );
+            selectedHBLID.value = null;
+        },
+        reject: () => {
+        }
+    });
+};
+
+const confirmPayment = (obj) => {
+    if (!obj) return;
+    hbl.value = obj.value;
+    showConfirmPaymentModal.value = true;
+};
+
+const closePaymentModal = () => {
+    showConfirmPaymentModal.value = false;
+    hbl.value = null;
+};
+
 const exportCSV = () => {
     dt.value.exportCSV();
 };
@@ -385,11 +408,6 @@ const exportCSV = () => {
                     <FloatLabel class="w-full" variant="in">
                         <DatePicker v-model="toDate" class="w-full" date-format="yy-mm-dd" input-id="to-date"/>
                         <label for="to-date">To Date</label>
-                    </FloatLabel>
-
-                    <FloatLabel class="w-full" variant="in">
-                        <Select v-model="filters.payments.value" :options="paymentStatus" :showClear="true" class="w-full" input-id="payment-status" />
-                        <label for="payment-status">Payment Status</label>
                     </FloatLabel>
 
                     <FloatLabel class="w-full" variant="in">
@@ -583,6 +601,17 @@ const exportCSV = () => {
                 </template>
             </Card>
         </div>
-
     </AppLayout>
+
+    <HBLDetailModal
+        :hbl-id="selectedHBLID"
+        :show="showConfirmViewHBLModal"
+        @close="closeModal"
+    />
+
+    <PaymentModal
+        :hbl="hbl"
+        :visible="showConfirmPaymentModal"
+        @close="closePaymentModal"
+    />
 </template>
