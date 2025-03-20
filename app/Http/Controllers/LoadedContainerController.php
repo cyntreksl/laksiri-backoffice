@@ -138,4 +138,9 @@ class LoadedContainerController extends Controller
     {
         return $this->loadedContainerRepository->getLoadedContainer($id);
     }
+
+    public function loadMHBL(Request $request)
+    {
+        return $this->loadedContainerRepository->loadMHBL($request->all());
+    }
 }

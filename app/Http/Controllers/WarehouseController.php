@@ -42,7 +42,7 @@ class WarehouseController extends Controller
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
+        $limit = $request->input('limit', 100);
         $page = $request->input('offset', 1);
         $order = $request->input('order', 'id');
         $dir = $request->input('dir', 'asc');

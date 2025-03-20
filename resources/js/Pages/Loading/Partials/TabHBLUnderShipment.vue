@@ -53,7 +53,7 @@ fetchLoadedContainer()
 const hbls = () => {
     const hbls = containerData.value.hbls;
     filteredHBLS.value = Object.values(hbls).filter(hbl => hbl.mhbl === null);
-    hblsCount.value = filteredHBLS.value.length;
+    // hblsCount.value = filteredHBLS.value.length;
 
     const filteredHblIds = filteredHBLS.value.map(hbl => hbl.id);
 
@@ -83,7 +83,7 @@ const mhbls = () => {
     filteredMHBLsLHBL.value = Object.values(hbls).filter(hbl => hbl.mhbl !== null);
 
     //Get hbls count
-    hblsCount.value = hblsCount.value + filteredMHBLsLHBL.value.length;
+    // hblsCount.value = hblsCount.value + filteredMHBLsLHBL.value.length;
 
     const filteredMHblsHBLIds = filteredMHBLsLHBL.value.map(hbl => hbl.id);
     const filteredMHblsHBLPackages = props.container.hbl_packages.filter(pkg =>
@@ -118,6 +118,20 @@ const mhbls = () => {
     filteredMHBLS.value = mhblMap;
 
 }
+
+watch(
+    [
+        () => filteredHBLS.value,
+        () => filteredMHBLsLHBL.value
+    ],
+    ([filteredHBLS, filteredMHBLsLHBL]) => {
+        const flattenedMHBLs = filteredMHBLsLHBL.flat();
+        const uniqueMHBLs = new Set(flattenedMHBLs.map(item => item.mhbl?.id));
+        const uniqueMHBLCount = uniqueMHBLs.size;
+
+        hblsCount.value = filteredHBLS.length + uniqueMHBLCount;
+    }
+);
 </script>
 
 <template>
@@ -213,7 +227,7 @@ const mhbls = () => {
             </SimpleOverviewWidget>
         </div>
 
-        <TableHBLPackages :container="container" :containerHBLS="filteredHBLS" :containerMHBLS="filteredMHBLS" @fetContainerData="fetchLoadedContainer"/>
+        <TableHBLPackages :container="container" :containerHBLS="filteredHBLS" :containerMHBLS="filteredMHBLS" :filteredMHBLsLHBL="filteredMHBLsLHBL" @fetContainerData="fetchLoadedContainer"/>
     </Tab>
     <AddHBLModal :container="container" :show="showConfirmAddHBLModal" @close="closeModal"/>
 </template>

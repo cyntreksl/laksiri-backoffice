@@ -17,4 +17,6 @@ interface LoadedContainerRepositoryInterface
     public function downloadUnloadingPointDoc($container);
 
     public function getLoadedContainer(string $id);
+
+    public function loadMHBL(array $data);
 }

@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Enum\ContainerStatus;
 use App\Models\Scopes\BranchScope;
+use App\Observers\ContainerObserver;
 use App\Traits\HasStatusLogs;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +19,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ScopedBy(BranchScope::class)]
+#[ObservedBy([ContainerObserver::class])]
 class Container extends Model
 {
     use HasFactory;
