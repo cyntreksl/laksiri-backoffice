@@ -13,8 +13,7 @@ class PaymentStatusFilter implements FilterInterface
             $value = ! is_array($value) ? explode(',', $value) : $value;
 
             return $query->whereHas('hblPayment', function (Builder $query) use ($value) {
-                $query->whereIn('status', $value)
-                    ->whereRaw('`id` = (SELECT MAX(`id`) FROM `hbl_payments` WHERE `hbl_payments`.`hbl_id` = `hbl`.`id`)');
+                $query->whereIn('status', $value);
             });
         }
 

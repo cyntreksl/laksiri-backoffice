@@ -29,50 +29,40 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
             $query->where('hbl_number', 'like', "%$search%");
         }
 
-        // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $records = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => CashSettlementCollection::collection($records),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $records->total(),
+                'current_page' => $records->currentPage(),
+                'perPage' => $records->perPage(),
+                'lastPage' => $records->lastPage(),
             ],
         ]);
     }
 
-    public function getSummery(array $filters = [])
+    public function getSummery(array $filters = []): array
     {
         $query = HBL::query();
+
         $query->cashSettlement()->whereHas('packages');
-        // apply filters
 
-        $filters['isHold'] ? $filters['isHold'] = 'true' : $filters['isHold'] = 'false';
+        // Ensure 'isHold' key exists and set to boolean
+        $filters['isHold'] = isset($filters['isHold']) ? (bool) $filters['isHold'] : false;
 
-        count($filters['paymentStatus']) > 0 ? $filters['paymentStatus'] = implode(',', $filters['paymentStatus']) : $filters['paymentStatus'] = null;
-
+        // Apply filters
         FilterFactory::apply($query, $filters);
 
+        // Fetch records
         $records = $query->get();
 
-        $sumAmount = $records->sum('grand_total');
-        $sumPaidAmount = $records->sum('paid_amount');
-        $countRecords = $records->count();
-
         return [
-            'totalRecords' => $countRecords,
-            'sumAmount' => $sumAmount,
-            'sumPaidAmount' => $sumPaidAmount,
+            'totalRecords' => $records->count(),
+            'sumAmount' => $records->sum('grand_total'),
+            'sumPaidAmount' => $records->sum('paid_amount'),
         ];
     }
 
