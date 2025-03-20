@@ -60,6 +60,7 @@ const currentPage = ref(1);
 const showConfirmViewHBLModal = ref(false);
 const cm = ref();
 const selectedHBL = ref(null);
+const selectedHBLs = ref([]);
 const selectedHBLID = ref(null);
 const confirm = useConfirm();
 const dt = ref();
@@ -371,6 +372,48 @@ const closePaymentModal = () => {
     hbl.value = null;
 };
 
+const cashReceived = async () => {
+    const idList = selectedHBLs.value.map((item) => item.id);
+
+    try {
+        const response = await fetch("/cash-received", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+            body: JSON.stringify({hbl_ids: idList}),
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok.");
+        } else {
+            window.location.reload();
+            push.success("Cash collected successfully!");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
+
+const countOfSelectedData = computed(() => selectedHBLs.value.length);
+
+const valueOfSelectedData = computed(() => {
+    return selectedHBLs.value.reduce((total, item) => {
+        const grandTotal = parseFloat(item.grand_total || 0);
+        return total + grandTotal;
+    }, 0);
+});
+
+const paidValueOfSelectedData = computed(() => {
+    return selectedHBLs.value.reduce((total, item) => {
+        const grandTotal = parseFloat(item.paid_amount || 0);
+        return total + grandTotal;
+    }, 0);
+});
+
 const exportCSV = () => {
     dt.value.exportCSV();
 };
@@ -388,13 +431,13 @@ const exportCSV = () => {
 
             <SimpleOverviewWidget :count="totalPaidAmount.toFixed(2)" bg-color="white" title="HBL Paid Amount"/>
 
-<!--            <SimpleOverviewWidget :count="countOfSelectedData" bg-color="white" title="Selected HBL Count"/>-->
+            <SimpleOverviewWidget :count="countOfSelectedData" bg-color="white" title="Selected HBL Count"/>
 
-<!--            <SimpleOverviewWidget :count="valueOfSelectedData.toFixed(2)" bg-color="white"-->
-<!--                                  title="Selected HBL Amount"/>-->
+            <SimpleOverviewWidget :count="valueOfSelectedData.toFixed(2)" bg-color="white"
+                                  title="Selected HBL Amount"/>
 
-<!--            <SimpleOverviewWidget :count="paidValueOfSelectedData.toFixed(2)" bg-color="white"-->
-<!--                                  title="Selected HBL Paid Amount"/>-->
+            <SimpleOverviewWidget :count="paidValueOfSelectedData.toFixed(2)" bg-color="white"
+                                  title="Selected HBL Paid Amount"/>
         </div>
 
         <div>
@@ -424,6 +467,7 @@ const exportCSV = () => {
                         ref="dt"
                         v-model:contextMenuSelection="selectedHBL"
                         v-model:filters="filters"
+                        v-model:selection="selectedHBLs"
                         :globalFilterFields="['reference', 'hbl', 'hbl_name', 'email', 'address', 'contact_number', 'consignee_name', 'consignee_address', 'consignee_contact', 'cargo_type', 'hbl_type', 'warehouse', 'status', 'hbl_number']"
                         :loading="loading"
                         :rows="perPage"
@@ -448,7 +492,14 @@ const exportCSV = () => {
                                     Cash Settlements
                                 </div>
                                 <div>
-                                    <PrimaryButton class="w-full">Create New HBL</PrimaryButton>
+                                    <PrimaryButton
+                                        v-if="$page.props.user.permissions.includes('cash.cash received')"
+                                        :disabled="selectedHBLs.length === 0"
+                                        class="w-full"
+                                        @click="cashReceived"
+                                    >
+                                        Cash Received
+                                    </PrimaryButton>
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -491,6 +542,8 @@ const exportCSV = () => {
                         <template #empty> No cash settlements found. </template>
 
                         <template #loading> Loading cash settlements data. Please wait.</template>
+
+                        <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
 
                         <Column field="reference" header="Reference" hidden sortable></Column>
 
