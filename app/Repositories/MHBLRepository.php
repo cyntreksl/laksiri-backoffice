@@ -8,6 +8,7 @@ use App\Actions\MHBL\CreateMHBL;
 use App\Actions\MHBL\CreateMHBLsHBL;
 use App\Actions\MHBL\DeleteMHBL;
 use App\Actions\MHBL\GetContainerLoadedMHBLs;
+use App\Actions\MHBL\GetUnloadedMHBLWithHBLsByRef;
 use App\Actions\MHBL\GetUnloadMHBLWithHBLs;
 use App\Actions\MHBL\UpdateMHBL;
 use App\Actions\MHBL\UpdateMHBLsHBL;
@@ -110,5 +111,22 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
         return response()->json([
             'data' => $result,
         ]);
+    }
+
+    public function getUnloadedMHBLHBL(string $reference)
+    {
+        $mhbl = GetUnloadedMHBLWithHBLsByRef::run($reference);
+
+        if (! $mhbl) {
+            return response()->json([
+                'errors' => [
+                    'reference' => ['MHBL not found or invalid reference number to load.'],
+                ],
+            ], 422);
+        } else {
+            return response()->json([
+                'mhbl' => $mhbl,
+            ]);
+        }
     }
 }

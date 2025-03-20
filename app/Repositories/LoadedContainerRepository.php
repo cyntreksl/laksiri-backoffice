@@ -7,6 +7,7 @@ use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
 use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Loading\GetLoadedContainerWithHblsById;
+use App\Actions\MHBL\GetUnloadedMHBLWithHBLsByRef;
 use App\Actions\Setting\GetSettings;
 use App\Enum\ContainerStatus;
 use App\Exports\DoorToDoorManifestExport;
@@ -184,6 +185,26 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             return GetLoadedContainerWithHblsById::run($id);
         } catch (\Exception $exception) {
             throw new \Exception('Failed to get Container');
+        }
+    }
+
+    public function loadMHBL(array $data)
+    {
+        try {
+            $mhbl = GetUnloadedMHBLWithHBLsByRef::run($data['mhbl']);
+            $packages = $mhbl->hbls->flatMap(function ($hbl) {
+                return $hbl->packages->map(function ($package) {
+                    return $package->toArray();
+                });
+            })->values()->all();
+            $loadingData = [
+                'container_id' => $data['container_id'],
+                'packages' => $packages,
+            ];
+
+            return $this->store($loadingData);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to add MHBL to loaded container: '.$e->getMessage());
         }
     }
 }
