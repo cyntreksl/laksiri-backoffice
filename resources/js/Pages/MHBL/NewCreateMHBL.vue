@@ -329,9 +329,9 @@ const shipIcon = ref(`
                                         v-model="form.cargo_type"
                                         :value="cargoType"
                                         class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        disabled
                                         name="cargo_type"
                                         type="radio"
+                                        disabled
                                     />
                                     <p>{{ cargoType }}</p>
                                     <span v-if="cargoType == 'Sea Cargo'">
@@ -365,9 +365,9 @@ const shipIcon = ref(`
                                         v-model="form.hbl_type"
                                         :value="hblType"
                                         class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        disabled
                                         name="hbl_type"
                                         type="radio"
+                                        disabled
                                     />
                                     <p>{{ hblType }}</p>
                                 </label>
@@ -397,9 +397,9 @@ const shipIcon = ref(`
                                         v-model="form.warehouse"
                                         :value="warehouse.name"
                                         class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        disabled
                                         name="warehouse"
                                         type="radio"
+                                        disabled
                                         @change="form.warehouse_id = warehouse.id"
                                     />
                                     <p>{{ warehouse.name }}</p>
@@ -450,9 +450,9 @@ const shipIcon = ref(`
                                 <span>Email</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.email"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        disabled
                                         placeholder="Email"
                                         type="email"
                                     />
@@ -484,9 +484,9 @@ const shipIcon = ref(`
                                 <span>Mobile Number</span>
                                 <div class="flex -space-x-px">
                                     <select
+                                        disabled
                                         v-model="countryCode"
                                         class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        disabled
                                     >
                                         <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
                                             {{ countryCode }}
@@ -494,9 +494,9 @@ const shipIcon = ref(`
                                     </select>
 
                                     <input
+                                        disabled
                                         v-model="contactNumber"
                                         class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                        disabled
                                         placeholder="123 4567 890"
                                         type="text"
                                     />
@@ -510,9 +510,9 @@ const shipIcon = ref(`
                                 <span>PP or NIC No</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.nic"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        disabled
                                         placeholder="PP or NIC No"
                                         type="text"
                                     />
@@ -526,9 +526,9 @@ const shipIcon = ref(`
                                 <span>Residency No</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.iq_number"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        disabled
                                         placeholder="Residency No"
                                         type="text"
                                     />
@@ -542,9 +542,9 @@ const shipIcon = ref(`
                                 <span>Address</span>
                                 <label class="block">
                   <textarea
+                      disabled
                       v-model="form.address"
                       class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                      disabled
                       placeholder="Type address here..."
                       rows="4"
                   ></textarea>
@@ -587,9 +587,9 @@ const shipIcon = ref(`
                                 <span>PP or NIC No</span>
                                 <label class="relative flex">
                                     <input
+                                        disabled
                                         v-model="form.consignee_nic"
                                         class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        disabled
                                         placeholder="PP or NIC No"
                                         type="text"
                                     />
@@ -601,9 +601,9 @@ const shipIcon = ref(`
                                 <span>Mobile Number</span>
                                 <div class="flex -space-x-px">
                                     <select
+                                        disabled
                                         v-model="consignee_countryCode"
                                         class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        disabled
                                     >
                                         <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
                                             {{ countryCode }}
@@ -611,9 +611,9 @@ const shipIcon = ref(`
                                     </select>
 
                                     <input
+                                        disabled
                                         v-model="consignee_contact"
                                         class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                        disabled
                                         placeholder="123 4567 890"
                                         type="text"
                                     />
@@ -625,9 +625,9 @@ const shipIcon = ref(`
                                 <span>Address</span>
                                 <label class="block">
                                   <textarea
+                                      disabled
                                       v-model="form.consignee_address"
                                       class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                      disabled
                                       placeholder="Type address here..."
                                       rows="4"
                                   ></textarea>
