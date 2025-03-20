@@ -45,7 +45,7 @@ const handleUpdatePayment = () => {
     <Dialog :header="`Update Payment - ${hbl?.hbl || hbl?.reference}`" :style="{ width: '45rem' }" :visible="visible" modal @update:visible="(newValue) => $emit('update:visible', newValue)">
 
         <div class="rounded-lg bg-gradient-to-r from-green-500 to-indigo-600 py-5 sm:py-6">
-            <div class="grid grid-cols-3 px-4 text-white sm:px-5">
+            <div class="grid grid-cols-1 sm:grid-cols-3 px-4 text-white sm:px-5">
                 <div>
                     <div class="-mt-1 flex items-center space-x-2">
                         <h2 class="text-base font-medium tracking-wide">Total Amount</h2>

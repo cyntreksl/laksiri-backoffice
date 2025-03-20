@@ -613,5 +613,6 @@ const exportCSV = () => {
         :hbl="hbl"
         :visible="showConfirmPaymentModal"
         @close="closePaymentModal"
+        @update:visible="showConfirmPaymentModal = $event"
     />
 </template>
