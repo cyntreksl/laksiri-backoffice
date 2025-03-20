@@ -63,7 +63,6 @@ const selectedHBL = ref(null);
 const selectedHBLs = ref([]);
 const selectedHBLID = ref(null);
 const confirm = useConfirm();
-const dt = ref();
 const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
 const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
@@ -414,9 +413,20 @@ const paidValueOfSelectedData = computed(() => {
     }, 0);
 });
 
-const exportCSV = () => {
-    dt.value.exportCSV();
-};
+const exportURL = computed(() => {
+    const params = new URLSearchParams({
+        warehouse: filters.value.warehouse.value,
+        hblType: filters.value.hbl_type.value,
+        cargoMode: filters.value.cargo_type.value,
+        isHold: filters.value.is_hold.value,
+        officers: filters.value.user.value,
+        paymentStatus: filters.value.payments.value,
+        fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+        toDate: moment(toDate.value).format("YYYY-MM-DD"),
+    }).toString();
+
+    return `/cash-settlements/export?${params}`;
+});
 </script>
 <template>
     <AppLayout title="Cash Settlements">
@@ -464,7 +474,6 @@ const exportCSV = () => {
                 <template #content>
                     <ContextMenu ref="cm" :model="menuModel" @hide="selectedHBL = null" />
                     <DataTable
-                        ref="dt"
                         v-model:contextMenuSelection="selectedHBL"
                         v-model:filters="filters"
                         v-model:selection="selectedHBLs"
@@ -515,13 +524,14 @@ const exportCSV = () => {
                                         @click="clearFilter()"
                                     />
 
-                                    <Button
-                                        icon="pi pi-external-link"
-                                        label="Export"
-                                        severity="contrast"
-                                        size="small"
-                                        @click="exportCSV($event)"
-                                    />
+                                    <a :href="exportURL">
+                                        <Button
+                                            icon="pi pi-external-link"
+                                            label="Export"
+                                            severity="contrast"
+                                            size="small"
+                                        />
+                                    </a>
                                 </div>
 
                                 <!-- Search Field -->
