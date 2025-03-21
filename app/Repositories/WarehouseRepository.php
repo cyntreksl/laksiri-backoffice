@@ -31,21 +31,15 @@ class WarehouseRepository implements GridJsInterface, WarehouseRepositoryInterfa
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $records = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => CashSettlementCollection::collection($records),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $records->total(),
+                'current_page' => $records->currentPage(),
+                'perPage' => $records->perPage(),
+                'lastPage' => $records->lastPage(),
             ],
         ]);
     }
@@ -53,7 +47,10 @@ class WarehouseRepository implements GridJsInterface, WarehouseRepositoryInterfa
     public function getSummery(array $filters = [])
     {
         $query = HBL::query();
+
         $query->warehouse();
+
+        $filters['isHold'] = isset($filters['isHold']) ? (bool) $filters['isHold'] : false;
 
         // apply filters
         FilterFactory::apply($query, $filters);

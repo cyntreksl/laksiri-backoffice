@@ -8,6 +8,7 @@ use App\Enum\HBLPaymentStatus;
 use App\Http\Requests\AssignZoneRequest;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Models\HBL;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -22,6 +23,7 @@ class WarehouseController extends Controller
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly WarehouseRepositoryInterface $warehouseRepository,
         private readonly HBLRepositoryInterface $HBLRepository,
+        private readonly UserRepositoryInterface $userRepository,
     ) {}
 
     public function index()
@@ -29,11 +31,10 @@ class WarehouseController extends Controller
         $this->authorize('warehouse.index');
 
         $drivers = $this->driverRepository->getAllDrivers();
-        $officers = [];
 
         return Inertia::render('Warehouse/WarehouseList', [
             'drivers' => $drivers,
-            'officers' => $officers,
+            'officers' => $this->userRepository->getUsers(['customer']),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouseZones' => GetWarehouseZones::run(),
             'warehouses' => GetDestinationBranches::run(),
@@ -55,7 +56,7 @@ class WarehouseController extends Controller
 
     public function getSummery(Request $request)
     {
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'hblType']);
 
         return $this->warehouseRepository->getSummery($filters);
     }

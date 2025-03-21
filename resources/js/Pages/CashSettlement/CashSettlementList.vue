@@ -464,7 +464,17 @@ const exportURL = computed(() => {
                     </FloatLabel>
 
                     <FloatLabel class="w-full" variant="in">
-                        <Select v-model="filters.user.value" :options="users" :showClear="true" class="w-full" input-id="user" option-label="name" option-value="id" />
+                        <Select v-model="filters.hbl_type.value" :options="hblTypes" :showClear="true" class="w-full" input-id="hbl-type" />
+                        <label for="hbl-type">HBL Type</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.warehouse.value" :options="warehouses" :showClear="true" class="w-full" input-id="hbl-type" />
+                        <label for="hbl-type">Warehouse</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.user.value" :options="officers" :showClear="true" class="w-full" input-id="user" option-label="name" option-value="id" />
                         <label for="user">Created By</label>
                     </FloatLabel>
                 </div>
