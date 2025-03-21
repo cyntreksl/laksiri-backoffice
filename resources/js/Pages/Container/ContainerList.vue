@@ -57,6 +57,8 @@ const dt = ref();
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const fromDate = ref(moment(new Date()).subtract(7, "days").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
+const etdStartDate = ref('');
+const etdEndDate = ref('');
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -96,6 +98,8 @@ const fetchContainers = async (page = 1, search = "", sortField = 'created_at', 
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
                 containerType: filters.value.container_type.value || "",
                 status: filters.value.status.value || "",
+                etdStartDate: etdStartDate.value ? moment(etdStartDate.value).format("YYYY-MM-DD") : null,
+                etdEndDate: etdEndDate.value ? moment(etdEndDate.value).format("YYYY-MM-DD") : null,
             }
         });
         containers.value = response.data.data;
@@ -138,6 +142,14 @@ watch(() => toDate.value, (newValue) => {
     fetchContainers(1, filters.value.global.value);
 });
 
+watch(() => etdStartDate.value, (newValue) => {
+    fetchContainers(1, filters.value.global.value);
+});
+
+watch(() => etdEndDate.value, (newValue) => {
+    fetchContainers(1, filters.value.global.value);
+});
+
 const onPageChange = (event) => {
     currentPage.value = event.page + 1;
     fetchContainers(currentPage.value);
@@ -162,6 +174,10 @@ const clearFilter = () => {
         container_type: {value: null, matchMode: FilterMatchMode.EQUALS},
         status: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
+    fromDate.value = moment(new Date()).subtract(7, "days").toISOString().split("T")[0];
+    toDate.value = moment(new Date()).toISOString().split("T")[0];
+    etdStartDate.value = '';
+    etdEndDate.value = '';
     fetchContainers(currentPage.value);
 };
 
@@ -746,6 +762,16 @@ const exportCSV = () => {
                     <FloatLabel class="w-full" variant="in">
                         <DatePicker v-model="toDate" class="w-full" date-format="yy-mm-dd" input-id="to-date"/>
                         <label for="to-date">To Date</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="etdStartDate" class="w-full" date-format="yy-mm-dd" input-id="etd-start-date"/>
+                        <label for="etd-start-date">ETD Start Date</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="etdEndDate" class="w-full" date-format="yy-mm-dd" input-id="etd-end-date"/>
+                        <label for="etd-end-date">ETD End Date</label>
                     </FloatLabel>
                 </div>
             </Panel>
