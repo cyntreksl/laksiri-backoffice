@@ -27,6 +27,7 @@ import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
 import {push} from "notivue";
+import AssignZoneModal from "@/Pages/Warehouse/Partials/AssignZoneModal.vue";
 
 const props = defineProps({
     drivers: {
@@ -81,6 +82,7 @@ const totalPaidAmount = ref(0);
 const totalWeight = ref(0);
 const totalVolume = ref(0);
 const totalQuantity = ref(0);
+const showConfirmAssignZoneModal = ref(false);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -436,6 +438,16 @@ const revertToCashSettlement = async () => {
     }
 };
 
+const confirmAssignZone = (id) => {
+    selectedHBLID.value = id;
+    showConfirmAssignZoneModal.value = true;
+};
+
+const closeAssignZoneModal = () => {
+    selectedHBLID.value = null;
+    showConfirmAssignZoneModal.value = false;
+};
+
 const exportURL = computed(() => {
     const params = new URLSearchParams({
         warehouse: filters.value.warehouse.value,
@@ -692,8 +704,9 @@ const exportURL = computed(() => {
                         <Column field="is_released" header="Released" hidden></Column>
 
                         <Column field="zone" header="Zone">
-                            <template #body="{ data }">
-                                <Button v-if="data.zone === null" aria-label="Favorite" icon="pi pi-heart" rounded severity="help" size="small" />
+                            <template #body="slotProps">
+                                <Button v-if="slotProps.data.zone === null" aria-label="zone" icon="ti ti-home-plus" rounded severity="help" size="small" @click.prevent="confirmAssignZone(slotProps.data.id)" />
+                                <span v-else>{{ slotProps.data.zone }}</span>
                             </template>
                         </Column>
 
@@ -714,6 +727,14 @@ const exportURL = computed(() => {
         :hbl="hbl"
         :visible="showConfirmPaymentModal"
         @close="closePaymentModal"
+        @update:visible="showConfirmPaymentModal = $event"
+    />
+
+    <AssignZoneModal
+        :hbl-id="selectedHBLID"
+        :visible="showConfirmAssignZoneModal"
+        :warehouse-zones="warehouseZones"
+        @close="closeAssignZoneModal"
         @update:visible="showConfirmPaymentModal = $event"
     />
 </template>
