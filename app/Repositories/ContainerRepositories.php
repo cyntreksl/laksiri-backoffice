@@ -75,24 +75,17 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             });
         }
 
-        // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $containers = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $containers = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => ContainerResource::collection($containers),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $containers->total(),
+                'current_page' => $containers->currentPage(),
+                'perPage' => $containers->perPage(),
+                'lastPage' => $containers->lastPage(),
             ],
         ]);
     }
