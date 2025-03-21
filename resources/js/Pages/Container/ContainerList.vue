@@ -55,8 +55,6 @@ const perPage = ref(10);
 const currentPage = ref(1);
 const cm = ref();
 const selectedContainer = ref([]);
-const selectedContainerID = ref(null);
-const confirm = useConfirm();
 const dt = ref();
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const fromDate = ref(moment(new Date()).subtract(7, "days").toISOString().split("T")[0]);
@@ -65,20 +63,23 @@ const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
     cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
+    container_type: {value: null, matchMode: FilterMatchMode.EQUALS},
+    status: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const menuModel = ref([
     {
         label: 'Edit',
         icon: 'pi pi-fw pi-pencil',
-        command: () => router.visit(route("containers.edit", selectedContainer.value.id)),
-        disabled: !usePage().props.user.permissions.includes('containers.edit'),
+        command: () => router.visit(route("loading.loading-containers.edit", selectedContainer.value.id)),
+        disabled: !usePage().props.user.permissions.includes('container.edit'),
     },
     {
-        label: 'Delete',
-        icon: 'pi pi-fw pi-times',
-        command: () => confirmPickupDelete(selectedContainer),
-        disabled: !usePage().props.user.permissions.includes('containers.delete'),
+        label: 'Load to Container',
+        icon: 'pi pi-fw pi-pencil',
+        command: () => router.visit(route("loading.loading-containers.edit", selectedContainer.value.id)),
+        disabled: !(usePage().props.user.permissions.includes('container.load to container') &&
+            ["DRAFT", "LOADING", "Container Ordered"].includes(selectedContainer.value.status)),
     },
 ]);
 
@@ -95,6 +96,8 @@ const fetchContainers = async (page = 1, search = "", sortField = 'created_at', 
                 sort_order: sortOrder === 1 ? "asc" : "desc",
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
+                containerType: filters.value.container_type.value || "",
+                status: filters.value.status.value || "",
             }
         });
         containers.value = response.data.data;
@@ -125,6 +128,14 @@ watch(() => fromDate.value, (newValue) => {
     fetchContainers(1, filters.value.global.value);
 });
 
+watch(() => filters.value.container_type.value, (newValue) => {
+    fetchContainers(1, filters.value.global.value);
+});
+
+watch(() => filters.value.status.value, (newValue) => {
+    fetchContainers(1, filters.value.global.value);
+});
+
 watch(() => toDate.value, (newValue) => {
     fetchContainers(1, filters.value.global.value);
 });
@@ -150,6 +161,8 @@ const clearFilter = () => {
     filters.value = {
         global: {value: null, matchMode: FilterMatchMode.CONTAINS},
         cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
+        container_type: {value: null, matchMode: FilterMatchMode.EQUALS},
+        status: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
     fetchContainers(currentPage.value);
 };
@@ -222,41 +235,6 @@ const resolveContainerStatus = (container) => {
 
 const exportCSV = () => {
     dt.value.exportCSV();
-};
-
-const confirmPickupDelete = (pickup) => {
-    selectedContainerID.value = pickup.value.id;
-    confirm.require({
-        message: 'Would you like to delete this pickup record?',
-        header: 'Delete Pickup?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Delete',
-            severity: 'danger'
-        },
-        accept: () => {
-            router.delete(route("containers.destroy", selectedContainerID.value), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    push.success("Pickup record Deleted Successfully!");
-                    router.visit(route("containers.index"), {only: ["containers"]});
-                },
-                onError: () => {
-                    push.error("Something went to wrong!");
-                },
-            });
-            selectedContainerID.value = null;
-        },
-        reject: () => {
-            selectedContainerID.value = null;
-        }
-    });
 };
 </script>
 <template>
@@ -778,7 +756,7 @@ const confirmPickupDelete = (pickup) => {
                         ref="dt"
                         v-model:contextMenuSelection="selectedContainer"
                         v-model:filters="filters"
-                        :globalFilterFields="['name']"
+                        :globalFilterFields="['reference', 'bl_number', 'awb_number', 'container_number', 'seal_number', 'vessel_name', 'voyage_number', 'shipping_line']"
                         :loading="loading"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
@@ -873,13 +851,10 @@ const confirmPickupDelete = (pickup) => {
                                      :severity="resolveCargoType(slotProps.data).color"
                                      :value="slotProps.data.cargo_type" class="text-sm"></Tag>
                             </template>
+
                             <template #filter="{ filterModel }">
                                 <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true"
-                                        placeholder="Select One" style="min-width: 12rem" >
-                                    <template #option="slotProps">
-                                        <Tag :value="slotProps.option"/>
-                                    </template>
-                                </Select>
+                                        placeholder="Select One" style="min-width: 12rem"/>
                             </template>
                         </Column>
 
@@ -892,6 +867,11 @@ const confirmPickupDelete = (pickup) => {
                                 <Tag :icon="resolveContainerStatus(slotProps.data).icon"
                                      :severity="resolveContainerStatus(slotProps.data).color"
                                      :value="slotProps.data.status" class="text-sm uppercase"></Tag>
+                            </template>
+
+                            <template #filter="{ filterModel }">
+                                <Select v-model="filterModel.value" :options="['LOADED', 'REACHED DESTINATION', 'UNLOADED', 'IN TRANSIT', 'CONTAINER ORDERED']" :showClear="true"
+                                        placeholder="Select One" style="min-width: 12rem"/>
                             </template>
                         </Column>
 
