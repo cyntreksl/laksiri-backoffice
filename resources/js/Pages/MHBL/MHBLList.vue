@@ -3,23 +3,13 @@ import { computed, onMounted, reactive, ref, watch } from "vue";
 import { Link, router, usePage } from "@inertiajs/vue3";
 import moment from "moment";
 import { debounce } from "lodash";
-
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
-import FilterDrawer from "@/Components/FilterDrawer.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import DatePicker from "@/Components/DatePicker.vue";
-import FilterBorder from "@/Components/FilterBorder.vue";
+import DatePicker from 'primevue/datepicker';
 import DeleteMHBLConfirmationModal from "@/Pages/MHBL/Partials/DeleteMHBLConfirmationModal.vue";
 import { push } from "notivue";
 import HoldConfirmationModal from "@/Pages/HBL/Partials/HoldConfirmationModal.vue";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 import MHBLDetailModal from "@/Pages/Common/MHBLDetailModal.vue";
-import NoRecordsFound from "@/Components/NoRecordsFound.vue";
-
 import Select from "primevue/select";
 import Panel from "primevue/panel";
 import FloatLabel from "primevue/floatlabel";
@@ -32,11 +22,7 @@ import Button from "primevue/button";
 import IconField from "primevue/iconfield";
 import Column from "primevue/column";
 import ContextMenu from "primevue/contextmenu";
-import Checkbox from "primevue/checkbox";
 import { FilterMatchMode } from "@primevue/core/api";
-import { useConfirm } from "primevue/useconfirm";
-
-const confirm = useConfirm();
 
 const props = defineProps({
     users: {
@@ -54,7 +40,6 @@ const props = defineProps({
 });
 
 const baseUrl = ref("/mhbl-list");
-const wrapperRef = ref(null);
 const loading = ref(true);
 const mhbls = ref([]);
 const totalRecords = ref(0);
@@ -69,7 +54,6 @@ const showConfirmDeleteMHBLModal = ref(false);
 const showConfirmHoldModal = ref(false);
 const cm = ref();
 const dt = ref();
-const isData = ref(false);
 const perPage = ref(10);
 const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
@@ -104,9 +88,6 @@ const menuModel = ref([
         command: () => confirmDeleteMHBL(selectedMHBL.value),
         disabled: !usePage().props.user.permissions.includes("hbls.delete"),
     },
-
-
-
 ]);
 
 const fetchMHBLs = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
@@ -120,7 +101,6 @@ const fetchMHBLs = async (page = 1, search = "", sortField = 'created_at', sortO
                 warehouse: filters.value.warehouse.value || "",
                 hblType: filters.value.hbl_type.value || "",
                 cargoMode: filters.value.cargo_type.value || "",
-                isHold: filters.value.is_hold.value || false,
                 sort_field: sortField,
                 sort_order: sortOrder === 1 ? "asc" : "desc",
                 createdBy: filters.value.user.value || "",
@@ -244,12 +224,10 @@ const closeModal = () => {
     selectedMHBL.value = null;
 };
 
-
 const closeHoldModal = () => {
     showConfirmHoldModal.value = false;
 };
 
-// Added this missing method
 const toggleHold = (id) => {
     router.put(
         route("mhbls.toggle-hold", id),
@@ -267,7 +245,6 @@ const toggleHold = (id) => {
     );
 };
 
-// Added missing handler
 const handleDeleteMHBL = (id) => {
     router.delete(
         route("mhbls.destroy", id),
@@ -302,44 +279,6 @@ const clearFilter = () => {
 const confirmDeleteMHBL = (id) => {
     selectedMHBLID.value = id;
     showConfirmDeleteMHBLModal.value = true;
-};
-
-const confirmMHBLHold = (mhbl) => {
-    selectedMHBLID.value = mhbl.id;
-    confirm.require({
-        message: ` Would You like to ${mhbl.is_hold ? 'Release' : 'Hold'} this hbl? `,
-        header: `${mhbl.is_hold ? 'Release' : 'Hold'} HBL?`,
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: `${mhbl.is_hold ? 'Release' : 'Hold'}`,
-            severity: 'danger'
-        },
-        accept: () => {
-            router.put(
-                route("mhbls.toggle-hold", selectedMHBLID.value),
-                {},
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        push.success(`Operation Successfully!`);
-                        fetchMHBLs(currentPage.value);
-                    },
-                    onError: () => {
-                        push.error("Something went wrong!");
-                    },
-                }
-            );
-            selectedMHBLID.value = null;
-        },
-        reject: () => {
-        }
-    });
 };
 
 const exportCSV = () => {
@@ -400,13 +339,10 @@ const exportCSV = () => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    All HBLs
+                                     MHBLs
                                 </div>
-                                <Link v-if="$page.props.user.permissions.includes('hbls.create')"
-                                      :href="route('hbls.create')">
-                                    <PrimaryButton class="w-full">Create New HBL</PrimaryButton>
-                                </Link>
                             </div>
+
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Button Group -->
                                 <div class="flex flex-col sm:flex-row gap-2">
@@ -518,11 +454,12 @@ const exportCSV = () => {
 
                         </Column>
 
-                        <template #footer> In total there are {{ totalRecords }} MHBLs.</template>
+                        <template #footer> In total there are {{ mhbls ?totalRecords :0 }} MHBLs.</template>
                     </DataTable>
                 </template>
             </Card>
         </div>
+    </AppLayout>
 
         <DeleteMHBLConfirmationModal
             :show="showConfirmDeleteMHBLModal"
@@ -543,7 +480,7 @@ const exportCSV = () => {
         @close="closeHoldModal"
         @toggle-hold="toggleHold"
         />
-    </AppLayout>
+
 </template>
 
 <style>
