@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Branch\GetDestinationBranches;
 use App\Enum\HBLPaymentStatus;
 use App\Interfaces\DriverRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
 use App\Repositories\CashSettlementRepository;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -18,6 +19,7 @@ class CashSettlementController extends Controller
     public function __construct(
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly CashSettlementRepository $cashSettlementRepository,
+        private readonly UserRepositoryInterface $userRepository,
     ) {}
 
     public function index()
@@ -25,11 +27,10 @@ class CashSettlementController extends Controller
         $this->authorize('cash.index');
 
         $drivers = $this->driverRepository->getAllDrivers();
-        $officers = [];
 
         return Inertia::render('CashSettlement/CashSettlementList', [
             'drivers' => $drivers,
-            'officers' => $officers,
+            'officers' => $this->userRepository->getUsers(['customer']),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
         ]);

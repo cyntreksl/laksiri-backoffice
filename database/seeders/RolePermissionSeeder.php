@@ -141,6 +141,7 @@ class RolePermissionSeeder extends Seeder
                     'warehouse.hold and release',
                     'warehouse.download barcode',
                     'warehouse.revert to cash settlement',
+                    'warehouse.update payment',
                 ],
             ],
 
