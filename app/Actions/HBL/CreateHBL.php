@@ -50,6 +50,8 @@ class CreateHBL
             'hbl_number' => GenerateHBLNumber::run(GetUserCurrentBranchID::run()),
             'cr_number' => GenerateCRNumber::run(),
             'system_status' => $data['system_status'] ?? HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE,
+            'is_departure_charges_paid' => $data['is_departure_charges_paid'],
+            'is_destination_charges_paid' => $data['is_destination_charges_paid'],
         ]);
 
         if (isset($data['paid_amount'])) {

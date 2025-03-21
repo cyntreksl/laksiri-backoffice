@@ -25,6 +25,7 @@ import InputNumber from 'primevue/inputnumber';
 import IftaLabel from 'primevue/iftalabel';
 import Dialog from 'primevue/dialog';
 import Message from 'primevue/message';
+import ToggleButton from 'primevue/togglebutton';
 
 const props = defineProps({
     hblTypes: {
@@ -141,6 +142,8 @@ const form = useForm({
     grand_total: 0,
     packages: {},
     is_active_package: false,
+    is_departure_charges_paid: false,
+    is_destination_charges_paid: false,
 });
 
 const addContactToWhatsapp = () => {
@@ -1239,6 +1242,37 @@ const onDialogHide = () => {
                                         <label for="bill-charge">Paid Amount</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.paid_amount"/>
+                                </div>
+
+                                <div class="flow-root col-span-2 my-3">
+                                    <ul class="-my-6" role="list">
+                                        <li class="flex py-3">
+                                            <div class="flex items-center gap-3 text-base font-medium text-gray-900 dark:text-white">
+                                                <ToggleButton
+                                                    v-model="form.is_departure_charges_paid"
+                                                    onIcon="pi pi-check"
+                                                    offIcon="pi pi-times"
+                                                    class="w-40"
+                                                    size="small"
+                                                    aria-label="Confirmation"
+                                                />
+                                                <InputLabel value="Departure Charges Paid"/>
+                                            </div>
+                                        </li>
+                                        <li class="flex py-3">
+                                            <div class="flex items-center gap-3 text-base font-medium text-gray-900 dark:text-white">
+                                                <ToggleButton
+                                                    v-model="form.is_destination_charges_paid"
+                                                    onIcon="pi pi-check"
+                                                    offIcon="pi pi-times"
+                                                    class="w-40"
+                                                    size="small"
+                                                    aria-label="Confirmation"
+                                                />
+                                                <InputLabel value="Destination Charges Paid"/>
+                                            </div>
+                                        </li>
+                                    </ul>
                                 </div>
 
                                 <div class="flow-root col-span-2 my-3">
