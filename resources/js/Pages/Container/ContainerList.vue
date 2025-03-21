@@ -76,7 +76,7 @@ const menuModel = ref([
     },
     {
         label: 'Load to Container',
-        icon: 'pi pi-fw pi-pencil',
+        icon: 'pi pi-hourglass',
         command: () => router.visit(route("loading.loading-containers.edit", selectedContainer.value.id)),
         disabled: !(usePage().props.user.permissions.includes('container.load to container') &&
             ["DRAFT", "LOADING", "Container Ordered"].includes(selectedContainer.value.status)),
