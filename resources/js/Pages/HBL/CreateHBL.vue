@@ -1461,7 +1461,7 @@ const onDialogHide = () => {
 
                 <div class="col-span-4 md:col-span-1">
                     <InputLabel>
-                        Length (cm)
+                        Length
                         <span class="text-red-500 text-sm">*</span>
                     </InputLabel>
                     <InputNumber v-model="packageItem.length" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
