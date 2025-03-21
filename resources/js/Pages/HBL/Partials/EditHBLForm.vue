@@ -13,6 +13,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import hblImage from "../../../../images/illustrations/hblimage.png";
 import DialogModal from "@/Components/DialogModal.vue";
 
+import {useConfirm} from "primevue/useconfirm";
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
@@ -69,6 +70,7 @@ const props = defineProps({
 
 const errors = ref([]);
 const measureTypes = ref(['cm', 'm', 'in', 'ft']);
+const confirm = useConfirm();
 const volumeUnit = computed(() => {
     const units = {
         cm: 'CM.CU',
@@ -496,21 +498,38 @@ const packageIndex = ref(null);
 
 // remove package
 const confirmRemovePackage = (index) => {
-    packageIndex.value = index;
-    showConfirmRemovePackageModal.value = true;
+    confirm.require({
+        message: 'Would you like to remove this hbl package record?',
+        header: 'Remove Package?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Remove Package',
+            severity: 'danger'
+        },
+        accept: () => {
+            handleRemovePackage(index)
+        },
+        reject: () => {
+        }
+    });
 };
 
 const closeModal = () => {
     showConfirmRemovePackageModal.value = false;
 };
 
-const handleRemovePackage = () => {
-    if (packageIndex.value !== null) {
-        grandTotalVolume.value -= packageList.value[packageIndex.value].volume;
-        grandTotalWeight.value -= packageList.value[packageIndex.value].totalWeight;
-        packageList.value.splice(packageIndex.value, 1);
+const handleRemovePackage = (index) => {
+    if (index !== null) {
+        grandTotalVolume.value -= packageList.value[index].volume;
+        grandTotalWeight.value -= packageList.value[index].totalWeight;
+        packageList.value.splice(index, 1);
         calculatePayment();
-        closeModal();
     }
 };
 
@@ -663,8 +682,119 @@ const resetConsigneeDetails = () => {
     consigneeAdditionalMobileCountryCode.value = splitCountryCode(props.hbl.consignee_additional_mobile_number);
     consigneeAdditionalMobileNumber.value = splitContactNumber(props.hbl.consignee_additional_mobile_number);
 };
+
+const copyFromHBLToShipperModalShow = ref(false);
+const reference = ref(null);
+
 const confirmShowingCopyFromHBLToShipperModal = () => {
     copyFromHBLToShipperModalShow.value = true;
+}
+
+const closeCopyFromHBLToShipperModal = () => {
+    reference.value = null;
+    copyFromHBLToShipperModalShow.value = false;
+}
+
+const splitNumber = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            countryCode.value = code;
+            contactNumber.value = fullNumber.slice(code.length);
+            break;
+        }
+    }
+}
+
+const handleCopyFromHBLToShipper = async () => {
+    try {
+        const response = await fetch(`/get-hbl-by-reference/${reference.value}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+
+        if (!response.ok) {
+            closeCopyFromHBLToShipperModal()
+            push.error('HBL Missing or Invalid Reference Number');
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            closeCopyFromHBLToShipperModal()
+
+            form.hbl_name = data.hbl_name;
+            form.email = data.email;
+            form.nic = data.nic;
+            form.iq_number = data.iq_number;
+            form.address = data.address;
+
+            splitNumber(data.contact_number);
+
+            push.success('Copied!');
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+const handleCopyShipper = () => {
+    form.consignee_name = form.hbl_name;
+    form.consignee_nic = form.nic;
+}
+
+const copyFromHBLToConsigneeModalShow = ref(false);
+
+const confirmShowingCopyFromHBLToConsigneeModal = () => {
+    copyFromHBLToConsigneeModalShow.value = true;
+}
+
+const closeCopyFromHBLToConsigneeModal = () => {
+    reference.value = null;
+    copyFromHBLToConsigneeModalShow.value = false;
+}
+
+const splitNumberConsignee = (fullNumber) => {
+    for (let code of props.countryCodes) {
+        if (fullNumber.startsWith(code)) {
+            consigneeCountryCode.value = code;
+            consigneeContactNumber.value = fullNumber.slice(code.length);
+            break;
+        }
+    }
+}
+
+const handleCopyFromHBLToConsignee = async () => {
+    try {
+        const response = await fetch(`/get-hbl-by-reference/${reference.value}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+
+        if (!response.ok) {
+            closeCopyFromHBLToConsigneeModal()
+            push.error('HBL Missing or Invalid Reference Number');
+            throw new Error('Network response was not ok.');
+        } else {
+            const data = await response.json();
+            closeCopyFromHBLToConsigneeModal()
+
+            form.consignee_name = data.consignee_name;
+            form.consignee_nic = data.consignee_nic;
+            form.consignee_address = data.consignee_address;
+            form.consignee_note = data.consignee_note;
+
+            splitNumberConsignee(data.consignee_contact);
+
+            push.success('Copied!');
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
 }
 </script>
 
@@ -813,10 +943,10 @@ const confirmShowingCopyFromHBLToShipperModal = () => {
                         <div class="flex justify-between items-center">
                             <span>Consignee Details</span>
                             <div class="flex space-x-1">
-<!--                                <Button v-if="form.hbl_name" aria-label="Copy Shipper" icon="pi pi-clone" rounded size="large" variant="text"  x-tooltip.placement.bottom="'Copy Shipper'"-->
-<!--                                        @click.prevent="handleCopyShipper" />-->
-<!--                                <Button aria-label="Copy from HBL" icon="pi pi-clipboard" rounded size="large" variant="text"  x-tooltip.placement.bottom="'Copy from HBL'"-->
-<!--                                        @click.prevent="confirmShowingCopyFromHBLToConsigneeModal" />-->
+                                <Button v-if="form.hbl_name" aria-label="Copy Shipper" icon="pi pi-clone" rounded size="large" variant="text"  x-tooltip.placement.bottom="'Copy Shipper'"
+                                        @click.prevent="handleCopyShipper" />
+                                <Button aria-label="Copy from HBL" icon="pi pi-clipboard" rounded size="large" variant="text"  x-tooltip.placement.bottom="'Copy from HBL'"
+                                        @click.prevent="confirmShowingCopyFromHBLToConsigneeModal" />
                             </div>
                         </div>
                     </template>
@@ -1240,6 +1370,28 @@ const confirmShowingCopyFromHBLToShipperModal = () => {
             <Button :label="editMode ? `Edit Package` : `Add Package`" severity="help" @click="addPackageData" />
         </template>
 
+    </Dialog>
+
+    <Dialog v-model:visible="copyFromHBLToShipperModalShow" :style="{ width: '25rem' }" header="Copy From HBL" modal>
+        <div class="flex items-center gap-4 mb-4">
+            <label class="font-semibold w-24" for="reference">HBL Reference</label>
+            <InputText id="reference" v-model="reference" autocomplete="off" class="flex-auto" placeholder="Enter HBL Reference" required="true" />
+        </div>
+        <div class="flex justify-end gap-2">
+            <Button label="Cancel" severity="secondary" type="button" @click="closeCopyFromHBLToShipperModal"></Button>
+            <Button label="Copy" type="button" @click.prevent="handleCopyFromHBLToShipper"></Button>
+        </div>
+    </Dialog>
+
+    <Dialog v-model:visible="copyFromHBLToConsigneeModalShow" :style="{ width: '25rem' }" header="Copy From HBL" modal>
+        <div class="flex items-center gap-4 mb-4">
+            <label class="font-semibold w-24" for="reference">HBL Reference</label>
+            <InputText id="reference" v-model="reference" autocomplete="off" class="flex-auto" placeholder="Enter HBL Reference" required="true" />
+        </div>
+        <div class="flex justify-end gap-2">
+            <Button label="Cancel" severity="secondary" type="button" @click="closeCopyFromHBLToConsigneeModal"></Button>
+            <Button label="Copy" type="button" @click.prevent="handleCopyFromHBLToConsignee"></Button>
+        </div>
     </Dialog>
 
     <RemovePackageConfirmationModal
