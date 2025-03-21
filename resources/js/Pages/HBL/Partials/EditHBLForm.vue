@@ -4,15 +4,10 @@ import {computed, onBeforeMount, reactive, ref, watch, onMounted} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
-import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import {push} from "notivue";
-import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import hblImage from "../../../../images/illustrations/hblimage.png";
-import DialogModal from "@/Components/DialogModal.vue";
-
 import {useConfirm} from "primevue/useconfirm";
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
@@ -1393,10 +1388,4 @@ const handleCopyFromHBLToConsignee = async () => {
             <Button label="Copy" type="button" @click.prevent="handleCopyFromHBLToConsignee"></Button>
         </div>
     </Dialog>
-
-    <RemovePackageConfirmationModal
-        :show="showConfirmRemovePackageModal"
-        @close="closeModal"
-        @remove-package="handleRemovePackage"
-    />
 </template>
