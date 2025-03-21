@@ -57,6 +57,7 @@ const dt = ref();
 const perPage = ref(10);
 const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
+const showReferenceColumn = ref(false);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -384,7 +385,7 @@ const exportCSV = () => {
 
                         <template #loading> Loading MHBL data. Please wait.</template>
 
-                        <Column field="reference" header="Reference" sortable>
+                        <Column v-if="showReferenceColumn" field="reference" header="Reference" sortable>
                             <template #body="slotProps">
                                 <span>{{ slotProps.data.reference }}</span>
                             </template>
@@ -419,21 +420,28 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column field="shipper_name" header="Shipper Name">
+                        <Column field="shipper_name" header="Shipper">
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.shipper_name }}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.shipper_contact}}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.shipper_nic}}</div>
                             </template>
                         </Column>
 
-                        <Column field="shipper_contact" header="Shipper Contact">
+                        <Column field="shipper_contact" header="Shipper Email">
                             <template #body="slotProps">
-                                <div>{{ slotProps.data.shipper_contact }}</div>
+                                <div>{{ slotProps.data.shipper_email }}</div>
                             </template>
                         </Column>
 
-                        <Column field="consignee_name" header="Consignee Name">
+                        <Column field="consignee_name" header="Consignee">
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.consignee_name }}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.consignee_contact}}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.consignee_nic}}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.consignee_email}}</div>
+
+
                             </template>
                         </Column>
 
