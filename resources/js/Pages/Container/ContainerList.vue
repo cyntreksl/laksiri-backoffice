@@ -7,12 +7,12 @@ import moment from "moment";
 import FilterDrawer from "@/Components/FilterDrawer.vue";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import DatePicker from "@/Components/DatePicker.vue";
 import FilterBorder from "@/Components/FilterBorder.vue";
 import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
 import FilterHeader from "@/Components/FilterHeader.vue";
+import DatePicker from 'primevue/datepicker';
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import RadioButton from "@/Components/RadioButton.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
@@ -28,11 +28,9 @@ import Panel from "primevue/panel";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
 import Select from "primevue/select";
-import {useConfirm} from "primevue/useconfirm";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
-import {push} from "notivue";
 
 const props = defineProps({
     cargoTypes: {
@@ -206,30 +204,33 @@ const resolveContainerStatus = (container) => {
         case 'LOADED':
             return {
                 icon: "ti ti-package",
-                color: "success",
+                color: "info",
             };
         case 'Container Ordered':
             return {
                 icon: "ti ti-clock-play",
-                color: "info",
+                color: "secondary",
             };
         case 'IN TRANSIT':
             return {
                 icon: "ti ti-tir",
-                color: "info",
+                color: "help",
             };
         case 'UNLOADED':
             return {
                 icon: "ti ti-package-off",
-                color: "info",
+                color: "warn",
             };
         case 'REACHED DESTINATION':
             return {
                 icon: "ti ti-checks",
-                color: "info",
+                color: "success",
             };
         default:
-            return null;
+            return {
+                icon: "ti ti-question-mark",
+                color: "danger",
+            };
     }
 };
 
