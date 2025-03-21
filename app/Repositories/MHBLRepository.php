@@ -55,21 +55,15 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $mhbls = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $mhbls = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => MHBLResource::collection($mhbls),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $mhbls->total(),
+                'current_page' => $mhbls->currentPage(),
+                'perPage' => $mhbls->perPage(),
+                'lastPage' => $mhbls->lastPage(),
             ],
         ]);
     }

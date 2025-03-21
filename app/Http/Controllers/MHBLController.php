@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateMHBLRequest;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\MHBLRepositoryInterface;
 use App\Interfaces\OfficerRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
 use App\Models\HBLPackage;
 use App\Models\MHBL;
@@ -26,6 +27,7 @@ class MHBLController extends Controller
         private readonly OfficerRepositoryInterface $officerRepository,
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly MHBLRepositoryInterface $mhblRepository,
+        private readonly UserRepositoryInterface $userRepository,
     ) {}
 
     public function index()
@@ -34,6 +36,7 @@ class MHBLController extends Controller
 
         return Inertia::render('MHBL/MHBLList', [
             'warehouses' => GetDestinationBranches::run(),
+            'users' => $this->userRepository->getUsers(['customer']),
         ]);
     }
 
