@@ -408,6 +408,20 @@ const exportCSV = () => {
                                         placeholder="Select One" style="min-width: 12rem" @change="filterCallback()"/>
                             </template>
                         </Column>
+                        
+                        <Column field="shipper_name" header="Shipper">
+                            <template #body="slotProps">
+                                <div>{{ slotProps.data.shipper_name }}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.shipper_contact}}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.shipper_email}}</div>
+                            </template>
+                        </Column>
+
+                        <Column field="shipper_contact" header="Shipper NIC">
+                            <template #body="slotProps">
+                                <div>{{ slotProps.data.shipper_nic }}</div>
+                            </template>
+                        </Column>
 
                         <Column field="warehouse" header="Warehouse" sortable>
                             <template #body="slotProps">
@@ -420,34 +434,17 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column field="shipper_name" header="Shipper">
-                            <template #body="slotProps">
-                                <div>{{ slotProps.data.shipper_name }}</div>
-                                <div class="text-gray-500 text-sm">{{slotProps.data.shipper_contact}}</div>
-                                <div class="text-gray-500 text-sm">{{slotProps.data.shipper_nic}}</div>
-                            </template>
-                        </Column>
-
-                        <Column field="shipper_contact" header="Shipper Email">
-                            <template #body="slotProps">
-                                <div>{{ slotProps.data.shipper_email }}</div>
-                            </template>
-                        </Column>
-
                         <Column field="consignee_name" header="Consignee">
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.consignee_name }}</div>
                                 <div class="text-gray-500 text-sm">{{slotProps.data.consignee_contact}}</div>
-                                <div class="text-gray-500 text-sm">{{slotProps.data.consignee_nic}}</div>
                                 <div class="text-gray-500 text-sm">{{slotProps.data.consignee_email}}</div>
-
-
                             </template>
                         </Column>
 
-                        <Column field="consignee_contact" header="Consignee Contact">
+                        <Column field="consignee_contact" header="Consignee NIC">
                             <template #body="slotProps">
-                                <div>{{ slotProps.data.consignee_contact }}</div>
+                                <div>{{ slotProps.data.consignee_nic }}</div>
                             </template>
                         </Column>
 
@@ -459,7 +456,6 @@ const exportCSV = () => {
                                 <Select v-model="filterModel.value" :options="hblTypes " :showClear="true"
                                         placeholder="Select One" style="min-width: 12rem" @change="filterCallback()"/>
                             </template>
-
                         </Column>
 
                         <template #footer> In total there are {{ mhbls ?totalRecords :0 }} MHBLs.</template>
