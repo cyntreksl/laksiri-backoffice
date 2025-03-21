@@ -514,7 +514,7 @@ const confirmPickupRetry = (pickup) => {
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
                                 <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true"
-                                        placeholder="Select One" style="min-width: 12rem" @change="filterCallback()" />
+                                        placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 
@@ -525,7 +525,7 @@ const confirmPickupRetry = (pickup) => {
 
                             <template #filter="{ filterModel, filterCallback }">
                                 <Select v-model="filterModel.value" :options="drivers" :showClear="true" option-label="name" option-value="id"
-                                        placeholder="Select One" style="min-width: 12rem" @change="filterCallback()" />
+                                        placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 

@@ -19,7 +19,7 @@ class CashSettlementCollection extends JsonResource
 
         return [
             'id' => $this->id ?? '-',
-            'hbl' => $this->hbl_number ?? '-',
+            'hbl' => $this->hbl_number ?? $this->reference,
             'hbl_name' => $this->hbl_name ?? '-',
             'address' => $this->address ?? '-',
             'picked_date' => $this->pickup->pickup_date ?? '-',
@@ -30,8 +30,9 @@ class CashSettlementCollection extends JsonResource
             'cargo_type' => $this->cargo_type ?? '-',
             'hbl_type' => $this->hbl_type ?? '-',
             'officer' => $this->created_by ?? '-',
+            'warehouse' => $this->warehouse,
             'is_hold' => $this->is_hold ?? '-',
-            'status' => $this->hblPayment()->latest()->first()->status ?? '-',
+            'status' => $this->hblPayment()->latest()->first()->status ?? 'Not Updated',
             'zone' => $this->warehouseZone?->name,
             'packages_counts' => $this->packages->count() ?? 0,
             'actions' => '-',

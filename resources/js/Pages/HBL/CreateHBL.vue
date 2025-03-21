@@ -482,7 +482,6 @@ const calculatePayment = async () => {
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": usePage().props.csrf,
-                // "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             },
             body: JSON.stringify({
                 cargo_type: form.cargo_type,
@@ -1190,7 +1189,7 @@ const onDialogHide = () => {
                             <div class="grid grid-cols-2 gap-5 mt-5">
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.freight_charge" :disabled="!isEditable" class="w-full" inputId="freight-charge" min="0" step="any" variant="filled" />
+                                        <InputNumber v-model="form.freight_charge" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="freight-charge" min="0" step="any" variant="filled" />
                                         <label for="freight-charge">Freight Charge</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.freight_charge"/>
@@ -1198,7 +1197,7 @@ const onDialogHide = () => {
 
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.bill_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <InputNumber v-model="form.bill_charge" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
                                         <label for="bill-charge">Bill Charge</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.bill_charge"/>
@@ -1206,7 +1205,7 @@ const onDialogHide = () => {
 
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.destination_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <InputNumber v-model="form.destination_charge" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
                                         <label for="bill-charge">Destination Charges</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.destination_charge"/>
@@ -1214,7 +1213,7 @@ const onDialogHide = () => {
 
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.package_charges" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <InputNumber v-model="form.package_charges" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled"/>
                                         <label for="bill-charge">Package Charges</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.package_charges"/>
@@ -1222,7 +1221,7 @@ const onDialogHide = () => {
 
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.discount" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <InputNumber v-model="form.discount" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
                                         <label for="bill-charge">Discount</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.discount"/>
@@ -1230,7 +1229,7 @@ const onDialogHide = () => {
 
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.additional_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <InputNumber v-model="form.additional_charge" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled"/>
                                         <label for="bill-charge">Additional Charges</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.additional_charge"/>
@@ -1238,7 +1237,7 @@ const onDialogHide = () => {
 
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.paid_amount" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <InputNumber v-model="form.paid_amount" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled"/>
                                         <label for="bill-charge">Paid Amount</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.paid_amount"/>
@@ -1464,7 +1463,7 @@ const onDialogHide = () => {
                         Length
                         <span class="text-red-500 text-sm">*</span>
                     </InputLabel>
-                    <InputNumber v-model="packageItem.length" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
+                    <InputNumber v-model="packageItem.length" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
                     <Message severity="secondary" size="small" variant="simple">{{ packageItemLength.toFixed(2) }} cm</Message>
                 </div>
 
@@ -1473,7 +1472,7 @@ const onDialogHide = () => {
                         Width
                         <span class="text-red-500 text-sm">*</span>
                     </InputLabel>
-                    <InputNumber v-model="packageItem.width" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
+                    <InputNumber v-model="packageItem.width" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
                     <Message severity="secondary" size="small" variant="simple">{{ packageItemWidth.toFixed(2) }} cm</Message>
                 </div>
 
@@ -1482,7 +1481,7 @@ const onDialogHide = () => {
                         Height
                         <span class="text-red-500 text-sm">*</span>
                     </InputLabel>
-                    <InputNumber v-model="packageItem.height" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
+                    <InputNumber v-model="packageItem.height" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
                     <Message severity="secondary" size="small" variant="simple">{{ packageItemHeight.toFixed(2) }} cm</Message>
                 </div>
 
@@ -1499,13 +1498,13 @@ const onDialogHide = () => {
                         Volume ({{volumeUnit }})
                         <span class="text-red-500 text-sm">*</span>
                     </InputLabel>
-                    <InputNumber v-model="packageItem.volume" class="w-full" placeholder="1.00" step="0.001"/>
+                    <InputNumber v-model="packageItem.volume" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" placeholder="1.00" step="0.001"/>
                     <Message severity="secondary" size="small" variant="simple">{{packageItemVolume}} M.CU</Message>
                 </div>
 
                 <div class="col-span-2">
                     <InputLabel value="Total Weight" />
-                    <InputNumber v-model="packageItem.totalWeight" class="w-full" min="0" placeholder="1" step="1"/>
+                    <InputNumber v-model="packageItem.totalWeight" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" min="0" placeholder="1" step="1"/>
                 </div>
 
                 <div class="col-span-4">

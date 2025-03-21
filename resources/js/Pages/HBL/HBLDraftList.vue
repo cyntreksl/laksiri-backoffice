@@ -376,7 +376,7 @@ const exportCSV = () => {
                                 <Tag :icon="resolveCargoType(slotProps.data).icon" :severity="resolveCargoType(slotProps.data).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" @change="filterCallback()" />
+                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 
@@ -395,7 +395,7 @@ const exportCSV = () => {
                                 <Tag :severity="resolveWarehouse(slotProps.data)" :value="slotProps.data.warehouse.toUpperCase()"></Tag>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" @change="filterCallback()" />
+                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 
@@ -414,7 +414,7 @@ const exportCSV = () => {
                                 <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" @change="filterCallback()"/>
+                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 
@@ -425,7 +425,7 @@ const exportCSV = () => {
                                 <i :class="{ 'pi-pause-circle text-yellow-500': data.is_hold, 'pi-play-circle text-green-400': !data.is_hold }" class="pi"></i>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary @change="filterCallback()" />
+                                <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary />
                             </template>
                         </Column>
 
