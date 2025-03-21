@@ -65,10 +65,6 @@ const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
     cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
-    driver: {value: null, matchMode: FilterMatchMode.EQUALS},
-    pickup_date: {value: null, matchMode: FilterMatchMode.EQUALS},
-    user: {value: null, matchMode: FilterMatchMode.EQUALS},
-    zone: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const menuModel = ref([
@@ -99,10 +95,6 @@ const fetchContainers = async (page = 1, search = "", sortField = 'created_at', 
                 sort_order: sortOrder === 1 ? "asc" : "desc",
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
-                createdBy: filters.value.user.value || "",
-                pickupDate: filters.value.pickup_date.value || "",
-                zoneBy: filters.value.zone.value || "",
-                driverBy: filters.value.driver.value || [],
             }
         });
         containers.value = response.data.data;
@@ -126,22 +118,6 @@ watch(() => filters.value.global.value, (newValue) => {
 });
 
 watch(() => filters.value.cargo_type.value, (newValue) => {
-    fetchContainers(1, filters.value.global.value);
-});
-
-watch(() => filters.value.driver.value, (newValue) => {
-    fetchContainers(1, filters.value.global.value);
-});
-
-watch(() => filters.value.pickup_date.value, (newValue) => {
-    fetchContainers(1, filters.value.global.value);
-});
-
-watch(() => filters.value.user.value, (newValue) => {
-    fetchContainers(1, filters.value.global.value);
-});
-
-watch(() => filters.value.zone.value, (newValue) => {
     fetchContainers(1, filters.value.global.value);
 });
 
@@ -174,10 +150,6 @@ const clearFilter = () => {
     filters.value = {
         global: {value: null, matchMode: FilterMatchMode.CONTAINS},
         cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
-        driver: {value: [], matchMode: FilterMatchMode.EQUALS},
-        pickup_date: {value: null, matchMode: FilterMatchMode.EQUALS},
-        user: {value: null, matchMode: FilterMatchMode.EQUALS},
-        zone: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
     fetchContainers(currentPage.value);
 };
