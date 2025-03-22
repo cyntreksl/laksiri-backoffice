@@ -669,7 +669,7 @@ const exportURL = computed(() => {
 
                         <Column field="is_released" header="Released" hidden></Column>
 
-                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} cash settlements.</template>
+                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs.</template>
                     </DataTable>
                 </template>
             </Card>

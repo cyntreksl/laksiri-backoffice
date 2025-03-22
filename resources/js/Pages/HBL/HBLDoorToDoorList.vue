@@ -70,7 +70,6 @@ const isCreateMHBL = ref(false);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
-    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
     cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
     is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
     user: {value: null, matchMode: FilterMatchMode.EQUALS},
@@ -137,7 +136,6 @@ const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOr
                 per_page: perPage.value,
                 search,
                 warehouse: filters.value.warehouse.value || "",
-                hblType: filters.value.hbl_type.value || "",
                 cargoMode: filters.value.cargo_type.value || "",
                 isHold: filters.value.is_hold.value || false,
                 sort_field: sortField,
@@ -169,10 +167,6 @@ watch(() => filters.value.global.value, (newValue) => {
 });
 
 watch(() => filters.value.warehouse.value, (newValue) => {
-    fetchHBLs(1, filters.value.global.value);
-});
-
-watch(() => filters.value.hbl_type.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
 });
 
@@ -212,19 +206,6 @@ const onSort = (event) => {
 onMounted(() => {
     fetchHBLs();
 });
-
-const resolveHBLType = (hbl) => {
-    switch (hbl.hbl_type) {
-        case 'UPB':
-            return 'secondary';
-        case 'Gift':
-            return 'warn';
-        case 'Door to Door':
-            return 'info';
-        default:
-            return null;
-    }
-};
 
 const resolveCargoType = (hbl) => {
     switch (hbl.cargo_type) {
@@ -272,7 +253,6 @@ const clearFilter = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
-        hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
         cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
         is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
         user: {value: null, matchMode: FilterMatchMode.EQUALS},
@@ -593,15 +573,6 @@ const exportCSV = () => {
                         </Column>
 
                         <Column field="consignee_address" header="Consignee Address"></Column>
-
-                        <Column field="hbl_type" header="HBL Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
 
                         <Column field="status" header="Status" hidden></Column>
 
