@@ -247,7 +247,7 @@ Breadcrumbs::for('branches.create', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('branches.edit', function (BreadcrumbTrail $trail, Branch $branch) {
     $trail->parent('dashboard');
     $trail->push('Branch');
-    $trail->push('Edit', route('branches.edit', $branch->id));
+    $trail->push('Configurations', route('branches.edit', $branch->id));
 });
 
 // Pricing
