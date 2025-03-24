@@ -121,7 +121,7 @@ class LoadedContainerManifestExport
                 $hbl->consignee_name,
                 $hbl->consignee_address,
                 $hbl->consignee_nic,
-                $hbl->consignee_contact,
+                $hbl->consignee_contact . ($hbl->consignee_additional_mobile_number ? '/' . $hbl->consignee_additional_mobile_number : ''),
                 $loadedHBLPackages[$hbl->id]['packages'],
                 $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
                 $hbl->hbl_type,
