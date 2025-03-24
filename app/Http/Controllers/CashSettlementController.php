@@ -107,6 +107,17 @@ class CashSettlementController extends Controller
 
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
 
-        return $this->cashSettlementRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+        return $this->cashSettlementRepository->duePaymentDataset($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function duePaymentExport(Request $request)
+    {
+        $filteredRequest = array_filter($request->all(), fn ($value) => $value !== 'null' && $value !== null);
+
+        $filters = collect($filteredRequest)->only([
+            'fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus',
+        ])->toArray();
+
+        return $this->cashSettlementRepository->duePaymentExport($filters);
     }
 }

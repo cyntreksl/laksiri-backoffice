@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Factory\Warehouse\FilterFactory;
+use App\Factory\CashSettlement\FilterFactory;
 use App\Models\HBL;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class DuePaymentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
     use Exportable;
 
@@ -26,12 +26,14 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
         return [
             '#',
             'HBL Number',
-            'Shipper Name',
-            'Cargo Type',
-            'HBL Type',
+            'Name',
+            'Pickup Date',
             'Weight',
             'Volume',
             'No of Packages',
+            'Amount',
+            'Paid Amount',
+            'Cargo Mode',
         ];
     }
 
@@ -47,9 +49,8 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
     {
         $query = HBL::query();
 
-        $query->warehouse();
-
-        $query->with(['packages'])
+        $query->duePayment();
+        $query->with(['pickup', 'packages'])
             ->withSum('packages', 'weight')
             ->withSum('packages', 'volume');
 
@@ -63,12 +64,14 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
         $array = [
             'Id' => $row->id,
             'HBL Number' => $row->hbl_number,
-            'Shipper Name' => $row->hbl_name,
-            'Cargo Type' => $row->cargo_type,
-            'HBL Type' => $row->hbl_type,
+            'Name' => $row->hbl_name,
+            'Pickup Date' => $row->pickup ? $row->pickup['pickup_date'] : null,
             'Weight' => $row['packages_sum_weight'],
             'Volume' => $row['packages_sum_volume'],
             'No of Packages' => count($row->packages),
+            'Amount' => $row->grand_total,
+            'Paid Amount' => $row->paid_amount,
+            'Cargo Mode' => $row->cargo_type,
         ];
 
         return $array;
