@@ -4,7 +4,6 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import { push } from "notivue";
 import moment from "moment";
-import DatePicker from "@/Components/DatePicker.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 import { router, usePage } from "@inertiajs/vue3";
@@ -12,12 +11,12 @@ import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import Card from "primevue/card";
 import FloatLabel from "primevue/floatlabel";
+import DatePicker from "primevue/datepicker";
 import DataTable from "primevue/datatable";
 import ContextMenu from "primevue/contextmenu";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
 import Column from "primevue/column";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Tag from "primevue/tag";
 import Panel from "primevue/panel";
 import Button from "primevue/button";
@@ -206,6 +205,7 @@ watch(() => toDate.value, (newValue) => {
 });
 
 const onPageChange = (event) => {
+    perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchDuePayments(currentPage.value);
 };
@@ -363,32 +363,6 @@ const closePaymentModal = () => {
     hbl.value = null;
 };
 
-const cashReceived = async () => {
-    const idList = selectedHBLs.value.map((item) => item.id);
-
-    try {
-        const response = await fetch("/cash-received", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-            },
-            body: JSON.stringify({hbl_ids: idList}),
-        });
-
-        if (!response.ok) {
-            throw new Error("Network response was not ok.");
-        } else {
-            window.location.reload();
-            push.success("Cash collected successfully!");
-        }
-    } catch (error) {
-        console.error("Error:", error);
-    }
-};
-
 const countOfSelectedData = computed(() => selectedHBLs.value.length);
 
 const valueOfSelectedData = computed(() => {
@@ -515,16 +489,6 @@ const exportURL = computed(() => {
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
                                     Due Payments
-                                </div>
-                                <div>
-                                    <PrimaryButton
-                                        v-if="$page.props.user.permissions.includes('cash.cash received')"
-                                        :disabled="selectedHBLs.length === 0"
-                                        class="w-full"
-                                        @click="cashReceived"
-                                    >
-                                        Cash Received
-                                    </PrimaryButton>
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -675,7 +639,7 @@ const exportURL = computed(() => {
 
                         <Column field="is_released" header="Released" hidden></Column>
 
-                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} due payments.</template>
+                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs.</template>
                     </DataTable>
                 </template>
             </Card>

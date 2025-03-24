@@ -20,7 +20,6 @@ import IconField from "primevue/iconfield";
 import Select from "primevue/select";
 import Checkbox from "primevue/checkbox";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 import {useConfirm} from "primevue/useconfirm";
 import moment from "moment";
 import {FilterMatchMode} from "@primevue/core/api";
@@ -74,8 +73,6 @@ const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const fromDate = ref(moment(new Date()).subtract(1, "month").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
-const showConfirmPaymentModal = ref(false);
-const hbl = ref(null);
 const totalRecord = ref(0);
 const totalGrandAmount = ref(0);
 const totalPaidAmount = ref(0);
@@ -100,12 +97,6 @@ const menuModel = ref([
         icon: "pi pi-fw pi-search",
         command: () => confirmViewHBL(selectedHBL),
         disabled: !usePage().props.user.permissions.includes('warehouse.show'),
-    },
-    {
-        label: "Update Payment",
-        icon: "pi pi-fw pi-dollar",
-        command: () => confirmPayment(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes('warehouse.update payment'),
     },
     {
         label: computed(() => (selectedHBL.value?.is_hold ? 'Release' : 'Hold')),
@@ -232,6 +223,7 @@ watch(() => toDate.value, (newValue) => {
 });
 
 const onPageChange = (event) => {
+    perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchCashSettlements(currentPage.value);
 };
@@ -376,17 +368,6 @@ const confirmHBLHold = (hbl) => {
         reject: () => {
         }
     });
-};
-
-const confirmPayment = (obj) => {
-    if (!obj) return;
-    hbl.value = obj.value;
-    showConfirmPaymentModal.value = true;
-};
-
-const closePaymentModal = () => {
-    showConfirmPaymentModal.value = false;
-    hbl.value = null;
 };
 
 const confirmRevert = () => {
@@ -616,7 +597,7 @@ const exportURL = computed(() => {
                             </template>
                         </Column>
 
-                        <Column field="hbl_name" header="HBL Name"></Column>
+                        <Column field="hbl_name" header="Shipper Name"></Column>
 
                         <Column field="picked_date" header="Picked Date"></Column>
 
@@ -665,7 +646,7 @@ const exportURL = computed(() => {
                             </template>
                         </Column>
 
-                        <Column field="grand_total" header="Amount">
+                        <Column field="grand_total" header="Amount" hidden>
                             <template #body="slotProps">
                                 <div class="flex items-center">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
@@ -674,7 +655,7 @@ const exportURL = computed(() => {
                             </template>
                         </Column>
 
-                        <Column field="paid_amount" header="Paid">
+                        <Column field="paid_amount" header="Paid" hidden>
                             <template #body="slotProps">
                                 <div class="flex items-center">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
@@ -710,7 +691,7 @@ const exportURL = computed(() => {
                             </template>
                         </Column>
 
-                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} warehouses.</template>
+                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs.</template>
                     </DataTable>
                 </template>
             </Card>
@@ -723,18 +704,11 @@ const exportURL = computed(() => {
         @close="closeModal"
     />
 
-    <PaymentModal
-        :hbl="hbl"
-        :visible="showConfirmPaymentModal"
-        @close="closePaymentModal"
-        @update:visible="showConfirmPaymentModal = $event"
-    />
-
     <AssignZoneModal
         :hbl-id="selectedHBLID"
         :visible="showConfirmAssignZoneModal"
         :warehouse-zones="warehouseZones"
         @close="closeAssignZoneModal"
-        @update:visible="showConfirmPaymentModal = $event"
+        @update:visible="showConfirmAssignZoneModal = $event"
     />
 </template>

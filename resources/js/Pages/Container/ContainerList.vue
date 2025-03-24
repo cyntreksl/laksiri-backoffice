@@ -151,6 +151,7 @@ watch(() => etdEndDate.value, (newValue) => {
 });
 
 const onPageChange = (event) => {
+    perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchContainers(currentPage.value);
 };
