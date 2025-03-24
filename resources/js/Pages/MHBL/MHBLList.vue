@@ -47,7 +47,6 @@ const currentPage = ref(1);
 const selectedMHBL = ref(null);
 const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
-const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const selectedMHBLID = ref(null);
 const showConfirmViewMHBLModal = ref(false);
 const showConfirmDeleteMHBLModal = ref(false);
@@ -100,7 +99,6 @@ const fetchMHBLs = async (page = 1, search = "", sortField = 'created_at', sortO
                 per_page: perPage.value,
                 search,
                 warehouse: filters.value.warehouse.value || "",
-                hblType: filters.value.hbl_type.value || "",
                 cargoMode: filters.value.cargo_type.value || "",
                 sort_field: sortField,
                 sort_order: sortOrder === 1 ? "asc" : "desc",
@@ -134,10 +132,6 @@ watch(() => filters.value.warehouse.value, (newValue) => {
     fetchMHBLs(1, filters.value.global.value);
 });
 
-watch(() => filters.value.hbl_type.value, (newValue) => {
-    fetchMHBLs(1, filters.value.global.value);
-});
-
 watch(() => filters.value.cargo_type.value, (newValue) => {
     fetchMHBLs(1, filters.value.global.value);
 });
@@ -163,6 +157,7 @@ watch(() => toDate.value, (newValue) => {
 });
 
 const onPageChange = (event) => {
+    perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchMHBLs(currentPage.value);
 };
@@ -179,8 +174,6 @@ const resolveMHBLType = (mhbl) => {
     switch (mhbl.hbl_type) {
         case 'Gift':
             return 'warn';
-        case 'Door to Door':
-            return 'info';
         default:
             return null;
     }
@@ -266,7 +259,6 @@ const clearFilter = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
-        hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
         cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
         is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
         user: { value: null, matchMode: FilterMatchMode.EQUALS },
@@ -319,7 +311,7 @@ const exportCSV = () => {
                         ref="dt"
                         v-model:contextMenuSelection="selectedMHBL"
                         v-model:filters="filters"
-                        :globalFilterFields="['reference', 'hbl', 'hbl_name', 'email', 'address', 'contact_number', 'consignee_name', 'consignee_address', 'consignee_contact', 'cargo_type', 'hbl_type', 'warehouse', 'status', 'mhbl_number']"
+                        :globalFilterFields="['reference', 'hbl', 'hbl_name', 'email', 'address', 'contact_number', 'consignee_name', 'consignee_address', 'consignee_contact', 'cargo_type',  'warehouse', 'status', 'mhbl_number']"
                         :loading="loading"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
@@ -408,7 +400,7 @@ const exportCSV = () => {
                                         placeholder="Select One" style="min-width: 12rem" @change="filterCallback()"/>
                             </template>
                         </Column>
-                        
+
                         <Column field="shipper_name" header="Shipper">
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.shipper_name }}</div>
@@ -451,10 +443,6 @@ const exportCSV = () => {
                         <Column field="hbl_type" header="HBL Type" sortable>
                             <template #body="slotProps">
                                 <Tag :severity="resolveMHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes " :showClear="true"
-                                        placeholder="Select One" style="min-width: 12rem" @change="filterCallback()"/>
                             </template>
                         </Column>
 

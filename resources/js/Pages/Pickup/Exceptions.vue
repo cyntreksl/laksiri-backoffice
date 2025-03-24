@@ -143,6 +143,7 @@ watch(() => toDate.value, (newValue) => {
 });
 
 const onPageChange = (event) => {
+    perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchPickups(currentPage.value);
 };
@@ -176,6 +177,8 @@ const clearFilter = () => {
         user: {value: null, matchMode: FilterMatchMode.EQUALS},
         zone: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
+    fromDate.value = moment(new Date()).subtract(7, "days").toISOString().split("T")[0];
+    toDate.value = moment(new Date()).toISOString().split("T")[0];
     fetchPickups(currentPage.value);
 };
 

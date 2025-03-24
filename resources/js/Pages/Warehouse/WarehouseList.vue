@@ -20,7 +20,6 @@ import IconField from "primevue/iconfield";
 import Select from "primevue/select";
 import Checkbox from "primevue/checkbox";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 import {useConfirm} from "primevue/useconfirm";
 import moment from "moment";
 import {FilterMatchMode} from "@primevue/core/api";
@@ -74,8 +73,6 @@ const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const fromDate = ref(moment(new Date()).subtract(1, "month").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
-const showConfirmPaymentModal = ref(false);
-const hbl = ref(null);
 const totalRecord = ref(0);
 const totalGrandAmount = ref(0);
 const totalPaidAmount = ref(0);
@@ -102,12 +99,6 @@ const menuModel = ref([
         disabled: !usePage().props.user.permissions.includes('warehouse.show'),
     },
     {
-        label: "Update Payment",
-        icon: "pi pi-fw pi-dollar",
-        command: () => confirmPayment(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes('warehouse.update payment'),
-    },
-    {
         label: computed(() => (selectedHBL.value?.is_hold ? 'Release' : 'Hold')),
         icon: computed(() => (selectedHBL.value?.is_hold ? 'pi pi-fw pi-play-circle' : 'pi pi-fw pi-pause-circle')) ,
         command: () => confirmHBLHold(selectedHBL),
@@ -130,7 +121,7 @@ const fetchCashSettlements = async (page = 1, search = "", sortField = 'created_
                 per_page: perPage.value,
                 search,
                 warehouse: filters.value.warehouse.value || "",
-                hblType: filters.value.hbl_type.value || "",
+                deliveryType: filters.value.hbl_type.value || "",
                 cargoMode: filters.value.cargo_type.value || "",
                 isHold: filters.value.is_hold.value || false,
                 sort_field: sortField,
@@ -163,7 +154,7 @@ const getWarehouseSummary = async () => {
             },
             body: JSON.stringify({
                 warehouse: filters.value.warehouse.value,
-                hblType: filters.value.hbl_type.value,
+                deliveryType: filters.value.hbl_type.value,
                 cargoMode: filters.value.cargo_type.value,
                 isHold: filters.value.is_hold.value,
                 officers: filters.value.user.value,
@@ -201,37 +192,46 @@ watch(() => filters.value.global.value, (newValue) => {
 
 watch(() => filters.value.warehouse.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getWarehouseSummary();
 });
 
 watch(() => filters.value.hbl_type.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getWarehouseSummary();
 });
 
 watch(() => filters.value.cargo_type.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getWarehouseSummary();
 });
 
 watch(() => filters.value.is_hold.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getWarehouseSummary();
 });
 
 watch(() => filters.value.user.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getWarehouseSummary();
 });
 
 watch(() => filters.value.payments.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getWarehouseSummary();
 });
 
 watch(() => fromDate.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getWarehouseSummary();
 });
 
 watch(() => toDate.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getWarehouseSummary();
 });
 
 const onPageChange = (event) => {
+    perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchCashSettlements(currentPage.value);
 };
@@ -378,17 +378,6 @@ const confirmHBLHold = (hbl) => {
     });
 };
 
-const confirmPayment = (obj) => {
-    if (!obj) return;
-    hbl.value = obj.value;
-    showConfirmPaymentModal.value = true;
-};
-
-const closePaymentModal = () => {
-    showConfirmPaymentModal.value = false;
-    hbl.value = null;
-};
-
 const confirmRevert = () => {
     confirm.require({
         message: `Would you like to revert the selected records to a cash settlement?`,
@@ -451,7 +440,7 @@ const closeAssignZoneModal = () => {
 const exportURL = computed(() => {
     const params = new URLSearchParams({
         warehouse: filters.value.warehouse.value,
-        hblType: filters.value.hbl_type.value,
+        deliveryType: filters.value.hbl_type.value,
         cargoMode: filters.value.cargo_type.value,
         isHold: filters.value.is_hold.value,
         officers: filters.value.user.value,
@@ -616,7 +605,7 @@ const exportURL = computed(() => {
                             </template>
                         </Column>
 
-                        <Column field="hbl_name" header="HBL Name"></Column>
+                        <Column field="hbl_name" header="Shipper Name"></Column>
 
                         <Column field="picked_date" header="Picked Date"></Column>
 
@@ -665,7 +654,7 @@ const exportURL = computed(() => {
                             </template>
                         </Column>
 
-                        <Column field="grand_total" header="Amount">
+                        <Column field="grand_total" header="Amount" hidden>
                             <template #body="slotProps">
                                 <div class="flex items-center">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
@@ -674,7 +663,7 @@ const exportURL = computed(() => {
                             </template>
                         </Column>
 
-                        <Column field="paid_amount" header="Paid">
+                        <Column field="paid_amount" header="Paid" hidden>
                             <template #body="slotProps">
                                 <div class="flex items-center">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
@@ -697,7 +686,10 @@ const exportURL = computed(() => {
                                 <i :class="{ 'pi-pause-circle text-yellow-500': data.is_hold, 'pi-play-circle text-green-400': !data.is_hold }" class="pi"></i>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary />
+                                <div class="flex items-center gap-2">
+                                    <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary inputId="is-hold"/>
+                                    <label for="is-hold"> Is Hold </label>
+                                </div>
                             </template>
                         </Column>
 
@@ -710,7 +702,7 @@ const exportURL = computed(() => {
                             </template>
                         </Column>
 
-                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} warehouses.</template>
+                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs.</template>
                     </DataTable>
                 </template>
             </Card>
@@ -723,18 +715,11 @@ const exportURL = computed(() => {
         @close="closeModal"
     />
 
-    <PaymentModal
-        :hbl="hbl"
-        :visible="showConfirmPaymentModal"
-        @close="closePaymentModal"
-        @update:visible="showConfirmPaymentModal = $event"
-    />
-
     <AssignZoneModal
         :hbl-id="selectedHBLID"
         :visible="showConfirmAssignZoneModal"
         :warehouse-zones="warehouseZones"
         @close="closeAssignZoneModal"
-        @update:visible="showConfirmPaymentModal = $event"
+        @update:visible="showConfirmAssignZoneModal = $event"
     />
 </template>

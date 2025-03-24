@@ -67,25 +67,25 @@ Breadcrumbs::for('pickups.all', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('hbls.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('HBL');
-    $trail->push('HBL List', route('hbls.index'));
+    $trail->push('HBLs', route('hbls.index'));
 });
 
 Breadcrumbs::for('hbls.door-to-door-list', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('HBL');
-    $trail->push('HBL Door to Door List', route('hbls.door-to-door-list'));
+    $trail->push('Door to Door HBLs', route('hbls.door-to-door-list'));
 });
 
 Breadcrumbs::for('hbls.draft-list', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('HBL');
-    $trail->push('HBL Draft List', route('hbls.draft-list'));
+    $trail->push('Draft HBLs', route('hbls.draft-list'));
 });
 
 Breadcrumbs::for('hbls.get-hbls-by-user', function (BreadcrumbTrail $trail, string $userData) {
     $trail->parent('dashboard');
     $trail->push('HBLs', route('hbls.index'));
-    $trail->push('HBL List', route('hbls.get-hbls-by-user', $userData));
+    $trail->push('HBLs', route('hbls.get-hbls-by-user', $userData));
 });
 
 // HBL > create
@@ -106,7 +106,7 @@ Breadcrumbs::for('hbls.edit', function (BreadcrumbTrail $trail, $hbl) {
 Breadcrumbs::for('hbls.cancelled-hbls', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('HBL', route('hbls.index'));
-    $trail->push('Cancelled HBL List', route('hbls.cancelled-hbls'));
+    $trail->push('Cancelled HBLs', route('hbls.cancelled-hbls'));
 });
 
 // MHBL > create
@@ -127,7 +127,7 @@ Breadcrumbs::for('users.index', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('mhbls.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('MHBL');
-    $trail->push('MHBL List', route('mhbls.index'));
+    $trail->push('MHBLs', route('mhbls.index'));
 });
 
 // Users > Edit
@@ -192,13 +192,13 @@ Breadcrumbs::for('users.customers.index', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('back-office.cash-settlements.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Back Office');
-    $trail->push('Cash Settlement List', route('back-office.cash-settlements.index'));
+    $trail->push('Cash Settlements', route('back-office.cash-settlements.index'));
 });
 // due payment
 Breadcrumbs::for('back-office.duepayments.duePaymentIndex', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Back Office');
-    $trail->push('Due Payment List', route('back-office.duepayments.duePaymentIndex'));
+    $trail->push('Due Payments', route('back-office.duepayments.duePaymentIndex'));
 });
 
 // Settings > Zones
@@ -212,7 +212,7 @@ Breadcrumbs::for('setting.driver-zones.index', function (BreadcrumbTrail $trail)
 Breadcrumbs::for('loading.loading-containers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Loading');
-    $trail->push('Containers List', route('loading.loading-containers.index'));
+    $trail->push('Containers', route('loading.loading-containers.index'));
 });
 
 // Loading > Container Create
@@ -247,20 +247,20 @@ Breadcrumbs::for('branches.create', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('branches.edit', function (BreadcrumbTrail $trail, Branch $branch) {
     $trail->parent('dashboard');
     $trail->push('Branch');
-    $trail->push('Edit', route('branches.edit', $branch->id));
+    $trail->push('Configurations', route('branches.edit', $branch->id));
 });
 
 // Pricing
 Breadcrumbs::for('setting.prices.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');
-    $trail->push('Price Rule List', route('setting.prices.index'));
+    $trail->push('Price Rules', route('setting.prices.index'));
 });
 
 // Branches > Create
 Breadcrumbs::for('setting.prices.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Price Rule List', route('setting.prices.index'));
+    $trail->push('Price Rules', route('setting.prices.index'));
     $trail->push('Create', route('setting.prices.create'));
 });
 
@@ -275,7 +275,7 @@ Breadcrumbs::for('setting.prices.edit', function (BreadcrumbTrail $trail, $id) {
 Breadcrumbs::for('back-office.warehouses.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Back Office');
-    $trail->push('Warehouse List', route('back-office.warehouses.index'));
+    $trail->push('Warehouses', route('back-office.warehouses.index'));
 });
 
 // Loaded Shipments
@@ -340,14 +340,14 @@ Breadcrumbs::for('setting.exception-names.edit', function (BreadcrumbTrail $trai
 Breadcrumbs::for('setting.package-prices.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');
-    $trail->push('Package Price Rule List', route('setting.package-prices.index'));
+    $trail->push('Package Price Rules', route('setting.package-prices.index'));
 });
 
 // Package Rule > create
 Breadcrumbs::for('setting.package-prices.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');
-    $trail->push('Package Price Rule List', route('setting.package-prices.index'));
+    $trail->push('Package Price Rules', route('setting.package-prices.index'));
     $trail->push('Create Package Rule', route('setting.package-prices.create'));
 });
 
@@ -355,7 +355,7 @@ Breadcrumbs::for('setting.package-prices.create', function (BreadcrumbTrail $tra
 Breadcrumbs::for('setting.package-prices.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->parent('dashboard');
     $trail->push('Settings');
-    $trail->push('Package Price Rule List', route('setting.package-prices.index', $id));
+    $trail->push('Package Price Rules', route('setting.package-prices.index', $id));
     $trail->push('Edit', route('setting.package-prices.edit', $id));
 });
 
@@ -391,8 +391,7 @@ Breadcrumbs::for('setting.shipper-consignees.edit', function (BreadcrumbTrail $t
 Breadcrumbs::for('third-party-agents.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Courier');
-    $trail->push('Third Party Agents');
-    $trail->push('Third Party Agents List', route('third-party-agents.index'));
+    $trail->push('Third Party Agents', route('third-party-agents.index'));
 });
 
 // Third-Party Agents > Create

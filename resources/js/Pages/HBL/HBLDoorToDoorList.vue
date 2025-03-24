@@ -60,7 +60,6 @@ const dt = ref();
 const fromDate = ref(moment(new Date()).subtract(1, "month").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
-const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const showConfirmViewCallFlagModal = ref(false);
 const hblName = ref("");
@@ -70,7 +69,6 @@ const isCreateMHBL = ref(false);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
-    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
     cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
     is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
     user: {value: null, matchMode: FilterMatchMode.EQUALS},
@@ -137,7 +135,6 @@ const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOr
                 per_page: perPage.value,
                 search,
                 warehouse: filters.value.warehouse.value || "",
-                hblType: filters.value.hbl_type.value || "",
                 cargoMode: filters.value.cargo_type.value || "",
                 isHold: filters.value.is_hold.value || false,
                 sort_field: sortField,
@@ -172,10 +169,6 @@ watch(() => filters.value.warehouse.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
 });
 
-watch(() => filters.value.hbl_type.value, (newValue) => {
-    fetchHBLs(1, filters.value.global.value);
-});
-
 watch(() => filters.value.cargo_type.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
 });
@@ -201,6 +194,7 @@ watch(() => toDate.value, (newValue) => {
 });
 
 const onPageChange = (event) => {
+    perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchHBLs(currentPage.value);
 };
@@ -212,19 +206,6 @@ const onSort = (event) => {
 onMounted(() => {
     fetchHBLs();
 });
-
-const resolveHBLType = (hbl) => {
-    switch (hbl.hbl_type) {
-        case 'UPB':
-            return 'secondary';
-        case 'Gift':
-            return 'warn';
-        case 'Door to Door':
-            return 'info';
-        default:
-            return null;
-    }
-};
 
 const resolveCargoType = (hbl) => {
     switch (hbl.cargo_type) {
@@ -272,7 +253,6 @@ const clearFilter = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
-        hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
         cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
         is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
         user: {value: null, matchMode: FilterMatchMode.EQUALS},
@@ -594,15 +574,6 @@ const exportCSV = () => {
 
                         <Column field="consignee_address" header="Consignee Address"></Column>
 
-                        <Column field="hbl_type" header="HBL Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
-
                         <Column field="status" header="Status" hidden></Column>
 
                         <Column field="is_hold" header="Hold">
@@ -610,7 +581,10 @@ const exportCSV = () => {
                                 <i :class="{ 'pi-pause-circle text-yellow-500': data.is_hold, 'pi-play-circle text-green-400': !data.is_hold }" class="pi"></i>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary />
+                                <div class="flex items-center gap-2">
+                                    <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary inputId="is-hold"/>
+                                    <label for="is-hold"> Is Hold </label>
+                                </div>
                             </template>
                         </Column>
 
