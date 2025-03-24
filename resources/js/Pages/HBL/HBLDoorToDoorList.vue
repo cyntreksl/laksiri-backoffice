@@ -60,7 +60,6 @@ const dt = ref();
 const fromDate = ref(moment(new Date()).subtract(1, "month").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
-const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const showConfirmViewCallFlagModal = ref(false);
 const hblName = ref("");
@@ -582,7 +581,10 @@ const exportCSV = () => {
                                 <i :class="{ 'pi-pause-circle text-yellow-500': data.is_hold, 'pi-play-circle text-green-400': !data.is_hold }" class="pi"></i>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary />
+                                <div class="flex items-center gap-2">
+                                    <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary inputId="is-hold"/>
+                                    <label for="is-hold"> Is Hold </label>
+                                </div>
                             </template>
                         </Column>
 

@@ -114,7 +114,7 @@ const fetchCashSettlements = async (page = 1, search = "", sortField = 'created_
                 per_page: perPage.value,
                 search,
                 warehouse: filters.value.warehouse.value || "",
-                hblType: filters.value.hbl_type.value || "",
+                deliveryType: filters.value.hbl_type.value || "",
                 cargoMode: filters.value.cargo_type.value || "",
                 isHold: filters.value.is_hold.value || false,
                 sort_field: sortField,
@@ -147,7 +147,7 @@ const getCashSettlementSummary = async () => {
             },
             body: JSON.stringify({
                 warehouse: filters.value.warehouse.value,
-                hblType: filters.value.hbl_type.value,
+                deliveryType: filters.value.hbl_type.value,
                 cargoMode: filters.value.cargo_type.value,
                 isHold: filters.value.is_hold.value,
                 officers: filters.value.user.value,
@@ -183,34 +183,42 @@ watch(() => filters.value.global.value, (newValue) => {
 
 watch(() => filters.value.warehouse.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.hbl_type.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.cargo_type.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.is_hold.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.user.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.payments.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => fromDate.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => toDate.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 const onPageChange = (event) => {
@@ -417,7 +425,7 @@ const paidValueOfSelectedData = computed(() => {
 const exportURL = computed(() => {
     const params = new URLSearchParams({
         warehouse: filters.value.warehouse.value,
-        hblType: filters.value.hbl_type.value,
+        deliveryType: filters.value.hbl_type.value,
         cargoMode: filters.value.cargo_type.value,
         isHold: filters.value.is_hold.value,
         officers: filters.value.user.value,
@@ -664,7 +672,10 @@ const exportURL = computed(() => {
                                 <i :class="{ 'pi-pause-circle text-yellow-500': data.is_hold, 'pi-play-circle text-green-400': !data.is_hold }" class="pi"></i>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary />
+                                <div class="flex items-center gap-2">
+                                    <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary inputId="is-hold"/>
+                                    <label for="is-hold"> Is Hold </label>
+                                </div>
                             </template>
                         </Column>
 
