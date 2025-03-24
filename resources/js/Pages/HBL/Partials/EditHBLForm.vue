@@ -1066,6 +1066,7 @@ const handleCopyFromHBLToConsignee = async () => {
                         <div class="flex justify-between items-center">
                             <div class="flex items-center space-x-2">
                                 <span>Package Details</span>
+                                <InputError :message="errors.packages"/>
                             </div>
                             <Button :disabled="!isExistsRules" icon="pi pi-plus" label="New Package" severity="help" type="button" variant="outlined"
                                     @click="showPackageDialog" />
@@ -1109,6 +1110,17 @@ const handleCopyFromHBLToConsignee = async () => {
                             <Column field="volume" header="Volume (M.CU)"></Column>
                             <Column field="remarks" header="Remark"></Column>
                         </DataTable>
+                        <div v-if="packageList.length === 0"
+                             class="text-center">
+                            <div class="text-center mb-4">
+                                <i class="pi pi-box text-purple-300 animate-slow-bounce" style="font-size: 8rem"></i>
+                                <p class="text-gray-600">
+                                    No packages. Please add packages to view data.
+                                </p>
+                            </div>
+                            <Button :disabled="!isExistsRules" icon="pi pi-plus" label="New Package" severity="help" type="button" variant="outlined"
+                                    @click="showPackageDialog" />
+                        </div>
                     </template>
                 </Card>
             </div>
