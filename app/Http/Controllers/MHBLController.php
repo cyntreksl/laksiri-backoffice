@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateMHBLRequest;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\MHBLRepositoryInterface;
 use App\Interfaces\OfficerRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
 use App\Models\HBLPackage;
 use App\Models\MHBL;
@@ -26,6 +27,7 @@ class MHBLController extends Controller
         private readonly OfficerRepositoryInterface $officerRepository,
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly MHBLRepositoryInterface $mhblRepository,
+        private readonly UserRepositoryInterface $userRepository,
     ) {}
 
     public function index()
@@ -34,15 +36,16 @@ class MHBLController extends Controller
 
         return Inertia::render('MHBL/MHBLList', [
             'warehouses' => GetDestinationBranches::run(),
+            'users' => $this->userRepository->getUsers(['customer']),
         ]);
     }
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
         $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold', 'paymentStatus']);

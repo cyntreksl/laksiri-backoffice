@@ -9,8 +9,10 @@ class DeliveryTypeFilter implements FilterInterface
 {
     public function apply(Builder $query, $value)
     {
-        $value = ! is_array($value) ? explode(',', $value) : $value;
+        if (! is_null($value)) {
+            return $query->whereRaw('LOWER(hbl_type) = ?', [strtolower($value)]);
+        }
 
-        return $query->whereIn('hbl_type', $value);
+        return $query;
     }
 }

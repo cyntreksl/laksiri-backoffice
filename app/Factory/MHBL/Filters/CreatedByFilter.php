@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Factory\HBL\Filters;
+namespace App\Factory\MHBL\Filters;
 
 use App\Interfaces\FilterInterface;
 use Illuminate\Database\Eloquent\Builder;
 
-class HBLTypeFilter implements FilterInterface
+class CreatedByFilter implements FilterInterface
 {
     public function apply(Builder $query, $value)
     {
-        if (! is_null($value)) {
+        if ($value) {
             $value = ! is_array($value) ? explode(',', $value) : $value;
 
-            return $query->whereIn('hbl_type', $value);
+            return $query->whereIn('created_by', $value);
         }
-
-        return $query;
     }
 }

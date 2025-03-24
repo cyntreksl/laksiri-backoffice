@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Branch\GetDestinationBranches;
 use App\Enum\HBLPaymentStatus;
 use App\Interfaces\DriverRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
 use App\Repositories\CashSettlementRepository;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -18,6 +19,7 @@ class CashSettlementController extends Controller
     public function __construct(
         private readonly DriverRepositoryInterface $driverRepository,
         private readonly CashSettlementRepository $cashSettlementRepository,
+        private readonly UserRepositoryInterface $userRepository,
     ) {}
 
     public function index()
@@ -25,11 +27,10 @@ class CashSettlementController extends Controller
         $this->authorize('cash.index');
 
         $drivers = $this->driverRepository->getAllDrivers();
-        $officers = [];
 
         return Inertia::render('CashSettlement/CashSettlementList', [
             'drivers' => $drivers,
-            'officers' => $officers,
+            'officers' => $this->userRepository->getUsers(['customer']),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
         ]);
@@ -43,14 +44,14 @@ class CashSettlementController extends Controller
         $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'hblType', 'warehouse']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
 
         return $this->cashSettlementRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 
     public function getSummery(Request $request)
     {
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'hblType']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
 
         return $this->cashSettlementRepository->getSummery($filters);
     }
@@ -94,12 +95,13 @@ class CashSettlementController extends Controller
 
     public function duePaymentList(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus']);
+
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
 
         return $this->cashSettlementRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
