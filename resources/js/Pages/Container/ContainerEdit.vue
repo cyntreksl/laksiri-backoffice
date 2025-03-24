@@ -8,6 +8,14 @@ import InputError from "@/Components/InputError.vue";
 import { ref, watchEffect } from "vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import {push} from "notivue";
+import Card from 'primevue/card';
+import Button from "primevue/button";
+import SelectButton from "primevue/selectbutton";
+import InputLabel from "@/Components/InputLabel.vue";
+import InputText from "primevue/inputtext";
+import DatePicker from "primevue/datepicker";
+import moment from "moment";
+
 
 const props = defineProps({
     cargoTypes: {
@@ -411,164 +419,203 @@ const handleCreate = () => {
         <form @submit.prevent="handleCreate">
             <div class="grid grid-cols-1 sm:grid-cols-5 my-4 gap-4">
                 <div class="sm:col-span-2 space-y-5">
+
                     <!--Cargo Type-->
-                    <div class="card px-4 py-4 sm:px-5">
-                        <div>
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Cargo Type
-                            </h2>
-                        </div>
-                        <div class="my-5">
-                            <div class="space-x-5">
-                                <label
-                                    v-for="cargoType in cargoTypes"
-                                    class="inline-flex items-center space-x-2"
-                                >
-                                    <input
-                                        v-model="form.cargo_type"
-                                        :value="cargoType"
-                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        name="cargo_type"
-                                        type="radio"
-                                    />
-                                    <p>{{ cargoType }}</p>
-                                </label>
+                    <Card>
+                        <template #title>Cargo Type</template>
+                        <template #content>
+                            <div class="my-3">
+                                <SelectButton v-model="form.cargo_type" :options="cargoTypes" name="Cargo Type">
+                                    <template #option="slotProps">
+                                        <div class="flex items-center">
+                                            <i v-if="slotProps.option === 'Sea Cargo'" class="ti ti-ship mr-2"></i>
+                                            <i v-else class="ti ti-plane mr-2"></i>
+                                            <span>{{ slotProps.option }}</span>
+                                        </div>
+                                    </template>
+                                </SelectButton>
+                                <InputError :message="form.errors.cargo_type" />
                             </div>
-                            <InputError :message="form.errors.cargo_type" />
-                        </div>
-                    </div>
+                        </template>
+                    </Card>
 
                     <!-- Container Type-->
-                    <div class="card px-4 py-4 sm:px-5">
-                        <div>
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Container Specs
-                            </h2>
-                        </div>
-                        <div class="my-5">
-                            <div class="grid sm:grid-cols-2 md:grid-cols-2">
-                                <label
-                                    v-for="containerType in containerTypes"
-                                    class="inline-flex items-center space-x-2 my-2"
-                                >
-                                    <input
-                                        v-model="form.container_type"
-                                        :value="containerType"
-                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        name="container_type"
-                                        type="radio"
-                                    />
-                                    <p>{{ containerType }}</p>
-                                </label>
+                    <Card>
+                        <template #title>Container Specs</template>
+                        <template #content>
+                            <div class="my-3">
+                                <SelectButton v-model="form.container_type" :disabled="form.cargo_type === 'Air Cargo'" :options="containerTypes" name="container_type"/>
+                                <InputError :message="form.errors.container_type" />
                             </div>
-                            <InputError :message="form.errors.container_type" />
-                        </div>
-                    </div>
+                        </template>
+                    </Card>
                 </div>
 
                 <div class="sm:col-span-3 space-y-5">
-                    <div class="card px-4 py-4 sm:px-5">
-                        <div>
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Container Details
-                            </h2>
-                        </div>
-                        <div class="grid grid-cols-4 gap-5 mt-3">
-                            <div class="col-span-2">
-                                <span>Reference</span>
+                    <card>
+                        <template #title>Container Details</template>
+                        <template #content>
+                            <div class="grid grid-cols-4 gap-5">
+                                <div class="col-span-2">
+                                    <InputLabel value="Reference"/>
+                                    <InputText v-model="form.reference" class="w-full" placeholder="Enter Container Reference"/>
+                                    <InputError :message="form.errors.reference" />
+                                </div>
+                                <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">
+                                    <InputLabel value="Container Number"/>
+                                    <InputText v-model="form.container_number" class="w-full" placeholder="Enter Container Number"/>
+                                    <InputError :message="form.errors.container_number" />
+                                </div>
+                                <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">
+                                    <InputLabel value="Seal Number"/>
+                                    <InputText v-model="form.seal_number" class="w-full" placeholder="Enter Seal Number"/>
+                                    <InputError :message="form.errors.seal_number" />
+                                </div>
+                                <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">
+                                    <InputLabel value="BL Number"/>
+                                    <InputText v-model="form.bl_number" class="w-full" placeholder="Enter BL Number"/>
+                                    <InputError :message="form.errors.bl_number" />
+                                </div>
+                                <div v-else class="col-span-2">
+                                    <InputLabel value="AWB Number"/>
+                                    <InputText v-model="form.awb_number" class="w-full" placeholder="Enter AWB Number"/>
+                                    <InputError :message="form.errors.awb_number" />
+                                </div>
+                                <div class="col-span-2">
+                                    <InputLabel value="Estimated Departure Date"/>
+                                    <DatePicker v-model="form.estimated_time_of_departure" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set Estimated Departure Date" show-icon/>
+                                    <InputError
+                                        :message="form.errors.estimated_time_of_departure"
+                                    />
+                                </div>
+                                <div class="col-span-2">
+                                    <InputLabel value="Estimated Arrival Date to Destination"/>
+                                    <DatePicker v-model="form.estimated_time_of_arrival" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set Estimated Arrival Date" show-icon/>
+                                    <InputError :message="form.errors.estimated_time_of_arrival" />
+                                </div>
 
-                                <label class="block">
-                                    <input
-                                        v-model="form.reference"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0"
-                                        type="text"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.reference" />
                             </div>
-                            <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">
-                                <span>Container Number</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.container_number"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="text"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.container_number" />
-                            </div>
-                            <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">
-                                <span>Seal Number</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.seal_number"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="text"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.seal_number" />
-                            </div>
+                        </template>
+                    </card>
 
-                            <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">
-                                <span>BL Number</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.bl_number"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="text"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.bl_number" />
-                            </div>
 
-                            <div v-else class="col-span-2">
-                                <span>AWB Number</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.awb_number"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="text"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.awb_number" />
-                            </div>
 
-                            <div class="col-span-2">
-                                <span>Estimated Departure Date</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.estimated_time_of_departure"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="date"
-                                    />
-                                </label>
-                                <InputError
-                                    :message="form.errors.estimated_time_of_departure"
-                                />
-                            </div>
+<!--                    <div class="card px-4 py-4 sm:px-5">-->
+<!--                        <div>-->
+<!--                            <h2-->
+<!--                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"-->
+<!--                            >-->
+<!--                                Container Details-->
+<!--                            </h2>-->
+<!--                        </div>-->
+<!--                        <div class="grid grid-cols-4 gap-5 mt-3">-->
+<!--                            <div class="col-span-2">-->
+<!--                                <span>Reference</span>-->
 
-                            <div class="col-span-2">
-                                <span>Estimated Arrival Date to Destination</span>
-                                <label class="block">
-                                    <input
-                                        v-model="form.estimated_time_of_arrival"
-                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="date"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.estimated_time_of_arrival" />
-                            </div>
-                        </div>
-                    </div>
+<!--                                <label class="block">-->
+<!--                                    <input-->
+<!--                                        v-model="form.reference"-->
+<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
+<!--                                        min="0"-->
+<!--                                        type="text"-->
+<!--                                    />-->
+<!--                                </label>-->
+<!--                                <InputError :message="form.errors.reference" />-->
+<!--                            </div>-->
+<!--                            <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">-->
+<!--                                <span>Container Number</span>-->
+<!--                                <label class="block">-->
+<!--                                    <input-->
+<!--                                        v-model="form.container_number"-->
+<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
+<!--                                        type="text"-->
+<!--                                    />-->
+<!--                                </label>-->
+<!--                                <InputError :message="form.errors.container_number" />-->
+<!--                            </div>-->
+<!--                            <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">-->
+<!--                                <span>Seal Number</span>-->
+<!--                                <label class="block">-->
+<!--                                    <input-->
+<!--                                        v-model="form.seal_number"-->
+<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
+<!--                                        type="text"-->
+<!--                                    />-->
+<!--                                </label>-->
+<!--                                <InputError :message="form.errors.seal_number" />-->
+<!--                            </div>-->
+
+<!--                            <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">-->
+<!--                                <span>BL Number</span>-->
+<!--                                <label class="block">-->
+<!--                                    <input-->
+<!--                                        v-model="form.bl_number"-->
+<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
+<!--                                        type="text"-->
+<!--                                    />-->
+<!--                                </label>-->
+<!--                                <InputError :message="form.errors.bl_number" />-->
+<!--                            </div>-->
+
+<!--                            <div v-else class="col-span-2">-->
+<!--                                <span>AWB Number</span>-->
+<!--                                <label class="block">-->
+<!--                                    <input-->
+<!--                                        v-model="form.awb_number"-->
+<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
+<!--                                        type="text"-->
+<!--                                    />-->
+<!--                                </label>-->
+<!--                                <InputError :message="form.errors.awb_number" />-->
+<!--                            </div>-->
+
+<!--                            <div class="col-span-2">-->
+<!--                                <span>Estimated Departure Date</span>-->
+<!--                                <label class="block">-->
+<!--                                    <input-->
+<!--                                        v-model="form.estimated_time_of_departure"-->
+<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
+<!--                                        type="date"-->
+<!--                                    />-->
+<!--                                </label>-->
+<!--                                <InputError-->
+<!--                                    :message="form.errors.estimated_time_of_departure"-->
+<!--                                />-->
+<!--                            </div>-->
+
+<!--                            <div class="col-span-2">-->
+<!--                                <span>Estimated Arrival Date to Destination</span>-->
+<!--                                <label class="block">-->
+<!--                                    <input-->
+<!--                                        v-model="form.estimated_time_of_arrival"-->
+<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
+<!--                                        type="date"-->
+<!--                                    />-->
+<!--                                </label>-->
+<!--                                <InputError :message="form.errors.estimated_time_of_arrival" />-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
                     <!-- ship/flight details-->
+                    <card v-if="form.cargo_type === 'Sea Cargo'">
+                        <template #title>Vessel Details</template>
+                        <template #content>
+                            <div class="grid grid-cols-4 gap-5 mt-3">
+                                <div class="col-span-2">
+                                    <InputLabel value="Vessel Name"/>
+                                    <InputText v-model="form.vessel_name" class="w-full" placeholder="Enter Vessel Name"/>
+                                    <InputError :message="form.errors.vessel_name" />
+                                </div>
+
+
+                            </div>
+                        </template>
+                    </card>
+
+
+
+
                     <div
                         v-if="form.cargo_type === 'Sea Cargo'"
                         class="sm:col-span-3 space-y-5"
