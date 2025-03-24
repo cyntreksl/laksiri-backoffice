@@ -8,10 +8,11 @@ use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithStyles
+class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithStyles, WithMapping
 {
     use Exportable;
 
@@ -24,39 +25,13 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithSt
     {
         return [
             '#',
-            'Reference',
-            'Warehouse Zone Id',
-            'Branch',
-            'Pickup Id',
+            'HBL Number',
+            'Shipper Name',
             'Cargo Type',
             'HBL Type',
-            'HBL',
-            'HBL Name',
-            'Email',
-            'Contact Number',
-            'NIC',
-            'IQ Number',
-            'Address',
-            'Consignee Name',
-            'Consignee NIC',
-            'Consignee Contact',
-            'Consignee Address',
-            'Consignee Note',
-            'Warehouse',
-            'Freight Charge',
-            'Bill Charge',
-            'Other Charge',
-            'Discount',
-            'Paid Amount',
-            'Grand Total',
-            'Status',
-            'System Status',
-            'Created By',
-            'Is Hold',
-            'Is Short Loading',
-            'Created At',
-            'Updated At',
-            'Deleted At',
+            'Weight',
+            'Volume',
+            'No of Packages',
         ];
     }
 
@@ -74,8 +49,28 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithSt
 
         $query->warehouse();
 
+        $query->with(['packages'])
+            ->withSum('packages', 'weight')
+            ->withSum('packages', 'volume');
+
         FilterFactory::apply($query, $this->filters);
 
         return $query;
+    }
+
+    public function map($row): array
+    {
+        $array = [
+            'Id' => $row->id,
+            'HBL Number' => $row->hbl_number,
+            'Shipper Name' => $row->hbl_name,
+            'Cargo Type' => $row->cargo_type,
+            'HBL Type' => $row->hbl_type,
+            'Weight' => $row['packages_sum_weight'],
+            'Volume' => $row['packages_sum_volume'],
+            'No of Packages' => count($row->packages),
+        ];
+
+        return $array;
     }
 }
