@@ -114,7 +114,7 @@ const fetchCashSettlements = async (page = 1, search = "", sortField = 'created_
                 per_page: perPage.value,
                 search,
                 warehouse: filters.value.warehouse.value || "",
-                hblType: filters.value.hbl_type.value || "",
+                deliveryType: filters.value.hbl_type.value || "",
                 cargoMode: filters.value.cargo_type.value || "",
                 isHold: filters.value.is_hold.value || false,
                 sort_field: sortField,
@@ -147,7 +147,7 @@ const getCashSettlementSummary = async () => {
             },
             body: JSON.stringify({
                 warehouse: filters.value.warehouse.value,
-                hblType: filters.value.hbl_type.value,
+                deliveryType: filters.value.hbl_type.value,
                 cargoMode: filters.value.cargo_type.value,
                 isHold: filters.value.is_hold.value,
                 officers: filters.value.user.value,
@@ -417,7 +417,7 @@ const paidValueOfSelectedData = computed(() => {
 const exportURL = computed(() => {
     const params = new URLSearchParams({
         warehouse: filters.value.warehouse.value,
-        hblType: filters.value.hbl_type.value,
+        deliveryType: filters.value.hbl_type.value,
         cargoMode: filters.value.cargo_type.value,
         isHold: filters.value.is_hold.value,
         officers: filters.value.user.value,
