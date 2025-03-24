@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class CashSettlementsExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class DuePaymentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
     use Exportable;
 
@@ -49,7 +49,7 @@ class CashSettlementsExport implements FromQuery, ShouldAutoSize, WithHeadings, 
     {
         $query = HBL::query();
 
-        $query->cashSettlement();
+        $query->duePayment();
         $query->with(['pickup', 'packages'])
             ->withSum('packages', 'weight')
             ->withSum('packages', 'volume');
