@@ -1,6 +1,5 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { useForm, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue"
@@ -14,8 +13,6 @@ import SelectButton from "primevue/selectbutton";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputText from "primevue/inputtext";
 import DatePicker from "primevue/datepicker";
-import moment from "moment";
-
 
 const props = defineProps({
     cargoTypes: {
@@ -498,105 +495,6 @@ const handleCreate = () => {
                         </template>
                     </card>
 
-
-
-<!--                    <div class="card px-4 py-4 sm:px-5">-->
-<!--                        <div>-->
-<!--                            <h2-->
-<!--                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"-->
-<!--                            >-->
-<!--                                Container Details-->
-<!--                            </h2>-->
-<!--                        </div>-->
-<!--                        <div class="grid grid-cols-4 gap-5 mt-3">-->
-<!--                            <div class="col-span-2">-->
-<!--                                <span>Reference</span>-->
-
-<!--                                <label class="block">-->
-<!--                                    <input-->
-<!--                                        v-model="form.reference"-->
-<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
-<!--                                        min="0"-->
-<!--                                        type="text"-->
-<!--                                    />-->
-<!--                                </label>-->
-<!--                                <InputError :message="form.errors.reference" />-->
-<!--                            </div>-->
-<!--                            <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">-->
-<!--                                <span>Container Number</span>-->
-<!--                                <label class="block">-->
-<!--                                    <input-->
-<!--                                        v-model="form.container_number"-->
-<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
-<!--                                        type="text"-->
-<!--                                    />-->
-<!--                                </label>-->
-<!--                                <InputError :message="form.errors.container_number" />-->
-<!--                            </div>-->
-<!--                            <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">-->
-<!--                                <span>Seal Number</span>-->
-<!--                                <label class="block">-->
-<!--                                    <input-->
-<!--                                        v-model="form.seal_number"-->
-<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
-<!--                                        type="text"-->
-<!--                                    />-->
-<!--                                </label>-->
-<!--                                <InputError :message="form.errors.seal_number" />-->
-<!--                            </div>-->
-
-<!--                            <div v-if="form.cargo_type === 'Sea Cargo'" class="col-span-2">-->
-<!--                                <span>BL Number</span>-->
-<!--                                <label class="block">-->
-<!--                                    <input-->
-<!--                                        v-model="form.bl_number"-->
-<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
-<!--                                        type="text"-->
-<!--                                    />-->
-<!--                                </label>-->
-<!--                                <InputError :message="form.errors.bl_number" />-->
-<!--                            </div>-->
-
-<!--                            <div v-else class="col-span-2">-->
-<!--                                <span>AWB Number</span>-->
-<!--                                <label class="block">-->
-<!--                                    <input-->
-<!--                                        v-model="form.awb_number"-->
-<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
-<!--                                        type="text"-->
-<!--                                    />-->
-<!--                                </label>-->
-<!--                                <InputError :message="form.errors.awb_number" />-->
-<!--                            </div>-->
-
-<!--                            <div class="col-span-2">-->
-<!--                                <span>Estimated Departure Date</span>-->
-<!--                                <label class="block">-->
-<!--                                    <input-->
-<!--                                        v-model="form.estimated_time_of_departure"-->
-<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
-<!--                                        type="date"-->
-<!--                                    />-->
-<!--                                </label>-->
-<!--                                <InputError-->
-<!--                                    :message="form.errors.estimated_time_of_departure"-->
-<!--                                />-->
-<!--                            </div>-->
-
-<!--                            <div class="col-span-2">-->
-<!--                                <span>Estimated Arrival Date to Destination</span>-->
-<!--                                <label class="block">-->
-<!--                                    <input-->
-<!--                                        v-model="form.estimated_time_of_arrival"-->
-<!--                                        class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"-->
-<!--                                        type="date"-->
-<!--                                    />-->
-<!--                                </label>-->
-<!--                                <InputError :message="form.errors.estimated_time_of_arrival" />-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
                     <!-- ship/flight details-->
                     <card v-if="form.cargo_type === 'Sea Cargo'">
                         <template #title>Vessel Details</template>
@@ -607,172 +505,69 @@ const handleCreate = () => {
                                     <InputText v-model="form.vessel_name" class="w-full" placeholder="Enter Vessel Name"/>
                                     <InputError :message="form.errors.vessel_name" />
                                 </div>
+                                <div class="col-span-2">
+                                    <InputLabel value="Voyage Number"/>
+                                    <InputText v-model="form.voyage_number" class="w-full" placeholder="Enter Voyage Number"/>
+                                    <InputError :message="form.errors.voyage_number" />
+                                </div>
+                                <div class="col-span-4">
+                                    <InputLabel value="Shipping Line"/>
+                                    <InputText v-model="form.shipping_line" class="w-full" placeholder="Enter Shipping Line"/>
+                                    <InputError :message="form.errors.shipping_line" />
+                                </div>
+                                <div class="col-span-2">
+                                    <InputLabel value="Port of Loading"/>
+                                    <InputText v-model="form.port_of_loading" class="w-full" placeholder="Enter Port of Loading"/>
+                                    <InputError :message="form.errors.port_of_loading" />
+                                </div>
+                                <div class="col-span-2">
+                                    <InputLabel value="Port of Discharge"/>
+                                    <InputText v-model="form.port_of_discharge" class="w-full" placeholder="Enter Port of Discharge"/>
+                                    <InputError :message="form.errors.port_of_discharge" />
+                                </div>
 
 
                             </div>
                         </template>
                     </card>
 
-
-
-
-                    <div
-                        v-if="form.cargo_type === 'Sea Cargo'"
-                        class="sm:col-span-3 space-y-5"
-                    >
-                        <div class="card px-4 py-4 sm:px-5">
-                            <div>
-                                <h2
-                                    class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                                >
-                                    Vessel Details
-                                </h2>
-                            </div>
+                    <Card v-else>
+                        <template #title>Flight Details</template>
+                        <template #content>
                             <div class="grid grid-cols-4 gap-5 mt-3">
-                                <div class="col-span-2">
-                                    <span>Vessel Name</span>
-                                    <label class="block">
-                                        <input
-                                            v-model="form.vessel_name"
-                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            type="text"
-                                        />
-                                    </label>
-                                    <InputError :message="form.errors.vessel_name" />
-                                </div>
-                                <div class="col-span-2">
-                                    <span>Voyage Number</span>
-                                    <label class="block">
-                                        <input
-                                            v-model="form.voyage_number"
-                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            type="text"
-                                        />
-                                    </label>
-                                    <InputError :message="form.errors.voyage_number" />
-                                </div>
-                                <div class="col-span-4">
-                                    <span>Shipping Line</span>
-                                    <label class="block">
-                                        <input
-                                            v-model="form.shipping_line"
-                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            type="text"
-                                        />
-                                    </label>
-                                    <InputError :message="form.errors.shipping_line" />
-                                </div>
-                                <div class="col-span-2">
-                                    <span>Port of Loading</span>
-                                    <label class="block">
-                                        <input
-                                            v-model="form.port_of_loading"
-                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            type="text"
-                                        />
-                                    </label>
-                                    <InputError :message="form.errors.port_of_loading" />
-                                </div>
-                                <div class="col-span-2">
-                                    <span>Port of Discharge</span>
-                                    <label class="block">
-                                        <input
-                                            v-model="form.port_of_discharge"
-                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            type="text"
-                                        />
-                                    </label>
-                                    <InputError :message="form.errors.port_of_discharge" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-else class="sm:col-span-3 space-y-5">
-                        <div class="card px-4 py-4 sm:px-5">
-                            <div>
-                                <h2
-                                    class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                                >
-                                    Flight Details
-                                </h2>
-                            </div>
-                            <div class="grid grid-cols-4 gap-5 mt-3">
+
                                 <div class="col-span-1">
-                                    <span>Flight Number</span>
-                                    <label class="block">
-                                        <input
-                                            v-model="form.flight_number"
-                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            type="text"
-                                        />
-                                    </label>
+                                    <InputLabel value="Flight Number"/>
+                                    <InputText v-model="form.flight_number" class="w-full" placeholder="Enter Flight Number"/>
                                     <InputError :message="form.errors.flight_number" />
                                 </div>
+
                                 <div class="col-span-3">
-                                    <span>Airline Name</span>
-                                    <label class="block">
-                                        <input
-                                            v-model="form.airline_name"
-                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            type="text"
-                                        />
-                                    </label>
+                                    <InputLabel value="Airline Name"/>
+                                    <InputText v-model="form.airline_name" class="w-full" placeholder="Enter Airline Name"/>
                                     <InputError :message="form.errors.airline_name" />
                                 </div>
+
                                 <div class="col-span-2">
-                                    <span>Airport of Departure</span>
-                                    <label class="block">
-                                        <input
-                                            v-model="form.airport_of_departure"
-                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            type="text"
-                                        />
-                                    </label>
+                                    <InputLabel value="Airport of Departure"/>
+                                    <InputText v-model="form.airport_of_departure" class="w-full" placeholder="Enter Airport of Departure"/>
                                     <InputError :message="form.errors.airport_of_departure" />
                                 </div>
+
                                 <div class="col-span-2">
-                                    <span>Airport of Arrival</span>
-                                    <label class="block">
-                                        <input
-                                            v-model="form.airport_of_arrival"
-                                            class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                            type="text"
-                                        />
-                                    </label>
+                                    <InputLabel value="Airport of Arrival"/>
+                                    <InputText v-model="form.airport_of_arrival" class="w-full" placeholder="Enter Airport of Arrival"/>
                                     <InputError :message="form.errors.airport_of_arrival" />
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </template>
+                    </Card>
 
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-5">
-                        <DangerOutlineButton
-                            @click="router.visit(route('loading.loading-containers.index'))"
-                        >Cancel</DangerOutlineButton
-                        >
-                        <PrimaryButton
-                            :class="{ 'opacity-50': form.processing }"
-                            :disabled="form.processing"
-                            class="space-x-2"
-                            type="submit"
-                        >
-                            <span>Update Container</span>
-                            <svg
-                                class="size-5"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-                            </svg>
-                        </PrimaryButton>
+                        <Button label="Cancel" severity="danger" variant="outlined" @click="router.visit(route('loading.loading-containers.index'))" />
+
+                        <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Update Container" type="submit" />
                     </div>
                 </div>
             </div>
