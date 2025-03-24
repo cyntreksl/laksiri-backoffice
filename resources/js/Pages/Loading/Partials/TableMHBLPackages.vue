@@ -190,5 +190,6 @@ const closeShowHBLModal = () => {
         :hbl-id="hblRecord?.id"
         :show="showConfirmViewHBLModal"
         @close="closeShowHBLModal"
+        @update:show="showConfirmViewHBLModal = $event"
     />
 </template>

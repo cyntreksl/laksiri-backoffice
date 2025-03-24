@@ -1313,6 +1313,7 @@ const confirmViewHBL = async (id) => {
             :hbl-id="hblId"
             :show="showConfirmViewHBLModal"
             @close="closeViewModal"
+            @update:show="showConfirmViewHBLModal = $event"
         />
     </AppLayout>
 </template>
