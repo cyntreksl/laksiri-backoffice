@@ -92,21 +92,15 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $loaded_containers = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $loaded_containers = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => ContainerResource::collection($loaded_containers),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $loaded_containers->total(),
+                'current_page' => $loaded_containers->currentPage(),
+                'perPage' => $loaded_containers->perPage(),
+                'lastPage' => $loaded_containers->lastPage(),
             ],
         ]);
     }
