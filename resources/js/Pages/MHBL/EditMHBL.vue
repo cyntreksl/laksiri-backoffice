@@ -362,175 +362,154 @@ const copiedPackages = ref({});
         <!-- Create Pickup Form -->
         <form @submit.prevent="handleMHBLUpdate">
             <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
-                <div class="sm:col-span-2 grid grid-rows gap-4">
-                    <card>
+                <!-- Primary Details Card -->
+                <div class="sm:col-span-2">
+                    <Card>
                         <template #title>Primary Details</template>
+                        <template #subtitle>Automatically selected the options below.</template>
                         <template #content>
-                            <Fieldset legend="Cargo Type (Automatically Selected)">
-                                <SelectButton disabled v-model="form.cargo_type" :options="cargoTypes"
-                                    name="Cargo Type">
+                            <Fieldset legend="Cargo Type">
+                                <SelectButton v-model="form.cargo_type" :options="cargoTypes" disabled name="Cargo Type">
                                     <template #option="slotProps">
                                         <div class="flex items-center">
-                                            <i v-if="slotProps.option === 'Sea Cargo'" class="ti ti-ship mr-2"></i>
-                                            <i v-else class="ti ti-plane mr-2"></i>
+                                            <i :class="slotProps.option === 'Sea Cargo' ? 'ti ti-ship' : 'ti ti-plane'" class="mr-2"></i>
                                             <span>{{ slotProps.option }}</span>
                                         </div>
                                     </template>
                                 </SelectButton>
-                                <InputError :message="form.errors.cargo_type" />
+                                <InputError :message="form.errors.cargo_type"/>
                             </Fieldset>
-                            <Fieldset legend="Warehouse (Automatically Selected)">
-                                <SelectButton disabled v-model="form.warehouse" :options="warehouses" name="HBL Type"
-                                    option-label="name" option-value="name" @change="updateWarehouseId" />
+
+                            <Fieldset v-if="false" legend="Type">
+                                <SelectButton v-model="form.hbl_type" :options="hblTypes" disabled name="HBL Type"/>
+                                <InputError :message="form.errors.hbl_type"/>
+                            </Fieldset>
+
+                            <Fieldset legend="Warehouse">
+                                <SelectButton v-model="form.warehouse" :options="warehouses" disabled option-label="name" option-value="name"/>
                                 <InputError :message="form.errors.warehouse" />
                             </Fieldset>
-                            <div class="flex justify-center mt-36">
+
+                            <div class="flex justify-center mt-16">
                                 <img :src="hblImage" alt="hbl-image" class="w-3/4">
                             </div>
                         </template>
-                    </card>
-
+                    </Card>
                 </div>
+
+                <!-- Shipper Details Card -->
                 <div class="sm:col-span-2">
-                    <card>
-                        <template #title>
-                            <div class="flex justify-between items-center">
-                                <span>Shipper Details</span>
-                            </div>
-                        </template>
+                    <Card>
+                        <template #title>Shipper Details</template>
                         <template #content>
-                            <div class="grid grid-cols-3 gap-5 mt-3">
-                                <div class="col-span-3">
-                                    <InputLabel value="Name" />
-                                    <Dropdown v-model="form.hbl_name" :options="shippers" optionLabel="name"
-                                        optionValue="name" placeholder="Select shipper" class="w-full mt-1.5"
-                                        :disabled="true"
-                                        inputClass="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" />
-                                    <InputError :message="form.errors.hbl_name" />
+                            <div class="grid grid-cols-1 gap-4 mt-3">
+                                <div>
+                                    <InputLabel value="Name"/>
+                                    <Select v-model="form.hbl_name" :options="shippers" class="w-full" filter option-label="name" option-value="name" placeholder="Select shipper" disabled />
+                                    <InputError :message="form.errors.hbl_name"/>
                                 </div>
-                                <div class="col-span-3">
+                                <div>
                                     <InputLabel value="Email" />
                                     <IconField>
                                         <InputField>
                                             <InputIcon class="pi pi-envelope" />
-                                            <InputText v-model="form.email" class="w-full" placeholder="Email"
-                                                type="email" :disabled="true" />
+                                            <InputText v-model="form.email" class="w-full" placeholder="Email" type="email" disabled />
                                         </InputField>
                                         <InputError :message="form.errors.email" />
                                     </IconField>
                                 </div>
-                                <div class="col-span-3">
+                                <div>
                                     <InputLabel value="Mobile Number" />
-                                    <div class="flex flex-row">
-                                        <Select v-model="countryCode" :options="countryCodes"
-                                            class="w-25 !rounded-r-none !border-r-0" filter
-                                            placeholder="Select a Country Code" :disabled="true" />
-                                        <InputText v-model="contactNumber" class="!rounded-l-none w-full"
-                                            placeholder="123 4567 890" :disabled="true" />
+                                    <div class="flex">
+                                        <Select v-model="countryCode" :options="countryCodes" class="w-25 !rounded-r-none !border-r-0" filter placeholder="Select a Country Code" disabled />
+                                        <InputText v-model="contactNumber" class="!rounded-l-none w-full" placeholder="123 4567 890" disabled />
                                     </div>
-                                    <InputError :message="form.errors.contact_number" class="col-span-1" />
+                                    <InputError :message="form.errors.contact_number" />
                                 </div>
-                                <div class="col-span-3">
+                                <div>
                                     <InputLabel value="PP or NIC No" />
                                     <IconField>
                                         <InputIcon class="pi pi-tag" />
-                                        <InputText v-model="form.nic" class="w-full" placeholder="PP or NIC No"
-                                            :disabled="true" />
+                                        <InputText v-model="form.nic" class="w-full" placeholder="PP or NIC No" disabled />
                                     </IconField>
                                     <InputError :message="form.errors.nic" />
                                 </div>
-                                <div class="col-span-3">
+                                <div>
                                     <InputLabel value="Residency No" />
                                     <IconField>
                                         <InputIcon class="pi pi-home" />
-                                        <InputText v-model="form.iq_number" class="w-full" placeholder="Residency No"
-                                            :disabled="true" />
+                                        <InputText v-model="form.iq_number" class="w-full" placeholder="Residency No" disabled />
                                     </IconField>
                                     <InputError :message="form.errors.iq_number" />
                                 </div>
-                                <div class="col-span-3">
+                                <div>
                                     <InputLabel value="Address" />
-                                    <Textarea v-model="form.address" class="w-full" cols="30"
-                                        placeholder="Type address here..." rows="5" :disabled="true" />
+                                    <Textarea v-model="form.address" class="w-full" cols="30" placeholder="Type address here..." rows="5" disabled />
                                     <InputError :message="form.errors.address" />
                                 </div>
-                                <br>
                             </div>
                         </template>
-                    </card>
+                    </Card>
                 </div>
 
+                <!-- Consignee Details Card -->
                 <div class="sm:col-span-2">
                     <Card>
-                        <template #title>
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                                Consignee Details
-                            </h2>
-                        </template>
+                        <template #title>Consignee Details</template>
                         <template #content>
-                            <div class="grid grid-cols-3 gap-5 mt-3">
-                                <div class="col-span-3">
-                                    <InputLabel value="Name" />
-                                    <Dropdown v-model="form.consignee_name" :options="consignees" optionLabel="name"
-                                        optionValue="name" placeholder="Select consignee" class="w-full mt-1.5"
-                                        :disabled="true"
-                                        inputClass="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" />
-                                    <InputError :message="form.errors.consignee_name" />
+                            <div class="grid grid-cols-1 gap-4 mt-3">
+                                <div>
+                                    <InputLabel value="Name"/>
+                                    <Select v-model="form.consignee_name" :options="consignees" class="w-full" filter option-label="name" option-value="name" placeholder="Select Consignee" disabled />
+                                    <InputError :message="form.errors.consignee_name"/>
                                 </div>
-                                <div class="col-span-3">
+                                <div>
                                     <InputLabel value="PP or NIC No" />
                                     <IconField>
                                         <InputIcon class="pi pi-tag" />
-                                        <InputText v-model="form.consignee_nic" class="w-full" placeholder="PP or NIC No"
-                                                   :disabled="true" />
+                                        <InputText v-model="form.consignee_nic" class="w-full" placeholder="PP or NIC No" disabled />
                                     </IconField>
                                     <InputError :message="form.errors.consignee_nic" />
                                 </div>
-                                <div class="col-span-3">
+                                <div>
                                     <InputLabel value="Mobile Number" />
-                                    <div class="flex flex-row">
-                                        <Select v-model="consignee_countryCode" :options="countryCodes"
-                                                class="w-25 !rounded-r-none !border-r-0" filter
-                                                placeholder="Select a Country Code" :disabled="true" />
-                                        <InputText v-model="consignee_contact" class="!rounded-l-none w-full"
-                                                   placeholder="123 4567 890" :disabled="true" />
+                                    <div class="flex">
+                                        <Select v-model="consignee_countryCode" :options="countryCodes" class="w-25 !rounded-r-none !border-r-0" filter placeholder="Select a Country Code" disabled />
+                                        <InputText v-model="consignee_contact" class="!rounded-l-none w-full" placeholder="123 4567 890" disabled />
                                     </div>
-                                    <InputError :message="form.errors.consignee_contact" class="col-span-1" />
+                                    <InputError :message="form.errors.consignee_contact" />
                                 </div>
-                                <div class="col-span-3">
+                                <div>
                                     <InputLabel value="Address" />
-                                    <Textarea v-model="form.consignee_address" class="w-full" cols="30"
-                                              placeholder="Type address here..." rows="5" :disabled="true" />
+                                    <Textarea v-model="form.consignee_address" class="w-full" cols="30" placeholder="Type address here..." rows="5" disabled />
                                     <InputError :message="form.errors.consignee_address" />
                                 </div>
-                                <br> <br> <br> <br>  <br>  <br>  <br>  <br>  <br>
+                                <div>
+                                    <div class="h-34"></div>
+                                </div>
                             </div>
                         </template>
                     </Card>
                 </div>
             </div>
 
+            <!-- Package Details and Summary Section -->
             <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
-                <div class="sm:col-span-4  ">
+                <div class="sm:col-span-4">
                     <Card>
-                        <template #content>
-                            <!-- Header Section -->
-                            <div class="mt-4 flex justify-between items-center ">
-                                <h2 class="text-lg font-medium tracking-wide text-slate-700 dark:text-navy-100">
-                                    Package Details
-                                </h2>
-                                <div class="flex space-x-3 gap-5 ">
-                                    <Button label="New HBL" icon="pi pi-plus" class="p-button-outlined "
-                                        @click="showAddHBLModal" />
-                                    <Button label="Remove HBL" icon="pi pi-trash" class="p-button-danger"
-                                        @click="showRemoveHBLModal" />
+                        <template #title>
+                            <div class="flex justify-between items-center">
+                                <span>Package Details</span>
+                                <div class="flex gap-5">
+                                    <Button label="New HBL" icon="pi pi-plus" class="p-button-outlined" @click="showAddHBLModal" />
+                                    <Button label="Remove HBL" icon="pi pi-trash" class="p-button-danger" @click="showRemoveHBLModal" />
                                 </div>
                             </div>
-                            <br>
+                        </template>
+                        <template #content>
                             <!-- Packages Table -->
                             <DataTable v-if="packageList.length > 0" :value="packageList" stripedRows removableSort
-                                       class="min-w-50rem border-radius-10 overflow-hidden">
+                                       class="min-w-50rem border-radius-10 overflow-hidden mt-4">
                                 <Column field="hbl" header="HBL"/>
                                 <Column field="type" header="Type"/>
                                 <Column field="length" header="Length (CM)">
@@ -554,14 +533,14 @@ const copiedPackages = ref({});
                                         {{ Number(data.weight).toFixed(3) }}
                                     </template>
                                 </Column>
-                                <Column field="volume" header="Volume (M³)"/>
+                                <Column field="volume" header="Volume (M.CU)"/>
                                 <Column field="remarks" header="Remarks"/>
                             </DataTable>
 
                             <!-- Copied Packages Table -->
                             <DataTable v-else-if="Object.keys(copiedPackages).length > 0"
                                        :value="Object.values(copiedPackages)" stripedRows removableSort
-                                       class="min-w-50rem border-radius-10 overflow-hidden">
+                                       class="min-w-50rem border-radius-10 overflow-hidden mt-4">
                                 <Column field="package_type" header="Type"/>
                                 <Column field="length" header="Length (CM)">
                                     <template #body="{ data }">
@@ -584,7 +563,7 @@ const copiedPackages = ref({});
                                         {{ Number(data.weight).toFixed(3) }}
                                     </template>
                                 </Column>
-                                <Column field="volume" header="Volume (M³)">
+                                <Column field="volume" header="Volume (M.CU)">
                                     <template #body="{ data }">
                                         {{ Number(data.volume).toFixed(3) }}
                                     </template>
@@ -593,113 +572,104 @@ const copiedPackages = ref({});
                             </DataTable>
 
                             <!-- Empty State -->
-                            <div v-else class="flex flex-col items-center mt-6 mb-6">
-                                <i class="pi pi-box text-7xl text-gray-400 mb-4"></i>
-                                <p class="text-gray-600">No packages. Please add packages to view data.</p>
+                            <div v-else class="text-center py-8">
+                                <i class="pi pi-box text-purple-300 animate-slow-bounce" style="font-size: 8rem"></i>
+                                <p class="text-gray-600 mt-4">
+                                    No packages. Please add packages to view data.
+                                </p>
                             </div>
                         </template>
                     </Card>
                 </div>
 
-                <div class="sm:col-span-2 grid grid-cols-2 gap-4">
-                    <div class="sm:col-span-2">
-                        <Card class="p-4 sm:p-5">
-                            <template #title>
-                                <h2 class="text-lg font-medium tracking-wide text-slate-700 dark:text-navy-100">
-                                    MHBL Summary
-                                </h2>
-                            </template>
-                            <template #content>
-                                <div class="mt-5 space-y-2.5 font-bold">
-                                    <div class="flex justify-between">
-                                        <p class="line-clamp-1">Packages</p>
-                                        <p class="text-slate-700 dark:text-navy-100">
-                                            {{ packageList.length }}
-                                        </p>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <p class="line-clamp-1">Weight</p>
-                                        <p class="text-slate-700 dark:text-navy-100">
-                                            {{ form.grand_weight ? form.grand_weight.toFixed(2) : '0.00' }}
-                                        </p>
-                                    </div>
-                                    <div class="flex justify-between mb-4">
-                                        <p class="line-clamp-1">Volume</p>
-                                        <p class="text-slate-700 dark:text-navy-100">
-                                            {{ form.grand_volume ? form.grand_volume.toFixed(2) : '0.00' }}
-                                        </p>
-                                    </div>
+                <!-- MHBL Summary Card -->
+                <div class="sm:col-span-2">
+                    <Card>
+                        <template #title>MHBL Summary</template>
+                        <template #content>
+                            <div class="grid grid-cols-2 gap-5 mt-5">
+                                <div class="flow-root col-span-2 my-3">
+                                    <ul class="-my-6" role="list">
+                                        <li class="flex py-3">
+                                            <div class="flex flex-1 flex-col">
+                                                <div>
+                                                    <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                        <h3>
+                                                            Packages
+                                                        </h3>
+                                                        <p class="ml-4">{{ packageList.length }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li class="flex py-3">
+                                            <div class="flex flex-1 flex-col">
+                                                <div>
+                                                    <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                        <h3>
+                                                            Weight
+                                                        </h3>
+                                                        <p class="ml-4">{{ form.grand_weight.toFixed(2) }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li class="flex py-3">
+                                            <div class="flex flex-1 flex-col">
+                                                <div>
+                                                    <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                        <h3>
+                                                            Volume
+                                                        </h3>
+                                                        <p class="ml-4">{{ form.grand_volume.toFixed(3) }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
                                 </div>
-                            </template>
-                        </Card>
-                    </div>
-                </div>
-
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-6 my-6 gap-4">
-                <!-- Empty grid columns for spacing -->
-                <div class="col-span-4"></div>
-
-                <!-- Action Buttons -->
-                <div class="flex justify-end space-x-5 col-span-2">
-                    <DangerOutlineButton @click="router.visit(route('mhbls.index'))">
-                        Cancel
-                    </DangerOutlineButton>
-                    <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
-                        class="space-x-2" type="submit">
-                        <span>Update MHBL</span>
-                        <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg>
-                    </PrimaryButton>
+                            </div>
+                        </template>
+                    </Card>
                 </div>
             </div>
-            <DialogModal :maxWidth="'xl'" :show="showAddNewHBLDialog" @close="closeAddNewHBLModal">
-                <template #title>
-                    Add New HBL
-                </template>
 
-                <template #content>
-                    <div class="mt-4">
-                        <TextInput v-model="hblNumber" class="w-full" placeholder="Enter HBL Number" required
-                            type="text" />
-                    </div>
-                </template>
+            <!-- Action Buttons -->
+            <div class="flex justify-end space-x-5 my-6">
+                <Button label="Cancel" severity="danger" variant="outlined" @click="router.visit(route('mhbls.index'))" />
+                <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Create a MHBL" type="submit" />
+            </div>
 
-                <template #footer>
-                    <SecondaryButton @click="closeAddNewHBLModal">
-                        Cancel
-                    </SecondaryButton>
-                    <PrimaryButton class="ms-3" @click.prevent="handleAddNewHBL">
-                        Add HBL
-                    </PrimaryButton>
-                </template>
-            </DialogModal>
-
-            <DialogModal :maxWidth="'xl'" :show="showRemoveHBLDialog" @close="closeRemoveHBLModal">
-                <template #title>
-                    Remove HBL
-                </template>
-
-                <template #content>
-                    <div class="mt-4">
-                        <TextInput v-model="hblNumber" class="w-full" placeholder="Enter HBL Number" required
-                            type="text" />
-                    </div>
-                </template>
+            <!-- Add New HBL Dialog -->
+            <Dialog v-model:visible="showAddNewHBLDialog" modal header="Add New HBL" :style="{ width: '30vw' }">
+                <div class="mt-4">
+                    <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
+                </div>
 
                 <template #footer>
-                    <SecondaryButton @click="closeRemoveHBLModal">
-                        Cancel
-                    </SecondaryButton>
-                    <PrimaryButton class="ms-3 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                        @click.prevent="handleRemoveHBL">
-                        Remove HBL
-                    </PrimaryButton>
+                    <Button label="Cancel" class="p-button-text" @click="closeAddNewHBLModal" />
+                    <Button label="Add HBL" class="p-button-primary ms-3" icon="pi pi-plus" @click.prevent="handleAddNewHBL" />
                 </template>
-            </DialogModal>
+            </Dialog>
+
+            <!-- Remove HBL Dialog -->
+            <Dialog v-model:visible="showRemoveHBLDialog" modal header="Remove HBL" :style="{ width: '30vw' }">
+                <div class="mt-4">
+                    <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
+                </div>
+                <template #footer>
+                    <Button label="Cancel" class="p-button-text" @click="closeRemoveHBLModal" />
+                    <Button label="Remove HBL" class="p-button-danger ms-3" icon="pi pi-trash" @click.prevent="handleRemoveHBL" />
+                </template>
+            </Dialog>
         </form>
     </AppLayout>
 </template>
+
+<style>
+.h-34 {
+height: 8.7rem;
+}
+</style>
