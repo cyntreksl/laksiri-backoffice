@@ -124,8 +124,8 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         usort($data, function ($a, $b) {
             return $a[0] <=> $b[0];
         });
-        $giftCount = count(array_filter($data, fn($item) => strtolower($item[11]) === 'gift'));
-        $upbCount = count(array_filter($data, fn($item) => $item[11] === 'UPB'));
+        $giftCount = count(array_filter($data, fn ($item) => strtolower($item[11]) === 'gift'));
+        $upbCount = count(array_filter($data, fn ($item) => $item[11] === 'UPB'));
 
         $cargoType = strtolower(trim($container->cargo_type));
 
@@ -134,7 +134,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $pdf = PDF::loadView($view, ['data' => $data, 'container' => $container, 'settings' => $settings, 'giftCount' => $giftCount, 'upbCount' => $upbCount]);
         $pdf->setPaper('a4', 'landscape');
 
-        return $pdf->stream($filename);
+        return $pdf->download($filename);
     }
 
     public function updateVerificationStatus(array $data)
