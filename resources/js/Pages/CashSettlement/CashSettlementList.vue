@@ -183,34 +183,42 @@ watch(() => filters.value.global.value, (newValue) => {
 
 watch(() => filters.value.warehouse.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.hbl_type.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.cargo_type.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.is_hold.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.user.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.payments.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => fromDate.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => toDate.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 const onPageChange = (event) => {

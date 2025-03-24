@@ -51,7 +51,6 @@ const currentPage = ref(1);
 const showConfirmViewHBLModal = ref(false);
 const cm = ref();
 const selectedHBL = ref(null);
-const selectedHBLs = ref([]);
 const selectedHBLID = ref(null);
 const confirm = useConfirm();
 const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
@@ -145,7 +144,6 @@ const getCashSettlementSummary = async () => {
                 paymentStatus: filters.value.payments.value,
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
-                type: "cash-settlements",
             }),
         });
 
@@ -174,34 +172,42 @@ watch(() => filters.value.global.value, (newValue) => {
 
 watch(() => filters.value.warehouse.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.hbl_type.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.cargo_type.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.is_hold.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.user.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => filters.value.payments.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => fromDate.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 watch(() => toDate.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
+    getCashSettlementSummary();
 });
 
 const onPageChange = (event) => {
@@ -363,22 +369,6 @@ const closePaymentModal = () => {
     hbl.value = null;
 };
 
-const countOfSelectedData = computed(() => selectedHBLs.value.length);
-
-const valueOfSelectedData = computed(() => {
-    return selectedHBLs.value.reduce((total, item) => {
-        const grandTotal = parseFloat(item.grand_total || 0);
-        return total + grandTotal;
-    }, 0);
-});
-
-const paidValueOfSelectedData = computed(() => {
-    return selectedHBLs.value.reduce((total, item) => {
-        const grandTotal = parseFloat(item.paid_amount || 0);
-        return total + grandTotal;
-    }, 0);
-});
-
 const exportURL = computed(() => {
     const params = new URLSearchParams({
         warehouse: filters.value.warehouse.value,
@@ -420,14 +410,6 @@ const exportURL = computed(() => {
                 bg-color="white"
                 title="HBL Paid Amount"
             />
-
-            <SimpleOverviewWidget :count="countOfSelectedData" bg-color="white" title="Selected HBL Count"/>
-
-            <SimpleOverviewWidget :count="valueOfSelectedData.toFixed(2)" bg-color="white"
-                                  title="Selected HBL Amount"/>
-
-            <SimpleOverviewWidget :count="paidValueOfSelectedData.toFixed(2)" bg-color="white"
-                                  title="Selected HBL Paid Amount"/>
         </div>
 
         <div>
@@ -466,7 +448,6 @@ const exportURL = computed(() => {
                     <DataTable
                         v-model:contextMenuSelection="selectedHBL"
                         v-model:filters="filters"
-                        v-model:selection="selectedHBLs"
                         :globalFilterFields="['reference', 'hbl', 'hbl_name', 'email', 'address', 'contact_number', 'consignee_name', 'consignee_address', 'consignee_contact', 'cargo_type', 'hbl_type', 'warehouse', 'status', 'hbl_number']"
                         :loading="loading"
                         :rows="perPage"
@@ -532,8 +513,6 @@ const exportURL = computed(() => {
                         <template #empty> No due payments found. </template>
 
                         <template #loading> Loading due payments data. Please wait.</template>
-
-                        <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
 
                         <Column field="reference" header="Reference" hidden sortable></Column>
 
