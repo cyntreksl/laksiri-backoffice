@@ -99,7 +99,6 @@ const fetchMHBLs = async (page = 1, search = "", sortField = 'created_at', sortO
                 per_page: perPage.value,
                 search,
                 warehouse: filters.value.warehouse.value || "",
-                hblType: filters.value.hbl_type.value || "",
                 cargoMode: filters.value.cargo_type.value || "",
                 sort_field: sortField,
                 sort_order: sortOrder === 1 ? "asc" : "desc",
