@@ -64,6 +64,7 @@ const props = defineProps({
 });
 
 const errors = ref([]);
+const packageItemVolume = ref(0);
 const measureTypes = ref(['cm', 'm', 'in', 'ft']);
 const confirm = useConfirm();
 const volumeUnit = computed(() => {
@@ -295,6 +296,45 @@ watch(
     [() => packageItem.height],
     ([newHeight]) => {
         packageItemHeight.value = convertMeasurementstocm(packageItem.measure_type, newHeight);
+    }
+);
+
+watch(
+    [
+        () => packageItem.length,
+        () => packageItem.width,
+        () => packageItem.height,
+        () => packageItem.quantity,
+        () => packageItem.measure_type,
+    ],
+    ([newLength, newWidth, newHeight, newQuantity, newMeasureType]) => {
+        // Convert dimensions from cm to meters
+        const lengthMeters = newLength / 100; // 1 cm = 0.01 meters
+        const widthMeters = newWidth / 100;
+        const heightMeters = newHeight / 100;
+
+        // Calculate volume in cubic meters (m³)
+        const volumeCubicMeters =
+            lengthMeters * widthMeters * heightMeters * newQuantity;
+
+
+        // Update reactive properties
+        packageItem.volume = (newLength*newWidth*newHeight*newQuantity).toFixed(3);
+        if (packageItem.measure_type === 'cm') {
+            // Convert cm³ to m³ by dividing by 1,000,000
+            packageItemVolume.value = (packageItem.volume / 1000000).toFixed(3);
+        } else if (packageItem.measure_type === 'in') {
+            // Convert from inches to cubic centimeters (1 inch = 16.387 cm³)
+            packageItemVolume.value = (packageItem.volume * 16.387 / 1000000).toFixed(3);  // Convert to m³
+        } else if (packageItem.measure_type === 'ft') {
+            // Convert from cubic feet to cubic meters (1 ft³ = 0.0283 m³)
+            packageItemVolume.value = (packageItem.volume * 0.0283).toFixed(3);
+        } else {
+            // Assume volume is already in cubic meters if no unit conversion is needed
+            packageItemVolume.value = packageItem.volume;
+        }
+
+        // packageItem.totalWeight = totalWeightKg;
     }
 );
 
@@ -1085,7 +1125,7 @@ const handleCopyFromHBLToConsignee = async () => {
                         <div class="grid grid-cols-2 gap-5 mt-5">
                             <div class="col-span-2">
                                 <IftaLabel>
-                                    <InputNumber v-model="form.freight_charge" :disabled="!isEditable" class="w-full" inputId="freight-charge" min="0" step="any" variant="filled" />
+                                    <InputNumber v-model="form.freight_charge" :disabled="!isEditable" :minFractionDigits="2"  class="w-full" inputId="freight-charge" min="0" step="any" variant="filled" />
                                     <label for="freight-charge">Freight Charge</label>
                                 </IftaLabel>
                                 <InputError :message="form.errors.freight_charge"/>
@@ -1093,7 +1133,7 @@ const handleCopyFromHBLToConsignee = async () => {
 
                             <div class="col-span-2">
                                 <IftaLabel>
-                                    <InputNumber v-model="form.bill_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                    <InputNumber v-model="form.bill_charge" :disabled="!isEditable" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
                                     <label for="bill-charge">Bill Charge</label>
                                 </IftaLabel>
                                 <InputError :message="form.errors.bill_charge"/>
@@ -1101,7 +1141,7 @@ const handleCopyFromHBLToConsignee = async () => {
 
                             <div class="col-span-2">
                                 <IftaLabel>
-                                    <InputNumber v-model="form.destination_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                    <InputNumber v-model="form.destination_charge" :disabled="!isEditable" :minFractionDigits="2"  class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
                                     <label for="bill-charge">Destination Charges</label>
                                 </IftaLabel>
                                 <InputError :message="form.errors.destination_charge"/>
@@ -1109,7 +1149,7 @@ const handleCopyFromHBLToConsignee = async () => {
 
                             <div class="col-span-2">
                                 <IftaLabel>
-                                    <InputNumber v-model="form.package_charges" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                    <InputNumber v-model="form.package_charges" :disabled="!isEditable" :minFractionDigits="2"  class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
                                     <label for="bill-charge">Package Charges</label>
                                 </IftaLabel>
                                 <InputError :message="form.errors.package_charges"/>
@@ -1117,7 +1157,7 @@ const handleCopyFromHBLToConsignee = async () => {
 
                             <div class="col-span-2">
                                 <IftaLabel>
-                                    <InputNumber v-model="form.discount" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                    <InputNumber v-model="form.discount" :disabled="!isEditable" :minFractionDigits="2"  class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
                                     <label for="bill-charge">Discount</label>
                                 </IftaLabel>
                                 <InputError :message="form.errors.discount"/>
@@ -1125,7 +1165,7 @@ const handleCopyFromHBLToConsignee = async () => {
 
                             <div class="col-span-2">
                                 <IftaLabel>
-                                    <InputNumber v-model="form.additional_charge" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                    <InputNumber v-model="form.additional_charge" :disabled="!isEditable" :minFractionDigits="2"  class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
                                     <label for="bill-charge">Additional Charges</label>
                                 </IftaLabel>
                                 <InputError :message="form.errors.additional_charge"/>
@@ -1133,7 +1173,7 @@ const handleCopyFromHBLToConsignee = async () => {
 
                             <div class="col-span-2">
                                 <IftaLabel>
-                                    <InputNumber v-model="form.paid_amount" :disabled="!isEditable" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                    <InputNumber v-model="form.paid_amount" :disabled="!isEditable" :minFractionDigits="2"  class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
                                     <label for="bill-charge">Paid Amount</label>
                                 </IftaLabel>
                                 <InputError :message="form.errors.paid_amount"/>
