@@ -1,8 +1,8 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {router, useForm, usePage} from "@inertiajs/vue3";
+import { router, useForm, usePage } from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {computed, reactive, ref, watch} from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
@@ -11,12 +11,30 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
-import {push} from "notivue";
+import { push } from "notivue";
 import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-import {float} from "quill/ui/icons.js";
-import {forEach} from "vuedraggable/dist/vuedraggable.common.js";
+import { float } from "quill/ui/icons.js";
+import { forEach } from "vuedraggable/dist/vuedraggable.common.js";
+import Card from 'primevue/card';
+import Fieldset from 'primevue/fieldset';
+import InputText from 'primevue/inputtext';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+import Select from 'primevue/select';
+// import Checkbox from 'primevue/checkbox';
+import Textarea from 'primevue/textarea';
+import SelectButton from 'primevue/selectbutton';
+import Button from 'primevue/button';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import InputNumber from 'primevue/inputnumber';
+import IftaLabel from 'primevue/iftalabel';
+import Dialog from 'primevue/dialog';
+import Message from 'primevue/message';
+import Dropdown from 'primevue/dropdown';
+import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
     hblTypes: {
@@ -209,7 +227,7 @@ watch(
 
 const handleMHBLUpdate = () => {
     form.packages = packageList.value;
-    if(form.packages.length > 0){
+    if (form.packages.length > 0) {
         form.put(route("mhbls.update", props.mhbl.id), {
             onSuccess: (page) => {
                 form.reset();
@@ -219,7 +237,7 @@ const handleMHBLUpdate = () => {
             preserveScroll: true,
             preserveState: true,
         });
-    }else push.error("Please select HBLs!");
+    } else push.error("Please select HBLs!");
 
 };
 
@@ -246,10 +264,10 @@ const closeRemoveHBLModal = () => {
 }
 
 const handleAddNewHBL = async () => {
-    if(!hblNumber.value){
+    if (!hblNumber.value) {
         closeAddNewHBLModal();
         push.error('Please enter HBL Number!')
-    }else{
+    } else {
         const response = await fetch(`/mhbls/add-hbl`, {
             method: "POST",
             headers: {
@@ -265,15 +283,15 @@ const handleAddNewHBL = async () => {
         } else {
             const data = await response.json();
 
-            if(data.mhbl){
+            if (data.mhbl) {
                 closeAddNewHBLModal();
                 push.error("HBL already added to a MHBL.");
             }
 
-            if(data.cargo_type !== form.cargo_type || data.hbl_type !== 'Door to Door' || data.warehouse === form.warehouse){
+            if (data.cargo_type !== form.cargo_type || data.hbl_type !== 'Door to Door' || data.warehouse === form.warehouse) {
                 closeAddNewHBLModal();
                 push.error("Selected HBL is not maching to  Primary Details");
-            }else{
+            } else {
                 for (const hblPackage of data.packages) {
                     const packageItem = {
                         hbl: data.hbl_number,
@@ -290,7 +308,7 @@ const handleAddNewHBL = async () => {
                         measure_type: hblPackage.measure_type,
                     };
 
-                    const newItem = {...packageItem};
+                    const newItem = { ...packageItem };
                     packageList.value.push(newItem);
                     form.grand_weight = form.grand_weight + packageItem.weight;
                     form.grand_volume = form.grand_volume + packageItem.volume;
@@ -305,10 +323,10 @@ const handleAddNewHBL = async () => {
 }
 
 const handleRemoveHBL = async () => {
-    if(!hblNumber.value){
+    if (!hblNumber.value) {
         closeRemoveHBLModal();
         push.error('Please enter HBL Number!')
-    }else{
+    } else {
         const selectedPackages = packageList.value.filter(pkg => pkg.hbl === hblNumber.value);
         form.grand_weight = form.grand_weight - selectedPackages.reduce((sum, pkg) => sum + pkg.weight, 0);
         form.grand_volume = form.grand_volume - selectedPackages.reduce((sum, pkg) => sum + pkg.volume, 0);
@@ -332,646 +350,267 @@ const resetConsigneeDetails = () => {
 
 const copiedPackages = ref({});
 
-const planeIcon = ref(`
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  class="icon icon-tabler icons-tabler-outline icon-tabler-plane"
->
-  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-  <path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" />
-</svg>
-`);
-
-const shipIcon = ref(`
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  class="icon icon-tabler icons-tabler-outline icon-tabler-ship"
->
-  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-  <path d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1" />
-  <path d="M4 18l-1 -5h18l-2 4" />
-  <path d="M5 13v-6h8l4 6" />
-  <path d="M7 7v-4h-1" />
-</svg>
-`);
-
 </script>
 
 <template>
-    <AppLayout title="HBL Create">
-        <template #header>HBL - Create</template>
+    <AppLayout title="MHBL - Edit">
+        <template #header>MHBL - Edit</template>
 
         <!-- Breadcrumb -->
-        <Breadcrumb/>
+        <Breadcrumb />
 
         <!-- Create Pickup Form -->
         <form @submit.prevent="handleMHBLUpdate">
             <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
                 <div class="sm:col-span-2 grid grid-rows gap-4">
-
-                    <div class="card px-4 py-4 sm:px-5">
-                        <!-- Primary Details -->
-                        <div>
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Primary Details
-                            </h2>
-                        </div>
-
-                        <!-- Cargo Type Section -->
-                        <div class="mt-5">
-                            <h2 class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                                Cargo Type <span class="text-xs text-gray-400">(Automatically Selected)</span>
-                            </h2>
-                        </div>
-                        <div  class="my-5">
-                            <div class="space-x-5">
-                                <label
-                                    v-for="cargoType in cargoTypes"
-                                    class="inline-flex items-center space-x-2"
-                                >
-                                    <input
-                                        v-model="form.cargo_type"
-                                        :value="cargoType"
-                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        name="cargo_type"
-                                        type="radio"
-                                        disabled
-                                    />
-                                    <p>{{ cargoType }}</p>
-                                    <span v-if="cargoType == 'Sea Cargo'">
-                    <div v-html="shipIcon"></div>
-                  </span>
-                                    <span v-if="cargoType == 'Air Cargo'">
-                    <div v-html="planeIcon"></div>
-                  </span>
-                                </label>
+                    <card>
+                        <template #title>Primary Details</template>
+                        <template #content>
+                            <Fieldset legend="Cargo Type (Automatically Selected)">
+                                <SelectButton disabled v-model="form.cargo_type" :options="cargoTypes"
+                                    name="Cargo Type">
+                                    <template #option="slotProps">
+                                        <div class="flex items-center">
+                                            <i v-if="slotProps.option === 'Sea Cargo'" class="ti ti-ship mr-2"></i>
+                                            <i v-else class="ti ti-plane mr-2"></i>
+                                            <span>{{ slotProps.option }}</span>
+                                        </div>
+                                    </template>
+                                </SelectButton>
+                                <InputError :message="form.errors.cargo_type" />
+                            </Fieldset>
+                            <Fieldset legend="Warehouse (Automatically Selected)">
+                                <SelectButton disabled v-model="form.warehouse" :options="warehouses" name="HBL Type"
+                                    option-label="name" option-value="name" @change="updateWarehouseId" />
+                                <InputError :message="form.errors.warehouse" />
+                            </Fieldset>
+                            <div class="flex justify-center mt-36">
+                                <img :src="hblImage" alt="hbl-image" class="w-3/4">
                             </div>
-                            <InputError :message="form.errors.cargo_type"/>
-                        </div>
+                        </template>
+                    </card>
 
-                        <hr class="my-4 border-t border-slate-200 dark:border-navy-600">
-
-                        <!-- Type -->
-                        <div hidden="true">
-                            <h2
-                                class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-0"
-                            >
-                                Type <span class="text-xs text-gray-400">(Automatically Selected)</span>
-                            </h2>
-                        </div>
-                        <div hidden="true" class="my-5">
-                            <div class="space-x-5">
-                                <label
-                                    v-for="hblType in hblTypes"
-                                    class="inline-flex items-center space-x-2"
-                                >
-                                    <input
-                                        v-model="form.hbl_type"
-                                        :value="hblType"
-                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        name="hbl_type"
-                                        type="radio"
-                                        disabled
-                                    />
-                                    <p>{{ hblType }}</p>
-                                </label>
+                </div>
+                <div class="sm:col-span-2">
+                    <card>
+                        <template #title>
+                            <div class="flex justify-between items-center">
+                                <span>Shipper Details</span>
                             </div>
-                            <InputError :message="form.errors.hbl_type"/>
-                        </div>
-
-                        <hr hidden="true" class="my-4 border-t border-slate-200 dark:border-navy-600">
-
-                        <!-- Warehouse -->
-                        <div>
-                            <h2
-                                class="text-sm font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-0"
-                            >
-                                Warehouse <span class="text-xs text-gray-400">(Automatically Selected)</span>
-                            </h2>
-                        </div>
-                        <div class="my-5">
-                            <div class="space-x-5">
-                                <label
-                                    v-for="warehouse in warehouses"
-                                    :key="warehouse.id"
-                                    class="inline-flex items-center space-x-2"
-                                >
-                                    <input
-                                        v-model="form.warehouse"
-                                        :value="warehouse.name"
-                                        class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-                                        name="warehouse"
-                                        type="radio"
-                                        disabled
-                                        @change="form.warehouse_id = warehouse.id"
-                                    />
-                                    <p>{{ warehouse.name }}</p>
-                                </label>
+                        </template>
+                        <template #content>
+                            <div class="grid grid-cols-3 gap-5 mt-3">
+                                <div class="col-span-3">
+                                    <InputLabel value="Name" />
+                                    <Dropdown v-model="form.hbl_name" :options="shippers" optionLabel="name"
+                                        optionValue="name" placeholder="Select shipper" class="w-full mt-1.5"
+                                        :disabled="true"
+                                        inputClass="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" />
+                                    <InputError :message="form.errors.hbl_name" />
+                                </div>
+                                <div class="col-span-3">
+                                    <InputLabel value="Email" />
+                                    <IconField>
+                                        <InputField>
+                                            <InputIcon class="pi pi-envelope" />
+                                            <InputText v-model="form.email" class="w-full" placeholder="Email"
+                                                type="email" :disabled="true" />
+                                        </InputField>
+                                        <InputError :message="form.errors.email" />
+                                    </IconField>
+                                </div>
+                                <div class="col-span-3">
+                                    <InputLabel value="Mobile Number" />
+                                    <div class="flex flex-row">
+                                        <Select v-model="countryCode" :options="countryCodes"
+                                            class="w-25 !rounded-r-none !border-r-0" filter
+                                            placeholder="Select a Country Code" :disabled="true" />
+                                        <InputText v-model="contactNumber" class="!rounded-l-none w-full"
+                                            placeholder="123 4567 890" :disabled="true" />
+                                    </div>
+                                    <InputError :message="form.errors.contact_number" class="col-span-1" />
+                                </div>
+                                <div class="col-span-3">
+                                    <InputLabel value="PP or NIC No" />
+                                    <IconField>
+                                        <InputIcon class="pi pi-tag" />
+                                        <InputText v-model="form.nic" class="w-full" placeholder="PP or NIC No"
+                                            :disabled="true" />
+                                    </IconField>
+                                    <InputError :message="form.errors.nic" />
+                                </div>
+                                <div class="col-span-3">
+                                    <InputLabel value="Residency No" />
+                                    <IconField>
+                                        <InputIcon class="pi pi-home" />
+                                        <InputText v-model="form.iq_number" class="w-full" placeholder="Residency No"
+                                            :disabled="true" />
+                                    </IconField>
+                                    <InputError :message="form.errors.iq_number" />
+                                </div>
+                                <div class="col-span-3">
+                                    <InputLabel value="Address" />
+                                    <Textarea v-model="form.address" class="w-full" cols="30"
+                                        placeholder="Type address here..." rows="5" :disabled="true" />
+                                    <InputError :message="form.errors.address" />
+                                </div>
+                                <br>
                             </div>
-                            <InputError :message="form.errors.warehouse"/>
-                        </div>
-
-                        <div class="flex justify-center">
-                            <img :src="hblImage" class="mx-auto" style="width: 50%;">
-                        </div>
-
-                    </div>
+                        </template>
+                    </card>
                 </div>
 
                 <div class="sm:col-span-2">
-                    <div class="card px-4 py-4 sm:px-5">
-                        <div class="flex justify-between items-center">
+                    <Card>
+                        <template #title>
                             <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Shipper Details
-                            </h2>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <span>Name</span>
-                                <select
-                                    v-model="form.hbl_name"
-                                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                >
-                                    <option :value="null" disabled>Select shipper</option>
-                                    <option
-                                        v-for="shipper in shippers"
-                                        :key="shipper"
-                                        :value="shipper.name"
-                                    >
-                                        {{ shipper.name }}
-                                    </option>
-                                </select>
-                                <InputError :message="form.errors.hbl_name"/>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <span>Email</span>
-                                <label class="relative flex">
-                                    <input
-                                        disabled
-                                        v-model="form.email"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Email"
-                                        type="email"
-                                    />
-                                    <div
-                                        class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-                                    >
-                                        <svg
-                                            class="size-4.5 transition-colors duration-200"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                            />
-                                        </svg>
-                                    </div>
-                                </label>
-                                <InputError :message="form.errors.email"/>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <span>Mobile Number</span>
-                                <div class="flex -space-x-px">
-                                    <select
-                                        disabled
-                                        v-model="countryCode"
-                                        class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    >
-                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                            {{ countryCode }}
-                                        </option>
-                                    </select>
-
-                                    <input
-                                        disabled
-                                        v-model="contactNumber"
-                                        class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                        placeholder="123 4567 890"
-                                        type="text"
-                                    />
-                                </div>
-                                <InputError :message="form.errors.contact_number"/>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <span>PP or NIC No</span>
-                                <label class="relative flex">
-                                    <input
-                                        disabled
-                                        v-model="form.nic"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="PP or NIC No"
-                                        type="text"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.nic"/>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <span>Residency No</span>
-                                <label class="relative flex">
-                                    <input
-                                        disabled
-                                        v-model="form.iq_number"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Residency No"
-                                        type="text"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.iq_number"/>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-5 mt-3">
-                            <div class="col-span-3">
-                                <span>Address</span>
-                                <label class="block">
-                  <textarea
-                      disabled
-                      v-model="form.address"
-                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                      placeholder="Type address here..."
-                      rows="4"
-                  ></textarea>
-                                </label>
-                                <InputError :message="form.errors.address"/>
-                            </div>
-                        </div>
-                        <div v-if="form.hbl_type === 'Door to Door'" class="col-span-2">
-                            <Checkbox
-                                v-model="isChecked"
-                                @change="addToConsigneeDetails"
-                            ></Checkbox>
-
-                            <span class="ml-5">Same as Consignee Details</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="sm:col-span-2 grid grid-rows">
-                    <div class="card px-4 sm:px-5 p-4">
-                        <div class="flex justify-between items-center">
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
+                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
                                 Consignee Details
                             </h2>
-
-                            <div class="flex space-x-1">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-5 mt-3">
-                            <div class="col-span-2">
-                                <span>Name</span>
-                                <select
-                                    v-model="form.consignee_name"
-                                    class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                >
-                                    <option :value="null" disabled>Select shipper</option>
-                                    <option
-                                        v-for="consignee in consignees"
-                                        :key="consignee"
-                                        :value="consignee.name"
-                                    >
-                                        {{ consignee.name }}
-                                    </option>
-                                </select>
-                                <InputError :message="form.errors.consignee_name"/>
-                            </div>
-
-                            <div class="col-span-2">
-                                <span>PP or NIC No</span>
-                                <label class="relative flex">
-                                    <input
-                                        disabled
-                                        v-model="form.consignee_nic"
-                                        class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="PP or NIC No"
-                                        type="text"
-                                    />
-                                </label>
-                                <InputError :message="form.errors.consignee_nic"/>
-                            </div>
-
-                            <div class="col-span-2">
-                                <span>Mobile Number</span>
-                                <div class="flex -space-x-px">
-                                    <select
-                                        disabled
-                                        v-model="consignee_countryCode"
-                                        class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    >
-                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                            {{ countryCode }}
-                                        </option>
-                                    </select>
-
-                                    <input
-                                        disabled
-                                        v-model="consignee_contact"
-                                        class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                        placeholder="123 4567 890"
-                                        type="text"
-                                    />
+                        </template>
+                        <template #content>
+                            <div class="grid grid-cols-3 gap-5 mt-3">
+                                <div class="col-span-3">
+                                    <InputLabel value="Name" />
+                                    <Dropdown v-model="form.consignee_name" :options="consignees" optionLabel="name"
+                                        optionValue="name" placeholder="Select consignee" class="w-full mt-1.5"
+                                        :disabled="true"
+                                        inputClass="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" />
+                                    <InputError :message="form.errors.consignee_name" />
                                 </div>
-                                <InputError :message="form.errors.consignee_contact"/>
+                                <div class="col-span-3">
+                                    <InputLabel value="PP or NIC No" />
+                                    <IconField>
+                                        <InputIcon class="pi pi-tag" />
+                                        <InputText v-model="form.consignee_nic" class="w-full" placeholder="PP or NIC No"
+                                                   :disabled="true" />
+                                    </IconField>
+                                    <InputError :message="form.errors.consignee_nic" />
+                                </div>
+                                <div class="col-span-3">
+                                    <InputLabel value="Mobile Number" />
+                                    <div class="flex flex-row">
+                                        <Select v-model="consignee_countryCode" :options="countryCodes"
+                                                class="w-25 !rounded-r-none !border-r-0" filter
+                                                placeholder="Select a Country Code" :disabled="true" />
+                                        <InputText v-model="consignee_contact" class="!rounded-l-none w-full"
+                                                   placeholder="123 4567 890" :disabled="true" />
+                                    </div>
+                                    <InputError :message="form.errors.consignee_contact" class="col-span-1" />
+                                </div>
+                                <div class="col-span-3">
+                                    <InputLabel value="Address" />
+                                    <Textarea v-model="form.consignee_address" class="w-full" cols="30"
+                                              placeholder="Type address here..." rows="5" :disabled="true" />
+                                    <InputError :message="form.errors.consignee_address" />
+                                </div>
+                                <br> <br> <br> <br>  <br>  <br>  <br>  <br>  <br>
                             </div>
-
-                            <div class="col-span-2">
-                                <span>Address</span>
-                                <label class="block">
-                                  <textarea
-                                      disabled
-                                      v-model="form.consignee_address"
-                                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                      placeholder="Type address here..."
-                                      rows="4"
-                                  ></textarea>
-                                </label>
-                                <InputError :message="form.errors.consignee_address"/>
-                            </div>
-
-                            <div hidden="true" class="col-span-2">
-                                <span>Note</span>
-                                <label class="block">
-                                  <textarea
-                                      v-model="form.consignee_note"
-                                      class="form-textarea w-full resize-none rounded-lg border border-slate-300 bg-transparent p-2.5 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                      placeholder="Type note here..."
-                                      rows="2"
-                                  ></textarea>
-                                </label>
-                                <InputError :message="form.errors.consignee_note"/>
-                            </div>
-                        </div>
-                    </div>
+                        </template>
+                    </Card>
                 </div>
-
             </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
-                <div class="sm:col-span-4">
-                    <div class="card p-1" style="height: 100%">
-                        <div class="mt-4 flex justify-between items-center">
-                            <div class="flex items-center space-x-2">
-                                <h2
-                                    class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                                >
+                <div class="sm:col-span-4  ">
+                    <Card>
+                        <template #content>
+                            <!-- Header Section -->
+                            <div class="mt-4 flex justify-between items-center ">
+                                <h2 class="text-lg font-medium tracking-wide text-slate-700 dark:text-navy-100">
                                     Package Details
                                 </h2>
-                            </div>
-                            <div>
-                                <PrimaryOutlineButton class="mr-5" type="button"
-                                                      @click="showAddHBLModal">
-                                    New HBL <i class="fas fa-plus fa-fw fa-fw"></i>
-                                </PrimaryOutlineButton>
-                                <PrimaryOutlineButton class="border-red-500 text-red-500 hover:bg-red-500 hover:text-white" type="button" @click="showRemoveHBLModal">
-                                    Remove HBL
-                                </PrimaryOutlineButton>
-                            </div>
-                        </div>
-
-                        <div class="mt-5">
-                            <div
-                                v-if="packageList.length > 0"
-                                class="is-scrollbar-hidden min-w-full overflow-x-auto"
-                            >
-                                <table class="is-zebra w-full text-left">
-                                    <thead>
-                                    <tr>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            HBL
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Type
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Length (CM)
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Width
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Height
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Quantity
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Weight
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Volume (M.CU)
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Remark
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr v-for="(item, index) in packageList">
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.hbl}}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.type }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.length.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.width.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.height.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.quantity }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.weight.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.volume }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.remarks }}
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div
-                                v-if="Object.keys(copiedPackages).length > 0"
-                                class="is-scrollbar-hidden min-w-full overflow-x-auto"
-                            >
-                                <table class="is-zebra w-full text-left">
-                                    <thead>
-                                    <tr>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Type
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Length (CM)
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Width
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Height
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Quantity
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Weight
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Volume (M.CU)
-                                        </th>
-                                        <th
-                                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                        >
-                                            Remark
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr v-for="(item, index) in copiedPackages">
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.package_type }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.length }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.width }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.height }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.quantity }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.weight.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.volume.toFixed(3) }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.remarks }}
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div v-if="packageList.length === 0 && Object.values(copiedPackages).length === 0"
-                                 class="text-center">
-                                <div class="text-center mb-8">
-                                    <svg
-                                        class="w-24 h-24 mx-auto mb-4 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M12 9l-2 2-2-2m4 2h4a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2h4m4-2l2 2 2-2"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                        ></path>
-                                    </svg>
-                                    <p class="text-gray-600">
-                                        No packages. Please add packages to view data.
-                                    </p>
+                                <div class="flex space-x-3 gap-5 ">
+                                    <Button label="New HBL" icon="pi pi-plus" class="p-button-outlined "
+                                        @click="showAddHBLModal" />
+                                    <Button label="Remove HBL" icon="pi pi-trash" class="p-button-danger"
+                                        @click="showRemoveHBLModal" />
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                            <br>
+                            <!-- Packages Table -->
+                            <DataTable v-if="packageList.length > 0" :value="packageList" stripedRows removableSort
+                                       class="min-w-50rem border-radius-10 overflow-hidden">
+                                <Column field="hbl" header="HBL"/>
+                                <Column field="type" header="Type"/>
+                                <Column field="length" header="Length (CM)">
+                                    <template #body="{ data }">
+                                        {{ Number(data.length).toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="width" header="Width (CM)">
+                                    <template #body="{ data }">
+                                        {{ Number(data.width).toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="height" header="Height (CM)">
+                                    <template #body="{ data }">
+                                        {{ Number(data.height).toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="quantity" header="Quantity"/>
+                                <Column field="weight" header="Weight (KG)">
+                                    <template #body="{ data }">
+                                        {{ Number(data.weight).toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="volume" header="Volume (M³)"/>
+                                <Column field="remarks" header="Remarks"/>
+                            </DataTable>
 
+                            <!-- Copied Packages Table -->
+                            <DataTable v-else-if="Object.keys(copiedPackages).length > 0"
+                                       :value="Object.values(copiedPackages)" stripedRows removableSort
+                                       class="min-w-50rem border-radius-10 overflow-hidden">
+                                <Column field="package_type" header="Type"/>
+                                <Column field="length" header="Length (CM)">
+                                    <template #body="{ data }">
+                                        {{ Number(data.length).toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="width" header="Width (CM)">
+                                    <template #body="{ data }">
+                                        {{ Number(data.width).toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="height" header="Height (CM)">
+                                    <template #body="{ data }">
+                                        {{ Number(data.height).toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="quantity" header="Quantity"/>
+                                <Column field="weight" header="Weight (KG)">
+                                    <template #body="{ data }">
+                                        {{ Number(data.weight).toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="volume" header="Volume (M³)">
+                                    <template #body="{ data }">
+                                        {{ Number(data.volume).toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column field="remarks" header="Remarks"/>
+                            </DataTable>
+
+                            <!-- Empty State -->
+                            <div v-else class="flex flex-col items-center mt-6 mb-6">
+                                <i class="pi pi-box text-7xl text-gray-400 mb-4"></i>
+                                <p class="text-gray-600">No packages. Please add packages to view data.</p>
+                            </div>
+                        </template>
+                    </Card>
                 </div>
 
-                <div class="sm:col-span-2 grid-cols-2 grid gap-4 space-y-5">
-                    <!-- Price & Payment -->
-                    <div class="sm:col-span-2 space-y-5">
-                        <div class="card px-4 sm:px-5 p-5">
-                            <div class="flex justify-between items-center">
-                                <h2
-                                    class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                                >
+                <div class="sm:col-span-2 grid grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <Card class="p-4 sm:p-5">
+                            <template #title>
+                                <h2 class="text-lg font-medium tracking-wide text-slate-700 dark:text-navy-100">
                                     MHBL Summary
                                 </h2>
-                            </div>
-                            <div class="mt-5">
-                                <div class="col-start-2 mt-5 space-y-2.5 font-bold">
+                            </template>
+                            <template #content>
+                                <div class="mt-5 space-y-2.5 font-bold">
                                     <div class="flex justify-between">
                                         <p class="line-clamp-1">Packages</p>
                                         <p class="text-slate-700 dark:text-navy-100">
@@ -981,20 +620,21 @@ const shipIcon = ref(`
                                     <div class="flex justify-between">
                                         <p class="line-clamp-1">Weight</p>
                                         <p class="text-slate-700 dark:text-navy-100">
-                                            {{ form.grand_weight.toFixed(2) }}
+                                            {{ form.grand_weight ? form.grand_weight.toFixed(2) : '0.00' }}
                                         </p>
                                     </div>
-                                    <div class="flex justify-between mb-20">
+                                    <div class="flex justify-between mb-4">
                                         <p class="line-clamp-1">Volume</p>
                                         <p class="text-slate-700 dark:text-navy-100">
-                                            {{ form.grand_volume.toFixed(2) }}
+                                            {{ form.grand_volume ? form.grand_volume.toFixed(2) : '0.00' }}
                                         </p>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </template>
+                        </Card>
                     </div>
                 </div>
+
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-6 my-6 gap-4">
                 <!-- Empty grid columns for spacing -->
@@ -1005,45 +645,26 @@ const shipIcon = ref(`
                     <DangerOutlineButton @click="router.visit(route('mhbls.index'))">
                         Cancel
                     </DangerOutlineButton>
-                    <PrimaryButton
-                        :class="{ 'opacity-50': form.processing }"
-                        :disabled="form.processing"
-                        class="space-x-2"
-                        type="submit"
-                    >
+                    <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
+                        class="space-x-2" type="submit">
                         <span>Update MHBL</span>
-                        <svg
-                            class="size-5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
+                        <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" stroke-linecap="round"
+                                stroke-linejoin="round" />
                         </svg>
                     </PrimaryButton>
                 </div>
             </div>
-            <DialogModal :maxWidth="'xl'" :show="showAddNewHBLDialog"
-                         @close="closeAddNewHBLModal">
+            <DialogModal :maxWidth="'xl'" :show="showAddNewHBLDialog" @close="closeAddNewHBLModal">
                 <template #title>
                     Add New HBL
                 </template>
 
                 <template #content>
                     <div class="mt-4">
-                        <TextInput
-                            v-model="hblNumber"
-                            class="w-full"
-                            placeholder="Enter HBL Number"
-                            required
-                            type="text"
-                        />
+                        <TextInput v-model="hblNumber" class="w-full" placeholder="Enter HBL Number" required
+                            type="text" />
                     </div>
                 </template>
 
@@ -1051,30 +672,21 @@ const shipIcon = ref(`
                     <SecondaryButton @click="closeAddNewHBLModal">
                         Cancel
                     </SecondaryButton>
-                    <PrimaryButton
-                        class="ms-3"
-                        @click.prevent="handleAddNewHBL"
-                    >
+                    <PrimaryButton class="ms-3" @click.prevent="handleAddNewHBL">
                         Add HBL
                     </PrimaryButton>
                 </template>
             </DialogModal>
 
-            <DialogModal :maxWidth="'xl'" :show="showRemoveHBLDialog"
-                         @close="closeRemoveHBLModal">
+            <DialogModal :maxWidth="'xl'" :show="showRemoveHBLDialog" @close="closeRemoveHBLModal">
                 <template #title>
                     Remove HBL
                 </template>
 
                 <template #content>
                     <div class="mt-4">
-                        <TextInput
-                            v-model="hblNumber"
-                            class="w-full"
-                            placeholder="Enter HBL Number"
-                            required
-                            type="text"
-                        />
+                        <TextInput v-model="hblNumber" class="w-full" placeholder="Enter HBL Number" required
+                            type="text" />
                     </div>
                 </template>
 
@@ -1082,10 +694,8 @@ const shipIcon = ref(`
                     <SecondaryButton @click="closeRemoveHBLModal">
                         Cancel
                     </SecondaryButton>
-                    <PrimaryButton
-                        class="ms-3 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                        @click.prevent="handleRemoveHBL"
-                    >
+                    <PrimaryButton class="ms-3 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                        @click.prevent="handleRemoveHBL">
                         Remove HBL
                     </PrimaryButton>
                 </template>
