@@ -381,7 +381,7 @@ const exportURL = computed(() => {
         toDate: moment(toDate.value).format("YYYY-MM-DD"),
     }).toString();
 
-    return `/cash-settlements/export?${params}`;
+    return `/cash-settlements/due-payment/export?${params}`;
 });
 </script>
 <template>

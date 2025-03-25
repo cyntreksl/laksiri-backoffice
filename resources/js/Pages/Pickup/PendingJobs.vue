@@ -83,12 +83,6 @@ const menuModel = ref([
         disabled: !usePage().props.user.permissions.includes('pickups.edit'),
     },
     {
-        label: 'Retry',
-        icon: 'pi pi-fw pi-refresh',
-        command: () => confirmPickupRetry(selectedPickup),
-        disabled: !usePage().props.user.permissions.includes('pickups.retry'),
-    },
-    {
         label: 'Delete',
         icon: 'pi pi-fw pi-times',
         command: () => confirmPickupDelete(selectedPickup),

@@ -7,6 +7,7 @@ use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\UpdateHBLSystemStatus;
 use App\Events\PickupCollected;
 use App\Exports\CashSettlementsExport;
+use App\Exports\DuePaymentExport;
 use App\Factory\CashSettlement\FilterFactory;
 use App\Http\Resources\CashSettlementCollection;
 use App\Interfaces\CashSettlementInterface;
@@ -24,6 +25,31 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         $query = HBL::query();
 
         $query->cashSettlement()->whereHas('packages');
+
+        if (! empty($search)) {
+            $query->where('hbl_number', 'like', "%$search%");
+        }
+
+        FilterFactory::apply($query, $filters);
+
+        $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
+
+        return response()->json([
+            'data' => CashSettlementCollection::collection($records),
+            'meta' => [
+                'total' => $records->total(),
+                'current_page' => $records->currentPage(),
+                'perPage' => $records->perPage(),
+                'lastPage' => $records->lastPage(),
+            ],
+        ]);
+    }
+
+    public function duePaymentDataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        $query = HBL::query();
+
+        $query->duePayment()->whereHas('packages');
 
         if (! empty($search)) {
             $query->where('hbl_number', 'like', "%$search%");
@@ -93,5 +119,10 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
     public function export(array $filters)
     {
         return Excel::download(new CashSettlementsExport($filters), 'cash-settlements.xlsx');
+    }
+
+    public function duePaymentExport(array $filters)
+    {
+        return Excel::download(new DuePaymentExport($filters), 'due-payment.xlsx');
     }
 }

@@ -85,7 +85,8 @@ const menuModel = ref([
         label: 'Retry',
         icon: 'pi pi-fw pi-refresh',
         command: () => confirmPickupRetry(selectedPickup),
-        disabled: !usePage().props.user.permissions.includes('pickups.retry'),
+        disabled: () => (selectedPickup.value.exception_note === '-') ||
+            (!usePage().props.user.permissions.includes('pickups.retry'))
     },
     {
         label: 'Delete',
@@ -543,6 +544,12 @@ const confirmPickupRetry = (pickup) => {
                                 <div v-else>
                                     {{ slotProps.data.packages || '-' }}
                                 </div>
+                            </template>
+                        </Column>
+
+                        <Column field="exception_note" header="Exception">
+                            <template #body="slotProps">
+                                <div>{{ slotProps.data.exception_note }}</div>
                             </template>
                         </Column>
 
