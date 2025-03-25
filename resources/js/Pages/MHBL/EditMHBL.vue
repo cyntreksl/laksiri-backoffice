@@ -282,10 +282,11 @@ const handleAddNewHBL = async () => {
             throw new Error('Network response was not ok.');
         } else {
             const data = await response.json();
-
-            if (data.mhbl) {
+            if (data.hbl_number === hblNumber.value) {
                 closeAddNewHBLModal();
-                push.error("HBL already added to a MHBL.");
+            } else {
+                closeAddNewHBLModal();
+                push.error("HBL Not Found!");
             }
 
             if (data.cargo_type !== form.cargo_type || data.hbl_type !== 'Door to Door' || data.warehouse === form.warehouse) {
@@ -321,7 +322,6 @@ const handleAddNewHBL = async () => {
         }
     }
 }
-
 const handleRemoveHBL = async () => {
     if (!hblNumber.value) {
         closeRemoveHBLModal();
