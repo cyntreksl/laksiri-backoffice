@@ -1332,7 +1332,8 @@ const reviewContainer = () => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }}
+                                                                        {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }} -
+                                                                        {{ index+1 }} / {{Object.keys(hbl.packages).length}}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -1522,7 +1523,7 @@ const reviewContainer = () => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ hbl.hbl_number }}
+                                                                        {{ hbl.hbl_number }} - {{index+1}} / {{hbl.packages.length}}
                                                                     </p>
                                                                 </div>
                                                             </div>
