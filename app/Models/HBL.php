@@ -188,7 +188,7 @@ class HBL extends Model
 
     public function pickup(): BelongsTo
     {
-        return $this->belongsTo(Pickup::class);
+        return $this->belongsTo(PickUp::class);
     }
 
     public function shipper(): BelongsTo
