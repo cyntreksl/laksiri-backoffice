@@ -22,7 +22,7 @@ class CashSettlementCollection extends JsonResource
             'hbl' => $this->hbl_number ?? $this->reference,
             'hbl_name' => $this->hbl_name ?? '-',
             'address' => $this->address ?? '-',
-            'picked_date' => $this->pickup ? $this->pickup->pickup_date : '-',
+            'picked_date' => $this->pickup && $this->pickup->pickup_date ? $this->pickup->pickup_date : '-',
             'weight' => $totalWeight ?? '-',
             'volume' => $totalVolume ?? '-',
             'grand_total' => $this->grand_total ?? '-',
