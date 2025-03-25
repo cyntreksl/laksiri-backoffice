@@ -1288,27 +1288,9 @@ const handleCopyFromHBLToConsignee = async () => {
 
             <!-- Action Buttons -->
             <div class="flex justify-end space-x-5 col-span-2">
-                <DangerOutlineButton @click="router.visit(route('hbls.index'))"
-                >Cancel
-                </DangerOutlineButton
-                >
-                <PrimaryButton class="space-x-2" type="submit">
-                    <span>Update HBL</span>
-                    <svg
-                        class="size-5"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                    </svg>
-                </PrimaryButton>
+                <Button label="Cancel" severity="danger" variant="outlined"  @click="router.visit(route('hbls.index'))" />
+
+                <Button :class="{ 'opacity-50': form.processing }" icon="pi pi-arrow-right" iconPos="right" label="Update HBL" type="submit" />
             </div>
         </div>
 
