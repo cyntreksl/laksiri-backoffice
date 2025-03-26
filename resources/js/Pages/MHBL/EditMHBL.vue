@@ -266,62 +266,86 @@ const closeRemoveHBLModal = () => {
 const handleAddNewHBL = async () => {
     if (!hblNumber.value) {
         closeAddNewHBLModal();
-        push.error('Please enter HBL Number!')
-    } else {
+        push.error('Please enter HBL Number!');
+        return;
+    }
+
+    // Check if HBL already exists in the form
+    if (form.hbls.includes(hblNumber.value)) {
+        closeAddNewHBLModal();
+        push.error("HBL Number is already added.");
+        return;
+    }
+
+    try {
         const response = await fetch(`/mhbls/add-hbl`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": usePage().props.csrf,
             },
-            body: JSON.stringify({
-                hbl_number: hblNumber.value
-            })
+            body: JSON.stringify({ hbl_number: hblNumber.value }),
         });
+
         if (!response.ok) {
             throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-            if (data.hbl_number === hblNumber.value) {
-                closeAddNewHBLModal();
-            } else {
-                closeAddNewHBLModal();
-                push.error("HBL Not Found!");
-            }
-
-            if (data.cargo_type !== form.cargo_type || data.hbl_type !== 'Door to Door' || data.warehouse === form.warehouse) {
-                closeAddNewHBLModal();
-                push.error("Selected HBL is not maching to  Primary Details");
-            } else {
-                for (const hblPackage of data.packages) {
-                    const packageItem = {
-                        hbl: data.hbl_number,
-                        hbl_id: data.id,
-                        type: hblPackage.package_type,
-                        length: hblPackage.length,
-                        width: hblPackage.width,
-                        height: hblPackage.height,
-                        quantity: hblPackage.quantity,
-                        volume: hblPackage.volume,
-                        weight: hblPackage.weight,
-                        remarks: hblPackage.remarks,
-                        packageRule: hblPackage.package_rule,
-                        measure_type: hblPackage.measure_type,
-                    };
-
-                    const newItem = { ...packageItem };
-                    packageList.value.push(newItem);
-                    form.grand_weight = form.grand_weight + packageItem.weight;
-                    form.grand_volume = form.grand_volume + packageItem.volume;
-                }
-                form.hbls.push(data.id);
-                closeAddNewHBLModal();
-                push.success('Add new HBL Successfully!')
-            }
-
         }
+
+        const data = await response.json();
+
+        if (!data.hbl_number || data.hbl_number !== hblNumber.value) {
+            closeAddNewHBLModal();
+            push.error("HBL Not Found!");
+            return;
+        }
+
+        // Ensure the HBL is not already linked
+        if (form.hbls.includes(data.id)) {
+            closeAddNewHBLModal();
+            push.error("HBL ID is already linked to this shipment.");
+            return;
+        }
+
+        // Validate primary details
+        if (data.cargo_type !== form.cargo_type || data.hbl_type !== 'Door to Door' || data.warehouse === form.warehouse) {
+            closeAddNewHBLModal();
+            push.error("Selected HBL does not match the Primary Details.");
+            return;
+        }
+
+        // Process package data
+        for (const hblPackage of data.packages) {
+            const packageItem = {
+                hbl: data.hbl_number,
+                hbl_id: data.id,
+                type: hblPackage.package_type,
+                length: hblPackage.length,
+                width: hblPackage.width,
+                height: hblPackage.height,
+                quantity: hblPackage.quantity,
+                volume: hblPackage.volume,
+                weight: hblPackage.weight,
+                remarks: hblPackage.remarks,
+                packageRule: hblPackage.package_rule,
+                measure_type: hblPackage.measure_type,
+            };
+
+            packageList.value.push({ ...packageItem });
+            form.grand_weight += packageItem.weight;
+            form.grand_volume += packageItem.volume;
+        }
+
+        // Add HBL ID to the form
+        form.hbls.push(data.id);
+        closeAddNewHBLModal();
+        push.success('HBL added successfully!');
+
+    } catch (error) {
+        push.error("An error occurred while adding HBL.");
+        console.error("Error adding HBL:", error);
     }
-}
+};
+
 const handleRemoveHBL = async () => {
     if (!hblNumber.value) {
         closeRemoveHBLModal();
