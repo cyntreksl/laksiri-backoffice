@@ -111,4 +111,11 @@ class LoadedContainerController extends Controller
     {
         return $this->loadedContainerRepository->loadMHBL($request->all());
     }
+
+    public function tallySheetDownloadPDF($container)
+    {
+        $this->authorize('shipment.download tally sheet');
+
+        return $this->loadedContainerRepository->tallySheetDownloadPDF($container);
+    }
 }

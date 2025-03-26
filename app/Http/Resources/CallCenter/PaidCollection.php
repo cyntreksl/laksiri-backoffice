@@ -23,7 +23,7 @@ class PaidCollection extends JsonResource
             'customer' => $this->token->customer->name,
             'reception' => $this->token->reception->name,
             'is_paid' => $this->token->isPaid(),
-            'verified_by' => $this->cashierHBLPayment->verifiedBy->name,
+            'verified_by' => $this->cashierHBLPayment->verifiedBy ? $this->cashierHBLPayment->verifiedBy->name : '',
             'paid_amount' => $this->cashierHBLPayment->paid_amount,
             'note' => $this->cashierHBLPayment->note,
             'paid_at' => $this->cashierHBLPayment->created_at->format('Y-m-d H:i:s'),
