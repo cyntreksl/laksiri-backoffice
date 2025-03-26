@@ -647,7 +647,7 @@ const copiedPackages = ref({});
             </div>
 
             <!-- Add New HBL Dialog -->
-            <Dialog v-model:visible="showAddNewHBLDialog" modal header="Add New HBL" :style="{ width: '30vw' }" :blockScroll="true">
+            <Dialog v-model:visible="showAddNewHBLDialog" modal header="Add New HBL" :style="{ width: '30vw' }"  block-scroll maximizable position="center">
                 <div class="mt-4">
                     <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
                 </div>
@@ -659,7 +659,7 @@ const copiedPackages = ref({});
             </Dialog>
 
             <!-- Remove HBL Dialog -->
-            <Dialog v-model:visible="showRemoveHBLDialog" modal header="Remove HBL" :style="{ width: '30vw' }" :blockScroll="true">
+            <Dialog v-model:visible="showRemoveHBLDialog" modal header="Remove HBL" :style="{ width: '30vw' }"  block-scroll maximizable position="center" >
                 <div class="mt-4">
                     <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
                 </div>
