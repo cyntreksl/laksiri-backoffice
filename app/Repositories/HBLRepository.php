@@ -462,9 +462,6 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         $ids = collect($data)->flatten()->toArray();
         $hbls = HBL::whereIn('id', $ids)->with('mhbl')->get();
-        //        $groupedHbls = $hbls->groupBy(function ($hbl) {
-        //            return $hbl->mhbl ? $hbl->mhbl->hbl_number : $hbl->hbl_number;
-        //        });
         $groupedPackagesArray = $hbls->flatMap(function ($hbl) {
             $groupKey = $hbl->id;
 
