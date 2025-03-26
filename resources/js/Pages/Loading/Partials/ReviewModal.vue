@@ -2,7 +2,7 @@
 import DialogModal from "@/Components/DialogModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {computed} from "vue";
+import {computed, ref} from "vue";
 import TextInput from "@/Components/TextInput.vue";
 import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
@@ -69,17 +69,24 @@ const form = useForm({
     isDestinationLoading: props.isDestinationLoading,
 });
 
+const handleDownLoadTallySheet = () => {
+    window.location.href = route("loading.containers.tally-sheet-downloads", form.container_id);
+}
+
 const getMHBLPackageCount = (hbls) => {
     return hbls.reduce((total, hbl) => {
         return total + (hbl.packages ? hbl.packages.length : 0);
     }, 0);
 }
 
-const handleCreateLoadedContainer = () => {
+const handleCreateLoadedContainer = (printTallySheet) => {
     form.post(route("loading.loaded-containers.store"), {
         onSuccess: () => {
             push.success('Container loaded successfully!');
             emit('close');
+            if(printTallySheet){
+                window.location.href = route("loading.containers.tally-sheet-downloads", form.container_id);
+            }
             router.visit(route("loading.loading-points.index", {
                 'container': route().params.container,
                 'cargoType': route().params.cargoType,
@@ -211,7 +218,13 @@ const handleCreateLoadedContainer = () => {
                 <SecondaryButton @click="$emit('close')">
                     Cancel
                 </SecondaryButton>
-                <PrimaryButton @click.prevent="handleCreateLoadedContainer">
+                <PrimaryButton @click.prevent="handleDownLoadTallySheet">
+                    Download Summery
+                </PrimaryButton>
+                <PrimaryButton @click.prevent="handleCreateLoadedContainer(true)">
+                    Finish Loading and Download Summery
+                </PrimaryButton>
+                <PrimaryButton @click.prevent="handleCreateLoadedContainer(false)">
                     Finish Loading
                 </PrimaryButton>
             </div>

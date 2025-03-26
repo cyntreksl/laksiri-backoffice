@@ -228,7 +228,7 @@
             </tr>
             <tr>
                 <td rowspan="{{ $packageCount > 4 ? $packageCount - 3 : 1 }}" style="font-size: 11px; border-left:none;vertical-align: top; border-top: 0">{{ $item[4] }}</td>
-                <td rowspan="{{ $packageCount > 4 ? $packageCount - 3 : 1 }}" style="font-size: 11px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">{{ $item[7] }}</td>
+                <td rowspan="{{ $packageCount > 4 ? $packageCount - 3 : 1 }}" style="font-size: 11px; border-left:none;vertical-align: top; border-top: 0; border-bottom: 0">{{ $item[7] }}0000</td>
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-top: 0; border-bottom: 0">{{ isset($item[9][3]) ? $item[9][3]['package_type'] : ' ' }}</td>
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][3]) ? $item[9][3]['quantity'] : ' ' }}</td>
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center"></td>

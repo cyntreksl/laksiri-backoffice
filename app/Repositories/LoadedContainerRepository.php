@@ -12,6 +12,7 @@ use App\Actions\Setting\GetSettings;
 use App\Enum\ContainerStatus;
 use App\Exports\DoorToDoorManifestExport;
 use App\Exports\LoadedContainerManifestExport;
+use App\Exports\LoadedContainerTallySheetExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
 use App\Interfaces\GridJsInterface;
@@ -205,5 +206,22 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         } catch (\Exception $e) {
             throw new \Exception('Failed to add MHBL to loaded container: '.$e->getMessage());
         }
+    }
+
+    public function tallySheetDownloadPDF($container)
+    {
+        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
+        $filename = $container->reference.'_tally_sheet_'.date('Y_m_d_h_i_s').'.pdf';
+
+        $export = new LoadedContainerTallySheetExport($container);
+
+        $data = array_filter($export->prepareData(), function ($item) {
+            return isset($item[0]) && $item[0] !== '';
+        });
+
+        $pdf = PDF::loadView('exports.tally_sheet', ['data' => $data, 'container' => $container]);
+        $pdf->setPaper('a4', 'landscape');
+
+        return $pdf->download($filename);
     }
 }
