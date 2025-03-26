@@ -13,6 +13,11 @@ import {push} from "notivue";
 import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
+    courier: {
+        type: Object,
+        default: () => {
+        },
+    },
     hblTypes: {
         type: Object,
         default: () => {
@@ -44,11 +49,31 @@ const currentBranch = usePage().props?.auth.user.active_branch_name;
 const findCountryCodeByBranch = (country) => {
     return usePage().props.currentBranch.country_code;
 };
+const splitCountryCode = (fullNumber) => {
+    if (fullNumber) {
+        for (let code of props.countryCodes) {
+            if (fullNumber.startsWith(code)) {
+                return code;
+            }
+        }
+    }
+    return '+94';
+};
 
-const countryCode = ref(findCountryCodeByBranch(currentBranch));
-const consignee_countryCode = ref('+94');
-const contactNumber = ref("");
-const consignee_contact = ref("");
+const splitContactNumber = (fullNumber) => {
+    if(fullNumber) {
+        for (let code of props.countryCodes) {
+            if (fullNumber.startsWith(code)) {
+                return fullNumber.slice(code.length);
+            }
+        }
+    } else return "";
+}
+
+const countryCode = ref(splitCountryCode(props.courier.contact_number));
+const consignee_countryCode = ref(splitCountryCode(props.courier.consignee_contact));
+const contactNumber = ref(splitContactNumber(props.courier.contact_number));
+const consignee_contact = ref(splitContactNumber(props.courier.consignee_contact));
 
 const splitNumber = (fullNumber) => {
     for (let code of props.countryCodes) {
@@ -71,24 +96,23 @@ const splitNumberConsignee = (fullNumber) => {
 }
 
 const form = useForm({
-    cargo_type: "",
-    hbl_type: "",
-    courier_agent: null,
-    name: "",
-    email: "",
+    cargo_type: props.courier.cargo_type,
+    hbl_type: props.courier.hbl_type,
+    courier_agent: props.courier.courier_agent,
+    name: props.courier.name,
+    email: props.courier.email,
     contact_number: computed(() => countryCode.value + contactNumber.value),
-    nic: "",
-    iq_number: "",
-    address: "",
-    consignee_name: "",
-    consignee_nic: "",
+    nic: props.courier.nic,
+    iq_number: props.courier.iq_number,
+    address: props.courier.address,
+    consignee_name: props.courier.consignee_name,
+    consignee_nic: props.courier.consignee_nic,
     consignee_contact: computed(
         () => consignee_countryCode.value + consignee_contact.value
     ),
-    consignee_address: "",
-    consignee_note: "",
-    packages: {},
-    is_active_package: false,
+    consignee_address: props.courier.consignee_address,
+    consignee_note: props.courier.consignee_note,
+    packages: props.courier.packages
 });
 
 const resetCreateForm = () => {
@@ -96,19 +120,18 @@ const resetCreateForm = () => {
     countryCode.value = findCountryCodeByBranch(currentBranch);
     consignee_countryCode.value = '+94';
     contactNumber.value = "";
-     consignee_contact.value = "";
+    consignee_contact.value = "";
 }
 
-const handleCourierCreate = () => {
+const handleCourierUpdate = () => {
     if(Object.keys(form.packages).length <= 0){
         push.error("Please add at least one package.");
         return;
     }else{
-        form.post(route("couriers.store"), {
+        form.put(route("couriers.update",props.courier.id), {
             onSuccess: (page) => {
-                form.reset();
-                resetCreateForm();
-                push.success("Courier Created Successfully!");
+                push.success("Courier Updated Successfully!");
+                router.visit(route("couriers.index"));
             },
             onError: () => console.log("error"),
             preserveScroll: true,
@@ -126,10 +149,11 @@ const showPackageDialog = () => {
     }
 };
 
-const packageList = ref([]);
+const packageList = ref(form.packages ?? []);
+console.log(packageList.value);
 
 const packageItem = reactive({
-    type: props.packageTypes.find(
+    package_type: props.packageTypes.find(
         type => type.name.toLowerCase() === 'carton'.toLowerCase()
     )?.name || "",
     length: 0,
@@ -142,12 +166,20 @@ const packageItem = reactive({
     measure_type: "cm",
 });
 
-const grandTotalWeight = ref(0);
-const grandTotalVolume = ref(0);
+const grandTotalWeight = computed(() => {
+    return form.packages.reduce((acc, pack) => {
+        return acc + pack.weight;
+    }, 0);
+});
+const grandTotalVolume = computed(() => {
+    return form.packages.reduce((acc, pack) => {
+        return acc + pack.volume;
+    }, 0);
+});
 
 const addPackageData = () => {
     if (
-        !packageItem.type ||
+        !packageItem.package_type ||
         packageItem.length <= 0 ||
         packageItem.width <= 0 ||
         packageItem.height <= 0 ||
@@ -164,6 +196,7 @@ const addPackageData = () => {
 
 
     if (editMode.value) {
+        packageItem.volume = parseFloat(packageItem.volume) || 0;
         packageList.value.splice(editIndex.value, 1, {...packageItem});
         grandTotalWeight.value = packageList.value.reduce(
             (accumulator, currentValue) => accumulator + parseFloat(currentValue.weight),
@@ -174,13 +207,13 @@ const addPackageData = () => {
             0
         );
     } else {
-        const newItem = {...packageItem}; // Create a copy of packageItem
+        const newItem = {...packageItem};
+        newItem.volume = parseFloat(newItem.volume) || 0;
         packageList.value.push(newItem); // Add the new item to packageList
         form.packages = packageList.value;
 
-        const volume = parseFloat(newItem.volume) || 0;
         grandTotalWeight.value += parseFloat(newItem.weight);
-        grandTotalVolume.value += parseFloat(volume.toFixed(3));
+        grandTotalVolume.value += parseFloat(newItem.volume.toFixed(3));
     }
     closeAddPackageModal();
 };
@@ -236,7 +269,7 @@ const selectedType = ref("");
 
 const isChecked = ref(false);
 const updateTypeDescription = () => {
-    packageItem.type = (packageItem.type ? " " : "") + selectedType.value;
+    packageItem.package_type = (packageItem.package_type ? " " : "") + selectedType.value;
 };
 const currency = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 
@@ -290,6 +323,7 @@ const openEditModal = (index) => {
     editMode.value = true;
     editIndex.value = index;
     showAddNewPackageDialog.value = true;
+    selectedType.value = packageList.value[index].package_type;
     // populate packageItem with existing data for editing
     Object.assign(packageItem, packageList.value[index]);
     const factor = conversionFactors[packageItem.measure_type] || 1;
@@ -415,7 +449,7 @@ const volumeUnit = computed(() => {
         <Breadcrumb/>
 
         <!-- Create Pickup Form -->
-        <form @submit.prevent="handleCourierCreate">
+        <form @submit.prevent="handleCourierUpdate">
             <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
                 <div class="sm:col-span-2 grid grid-rows gap-4">
 
@@ -894,7 +928,7 @@ const volumeUnit = computed(() => {
                                             </button>
                                         </td>
                                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.type }}
+                                            {{ item.package_type }}
                                         </td>
                                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                             {{ item.length.toFixed(3) }}
@@ -912,7 +946,7 @@ const volumeUnit = computed(() => {
                                             {{ item.weight.toFixed(3) }}
                                         </td>
                                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.volume }}
+                                            {{ item.volume.toFixed(3) }}
                                         </td>
                                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                             {{ item.remarks }}
@@ -1087,7 +1121,7 @@ const volumeUnit = computed(() => {
                                     <span class="text-red-500 text-sm">*</span></span
                                   >
                                     <input
-                                        v-model="packageItem.type"
+                                        v-model="packageItem.package_type"
                                         class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         placeholder="Sofa set"
                                         type="text"
