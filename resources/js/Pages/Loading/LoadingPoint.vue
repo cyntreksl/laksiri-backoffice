@@ -357,6 +357,28 @@ watch(unloadedMHBLs, (newVal) => {
 });
 
 const reviewContainerArr = ref([]);
+
+const loadedHBLsPackages = ref([]);
+const handleGetHBLsPackages = async(hbls) => {
+    const response = await fetch(`/hbls/packages`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": usePage().props.csrf,
+        },
+        body: JSON.stringify({
+            hbls_id: hbls,
+        })
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok.');
+    } else {
+        const data = await response.json();
+        loadedHBLsPackages.value = data.hblsPackages;
+
+        console.log(data, loadedHBLsPackages.value);
+    }
+}
 const reviewContainer = () => {
     const copiedContainer = JSON.parse(JSON.stringify(containerArr.value));
     reviewContainerArr.value = [...copiedContainer];
@@ -369,8 +391,12 @@ const reviewContainer = () => {
             });
         });
     });
+    const hblsIdsArray = [...new Set(reviewContainerArr.value.map(pkg => pkg.hbl_id))];
+    handleGetHBLsPackages(hblsIdsArray);
 
-    showReviewModal.value = true
+    if(loadedHBLsPackages.value){
+        showReviewModal.value = true
+    }
 }
 </script>
 
@@ -1949,6 +1975,7 @@ const reviewContainer = () => {
             :show="showReviewModal"
             :containerPackages="reviewContainerArr"
             :loadedMHBLs="loadedMHBLs"
+            :loadedHBLsPackages="loadedHBLsPackages"
             @close="showReviewModal = false"/>
 
         <!--        <ReviewModal :container-array="reviewContainerArr" :find-hbl-by-package-id="findHblByPackageId"-->

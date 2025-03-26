@@ -397,4 +397,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->getHBLTotalSummary($hbl);
     }
+
+    public function getHBLsPackages(Request $request)
+    {
+        return $this->HBLRepository->getHBLsPackages($request->all());
+    }
 }
