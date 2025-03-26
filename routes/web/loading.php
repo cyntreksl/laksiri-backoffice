@@ -88,6 +88,9 @@ Route::name('loading.')->group(function () {
     Route::post('containers/get-unloaded-mhbl-hbl', [ContainerController::class, 'getUnloadedMHBLHBL'])
         ->name('get-unloaded-mhbls-hbl');
 
+    Route::get('containers/tally-sheet-downloads/{container}', [LoadedContainerController::class, 'tallySheetDownloadPDF'])
+        ->name('containers.tally-sheet-downloads');
+
     // Manual Loadings
     Route::get('manual-loadings', function () {
         return Inertia::render('Loading/ManualLoading');
