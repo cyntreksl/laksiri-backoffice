@@ -35,7 +35,12 @@ const props = defineProps({
         type: Boolean,
         default: false,
         required: false,
-    }
+    },
+    loadedHBLsPackages: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const emit = defineEmits(['close']);
@@ -138,12 +143,12 @@ const handleCreateLoadedContainer = () => {
                         <th
                             class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
-                            Total Packages
+                            Loaded Packages
                         </th>
                         <th
                             class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
-                            Loaded Packages
+                            Total Packages
                         </th>
                     </tr>
                     </thead>
@@ -152,10 +157,10 @@ const handleCreateLoadedContainer = () => {
                         <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ findHblByPackageId(packageData.id).hbl_number }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                            {{ findHblByPackageId(packageData.id)?.packages.length }}
+                            {{ countPackages(packageData.hbl_id)}}
                         </td>
                         <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
-                            {{ countPackages(packageData.hbl_id)}}
+                            {{ loadedHBLsPackages[packageData.hbl_id].length }}
                         </td>
                     </tr>
                     </tbody>
@@ -179,12 +184,12 @@ const handleCreateLoadedContainer = () => {
                         <th
                             class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
-                            Total Packages
+                            Loaded Packages
                         </th>
                         <th
                             class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
-                            Loaded Packages
+                            Total Packages
                         </th>
                     </tr>
                     </thead>
