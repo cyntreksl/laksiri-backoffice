@@ -3,37 +3,22 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { router, useForm, usePage } from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { computed, reactive, ref, watch } from "vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
-import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Checkbox from "@/Components/Checkbox.vue";
 import { push } from "notivue";
-import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import { float } from "quill/ui/icons.js";
-import { forEach } from "vuedraggable/dist/vuedraggable.common.js";
 import Card from 'primevue/card';
 import Fieldset from 'primevue/fieldset';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import Select from 'primevue/select';
-// import Checkbox from 'primevue/checkbox';
 import Textarea from 'primevue/textarea';
 import SelectButton from 'primevue/selectbutton';
 import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import InputNumber from 'primevue/inputnumber';
-import IftaLabel from 'primevue/iftalabel';
 import Dialog from 'primevue/dialog';
-import Message from 'primevue/message';
-import Dropdown from 'primevue/dropdown';
 import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
@@ -270,7 +255,6 @@ const handleAddNewHBL = async () => {
         return;
     }
 
-    // Check if HBL already exists in the form
     if (form.hbls.includes(hblNumber.value)) {
         closeAddNewHBLModal();
         push.error("HBL Number is already added.");
@@ -299,21 +283,18 @@ const handleAddNewHBL = async () => {
             return;
         }
 
-        // Ensure the HBL is not already linked
         if (form.hbls.includes(data.id)) {
             closeAddNewHBLModal();
             push.error("HBL ID is already linked to this shipment.");
             return;
         }
 
-        // Validate primary details
         if (data.cargo_type !== form.cargo_type || data.hbl_type !== 'Door to Door' || data.warehouse === form.warehouse) {
             closeAddNewHBLModal();
             push.error("Selected HBL does not match the Primary Details.");
             return;
         }
 
-        // Process package data
         for (const hblPackage of data.packages) {
             const packageItem = {
                 hbl: data.hbl_number,
@@ -335,7 +316,6 @@ const handleAddNewHBL = async () => {
             form.grand_volume += packageItem.volume;
         }
 
-        // Add HBL ID to the form
         form.hbls.push(data.id);
         closeAddNewHBLModal();
         push.success('HBL added successfully!');
@@ -667,7 +647,7 @@ const copiedPackages = ref({});
             </div>
 
             <!-- Add New HBL Dialog -->
-            <Dialog v-model:visible="showAddNewHBLDialog" modal header="Add New HBL" :style="{ width: '30vw' }">
+            <Dialog v-model:visible="showAddNewHBLDialog" modal header="Add New HBL" :style="{ width: '30vw' }" :blockScroll="true">
                 <div class="mt-4">
                     <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
                 </div>
@@ -679,7 +659,7 @@ const copiedPackages = ref({});
             </Dialog>
 
             <!-- Remove HBL Dialog -->
-            <Dialog v-model:visible="showRemoveHBLDialog" modal header="Remove HBL" :style="{ width: '30vw' }">
+            <Dialog v-model:visible="showRemoveHBLDialog" modal header="Remove HBL" :style="{ width: '30vw' }" :blockScroll="true">
                 <div class="mt-4">
                     <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
                 </div>
