@@ -162,6 +162,9 @@ const handleCreateLoadedContainer = () => {
                         <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
                             {{ loadedHBLsPackages[packageData.hbl_id].length }}
                         </td>
+                        <td>
+                            <badge v-if="countPackages(packageData.hbl_id) < loadedHBLsPackages[packageData.hbl_id].length" class="badge bg-error/10 text-error dark:bg-error/15">Short Loaded</badge>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -187,9 +190,13 @@ const handleCreateLoadedContainer = () => {
                             Loaded Packages
                         </th>
                         <th
-                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
                             Total Packages
+                        </th>
+                        <th
+                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
                         </th>
                     </tr>
                     </thead>
