@@ -424,6 +424,13 @@ Breadcrumbs::for('couriers.create', function (BreadcrumbTrail $trail) {
     $trail->push('Courier', route('couriers.index'));
     $trail->push('Create', route('couriers.create'));
 });
+
+// Courier > edit
+Breadcrumbs::for('couriers.edit', function (BreadcrumbTrail $trail, $courier) {
+    $trail->parent('dashboard');
+    $trail->push('Courier', route('couriers.index'));
+    $trail->push('Edit Courier', route('couriers.edit', $courier->id));
+});
 // CourierAgents
 Breadcrumbs::for('courier-agents.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
