@@ -77,7 +77,7 @@ class CashSettlementController extends Controller
         $filteredRequest = array_filter($request->all(), fn ($value) => $value !== 'null' && $value !== null);
 
         $filters = collect($filteredRequest)->only([
-            'fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus',
+            'fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse'
         ])->toArray();
 
         return $this->cashSettlementRepository->export($filters);
