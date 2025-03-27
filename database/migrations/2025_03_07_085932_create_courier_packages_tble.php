@@ -16,12 +16,12 @@ return new class extends Migration
             $table->unsignedBigInteger('branch_id');
             $table->unsignedBigInteger('courier_id');
             $table->string('package_type');
-            $table->decimal('length', 10, 2);
-            $table->decimal('width', 10, 2);
-            $table->decimal('height', 10, 2);
+            $table->double('length');
+            $table->double('width');
+            $table->double('height');
             $table->integer('quantity');
-            $table->decimal('weight', 10, 2);
-            $table->decimal('volume', 10, 2)->nullable();
+            $table->double('weight');
+            $table->double('volume')->nullable();
             $table->string('remarks', 255)->nullable();
             $table->string('measure_type', 10);
             $table->softDeletes();
