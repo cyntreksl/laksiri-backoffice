@@ -6,7 +6,7 @@ use App\Enum\HBLImageType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HBLImage extends  Model
+class HBLImage extends Model
 {
     use HasFactory;
 
@@ -18,11 +18,10 @@ class HBLImage extends  Model
         'image_path',
         'shipper_nic',
         'shipper_passport',
-        'package_images'
+        'package_images',
     ];
 
     protected $table = 'hbl_images';
-
 
     protected $casts = [
         'package_images' => 'array',
@@ -43,5 +42,4 @@ class HBLImage extends  Model
     {
         return $this->belongsTo(HBLPackage::class, 'hbl_packages_id');
     }
-
 }
