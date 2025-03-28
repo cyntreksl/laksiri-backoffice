@@ -55,7 +55,6 @@ class LoadedContainerController extends Controller
         $search = $request->input('search', null);
 
         $filters = $request->only(['fromDate', 'toDate', 'etdStartDate', 'etdEndDate', 'cargoType', 'containerType', 'status']);
-
         return $this->loadedContainerRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 
