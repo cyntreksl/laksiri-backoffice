@@ -20,7 +20,7 @@ class DownloadHBLBarcodePDF
             'mhbl' => $hbl->mhbl ? ($hbl->mhbl->hbl_number ?? $hbl->mhbl->reference) : null,
         ])->setPaper($customPaper);
 
-        $filename = $hbl->hbl.'.pdf';
+        $filename = $hbl->hbl_number.'.pdf';
 
         return $pdf->download($filename);
     }

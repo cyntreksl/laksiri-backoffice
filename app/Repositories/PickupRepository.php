@@ -79,6 +79,8 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
         // apply filters
         FilterFactory::apply($query, $filters);
 
+        $query->orderBy('created_at', 'desc');
+
         $pickups = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
