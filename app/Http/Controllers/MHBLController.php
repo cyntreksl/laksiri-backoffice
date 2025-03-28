@@ -187,4 +187,11 @@ class MHBLController extends Controller
             'mhbl' => GetMHBLById::run($mhbl_id),
         ]);
     }
+
+    public function hblListDownloadPDF(MHBL $mhbl)
+    {
+        $this->authorize('mhbls.download hbl list');
+
+        return $this->mhblRepository->hblListDownloadPDF($mhbl);
+    }
 }
