@@ -11,6 +11,7 @@ import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
+import TabHBLPayments from "@/Pages/Common/Partials/TabHBLPayments.vue";
 
 const props = defineProps({
     show: {
@@ -146,7 +147,7 @@ onMounted(() => {
         maximizable
         dismissable-mask
         close-on-escape
-        header=" "
+        header="Overview"
         :draggable="false"
     >
         <Tabs value="0">
@@ -159,11 +160,17 @@ onMounted(() => {
                 </Tab>
                 <Tab value="1">
                     <a class="flex items-center gap-2 text-inherit">
+                        <i class="pi pi-dollar" />
+                        <span>Payments</span>
+                    </a>
+                </Tab>
+                <Tab value="2">
+                    <a class="flex items-center gap-2 text-inherit">
                         <i class="pi pi-chart-bar" />
                         <span>Status & Audit</span>
                     </a>
                 </Tab>
-                <Tab value="2">
+                <Tab value="3">
                     <a class="flex items-center gap-2 text-inherit">
                         <i class="pi pi-file" />
                         <span>Documents</span>
@@ -172,12 +179,15 @@ onMounted(() => {
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
-                    <TabHBLDetails :hbl="hbl" :is-loading="isLoading" :pickup="pickup" :hbl-total-summary="hblTotalSummary"/>
+                    <TabHBLDetails :hbl="hbl" :is-loading="isLoading" :pickup="pickup" />
                 </TabPanel>
                 <TabPanel value="1">
-                    <TabStatus v-if="hbl" :hbl="hbl" :pickup="pickup" />
+                    <TabHBLPayments :hbl="hbl" :hbl-total-summary="hblTotalSummary" />
                 </TabPanel>
                 <TabPanel value="2">
+                    <TabStatus v-if="hbl" :hbl="hbl" :pickup="pickup" />
+                </TabPanel>
+                <TabPanel value="3">
                     <TabDocuments v-if="hbl" :hbl-id="hbl.id"/>
                 </TabPanel>
             </TabPanels>
