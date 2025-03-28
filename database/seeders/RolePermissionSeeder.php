@@ -22,6 +22,7 @@ class RolePermissionSeeder extends Seeder
         Role::updateOrCreate(['name' => 'customer']);
         Role::updateOrCreate(['name' => 'call center']);
         Role::updateOrCreate(['name' => 'boned area']);
+        Role::updateOrCreate(['name' => 'Finance Team']);
 
         $this->command->info('Default Roles added.');
 
@@ -103,6 +104,7 @@ class RolePermissionSeeder extends Seeder
                     'hbls.delete documents',
                     'hbls.issue token',
                     'hbls.show draft hbls',
+                    'hbls.give finance approval',
                 ],
             ],
 
