@@ -101,7 +101,7 @@
                 </tr>
                 <tr>
                     <th colspan="10" style="background-color: #D8D8D8 ; text-align: center; height: 3% !important;">
-                        <strong> <em> SEA CARGO DOOR TO DOOR MANIFEST  </em> </strong>
+                        <strong> <em> {{ $container->cargo_type === 'Sea Cargo' ? 'SEA CARGO' : 'AIR CARGO' }} DOOR TO DOOR MANIFEST  </em> </strong>
                     </th>
                 </tr>
                 <tr>
