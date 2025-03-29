@@ -154,14 +154,14 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
         $groupedData = [];
         foreach ($data as $item) {
-            if (isset($item[10]) && $item[10]) {
-                $mhblKey = $item[10]->id;
+            if (isset($item[20]) && $item[20]) {
+                $mhblKey = $item[20]->id;
                 $groupedData[$mhblKey][] = $item;
             }
         }
 
         $pdf = PDF::loadView('exports.door_to_door', ['groupedData' => $groupedData, 'data' => $data, 'container' => $container, 'settings' => $settings]);
-        $pdf->setPaper('a3', 'portrait');
+        $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
 

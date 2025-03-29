@@ -279,7 +279,7 @@
             </tr>
             <tr style="border: none; line-height: 20px !important; font-size: 12px;">
                 <td colspan="2" style="border: none; text-align: center;"></td>
-                <td colspan="9" style="border: none; text-align: left;">
+                <td colspan="8" style="border: none; text-align: left;">
                     <strong>
                         UNIVERSAL FREIGHT SERVICES
                         <br>
