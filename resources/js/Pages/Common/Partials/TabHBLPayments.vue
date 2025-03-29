@@ -1,11 +1,6 @@
 <script setup>
-import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
-import AccordionPanel from "@/Components/AccordionPanel.vue";
-import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
-import PostSkeleton from "@/Components/PostSkeleton.vue";
-import {watch} from "vue";
-import Card from 'primevue/card';
-import Avatar from 'primevue/avatar';
+import {usePage} from "@inertiajs/vue3";
+import {ref} from "vue";
 
 const props = defineProps({
     hbl: {
@@ -17,96 +12,132 @@ const props = defineProps({
         default: () => ({}),
     },
 });
+
+const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
 </script>
 
 <template>
-    <AccordionPanel show-panel title="Payment Details">
-        <template #header-image>
-            <div
-                class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
-                <svg class="w-full h-full" fill="none" stroke="currentColor"
-                     stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"/>
-                </svg>
-            </div>
-        </template>
-        <div v-if="Object.keys(hblTotalSummary).length > 0"
-             class="is-scrollbar-hidden min-w-full overflow-x-auto my-5">
-            <table class="is-hoverable w-full text-left">
-                <thead>
-                <tr>
-                    <th
-                        class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Description
-                    </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
+    <div v-if="Object.keys(hblTotalSummary).length > 0">
 
-                    </th>
-                    <th
-                        class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Amount
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-if="hblTotalSummary.freight_charge" >
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">Freight Charge</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                <span v-for="(charge, index) in hblTotalSummary.freight_charge_operations"
-                                      :key="index">
+        <ul class="divide-y divide-gray-100" role="list">
+            <li v-if="hblTotalSummary.freight_charge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div class="flex min-w-0 gap-x-4">
+                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
+                    <div class="min-w-0 flex-auto">
+                        <p class="text-sm/6 font-semibold text-gray-900">Freight Charges</p>
+                        <div class="text-gray-500">
+                    <span v-for="(charge, index) in hblTotalSummary.freight_charge_operations" :key="index">
                                     {{ charge }} <br>
-                                </span>
-                    </td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.freight_charge).toFixed(2)}}</td>
-                </tr>
-                <tr v-if="hblTotalSummary.destination_charges" >
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">Destination Charge</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.destination_charges).toFixed(2)}}</td>
-                </tr>
-                <tr v-if="hblTotalSummary.package_charges" >
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">Package Charge</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.package_charges).toFixed(2)}}</td>
-                </tr>
-                <tr v-if="hblTotalSummary.bill_charge" >
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">Bill Charge</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.bill_charge).toFixed(2)}}</td>
-                </tr>
-                <tr v-if="hblTotalSummary.additional_charge" >
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">Additional Charge</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.additional_charge).toFixed(2)}}</td>
-                </tr>
-                <tr v-if="hblTotalSummary.vat" >
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">Vat</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{parseFloat(hblTotalSummary.vat).toFixed(2)}}</td>
-                </tr>
-                <tr v-if="hblTotalSummary.discount" >
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">Discount</td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5"></td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">-{{parseFloat(hblTotalSummary.discount).toFixed(2)}}</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="px-4 py-4 sm:px-5">
-            <div class="grid grid-cols-3 gap-x-4 gap-y-8">
+                    </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.freight_charge).toFixed(2) }}</p>
+                </div>
+            </li>
 
-                <InfoDisplay :value="(hbl?.grand_total ?? 0).toFixed(2)" label="Grand Total"/>
+            <li v-if="hblTotalSummary.destination_charges" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div class="flex min-w-0 gap-x-4">
+<!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
+                    <div class="min-w-0 flex-auto">
+                        <p class="text-sm/6 font-semibold text-gray-900">Destination Charges</p>
+                    </div>
+                </div>
+                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.destination_charges).toFixed(2) }}</p>
+                    <div v-if="hbl.is_destination_charges_paid" class="mt-1 flex items-center gap-x-1.5">
+                        <div class="flex-none rounded-full bg-emerald-500/20 p-1">
+                            <div class="size-1.5 rounded-full bg-emerald-500" />
+                        </div>
+                        <p class="text-xs/5 text-gray-500">Paid</p>
+                    </div>
+                </div>
+            </li>
 
-                <InfoDisplay :value="(hbl?.paid_amount ?? 0).toFixed(2)" label="Paid Amount"/>
+            <li v-if="hblTotalSummary.package_charges" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div class="flex min-w-0 gap-x-4">
+                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
+                    <div class="min-w-0 flex-auto">
+                        <p class="text-sm/6 font-semibold text-gray-900">Package Charges</p>
+                    </div>
+                </div>
+                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.package_charges).toFixed(2) }}</p>
+                </div>
+            </li>
 
-            </div>
-        </div>
-    </AccordionPanel>
+            <li v-if="hblTotalSummary.bill_charge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div class="flex min-w-0 gap-x-4">
+                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
+                    <div class="min-w-0 flex-auto">
+                        <p class="text-sm/6 font-semibold text-gray-900">Bill Charges</p>
+                    </div>
+                </div>
+                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.bill_charge).toFixed(2) }}</p>
+                </div>
+            </li>
+
+            <li v-if="hblTotalSummary.additional_charge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div class="flex min-w-0 gap-x-4">
+                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
+                    <div class="min-w-0 flex-auto">
+                        <p class="text-sm/6 font-semibold text-gray-900">Additional Charges</p>
+                    </div>
+                </div>
+                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.additional_charge).toFixed(2) }}</p>
+                </div>
+            </li>
+
+            <li v-if="hblTotalSummary.vat" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div class="flex min-w-0 gap-x-4">
+                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
+                    <div class="min-w-0 flex-auto">
+                        <p class="text-sm/6 font-semibold text-gray-900">VAT</p>
+                    </div>
+                </div>
+                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.vat).toFixed(2) }}</p>
+                </div>
+            </li>
+
+            <li v-if="hblTotalSummary.discount" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div class="flex min-w-0 gap-x-4">
+                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
+                    <div class="min-w-0 flex-auto">
+                        <p class="text-sm/6 font-semibold text-gray-900">Discount</p>
+                    </div>
+                </div>
+                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.discount).toFixed(2) }}</p>
+                </div>
+            </li>
+
+            <li class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div class="flex min-w-0 gap-x-4">
+                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
+                    <div class="min-w-0 flex-auto">
+                        <p class="text-sm/6 font-semibold text-gray-900">Grand Total</p>
+                    </div>
+                </div>
+                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p class="text-lg text-gray-900">{{ currencySymbol }} {{ (hbl?.grand_total ?? 0).toFixed(2) }}</p>
+                </div>
+            </li>
+
+            <li class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div class="flex min-w-0 gap-x-4">
+                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
+                    <div class="min-w-0 flex-auto">
+                        <p class="text-sm/6 font-semibold text-gray-900">Paid Amount</p>
+                    </div>
+                </div>
+                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p class="text-lg text-gray-900">{{ currencySymbol }} {{ (hbl?.paid_amount ?? 0).toFixed(2) }}</p>
+                </div>
+            </li>
+        </ul>
+    </div>
 </template>

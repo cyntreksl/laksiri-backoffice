@@ -80,8 +80,6 @@ const getHBLTotalSummary = async () => {
         }
     } catch (error) {
         console.error("Error:", error);
-    } finally {
-        // isLoading.value = false;
     }
 };
 
