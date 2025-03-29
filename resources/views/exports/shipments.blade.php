@@ -306,7 +306,7 @@
     <div class="footer">
         <div style="text-align: right; margin-top: 20px; margin-right: 50px !important;">
             @if($settings?->seal_url)
-                <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto; opacity: 0.5;">
+                <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto; opacity: 0.75;">
             @endif
         </div>
         <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_footer_title}}</div>
