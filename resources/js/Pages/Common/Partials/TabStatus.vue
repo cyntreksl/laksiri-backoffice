@@ -3,7 +3,6 @@ import AccordionPanel from "@/Components/AccordionPanel.vue";
 import {onMounted, ref, watch} from "vue";
 import moment from "moment";
 import NotFound from '@/../images/illustrations/empty-girl-box.svg';
-import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import AuditDetails from "@/Pages/Common/Components/AuditDetails.vue";
 import PostSkeleton from "@/Components/PostSkeleton.vue";
 import {usePage} from '@inertiajs/vue3';
@@ -27,6 +26,7 @@ const props = defineProps({
         default: true,
     },
 })
+
 watch(
     () => props.pickup,
     (newVal) => {
@@ -193,35 +193,6 @@ const fetchPickup = async () => {
     }
 }
 
-const container = ref({});
-const isLoadingContainer = ref(false);
-
-const fetchContainer = async () => {
-    isLoadingContainer.value = true;
-
-    try {
-        const response = await fetch(`/get-container/${props.hbl.id}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-            container.value = data;
-        }
-
-    } catch (error) {
-        console.log(error);
-    } finally {
-        isLoadingContainer.value = false;
-    }
-}
-
 const unloadingIssues = ref({});
 const isLoadingUnloadingIssues = ref(false);
 
@@ -317,7 +288,6 @@ watch(() => props.hbl, (newVal) => {
         fetchLogs();
         fetchCallFlags();
         fetchUnloadingIssues();
-        fetchContainer();
     }
 });
 
@@ -338,7 +308,6 @@ onMounted(() => {
         fetchLogs();
         fetchCallFlags();
         fetchUnloadingIssues();
-        fetchContainer();
     }
 });
 </script>
@@ -477,63 +446,6 @@ onMounted(() => {
                              class="w-1/4 mt-10"/>
                     </div>
                 </div>
-            </div>
-        </div>
-    </AccordionPanel>
-
-    <PostSkeleton v-if="isLoadingContainer"/>
-
-    <AccordionPanel v-else show-panel title="Shipment Details">
-        <template #header-image>
-            <div
-                class="flex size-8 items-center justify-center rounded-lg p-1 text-primary dark:bg-accent-light/10 dark:text-accent-light">
-                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-package-export"
-                     fill="none" height="24" stroke="currentColor"
-                     stroke-linecap="round"
-                     stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                     width="24"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                    <path d="M12 21l-8 -4.5v-9l8 -4.5l8 4.5v4.5"/>
-                    <path d="M12 12l8 -4.5"/>
-                    <path d="M12 12v9"/>
-                    <path d="M12 12l-8 -4.5"/>
-                    <path d="M15 18h7"/>
-                    <path d="M19 15l3 3l-3 3"/>
-                </svg>
-            </div>
-        </template>
-        <div class="px-4 py-4 sm:px-5">
-            <div v-if="Object.values(container).length !== 0"
-                 class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-8">
-                <InfoDisplay :value="container?.note" label="Name / Note"/>
-
-                <InfoDisplay :value="container?.reference" label="Ref"/>
-
-                <InfoDisplay :value="container?.loading_started_at" label="Created Date"/>
-
-                <InfoDisplay :value="container?.estimated_time_of_departure" label="ETD"/>
-
-                <InfoDisplay :value="container?.estimated_time_of_arrival" label="ETA"/>
-
-                <InfoDisplay :value="container?.reached_date" label="Reached Date"/>
-
-                <InfoDisplay :value="container?.cargo_type" label="Cargo Mode"/>
-
-                <InfoDisplay :value="hbl?.hbl_type" label="Delivery Type"/>
-
-                <InfoDisplay :value="container.awb_number || container.bl_number" label="AWB/BL"/>
-
-                <InfoDisplay :value="'-'" label="MHBL"/>
-
-                <InfoDisplay :value="container?.is_reached ? 'Yes' : 'No'" label="Has Reached Destination?"/>
-
-                <InfoDisplay :value="'-'" label="Has Custom Cleared?"/>
-            </div>
-
-            <div v-if="Object.values(container).length === 0" class="w-full flex justify-center">
-                <img :src="NotFound" alt="image"
-                     class="w-1/4 mt-10"/>
             </div>
         </div>
     </AccordionPanel>
@@ -819,9 +731,6 @@ onMounted(() => {
                     </tbody>
                 </table>
             </div>
-        </div>
-        <div v-if="Object.values(container).length === 0" class="w-full flex justify-center">
-            <img :src="NotFound" alt="image" class="w-1/4 mt-10" />
         </div>
     </AccordionPanel>
 </template>
