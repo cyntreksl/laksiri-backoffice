@@ -12,6 +12,7 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import TabHBLPayments from "@/Pages/Common/Partials/TabHBLPayments.vue";
+import TabShipment from "@/Pages/Common/Partials/TabShipment.vue";
 
 const props = defineProps({
     show: {
@@ -164,11 +165,17 @@ onMounted(() => {
                 </Tab>
                 <Tab value="2">
                     <a class="flex items-center gap-2 text-inherit">
+                        <i class="pi pi-truck" />
+                        <span>Shipment</span>
+                    </a>
+                </Tab>
+                <Tab value="3">
+                    <a class="flex items-center gap-2 text-inherit">
                         <i class="pi pi-chart-bar" />
                         <span>Status & Audit</span>
                     </a>
                 </Tab>
-                <Tab value="3">
+                <Tab value="4">
                     <a class="flex items-center gap-2 text-inherit">
                         <i class="pi pi-file" />
                         <span>Documents</span>
@@ -183,9 +190,12 @@ onMounted(() => {
                     <TabHBLPayments :hbl="hbl" :hbl-total-summary="hblTotalSummary" />
                 </TabPanel>
                 <TabPanel value="2">
-                    <TabStatus v-if="hbl" :hbl="hbl" :pickup="pickup" />
+                    <TabShipment v-if="hbl" :hbl="hbl" :pickup="pickup" />
                 </TabPanel>
                 <TabPanel value="3">
+                    <TabStatus v-if="hbl" :hbl="hbl" :pickup="pickup" />
+                </TabPanel>
+                <TabPanel value="4">
                     <TabDocuments v-if="hbl" :hbl-id="hbl.id"/>
                 </TabPanel>
             </TabPanels>
