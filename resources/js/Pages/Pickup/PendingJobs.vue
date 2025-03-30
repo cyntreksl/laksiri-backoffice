@@ -579,6 +579,7 @@ const confirmPickupRetry = (pickup) => {
         :pickup-id="selectedPickupID"
         :show="showConfirmViewPickupModal"
         @close="closeModal"
+        @update:show="showConfirmViewPickupModal = $event"
     />
 
     <AssignDriverDialog

@@ -1411,6 +1411,7 @@ const onDialogHide = () => {
             :hbl-id="hblId"
             :show="showConfirmViewHBLModal"
             @close="closeViewModal"
+            @update:show="showConfirmViewHBLModal = $event"
         />
 
         <Dialog v-model:visible="showAddNewPackageDialog" :header="editMode ? `Edit Package` : `Add New Package`" :style="{ width: '60rem' }" block-scroll maximizable modal position="bottom" @hide="onDialogHide" @show="onDialogShow">

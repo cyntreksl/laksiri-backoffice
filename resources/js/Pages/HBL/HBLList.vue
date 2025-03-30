@@ -579,6 +579,7 @@ const exportCSV = () => {
         :hbl-id="selectedHBLID"
         :show="showConfirmViewHBLModal"
         @close="closeModal"
+        @update:show="showConfirmViewHBLModal = $event"
     />
 
     <CallFlagModal
