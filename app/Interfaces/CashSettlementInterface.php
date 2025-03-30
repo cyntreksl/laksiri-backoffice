@@ -13,4 +13,6 @@ interface CashSettlementInterface
     public function updatePayment(array $data, HBL $hbl);
 
     public function export(array $filters);
+
+    public function duePaymentExport(array $filters);
 }

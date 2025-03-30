@@ -284,7 +284,7 @@ const createColumns = () => [
                         {
                             className:
                                 "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25",
-                            // href: route("couriers.edit", row.cells[0].data),
+                            href: route("couriers.edit", row.cells[1].data),
                         },
                         [
                             h("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 512 512", class: "size-4.5", fill: "none" }, [

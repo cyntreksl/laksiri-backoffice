@@ -17,6 +17,7 @@ Route::name('back-office.')->group(function () {
     Route::put('update/payments/{hbl}', [CashSettlementController::class, 'paymentUpdate'])
         ->name('cash-settlements.payment.update');
     Route::get('cash-settlements/export', [CashSettlementController::class, 'export']);
+    Route::get('cash-settlements/due-payment/export', [CashSettlementController::class, 'duePaymentExport']);
 
     // Warehouse
     Route::get('warehouses', [WarehouseController::class, 'index'])

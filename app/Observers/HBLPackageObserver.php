@@ -42,4 +42,13 @@ class HBLPackageObserver
             $package_rule_data = UpdateHBLPackageRuleData::run($hBLPackage, $data);
         }
     }
+
+    public function deleted(HBLPackage $hBLPackage): void
+    {
+        $existPackages = $hBLPackage->hbl->packages;
+        if ($existPackages->isEmpty()) {
+            $hBLPackage->hbl->delete();
+        }
+
+    }
 }

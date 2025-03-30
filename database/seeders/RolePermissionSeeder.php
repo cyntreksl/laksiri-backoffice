@@ -110,6 +110,7 @@ class RolePermissionSeeder extends Seeder
                 'group_name' => 'MHBL',
                 'permissions' => [
                     'mhbls.index',
+                    'mhbls.download hbl list',
                 ],
             ],
 
@@ -165,6 +166,7 @@ class RolePermissionSeeder extends Seeder
                     'shipment.show',
                     'shipment.download manifest',
                     'doortodoor.download manifest',
+                    'shipment.download tally sheet',
                 ],
             ],
 

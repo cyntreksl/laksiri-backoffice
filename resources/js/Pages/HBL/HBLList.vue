@@ -558,6 +558,12 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
+                        <Column field="is_short_loaded" header="">
+                            <template #body="slotProps">
+                                <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`"></Tag>
+                            </template>
+                        </Column>
+
                         <Column field="hbl_number" header="HBL Number" hidden sortable></Column>
 
                         <Column field="is_released" header="Released" hidden></Column>

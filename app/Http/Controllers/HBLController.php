@@ -294,7 +294,7 @@ class HBLController extends Controller
         $this->authorize('hbls.index');
 
         return Inertia::render('HBL/HBLListByUser', [
-            'users' => $this->userRepository->getUsers(),
+            'users' => $this->userRepository->getUsers(['customer']),
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'userData' => $user,
@@ -396,5 +396,10 @@ class HBLController extends Controller
     public function getHBLTotalSummary(HBL $hbl)
     {
         return $this->HBLRepository->getHBLTotalSummary($hbl);
+    }
+
+    public function getHBLsPackages(Request $request)
+    {
+        return $this->HBLRepository->getHBLsPackages($request->all());
     }
 }

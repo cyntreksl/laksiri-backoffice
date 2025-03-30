@@ -12,11 +12,13 @@ use App\Actions\MHBL\GetUnloadedMHBLWithHBLsByRef;
 use App\Actions\MHBL\GetUnloadMHBLWithHBLs;
 use App\Actions\MHBL\UpdateMHBL;
 use App\Actions\MHBL\UpdateMHBLsHBL;
+use App\Exports\MHBLsHBLListExport;
 use App\Factory\MHBL\FilterFactory;
 use App\Http\Resources\MHBLResource;
 use App\Interfaces\GridJsInterface;
 use App\Interfaces\MHBLRepositoryInterface;
 use App\Models\MHBL;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -55,21 +57,15 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $mhbls = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $mhbls = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => MHBLResource::collection($mhbls),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $mhbls->total(),
+                'current_page' => $mhbls->currentPage(),
+                'perPage' => $mhbls->perPage(),
+                'lastPage' => $mhbls->lastPage(),
             ],
         ]);
     }
@@ -128,5 +124,20 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
                 'mhbl' => $mhbl,
             ]);
         }
+    }
+
+    public function hblListDownloadPDF(MHBL $mhbl)
+    {
+        $filename = $mhbl->hbl_number.'_hbl_list_'.date('Y_m_d_h_i_s').'.pdf';
+        $export = new MHBLsHBLListExport($mhbl);
+        $data = array_filter($export->prepareData(), function ($item) {
+            return isset($item[0]) && $item[0] !== '';
+        });
+
+        $pdf = PDF::loadView('exports.mhbls_hbl_list', ['data' => $data, 'mhbl' => $mhbl]);
+
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->download($filename);
     }
 }

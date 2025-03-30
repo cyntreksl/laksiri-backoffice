@@ -81,6 +81,7 @@ class LoadedContainerManifestExport
                 0,
                 null,
                 null,
+                null,
             ];
         }
 
@@ -94,6 +95,12 @@ class LoadedContainerManifestExport
                     : null);
 
             $isHBLFullLoad = $hbl->packages->every(fn ($package) => $package->duplicate_containers->isNotEmpty());
+            $hblLoadedContainers = $hbl->packages
+                ->load('duplicate_containers')
+                ->pluck('duplicate_containers')
+                ->flatten()
+                ->unique('id')
+                ->sortByDesc('created_at');
             $hblLoadedLatestContainer = $hbl->packages
                 ->load('duplicate_containers')
                 ->pluck('duplicate_containers')
@@ -101,7 +108,13 @@ class LoadedContainerManifestExport
                 ->unique('id')
                 ->sortByDesc('created_at')
                 ->first();
-            $status = $hblLoadedLatestContainer['id'] === $this->container['id'] && $isHBLFullLoad ? 'BALANCE' : 'SHORT LOADED';
+            if ($isHBLFullLoad && count($hblLoadedContainers) === 1) {
+                $status = '';
+            } elseif (count($hblLoadedContainers) > 1 && $hblLoadedLatestContainer['id'] === $this->container['id']) {
+                $status = 'BALANCE';
+            } else {
+                $status = 'SHORT LOADED';
+            }
             $loadedContainerReferences = $hbl->packages->load('duplicate_containers')
                 ->pluck('duplicate_containers')
                 ->flatten()
@@ -121,7 +134,7 @@ class LoadedContainerManifestExport
                 $hbl->consignee_name,
                 $hbl->consignee_address,
                 $hbl->consignee_nic,
-                $hbl->consignee_contact,
+                $hbl->consignee_contact.($hbl->consignee_additional_mobile_number ? '/'.$hbl->consignee_additional_mobile_number : ''),
                 $loadedHBLPackages[$hbl->id]['packages'],
                 $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
                 $hbl->hbl_type,
@@ -132,6 +145,7 @@ class LoadedContainerManifestExport
                 $hbl->is_destination_charges_paid,
                 $status,
                 $referencesString ? "SHIP NO. $referencesString" : null,
+                $hbl->branch['currency_symbol'].' '.$hbl['grand_total'],
             ];
         }
 

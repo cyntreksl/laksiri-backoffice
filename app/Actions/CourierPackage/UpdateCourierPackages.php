@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Actions\HBL;
+namespace App\Actions\CourierPackage;
 
-use App\Models\HBL;
+use App\Actions\Courier\CreateCourierPackages;
+use App\Models\Courier;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class UpdateHBLPackages
+class UpdateCourierPackages
 {
     use AsAction;
 
-    public function handle(HBL $hbl, array $data)
+    public function handle(Courier $courier, array $data)
     {
-        DB::transaction(function () use ($hbl, $data) {
+        DB::transaction(function () use ($courier, $data) {
             $newPackages = [];
 
             $existPackages = array_filter($data, function ($item) {
@@ -25,13 +26,13 @@ class UpdateHBLPackages
 
             $existPackageIds = collect($existPackages)->pluck('id')->toArray();
 
-            $deletedPackages = $hbl->packages->reject(function ($package) use ($existPackageIds) {
+            $deletedPackages = $courier->packages->reject(function ($package) use ($existPackageIds) {
                 return in_array($package->id, $existPackageIds);
             });
             foreach ($deletedPackages as $packageToDelete) {
                 $packageToDelete->delete();
             }
-            CreateHBLPackages::run($hbl, $newPackages);
+            CreateCourierPackages::run($courier, $newPackages);
         });
     }
 }

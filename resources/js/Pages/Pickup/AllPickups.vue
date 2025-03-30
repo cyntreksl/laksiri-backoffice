@@ -85,7 +85,8 @@ const menuModel = ref([
         label: 'Retry',
         icon: 'pi pi-fw pi-refresh',
         command: () => confirmPickupRetry(selectedPickup),
-        disabled: !usePage().props.user.permissions.includes('pickups.retry'),
+        disabled: () => (selectedPickup.value.exception_note === '-') ||
+            (!usePage().props.user.permissions.includes('pickups.retry'))
     },
     {
         label: 'Delete',
@@ -545,7 +546,6 @@ const confirmPickupRetry = (pickup) => {
                                 </div>
                             </template>
                         </Column>
-
                         <template #footer> In total there are {{ pickups ? pickups.length : 0 }} pickups. </template>
                     </DataTable>
                 </template>

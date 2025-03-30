@@ -71,7 +71,7 @@
                 <tr>
                     <td  style="width: 15%;" >C.R.No</td>
                     <td style="width: 2%;" >:</td>
-                    <td>{{ $hbl?->reference }}</td>
+                    <td>{{ $hbl?->hbl_number }}</td>
                 </tr>
                 <tr>
                     <td>Time:</td>
@@ -109,7 +109,7 @@
     </tr>
     <tr   >
         <td   >1</td>
-        <td>{{$hbl?->reference}}</td>
+        <td>{{$hbl?->hbl_number}}</td>
         <td>{{$hbl?->cargo_type}} \ {{$hbl?->hbl_type}}</td>
         <td>{{$hbl?->grand_total }} {{$branch->currency_symbol}}</td>
 

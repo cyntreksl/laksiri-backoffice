@@ -70,7 +70,8 @@ class WarehouseController extends Controller
 
     public function export(Request $request)
     {
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus']);
+        $filteredRequest = array_filter($request->all(), fn ($value) => $value !== 'null' && $value !== null);
+        $filters = collect($filteredRequest)->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse'])->toArray();
 
         return $this->warehouseRepository->export($filters);
     }
