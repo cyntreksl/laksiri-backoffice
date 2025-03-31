@@ -137,7 +137,7 @@
                 </th>
                 <tr>
                     <th colspan="3" style="font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                        <strong>CONTR NO {{$container?->id}}</strong>
+                        <strong>{{$container?->cargo_type === 'Sea Cargo' ? 'CONTR NO '. $container?->container_number : 'AWB NO '.$container?->awb_number}}</strong>
                     </th>
 
                     <th colspan="4" style="text-align: left;font-family: 'Times New Roman',fantasy; font-size: 11px; border-bottom: none">
