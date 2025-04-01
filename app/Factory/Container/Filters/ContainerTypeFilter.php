@@ -9,8 +9,10 @@ class ContainerTypeFilter implements FilterInterface
 {
     public function apply(Builder $query, $value)
     {
-        $value = is_array($value) ? $value : array_map('trim', explode(',', $value));
+        if (! empty($value)) {
+            return $query->where('container_type', $value);
+        }
 
-        return $query->whereIn('container_type', $value);
+        return $query;
     }
 }
