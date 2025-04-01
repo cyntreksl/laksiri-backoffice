@@ -354,6 +354,10 @@ const resetConsigneeDetails = () => {
 
 const copiedPackages = ref({});
 
+const handleDialogHide = () => {
+    // Prevent scroll jump by focusing on a neutral element
+    document.body.focus({ preventScroll: true });
+};
 </script>
 
 <template>
@@ -647,19 +651,19 @@ const copiedPackages = ref({});
             </div>
 
             <!-- Add New HBL Dialog -->
-            <Dialog v-model:visible="showAddNewHBLDialog" modal header="Add New HBL" :style="{ width: '30vw' }" :blockScroll="true">
+            <Dialog v-model:visible="showAddNewHBLDialog" modal header="Add New HBL" :style="{ width: '30vw' }"   :focusOnShow="false"  @hide="handleDialogHide"    >
                 <div class="mt-4">
                     <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
                 </div>
 
                 <template #footer>
                     <Button label="Cancel" class="p-button-text" @click="closeAddNewHBLModal" />
-                    <Button label="Add HBL" class="p-button-primary ms-3" icon="pi pi-plus" @click.prevent="handleAddNewHBL" />
+                    <Button label="Add HBL" class="p-button-primary ms-3" icon="pi pi-plus" @click.prevent="handleAddNewHBL"  @hide="handleDialogHide"  />
                 </template>
             </Dialog>
 
             <!-- Remove HBL Dialog -->
-            <Dialog v-model:visible="showRemoveHBLDialog" modal header="Remove HBL" :style="{ width: '30vw' }" :blockScroll="true" >
+            <Dialog v-model:visible="showRemoveHBLDialog" modal header="Remove HBL" :style="{ width: '30vw' }" :blockScroll="true"     :focusOnShow="false"  >
                 <div class="mt-4">
                     <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
                 </div>
@@ -675,5 +679,8 @@ const copiedPackages = ref({});
 <style>
 .h-34 {
 height: 8.7rem;
+}
+body {
+    overflow-anchor: none;
 }
 </style>
