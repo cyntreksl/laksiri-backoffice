@@ -13,17 +13,13 @@ return new class extends Migration
     {
         Schema::create('hbl_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->foreignId('officer_id')->nullable()->constrained('officers')->onDelete('cascade');
             $table->foreignId('hbl_id')->nullable()->constrained('hbl')->onDelete('cascade');
             $table->foreignId('hbl_packages_id')->nullable()->constrained('hbl_packages')->onDelete('cascade');
             $table->enum('image_type', ['shipper_nic', 'shipper_passport', 'package']);
 
             $table->string('image_path');
 
-            // Specific fields for each type
-            $table->string('shipper_nic')->nullable();
-            $table->string('shipper_passport')->nullable();
-            $table->json('package_images')->nullable();
             $table->timestamps();
         });
     }

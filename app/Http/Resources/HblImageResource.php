@@ -19,10 +19,7 @@ class HblImageResource extends JsonResource
             'image_type' => $this->image_type,
             'hbl_id' => $this->hbl_id,
             'hbl_packages_id' => $this->hbl_packages_id,
-            'user_id' => $this->user_id,
-            'shipper_nic' => $this->shipper_nic,
-            'shipper_passport' => $this->shipper_passport,
-            'package_images' => $this->package_images,
+            'officer_id' => $this->officer_id,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

@@ -11,26 +11,22 @@ class HBLImage extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'officer_id',
         'hbl_id',
         'hbl_packages_id',
         'image_type',
         'image_path',
-        'shipper_nic',
-        'shipper_passport',
-        'package_images',
     ];
 
     protected $table = 'hbl_images';
 
     protected $casts = [
-        'package_images' => 'array',
         'image_type' => HBLImageType::class,
     ];
 
-    public function user()
+    public function officer()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Officer::class);
     }
 
     public function hbl()
