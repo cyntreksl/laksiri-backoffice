@@ -104,8 +104,9 @@ class RolePermissionSeeder extends Seeder
                     'hbls.delete documents',
                     'hbls.issue token',
                     'hbls.show draft hbls',
-                    'hbls.give finance approval',
+                    'hbls.hbl finance approval list',
                     'hbls.show finance approved hbls',
+                    'hbls.finance approved',
                 ],
             ],
 

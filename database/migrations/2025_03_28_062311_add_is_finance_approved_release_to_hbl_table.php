@@ -35,7 +35,7 @@ return new class extends Migration
             $table->dropColumn([
                 'is_finance_release_approved',
                 'finance_release_approved_by',
-                'finance_release_approved_date'
+                'finance_release_approved_date',
             ]);
         });
     }

@@ -58,6 +58,11 @@ Route::middleware([
         require_once __DIR__.'/web/call-center/boned-area.php';
         require_once __DIR__.'/web/call-center/reception.php';
     });
+
+    // finance routes
+    Route::name('finance.')->prefix('finance')->group(function () {
+        require_once __DIR__.'/web/finance/hbl.php';
+    });
 });
 
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);

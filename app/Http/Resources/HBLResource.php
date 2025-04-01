@@ -55,6 +55,7 @@ class HBLResource extends JsonResource
                     : null),
             'is_released' => $this->is_released,
             'is_short_loaded' => $this->packages()->whereDoesntHave('containers')->exists(),
+            'payment_status' => $this->hblPayment()->latest()->first()->status ?? 'Not Updated',
         ];
     }
 }
