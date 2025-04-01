@@ -10,7 +10,5 @@ Route::get('approve-hbls', [App\Http\Controllers\Finance\HBLController::class, '
 
 Route::get('approve-hbl-list', [App\Http\Controllers\Finance\HBLController::class, 'list']);
 
-Route::get('approve-hbl-list', [App\Http\Controllers\Finance\HBLController::class, 'list']);
-
 Route::post('finance-approved', [App\Http\Controllers\Finance\HBLController::class, 'financeApproved'])
     ->name('hbls.finance-approved');
