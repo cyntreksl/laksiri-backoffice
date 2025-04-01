@@ -546,13 +546,6 @@ const confirmPickupRetry = (pickup) => {
                                 </div>
                             </template>
                         </Column>
-
-                        <Column field="exception_note" header="Exception">
-                            <template #body="slotProps">
-                                <div>{{ slotProps.data.exception_note }}</div>
-                            </template>
-                        </Column>
-
                         <template #footer> In total there are {{ pickups ? pickups.length : 0 }} pickups. </template>
                     </DataTable>
                 </template>
@@ -564,6 +557,7 @@ const confirmPickupRetry = (pickup) => {
         :pickup-id="selectedPickupID"
         :show="showConfirmViewPickupModal"
         @close="closeModal"
+        @update:show="showConfirmViewPickupModal = $event"
     />
 
     <AssignDriverDialog

@@ -610,6 +610,7 @@ const handlePerPageChange = (event) => {
             :hbl-id="hblId"
             :show="showConfirmViewHBLModal"
             @close="closeShowHBLModal"
+            @update:show="showConfirmViewHBLModal = $event"
         />
     </AppLayout>
 </template>

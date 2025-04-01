@@ -1203,7 +1203,7 @@ const handleCopyFromHBLToConsignee = async () => {
                                                 size="small"
                                                 aria-label="Confirmation"
                                             />
-                                            <InputLabel value="Departure Charges Paid"/>
+                                            <InputLabel value="Departure(Agent) Charges Paid"/>
                                         </div>
                                     </li>
                                     <li class="flex py-3">

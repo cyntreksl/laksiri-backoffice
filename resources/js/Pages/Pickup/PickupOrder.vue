@@ -364,5 +364,6 @@ const closeModal = () => {
         :pickup-id="pickupId"
         :show="showConfirmViewPickupModal"
         @close="closeModal"
+        @update:show="showConfirmViewPickupModal = $event"
     />
 </template>

@@ -72,7 +72,7 @@
             <tbody>
             <tr>
                 <td style="text-align: left;" >To:<br>
-                    {{ $hbl->consignee_name }}<br>{{ $hbl->consignee_address }}<br>{{ $hbl->consignee_contact }}<br>
+                    {{ $hbl->consignee_name }}<br>{{ $hbl->consignee_address }}<br>{{ $hbl->consignee_contact }} {{ $hbl->consignee_additional_mobile_number ?  '/ '.$hbl->consignee_additional_mobile_number : ''}}<br>
 
                 </td>
             </tr>
