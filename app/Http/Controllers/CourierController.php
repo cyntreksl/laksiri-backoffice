@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enum\CargoType;
 use App\Enum\HBLType;
 use App\Http\Requests\StoreCourierRequest;
+use App\Http\Requests\UpdateCourierRequest;
 use App\Http\Requests\UpdateCourierStatusRequest;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\CourierAgentRepositoryInterface;
@@ -85,17 +86,26 @@ class CourierController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(Courier $courier)
     {
-        //
+        $this->authorize('courier.edit');
+
+        return Inertia::render('Courier/EditCourier', [
+            'courier' => $courier->load('packages'),
+            'cargoTypes' => CargoType::cases(),
+            'hblTypes' => HBLType::cases(),
+            'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
+            'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
+            'courierAgents' => $this->CourierAgentRepository->getAllCourierAgents(),
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Courier $courier, UpdateCourierRequest $request)
     {
-        //
+        $this->CourierRepository->updateCourier($courier, $request->all());
     }
 
     /**

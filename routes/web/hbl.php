@@ -91,3 +91,5 @@ Route::get('hbls/download/baggage/{hbl}', [HBLController::class, 'downloadBaggag
     ->name('hbls.download.baggage');
 
 Route::get('hbls/get-total-summary/{hbl}', [HBLController::class, 'getHBLTotalSummary'])->name('hbls.get-hbl-total-summary');
+
+Route::post('hbls/packages', [HBLController::class, 'getHBLsPackages'])->name('hbls.get-hbls-packages');

@@ -95,6 +95,12 @@ class LoadedContainerManifestExport
                     : null);
 
             $isHBLFullLoad = $hbl->packages->every(fn ($package) => $package->duplicate_containers->isNotEmpty());
+            $hblLoadedContainers = $hbl->packages
+                ->load('duplicate_containers')
+                ->pluck('duplicate_containers')
+                ->flatten()
+                ->unique('id')
+                ->sortByDesc('created_at');
             $hblLoadedLatestContainer = $hbl->packages
                 ->load('duplicate_containers')
                 ->pluck('duplicate_containers')
@@ -102,7 +108,13 @@ class LoadedContainerManifestExport
                 ->unique('id')
                 ->sortByDesc('created_at')
                 ->first();
-            $status = $hblLoadedLatestContainer['id'] === $this->container['id'] && $isHBLFullLoad ? 'BALANCE' : 'SHORT LOADED';
+            if ($isHBLFullLoad && count($hblLoadedContainers) === 1) {
+                $status = '';
+            } elseif (count($hblLoadedContainers) > 1 && $hblLoadedLatestContainer['id'] === $this->container['id']) {
+                $status = 'BALANCE';
+            } else {
+                $status = 'SHORT LOADED';
+            }
             $loadedContainerReferences = $hbl->packages->load('duplicate_containers')
                 ->pluck('duplicate_containers')
                 ->flatten()

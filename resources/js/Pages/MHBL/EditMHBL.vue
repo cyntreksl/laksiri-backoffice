@@ -3,37 +3,22 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { router, useForm, usePage } from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { computed, reactive, ref, watch } from "vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
-import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Checkbox from "@/Components/Checkbox.vue";
 import { push } from "notivue";
-import DialogModal from "@/Components/DialogModal.vue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import { float } from "quill/ui/icons.js";
-import { forEach } from "vuedraggable/dist/vuedraggable.common.js";
 import Card from 'primevue/card';
 import Fieldset from 'primevue/fieldset';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import Select from 'primevue/select';
-// import Checkbox from 'primevue/checkbox';
 import Textarea from 'primevue/textarea';
 import SelectButton from 'primevue/selectbutton';
 import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import InputNumber from 'primevue/inputnumber';
-import IftaLabel from 'primevue/iftalabel';
 import Dialog from 'primevue/dialog';
-import Message from 'primevue/message';
-import Dropdown from 'primevue/dropdown';
 import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
@@ -266,61 +251,80 @@ const closeRemoveHBLModal = () => {
 const handleAddNewHBL = async () => {
     if (!hblNumber.value) {
         closeAddNewHBLModal();
-        push.error('Please enter HBL Number!')
-    } else {
+        push.error('Please enter HBL Number!');
+        return;
+    }
+
+    if (form.hbls.includes(hblNumber.value)) {
+        closeAddNewHBLModal();
+        push.error("HBL Number is already added.");
+        return;
+    }
+
+    try {
         const response = await fetch(`/mhbls/add-hbl`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": usePage().props.csrf,
             },
-            body: JSON.stringify({
-                hbl_number: hblNumber.value
-            })
+            body: JSON.stringify({ hbl_number: hblNumber.value }),
         });
+
         if (!response.ok) {
             throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-
-            if (data.mhbl) {
-                closeAddNewHBLModal();
-                push.error("HBL already added to a MHBL.");
-            }
-
-            if (data.cargo_type !== form.cargo_type || data.hbl_type !== 'Door to Door' || data.warehouse === form.warehouse) {
-                closeAddNewHBLModal();
-                push.error("Selected HBL is not maching to  Primary Details");
-            } else {
-                for (const hblPackage of data.packages) {
-                    const packageItem = {
-                        hbl: data.hbl_number,
-                        hbl_id: data.id,
-                        type: hblPackage.package_type,
-                        length: hblPackage.length,
-                        width: hblPackage.width,
-                        height: hblPackage.height,
-                        quantity: hblPackage.quantity,
-                        volume: hblPackage.volume,
-                        weight: hblPackage.weight,
-                        remarks: hblPackage.remarks,
-                        packageRule: hblPackage.package_rule,
-                        measure_type: hblPackage.measure_type,
-                    };
-
-                    const newItem = { ...packageItem };
-                    packageList.value.push(newItem);
-                    form.grand_weight = form.grand_weight + packageItem.weight;
-                    form.grand_volume = form.grand_volume + packageItem.volume;
-                }
-                form.hbls.push(data.id);
-                closeAddNewHBLModal();
-                push.success('Add new HBL Successfully!')
-            }
-
         }
+
+        const data = await response.json();
+
+        if (!data.hbl_number || data.hbl_number !== hblNumber.value) {
+            closeAddNewHBLModal();
+            push.error("HBL Not Found!");
+            return;
+        }
+
+        if (form.hbls.includes(data.id)) {
+            closeAddNewHBLModal();
+            push.error("HBL ID is already linked to this shipment.");
+            return;
+        }
+
+        if (data.cargo_type !== form.cargo_type || data.hbl_type !== 'Door to Door' || data.warehouse === form.warehouse) {
+            closeAddNewHBLModal();
+            push.error("Selected HBL does not match the Primary Details.");
+            return;
+        }
+
+        for (const hblPackage of data.packages) {
+            const packageItem = {
+                hbl: data.hbl_number,
+                hbl_id: data.id,
+                type: hblPackage.package_type,
+                length: hblPackage.length,
+                width: hblPackage.width,
+                height: hblPackage.height,
+                quantity: hblPackage.quantity,
+                volume: hblPackage.volume,
+                weight: hblPackage.weight,
+                remarks: hblPackage.remarks,
+                packageRule: hblPackage.package_rule,
+                measure_type: hblPackage.measure_type,
+            };
+
+            packageList.value.push({ ...packageItem });
+            form.grand_weight += packageItem.weight;
+            form.grand_volume += packageItem.volume;
+        }
+
+        form.hbls.push(data.id);
+        closeAddNewHBLModal();
+        push.success('HBL added successfully!');
+
+    } catch (error) {
+        push.error("An error occurred while adding HBL.");
+        console.error("Error adding HBL:", error);
     }
-}
+};
 
 const handleRemoveHBL = async () => {
     if (!hblNumber.value) {
@@ -350,6 +354,13 @@ const resetConsigneeDetails = () => {
 
 const copiedPackages = ref({});
 
+const onDialogShow = () => {
+    document.body.classList.add('p-overflow-hidden');
+};
+
+const onDialogHide = () => {
+    document.body.classList.remove('p-overflow-hidden');
+};
 </script>
 
 <template>
@@ -405,7 +416,7 @@ const copiedPackages = ref({});
                             <div class="grid grid-cols-1 gap-4 mt-3">
                                 <div>
                                     <InputLabel value="Name"/>
-                                    <Select v-model="form.hbl_name" :options="shippers" class="w-full" filter option-label="name" option-value="name" placeholder="Select shipper" disabled />
+                                    <Select v-model="form.hbl_name" :options="shippers" class="w-full" filter option-label="name" option-value="name" placeholder="Select shipper"  />
                                     <InputError :message="form.errors.hbl_name"/>
                                 </div>
                                 <div>
@@ -460,7 +471,7 @@ const copiedPackages = ref({});
                             <div class="grid grid-cols-1 gap-4 mt-3">
                                 <div>
                                     <InputLabel value="Name"/>
-                                    <Select v-model="form.consignee_name" :options="consignees" class="w-full" filter option-label="name" option-value="name" placeholder="Select Consignee" disabled />
+                                    <Select v-model="form.consignee_name" :options="consignees" class="w-full" filter option-label="name" option-value="name" placeholder="Select Consignee"  />
                                     <InputError :message="form.errors.consignee_name"/>
                                 </div>
                                 <div>
@@ -485,7 +496,7 @@ const copiedPackages = ref({});
                                     <InputError :message="form.errors.consignee_address" />
                                 </div>
                                 <div>
-                                    <div class="h-34"></div>
+                                    <div class="min-h-[2.2rem] md:min-h-[8.7rem]"></div>
                                 </div>
                             </div>
                         </template>
@@ -639,37 +650,34 @@ const copiedPackages = ref({});
             <!-- Action Buttons -->
             <div class="flex justify-end space-x-5 my-6">
                 <Button label="Cancel" severity="danger" variant="outlined" @click="router.visit(route('mhbls.index'))" />
-                <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Create a MHBL" type="submit" />
+                <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Update MHBL" type="submit" />
             </div>
 
             <!-- Add New HBL Dialog -->
-            <Dialog v-model:visible="showAddNewHBLDialog" modal header="Add New HBL" :style="{ width: '30vw' }">
+            <Dialog v-model:visible="showAddNewHBLDialog" modal header="Add New HBL" :style="{ width: '90%', maxWidth: '450px' }" :block-scroll @hide="onDialogHide" @show="onDialogShow">
                 <div class="mt-4">
                     <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
                 </div>
-
                 <template #footer>
-                    <Button label="Cancel" class="p-button-text" @click="closeAddNewHBLModal" />
-                    <Button label="Add HBL" class="p-button-primary ms-3" icon="pi pi-plus" @click.prevent="handleAddNewHBL" />
+                    <div class="flex flex-wrap justify-content-end gap-2">
+                        <Button label="Cancel" class="p-button-text" @click="closeAddNewHBLModal" />
+                        <Button label="Add HBL" class="p-button-primary" icon="pi pi-plus" @click.prevent="handleAddNewHBL" @hide="handleDialogHide" />
+                    </div>
                 </template>
             </Dialog>
 
             <!-- Remove HBL Dialog -->
-            <Dialog v-model:visible="showRemoveHBLDialog" modal header="Remove HBL" :style="{ width: '30vw' }">
+            <Dialog v-model:visible="showRemoveHBLDialog" modal header="Remove HBL" :style="{ width: '90%', maxWidth: '450px' }" block-scroll @hide="onDialogHide" @show="onDialogShow">
                 <div class="mt-4">
                     <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
                 </div>
                 <template #footer>
-                    <Button label="Cancel" class="p-button-text" @click="closeRemoveHBLModal" />
-                    <Button label="Remove HBL" class="p-button-danger ms-3" icon="pi pi-trash" @click.prevent="handleRemoveHBL" />
+                    <div class="flex flex-wrap justify-content-end gap-2">
+                        <Button label="Cancel" class="p-button-text" @click="closeRemoveHBLModal" />
+                        <Button label="Remove HBL" class="p-button-danger" icon="pi pi-trash" @click.prevent="handleRemoveHBL" />
+                    </div>
                 </template>
             </Dialog>
         </form>
     </AppLayout>
 </template>
-
-<style>
-.h-34 {
-height: 8.7rem;
-}
-</style>

@@ -1319,6 +1319,7 @@ const shipIcon = ref(`
             :hbl-id="hblId"
             :show="showConfirmViewHBLModal"
             @close="closeModal"
+            @update:show="showConfirmViewHBLModal = $event"
         />
     </AppLayout>
 </template>

@@ -83,6 +83,14 @@ const menuModel = ref([
         disabled: !usePage().props.user.permissions.includes("hbls.edit"),
     },
     {
+        label: 'HBL List Download',
+        icon: 'pi pi-fw pi-download',
+        command: () => {
+            window.location.href = route("mhbls.hbl-list-downloads", selectedMHBL.value.id);
+        },
+        disabled: !usePage().props.user.permissions.includes("mhbls.download hbl list"),
+    },
+    {
         label: 'Delete',
         icon: 'pi pi-fw pi-trash',
         command: () => confirmDeleteMHBL(selectedMHBL.value),

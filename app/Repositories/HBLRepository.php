@@ -457,4 +457,25 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         return GetHBLTotalSummary::run($hbl);
     }
+
+    public function getHBLsPackages(array $data)
+    {
+        $ids = collect($data)->flatten()->toArray();
+        $hbls = HBL::whereIn('id', $ids)->with('mhbl')->get();
+        $groupedPackagesArray = $hbls->flatMap(function ($hbl) {
+            $groupKey = $hbl->id;
+
+            return $hbl->packages->map(function ($package) use ($groupKey) {
+                return ['group_key' => $groupKey, 'package' => $package];
+            });
+        })->groupBy('group_key')->map(function ($group) {
+            return $group->pluck('package');
+        })->map(function ($packages) {
+            return $packages->toArray();
+        })->toArray();
+
+        return response()->json([
+            'hblsPackages' => $groupedPackagesArray,
+        ]);
+    }
 }

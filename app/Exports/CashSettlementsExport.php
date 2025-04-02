@@ -49,7 +49,7 @@ class CashSettlementsExport implements FromQuery, ShouldAutoSize, WithHeadings, 
     {
         $query = HBL::query();
 
-        $query->cashSettlement();
+        $query->cashSettlement()->whereHas('packages');
         $query->with(['pickup', 'packages'])
             ->withSum('packages', 'weight')
             ->withSum('packages', 'volume');

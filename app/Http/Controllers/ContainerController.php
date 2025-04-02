@@ -100,6 +100,7 @@ class ContainerController extends Controller
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
             'cargoTypes' => $cargoTypes,
+            'warehouses' => GetDestinationBranches::run()->reject(fn ($warehouse) => $warehouse->name === 'Other'),
         ]);
     }
 

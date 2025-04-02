@@ -35,7 +35,12 @@ const props = defineProps({
         type: Boolean,
         default: false,
         required: false,
-    }
+    },
+    loadedHBLsPackages: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const emit = defineEmits(['close']);
@@ -145,12 +150,17 @@ const handleCreateLoadedContainer = (printTallySheet) => {
                         <th
                             class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
+                            Loaded Packages
+                        </th>
+                        <th
+                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
                             Total Packages
                         </th>
                         <th
                             class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
-                            Loaded Packages
+                            Status
                         </th>
                     </tr>
                     </thead>
@@ -159,17 +169,20 @@ const handleCreateLoadedContainer = (printTallySheet) => {
                         <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ findHblByPackageId(packageData.id).hbl_number }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                            {{ findHblByPackageId(packageData.id)?.packages.length }}
+                            {{ countPackages(packageData.hbl_id)}}
                         </td>
                         <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
-                            {{ countPackages(packageData.hbl_id)}}
+                            {{ loadedHBLsPackages[packageData.hbl_id].length }}
+                        </td>
+                        <td>
+                            <badge v-if="countPackages(packageData.hbl_id) < loadedHBLsPackages[packageData.hbl_id].length" class="badge bg-error/10 text-error dark:bg-error/15">Short Loaded</badge>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
 
-            <div v-if="!isDestinationLoading" class="is-scrollbar-hidden min-w-full overflow-x-auto mt-2">
+            <div v-if="!isDestinationLoading && Object.keys(loadedMHBLs).length > 0" class="is-scrollbar-hidden min-w-full overflow-x-auto mt-2">
                 <table class="is-hoverable w-full text-left">
                     <thead>
                     <tr>
@@ -186,12 +199,16 @@ const handleCreateLoadedContainer = (printTallySheet) => {
                         <th
                             class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
+                            Loaded Packages
+                        </th>
+                        <th
+                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
                             Total Packages
                         </th>
                         <th
                             class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
-                            Loaded Packages
                         </th>
                     </tr>
                     </thead>
