@@ -24,7 +24,14 @@ class DashboardController extends Controller
             'cashSettlements' => $this->dashboardRepository->countCashSettlements(),
             'totalDrivers' => $this->dashboardRepository->countTotalDrivers(),
             'driverAssignedJobs' => $this->dashboardRepository->countDriverAssignedJobs(),
-            'driverChartData' => $this->dashboardRepository->getTotalDriverAssignedJobsByMonth(),
+            'driverChartData' => [
+                'total' => $this->dashboardRepository->getTotalJobsByMonth(),
+                'exceptions' => $this->dashboardRepository->getExceptionJobsByMonth(),
+                'assigned' => $this->dashboardRepository->getTotalDriverAssignedJobsByMonth(),
+                'collected' => $this->dashboardRepository->getCollectedJobsByMonth(),
+            ],
+            'totalPickups' => $this->dashboardRepository->countTotalPickups(),
+            'hblChartData' => $this->dashboardRepository->getTotalHBLCountByMonth(),
         ]);
     }
 }

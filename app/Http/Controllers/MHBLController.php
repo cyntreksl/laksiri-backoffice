@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateMHBLRequest;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\MHBLRepositoryInterface;
 use App\Interfaces\OfficerRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
 use App\Models\HBL;
 use App\Models\HBLPackage;
 use App\Models\MHBL;
@@ -26,6 +27,7 @@ class MHBLController extends Controller
         private readonly OfficerRepositoryInterface $officerRepository,
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly MHBLRepositoryInterface $mhblRepository,
+        private readonly UserRepositoryInterface $userRepository,
     ) {}
 
     public function index()
@@ -34,15 +36,16 @@ class MHBLController extends Controller
 
         return Inertia::render('MHBL/MHBLList', [
             'warehouses' => GetDestinationBranches::run(),
+            'users' => $this->userRepository->getUsers(['customer']),
         ]);
     }
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
         $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold', 'paymentStatus']);
@@ -53,14 +56,17 @@ class MHBLController extends Controller
     public function create(Request $request)
     {
         $this->authorize('hbls.create');
+
         $data = $request->all();
-        $hblIds = array_column($data['hbls'], 'id');
 
-        $grand_total = HBL::whereIn('id', $hblIds)->get()->sum('grand_total');
+        $grand_total = HBL::whereIn('id', $data['hbls'])->get()->sum('grand_total');
 
-        $hblPackages = HblPackage::whereIn('hbl_id', $hblIds)->get();
+        $hblPackages = HblPackage::whereIn('hbl_id', $data['hbls'])->get();
+
         $grand_volume = $hblPackages->sum('volume');
+
         $grand_weight = $hblPackages->sum('weight');
+
         $packages = $hblPackages->map(function ($package) {
             return [
                 'id' => $package->id,
@@ -83,12 +89,12 @@ class MHBLController extends Controller
             'warehouses' => GetDestinationBranches::run(),
             'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
             'selectedCargoType' => $data['cargo_type'],
-            'selectedHblType' => 'Gift',
+            'selectedHblType' => HBLType::GIFT->value,
             'selectedWarehouse' => ucfirst(strtolower($data['warehouse'])),
             'shippers' => $this->officerRepository->getShippers(),
             'consignees' => $this->officerRepository->getConsignees(),
             'packages' => $packages,
-            'hblIds' => $hblIds,
+            'hblIds' => $data['hbls'],
             'grandVolume' => $grand_volume,
             'grandWeight' => $grand_weight,
             'grandTotal' => $grand_total,
@@ -180,5 +186,12 @@ class MHBLController extends Controller
         return response()->json([
             'mhbl' => GetMHBLById::run($mhbl_id),
         ]);
+    }
+
+    public function hblListDownloadPDF(MHBL $mhbl)
+    {
+        $this->authorize('mhbls.download hbl list');
+
+        return $this->mhblRepository->hblListDownloadPDF($mhbl);
     }
 }

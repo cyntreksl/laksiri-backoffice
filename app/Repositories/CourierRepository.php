@@ -6,7 +6,9 @@ use App\Actions\Courier\CreateCourier;
 use App\Actions\Courier\CreateCourierPackages;
 use App\Actions\Courier\DeleteCourier;
 use App\Actions\Courier\GetCourierByCourierNumber;
+use App\Actions\Courier\UpdateCourier;
 use App\Actions\Courier\UpdateCourierStatus;
+use App\Actions\CourierPackage\UpdateCourierPackages;
 use App\Factory\Courier\FilterFactory;
 use App\Http\Resources\CourierCollection;
 use App\Interfaces\CourierRepositoryInterface;
@@ -69,5 +71,14 @@ class CourierRepository implements CourierRepositoryInterface, GridJsInterface
             $courier = GetCourierByCourierNumber::run($selectedCourier[2]);
             UpdateCourierStatus::run($courier, $status);
         }
+    }
+
+    public function updateCourier(Courier $courier, $data)
+    {
+        $courier = UpdateCourier::run($courier, $data);
+        $packagesData = $data['packages'];
+        UpdateCourierPackages::run($courier, $packagesData);
+
+        return $courier;
     }
 }

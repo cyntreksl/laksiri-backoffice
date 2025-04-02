@@ -9,6 +9,10 @@ import ReviewModal from "@/Pages/Loading/Partials/ReviewModal.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import ActionMessage from "@/Components/ActionMessage.vue";
 import RadioButton from "@/Components/RadioButton.vue";
+import Fieldset from "primevue/fieldset";
+import SelectButton from "primevue/selectbutton";
+import InputError from "@/Components/InputError.vue";
+import Card from "primevue/card";
 
 const props = defineProps({
     container: {
@@ -170,7 +174,7 @@ const filteredPackages = computed(() => {
         return unloadedHBLs.value;
     }
     return unloadedHBLs.value.filter(hbl => {
-        return hbl?.hbl.toLowerCase().includes(searchQuery.value.toLowerCase());
+        return hbl?.hbl_number.toLowerCase().includes(searchQuery.value.toLowerCase());
     });
 })
 
@@ -353,6 +357,28 @@ watch(unloadedMHBLs, (newVal) => {
 });
 
 const reviewContainerArr = ref([]);
+
+const loadedHBLsPackages = ref([]);
+const handleGetHBLsPackages = async(hbls) => {
+    const response = await fetch(`/hbls/packages`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": usePage().props.csrf,
+        },
+        body: JSON.stringify({
+            hbls_id: hbls,
+        })
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok.');
+    } else {
+        const data = await response.json();
+        loadedHBLsPackages.value = data.hblsPackages;
+
+        console.log(data, loadedHBLsPackages.value);
+    }
+}
 const reviewContainer = () => {
     const copiedContainer = JSON.parse(JSON.stringify(containerArr.value));
     reviewContainerArr.value = [...copiedContainer];
@@ -365,8 +391,12 @@ const reviewContainer = () => {
             });
         });
     });
+    const hblsIdsArray = [...new Set(reviewContainerArr.value.map(pkg => pkg.hbl_id))];
+    handleGetHBLsPackages(hblsIdsArray);
 
-    showReviewModal.value = true
+    if(loadedHBLsPackages.value){
+        showReviewModal.value = true
+    }
 }
 </script>
 
@@ -1225,94 +1255,42 @@ const reviewContainer = () => {
                 </label>
             </div>
 
-            <div class="flex flex-wrap space-x-10 items-center p-4 my-4 rounded bg-white border border-indigo-400 mx-[var(--margin-x)]">
-                <div class="flex space-x-4 bg-green-100 p-5 rounded-lg">
-                    <label
-                        v-for="cargoType in cargoTypes"
-                        :key="cargoType"
-                        class="flex space-x-2 items-center"
-                    >
-                        <RadioButton
-                            v-model="filters.cargoMode"
-                            :label="cargoType"
-                            name="cargoType"
-                            :value="cargoType"
-                        />
-                        <svg
-                            v-if="cargoType === 'Air Cargo'"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-plane"
-                            fill="none"
-                            height="15"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            width="15"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                            <path
-                                d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z"/>
-                        </svg>
-                        <svg
-                            v-else
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
-                            fill="none"
-                            height="15"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            width="15"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                            <path
-                                d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1"/>
-                            <path d="M4 18l-1 -5h18l-2 4"/>
-                            <path d="M5 13v-6h8l4 6"/>
-                            <path d="M7 7v-4h-1"/>
-                        </svg>
-                    </label>
-                </div>
-                <div class="flex space-x-4 bg-blue-100 p-5 rounded-lg">
-                    <label
-                        v-for="hblType in hblTypes"
-                        :key="hblType"
-                        class="flex space-x-2 items-center"
-                    >
-                        <RadioButton
-                            v-model="filters.hblType"
-                            :label="hblType"
-                            :value="hblType"
-                            name="hblType"
-                        />
-                    </label>
+            <div class="flex flex-wrap space-x-10 items-center p-4 my-4 rounded border-none mx-[var(--margin-x)]">
+                <Card class="w-full">
+                    <template #content>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <Fieldset legend="Cargo Type">
+                                <SelectButton v-model="filters.cargoMode" :options="cargoTypes" name="Cargo Type" disabled>
+                                    <template #option="slotProps">
+                                        <div class="flex items-center">
+                                            <i v-if="slotProps.option === 'Sea Cargo'" class="ti ti-ship mr-2"></i>
+                                            <i v-else class="ti ti-plane mr-2"></i>
+                                            <span>{{ slotProps.option }}</span>
+                                        </div>
+                                    </template>
+                                </SelectButton>
+                            </Fieldset>
 
-                    <div v-if="filters.hblType" class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer" @click.prevent="filters.hblType = ''">
-                        <i class="fa fa-times-circle text-base"></i>
-                    </div>
-                </div>
-                <div class="flex space-x-4 bg-amber-100 p-5 rounded-lg">
-                    <label
-                        v-for="warehouse in warehouses"
-                        :key="warehouse"
-                        class="flex space-x-2 items-center"
-                    >
-                        <RadioButton
-                            v-model="filters.warehouse"
-                            :label="warehouse"
-                            :value="warehouse"
-                            name="warehouse"
-                        />
-                    </label>
+                            <Fieldset legend="Type">
+                                <div class="flex items-center gap-2">
+                                    <SelectButton v-model="filters.hblType" :options="hblTypes" name="HBL Type" />
+                                    <div v-if="filters.hblType" class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer" @click.prevent="filters.hblType = ''">
+                                        <i class="fa fa-times-circle text-base"></i>
+                                    </div>
+                                </div>
+                            </Fieldset>
 
-                    <div v-if="filters.warehouse" class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer" @click.prevent="filters.warehouse = ''">
-                        <i class="fa fa-times-circle text-base"></i>
-                    </div>
-                </div>
+                            <Fieldset legend="Warehouse">
+                                <div class="flex items-center gap-2">
+                                    <SelectButton v-model="filters.warehouse" :options="warehouses" name="Warehouse"/>
+                                    <div v-if="filters.warehouse" class="flex size-8 items-center justify-center rounded-lg bg-error/10 text-error hover:bg-error/40 hover:cursor-pointer" @click.prevent="filters.warehouse = ''">
+                                        <i class="fa fa-times-circle text-base"></i>
+                                    </div>
+                                </div>
+                            </Fieldset>
+                        </div>
+                    </template>
+                </Card>
             </div>
 
             <div class="flex h-[calc(100vh-8.5rem)] flex-grow flex-col">
@@ -1380,7 +1358,8 @@ const reviewContainer = () => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }}
+                                                                        {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }} -
+                                                                        {{ index+1 }} / {{Object.keys(hbl.packages).length}}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -1570,7 +1549,7 @@ const reviewContainer = () => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ hbl.hbl_number }}
+                                                                        {{ hbl.hbl_number }} - {{index+1}} / {{hbl.packages.length}}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -1996,6 +1975,7 @@ const reviewContainer = () => {
             :show="showReviewModal"
             :containerPackages="reviewContainerArr"
             :loadedMHBLs="loadedMHBLs"
+            :loadedHBLsPackages="loadedHBLsPackages"
             @close="showReviewModal = false"/>
 
         <!--        <ReviewModal :container-array="reviewContainerArr" :find-hbl-by-package-id="findHblByPackageId"-->

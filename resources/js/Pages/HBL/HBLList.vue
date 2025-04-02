@@ -1,26 +1,31 @@
 <script setup>
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {Link, router, usePage} from "@inertiajs/vue3";
-import {Grid, h, html} from "gridjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
-import FilterDrawer from "@/Components/FilterDrawer.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import DatePicker from "@/Components/DatePicker.vue";
-import FilterBorder from "@/Components/FilterBorder.vue";
+import FloatLabel from 'primevue/floatlabel';
+import {useConfirm} from "primevue/useconfirm";
+import Select from 'primevue/select';
+import Checkbox from 'primevue/checkbox';
+import InputText from 'primevue/inputtext';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+import Card from "primevue/card";
+import ContextMenu from 'primevue/contextmenu';
+import Panel from 'primevue/panel';
+import DatePicker from 'primevue/datepicker';
+import Button from "primevue/button";
+import Tag from 'primevue/tag';
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import axios from "axios";
+import {FilterMatchMode} from '@primevue/core/api';
 import moment from "moment";
-import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
-import Checkbox from "@/Components/Checkbox.vue";
-import Switch from "@/Components/Switch.vue";
-import FilterHeader from "@/Components/FilterHeader.vue";
-import DeleteHBLConfirmationModal from "@/Pages/HBL/Partials/DeleteHBLConfirmationModal.vue";
-import {push} from "notivue";
-import HoldConfirmationModal from "@/Pages/HBL/Partials/HoldConfirmationModal.vue";
+import {debounce} from "lodash";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import {push} from "notivue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
-import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const props = defineProps({
     users: {
@@ -34,9 +39,8 @@ const props = defineProps({
         },
     },
     paymentStatus: {
-        type: Object,
-        default: () => {
-        },
+        type: Array,
+        default: () => [],
     },
     warehouses: {
         type: Object,
@@ -45,694 +49,330 @@ const props = defineProps({
     },
 });
 
-const wrapperRef = ref(null);
-let grid = null;
-const isData = ref(false)
-const perPage = ref(10);
-const showFilters = ref(false);
-const fromDate = moment("2023-01-01").format("YYYY-MM-DD");
-const toDate = moment(new Date()).format("YYYY-MM-DD");
-
-const filters = reactive({
-    fromDate: fromDate,
-    toDate: toDate,
-    cargoMode: ["Air Cargo", "Sea Cargo"],
-    hblType: ["UPB", "Gift", "Door to Door"],
-    isHold: false,
-    warehouse: props.warehouses.map(warehouse => warehouse.name),
-    createdBy: "",
-    paymentStatus: [],
-});
-
-const data = reactive({
-    columnVisibility: {
-        id: false,
-        reference: false,
-        hbl: true,
-        hbl_name: true,
-        consignee_name: true,
-        consignee_address: true,
-        consignee_contact: true,
-        email: false,
-        address: false,
-        contact_number: true,
-        cargo_type: true,
-        hbl_type: true,
-        warehouse: false,
-        status: false,
-        is_hold: false,
-        hbl_number: false,
-        is_released: false,
-        view: true,
-        actions: true,
-    },
-});
-
 const baseUrl = ref("/hbl-list");
-
-const toggleColumnVisibility = (columnName) => {
-    data.columnVisibility[columnName] = !data.columnVisibility[columnName];
-    updateGridConfig();
-    grid.forceRender();
-};
-
-const initializeGrid = () => {
-    const visibleColumns = Object.keys(data.columnVisibility);
-
-    grid = new Grid({
-        columns: createColumns(),
-        search: {
-            debounceTimeout: 1000,
-            server: {
-                url: (prev, keyword) => `${prev}&search=${keyword}`,
-            },
-        },
-        sort: {
-            multiColumn: false,
-            server: {
-                url: (prev, columns) => {
-                    if (!columns.length) return `${prev}&order=id&dir=desc`;
-                    const col = columns[0];
-                    const dir = col.direction === 1 ? "asc" : "desc";
-                    let colName = visibleColumns[col.index];
-
-                    return `${prev}&order=${colName}&dir=${dir}`;
-                },
-            },
-        },
-        pagination: {
-            limit: perPage.value,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
-        },
-        server: {
-            url: constructUrl(),
-            then: (data) =>
-                data.data.map((item) => {
-                    const row = [];
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                }),
-            total: (response) => {
-                if (response && response.meta) {
-                    response.meta.total > 0 ? isData.value = true : isData.value = false;
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
-
-    grid.render(wrapperRef.value);
-};
-
-const createColumns = () => [
-    {name: "ID", hidden: !data.columnVisibility.id},
-    {name: "Reference", hidden: !data.columnVisibility.reference},
-    {
-        name: "HBL",
-        hidden: !data.columnVisibility.hbl,
-        formatter: (_, row) => {
-            return row.cells[15].data || row.cells[1].data
-        },
-    },
-    {
-        name: "HBL Name",
-        hidden: !data.columnVisibility.hbl_name,
-        formatter: (cell) => {
-            if (!cell) return "";
-            let value = cell.toString();
-
-            if (value.length < 20) {
-                return html(
-                    `<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">${value}</a>`
-                );
-            }
-
-            return html(
-                `<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">${
-                    value.substring(0, 20) + "..."
-                }</a>`
-            );
-        },
-    },
-    {name: "Consignee Name", hidden: !data.columnVisibility.consignee_name},
-    {
-        name: "Consignee Address",
-        hidden: !data.columnVisibility.consignee_address,
-        sort: false,
-        formatter: (cell) => {
-            if (!cell) return "";
-            let value = cell.toString();
-
-            if (value.length < 10) {
-                return html(
-                    `<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">${value}</a>`
-                );
-            }
-
-        //     hover icon and show full address
-            // Display with info icon and tooltip for addresses longer than 20 characters
-            return html(
-                `<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">
-                ${value.substring(0, 10) + "..."}
-            </a>
-            <i class="fa fa-info-circle"
-            x-tooltip.placement.bottom.error="'${value}'"
-               class="info-icon"></i>`
-            );
-        },
-    },
-    {
-        name: "Consignee Contact",
-        hidden: !data.columnVisibility.consignee_contact,
-        sort: false,
-    },
-    {name: "Email", hidden: !data.columnVisibility.email, sort: false},
-    {name: "Address", hidden: !data.columnVisibility.address, sort: false},
-    {
-        name: "Contact",
-        hidden: !data.columnVisibility.contact_number,
-        sort: false,
-        formatter: (cell) => {
-            if (!cell) return "";
-
-            return html(
-                `<a style="text-decoration: underline; color: blue" href="hbls/get-hbls-by-user/${cell}">${cell} </a>`
-            );
-        },
-    },
-    {
-        name: "Cargo Mode",
-        sort: false,
-        hidden: !data.columnVisibility.cargo_type,
-        formatter: (_, row) =>
-            row.cells[10].data == "Sea Cargo"
-                ? h(
-                    "span",
-                    {className: "flex"},
-                    h(
-                        "svg",
-                        {
-                            xmlns: "http://www.w3.org/2000/svg",
-                            viewBox: "0 0 24 24",
-                            class: "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
-                            fill: "none",
-                            height: 24,
-                            width: 24,
-                            stroke: "currentColor",
-                            strokeLinecap: "round",
-                            strokeLinejoin: "round",
-                            strokeWidth: 2,
-                        },
-                        [
-                            h("path", {
-                                stroke: "none",
-                                d: "M0 0h24v24H0z",
-                                fill: "none",
-                            }),
-                            h("path", {
-                                d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
-                            }),
-                            h("path", {
-                                d: "M4 18l-1 -5h18l-2 4",
-                            }),
-                            h("path", {
-                                d: "M5 13v-6h8l4 6",
-                            }),
-                            h("path", {
-                                d: "M7 7v-4h-1",
-                            }),
-                        ]
-                    ),
-                    row.cells[10].data
-                )
-                : row.cells[10].data == "Air Cargo"
-                    ? h("span", {className: "flex space-x-2"}, [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class: "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                                strokeWidth: 2,
-                            },
-                            [
-                                h("path", {
-                                    stroke: "none",
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                }),
-                                h("path", {
-                                    d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
-                                }),
-                            ]
-                        ),
-                        row.cells[10].data,
-                    ])
-                    : row.cells[10].data,
-    },
-    {name: "HBL Type", hidden: !data.columnVisibility.hbl_type},
-    {name: "Warehouse", hidden: !data.columnVisibility.warehouse},
-    {name: "Status", hidden: !data.columnVisibility.status},
-    {
-        name: "Is Hold",
-        hidden: !data.columnVisibility.is_hold,
-        formatter: (cell) => {
-            return cell
-                ? html(`<div></div class="text-center"><svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg></div>`)
-                : null;
-        },
-        sort: false,
-    },
-    {name: "Is Released", hidden: !data.columnVisibility.is_released},
-    // {
-    //     name: "Actions",
-    //     sort: false,
-    //     hidden: !data.columnVisibility.actions,
-    //     formatter: (_, row) => {
-    //         return h("div", {className: "flex space-x-2"}, [
-    //             usePage().props.user.permissions.includes("hbls.show")
-    //                 ? h(
-    //                     "a",
-    //                     {
-    //                         className:
-    //                             "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-    //                         onClick: () => confirmViewHBL(row.cells[0].data),
-    //                         "x-tooltip..placement.bottom.primary":
-    //                             "'View HBL'",
-    //                     },
-    //                     [
-    //                         h(
-    //                             "svg",
-    //                             {
-    //                                 xmlns: "http://www.w3.org/2000/svg",
-    //                                 viewBox: "0 0 24 24",
-    //                                 class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-    //                                 fill: "none",
-    //                                 height: 24,
-    //                                 width: 24,
-    //                                 stroke: "currentColor",
-    //                                 strokeLinecap: "round",
-    //                                 strokeLinejoin: "round",
-    //                             },
-    //                             [
-    //                                 h("path", {
-    //                                     d: "M0 0h24v24H0z",
-    //                                     fill: "none",
-    //                                     stroke: "none",
-    //                                 }),
-    //                                 h("path", {
-    //                                     d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-    //                                 }),
-    //                                 h("path", {
-    //                                     d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-    //                                 }),
-    //                             ]
-    //                         ),
-    //                     ]
-    //                 )
-    //                 : null,
-    //         ]);
-    //     },
-    // },
-    {
-        name: "",
-        sort: false,
-        formatter: (_, row) => {
-            return usePage().props.user.permissions.includes("hbls.show")
-                ? h(
-                    "a",
-                    {
-                        className:
-                            "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                        onClick: () => confirmViewHBL(row.cells[0].data),
-                        "x-tooltip..placement.bottom.primary":
-                            "'View HBL'",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                fill: "none",
-                                height: 24,
-                                width: 24,
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                            },
-                            [
-                                h("path", {
-                                    d: "M0 0h24v24H0z",
-                                    fill: "none",
-                                    stroke: "none",
-                                }),
-                                h("path", {
-                                    d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                }),
-                                h("path", {
-                                    d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                }),
-                            ]
-                        ),
-                    ]
-                )
-                : null
-        }
-    },
-    {
-        name: "",
-        sort: false,
-        hidden: !data.columnVisibility.actions,
-        formatter: (_, row) => {
-            return h("div", { className: "flex space-x-2 relative group" }, [
-                // Popover action button (Hamburger or similar)
-                h(
-                    "a",
-                    {
-                        className:
-                            "btn size-5 p-0 hover:bg-dark/20 focus:bg-dark/20 active:bg-dark/25 mr-2",
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 128 512",
-                                class: "icon icon-ellipsis",
-                                fill: "currentColor",
-                                height: 24,
-                                width: 24,
-                            },
-                            [
-                                h("path", {
-                                    d: "M64 360a56 56 0 1 0 0 112 56 56 0 1 0 0-112zm0-160a56 56 0 1 0 0 112 56 56 0 1 0 0-112zM120 96A56 56 0 1 0 8 96a56 56 0 1 0 112 0z",
-                                })
-                            ]
-                        )
-
-                    ]),
-
-                // Popover content
-                h("div", {
-                    className: "absolute hidden group-hover:block bg-white shadow-lg rounded-md mt-2 w-32 z-100 right-full mr-2 transition-opacity duration-200 ease-in-out opacity-0 group-hover:opacity-100",
-                }, [
-                    usePage().props.user.permissions.includes("hbls.edit") && h("a", {
-                        href: "#",
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                        onClick: () => confirmViewCallFlagModal(row.cells),
-                    }, "Call Flag"),
-
-                    usePage().props.user.permissions.includes("hbls.edit") && h("a", {
-                        href: "#",
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                        onClick: () => router.visit(route("hbls.edit", row.cells[0].data)),
-                    }, "Edit"),
-
-                    usePage().props.user.permissions.includes("hbls.show") && h("a", {
-                        href: "#",
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                        onClick: () => confirmViewHBL(row.cells[0].data),
-                    }, "View HBL"),
-
-                    usePage().props.user.permissions.includes("hbls.hold and release") && h("a", {
-                        href: "#",
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                        onClick: () => confirmIsHold(row.cells),
-                    }, row.cells[14].data ? "Release HBL" : "Hold HBL"),
-
-                    usePage().props.user.permissions.includes("hbls.download pdf") && h("a", {
-                        href: route("hbls.download", row.cells[0].data),
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                    }, "Download HBL"),
-
-                    usePage().props.user.permissions.includes("hbls.download invoice") && h("a", {
-                        href: route("hbls.download.invoice", row.cells[0].data),
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                    }, "Invoice"),
-
-                    usePage().props.user.permissions.includes("hbls.download barcode") && h("a", {
-                        href: route("hbls.download.barcode", row.cells[0].data),
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                    }, "Barcode"),
-
-                    !row.cells[16].data && usePage().props.user.permissions.includes("hbls.delete") && h("a", {
-                        href: "#",
-                        className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                        onClick: () => confirmDeleteHBL(row.cells[0].data),
-                    }, "Delete"),
-
-                    // usePage().props.user.permissions.includes("hbls.download pdf") && h("a", {
-                    //     href: route("hbls.getCashierReceipt", row.cells[0].data),
-                    //     className: "block px-4 py-2 text-gray-700 hover:bg-gray-100",
-                    // }, "Download Cashier Receipt"),
-                ]),
-            ]);
-        }
-    },
-
-];
-
-const updateGridConfig = () => {
-    grid.updateConfig({
-        columns: createColumns(),
-    });
-};
-
-onMounted(() => {
-    initializeGrid();
-});
-
-const constructUrl = () => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
-        }
-    }
-    return baseUrl.value + "?" + params.toString();
-};
-
-const applyFilters = () => {
-    showFilters.value = false;
-    const newUrl = constructUrl();
-    const visibleColumns = Object.keys(data.columnVisibility);
-
-    grid.updateConfig({
-        server: {
-            url: newUrl,
-            then: (data) => {
-                if (data.data.length === 0) {
-                    // Return a placeholder row for "No matching data"
-                    return [
-                        visibleColumns.map(() => "No matching data found"),
-                    ];
-                }
-
-                // Map the data to visible columns
-                return data.data.map((item) => {
-                    const row = [];
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                });
-            },
-            total: (response) => {
-                if (response && response.meta) {
-                    response.meta.total > 0 ? isData.value = true : isData.value = false;
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
-
-    grid.forceRender();
-};
-
-const showConfirmDeleteHBLModal = ref(false);
-const hblId = ref(null);
-const selectedHBL = ref({});
-
-const confirmDeleteHBL = (id) => {
-    hblId.value = id;
-    showConfirmDeleteHBLModal.value = true;
-};
-
-const handleDeleteHBL = () => {
-    router.delete(route("hbls.destroy", hblId.value), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            push.success("HBL record Deleted Successfully!");
-            router.visit(route("hbls.index"), {only: ["hbls"]});
-        },
-        onError: () => {
-            closeModal();
-            push.error("Something went to wrong!");
-        },
-    });
-};
-
+const loading = ref(true);
+const hbls = ref([]);
+const totalRecords = ref(0);
+const perPage = ref(10);
+const currentPage = ref(1);
 const showConfirmViewHBLModal = ref(false);
-
-const confirmViewHBL = async (id) => {
-    hblId.value = id;
-    showConfirmViewHBLModal.value = true;
-};
-
-const hblData = ref({});
-
-const showConfirmHoldModal = ref(false);
-
-const confirmIsHold = (row) => {
-    hblData.value = row;
-    showConfirmHoldModal.value = true;
-};
-
-const closeHoldModal = () => {
-    showConfirmHoldModal.value = false;
-};
-
-const toggleHold = () => {
-    router.put(
-        route("hbls.toggle-hold", hblData.value[0].data),
-        {},
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                closeHoldModal();
-                push.success(
-                    hblData.value[14].data
-                        ? "Released " + hblData.value[1].data
-                        : "Hold " + hblData.value[1].data
-                );
-                router.visit(route("hbls.index"));
-                hblData.value = {};
-            },
-            onError: () => {
-                push.error("Something went to wrong!");
-            },
-        }
-    );
-};
-
-const resetFilter = () => {
-    filters.fromDate = fromDate;
-    filters.toDate = toDate;
-    filters.cargoMode = ["Air Cargo", "Sea Cargo", "Door to Door"];
-    filters.hblType = ["UPB", "Gift", "Door to Door"];
-    filters.isHold = false;
-    filters.warehouse = props.warehouses.map(warehouse => warehouse.name);
-    filters.createdBy = "";
-    filters.paymentStatus = [];
-    applyFilters();
-};
-
-const exportURL = computed(() => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
-        }
-    }
-    return "/hbls/list/export" + "?" + params.toString();
-});
-
-const closeModal = () => {
-    showConfirmDeleteHBLModal.value = false;
-    showConfirmViewHBLModal.value = false;
-    hblId.value = null;
-    selectedHBL.value = null;
-};
-
-const handlePerPageChange = (event) => {
-    perPage.value = parseInt(event.target.value);
-
-    grid.updateConfig({
-        pagination: {
-            limit: perPage.value,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
-        },
-    });
-
-    grid.forceRender();
-};
-
+const cm = ref();
+const selectedHBL = ref(null);
+const selectedHBLID = ref(null);
+const confirm = useConfirm();
+const dt = ref();
+const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
+const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
+const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
+const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
+const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const showConfirmViewCallFlagModal = ref(false);
 const hblName = ref("");
 
-const confirmViewCallFlagModal = async (row) => {
-    hblId.value = row[0].data;
-    hblName.value = row[3].data;
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
+    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+    cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+    is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
+    user: {value: null, matchMode: FilterMatchMode.EQUALS},
+    payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+});
+
+const menuModel = ref([
+    {
+        label: "View",
+        icon: "pi pi-fw pi-search",
+        command: () => confirmViewHBL(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.show"),
+    },
+    {
+        label: "Call Flag",
+        icon: "pi pi-fw pi-flag",
+        command: () => confirmViewCallFlagModal(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
+    },
+    {
+        label: "Edit",
+        icon: "pi pi-fw pi-pencil",
+        command: () => router.visit(route("hbls.edit", selectedHBL.value.id)),
+        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
+    },
+    {
+        label: computed(() => (selectedHBL.value?.is_hold ? 'Release' : 'Hold')),
+        icon: computed(() => (selectedHBL.value?.is_hold ? 'pi pi-fw pi-play-circle' : 'pi pi-fw pi-pause-circle')) ,
+        command: () => confirmHBLHold(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.hold and release"),
+    },
+    {
+        label: "Download",
+        icon: "pi pi-fw pi-download",
+        url: () => route("hbls.download", selectedHBL.value.id),
+        disabled: !usePage().props.user.permissions.includes("hbls.download pdf"),
+    },
+    {
+        label: "Invoice",
+        icon: "pi pi-fw pi-receipt",
+        url: () => route("hbls.download.invoice", selectedHBL.value.id),
+        disabled: !usePage().props.user.permissions.includes("hbls.download invoice"),
+    },
+    {
+        label: "Barcode",
+        icon: "pi pi-fw pi-barcode",
+        url: () => route("hbls.download.barcode", selectedHBL.value.id),
+        disabled: !usePage().props.user.permissions.includes("hbls.download barcode"),
+    },
+    {
+        label: "Delete",
+        icon: "pi pi-fw pi-times",
+        command: () => confirmHBLDelete(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.delete"),
+    },
+]);
+
+const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+    loading.value = true;
+    try {
+        const response = await axios.get(baseUrl.value, {
+            params: {
+                page,
+                per_page: perPage.value,
+                search,
+                warehouse: filters.value.warehouse.value || "",
+                deliveryType: filters.value.hbl_type.value || "",
+                cargoMode: filters.value.cargo_type.value || "",
+                isHold: filters.value.is_hold.value || false,
+                sort_field: sortField,
+                sort_order: sortOrder === 1 ? "asc" : "desc",
+                createdBy: filters.value.user.value || "",
+                paymentStatus: filters.value.payments.value || [],
+                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+                toDate: moment(toDate.value).format("YYYY-MM-DD"),
+            }
+        });
+        hbls.value = response.data.data;
+        totalRecords.value = response.data.meta.total;
+        currentPage.value = response.data.meta.current_page;
+    } catch (error) {
+        console.error("Error fetching HBLs:", error);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const debouncedFetchHBLs = debounce((searchValue) => {
+    fetchHBLs(1, searchValue);
+}, 1000);
+
+watch(() => filters.value.global.value, (newValue) => {
+    if (newValue !== null) {
+        debouncedFetchHBLs(newValue);
+    }
+});
+
+watch(() => filters.value.warehouse.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.hbl_type.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.cargo_type.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.is_hold.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.user.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.payments.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => fromDate.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => toDate.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+const onPageChange = (event) => {
+    perPage.value = event.rows;
+    currentPage.value = event.page + 1;
+    fetchHBLs(currentPage.value);
+};
+
+const onSort = (event) => {
+    fetchHBLs(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+};
+
+onMounted(() => {
+    fetchHBLs();
+});
+
+const resolveHBLType = (hbl) => {
+    switch (hbl.hbl_type) {
+        case 'UPB':
+            return 'secondary';
+        case 'Gift':
+            return 'warn';
+        case 'Door to Door':
+            return 'info';
+        default:
+            return null;
+    }
+};
+
+const resolveCargoType = (hbl) => {
+    switch (hbl.cargo_type) {
+        case 'Sea Cargo':
+            return {
+                icon: "ti ti-sailboat",
+                color: "success",
+            };
+        case 'Air Cargo':
+            return {
+                icon: "ti ti-plane-tilt",
+                color: "info",
+            };
+        default:
+            return null;
+    }
+};
+
+const resolveWarehouse = (hbl) => {
+    switch (hbl.warehouse.toUpperCase()) {
+        case 'COLOMBO':
+            return 'info';
+        case 'NINTAVUR':
+            return 'danger';
+        default:
+            return null;
+    }
+};
+
+const onRowContextMenu = (event) => {
+    cm.value.show(event.originalEvent);
+};
+
+const confirmViewHBL = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    showConfirmViewHBLModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmViewHBLModal.value = false;
+    selectedHBLID.value = null;
+};
+
+const clearFilter = () => {
+    filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
+        hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+        cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+        is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
+        user: {value: null, matchMode: FilterMatchMode.EQUALS},
+        payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+    };
+    fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
+    toDate.value = moment(new Date()).toISOString().split("T")[0];
+    fetchHBLs(currentPage.value);
+};
+
+const confirmHBLDelete = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    confirm.require({
+        message: 'Would you like to delete this hbl record?',
+        header: 'Delete HBL?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            router.delete(route("hbls.destroy", selectedHBLID.value), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("HBL record Deleted Successfully!");
+                    router.visit(route("hbls.index"), {only: ["hbls"]});
+                },
+                onError: () => {
+                    push.error("Something went to wrong!");
+                },
+            });
+            selectedHBLID.value = null;
+        },
+        reject: () => {
+        }
+    });
+};
+
+const confirmHBLHold = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    confirm.require({
+        message: `Would you like to ${hbl.value.is_hold ? 'Release' : 'Hold'} this hbl?`,
+        header: `${hbl.value.is_hold ? 'Release' : 'Hold'} HBL?`,
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: `${hbl.value.is_hold ? 'Release' : 'Hold'}`,
+            severity: 'warn'
+        },
+        accept: () => {
+            router.put(
+                route("hbls.toggle-hold", selectedHBLID.value),
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success(`Operation Successfully!`);
+                        fetchHBLs(currentPage.value);
+                    },
+                    onError: () => {
+                        push.error("Something went to wrong!");
+                    },
+                }
+            );
+            selectedHBLID.value = null;
+        },
+        reject: () => {
+        }
+    });
+};
+
+const confirmViewCallFlagModal = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    hblName.value = hbl.value.hbl_name;
     showConfirmViewCallFlagModal.value = true;
 };
 
 const closeCallFlagModal = () => {
     showConfirmViewCallFlagModal.value = false;
-    hblId.value = null;
+    selectedHBLID.value = null;
     hblName.value = "";
 };
 
-const planeIcon = ref(`
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="15"
-  height="15"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  class="icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2"
->
-  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-  <path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" />
-</svg>
-`);
-
-const shipIcon = ref(`
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="15"
-  height="15"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
->
-  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-  <path d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1" />
-  <path d="M4 18l-1 -5h18l-2 4" />
-  <path d="M5 13v-6h8l4 6" />
-  <path d="M7 7v-4h-1" />
-</svg>
-`);
+const exportCSV = () => {
+    dt.value.exportCSV();
+};
 </script>
 
 <template>
@@ -740,504 +380,218 @@ const shipIcon = ref(`
         <template #header>HBL List</template>
 
         <Breadcrumb/>
-        <div class="flex justify-end mt-5">
-            <Link
-                v-if="$page.props.user.permissions.includes('hbls.create')"
-                :href="route('hbls.create')"
-            >
-                <PrimaryButton> Create New HBL</PrimaryButton>
-            </Link>
+
+        <div>
+            <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="fromDate" class="w-full" date-format="yy-mm-dd" input-id="from-date"/>
+                        <label for="from-date">From Date</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="toDate" class="w-full" date-format="yy-mm-dd" input-id="to-date"/>
+                        <label for="to-date">To Date</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.payments.value" :options="paymentStatus" :showClear="true" class="w-full" input-id="payment-status" />
+                        <label for="payment-status">Payment Status</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.user.value" :options="users" :showClear="true" class="w-full" input-id="user" option-label="name" option-value="id" />
+                        <label for="user">Created By</label>
+                    </FloatLabel>
+                </div>
+            </Panel>
+
+            <Card class="my-5">
+                <template #content>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedHBL = null" />
+                    <DataTable
+                        ref="dt"
+                        v-model:contextMenuSelection="selectedHBL"
+                        v-model:filters="filters"
+                        :globalFilterFields="['reference', 'hbl', 'hbl_name', 'email', 'address', 'contact_number', 'consignee_name', 'consignee_address', 'consignee_contact', 'cargo_type', 'hbl_type', 'warehouse', 'status', 'hbl_number']"
+                        :loading="loading"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="totalRecords"
+                        :value="hbls"
+                        context-menu
+                        dataKey="id"
+                        filter-display="menu"
+                        lazy
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
+                        @page="onPageChange"
+                        @rowContextmenu="onRowContextMenu"
+                        @sort="onSort">
+
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    All HBLs
+                                </div>
+                                <Link v-if="$page.props.user.permissions.includes('hbls.create')" :href="route('hbls.create')">
+                                    <PrimaryButton class="w-full">Create New HBL</PrimaryButton>
+                                </Link>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Button Group -->
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        icon="pi pi-filter-slash"
+                                        label="Clear Filters"
+                                        outlined
+                                        severity="contrast"
+                                        size="small"
+                                        type="button"
+                                        @click="clearFilter()"
+                                    />
+
+                                    <Button
+                                        icon="pi pi-external-link"
+                                        label="Export"
+                                        severity="contrast"
+                                        size="small"
+                                        @click="exportCSV($event)"
+                                    />
+                                </div>
+
+                                <!-- Search Field -->
+                                <IconField class="w-full sm:w-auto">
+                                    <InputIcon>
+                                        <i class="pi pi-search" />
+                                    </InputIcon>
+                                    <InputText
+                                        v-model="filters.global.value"
+                                        class="w-full"
+                                        placeholder="Keyword Search"
+                                        size="small"
+                                    />
+                                </IconField>
+                            </div>
+                        </template>
+
+                        <template #empty> No hbls found. </template>
+
+                        <template #loading> Loading hbl data. Please wait.</template>
+
+                        <Column field="reference" header="Reference" hidden sortable></Column>
+
+                        <Column field="hbl_number" header="HBL" sortable>
+                            <template #body="slotProps">
+                                <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
+                            </template>
+                        </Column>
+
+                        <Column field="cargo_type" header="Cargo Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :icon="resolveCargoType(slotProps.data).icon" :severity="resolveCargoType(slotProps.data).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="hbl_name" header="HBL Name">
+                            <template #body="slotProps">
+                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.hbl_name}`"
+                                      class="hover:underline" target="_blank">
+                                    <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
+                                    {{ slotProps.data.hbl_name }}
+                                </a>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.email}}</div>
+                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.contact_number}`"
+                                   class="text-gray-500 hover:underline text-sm" target="_blank">
+                                    <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
+                                    {{ slotProps.data.contact_number }}
+                                </a>
+                            </template>
+                        </Column>
+
+                        <Column field="address" header="Address"></Column>
+
+                        <Column field="warehouse" header="Warehouse" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveWarehouse(slotProps.data)" :value="slotProps.data.warehouse.toUpperCase()"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="consignee_name" header="Consignee">
+                            <template #body="slotProps">
+                                <div>{{ slotProps.data.hbl_name }}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.consignee_email}}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.consignee_contact}}</div>
+                            </template>
+                        </Column>
+
+                        <Column field="consignee_address" header="Consignee Address"></Column>
+
+                        <Column field="hbl_type" header="HBL Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="status" header="Status" hidden></Column>
+
+                        <Column field="is_hold" header="Hold">
+                            <template #body="{ data }">
+                                <i :class="{ 'pi-pause-circle text-yellow-500': data.is_hold, 'pi-play-circle text-green-400': !data.is_hold }" class="pi"></i>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <div class="flex items-center gap-2">
+                                    <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary inputId="is-hold"/>
+                                    <label for="is-hold"> Is Hold </label>
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="is_short_loaded" header="">
+                            <template #body="slotProps">
+                                <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`"></Tag>
+                            </template>
+                        </Column>
+
+                        <Column field="hbl_number" header="HBL Number" hidden sortable></Column>
+
+                        <Column field="is_released" header="Released" hidden></Column>
+
+                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs. </template>
+                    </DataTable>
+                </template>
+            </Card>
         </div>
-        <div class="card mt-4">
-            <div>
-                <div class="flex items-center justify-between p-2">
-                    <div class="">
-                        <div class="flex items-center">
-                            <h2
-                                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                HBL List
-                            </h2>
-                            <div class="flex m-3">
-                                <select
-                                    class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                    @change="handlePerPageChange"
-                                >
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div
-                            class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
-                        >
-                            <div
-                                class="mr-4 cursor-pointer self-start"
-                                x-tooltip.info.placement.bottom="'Applied Filters'"
-                            >
-                                Filter Options:
-                            </div>
-                            <div class="flex">
-                                <div>
-                                    <div
-                                        class="mb-1 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        From Date
-                                    </div>
-                                    <div
-                                        class="mb-1 tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.fromDate }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div
-                                        class="mb-1 ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        To Date
-                                    </div>
-                                    <div
-                                        class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.toDate }}
-                                    </div>
-                                </div>
-                                <div
-                                    class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
-                                >
-                                    <div
-                                        v-for="(
-                                            mode, index
-                                        ) in filters.cargoMode"
-                                        v-if="filters.cargoMode"
-                                        :key="index"
-                                        class="mb-1 badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
-                                    >
-                                        <span v-if="mode == 'Sea Cargo'">
-                                            <div v-html="shipIcon"></div>
-                                        </span>
-                                        <span v-if="mode == 'Air Cargo'">
-                                            <div v-html="planeIcon"></div>
-                                        </span>
-
-                                        {{ mode }}
-                                    </div>
-
-                                    <div
-                                        v-for="(type, index) in filters.hblType"
-                                        v-if="filters.hblType"
-                                        :key="index"
-                                        class="mb-1 badge bg-fuchsia-600 text-white dark:bg-fuchsia-600 ml-2"
-                                    >
-                                        {{ type }}
-                                    </div>
-
-                                    <div
-                                        v-for="(
-                                            item, index
-                                        ) in filters.warehouse"
-                                        v-if="filters.warehouse"
-                                        :key="index"
-                                        class="mb-1 badge bg-pink-600 text-white dark:bg-pink-600 ml-2"
-                                    >
-                                        {{ item }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex">
-                        <ColumnVisibilityPopover>
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.reference"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'reference',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Reference</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.hbl"
-                                    @change="
-                                        toggleColumnVisibility('hbl', $event)
-                                    "
-                                />
-                                <span class="hover:cursor-pointer">HBL</span>
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.hbl_name"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'hbl_name',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >HBL Name</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="
-                                        data.columnVisibility.consignee_name
-                                    "
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'consignee_name',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Consignee Name</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="
-                                        data.columnVisibility.consignee_address
-                                    "
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'consignee_address',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Consignee Address</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="
-                                        data.columnVisibility.consignee_contact
-                                    "
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'consignee_contact',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Consignee Contact</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.email"
-                                    @change="
-                                        toggleColumnVisibility('email', $event)
-                                    "
-                                />
-                                <span class="hover:cursor-pointer">Email</span>
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.address"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'address',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Address</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="
-                                        data.columnVisibility.contact_number
-                                    "
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'contact_number',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Contact</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.cargo_type"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'cargo_type',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Cargo Mode</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.hbl_type"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'hbl_type',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >HBL Type</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.warehouse"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'warehouse',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                >Warehouse</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.status"
-                                    @change="
-                                        toggleColumnVisibility('status', $event)
-                                    "
-                                />
-                                <span class="hover:cursor-pointer">Status</span>
-                            </label>
-                        </ColumnVisibilityPopover>
-                        <button
-                            class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.top="'Filters'"
-                            @click="showFilters = true"
-                        >
-                            <i class="fa-solid fa-filter"></i>
-                        </button>
-
-                        <a :href="exportURL">
-                            <button
-                                class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.top="'Download CSV'"
-                            >
-                                <i class="fa-solid fa-cloud-arrow-down"></i>
-                            </button>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="mt-3">
-                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div v-show="isData" ref="wrapperRef"></div>
-                        <NoRecordsFound v-show="!isData"/>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <FilterDrawer :show="showFilters" @close="showFilters = false">
-            <template #title> Filter HBL</template>
-
-            <template #content>
-
-                <div class="grid grid-cols-2  space-x-2">
-                    <!--Filter Rest Button-->
-                    <SoftPrimaryButton class="space-x-2" @click="resetFilter">
-                        <i class="fa-solid fa-refresh"></i>
-                        <span>Reset</span>
-                    </SoftPrimaryButton>
-                    <!--Filter Now Action Button-->
-                    <button class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90 dark:border-accent dark:text-accent-light dark:hover:bg-accent dark:hover:text-white dark:focus:bg-accent dark:focus:text-white dark:active:bg-accent/90" @click="applyFilters">
-                        <i class="fa-solid fa-filter"></i>
-                        <span>Apply</span>
-                    </button>
-                </div>
-                <div>
-                    <InputLabel value="From"/>
-                    <DatePicker
-                        v-model="filters.fromDate"
-                        placeholder="Choose date..."
-                    />
-                </div>
-
-                <div>
-                    <InputLabel value="To"/>
-                    <DatePicker
-                        v-model="filters.toDate"
-                        placeholder="Choose date..."
-                    />
-                </div>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Cargo Mode"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.cargoMode"
-                        label="Air Cargo"
-                        value="Air Cargo"
-                    />
-                    <div v-html="planeIcon"></div>
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.cargoMode"
-                        label="Sea Cargo"
-                        value="Sea Cargo"
-                    />
-                    <div v-html="shipIcon"></div>
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="HBL Type"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch v-model="filters.hblType" label="UPB" value="UPB"/>
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.hblType"
-                        label="Gift"
-                        value="Gift"
-                    />
-                </label>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.hblType"
-                        label="Door to Door"
-                        value="Door to Door"
-                    />
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Payment Status"/>
-
-                <label
-                    v-for="item in paymentStatus"
-                    :key="item"
-                    class="inline-flex items-center space-x-2 mt-2"
-                >
-                    <Switch
-                        v-model="filters.paymentStatus"
-                        :label="item"
-                        :value="item"
-                    />
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Is Hold"/>
-
-                <label class="inline-flex items-center space-x-2 mt-2">
-                    <Switch
-                        v-model="filters.isHold"
-                        label="Is Hold"
-                        value="true"
-                    />
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Warehouse"/>
-
-                <label
-                    v-for="warehouse in warehouses"
-                    :key="warehouse.id"
-                    class="inline-flex items-center space-x-2 mt-2"
-                >
-                    <Switch
-                        v-model="filters.warehouse"
-                        :label="warehouse.name"
-                        :value="warehouse.name"
-                    />
-                </label>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Created By"/>
-
-                <select
-                    v-model="filters.createdBy"
-                    autocomplete="off"
-                    class="w-full"
-                    multiple
-                    placeholder="Select a User..."
-                    x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                >
-                    <option v-for="user in users" :value="user.id">
-                        {{ user.name }}
-                    </option>
-                </select>
-
-
-            </template>
-        </FilterDrawer>
-
-        <DeleteHBLConfirmationModal
-            :show="showConfirmDeleteHBLModal"
-            @close="closeModal"
-            @delete-hbl="handleDeleteHBL"
-        />
-
-        <HBLDetailModal
-            :hbl-id="hblId"
-            :show="showConfirmViewHBLModal"
-            @close="closeModal"
-        />
-
-        <HoldConfirmationModal
-            :hbl-data="hblData"
-            :show="showConfirmHoldModal"
-            @close="closeHoldModal"
-            @toggle-hold="toggleHold"
-        />
-
-        <CallFlagModal
-            :caller-name="hblName"
-            :hbl-id="hblId"
-            :show="showConfirmViewCallFlagModal"
-            @close="closeCallFlagModal"/>
     </AppLayout>
+
+    <HBLDetailModal
+        :hbl-id="selectedHBLID"
+        :show="showConfirmViewHBLModal"
+        @close="closeModal"
+        @update:show="showConfirmViewHBLModal = $event"
+    />
+
+    <CallFlagModal
+        :caller-name="hblName"
+        :hbl-id="selectedHBLID"
+        :visible="showConfirmViewCallFlagModal"
+        @close="closeCallFlagModal"
+        @update:visible="showConfirmViewCallFlagModal = $event"/>
 </template>
+
+<style>
+.p-tag-icon {
+    font-size: 15px;
+}
+</style>

@@ -55,13 +55,13 @@ class HBLController extends Controller
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold', 'paymentStatus']);
+        $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'createdBy', 'deliveryType', 'warehouse', 'isHold', 'paymentStatus']);
 
         return $this->HBLRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
@@ -167,7 +167,7 @@ class HBLController extends Controller
         $this->authorize('hbls.show cancelled hbls');
 
         return Inertia::render('HBL/CancelledHBLList', [
-            'users' => $this->userRepository->getUsers(),
+            'users' => $this->userRepository->getUsers(['customer']),
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
@@ -176,13 +176,13 @@ class HBLController extends Controller
 
     public function cancelledList(Request $request): JsonResponse
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold', 'paymentStatus']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'deliveryType', 'warehouse', 'isHold', 'paymentStatus']);
 
         return $this->HBLRepository->getCancelledList($limit, $page, $order, $dir, $search, $filters);
     }
@@ -248,14 +248,14 @@ class HBLController extends Controller
 
     public function export(Request $request)
     {
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold', 'paymentStatus']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'deliveryType', 'warehouse', 'isHold', 'paymentStatus']);
 
         return $this->HBLRepository->export($filters);
     }
 
     public function exportCancelled(Request $request)
     {
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'hblType', 'warehouse', 'isHold', 'paymentStatus']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'deliveryType', 'warehouse', 'isHold', 'paymentStatus']);
 
         return $this->HBLRepository->exportCancelled($filters);
     }
@@ -294,7 +294,7 @@ class HBLController extends Controller
         $this->authorize('hbls.index');
 
         return Inertia::render('HBL/HBLListByUser', [
-            'users' => $this->userRepository->getUsers(),
+            'users' => $this->userRepository->getUsers(['customer']),
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'userData' => $user,
@@ -318,7 +318,7 @@ class HBLController extends Controller
         $this->authorize('hbls.show draft hbls');
 
         return Inertia::render('HBL/HBLDraftList', [
-            'users' => $this->userRepository->getUsers(),
+            'users' => $this->userRepository->getUsers(['customer']),
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
         ]);
@@ -326,13 +326,15 @@ class HBLController extends Controller
 
     public function getDraftList(Request $request): JsonResponse
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        return $this->HBLRepository->getDraftList($limit, $page, $order, $dir, $search);
+        $filters = $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'createdBy', 'deliveryType', 'warehouse', 'paymentStatus']);
+
+        return $this->HBLRepository->getDraftList($limit, $page, $order, $dir, $search, $filters);
     }
 
     public function createCallFlag(StoreCallFlagRequest $request, HBL $hbl)
@@ -366,16 +368,19 @@ class HBLController extends Controller
 
         return Inertia::render('HBL/HBLDoorToDoorList', [
             'warehouses' => GetDestinationBranches::run(),
+            'paymentStatus' => HBLPaymentStatus::cases(),
+            'users' => $this->userRepository->getUsers(['customer']),
         ]);
     }
 
     public function getDoorToDoorList(Request $request): JsonResponse
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
+
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'warehouse']);
 
         return $this->HBLRepository->getDoorToDoorHBL($limit, $page, $order, $dir, $search, $filters);
@@ -391,5 +396,10 @@ class HBLController extends Controller
     public function getHBLTotalSummary(HBL $hbl)
     {
         return $this->HBLRepository->getHBLTotalSummary($hbl);
+    }
+
+    public function getHBLsPackages(Request $request)
+    {
+        return $this->HBLRepository->getHBLsPackages($request->all());
     }
 }

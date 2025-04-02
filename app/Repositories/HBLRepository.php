@@ -78,7 +78,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         return $hbl;
     }
 
-    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
     {
         if (isset($filters['userData'])) {
             $query = HBL::query()
@@ -113,21 +113,15 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $hbls = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $hbls = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => HBLResource::collection($hbls),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $hbls->total(),
+                'current_page' => $hbls->currentPage(),
+                'perPage' => $hbls->perPage(),
+                'lastPage' => $hbls->lastPage(),
             ],
         ]);
     }
@@ -203,21 +197,15 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $hbls = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $hbls = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => HBLResource::collection($hbls),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $hbls->total(),
+                'current_page' => $hbls->currentPage(),
+                'perPage' => $hbls->perPage(),
+                'lastPage' => $hbls->lastPage(),
             ],
         ]);
     }
@@ -358,21 +346,17 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ], 'like', '%'.$search.'%');
         }
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
+        FilterFactory::apply($query, $filters);
 
-        $hbls = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $hbls = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => HBLResource::collection($hbls),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $hbls->total(),
+                'current_page' => $hbls->currentPage(),
+                'perPage' => $hbls->perPage(),
+                'lastPage' => $hbls->lastPage(),
             ],
         ]);
     }
@@ -451,21 +435,15 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $hbls = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $hbls = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => HBLResource::collection($hbls),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $hbls->total(),
+                'current_page' => $hbls->currentPage(),
+                'perPage' => $hbls->perPage(),
+                'lastPage' => $hbls->lastPage(),
             ],
         ]);
     }
@@ -478,5 +456,26 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function getHBLTotalSummary(HBL $hbl)
     {
         return GetHBLTotalSummary::run($hbl);
+    }
+
+    public function getHBLsPackages(array $data)
+    {
+        $ids = collect($data)->flatten()->toArray();
+        $hbls = HBL::whereIn('id', $ids)->with('mhbl')->get();
+        $groupedPackagesArray = $hbls->flatMap(function ($hbl) {
+            $groupKey = $hbl->id;
+
+            return $hbl->packages->map(function ($package) use ($groupKey) {
+                return ['group_key' => $groupKey, 'package' => $package];
+            });
+        })->groupBy('group_key')->map(function ($group) {
+            return $group->pluck('package');
+        })->map(function ($packages) {
+            return $packages->toArray();
+        })->toArray();
+
+        return response()->json([
+            'hblsPackages' => $groupedPackagesArray,
+        ]);
     }
 }

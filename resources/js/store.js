@@ -13,11 +13,11 @@ export default {
       document.body.classList.contains("is-sidebar-open") &&
       Alpine.store("breakpoints").xlAndUp;
 
-    Alpine.effect(() => {
-      this.isDarkModeEnabled
-        ? document.documentElement.classList.add("dark")
-        : document.documentElement.classList.remove("dark");
-    });
+    // Alpine.effect(() => {
+    //   this.isDarkModeEnabled
+    //     ? document.documentElement.classList.add("dark")
+    //     : document.documentElement.classList.remove("dark");
+    // });
 
     Alpine.effect(() => {
       this.isMonochromeModeEnabled
@@ -25,11 +25,11 @@ export default {
         : document.body.classList.remove("is-monochrome");
     });
 
-    Alpine.effect(() => {
-      this.isSidebarExpanded
-        ? document.body.classList.add("is-sidebar-open")
-        : document.body.classList.remove("is-sidebar-open");
-    });
+    // Alpine.effect(() => {
+    //   this.isSidebarExpanded
+    //     ? document.body.classList.add("is-sidebar-open")
+    //     : document.body.classList.remove("is-sidebar-open");
+    // });
 
     Alpine.effect(() => {
       if (Alpine.store("breakpoints").smAndUp) this.isSearchbarActive = false;

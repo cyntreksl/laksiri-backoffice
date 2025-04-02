@@ -16,6 +16,7 @@ use App\Http\Requests\StoreUnloadingIssue;
 use App\Http\Requests\UpdateContainerRequest;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
+use App\Interfaces\MHBLRepositoryInterface;
 use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\HBL;
@@ -31,6 +32,7 @@ class ContainerController extends Controller
     public function __construct(
         private readonly ContainerRepositoryInterface $containerRepository,
         private readonly HBLRepositoryInterface $HBLRepository,
+        private readonly MHBLRepositoryInterface $MHBLRepository,
     ) {}
 
     public function index()
@@ -45,10 +47,10 @@ class ContainerController extends Controller
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
         $filters = $request->only(['fromDate', 'toDate', 'etdStartDate', 'etdEndDate', 'cargoType', 'containerType', 'status']);
@@ -278,5 +280,10 @@ class ContainerController extends Controller
     public function getDestinationUnloadedHBLs(Request $request)
     {
         return $this->HBLRepository->getDestinationUnloadedHBLsByCargoType($request->all());
+    }
+
+    public function getUnloadedMHBLHBL(Request $request)
+    {
+        return $this->MHBLRepository->getUnloadedMHBLHBL($request->all()['reference']);
     }
 }

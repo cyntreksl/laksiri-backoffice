@@ -315,5 +315,6 @@ const closeHBLModal = () => {
         :hbl-id="hblId"
         :show="showConfirmViewHBLModal"
         @close="closeHBLModal"
+        @update:show="showConfirmViewHBLModal = $event"
     />
 </template>

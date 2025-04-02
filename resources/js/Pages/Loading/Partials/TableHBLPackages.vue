@@ -21,6 +21,10 @@ const props = defineProps({
     containerMHBLS: {
         type: Array,
         default: () => [],
+    },
+    filteredMHBLsLHBL: {
+        type: Array,
+        default: () => [],
     }
 });
 const emit = defineEmits(['fetContainerData']);
@@ -42,6 +46,12 @@ const closeModal = () => {
     showConfirmDeleteHBLModal.value = false;
     hblId.value = null;
 };
+const getMHBLPackageCount = (mhblId) => {
+    const relatedHBLs = props.filteredMHBLsLHBL.filter(item => item.mhbl?.id === mhblId);
+    if (relatedHBLs.length > 0) {
+        return relatedHBLs.reduce((sum, item) => sum + (item.packages_count || 0), 0);
+    }else return 0;
+}
 
 const handleRemoveHBLFromContainer = () => {
     router.put(route('loading.containers.unload.hbl', containerData.value.id), {
@@ -236,7 +246,7 @@ const handleRemoveMHBLFromContainer = () => {
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                     {{ hbl.hbl_name || '-' }}
                 </td>
-                <td class="whitespace-nowrap px-4 py-3 sm:px-5">-</td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.nic || '-' }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.address || '-' }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.contact_number || '-' }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ hbl.consignee_name || '-' }}</td>
@@ -268,7 +278,7 @@ const handleRemoveMHBLFromContainer = () => {
                 <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
                     {{ mhbl.hbl_number || '-' }}
                 </td>
-                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ packageCounts[mhbl.id] || 0 }}</td>
+                <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ getMHBLPackageCount(mhbl.id) }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.shipper.name || '-' }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.shipper.pp_or_nic_no || '-' }}</td>
                 <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.shipper.address || '-' }}</td>
@@ -309,6 +319,7 @@ const handleRemoveMHBLFromContainer = () => {
         :hbl-id="hblRecord?.id"
         :show="showConfirmViewHBLModal"
         @close="closeShowHBLModal"
+        @update:show="showConfirmViewHBLModal = $event"
     />
 
     <MHBLDetailModal

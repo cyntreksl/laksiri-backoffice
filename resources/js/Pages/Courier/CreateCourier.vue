@@ -9,12 +9,7 @@ import InputError from "@/Components/InputError.vue";
 import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Checkbox from "@/Components/Checkbox.vue";
 import {push} from "notivue";
-import DialogModal from "@/Components/DialogModal.vue";
-import hblImage from "../../../../resources/images/illustrations/hblimage.png";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
@@ -142,7 +137,7 @@ const packageItem = reactive({
     height: 0,
     quantity: 1,
     volume: 0,
-    totalWeight: 0,
+    weight: 0,
     remarks: "",
     measure_type: "cm",
 });
@@ -171,7 +166,7 @@ const addPackageData = () => {
     if (editMode.value) {
         packageList.value.splice(editIndex.value, 1, {...packageItem});
         grandTotalWeight.value = packageList.value.reduce(
-            (accumulator, currentValue) => accumulator + parseFloat(currentValue.totalWeight),
+            (accumulator, currentValue) => accumulator + parseFloat(currentValue.weight),
             0
         );
         grandTotalVolume.value = packageList.value.reduce(
@@ -184,7 +179,7 @@ const addPackageData = () => {
         form.packages = packageList.value;
 
         const volume = parseFloat(newItem.volume) || 0;
-        grandTotalWeight.value += parseFloat(newItem.totalWeight);
+        grandTotalWeight.value += parseFloat(newItem.weight);
         grandTotalVolume.value += parseFloat(volume.toFixed(3));
     }
     closeAddPackageModal();
@@ -240,14 +235,6 @@ const vat = ref(0);
 const selectedType = ref("");
 
 const isChecked = ref(false);
-
-const resetConsigneeDetails = () => {
-    form.consignee_name = "";
-    consignee_contact.value = "";
-    form.consignee_nic = "";
-    form.consignee_address = "";
-};
-
 const updateTypeDescription = () => {
     packageItem.type = (packageItem.type ? " " : "") + selectedType.value;
 };
@@ -266,16 +253,10 @@ const closeModal = () => {
     showConfirmRemovePackageModal.value = false;
 };
 
-const closeViewModal = () => {
-    showConfirmViewHBLModal.value = false;
-    hblId.value = null;
-    router.visit(route("hbls.create"));
-};
-
 const handleRemovePackage = () => {
     if (packageIndex.value !== null) {
         grandTotalVolume.value -= packageList.value[packageIndex.value].volume;
-        grandTotalWeight.value -= packageList.value[packageIndex.value].totalWeight;
+        grandTotalWeight.value -= packageList.value[packageIndex.value].weight;
         packageList.value.splice(packageIndex.value, 1);
         closeModal();
     }
@@ -298,7 +279,7 @@ const restModalFields = () => {
     packageItem.height = 0;
     packageItem.quantity = 1;
     packageItem.volume = 0;
-    packageItem.totalWeight = 0;
+    packageItem.weight = 0;
     packageItem.remarks = "";
     packageItem.packageRule = 0;
 };
@@ -317,16 +298,7 @@ const openEditModal = (index) => {
     packageItem.height = packageItem.height/factor;
 };
 
-const copyFromHBLToShipperModalShow = ref(false);
-
 const reference = ref(null);
-
-const volumeMeasurements = {
-    cm: 'cm.cu',
-    m: 'm.cu',
-    in: 'in.cu',
-    ft: 'ft.cu',
-};
 
 const handleCopyShipper = () => {
     form.consignee_name = form.name;
@@ -371,23 +343,6 @@ const shipIcon = ref(`
   <path d="M7 7v-4h-1" />
 </svg>
 `);
-
-const getSelectedPackage = () => {
-    // Find the selected package from the packages array based on the selected ID
-    const selectedRule = packageRulesData.value.find(pkg => pkg.id === packageItem.packageRule);
-    if (selectedRule) {
-        isPackageRuleSelected.value = true;
-        packageItem.length = convertMeasurements(selectedRule.measure_type, selectedRule.length).toFixed(2);
-        packageItem.width = convertMeasurements(selectedRule.measure_type, selectedRule.width).toFixed(2);
-        packageItem.height = convertMeasurements(selectedRule.measure_type, selectedRule.height).toFixed(2);
-        packageItem.measure_type = selectedRule.measure_type;
-    }else {
-        isPackageRuleSelected.value = false;
-        packageItem.length = 0;
-        packageItem.width = 0;
-        packageItem.height = 0;
-    }
-};
 
 const packageItemLength = ref(0);
 const packageItemWidth = ref(0);
@@ -450,13 +405,6 @@ const volumeUnit = computed(() => {
     return units[packageItem.measure_type] || 'M.CM';
 });
 
-const hblId = ref(null);
-const showConfirmViewHBLModal = ref(false);
-
-const confirmViewHBL = async (id) => {
-    hblId.value = id;
-    showConfirmViewHBLModal.value = true;
-};
 </script>
 
 <template>
@@ -961,7 +909,7 @@ const confirmViewHBL = async (id) => {
                                             {{ item.quantity }}
                                         </td>
                                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                            {{ item.totalWeight.toFixed(3) }}
+                                            {{ item.weight.toFixed(3) }}
                                         </td>
                                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                             {{ item.volume }}
@@ -1260,7 +1208,7 @@ const confirmViewHBL = async (id) => {
                                 <label class="block">
                                     <span>Total Weight</span>
                                     <input
-                                        v-model="packageItem.totalWeight"
+                                        v-model="packageItem.weight"
                                         class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
                                         min="0"
                                         placeholder="1"
@@ -1307,12 +1255,6 @@ const confirmViewHBL = async (id) => {
             :show="showConfirmRemovePackageModal"
             @close="closeModal"
             @remove-package="handleRemovePackage"
-        />
-
-        <HBLDetailModal
-            :hbl-id="hblId"
-            :show="showConfirmViewHBLModal"
-            @close="closeViewModal"
         />
     </AppLayout>
 </template>

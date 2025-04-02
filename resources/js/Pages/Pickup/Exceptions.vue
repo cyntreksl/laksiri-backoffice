@@ -1,28 +1,33 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {computed, onMounted, reactive, ref} from "vue";
-import {Grid, h, html} from "gridjs";
+import {onMounted, ref, watch} from "vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import moment from "moment";
-import FilterDrawer from "@/Components/FilterDrawer.vue";
-import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import DatePicker from "@/Components/DatePicker.vue";
-import FilterBorder from "@/Components/FilterBorder.vue";
-import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
-import Checkbox from "@/Components/Checkbox.vue";
-import FilterHeader from "@/Components/FilterHeader.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import AssignDriverModal from "@/Pages/Pickup/Partials/AssignDriverModal.vue";
-import DangerButton from "@/Components/DangerButton.vue";
-import DeleteExceptionConfirmationModal from "@/Pages/Pickup/Partials/DeleteExceptionConfirmationModal.vue";
+import FloatLabel from 'primevue/floatlabel';
+import {useConfirm} from "primevue/useconfirm";
+import Select from 'primevue/select';
+import Chip from 'primevue/chip';
+import InputText from 'primevue/inputtext';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+import Card from "primevue/card";
+import ContextMenu from 'primevue/contextmenu';
+import Panel from 'primevue/panel';
+import DatePicker from 'primevue/datepicker';
+import Button from "primevue/button";
+import Tag from 'primevue/tag';
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import axios from "axios";
+import {FilterMatchMode} from '@primevue/core/api';
+import {debounce} from "lodash";
+import {router, Link, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
-import {router} from "@inertiajs/vue3";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-import RetryPickupConfirmationModal from "@/Pages/Pickup/Partials/RetryPickupConfirmationModal.vue";
-import NoRecordsFound from "@/Components/NoRecordsFound.vue";
+import moment from "moment";
+import AssignDriverDialog from "@/Pages/Pickup/Partials/AssignDriverDialog.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
-defineProps({
+const props = defineProps({
     drivers: {
         type: Object,
         default: () => {
@@ -40,751 +45,426 @@ defineProps({
     },
 });
 
-const wrapperRef = ref(null);
-let grid = null;
-const isData = ref(false)
-const perPage = ref(10);
-
-const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(7, "days").format("YYYY-MM-DD");
-const toDate = moment(new Date()).format("YYYY-MM-DD");
-
-const filters = reactive({
-    fromDate: fromDate,
-    toDate: toDate,
-    createdBy: "",
-    zoneBy: "",
-});
-
-const data = reactive({
-    columnVisibility: {
-        reference: true,
-        name: true,
-        zone: true,
-        picker_note: true,
-        address: true,
-        pickup_date: true,
-        created_date: true,
-        driver: true,
-        auth: true,
-        actions: true,
-        pickup_id: false,
-    },
-});
-
 const baseUrl = ref("/pickup-exception-list");
+const loading = ref(true);
+const pickups = ref([]);
+const totalRecords = ref(0);
+const perPage = ref(100);
+const currentPage = ref(1);
+const showConfirmViewPickupModal = ref(false);
+const cm = ref();
+const selectedPickup = ref([]);
+const selectedPickups = ref([]);
+const selectedPickupID = ref(null);
+const confirm = useConfirm();
+const showAssignDriverDialog = ref(false);
+const dt = ref();
 
-const toggleColumnVisibility = (columnName) => {
-    data.columnVisibility[columnName] = !data.columnVisibility[columnName];
-    updateGridConfig();
-    grid.forceRender();
+const filters = ref({
+    global: {value: null, matchMode: FilterMatchMode.CONTAINS},
+    driver: {value: null, matchMode: FilterMatchMode.EQUALS},
+    user: {value: null, matchMode: FilterMatchMode.EQUALS},
+    zone: {value: null, matchMode: FilterMatchMode.EQUALS},
+});
+
+const menuModel = ref([
+    {
+        label: 'View',
+        icon: 'pi pi-fw pi-search',
+        command: () => confirmViewPickup(selectedPickup),
+        disabled: !usePage().props.user.permissions.includes('pickups.show'),
+    },
+    {
+        label: 'Retry',
+        icon: 'pi pi-fw pi-refresh',
+        command: () => confirmPickupRetry(selectedPickup),
+        disabled: !usePage().props.user.permissions.includes('pickups.retry'),
+    },
+]);
+
+const fromDate = ref(moment(new Date()).subtract(7, "days").toISOString().split("T")[0]);
+const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
+
+const fetchPickups = async (page = 1, search = "", sortField = 'id', sortOrder = 1) => {
+    loading.value = true;
+    try {
+        const response = await axios.get(baseUrl.value, {
+            params: {
+                page,
+                per_page: perPage.value,
+                search,
+                sort_field: sortField,
+                sort_order: sortOrder === 1 ? "asc" : "desc",
+                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+                toDate: moment(toDate.value).format("YYYY-MM-DD"),
+                createdBy: filters.value.user.value || "",
+                zoneBy: filters.value.zone.value || "",
+                driverBy: filters.value.driver.value || [],
+            }
+        });
+        pickups.value = response.data.data;
+        totalRecords.value = response.data.meta.total;
+        currentPage.value = response.data.meta.current_page;
+    } catch (error) {
+        console.error("Error fetching Pickups:", error);
+    } finally {
+        loading.value = false;
+    }
 };
 
-const initializeGrid = () => {
-    const visibleColumns = Object.keys(data.columnVisibility);
+const debouncedFetchPickups = debounce((searchValue) => {
+    fetchPickups(1, searchValue);
+}, 1000);
 
-    grid = new Grid({
-        columns: createColumns(),
-        search: {
-            debounceTimeout: 1000,
-            server: {
-                url: (prev, keyword) => `${prev}&search=${keyword}`,
-            },
-        },
-        sort: {
-            multiColumn: false,
-            server: {
-                url: (prev, columns) => {
-                    if (!columns.length) return prev;
-                    const col = columns[0];
-                    const dir = col.direction === 1 ? "asc" : "desc";
-                    let colName = visibleColumns[col.index];
-                    return `${prev}&order=${colName}&dir=${dir}`;
-                },
-            },
-        },
-        pagination: {
-            limit: perPage.value,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
-        },
-        server: {
-            url: constructUrl(),
-            then: (data) =>
-                data.data.map((item) => {
-                    const row = [];
-                    row.push({id: item.id});
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                }),
-            total: (response) => {
-                if (response && response.meta) {
-                    response.meta.total > 0 ? isData.value = true : isData.value = false;
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
+watch(() => filters.value.global.value, (newValue) => {
+    if (newValue !== null) {
+        debouncedFetchPickups(newValue);
+    }
+});
 
-    grid.render(wrapperRef.value);
+watch(() => filters.value.driver.value, (newValue) => {
+    fetchPickups(1, filters.value.global.value);
+});
+
+watch(() => filters.value.user.value, (newValue) => {
+    fetchPickups(1, filters.value.global.value);
+});
+
+watch(() => filters.value.zone.value, (newValue) => {
+    fetchPickups(1, filters.value.global.value);
+});
+
+watch(() => fromDate.value, (newValue) => {
+    fetchPickups(1, filters.value.global.value);
+});
+
+watch(() => toDate.value, (newValue) => {
+    fetchPickups(1, filters.value.global.value);
+});
+
+const onPageChange = (event) => {
+    perPage.value = event.rows;
+    currentPage.value = event.page + 1;
+    fetchPickups(currentPage.value);
 };
 
-const selectedData = ref([]);
-
-const createColumns = () => [
-    {
-        name: "#",
-        formatter: (_, row) => {
-            return h("input", {
-                type: "checkbox",
-                className:
-                    "form-checkbox is-basic size-4 rounded border-slate-400/70 checked:bg-primary checked:border-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:bg-accent dark:checked:border-accent dark:hover:border-accent dark:focus:border-accent",
-                onChange: (event) => {
-                    const isChecked = event.target.checked;
-                    if (isChecked) {
-                        const rowData = row.cells.map((cell) => cell.data); // Extract data from cells array
-                        selectedData.value.push(rowData); // Push extracted data into selectedData
-                    } else {
-                        // Remove the specific row from selectedData (assuming uniqueness of rows)
-                        const index = selectedData.value.findIndex((selectedRow) => {
-                            const rowData = row.cells.map((cell) => cell.data);
-                            return JSON.stringify(selectedRow) === JSON.stringify(rowData);
-                        });
-                        if (index !== -1) {
-                            selectedData.value.splice(index, 1);
-                        }
-                    }
-                },
-            });
-        },
-    },
-    {name: "Reference", hidden: !data.columnVisibility.reference},
-    {name: "Name", hidden: !data.columnVisibility.name},
-    {name: "Zone", hidden: !data.columnVisibility.zone},
-    {
-        name: "Picker Note",
-        hidden: !data.columnVisibility.picker_note,
-        formatter: (cell) => {
-            return cell
-                ? html(
-                    `<div class="badge space-x-2.5 rounded-full bg-red-100 text-red-500 dark:bg-red-100"> ${cell}</div>`
-                )
-                : null;
-        },
-    },
-    {name: "Address", hidden: !data.columnVisibility.address, sort: false},
-    {name: "Pickup Date", hidden: !data.columnVisibility.pickup_date},
-    {name: "Created Date", hidden: !data.columnVisibility.created_date},
-    {
-        name: "Driver",
-        hidden: !data.columnVisibility.driver,
-        formatter: (cell) => {
-            return cell
-                ? html(
-                    `<div class="flex item-center"><svg xmlns="http://www.w3.org/2000/svg"  width="18"  height="18"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M12 14l0 7" /><path d="M10 12l-6.75 -2" /><path d="M14 12l6.75 -2" /></svg> ${cell} </div>`
-                )
-                : null;
-        },
-    },
-    {name: "Auth", hidden: !data.columnVisibility.auth},
-    {
-        name: "Actions",
-        sort: false,
-        hidden: !data.columnVisibility.actions,
-        formatter: (_, row) => {
-            return h("div", {}, [
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                        onClick: () => confirmRetry(row.cells[11].data),
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class: "size-4.5",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: 1.5,
-                            },
-                            [
-                                h("path", {
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                    d: "M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
-
-                h(
-                    "button",
-                    {
-                        className:
-                            "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                        onClick: () => confirmViewPickup(row.cells[11].data),
-                    },
-                    [
-                        h(
-                            "svg",
-                            {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                viewBox: "0 0 24 24",
-                                class: "size-4.5",
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeWidth: 1.5,
-                            },
-                            [
-                                h("path", {
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                    d: "M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z",
-                                }),
-                                h("path", {
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                    d: "M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z",
-                                }),
-                            ]
-                        ),
-                    ]
-                ),
-            ]);
-        },
-    },
-    {name: "Pickup Id", hidden: !data.columnVisibility.pickup_id},
-];
-
-const updateGridConfig = () => {
-    grid.updateConfig({
-        columns: createColumns(),
-    });
+const onSort = (event) => {
+    fetchPickups(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
 
 onMounted(() => {
-    initializeGrid();
+    fetchPickups();
 });
 
-const constructUrl = () => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
-        }
-    }
-    return baseUrl.value + "?" + params.toString();
+const onRowContextMenu = (event) => {
+    cm.value.show(event.originalEvent);
 };
 
-const applyFilters = () => {
-    showFilters.value = false;
-    const newUrl = constructUrl();
-    const visibleColumns = Object.keys(data.columnVisibility);
-    grid.updateConfig({
-        server: {
-            url: newUrl,
-            then: (data) => {
-                if (data.data.length === 0) {
-                    // Display a message when no matching data is found
-                    return [ visibleColumns.map(() => "No matching data found"),];
-                }
-
-                return data.data.map((item) => {
-                    const row = [];
-                    row.push({id: item.id})
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                });
-            },
-            total: (response) => {
-                if (response && response.meta) {
-                    response.meta.total > 0 ? isData.value = true : isData.value = false;
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
-    grid.forceRender();
-
-};
-
-const showConfirmAssignDriverModal = ref(false);
-const isDataEmpty = computed(() => selectedData.value.length === 0);
-const countOfSelectedData = computed(() => selectedData.value.length);
-const idList = ref([]);
-
-const pickupId = ref(null);
-const showConfirmViewPickupModal = ref(false);
-
-const confirmViewPickup = async (id) => {
-    pickupId.value = id;
+const confirmViewPickup = (hbl) => {
+    selectedPickupID.value = hbl.value.id;
     showConfirmViewPickupModal.value = true;
 };
 
-const closeViewModal = () => {
-    showConfirmViewPickupModal.value = false;
-    pickupId.value = null;
-};
-
-const showConfirmRetryModal = ref(false);
-
-const confirmRetry = async (id) => {
-    pickupId.value = id;
-    showConfirmRetryModal.value = true;
-};
-
-const closeRetryModal = () => {
-    showConfirmRetryModal.value = false;
-    pickupId.value = null;
-};
-
-const confirmAssignDriver = () => {
-    idList.value = selectedData.value.map((item) => item[0]);
-    showConfirmAssignDriverModal.value = true;
-};
-
-const showConfirmDeleteExceptionModal = ref(false);
-
-const confirmDeleteExceptions = () => {
-    idList.value = selectedData.value.map((item) => item[0]);
-    showConfirmDeleteExceptionModal.value = true;
-};
-
 const closeModal = () => {
-    showConfirmAssignDriverModal.value = false;
-    showConfirmDeleteExceptionModal.value = false;
-    idList.value = [];
+    showConfirmViewPickupModal.value = false;
+    selectedPickupID.value = null;
 };
 
-const handleDeleteExceptions = () => {
-    router.post(
-        route("pickups.exceptions.delete"),
-        {
-            exceptionIds: idList.value,
+const clearFilter = () => {
+    filters.value = {
+        global: {value: null, matchMode: FilterMatchMode.CONTAINS},
+        driver: {value: [], matchMode: FilterMatchMode.EQUALS},
+        user: {value: null, matchMode: FilterMatchMode.EQUALS},
+        zone: {value: null, matchMode: FilterMatchMode.EQUALS},
+    };
+    fromDate.value = moment(new Date()).subtract(7, "days").toISOString().split("T")[0];
+    toDate.value = moment(new Date()).toISOString().split("T")[0];
+    fetchPickups(currentPage.value);
+};
+
+const exportCSV = () => {
+    dt.value.exportCSV();
+};
+
+const confirmPickupsDelete = () => {
+    const idList = selectedPickups.value.map((item) => item.id);
+
+    confirm.require({
+        message: 'Would you like to delete this pickup records?',
+        header: `${idList.length} Delete Pickups?`,
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
         },
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                push.success("Pickup Exception Deleted Successfully!");
-                const currentRoute = route().current();
-                router.visit(route(currentRoute));
-            },
-            onError: () => {
-                push.error("Something went to wrong!");
-            },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            router.post(
+                route("pickups.exceptions.delete"),
+                {
+                    exceptionIds: idList,
+                },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success("Pickup Exception Deleted Successfully!");
+                        const currentRoute = route().current();
+                        router.visit(route(currentRoute));
+                    },
+                    onError: () => {
+                        push.error("Something went to wrong!");
+                    },
+                }
+            );
+            selectedPickups.value = [];
+        },
+        reject: () => {
+            selectedPickups.value = [];
         }
-    );
-};
-
-const handleRetryPickup = () => {
-    router.get(route("pickups.exceptions.retry", pickupId.value), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeRetryModal();
-            push.success("Added into Pending Jobs!");
-            router.visit(route("pickups.index"), {only: ["pickups"]});
-        },
-        onError: () => {
-            closeRetryModal();
-            push.error("Something went to wrong!");
-        },
     });
-}
-
-const resetFilter = () => {
-    filters.fromDate = fromDate;
-    filters.toDate = toDate;
-    filters.createdBy = "";
-    filters.zoneBy = "";
-    applyFilters();
 };
 
-const exportURL = computed(() => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
+const closeAssignDriverModal = () => {
+    showAssignDriverDialog.value = false;
+    selectedPickups.value = [];
+};
+
+const confirmPickupRetry = (pickup) => {
+    selectedPickupID.value = pickup.value.id;
+    confirm.require({
+        message: 'Are you sure you want to Retry Job?',
+        header: 'Retry Pickup?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Retry',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.get(route("pickups.exceptions.retry", selectedPickupID.value), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("Added into Pending Jobs!");
+                    router.visit(route("pickups.exceptions"), {only: ["pickups"]});
+                },
+                onError: () => {
+                    push.error("Something went to wrong!");
+                },
+            });
+            selectedPickupID.value = null;
+        },
+        reject: () => {
+            selectedPickupID.value = null;
         }
-    }
-    return '/pickups/exceptions/list/export' + "?" + params.toString();
-});
-
-const handlePerPageChange = (event) => {
-    perPage.value = parseInt(event.target.value);
-
-    grid.updateConfig({
-        pagination: {
-            limit: perPage.value,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
-        },
     });
-
-    grid.forceRender()
 };
 </script>
 <template>
-    <AppLayout title="Pickups Exceptions">
-        <template #header>Pickups Exceptions</template>
+    <AppLayout title="Pickup Exceptions">
+        <template #header>Pickup Exceptions</template>
 
         <Breadcrumb/>
 
-        <div class="card mt-4">
-            <div>
-                <div class="flex items-center justify-between p-2">
-                    <div class="">
-                        <div class="flex items-center">
-                            <h2
-                                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Pickups Exceptions
-                            </h2>
+        <div>
+            <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="fromDate" class="w-full" date-format="yy-mm-dd" input-id="from-date"/>
+                        <label for="from-date">From Date</label>
+                    </FloatLabel>
 
-                            <div class="flex m-3">
-                                <select class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" @change="handlePerPageChange">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                        </div>
-                        <br/>
-                        <div
-                            class="mr-4 cursor-pointer"
-                            x-tooltip.info.placement.bottom="'Applied Filters'"
-                        >
-                            Filter Options:
-                        </div>
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="toDate" class="w-full" date-format="yy-mm-dd" input-id="to-date"/>
+                        <label for="to-date">To Date</label>
+                    </FloatLabel>
 
-                        <div
-                            class="grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
-                        >
-                            <div class="flex space-x-px">
-                                <div>
-                                    <div
-                                        class="badge mb-1 bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        <i class="mr-1 fas fa-calendar-alt"></i>
-                                        From Date
-                                    </div>
-                                    <div
-                                        class="badge bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.fromDate }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div
-                                        class="ml-2 badge mb-1 bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        <i class="mr-1 far fa-calendar-alt"></i>
-                                        To &nbsp;&nbsp;Date
-                                    </div>
-                                    <div
-                                        class="badge bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.toDate }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div
-                                        v-for="(id, index) in filters.createdBy"
-                                        v-if="filters.createdBy"
-                                        :key="index"
-                                        class="badge bg-navy-700 text-white dark:bg-navy-900 ml-2"
-                                    >
-                                        {{ users.find((user) => user.id === id)?.name }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div
-                                        v-for="(id, index) in filters.zoneBy"
-                                        v-if="filters.zoneBy"
-                                        :key="index"
-                                        class="badge bg-success text-white dark:bg-success ml-2"
-                                    >
-                                        {{ zones.find((zone) => zone.id === id)?.name }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.user.value" :options="users" :showClear="true" class="w-full" input-id="user" option-label="name" option-value="id"/>
+                        <label for="user">Select User</label>
+                    </FloatLabel>
 
-                    <div
-                        class="mt-1 ml-1 grid sm:grid-cols-1 md:grid-cols-1 justify-items-end"
-                    >
-                        <div class="flex space-x-2">
-                            <ColumnVisibilityPopover>
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.reference"
-                                        @change="toggleColumnVisibility('reference', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Reference</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.name"
-                                        @change="toggleColumnVisibility('name', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Name</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.zone"
-                                        @change="toggleColumnVisibility('zone', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Zone</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.picker_note"
-                                        @change="toggleColumnVisibility('picker_note', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Pickup Note</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.address"
-                                        @change="toggleColumnVisibility('address', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Address</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.pickup_date"
-                                        @change="toggleColumnVisibility('pickup_date', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Pickup Date</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.created_date"
-                                        @change="toggleColumnVisibility('created_date', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Created Date</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.driver"
-                                        @change="toggleColumnVisibility('driver', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Driver</span>
-                                </label>
-
-                                <label class="inline-flex items-center space-x-2">
-                                    <Checkbox
-                                        :checked="data.columnVisibility.auth"
-                                        @change="toggleColumnVisibility('auth', $event)"
-                                    />
-                                    <span class="hover:cursor-pointer">Auth</span>
-                                </label>
-                            </ColumnVisibilityPopover>
-
-                            <button
-                                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.top="'Filters'"
-                                @click="showFilters = true"
-                            >
-                                <i class="fa-solid fa-filter"></i>
-                            </button>
-
-                            <a :href="exportURL">
-                                <button
-                                    class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                    x-tooltip.placement.top="'Download CSV'"
-                                >
-                                    <i class="fa-solid fa-cloud-arrow-down"></i>
-                                </button>
-                            </a>
-
-                            <PrimaryButton
-                                v-if="$page.props.user.permissions.includes('pickups.assign driver')"
-                                :disabled="isDataEmpty"
-                                @click="confirmAssignDriver"
-                            >
-                                <svg
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-steering-wheel mr-1"
-                                    fill="none"
-                                    height="18"
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    viewBox="0 0 24 24"
-                                    width="18"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
-                                    <path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                    <path d="M12 14l0 7"/>
-                                    <path d="M10 12l-6.75 -2"/>
-                                    <path d="M14 12l6.75 -2"/>
-                                </svg>
-                                Assign Driver ({{ countOfSelectedData }})
-                            </PrimaryButton>
-
-                            <DangerButton
-                                v-if="$page.props.user.permissions.includes('pickups.delete')"
-                                :disabled="isDataEmpty"
-                                @click="confirmDeleteExceptions"
-                            >
-                                <svg
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-trash mr-1"
-                                    fill="none"
-                                    height="18"
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    viewBox="0 0 24 24"
-                                    width="18"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M4 7l16 0"/>
-                                    <path d="M10 11l0 6"/>
-                                    <path d="M14 11l0 6"/>
-                                    <path
-                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"
-                                    />
-                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
-                                </svg>
-                                Delete ({{ countOfSelectedData }})
-                            </DangerButton>
-                        </div>
-                    </div>
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.zone.value" :options="zones" :showClear="true" class="w-full" input-id="zone" option-label="name" option-value="id" />
+                        <label for="zone">Select Zone</label>
+                    </FloatLabel>
                 </div>
+            </Panel>
 
-                <div class="mt-3">
-                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div v-show="isData" ref="wrapperRef"></div>
-                        <NoRecordsFound v-show="!isData"/>
-                    </div>
-                </div>
-            </div>
+            <Card class="my-5">
+                <template #content>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedPickup.length < 1"/>
+                    <DataTable
+                        ref="dt"
+                        v-model:contextMenuSelection="selectedPickup"
+                        v-model:filters="filters"
+                        v-model:selection="selectedPickups"
+                        :globalFilterFields="['name']"
+                        :loading="loading"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="totalRecords"
+                        :value="pickups"
+                        context-menu
+                        data-key="id"
+                        filter-display="menu"
+                        lazy
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
+                        @page="onPageChange"
+                        @rowContextmenu="onRowContextMenu"
+                        @sort="onSort">
+
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    Pickup Exceptions
+                                </div>
+                                <Link v-if="$page.props.user.permissions.includes('pickups.create')" :href="route('pickups.create')">
+                                    <PrimaryButton class="w-full">Create New Pending Job</PrimaryButton>
+                                </Link>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Button Group -->
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        v-if="$page.props.user.permissions.includes('pickups.assign driver')"
+                                        :disabled="selectedPickups.length === 0"
+                                        icon="ti ti-steering-wheel"
+                                        label="Assign Driver"
+                                        severity="primary"
+                                        size="small"
+                                        type="button"
+                                        @click="showAssignDriverDialog = !showAssignDriverDialog"
+                                    />
+
+                                    <Button
+                                        v-if="$page.props.user.permissions.includes('pickups.delete')"
+                                        :disabled="selectedPickups.length === 0"
+                                        icon="pi pi-trash"
+                                        label="Delete"
+                                        severity="danger"
+                                        size="small"
+                                        type="button"
+                                        @click="confirmPickupsDelete()"
+                                    />
+
+                                    <Button
+                                        icon="pi pi-filter-slash"
+                                        label="Clear Filters"
+                                        outlined
+                                        severity="contrast"
+                                        size="small"
+                                        type="button"
+                                        @click="clearFilter()"
+                                    />
+
+                                    <Button
+                                        icon="pi pi-external-link"
+                                        label="Export"
+                                        severity="contrast"
+                                        size="small"
+                                        @click="exportCSV($event)"
+                                    />
+                                </div>
+
+                                <!-- Search Field -->
+                                <IconField class="w-full sm:w-auto">
+                                    <InputIcon>
+                                        <i class="pi pi-search" />
+                                    </InputIcon>
+                                    <InputText
+                                        v-model="filters.global.value"
+                                        class="w-full"
+                                        placeholder="Keyword Search"
+                                        size="small"
+                                    />
+                                </IconField>
+                            </div>
+                        </template>
+
+                        <template #empty> No pickup exceptions found.</template>
+
+                        <template #loading> Loading pickup exceptions data. Please wait.</template>
+
+                        <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
+
+                        <Column field="reference" header="Reference" sortable>
+                            <template #body="slotProps">
+                                <div>{{ slotProps.data.reference }}</div>
+                                <div class="text-blue-400 text-sm">{{ slotProps.data.status }}</div>
+                            </template>
+                        </Column>
+
+                        <Column field="name" header="Name">
+                            <template #body="slotProps">
+                                <Link :href="`pickups/get-pending-jobs-by-user/${slotProps.data.name}`"
+                                      class="text-blue-600 underline">
+                                    {{ slotProps.data.name }}
+                                </Link>
+                                <div class="text-gray-500 text-sm">{{ slotProps.data.address }}</div>
+                                <Link :href="`pickups/get-pending-jobs-by-user/${slotProps.data.contact_number}`"
+                                      class="text-blue-600 underline text-sm">
+                                    {{ slotProps.data.contact_number }}
+                                </Link>
+                            </template>
+                        </Column>
+
+                        <Column field="pickup_date" header="Pickup Date" sortable></Column>
+
+                        <Column field="zone" header="Zone" sortable></Column>
+
+                        <Column field="picker_note" header="Picker Note" sortable>
+                            <template #body="slotProps">
+                                <Tag v-if="slotProps.data.picker_note !== '-'" :value="slotProps.data.picker_note" class="text-sm" severity="danger"></Tag>
+                            </template>
+                        </Column>
+
+                        <Column field="driver" header="Driver">
+                            <template #body="slotProps">
+                                <Chip v-if="slotProps.data.driver !== '-'" :label="slotProps.data.driver" class="!bg-blue-100" icon="ti ti-steering-wheel"/>
+                            </template>
+
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="drivers" :showClear="true" option-label="name" option-value="id"
+                                        placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="created_date" header="Created" sortable></Column>
+
+                        <Column field="auth" header="Auth"></Column>
+
+                        <template #footer> In total there are {{ pickups ? pickups.length : 0 }} pickup exceptions. </template>
+                    </DataTable>
+                </template>
+            </Card>
         </div>
-
-        <AssignDriverModal
-            :drivers="drivers"
-            :id-list="idList"
-            :show="showConfirmAssignDriverModal"
-            @close="closeModal"
-        />
-
-        <FilterDrawer :show="showFilters" @close="showFilters = false">
-            <template #title> Filter Pickup Exceptions</template>
-
-            <template #content>
-
-
-                <div class="grid grid-cols-2  space-x-2">
-                    <!--Filter Rest Button-->
-                    <SoftPrimaryButton class="space-x-2" @click="resetFilter">
-                        <i class="fa-solid fa-refresh"></i>
-                        <span>Reset</span>
-                    </SoftPrimaryButton>
-                    <!--Filter Now Action Button-->
-                    <button class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90 dark:border-accent dark:text-accent-light dark:hover:bg-accent dark:hover:text-white dark:focus:bg-accent dark:focus:text-white dark:active:bg-accent/90" @click="applyFilters">
-                        <i class="fa-solid fa-filter"></i>
-                        <span>Apply</span>
-                    </button>
-                </div>
-                <div>
-                    <InputLabel value="From"/>
-                    <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
-                </div>
-
-                <div>
-                    <InputLabel value="To"/>
-                    <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
-                </div>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Created By"/>
-
-                <select
-                    v-model="filters.createdBy"
-                    autocomplete="off"
-                    class="w-full"
-                    multiple
-                    placeholder="Select a User..."
-                    x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                >
-                    <option v-for="user in users" :value="user.id">
-                        {{ user.name }}
-                    </option>
-                </select>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Zone"/>
-
-                <select
-                    v-model="filters.zoneBy"
-                    autocomplete="off"
-                    class="w-full"
-                    multiple
-                    placeholder="Select a Zone..."
-                    x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                >
-                    <option v-for="zone in zones" :value="zone.id">
-                        {{ zone.name }}
-                    </option>
-                </select>
-            </template>
-        </FilterDrawer>
-
-        <DeleteExceptionConfirmationModal
-            :count-of-selected-data="countOfSelectedData"
-            :show="showConfirmDeleteExceptionModal"
-            @close="closeModal"
-            @delete-exceptions="handleDeleteExceptions"
-        />
-
-        <HBLDetailModal
-            :pickup-id="pickupId"
-            :show="showConfirmViewPickupModal"
-            @close="closeViewModal"
-        />
-
-        <RetryPickupConfirmationModal
-            :show="showConfirmRetryModal"
-            @close="closeRetryModal"
-            @retry-pickup="handleRetryPickup"
-        />
     </AppLayout>
+
+    <HBLDetailModal
+        :pickup-id="selectedPickupID"
+        :show="showConfirmViewPickupModal"
+        @close="closeModal"
+        @update:show="showConfirmViewPickupModal = $event"
+    />
+
+    <AssignDriverDialog
+        :drivers="drivers"
+        :selected-pickups="selectedPickups"
+        :visible="showAssignDriverDialog"
+        @close="closeAssignDriverModal"
+        @update:visible="showAssignDriverDialog = $event"
+    />
 </template>

@@ -33,7 +33,7 @@ class LoadedContainerManifestExport
         $loadedHBLPackages = [];
 
         // Group packages by HBL
-        foreach ($this->container->hbl_packages->groupBy('hbl_id') as $hblId => $packages) {
+        foreach ($this->container->duplicate_hbl_packages->groupBy('hbl_id') as $hblId => $packages) {
             $hbl = HBL::withoutGlobalScope(BranchScope::class)->with('mhbl')->find($hblId);
             if ($hbl->mhbl) {
                 $loadedMHBLPackages[$hbl->mhbl->id][] = $packages;
@@ -71,14 +71,17 @@ class LoadedContainerManifestExport
                 $mhbl->consignee->address ?? '',
                 $mhbl->consignee->pp_or_nic_no ?? '',
                 $mhbl->consignee->mobile_number ?? '',
-                $hblPackages ?? [],
+                collect($hblPackages ?? []),
                 $mhbl->hbls[0]->paid_amount > 0 ? 'PAID' : 'UNPAID',
-                '',
+                'Gift',
                 '',
                 $warehouse,
                 '',
-                false,
-                false,
+                1,
+                0,
+                null,
+                null,
+                null,
             ];
         }
 
@@ -91,6 +94,37 @@ class LoadedContainerManifestExport
                     ? ($hbl->warehouse === 'COLOMBO' ? 'CMB' : ($hbl->warehouse === 'NINTAVUR' ? 'NTR' : null))
                     : null);
 
+            $isHBLFullLoad = $hbl->packages->every(fn ($package) => $package->duplicate_containers->isNotEmpty());
+            $hblLoadedContainers = $hbl->packages
+                ->load('duplicate_containers')
+                ->pluck('duplicate_containers')
+                ->flatten()
+                ->unique('id')
+                ->sortByDesc('created_at');
+            $hblLoadedLatestContainer = $hbl->packages
+                ->load('duplicate_containers')
+                ->pluck('duplicate_containers')
+                ->flatten()
+                ->unique('id')
+                ->sortByDesc('created_at')
+                ->first();
+            if ($isHBLFullLoad && count($hblLoadedContainers) === 1) {
+                $status = '';
+            } elseif (count($hblLoadedContainers) > 1 && $hblLoadedLatestContainer['id'] === $this->container['id']) {
+                $status = 'BALANCE';
+            } else {
+                $status = 'SHORT LOADED';
+            }
+            $loadedContainerReferences = $hbl->packages->load('duplicate_containers')
+                ->pluck('duplicate_containers')
+                ->flatten()
+                ->pluck('reference')
+                ->unique();
+            $filteredReferences = $loadedContainerReferences->reject(function ($ref) {
+                return $ref == $this->container['reference'];
+            });
+            $referencesString = $filteredReferences->implode(',');
+
             $data[] = [
                 $hbl->hbl_number ?: $hbl->reference,
                 $hbl->hbl_name,
@@ -100,7 +134,7 @@ class LoadedContainerManifestExport
                 $hbl->consignee_name,
                 $hbl->consignee_address,
                 $hbl->consignee_nic,
-                $hbl->consignee_contact,
+                $hbl->consignee_contact.($hbl->consignee_additional_mobile_number ? '/'.$hbl->consignee_additional_mobile_number : ''),
                 $loadedHBLPackages[$hbl->id]['packages'],
                 $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID',
                 $hbl->hbl_type,
@@ -109,6 +143,9 @@ class LoadedContainerManifestExport
                 $hbl->iq_number,
                 $hbl->is_departure_charges_paid,
                 $hbl->is_destination_charges_paid,
+                $status,
+                $referencesString ? "SHIP NO. $referencesString" : null,
+                $hbl->branch['currency_symbol'].' '.$hbl['grand_total'],
             ];
         }
 

@@ -170,7 +170,7 @@ class PriceCalculationService
                 default:
                     return ['error' => 'Unsupported operation'];
             }
-            $measureType = $measuredData['cargo_type'] === 'Sea Cargo' ? '(V) ' : '(W) ';
+            $measureType = $measuredData['cargo_type'] === 'Sea Cargo' ? '(Volume) ' : '(Width) ';
             $freight_charge_operations[] = "{$quantity_after_operation} ".$measureType.($operator !== '' ? $operator : '=>').' '.number_format((float) $value, 2);
             $grand_total_quantity = $operation_quantity;
         }

@@ -996,6 +996,7 @@
             class="main-content w-full h-full pb-8 p-4"
             style="height: 100vh !important"
         >
+            <ConfirmDialog></ConfirmDialog>
             <Notivue v-slot="item">
                 <Notification :item="item"/>
             </Notivue>
@@ -1013,10 +1014,11 @@ import {Link} from "@inertiajs/vue3";
 import Popper from "vue3-popper";
 import {Notification, Notivue} from "notivue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import ConfirmDialog from 'primevue/confirmdialog';
 
 export default {
     methods: {usePage},
-    components: {Notification, Breadcrumb, Notivue, Head, Link, Popper},
+    components: {Notification, Breadcrumb, Notivue, Head, Link, Popper, ConfirmDialog},
     props: {
         title: "",
     },

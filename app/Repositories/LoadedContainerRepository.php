@@ -7,10 +7,12 @@ use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\Container\Loading\DeleteDraftLoadedContainer;
 use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Loading\GetLoadedContainerWithHblsById;
+use App\Actions\MHBL\GetUnloadedMHBLWithHBLsByRef;
 use App\Actions\Setting\GetSettings;
 use App\Enum\ContainerStatus;
 use App\Exports\DoorToDoorManifestExport;
 use App\Exports\LoadedContainerManifestExport;
+use App\Exports\LoadedContainerTallySheetExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
 use App\Interfaces\GridJsInterface;
@@ -91,21 +93,15 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $loaded_containers = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $loaded_containers = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => ContainerResource::collection($loaded_containers),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $loaded_containers->total(),
+                'current_page' => $loaded_containers->currentPage(),
+                'perPage' => $loaded_containers->perPage(),
+                'lastPage' => $loaded_containers->lastPage(),
             ],
         ]);
     }
@@ -120,12 +116,17 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $data = array_filter($export->prepareData(), function ($item) {
             return isset($item[0]) && $item[0] !== '';
         });
+        usort($data, function ($a, $b) {
+            return $a[0] <=> $b[0];
+        });
+        $giftCount = count(array_filter($data, fn ($item) => strtolower($item[11]) === 'gift'));
+        $upbCount = count(array_filter($data, fn ($item) => $item[11] === 'UPB'));
 
         $cargoType = strtolower(trim($container->cargo_type));
 
         $view = ($cargoType === 'air cargo') ? 'exports.air_cargo' : 'exports.shipments';
 
-        $pdf = PDF::loadView($view, ['data' => $data, 'container' => $container, 'settings' => $settings]);
+        $pdf = PDF::loadView($view, ['data' => $data, 'container' => $container, 'settings' => $settings, 'giftCount' => $giftCount, 'upbCount' => $upbCount]);
         $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
@@ -153,14 +154,14 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
         $groupedData = [];
         foreach ($data as $item) {
-            if (isset($item[10]) && $item[10]) {
-                $mhblKey = $item[10]->id;
+            if (isset($item[20]) && $item[20]) {
+                $mhblKey = $item[20]->id;
                 $groupedData[$mhblKey][] = $item;
             }
         }
 
         $pdf = PDF::loadView('exports.door_to_door', ['groupedData' => $groupedData, 'data' => $data, 'container' => $container, 'settings' => $settings]);
-        $pdf->setPaper('a3', 'portrait');
+        $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
 
@@ -185,5 +186,42 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         } catch (\Exception $exception) {
             throw new \Exception('Failed to get Container');
         }
+    }
+
+    public function loadMHBL(array $data)
+    {
+        try {
+            $mhbl = GetUnloadedMHBLWithHBLsByRef::run($data['mhbl']);
+            $packages = $mhbl->hbls->flatMap(function ($hbl) {
+                return $hbl->packages->map(function ($package) {
+                    return $package->toArray();
+                });
+            })->values()->all();
+            $loadingData = [
+                'container_id' => $data['container_id'],
+                'packages' => $packages,
+            ];
+
+            return $this->store($loadingData);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to add MHBL to loaded container: '.$e->getMessage());
+        }
+    }
+
+    public function tallySheetDownloadPDF($container)
+    {
+        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
+        $filename = $container->reference.'_tally_sheet_'.date('Y_m_d_h_i_s').'.pdf';
+
+        $export = new LoadedContainerTallySheetExport($container);
+
+        $data = array_filter($export->prepareData(), function ($item) {
+            return isset($item[0]) && $item[0] !== '';
+        });
+
+        $pdf = PDF::loadView('exports.tally_sheet', ['data' => $data, 'container' => $container]);
+        $pdf->setPaper('a4', 'landscape');
+
+        return $pdf->download($filename);
     }
 }

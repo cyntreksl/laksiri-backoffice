@@ -78,4 +78,6 @@ interface HBLRepositoryInterface
     public function getDestinationUnloadedHBLsByCargoType(array $data);
 
     public function getHBLTotalSummary(HBL $hbl);
+
+    public function getHBLsPackages(array $data);
 }

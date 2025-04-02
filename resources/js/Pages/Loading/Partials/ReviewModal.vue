@@ -2,7 +2,7 @@
 import DialogModal from "@/Components/DialogModal.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {computed} from "vue";
+import {computed, ref} from "vue";
 import TextInput from "@/Components/TextInput.vue";
 import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
@@ -35,7 +35,12 @@ const props = defineProps({
         type: Boolean,
         default: false,
         required: false,
-    }
+    },
+    loadedHBLsPackages: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const emit = defineEmits(['close']);
@@ -64,17 +69,24 @@ const form = useForm({
     isDestinationLoading: props.isDestinationLoading,
 });
 
+const handleDownLoadTallySheet = () => {
+    window.location.href = route("loading.containers.tally-sheet-downloads", form.container_id);
+}
+
 const getMHBLPackageCount = (hbls) => {
     return hbls.reduce((total, hbl) => {
         return total + (hbl.packages ? hbl.packages.length : 0);
     }, 0);
 }
 
-const handleCreateLoadedContainer = () => {
+const handleCreateLoadedContainer = (printTallySheet) => {
     form.post(route("loading.loaded-containers.store"), {
         onSuccess: () => {
             push.success('Container loaded successfully!');
             emit('close');
+            if(printTallySheet){
+                window.location.href = route("loading.containers.tally-sheet-downloads", form.container_id);
+            }
             router.visit(route("loading.loading-points.index", {
                 'container': route().params.container,
                 'cargoType': route().params.cargoType,
@@ -138,12 +150,12 @@ const handleCreateLoadedContainer = () => {
                         <th
                             class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
-                            Total Packages
+                            Loaded Packages
                         </th>
                         <th
                             class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
-                            Loaded Packages
+                            Total Packages
                         </th>
                     </tr>
                     </thead>
@@ -152,10 +164,13 @@ const handleCreateLoadedContainer = () => {
                         <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ findHblByPackageId(packageData.id).hbl_number }}</td>
                         <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                            {{ findHblByPackageId(packageData.id)?.packages.length }}
+                            {{ countPackages(packageData.hbl_id)}}
                         </td>
                         <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
-                            {{ countPackages(packageData.hbl_id)}}
+                            {{ loadedHBLsPackages[packageData.hbl_id].length }}
+                        </td>
+                        <td>
+                            <badge v-if="countPackages(packageData.hbl_id) < loadedHBLsPackages[packageData.hbl_id].length" class="badge bg-error/10 text-error dark:bg-error/15">Short Loaded</badge>
                         </td>
                     </tr>
                     </tbody>
@@ -179,12 +194,16 @@ const handleCreateLoadedContainer = () => {
                         <th
                             class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
+                            Loaded Packages
+                        </th>
+                        <th
+                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
+                        >
                             Total Packages
                         </th>
                         <th
                             class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                         >
-                            Loaded Packages
                         </th>
                     </tr>
                     </thead>
@@ -206,7 +225,13 @@ const handleCreateLoadedContainer = () => {
                 <SecondaryButton @click="$emit('close')">
                     Cancel
                 </SecondaryButton>
-                <PrimaryButton @click.prevent="handleCreateLoadedContainer">
+                <PrimaryButton @click.prevent="handleDownLoadTallySheet">
+                    Download Summery
+                </PrimaryButton>
+                <PrimaryButton @click.prevent="handleCreateLoadedContainer(true)">
+                    Finish Loading and Download Summery
+                </PrimaryButton>
+                <PrimaryButton @click.prevent="handleCreateLoadedContainer(false)">
                     Finish Loading
                 </PrimaryButton>
             </div>

@@ -1,14 +1,14 @@
 <script setup>
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import DialogModal from "@/Components/DialogModal.vue";
 import {router, useForm} from "@inertiajs/vue3";
 import InputError from "@/Components/InputError.vue";
 import {push} from "notivue";
 import InputLabel from "@/Components/InputLabel.vue";
+import Dialog from "primevue/dialog";
+import Select from "primevue/select";
+import Button from "primevue/button";
 
 const props = defineProps({
-    show: {
+    visible: {
         type: Boolean,
         default: false,
     },
@@ -45,43 +45,26 @@ const handleAssignZone = () => {
 </script>
 
 <template>
-    <DialogModal :maxWidth="'lg'" :show="show" @close="$emit('close')">
-        <template #title>
-            Assign Warehouse Zone
-        </template>
+    <Dialog :style="{ width: '25rem' }" :visible="visible" header="Assign Warehouse Zone" modal @update:visible="(newValue) => $emit('update:visible', newValue)">
 
-        <template #content>
-            <div class="mt-4">
-                <InputLabel value="Warehouse Zone" />
-                <select
-                    v-model="form.warehouse_zone_id"
-                    class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                >
-                    <option :value="null" disabled>Select Zone</option>
-                    <option
-                        v-for="zone in warehouseZones"
-                        :key="zone.id"
-                        :value="zone.id"
-                    >
-                        {{ zone.name }}
-                    </option>
-                </select>
-                <InputError :message="form.errors.warehouse_zone_id"/>
-            </div>
-        </template>
+        <span class="text-surface-500 dark:text-surface-400 block mb-8">You can assign warehouse to zone.</span>
+
+        <div>
+            <InputLabel value="Warehouse Zone" />
+            <Select v-model="form.warehouse_zone_id" :options="warehouseZones" class="w-full" option-value="id" optionLabel="name" placeholder="Select a Zone"/>
+            <InputError :message="form.errors.warehouse_zone_id"/>
+        </div>
 
         <template #footer>
-            <SecondaryButton @click="$emit('close')">
-                Cancel
-            </SecondaryButton>
-            <PrimaryButton
+            <Button label="Cancel" severity="secondary" type="button" @click="emit('close')"></Button>
+
+            <Button
                 :class="{ 'opacity-25': form.processing }"
                 :disabled="form.processing"
                 class="ms-3"
-                @click="handleAssignZone"
-            >
-                Assign
-            </PrimaryButton>
+                label="Assign"
+                @click="handleAssignZone"></Button>
         </template>
-    </DialogModal>
+
+    </Dialog>
 </template>

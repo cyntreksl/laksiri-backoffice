@@ -123,6 +123,11 @@ class HBL extends Model
         }
     }
 
+    public function scopeDuePayment(Builder $query): void
+    {
+        $query->whereColumn('paid_amount', '<', 'grand_total');
+    }
+
     public function status(): HasMany
     {
         return $this->hasMany(HBLStatusChange::class, 'hbl_id', 'id');
@@ -183,7 +188,7 @@ class HBL extends Model
 
     public function pickup(): BelongsTo
     {
-        return $this->belongsTo(Pickup::class);
+        return $this->belongsTo(PickUp::class);
     }
 
     public function shipper(): BelongsTo
