@@ -354,6 +354,13 @@ const resetConsigneeDetails = () => {
 
 const copiedPackages = ref({});
 
+const onDialogShow = () => {
+    document.body.classList.add('p-overflow-hidden');
+};
+
+const onDialogHide = () => {
+    document.body.classList.remove('p-overflow-hidden');
+};
 </script>
 
 <template>
@@ -489,7 +496,7 @@ const copiedPackages = ref({});
                                     <InputError :message="form.errors.consignee_address" />
                                 </div>
                                 <div>
-                                    <div class="h-34"></div>
+                                    <div class="min-h-[2.2rem] md:min-h-[8.7rem]"></div>
                                 </div>
                             </div>
                         </template>
@@ -647,33 +654,30 @@ const copiedPackages = ref({});
             </div>
 
             <!-- Add New HBL Dialog -->
-            <Dialog v-model:visible="showAddNewHBLDialog" modal header="Add New HBL" :style="{ width: '30vw' }"  block-scroll maximizable position="center">
+            <Dialog v-model:visible="showAddNewHBLDialog" modal header="Add New HBL" :style="{ width: '90%', maxWidth: '450px' }" :block-scroll @hide="onDialogHide" @show="onDialogShow">
                 <div class="mt-4">
                     <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
                 </div>
-
                 <template #footer>
-                    <Button label="Cancel" class="p-button-text" @click="closeAddNewHBLModal" />
-                    <Button label="Add HBL" class="p-button-primary ms-3" icon="pi pi-plus" @click.prevent="handleAddNewHBL" />
+                    <div class="flex flex-wrap justify-content-end gap-2">
+                        <Button label="Cancel" class="p-button-text" @click="closeAddNewHBLModal" />
+                        <Button label="Add HBL" class="p-button-primary" icon="pi pi-plus" @click.prevent="handleAddNewHBL" @hide="handleDialogHide" />
+                    </div>
                 </template>
             </Dialog>
 
             <!-- Remove HBL Dialog -->
-            <Dialog v-model:visible="showRemoveHBLDialog" modal header="Remove HBL" :style="{ width: '30vw' }"  block-scroll maximizable position="center" >
+            <Dialog v-model:visible="showRemoveHBLDialog" modal header="Remove HBL" :style="{ width: '90%', maxWidth: '450px' }" block-scroll @hide="onDialogHide" @show="onDialogShow">
                 <div class="mt-4">
                     <InputText v-model="hblNumber" class="w-full p-inputtext" placeholder="Enter HBL Number" required type="text" />
                 </div>
                 <template #footer>
-                    <Button label="Cancel" class="p-button-text" @click="closeRemoveHBLModal" />
-                    <Button label="Remove HBL" class="p-button-danger ms-3" icon="pi pi-trash" @click.prevent="handleRemoveHBL" />
+                    <div class="flex flex-wrap justify-content-end gap-2">
+                        <Button label="Cancel" class="p-button-text" @click="closeRemoveHBLModal" />
+                        <Button label="Remove HBL" class="p-button-danger" icon="pi pi-trash" @click.prevent="handleRemoveHBL" />
+                    </div>
                 </template>
             </Dialog>
         </form>
     </AppLayout>
 </template>
-
-<style>
-.h-34 {
-height: 8.7rem;
-}
-</style>

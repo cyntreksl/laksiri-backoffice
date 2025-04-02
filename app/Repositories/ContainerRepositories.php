@@ -254,7 +254,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function update(array $data, Container $container)
     {
         try {
-            $data['is_reached'] = $data['is_reached'] ? 1 : 0;
+            $data['is_reached'] = isset($data['is_reached']) ? ($data['is_reached'] ? 1 : 0) : 0;
             UpdateContainer::run($container, $data);
             if ($data['is_reached']) {
                 foreach ($container->hbl_packages as $package) {

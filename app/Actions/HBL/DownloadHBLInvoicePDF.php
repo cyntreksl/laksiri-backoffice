@@ -22,7 +22,7 @@ class DownloadHBLInvoicePDF
             'salesman' => GetUserById::run($hbl['created_by']),
         ])->setPaper('a4');
 
-        $filename = $hbl->hbl.'.pdf';
+        $filename = $hbl->hbl_number.'invoice'.'.pdf';
 
         return $pdf->download($filename);
     }

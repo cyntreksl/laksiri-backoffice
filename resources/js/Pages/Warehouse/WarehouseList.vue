@@ -713,6 +713,7 @@ const exportURL = computed(() => {
         :hbl-id="selectedHBLID"
         :show="showConfirmViewHBLModal"
         @close="closeModal"
+        @update:show="showConfirmViewHBLModal = $event"
     />
 
     <AssignZoneModal

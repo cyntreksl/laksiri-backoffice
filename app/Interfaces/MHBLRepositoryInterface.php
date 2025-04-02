@@ -20,4 +20,6 @@ interface MHBLRepositoryInterface
     public function getContainerLoadedMHBLs(array $data);
 
     public function getUnloadedMHBLHBL(string $reference);
+
+    public function hblListDownloadPDF(MHBL $MHBL);
 }

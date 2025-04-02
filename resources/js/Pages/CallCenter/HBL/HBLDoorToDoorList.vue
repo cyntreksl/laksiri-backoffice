@@ -1269,6 +1269,7 @@ const shipIcon = ref(`
             :hbl-id="hblId"
             :show="showConfirmViewHBLModal"
             @close="closeShowHBLModal"
+            @update:show="showConfirmViewHBLModal = $event"
         />
 
         <CallFlagModal

@@ -12,3 +12,6 @@ Route::post('mhbls/add-hbl', [MHBLController::class, 'addNewHBL']);
 Route::get('mhbls/get-unloaded-mhbl/list', [MHBLController::class, 'getUnloadedMHBLs']);
 
 Route::get('mhbls/get-container-loaded-mhbl/list', [MHBLController::class, 'getLoadedMHBLsToContainer']);
+
+Route::get('mhbls/hbl-list-downloads/{mhbl}', [MHBLController::class, 'hblListDownloadPDF'])
+    ->name('mhbls.hbl-list-downloads');

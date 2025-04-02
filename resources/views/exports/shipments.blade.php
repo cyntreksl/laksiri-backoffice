@@ -278,7 +278,8 @@
         @endforeach
         @if ($loop->last)
             <tr style="border: none; line-height: 20px !important; font-size: 12px;">
-                <td colspan="5" style="border: none; text-align: center;">GRAND TOTAL</td>
+                <td colspan="3" style="border-bottom: 0; border-left: 0; border-right: 0; text-align: center;"></td>
+                <td colspan="2" style="border-bottom: 0; border-left: 0; border-left: 0; border-right: 0; text-align: left;"><strong>GRAND TOTAL</strong></td>
                 <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_nototal, 0) }}</u></strong></td>
                 <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 2) }}</u></strong></td>
                 <td style="border: none; text-align: center;"><strong><u> {{ number_format($total_gtotal, 2) }}</u></strong></td>
@@ -290,9 +291,11 @@
             <tr style="border: none; line-height: 20px !important; font-size: 11px;">
                 <td colspan="2" style="border: none; text-align: center;"></td>
                 <td colspan="9" style="border: none; text-align: left;">
-                    UBP CARGO - {{ $upbCount }}
-                    <br>
-                    GIFT CARGO -{{ $giftCount }}
+                    <strong>
+                        UBP CARGO - {{ $upbCount }}
+                        <br>
+                        GIFT CARGO -{{ $giftCount }}
+                    </strong>
                 </td>
             </tr>
 
@@ -303,7 +306,7 @@
     <div class="footer">
         <div style="text-align: right; margin-top: 20px; margin-right: 50px !important;">
             @if($settings?->seal_url)
-                <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto; opacity: 0.5;">
+                <img src="{{ $settings->seal_url }}" alt="Seal" style="width: 150px; height: auto; opacity: 0.75;">
             @endif
         </div>
         <div class="footer-text"  style="font-family: 'Italic Outline Art', sans-serif; font-style: italic;">{{$settings?->invoice_footer_title}}</div>

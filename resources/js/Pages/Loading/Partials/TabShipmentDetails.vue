@@ -60,6 +60,11 @@ const handleDeleteLoadedShipment = () => {
     })
 }
 
+const isDepartureDisabled = (status) => {
+    const disabledStatuses = ["UNLOADED", "REACHED DESTINATION"];
+    return disabledStatuses.includes(status);
+};
+
 const form = useForm({
     cargo_type: props.container.cargo_type,
     reference: props.container.reference,
@@ -303,7 +308,11 @@ watchEffect(() => {
                                 <option :value="null" disabled>
                                     Select Status
                                 </option>
-                                <option v-for="status in containerStatus">
+                                <option
+                                    v-for="status in containerStatus"
+                                    :key="status"
+                                    :disabled="$page.props.currentBranch.type !== 'Destination' && isDepartureDisabled(status)"
+                                >
                                     {{ status }}
                                 </option>
                             </select>
