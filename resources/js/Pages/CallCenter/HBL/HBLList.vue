@@ -70,6 +70,7 @@ const data = reactive({
         status: false,
         is_hold: true,
         tokens: true,
+        finance_status: true,
         actions: true,
         system_status: false,
     },
@@ -755,10 +756,19 @@ const createColumns = () => [
         }
     },
     {
+        name: "Finance Status",
+        hidden: !data.columnVisibility.finance_status,
+        sort: false,
+        formatter: (_, row) => {
+            console.log(row.cells);
+            return row.cells[15].data;
+        }
+    },
+    {
         name: "System Status",
         hidden: !data.columnVisibility.system_status,
         formatter: (_, row) => {
-            return row.cells[15].data;
+            return row.cells[17].data;
         }
     },
 ];
