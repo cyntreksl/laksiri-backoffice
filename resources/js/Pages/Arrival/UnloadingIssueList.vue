@@ -9,7 +9,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import FilterBorder from "@/Components/FilterBorder.vue";
 import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
 import Checkbox from "@/Components/Checkbox.vue";
-import {Link, usePage} from "@inertiajs/vue3";
+import {usePage} from "@inertiajs/vue3";
 import ImageViewModal from "@/Pages/Arrival/Partials/ImageView.vue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 import Button from "primevue/button";
@@ -18,13 +18,10 @@ import Panel from "primevue/panel";
 import Card from "primevue/card";
 import Column from "primevue/column";
 import InputIcon from "primevue/inputicon";
-import Select from "primevue/select";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputText from "primevue/inputtext";
 import DataTable from "primevue/datatable";
 import DatePicker from "primevue/datepicker";
 import FloatLabel from "primevue/floatlabel";
-import Tag from "primevue/tag";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
@@ -383,13 +380,25 @@ const exportCSV = () => {
 
                         <Column field="issue" header="Issue"></Column>
 
-                        <Column field="rtf" header="RTF"></Column>
+                        <Column field="rtf" header="RTF">
+                            <template #body="{ data }">
+                                <i :class="{ 'pi-times text-red-500': !data.rtf, 'pi-check text-green-400': data.rtf }" class="pi"></i>
+                            </template>
+                        </Column>
 
-                        <Column field="is_damaged" header="Damaged"></Column>
+                        <Column field="is_damaged" header="Damaged">
+                            <template #body="{ data }">
+                                <i :class="{ 'pi-times text-red-500': data.is_damaged === 'No', 'pi-check text-green-400': data.is_damaged === 'Yes' }" class="pi"></i>
+                            </template>
+                        </Column>
 
                         <Column field="type" header="Type"></Column>
 
-                        <Column field="is_fixed" header="Fix"></Column>
+                        <Column field="is_fixed" header="Fix">
+                            <template #body="{ data }">
+                                <i :class="{ 'pi-times text-red-500': !data.is_fixed, 'pi-check text-green-400': data.is_fixed }" class="pi"></i>
+                            </template>
+                        </Column>
 
                         <template #footer> In total there are {{ unloadingIssues ? totalRecords : 0 }} unloading issues. </template>
                     </DataTable>
