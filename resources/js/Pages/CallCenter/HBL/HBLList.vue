@@ -760,8 +760,12 @@ const createColumns = () => [
         hidden: !data.columnVisibility.finance_status,
         sort: false,
         formatter: (_, row) => {
-            console.log(row.cells);
-            return row.cells[15].data;
+            const status = String(row.cells[15].data).trim().toLowerCase();
+            const isApproved = status === "approved";
+            const badgeColor = isApproved ? "green" : "red";
+            const displayText = isApproved ? "Approved" : "Not Approved";
+
+            return html(`<span class="badge" style="background-color: ${badgeColor}; color: white; padding: 4px 8px; border-radius: 4px;">${displayText}</span>`);
         }
     },
     {
