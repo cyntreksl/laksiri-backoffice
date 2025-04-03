@@ -451,3 +451,4 @@ Breadcrumbs::for('courier-agents.edit', function (BreadcrumbTrail $trail, $id) {
 });
 
 require_once __DIR__.'/call-center-breadcrumbs.php';
+require_once __DIR__.'/finance-breadcrumbs.php';

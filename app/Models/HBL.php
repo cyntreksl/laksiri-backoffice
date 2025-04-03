@@ -52,6 +52,7 @@ class HBL extends Model
         4.2 => 'Fully Loaded',
         4.3 => 'Partial Unloaded',
         4.4 => 'Fully Unloaded',
+        4.5 => 'Finance Approved',
     ];
 
     protected $fillable = [
@@ -101,6 +102,9 @@ class HBL extends Model
         'is_released',
         'hbl_number',
         'cr_number',
+        'is_finance_release_approved',
+        'finance_release_approved_by',
+        'finance_release_approved_date',
     ];
 
     protected $appends = [

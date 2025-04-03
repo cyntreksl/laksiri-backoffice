@@ -1172,7 +1172,7 @@ export default {
                                 route: "hbls.index",
                             }
                         );
-                    }else{
+                    }else if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'call center') {
                         hblMenu.splice(
                             2,
                             0,
@@ -1181,17 +1181,38 @@ export default {
                                 route: "call-center.hbls.index",
                             }
                         );
-                    }
-
-                    if (usePage().props.user.permissions.includes("mhbls.index")) {
+                    } else if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'finance team')
+                    {
                         hblMenu.splice(
                             2,
                             0,
                             {
-                                title: "All MHBL",
-                                route: "mhbls.index",
+                                title: "All HBL",
+                                route: "finance.hbls.index",
                             }
                         );
+                    }
+
+                    if (usePage().props.user.permissions.includes("hbls.hbl finance approval list")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Approve HBLs",
+                                route: "finance.hbls.approve-hbl",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("mhbls.index")) {
+                    hblMenu.splice(
+                        2,
+                        0,
+                        {
+                            title: "All MHBL",
+                            route: "mhbls.index",
+                        }
+                    );
                     }
 
                     if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'admin') {
