@@ -156,6 +156,13 @@ Breadcrumbs::for('setting.warehouse-zones.edit', function (BreadcrumbTrail $trai
     $trail->push('Update Warehouse Zone', route('setting.warehouse-zones.edit', $id));
 });
 
+// Air Lines
+Breadcrumbs::for('setting.air-lines.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Air Lines', route('setting.air-lines.index'));
+});
+
 // Driver Area
 Breadcrumbs::for('setting.driver-areas.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

@@ -27,7 +27,7 @@ Route::name('setting.')->group(function () {
     Route::get('driver-areas/list', [DriverAreasController::class, 'list'])
         ->name('driver-area.list');
 
-    Route::resource('air-lines', AirLineController::class)->except('show');
+    Route::resource('air-lines', AirLineController::class)->except('show', 'create', 'edit');
 
     Route::get('air-lines/list', [AirLineController::class, 'list'])
         ->name('air-lines.list');

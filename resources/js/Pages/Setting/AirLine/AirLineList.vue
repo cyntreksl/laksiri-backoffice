@@ -13,20 +13,14 @@ import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
 import Column from "primevue/column";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import Tag from "primevue/tag";
-import Panel from "primevue/panel";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
-import Select from "primevue/select";
-import Checkbox from "primevue/checkbox";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import {useConfirm} from "primevue/useconfirm";
 import moment from "moment";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
 import {push} from "notivue";
-import AssignZoneModal from "@/Pages/Warehouse/Partials/AssignZoneModal.vue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
 
@@ -59,6 +53,7 @@ const props = defineProps({
 });
 
 const cm = ref();
+const confirm = useConfirm();
 const baseUrl = ref("air-lines/list");
 const loading = ref(true);
 const airLines = ref([]);
@@ -66,9 +61,11 @@ const totalRecords = ref(0);
 const perPage = ref(100);
 const currentPage = ref(1);
 const selectedAirLine = ref(null);
+const selectedAirLineId = ref(null);
 
 const isDialogVisible = ref(false);
 const showEditAirLineDialog = ref(false);
+const showDeleteAirLineDialog = ref(false);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -91,14 +88,24 @@ const menuModel = ref([
         command: () => confirmViewEditAirLine(selectedAirLine),
         disabled: !usePage().props.user.permissions.includes("hbls.edit"),
     },
+    {
+        label: "Delete",
+        icon: "pi pi-fw pi-times",
+        command: () => confirmDeleteAirLine(selectedAirLine),
+        disabled: !usePage().props.user.permissions.includes("hbls.delete"),
+    },
 ]);
 
 const confirmViewEditAirLine = (airLine) => {
-    console.log(airLine);
-    selectedAirLine.value = airLine.value.id;
-    form.name = airLine.value.id;
+    form.name = airLine.value.name;
+    selectedAirLineId.value = airLine.value.id;
     showEditAirLineDialog.value = true;
     isDialogVisible.value = true;
+};
+
+const confirmAirLineDelete = (airLine) => {
+    selectedAirLineId.value = airLine.value.id;
+    showDeleteAirLineDialog.value = true;
 };
 
 const fetchAirLines = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
@@ -181,6 +188,14 @@ const closeAddNewAirLineModal = () => {
     isDialogVisible.value = false;
 }
 
+const onDialogShow = () => {
+    document.body.classList.add('p-overflow-hidden');
+};
+
+const onDialogHide = () => {
+    document.body.classList.remove('p-overflow-hidden');
+};
+
 const handleAddNewAirLine = async () => {
     form.post(route("setting.air-lines.store"), {
         onSuccess: () => {
@@ -196,6 +211,58 @@ const handleAddNewAirLine = async () => {
         preserveState: true,
     });
 }
+
+const handleEditAirLine = async () => {
+    form.put(route("setting.air-lines.update", selectedAirLineId.value), {
+        onSuccess: () => {
+            closeAddNewAirLineModal();
+            form.reset();
+            fetchAirLines();
+            push.success('Air Line Updated Successfully!');
+        },
+        onError: () => {
+            push.error('Something went to wrong!');
+        },
+        preserveScroll: true,
+        preserveState: true,
+    });
+}
+
+const confirmDeleteAirLine = (airLine) => {
+    selectedAirLineId.value = airLine.value.id;
+    confirm.require({
+        message: 'Are you sure you want to delete air line?',
+        header: 'Delete Air Line?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.delete(route("setting.air-lines.destroy", selectedAirLineId.value), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("Air Line Deleted Successfully!");
+                    const currentRoute = route().current();
+                    router.visit(route(currentRoute, route().params));
+                },
+                onError: () => {
+                    push.error("Something went to wrong!");
+                },
+            });
+            selectedAirLineId.value = null;
+        },
+        reject: () => {
+            selectedAirLineId.value = null;
+        }
+    });
+};
 </script>
 <template>
     <AppLayout title="Air Lines">
@@ -269,7 +336,7 @@ const handleAddNewAirLine = async () => {
                     </DataTable>
                 </template>
             </Card>
-            <!-- Add New HBL Dialog -->
+            <!-- Add New Air Line Dialog -->
             <Dialog
                 v-model:visible="isDialogVisible"
                 modal
@@ -302,7 +369,6 @@ const handleAddNewAirLine = async () => {
                     </div>
                 </template>
             </Dialog>
-
         </div>
     </AppLayout>
 
