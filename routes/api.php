@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\v1\DashboardController;
 use App\Http\Controllers\Api\v1\DriverController;
 use App\Http\Controllers\Api\v1\ExceptionNameController;
 use App\Http\Controllers\Api\v1\HBLController;
+use App\Http\Controllers\Api\v1\HblImageController;
 use App\Http\Controllers\Api\v1\PackageTypeController;
 use App\Http\Controllers\Api\v1\PickupController;
 use App\Http\Controllers\CallCenter\DeliverController;
@@ -53,6 +54,8 @@ Route::domain('api.'.config('app.url'))
         Route::post('/release-delivery', [DeliverController::class, 'releaseDeliverOrder']);
 
         Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+
+        Route::post('/hbl-images/upload', [HblImageController::class, 'upload']);
 
     });
 

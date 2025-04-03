@@ -39,7 +39,7 @@ class CreatePickUp
             'location_name' => $data['location'] ?? null,
             'zone_id' => $data['zone_id'] ?? null,
             'notes' => ! empty($data['notes']) ? Str::title($data['notes']) : null,
-            'package_types' => $package_types,
+            'package_types' => json_encode($data['package_types']),
             'pickup_date' => ! empty($data['pickup_date']) ? $data['pickup_date'] : null,
             'pickup_time_start' => ! empty($data['pickup_time_start']) ? $data['pickup_time_start'] : null,
             'pickup_time_end' => ! empty($data['pickup_time_end']) ? $data['pickup_time_end'] : null,
