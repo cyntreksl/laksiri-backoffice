@@ -58,6 +58,7 @@ const props = defineProps({
     },
 });
 
+const cm = ref();
 const baseUrl = ref("air-lines/list");
 const loading = ref(true);
 const airLines = ref([]);
@@ -65,6 +66,9 @@ const totalRecords = ref(0);
 const perPage = ref(100);
 const currentPage = ref(1);
 const selectedAirLine = ref(null);
+
+const isDialogVisible = ref(false);
+const showEditAirLineDialog = ref(false);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -76,26 +80,26 @@ const filters = ref({
     payments: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
+const form = useForm({
+    name: "",
+})
+
 const menuModel = ref([
     {
-        label: "View",
-        icon: "pi pi-fw pi-search",
-        command: () => confirmViewHBL(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes('warehouse.show'),
-    },
-    {
-        label: computed(() => (selectedHBL.value?.is_hold ? 'Release' : 'Hold')),
-        icon: computed(() => (selectedHBL.value?.is_hold ? 'pi pi-fw pi-play-circle' : 'pi pi-fw pi-pause-circle')) ,
-        command: () => confirmHBLHold(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes('warehouse.hold and release'),
-    },
-    {
-        label: "Download Barcode",
-        icon: "pi pi-fw pi-barcode",
-        url: () => route("back-office.warehouses.download.barcode", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes('warehouse.download barcode'),
+        label: "Edit",
+        icon: "pi pi-fw pi-pencil",
+        command: () => confirmViewEditAirLine(selectedAirLine),
+        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
     },
 ]);
+
+const confirmViewEditAirLine = (airLine) => {
+    console.log(airLine);
+    selectedAirLine.value = airLine.value.id;
+    form.name = airLine.value.id;
+    showEditAirLineDialog.value = true;
+    isDialogVisible.value = true;
+};
 
 const fetchAirLines = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
     loading.value = true;
@@ -165,13 +169,16 @@ const exportURL = computed(() => {
 
 const showAddNewAirLineDialog = ref(false);
 
-const form = useForm({
-    name: "",
-})
+const confirmViewAddNewAirLine = () => {
+    showAddNewAirLineDialog.value = true;
+    isDialogVisible.value = true;
+};
 
 const closeAddNewAirLineModal = () => {
     form.name = "";
     showAddNewAirLineDialog.value = false;
+    showEditAirLineDialog.value = false;
+    isDialogVisible.value = false;
 }
 
 const handleAddNewAirLine = async () => {
@@ -199,7 +206,7 @@ const handleAddNewAirLine = async () => {
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel" />
+                    <ContextMenu ref="cm" :model="menuModel"  @hide="selectedAirLine = null"/>
                     <DataTable
                         v-model:contextMenuSelection="selectedAirLine"
                         v-model:selection="selectedAirLine"
@@ -228,7 +235,7 @@ const handleAddNewAirLine = async () => {
                                 <div>
                                     <PrimaryButton
                                         class="w-full"
-                                        @click="showAddNewAirLineDialog = true"
+                                        @click="confirmViewAddNewAirLine()"
                                     >
                                        Create Air Line
                                     </PrimaryButton>
@@ -263,18 +270,39 @@ const handleAddNewAirLine = async () => {
                 </template>
             </Card>
             <!-- Add New HBL Dialog -->
-            <Dialog v-model:visible="showAddNewAirLineDialog" modal header="Add New Air Line" :style="{ width: '90%', maxWidth: '450px' }" :block-scroll @hide="onDialogHide" @show="onDialogShow">
+            <Dialog
+                v-model:visible="isDialogVisible"
+                modal
+                :header="showAddNewAirLineDialog ? 'Add New Air Line' : 'Edit Air Line'"
+                :style="{ width: '90%', maxWidth: '450px' }"
+                :block-scroll="true"
+                @hide="onDialogHide"
+                @show="onDialogShow"
+            >
                 <div class="mt-4">
-                    <InputText v-model="form.name" class="w-full p-inputtext" placeholder="Enter Air Line" required type="text" />
+                    <InputText
+                        v-model="form.name"
+                        class="w-full p-inputtext"
+                        placeholder="Enter Air Line"
+                        required
+                        type="text"
+                    />
                     <InputError :message="form.errors.name"/>
                 </div>
+
                 <template #footer>
-                    <div class="flex flex-wrap justify-content-end gap-2">
+                    <div class="flex flex-wrap justify-end gap-2">
                         <Button label="Cancel" class="p-button-text" @click="closeAddNewAirLineModal" />
-                        <Button label="Add Air Line" class="p-button-primary" icon="pi pi-plus" @click.prevent="handleAddNewAirLine" @hide="handleDialogHide" />
+                        <Button
+                            :label="showAddNewAirLineDialog ? 'Add Air Line' : 'Update Air Line'"
+                            class="p-button-primary"
+                            :icon="showAddNewAirLineDialog ? 'pi pi-plus' : 'pi pi-check'"
+                            @click.prevent="showAddNewAirLineDialog ? handleAddNewAirLine() : handleEditAirLine()"
+                        />
                     </div>
                 </template>
             </Dialog>
+
         </div>
     </AppLayout>
 
