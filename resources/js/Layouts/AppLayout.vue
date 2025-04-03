@@ -1779,6 +1779,10 @@ export default {
                             title: "Shipper & Consignee",
                             route: "setting.shipper-consignees.index",
                         },
+                        {
+                            title: "Air Lines",
+                            route: "setting.air-lines.index",
+                        },
 
                     );
                     changeSidePanelTitle("Setting");
