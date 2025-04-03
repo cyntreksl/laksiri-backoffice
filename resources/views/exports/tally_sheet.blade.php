@@ -81,7 +81,7 @@
             <th colspan="2" style="text-align: left; font-family: 'Times New Roman',fantasy; font-size: 10px; height: 3%">SHIPMENT NO: {{$container?->reference}}</th>
         </tr>
         <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: #D8D8D8  ;">
-            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">SR <br>NO</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">SR</th>
             <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">HBL</th>
             <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">NAME OF CUSTOMER</th>
             <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;"> CBM</th>
@@ -96,7 +96,7 @@
             <tr>
                 <td style="font-size: 11px; text-align: center; height: 3%">{{ $serialNumber++ }}</td>
                 <td style="font-size: 11px; text-align: center; height: 3%">{{ $item[0] }}</td>
-                <td style="font-size: 11px; text-align: left; height: 3%">{{ $item[1] }}</td>
+                <td style="font-size: 11px; text-align: left; height: 3%">{{ strtoupper($item[1]) }}</td>
                 <td style="font-size: 11px; text-align: center; height: 3%">{{ $item[2] }}</td>
                 <td style="font-size: 11px; text-align: center; height: 3%">{{ $item[3] }}</td>
                 <td style="font-size: 11px; width: 4%; text-align: center; height: 3%">{{ $item[4][0] ?? '' }}</td>
