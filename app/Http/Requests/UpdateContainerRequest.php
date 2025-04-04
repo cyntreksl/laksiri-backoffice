@@ -33,6 +33,7 @@ class UpdateContainerRequest extends FormRequest
             'bl_number' => ['required_if:cargo_type,Sea Cargo'],
             'awb_number' => ['required_if:cargo_type,Air Cargo'],
             'container_number' => ['required_if:cargo_type,Sea Cargo'],
+            'airline_name' => ['required_if:cargo_type,Air Cargo'],
         ];
     }
 }
