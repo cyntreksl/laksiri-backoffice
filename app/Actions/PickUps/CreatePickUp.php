@@ -23,7 +23,11 @@ class CreatePickUp
 
         $package_types = null;
         if (! empty($data['package_types'])) {
-            $package_types = isset($data['package_types']) ? json_encode($data['package_types']) : json_encode($data['note_type']);
+            $package_types = json_encode($data['package_types']);
+        }
+
+        if (! empty($data['note_type'])) {
+            $package_types = json_encode($data['note_type']);
         }
 
         $pickup = PickUp::create([
