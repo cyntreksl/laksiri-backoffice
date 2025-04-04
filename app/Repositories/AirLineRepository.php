@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Actions\AirLine\CreateAirLine;
 use App\Actions\AirLine\DeleteAirLine;
+use App\Actions\AirLine\GetAirLines;
 use App\Actions\AirLine\UpdateAirLine;
 use App\Http\Resources\AirLineResource;
 use App\Interfaces\AirLineRepositoryInterface;
@@ -13,6 +14,11 @@ use Illuminate\Http\JsonResponse;
 
 class AirLineRepository implements AirLineRepositoryInterface, GridJsInterface
 {
+    public function getAirLines()
+    {
+        return GetAirLines::run();
+    }
+
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
     {
         $query = AirLine::query();
