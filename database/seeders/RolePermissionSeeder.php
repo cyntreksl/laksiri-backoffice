@@ -250,6 +250,19 @@ class RolePermissionSeeder extends Seeder
                     'courier-agents.delete',
                 ],
             ],
+            [
+                'group_name' => 'Tax',
+                'permissions' => [
+                    'tax.departure tax',
+                    'tax.departure tax create',
+                    'tax.departure tax edit',
+                    'tax.departure tax delete',
+                    'tax.destination tax',
+                    'tax.destination tax create',
+                    'tax.destination tax edit',
+                    'tax.destination tax delete',
+                ],
+            ],
         ];
     }
 }
