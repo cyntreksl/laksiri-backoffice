@@ -1786,6 +1786,20 @@ export default {
                         }];
 
                     }
+                    if (usePage().props.user.permissions.includes("tax.destination tax")) {
+                        settingMenu = [...settingMenu,{
+                            title: "Tax",
+                            route: "setting.taxes.index",
+                        }];
+
+                    }
+                    if (usePage().props.user.permissions.includes("currencies.index")) {
+                        settingMenu = [...settingMenu,{
+                            title: "Currencies",
+                            route: "setting.currencies.index",
+                        }];
+
+                    }
 
                     childMenuList.splice(0, childMenuList.length, ...settingMenu);
                     changeSidePanelTitle("Setting");

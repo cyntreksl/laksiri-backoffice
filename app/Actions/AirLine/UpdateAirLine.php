@@ -11,6 +11,8 @@ class UpdateAirLine
 
     public function handle(AirLine $airLine, array $data)
     {
+        dd($airLine, $data);
+
         return $airLine->update($data);
     }
 }

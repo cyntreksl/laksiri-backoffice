@@ -273,6 +273,15 @@ class RolePermissionSeeder extends Seeder
                     'tax.destination tax delete',
                 ],
             ],
+            [
+                'group_name' => 'Currency',
+                'permissions' => [
+                    'currencies.index',
+                    'currencies.create',
+                    'currencies.edit',
+                    'currencies.delete',
+                ],
+            ],
         ];
     }
 }
