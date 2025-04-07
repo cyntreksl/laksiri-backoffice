@@ -24,34 +24,6 @@ import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
 
-const props = defineProps({
-    drivers: {
-        type: Object,
-        default: () => {
-        },
-    },
-    officers: {
-        type: Object,
-        default: () => {
-        },
-    },
-    paymentStatus: {
-        type: Object,
-        default: () => {
-        },
-    },
-    warehouseZones: {
-        type: Object,
-        default: () => {
-        },
-    },
-    warehouses: {
-        type: Object,
-        default: () => {
-        },
-    },
-});
-
 const cm = ref();
 const confirm = useConfirm();
 const baseUrl = ref("air-lines/list");
@@ -157,22 +129,6 @@ watch(() => filters.value.global.value, (newValue) => {
         debouncedFetchAirLines(newValue);
     }
 });
-
-const exportURL = computed(() => {
-    const params = new URLSearchParams({
-        warehouse: filters.value.warehouse.value,
-        deliveryType: filters.value.hbl_type.value,
-        cargoMode: filters.value.cargo_type.value,
-        isHold: filters.value.is_hold.value,
-        officers: filters.value.user.value,
-        paymentStatus: filters.value.payments.value,
-        fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
-        toDate: moment(toDate.value).format("YYYY-MM-DD"),
-    }).toString();
-
-    return `/warehouses/export?${params}`;
-});
-
 
 const showAddNewAirLineDialog = ref(false);
 
