@@ -70,6 +70,7 @@ const data = reactive({
         status: false,
         is_hold: true,
         tokens: true,
+        finance_status: true,
         actions: true,
         system_status: false,
     },
@@ -755,10 +756,23 @@ const createColumns = () => [
         }
     },
     {
+        name: "Finance Status",
+        hidden: !data.columnVisibility.finance_status,
+        sort: false,
+        formatter: (_, row) => {
+            const status = String(row.cells[15].data).trim().toLowerCase();
+            const isApproved = status === "approved";
+            const badgeColor = isApproved ? "green" : "red";
+            const displayText = isApproved ? "Approved" : "Not Approved";
+
+            return html(`<span class="badge" style="background-color: ${badgeColor}; color: white; padding: 4px 8px; border-radius: 4px;">${displayText}</span>`);
+        }
+    },
+    {
         name: "System Status",
         hidden: !data.columnVisibility.system_status,
         formatter: (_, row) => {
-            return row.cells[15].data;
+            return row.cells[17].data;
         }
     },
 ];
