@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Card from "primevue/card";
 import DataTable from "primevue/datatable";
@@ -19,18 +19,10 @@ import {debounce} from "lodash";
 import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-
-const props = defineProps({
-    isDOChargesPage: {
-        type: Boolean,
-        default: false,
-    },
-});
 
 const cm = ref();
 const confirm = useConfirm();
-const baseUrl = ref(props.isDOChargesPage ? "/air-lines/list" : "air-lines/list");
+const baseUrl = ref("air-lines/list");
 const loading = ref(true);
 const airLines = ref([]);
 const totalRecords = ref(0);
@@ -55,7 +47,6 @@ const filters = ref({
 
 const form = useForm({
     name: "",
-    do_charge: "",
 })
 
 const menuModel = ref([
@@ -63,19 +54,18 @@ const menuModel = ref([
         label: "Edit",
         icon: "pi pi-fw pi-pencil",
         command: () => confirmViewEditAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.edit"),
+        disabled: !usePage().props.user.permissions.includes("air-line.edit") || !usePage().props.user.permissions.includes("air-line.do charges edit"),
     },
     {
         label: "Delete",
         icon: "pi pi-fw pi-times",
         command: () => confirmDeleteAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.delete"),
+        disabled: !usePage().props.user.permissions.includes("air-line.delete") || !usePage().props.user.permissions.includes("air-line.do charges delete"),
     },
 ]);
 
 const confirmViewEditAirLine = (airLine) => {
     form.name = airLine.value.name;
-    form.do_charge = airLine.value.do_charge;
     selectedAirLineId.value = airLine.value.id;
     showEditAirLineDialog.value = true;
     isDialogVisible.value = true;
@@ -220,10 +210,9 @@ const confirmDeleteAirLine = (airLine) => {
         }
     });
 };
-console.log(props.isDOChargesPage);
 </script>
 <template>
-    <AppLayout :title="isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines'">
+    <AppLayout title="Air Lines">
         <template #header>Air Lines</template>
 
         <Breadcrumb/>
@@ -231,7 +220,7 @@ console.log(props.isDOChargesPage);
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel"  @hide="selectedAirLine = null"/>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedAirLine = null"/>
                     <DataTable
                         v-model:contextMenuSelection="selectedAirLine"
                         v-model:selection="selectedAirLine"
@@ -259,11 +248,11 @@ console.log(props.isDOChargesPage);
                                 </div>
                                 <div>
                                     <PrimaryButton
-                                        v-if="usePage().props.user.permissions.includes('air-line.create')"
+                                        v-if="usePage().props.user.permissions.includes('air-line.create') || usePage().props.user.permissions.includes('air-line.do charges create')"
                                         class="w-full"
                                         @click="confirmViewAddNewAirLine()"
                                     >
-                                       Create Air Line
+                                        Create Air Line
                                     </PrimaryButton>
                                 </div>
                             </div>
@@ -271,7 +260,7 @@ console.log(props.isDOChargesPage);
                                 <!-- Search Field -->
                                 <IconField class="w-full sm:w-auto">
                                     <InputIcon>
-                                        <i class="pi pi-search" />
+                                        <i class="pi pi-search"/>
                                     </InputIcon>
                                     <InputText
                                         v-model="filters.global.value"
@@ -283,15 +272,13 @@ console.log(props.isDOChargesPage);
                             </div>
                         </template>
 
-                        <template #empty> No Air Line found. </template>
+                        <template #empty> No Air Line found.</template>
 
                         <template #loading> Loading Air Lines data. Please wait.</template>
 
                         <Column field="id" header="ID" sortable></Column>
 
                         <Column field="name" header="Name" sortable></Column>
-
-                        <Column v-if="isDOChargesPage" field="do_charge" header="Do Charge"></Column>
 
                         <template #footer> In total there are {{ airLines ? totalRecords : 0 }} Air Lines.</template>
                     </DataTable>
@@ -318,22 +305,9 @@ console.log(props.isDOChargesPage);
                     <InputError :message="form.errors.name"/>
                 </div>
 
-                <div v-if="isDOChargesPage" class="mt-3">
-                    <InputText
-                        v-model="form.do_charge"
-                        class="w-full"
-                        placeholder="DO Charge(LKR)"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.do_charge" />
-                </div>
-
                 <template #footer>
                     <div class="flex flex-wrap justify-end gap-2">
-                        <Button label="Cancel" class="p-button-text" @click="closeAddNewAirLineModal" />
+                        <Button label="Cancel" class="p-button-text" @click="closeAddNewAirLineModal"/>
                         <Button
                             :label="showAddNewAirLineDialog ? 'Add Air Line' : 'Update Air Line'"
                             class="p-button-primary"
