@@ -1172,7 +1172,7 @@ export default {
                                 route: "hbls.index",
                             }
                         );
-                    }else{
+                    }else if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'call center') {
                         hblMenu.splice(
                             2,
                             0,
@@ -1184,14 +1184,14 @@ export default {
                     }
 
                     if (usePage().props.user.permissions.includes("mhbls.index")) {
-                        hblMenu.splice(
-                            2,
-                            0,
-                            {
-                                title: "All MHBL",
-                                route: "mhbls.index",
-                            }
-                        );
+                    hblMenu.splice(
+                        2,
+                        0,
+                        {
+                            title: "All MHBL",
+                            route: "mhbls.index",
+                        }
+                    );
                     }
 
                     if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'admin') {
@@ -1723,10 +1723,7 @@ export default {
                     changeSidePanelTitle("Report");
                     break;
                 case "setting":
-                    let settingMenu = [];
-                    settingMenu.splice(
-                        0,
-                        childMenuList.length,
+                    let settingMenu = [
                         {
                             title: "Driver Zones",
                             route: "setting.driver-zones.index",
@@ -1759,12 +1756,15 @@ export default {
                             title: "Shipper & Consignee",
                             route: "setting.shipper-consignees.index",
                         },
-                        {
-                            title: "PickupType",
-                            route: "setting.pickup-types.index",
-                        }
+                    ];
 
-                    );
+                    if (usePage().props.user.permissions.includes("air-line.index")) {
+                        settingMenu = [...settingMenu,{
+                            title: "Air Lines",
+                            route: "setting.air-lines.index",
+                        }];
+
+                    }
                     if (usePage().props.user.permissions.includes("pickup-type.index")){
 
                         settingMenu.splice(

@@ -14,6 +14,7 @@ use App\Enum\WarehouseType;
 use App\Http\Requests\StoreContainerRequest;
 use App\Http\Requests\StoreUnloadingIssue;
 use App\Http\Requests\UpdateContainerRequest;
+use App\Interfaces\AirLineRepositoryInterface;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\MHBLRepositoryInterface;
@@ -33,6 +34,7 @@ class ContainerController extends Controller
         private readonly ContainerRepositoryInterface $containerRepository,
         private readonly HBLRepositoryInterface $HBLRepository,
         private readonly MHBLRepositoryInterface $MHBLRepository,
+        private readonly AirLineRepositoryInterface $airLineRepository,
     ) {}
 
     public function index()
@@ -75,6 +77,7 @@ class ContainerController extends Controller
             'airContainerOptions' => $airContainerOptions,
             'cargoTypes' => $cargoTypes,
             'warehouses' => GetDestinationBranches::run()->reject(fn ($warehouse) => $warehouse->name === 'Other'),
+            'airLines' => $this->airLineRepository->getAirLines(),
         ]);
     }
 
@@ -100,6 +103,8 @@ class ContainerController extends Controller
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
             'cargoTypes' => $cargoTypes,
+            'warehouses' => GetDestinationBranches::run()->reject(fn ($warehouse) => $warehouse->name === 'Other'),
+            'airLines' => $this->airLineRepository->getAirLines(),
         ]);
     }
 
@@ -111,7 +116,6 @@ class ContainerController extends Controller
     public function showLoadingPoint(Request $request, Container $container)
     {
         $this->authorize('container.load to container');
-        //        dd($this->HBLRepository->getLoadedHBLsByCargoType($container, $request->cargoType));
         if (Auth::user()->hasRole('boned area')) {
             return Inertia::render('Loading/DestinationLoadingPoint', [
                 'container' => $container,

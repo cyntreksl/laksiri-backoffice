@@ -22,6 +22,7 @@ class RolePermissionSeeder extends Seeder
         Role::updateOrCreate(['name' => 'customer']);
         Role::updateOrCreate(['name' => 'call center']);
         Role::updateOrCreate(['name' => 'boned area']);
+        Role::updateOrCreate(['name' => 'finance Team']);
 
         $this->command->info('Default Roles added.');
 
@@ -114,6 +115,9 @@ class RolePermissionSeeder extends Seeder
                     'hbls.delete documents',
                     'hbls.issue token',
                     'hbls.show draft hbls',
+                    'hbls.hbl finance approval list',
+                    'hbls.show finance approved hbls',
+                    'hbls.finance approved',
                 ],
             ],
 
@@ -255,6 +259,29 @@ class RolePermissionSeeder extends Seeder
                     'courier-agents.create',
                     'courier-agents.edit',
                     'courier-agents.delete',
+                ],
+            ],
+            [
+                'group_name' => 'Air Line',
+                'permissions' => [
+                    'air-line.index',
+                    'air-line.create',
+                    'air-line.list',
+                    'air-line.edit',
+                    'air-line.delete',
+                ],
+            ],
+            [
+                'group_name' => 'Tax',
+                'permissions' => [
+                    'tax.departure tax',
+                    'tax.departure tax create',
+                    'tax.departure tax edit',
+                    'tax.departure tax delete',
+                    'tax.destination tax',
+                    'tax.destination tax create',
+                    'tax.destination tax edit',
+                    'tax.destination tax delete',
                 ],
             ],
         ];

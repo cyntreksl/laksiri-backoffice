@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AirLineController;
 use App\Http\Controllers\DriverAreasController;
 use App\Http\Controllers\ExceptionNameController;
 use App\Http\Controllers\OfficerController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\PackageTypeController;
 use App\Http\Controllers\PickupTypeController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TaxController;
 use App\Http\Controllers\WarehouseZoneController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +28,11 @@ Route::name('setting.')->group(function () {
 
     Route::get('driver-areas/list', [DriverAreasController::class, 'list'])
         ->name('driver-area.list');
+
+    Route::resource('air-lines', AirLineController::class)->except('show', 'create', 'edit');
+
+    Route::get('air-lines/list', [AirLineController::class, 'list'])
+        ->name('air-lines.list');
 
     // Warehouse Zones
     Route::get('warehouse-zones/list', [WarehouseZoneController::class, 'list'])
@@ -55,6 +62,11 @@ Route::name('setting.')->group(function () {
 
     Route::resource('package-types', PackageTypeController::class)
         ->except(['show', 'create']);
+
+    Route::resource('taxes', TaxController::class)->except('show', 'create', 'edit');
+
+    Route::get('taxes/list', [TaxController::class, 'list'])
+        ->name('taxes.list');
 
     // Invoice Settings
     Route::post('invoice/settings', [SettingController::class, 'updateInvoiceSettings'])

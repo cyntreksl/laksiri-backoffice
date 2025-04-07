@@ -13,6 +13,7 @@ import SelectButton from "primevue/selectbutton";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputText from "primevue/inputtext";
 import DatePicker from "primevue/datepicker";
+import Select from "primevue/select";
 
 const props = defineProps({
     cargoTypes: {
@@ -30,6 +31,14 @@ const props = defineProps({
     container: {
         type: Array,
         required: true,
+    },
+    warehouses: {
+        type: Object,
+        default: () => {},
+    },
+    airLines: {
+        type: Array,
+        default: () => [],
     },
 })
 
@@ -49,10 +58,12 @@ const form = useForm({
     port_of_loading: props.container.port_of_loading,
     port_of_discharge: props.container.port_of_discharge,
     flight_number: props.container.flight_number,
+    air_line_id: props.container.air_line_id,
     airline_name: props.container.airline_name,
     airport_of_departure: props.container.airport_of_departure,
     airport_of_arrival: props.container.airport_of_arrival,
     cargo_class: props.container.cargo_class,
+    target_warehouse: props.container.target_warehouse,
 });
 
 const containerTypes = ref(props.seaContainerOptions);
@@ -66,6 +77,11 @@ watchEffect(() => {
 });
 
 const handleCreate = () => {
+    const selectedAirline = props.airLines.find(airline => airline.name === form.airline_name);
+    if (selectedAirline) {
+        form.air_line_id = selectedAirline.id;
+    }
+
     form.put(route("loading.loading-containers.update", props.container.id), {
         onSuccess: () => {
             router.visit(route("loading.loading-containers.index"));
@@ -116,6 +132,36 @@ const handleCreate = () => {
               <InputError :message="form.errors.cargo_type" />
             </div>
           </div>
+            <div class="card px-4 py-4 sm:px-5">
+                <div>
+                    <h2
+                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
+                    >
+                        Target Warehouse
+                    </h2>
+                </div>
+                <div class="my-5">
+                    <div class="space-x-5">
+                        <div class="grid grid-cols-3 gap-4">
+                            <label
+                                v-for="warehouse in warehouses"
+                                :key="warehouse.id"
+                                class="inline-flex items-center space-x-2"
+                            >
+                                <input
+                                    v-model="form.target_warehouse"
+                                    :value="warehouse.id"
+                                    class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
+                                    name="target_warehouse"
+                                    type="radio"
+                                />
+                                <p>{{ warehouse.name }}</p>
+                            </label>
+                        </div>
+                    </div>
+                    <InputError :message="form.errors.target_warehouse" />
+                </div>
+            </div>
 
           <!-- Container Type-->
           <div class="card px-4 py-4 sm:px-5">
@@ -338,17 +384,19 @@ const handleCreate = () => {
                   </label>
                   <InputError :message="form.errors.flight_number" />
                 </div>
-                <div class="col-span-3">
-                  <span>Airline Name</span>
-                  <label class="block">
-                    <input
-                      v-model="form.airline_name"
-                      class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                      type="text"
-                    />
-                  </label>
-                  <InputError :message="form.errors.airline_name" />
-                </div>
+                  <div class="col-span-3">
+                      <InputLabel value="Airline Name"/>
+                      <Select
+                          v-model="form.airline_name"
+                          :options="airLines"
+                          class="w-full"
+                          filter
+                          option-label="name"
+                          option-value="name"
+                          placeholder="Select Air Line"
+                      />
+                      <InputError :message="form.errors.airline_name"/>
+                  </div>
                 <div class="col-span-2">
                   <span>Airport of Departure</span>
                   <label class="block">
@@ -432,6 +480,16 @@ const handleCreate = () => {
                                     </template>
                                 </SelectButton>
                                 <InputError :message="form.errors.cargo_type" />
+                            </div>
+                        </template>
+                    </Card>
+
+                    <Card>
+                        <template #title>Target Warehouse</template>
+                        <template #content>
+                            <div class="my-3">
+                                <SelectButton v-model="form.target_warehouse" :options="warehouses" name="target_warehouse" option-label="name" option-value="id"/>
+                                <InputError :message="form.errors.target_warehouse" />
                             </div>
                         </template>
                     </Card>
@@ -544,8 +602,16 @@ const handleCreate = () => {
 
                                 <div class="col-span-3">
                                     <InputLabel value="Airline Name"/>
-                                    <InputText v-model="form.airline_name" class="w-full" placeholder="Enter Airline Name"/>
-                                    <InputError :message="form.errors.airline_name" />
+                                    <Select
+                                        v-model="form.airline_name"
+                                        :options="airLines"
+                                        class="w-full"
+                                        filter
+                                        option-label="name"
+                                        option-value="name"
+                                        placeholder="Select Air Line"
+                                    />
+                                    <InputError :message="form.errors.airline_name"/>
                                 </div>
 
                                 <div class="col-span-2">

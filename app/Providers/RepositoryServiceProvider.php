@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Interfaces\AirLineRepositoryInterface;
 use App\Interfaces\AnyFileUploadRepositoryInterface;
 use App\Interfaces\BondedWarehouseRepositoryInterface;
 use App\Interfaces\BranchRepositoryInterface;
@@ -33,16 +34,16 @@ use App\Interfaces\PackagePriceRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PickupExceptionRepositoryInterface;
 use App\Interfaces\PickupRepositoryInterface;
-use App\Interfaces\PickupTypeRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\SettingRepositoryInterface;
-use App\Interfaces\ShipperConsigneeRepositoryInterface;
+use App\Interfaces\TaxRepositoryInterface;
 use App\Interfaces\UnloadingIssuesRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Interfaces\WarehousezoneRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
+use App\Repositories\AirLineRepository;
 use App\Repositories\AnyFileUploadRepository;
 use App\Repositories\BondedWarehouseRepository;
 use App\Repositories\BranchRepository;
@@ -74,11 +75,10 @@ use App\Repositories\PackagePriceRepository;
 use App\Repositories\PackageTypeRepository;
 use App\Repositories\PickupExceptionRepository;
 use App\Repositories\PickupRepository;
-use App\Repositories\PickupTypeRepository;
 use App\Repositories\PriceRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\SettingRepository;
-use App\Repositories\ShipperConsigneeRepository;
+use App\Repositories\TaxRepository;
 use App\Repositories\UnloadingIssuesRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WareahouseZoneRepository;
@@ -118,7 +118,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(NotificationMailRepositoryInterface::class, NotificationMailRepository::class);
         $this->app->bind(CourierAgentRepositoryInterface::class, CourierAgentRepository::class);
         $this->app->bind(CourierRepositoryInterface::class, CourierRepository::class);
-        $this->app->bind(PickupTypeRepositoryInterface::class, PickupTypeRepository::class);
+        $this->app->bind(AirLineRepositoryInterface::class, AirLineRepository::class);
+        $this->app->bind(TaxRepositoryInterface::class, TaxRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);
@@ -134,6 +135,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(MHBLRepositoryInterface::class, MHBLRepository::class);
         $this->app->bind(DeliveryRepositoryInterface::class, DeliveryRepository::class);
         $this->app->bind(ReceptionRepositoryInterface::class, ReceptionRepository::class);
+
+        // finance repositories
+        $this->app->bind(\App\Interfaces\Finance\HBLRepositoryInterface::class, \App\Repositories\Finance\HBLRepository::class);
     }
 
     public function boot(): void {}

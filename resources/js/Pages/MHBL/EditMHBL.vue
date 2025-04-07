@@ -416,7 +416,7 @@ const onDialogHide = () => {
                             <div class="grid grid-cols-1 gap-4 mt-3">
                                 <div>
                                     <InputLabel value="Name"/>
-                                    <Select v-model="form.hbl_name" :options="shippers" class="w-full" filter option-label="name" option-value="name" placeholder="Select shipper" disabled />
+                                    <Select v-model="form.hbl_name" :options="shippers" class="w-full" filter option-label="name" option-value="name" placeholder="Select shipper"  />
                                     <InputError :message="form.errors.hbl_name"/>
                                 </div>
                                 <div>
@@ -471,7 +471,7 @@ const onDialogHide = () => {
                             <div class="grid grid-cols-1 gap-4 mt-3">
                                 <div>
                                     <InputLabel value="Name"/>
-                                    <Select v-model="form.consignee_name" :options="consignees" class="w-full" filter option-label="name" option-value="name" placeholder="Select Consignee" disabled />
+                                    <Select v-model="form.consignee_name" :options="consignees" class="w-full" filter option-label="name" option-value="name" placeholder="Select Consignee"  />
                                     <InputError :message="form.errors.consignee_name"/>
                                 </div>
                                 <div>
@@ -650,7 +650,7 @@ const onDialogHide = () => {
             <!-- Action Buttons -->
             <div class="flex justify-end space-x-5 my-6">
                 <Button label="Cancel" severity="danger" variant="outlined" @click="router.visit(route('mhbls.index'))" />
-                <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Create a MHBL" type="submit" />
+                <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Update MHBL" type="submit" />
             </div>
 
             <!-- Add New HBL Dialog -->
