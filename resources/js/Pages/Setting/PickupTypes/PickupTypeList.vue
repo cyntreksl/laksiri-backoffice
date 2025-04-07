@@ -1,13 +1,24 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {Link, router, usePage} from "@inertiajs/vue3";
-import { ref } from "vue";
+import {Link, router, useForm, usePage} from "@inertiajs/vue3";
+import {computed, onMounted, ref, watch} from "vue";
 import { push } from "notivue";
-import CreatePickupTypeForm from "@/Pages/Setting/PickupTypes/partials/CreatePickupType.vue";
-import DeletePickupTypeConfirmationModal
-    from "@/Pages/Setting/PickupTypes/partials/DeletePickupType.vue";
-import UpdatePickupType from "@/Pages/Setting/PickupTypes/partials/UpdatePickupType.vue";
+import {debounce} from "lodash";
+import {FilterMatchMode} from "@primevue/core/api";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import Card from "primevue/card";
+import DataTable from "primevue/datatable";
+import ContextMenu from "primevue/contextmenu";
+import InputIcon from "primevue/inputicon";
+import InputText from "primevue/inputtext";
+import Column from "primevue/column";
+import Button from "primevue/button";
+import IconField from "primevue/iconfield";
+import {useConfirm} from "primevue/useconfirm";
+import axios from "axios";
+import Dialog from "primevue/dialog";
+import InputError from "@/Components/InputError.vue";
 
 defineProps({
     pickupTypes: {
@@ -16,145 +27,298 @@ defineProps({
     },
 });
 
-const showConfirmDeletePickupTypeModal = ref(false);
-const pickupTypeId = ref(null);
-const showConfirmUpdatePickupTypeModal = ref(false);
 const pickupType = ref({});
+const cm = ref();
+const confirm = useConfirm();
+const baseUrl = ref("pickup-types/list");
+const loading = ref(true);
+const pickupTypes = ref([]);
+const totalRecords = ref(0);
+const perPage = ref(10);
+const currentPage = ref(1);
+const selectedPickupType = ref(null);
+const selectedPickupTypeId = ref(null);
+const isDialogVisible = ref(false);
+const showUpdatePickupTypeDialog = ref(false);
+const showDeletePickupTypeDialog = ref(false);
 
-const confirmDeletePickupType = (id) => {
-    pickupTypeId.value = id;
-    showConfirmDeletePickupTypeModal.value = true;
+const filters  = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
+    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+    cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+    is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
+    user: {value: null, matchMode: FilterMatchMode.EQUALS},
+    payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+});
+
+const form = useForm({
+    pickup_type_name: "",
+})
+
+const menuModel = ref([
+    {
+        label: "Edit",
+        icon: "pi pi-fw pi-pencil",
+        command: () => confirmUpdatePickupType(selectedPickupType),
+        disabled: !usePage().props.user.permissions.includes("pickup-type.edit"),
+    },
+    {
+        label: "Delete",
+        icon: "pi pi-fw pi-trash",
+        command: () => confirmPickupTypeDelete(selectedPickupType),
+        disabled: !usePage().props.user.permissions.includes("pickup-type.delete"),
+    },
+]);
+
+const confirmUpdatePickupType = (pickupType) => {
+   form.pickup_type_name = pickupType.value.pickup_type_name;
+   selectedPickupTypeId.value = pickupType.value.id;
+    showUpdatePickupTypeDialog.value = true;
+    isDialogVisible.value = true;
+
 };
 
-const confirmUpdatePickupType = (selectedPickupType) => {
-    pickupType.value = {...selectedPickupType};
-    showConfirmUpdatePickupTypeModal.value = true;
-};
-
-const closeModal = () => {
-    showConfirmDeletePickupTypeModal.value = false;
-    pickupTypeId.value = null;
-};
-
-const closeUpdateModal = () => {
-    showConfirmUpdatePickupTypeModal.value = false;
-    pickupType.value = {};
-};
-
-const handleDeletePickupType = () => {
-    router.delete(route("setting.pickup-types.destroy", pickupTypeId.value), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            push.success("Pickup Type Deleted Successfully!");
-            router.visit(route("setting.pickup-types.index"));
+const fetchPickupTypes = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
+    loading.value = true;
+    try{
+    const response = await axios.get(baseUrl.value, {
+        params: {
+            page,
+            per_page: perPage.value,
+            search,
+            sort_field: sortField,
+            sort_order: sortOrder === 1 ? "desc" : "asc",
         },
     });
+    pickupTypes.value = response.data.data;
+    totalRecords.value = response.data.meta.total;
+    currentPage.value = response.data.meta.current_page;
+    } catch (error) {
+        console.error("Error fetching pickup types:", error);
+    } finally {
+        loading.value = false;
+    }
+}
+
+const onPageChange = (event) => {
+  perPage.value = event.rows;
+  currentPage.value = event.page + 1;
+  fetchPickupTypes(currentPage.value);
 };
+
+const onRowContextMenu = (event) => {
+    cm.value.show(event.originalEvent);
+};
+
+const onSort = (event) => {
+    fetchPickupTypes(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+};
+
+onMounted(() => {
+    fetchPickupTypes();
+});
+
+const  debouncedFetchPickupTypes = debounce((searchValue) => {
+    fetchPickupTypes(1, searchValue);
+}, 1000);
+
+watch (() => filters.value.global.value, (newValue) => {
+    debouncedFetchPickupTypes(newValue);
+});
+
+const exportURL = computed(() => {
+    const params = new URLSearchParams({
+
+    }).toString();
+    return `/warehouses/export?${params}`;
+});
+
+const showAddNewPickupTypeDialog =  ref (false);
+
+const confirmViewAddNewPickupType = () => {
+    showAddNewPickupTypeDialog.value = true;
+    isDialogVisible.value = true;
+};
+
+const closeAddNewPickupTypeModal = () => {
+    form.pickup_type_name = "";
+    showAddNewPickupTypeDialog.value = false;
+    showUpdatePickupTypeDialog.value = false;
+    isDialogVisible.value = false;
+};
+
+const onDialogShow = () => {
+    document.body.classList.add('p-overflow-hidden');
+};
+
+const onDialogHide = () => {
+    document.body.classList.remove('p-overflow-hidden');
+};
+
+const handleAddNewPickupType = async () => {
+    form.post(route("setting.pickup-types.store"), {
+        onSuccess: () => {
+           closeAddNewPickupTypeModal();
+           form.reset();
+           fetchPickupTypes();
+           push.success("Pickup Type Created Successfully!");
+        },
+        onError: () => {
+            push.error("Error creating pickup type");
+        },
+        preserveScroll: true,
+        preserveState: true,
+    });
+};
+
+const handleUpdatePickupType = async () => {
+    form.put (route("setting.pickup-types.update", selectedPickupTypeId.value),{
+        onSuccess: () => {
+            closeAddNewPickupTypeModal();
+            form.reset();
+            fetchPickupTypes();
+            push.success("Pickup Type Updated Successfully!");
+        },
+        onError: () => {
+            push.error("Error updating pickup type");
+        },
+        preserveScroll: true,
+        preserveState: true,
+    })
+};
+
+const confirmPickupTypeDelete = (pickupType) => {
+    selectedPickupTypeId.value = pickupType.value.id;
+    confirm.require({
+        message: "Are you sure you want to delete this pickup type?",
+        header: "Delete Pickup Type",
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.delete(route("setting.pickup-types.destroy", selectedPickupTypeId.value), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("Pickup Type Deleted Successfully!");
+                    const currentRoute = route().current();
+                    router.visit(route(currentRoute, route().params));
+                },
+                onError: () => {
+                    push.error("Something went to wrong!");
+                },
+            });
+            selectedPickupTypeId.value = null;
+        },
+        reject: () => {
+            selectedPickupTypeId.value = null;
+        },
+    })
+
+};
+
 </script>
 
 <template>
     <AppLayout title="Pickup Types">
         <template #header>Pickup Types</template>
-
         <Breadcrumb />
+        <div>
+            <card class="my-5">
+                <template #content>
+                    <ContextMenu ref="cm" :model="menuModel"  @hide="selectedPickupType = null"/>
+                    <DataTable
+                        v-model:contextMenuSelection="selectedPickupType"
+                        v-model:selection="selectedPickupType"
+                        :loading="loading"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="totalRecords"
+                        :value="pickupTypes"
+                        context-menu
+                        data-key="id"
+                        filter-display="menu"
+                        lazy
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
+                        @page="onPageChange"
+                        @rowContextmenu="onRowContextMenu"
+                        @sort="onSort">
 
-        <div class="flex items-center justify-between p-2 my-5">
-            <h2
-                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-            >
-                Pickup Types
-            </h2>
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    Pickup Types
+                                </div>
+                                <div>
+                                    <PrimaryButton
+                                        v-if="usePage().props.user.permissions.includes('pickup-type.create')"
+                                        class="w-full"
+                                        @click="confirmViewAddNewPickupType()"
+                                    >
+                                        Create Pickup Type
+                                    </PrimaryButton>
+                                </div>
+                            </div>
 
-            <CreatePickupTypeForm v-if="usePage().props.user.permissions.includes('pickup-type.create')" />
+                        </template>
+                        <template #empty> No Pickup Types found. </template>
+
+                        <template #loading> Loading Pickup Type data. Please wait.</template>
+
+                        <Column field="id" header="ID" sortable></Column>
+
+                        <Column field="pickup_type_name" header="Name" sortable></Column>
+
+                        <template #footer> In total there are {{ pickupType ? totalRecords : 0 }} Pickup Types.</template>
+
+                    </DataTable>
+
+                </template>
+            </card>
+            <!-- Add New Pickup Type Dialog -->
+            <Dialog
+                v-model:visible="isDialogVisible"
+                modal
+                :header="showAddNewPickupTypeDialog ? 'Add New Pickup Type' : 'Edit Pickup Type'"
+                :style="{ width: '90%', maxWidth: '450px' }"
+                :block-scroll="true"
+                @hide="onDialogHide"
+                @show="onDialogShow"
+                >
+                <div class="mt-4">
+                    <InputText
+                        v-model="form.pickup_type_name"
+                        classs ="w-full p-inputtext"
+                        placeholder="Pickup Type Name"
+                        required
+                        type="text"
+                    />
+                    <InputError :message="form.errors.pickup_type_name"/>
+                </div>
+                <template #footer>
+                    <div class="flex flex-wrap justify-end gap-2">
+                        <Button label="Cancel" class="p-button-text" @click="closeAddNewPickupTypeModal" />
+                        <Button
+                            :label="showAddNewPickupTypeDialog ? 'Add New Pickup Type' : 'Update Pickup Type'"
+                            class="p-button-primary"
+                            :icon="showAddNewPickupTypeDialog ? 'pi pi-plus' : 'pi pi-check'"
+                            @click.prevent="showAddNewPickupTypeDialog ? handleAddNewPickupType():handleUpdatePickupType()" />
+                    </div>
+                </template>
+
+            </Dialog>
         </div>
 
-        <div class="min-w-full overflow-auto">
-            <table class="is-hoverable w-full text-left">
-                <thead>
-                <tr>
-                    <th
-                        class="whitespace-nowrap rounded-tl-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        #
-                    </th>
-                    <th
-                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Pickup Type
-                    </th>
-                    <th
-                        class="whitespace-nowrap rounded-tr-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                    >
-                        Action
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr
-                    v-for="(pickupType, index) in pickupTypes"
-                    v-if="pickupTypes && Object.keys(pickupTypes).length > 0"
-                    :key="pickupType.id"
-                    class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500"
-                >
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                        {{ index + 1 }}
-                    </td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                        {{ pickupType.pickup_type_name }}
-                    </td>
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                        <div class="flex space-x-2">
-                            <button
-                                v-if= "usePage().props.user.permissions.includes('pickup-type.edit')"
-                                class="btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25"
-                                @click="confirmUpdatePickupType(pickupType)"
-                            >
-                                <svg
-                                    class="size-4.5"
-                                    fill="none"
-                                    viewBox="0 0 512 512"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M471 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152V424c0 48.6 39.4 88 88 88H360c48.6 0 88-39.4 88-88V312c0-13.3-10.7-24-24-24s-24 10.7-24 24V424c0 22.1-17.9 40-40 40H88c-22.1 0-40-17.9-40-40V152c0-22.1 17.9-40 40-40H200c13.3 0 24-10.7 24-24s-10.7-24-24-24H88z"
-                                        fill="currentColor"
-                                    ></path>
-                                </svg>
-                            </button>
-                            <button
-                                v-if="usePage().props.user.permissions.includes('pickup-type.delete')"
-                                class="btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
-                                @click="confirmDeletePickupType(pickupType.id)"
-                            >
-                                <svg
-                                    class="size-4.5"
-                                    fill="none"
-                                    viewBox="0 0 448 512"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z"
-                                        fill="currentColor"
-                                    ></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr
-                    v-else
-                    class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500 last:border-0 bg-white"
-                >
-                    <td class="whitespace-nowrap px-4 py-3 sm:px-5" colspan="8">
-                        No Pickup Types.
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <DeletePickupTypeConfirmationModal :show="showConfirmDeletePickupTypeModal" @delete-pickup-type="handleDeletePickupType" @close="closeModal"/>
-        <UpdatePickupType :show="showConfirmUpdatePickupTypeModal" :pickupType="pickupType" @close="closeUpdateModal"/>
     </AppLayout>
 </template>

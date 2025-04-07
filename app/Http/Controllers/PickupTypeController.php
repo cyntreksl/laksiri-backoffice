@@ -6,6 +6,7 @@ use App\Http\Requests\StorePickupTypeRequest;
 use App\Http\Requests\UpdatePickupTypeRequest;
 use App\Interfaces\PickupTypeRepositoryInterface;
 use App\Models\PickupType;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PickupTypeController extends Controller
@@ -13,6 +14,19 @@ class PickupTypeController extends Controller
     public function __construct(
         private readonly PickupTypeRepositoryInterface $pickupTypeRepository,
     ) {}
+
+    public function list(Request $request)
+    {
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
+
+        return $this->pickupTypeRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+    }
 
     public function index()
     {

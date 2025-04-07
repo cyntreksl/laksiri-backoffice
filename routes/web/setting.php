@@ -72,5 +72,8 @@ Route::name('setting.')->group(function () {
     Route::delete('shipper-consignees/{id}', [OfficerController::class, 'destroy'])
         ->name('shipper-consignees.destroy');
 
-    Route::resource('pickup-types', PickupTypeController::class);
+    Route::resource('pickup-types', PickupTypeController::class)->except('show', 'create', 'edit');
+    Route::get('pickup-types/list', [PickupTypeController::class, 'list'])
+        ->name('pickup-types.list');
+
 });
