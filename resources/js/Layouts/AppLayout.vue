@@ -1747,7 +1747,7 @@ export default {
                     let settingMenu = [
                         {
                             title: "Zones",
-                            route: "settings.zones.index",
+                            route: "setting.warehouse-zones.index",
                         },
                         {
                             title: "Driver Zones",
