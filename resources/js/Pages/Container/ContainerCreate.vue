@@ -14,6 +14,7 @@ import InputText from "primevue/inputtext";
 import DatePicker from "primevue/datepicker";
 import moment from "moment";
 import {push} from "notivue";
+import Select from "primevue/select";
 
 const props = defineProps({
     cargoTypes: {
@@ -35,6 +36,10 @@ const props = defineProps({
         type: Object,
         default: () => {},
     },
+    airLines: {
+        type: Array,
+        default: () => [],
+    },
 })
 
 const form = useForm({
@@ -53,6 +58,7 @@ const form = useForm({
     port_of_loading: "",
     port_of_discharge: "",
     flight_number: "",
+    air_line_id: "",
     airline_name: "",
     airport_of_departure: "",
     airport_of_arrival: "",
@@ -83,6 +89,11 @@ const handleCreate = () => {
         form.estimated_time_of_arrival = moment(form.estimated_time_of_arrival).format("YYYY-MM-DD");
     } else {
         form.estimated_time_of_arrival = null;
+    }
+
+    const selectedAirline = props.airLines.find(airline => airline.name === form.airline_name);
+    if (selectedAirline) {
+        form.air_line_id = selectedAirline.id;
     }
 
     form.post(route("loading.loading-containers.store"), {
@@ -397,17 +408,19 @@ watchEffect(() => {
                   </label>
                   <InputError :message="form.errors.flight_number" />
                 </div>
-                <div class="col-span-3">
-                  <span>Airline Name</span>
-                  <label class="block">
-                    <input
-                      v-model="form.airline_name"
-                      class="form-input w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                      type="text"
-                    />
-                  </label>
-                  <InputError :message="form.errors.airline_name" />
-                </div>
+                  <div class="col-span-3">
+                      <InputLabel value="Airline Name"/>
+                      <Select
+                          v-model="form.airline_name"
+                          :options="airLines"
+                          class="w-full"
+                          filter
+                          option-label="name"
+                          option-value="name"
+                          placeholder="Select Air Line"
+                      />
+                      <InputError :message="form.errors.airline_name"/>
+                  </div>
                 <div class="col-span-2">
                   <span>Airport of Departure</span>
                   <label class="block">
@@ -619,8 +632,16 @@ watchEffect(() => {
 
                                 <div class="col-span-3">
                                     <InputLabel value="Airline Name"/>
-                                    <InputText v-model="form.airline_name" class="w-full" placeholder="Enter Airline Name"/>
-                                    <InputError :message="form.errors.airline_name" />
+                                    <Select
+                                        v-model="form.airline_name"
+                                        :options="airLines"
+                                        class="w-full"
+                                        filter
+                                        option-label="name"
+                                        option-value="name"
+                                        placeholder="Select Air Line"
+                                    />
+                                    <InputError :message="form.errors.airline_name"/>
                                 </div>
 
                                 <div class="col-span-2">

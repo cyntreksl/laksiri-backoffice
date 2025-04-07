@@ -1744,20 +1744,7 @@ export default {
                     changeSidePanelTitle("Report");
                     break;
                 case "setting":
-                    let settingMenu = [];
-                    if (usePage().props.user.permissions.includes("air-line.index")){
-                        settingMenu.splice(
-                            2,
-                            0,
-                            {
-                                title: "Air Lines",
-                                route: "setting.air-lines.index",
-                            }
-                        );
-                    }
-                    settingMenu.splice(
-                        0,
-                        childMenuList.length,
+                    let settingMenu = [
                         {
                             title: "Driver Zones",
                             route: "setting.driver-zones.index",
@@ -1790,12 +1777,17 @@ export default {
                             title: "Shipper & Consignee",
                             route: "setting.shipper-consignees.index",
                         }
-                    );
-                    childMenuList.splice(
-                        0,
-                        settingMenu.length,
-                        ...settingMenu
-                    );
+                    ];
+
+                    if (usePage().props.user.permissions.includes("air-line.index")) {
+                        settingMenu = [...settingMenu,{
+                            title: "Air Lines",
+                            route: "setting.air-lines.index",
+                        }];
+
+                    }
+
+                    childMenuList.splice(0, childMenuList.length, ...settingMenu);
                     changeSidePanelTitle("Setting");
                     break;
                 case "settings":
