@@ -1759,6 +1759,10 @@ export default {
                             title: "Shipper & Consignee",
                             route: "setting.shipper-consignees.index",
                         },
+                        {
+                            title: "PickupType",
+                            route: "setting.pickup-types.index",
+                        }
 
                     );
                     if (usePage().props.user.permissions.includes("pickup-type.index")){
