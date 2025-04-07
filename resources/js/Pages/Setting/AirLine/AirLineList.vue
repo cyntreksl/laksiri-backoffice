@@ -58,13 +58,13 @@ const menuModel = ref([
         label: "Edit",
         icon: "pi pi-fw pi-pencil",
         command: () => confirmViewEditAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.edit"),
+        disabled: !usePage().props.user.permissions.includes("air-line.edit") || !usePage().props.user.permissions.includes("air-line.do charges edit"),
     },
     {
         label: "Delete",
         icon: "pi pi-fw pi-times",
         command: () => confirmDeleteAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.delete"),
+        disabled: !usePage().props.user.permissions.includes("air-line.delete") || !usePage().props.user.permissions.includes("air-line.do charges delete"),
     },
 ]);
 
@@ -257,7 +257,7 @@ const confirmDeleteAirLine = (airLine) => {
                                 </div>
                                 <div>
                                     <PrimaryButton
-                                        v-if="usePage().props.user.permissions.includes('air-line.create')"
+                                        v-if="usePage().props.user.permissions.includes('air-line.create') || usePage().props.user.permissions.includes('air-line.do charges create')"
                                         class="w-full"
                                         @click="confirmViewAddNewAirLine()"
                                     >
