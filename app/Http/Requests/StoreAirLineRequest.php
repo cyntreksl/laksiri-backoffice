@@ -22,8 +22,6 @@ class StoreAirLineRequest extends FormRequest
      */
     public function rules(): array
     {
-        dd($this);
-
         return [
             'name' => [
                 'required',
