@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreAirLineRequest extends FormRequest
+class StoreTaxRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,15 +22,17 @@ class StoreAirLineRequest extends FormRequest
      */
     public function rules(): array
     {
-
         return [
             'name' => [
                 'required',
                 'string',
-                Rule::unique('air_lines')->where(function ($query) {
-                    return $query->where('branch_id', session('current_branch_id'));
-                }),
+                Rule::unique('taxes')
+                    ->where(function ($query) {
+                        return $query->where('branch_id', session('current_branch_id'));
+                    }),
             ],
+            'rate' => ['required', 'numeric'],
+            'is_active' => ['required', 'boolean'],
         ];
     }
 }

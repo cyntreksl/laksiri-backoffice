@@ -170,6 +170,13 @@ Breadcrumbs::for('setting.driver-areas.index', function (BreadcrumbTrail $trail)
     $trail->push('Driver Areas', route('setting.driver-areas.index'));
 });
 
+// Taxes
+Breadcrumbs::for('setting.taxes.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Tax', route('setting.taxes.index'));
+});
+
 // Driver Area > Edit
 Breadcrumbs::for('setting.driver-areas.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->parent('setting.driver-areas.index');
