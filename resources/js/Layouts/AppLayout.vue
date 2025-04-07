@@ -1746,6 +1746,10 @@ export default {
                 case "setting":
                     let settingMenu = [
                         {
+                            title: "Zones",
+                            route: "settings.zones.index",
+                        },
+                        {
                             title: "Driver Zones",
                             route: "setting.driver-zones.index",
                         },
@@ -1803,13 +1807,6 @@ export default {
 
                     childMenuList.splice(0, childMenuList.length, ...settingMenu);
                     changeSidePanelTitle("Setting");
-                    break;
-                case "settings":
-                    childMenuList.splice(0, childMenuList.length, {
-                        title: "Zones",
-                        route: "settings.zones.index",
-                    });
-                    changeSidePanelTitle("Settings");
                     break;
             }
             activeMenu.value = menu;
