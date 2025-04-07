@@ -1723,7 +1723,7 @@ export default {
                     changeSidePanelTitle("Report");
                     break;
                 case "setting":
-                    let settingMenu = [
+                    let settingMenu  = [
                         {
                             title: "Driver Zones",
                             route: "setting.driver-zones.index",
@@ -1766,15 +1766,10 @@ export default {
 
                     }
                     if (usePage().props.user.permissions.includes("pickup-type.index")){
-
-                        settingMenu.splice(
-                            2,
-                            0,
-                            {
-                                title: "Pickup Types",
-                                route: "setting.pickup-types.index",
-                            }
-                        );
+                        settingMenu = [...settingMenu,{
+                            title: "Pickup Types",
+                            route: "setting.pickup-types.index",
+                        }];
                     }
                     childMenuList.splice(
                         0,
