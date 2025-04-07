@@ -250,6 +250,16 @@ class RolePermissionSeeder extends Seeder
                     'courier-agents.delete',
                 ],
             ],
+            [
+                'group_name' => 'Air Line',
+                'permissions' => [
+                    'air-line.index',
+                    'air-line.create',
+                    'air-line.list',
+                    'air-line.edit',
+                    'air-line.delete',
+                ],
+            ],
         ];
     }
 }

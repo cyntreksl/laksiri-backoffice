@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Interfaces\AirLineRepositoryInterface;
 use App\Interfaces\AnyFileUploadRepositoryInterface;
 use App\Interfaces\BondedWarehouseRepositoryInterface;
 use App\Interfaces\BranchRepositoryInterface;
@@ -42,6 +43,7 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Interfaces\WarehousezoneRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
+use App\Repositories\AirLineRepository;
 use App\Repositories\AnyFileUploadRepository;
 use App\Repositories\BondedWarehouseRepository;
 use App\Repositories\BranchRepository;
@@ -116,6 +118,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(NotificationMailRepositoryInterface::class, NotificationMailRepository::class);
         $this->app->bind(CourierAgentRepositoryInterface::class, CourierAgentRepository::class);
         $this->app->bind(CourierRepositoryInterface::class, CourierRepository::class);
+        $this->app->bind(AirLineRepositoryInterface::class, AirLineRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);

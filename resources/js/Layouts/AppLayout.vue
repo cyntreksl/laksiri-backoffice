@@ -1744,7 +1744,18 @@ export default {
                     changeSidePanelTitle("Report");
                     break;
                 case "setting":
-                    childMenuList.splice(
+                    let settingMenu = [];
+                    if (usePage().props.user.permissions.includes("air-line.index")){
+                        settingMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Air Lines",
+                                route: "setting.air-lines.index",
+                            }
+                        );
+                    }
+                    settingMenu.splice(
                         0,
                         childMenuList.length,
                         {
@@ -1778,8 +1789,12 @@ export default {
                         {
                             title: "Shipper & Consignee",
                             route: "setting.shipper-consignees.index",
-                        },
-
+                        }
+                    );
+                    childMenuList.splice(
+                        0,
+                        settingMenu.length,
+                        ...settingMenu
                     );
                     changeSidePanelTitle("Setting");
                     break;
