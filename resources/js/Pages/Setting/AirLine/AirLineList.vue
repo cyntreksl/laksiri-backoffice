@@ -1,13 +1,10 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {computed, onMounted, ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
-import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import Card from "primevue/card";
-import FloatLabel from "primevue/floatlabel";
 import DataTable from "primevue/datatable";
-import DatePicker from "primevue/datepicker";
 import ContextMenu from "primevue/contextmenu";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
@@ -16,17 +13,24 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
 import {useConfirm} from "primevue/useconfirm";
-import moment from "moment";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
 import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+
+const props = defineProps({
+    isDOChargesPage: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 const cm = ref();
 const confirm = useConfirm();
-const baseUrl = ref("air-lines/list");
+const baseUrl = ref(props.isDOChargesPage ? "/air-lines/list" : "air-lines/list");
 const loading = ref(true);
 const airLines = ref([]);
 const totalRecords = ref(0);
@@ -51,6 +55,7 @@ const filters = ref({
 
 const form = useForm({
     name: "",
+    do_charge: "",
 })
 
 const menuModel = ref([
@@ -70,14 +75,10 @@ const menuModel = ref([
 
 const confirmViewEditAirLine = (airLine) => {
     form.name = airLine.value.name;
+    form.do_charge = airLine.value.do_charge;
     selectedAirLineId.value = airLine.value.id;
     showEditAirLineDialog.value = true;
     isDialogVisible.value = true;
-};
-
-const confirmAirLineDelete = (airLine) => {
-    selectedAirLineId.value = airLine.value.id;
-    showDeleteAirLineDialog.value = true;
 };
 
 const fetchAirLines = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
@@ -219,9 +220,10 @@ const confirmDeleteAirLine = (airLine) => {
         }
     });
 };
+console.log(props.isDOChargesPage);
 </script>
 <template>
-    <AppLayout title="Air Lines">
+    <AppLayout :title="isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines'">
         <template #header>Air Lines</template>
 
         <Breadcrumb/>
@@ -289,6 +291,8 @@ const confirmDeleteAirLine = (airLine) => {
 
                         <Column field="name" header="Name" sortable></Column>
 
+                        <Column v-if="isDOChargesPage" field="do_charge" header="Do Charge"></Column>
+
                         <template #footer> In total there are {{ airLines ? totalRecords : 0 }} Air Lines.</template>
                     </DataTable>
                 </template>
@@ -312,6 +316,19 @@ const confirmDeleteAirLine = (airLine) => {
                         type="text"
                     />
                     <InputError :message="form.errors.name"/>
+                </div>
+
+                <div v-if="isDOChargesPage" class="mt-3">
+                    <InputText
+                        v-model="form.do_charge"
+                        class="w-full"
+                        placeholder="DO Charge(LKR)"
+                        required
+                        type="number"
+                        min="0.00"
+                        step="0.01"
+                    />
+                    <InputError :message="form.errors.do_charge" />
                 </div>
 
                 <template #footer>

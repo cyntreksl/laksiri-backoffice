@@ -184,6 +184,13 @@ Breadcrumbs::for('setting.taxes.index', function (BreadcrumbTrail $trail) {
     $trail->push('Tax', route('setting.taxes.index'));
 });
 
+// Air Line DO Charge
+Breadcrumbs::for('setting.air-lines.do-charges', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Air Lines DO Charges', route('setting.air-lines.do-charges'));
+});
+
 // Driver Area > Edit
 Breadcrumbs::for('setting.driver-areas.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->parent('setting.driver-areas.index');
