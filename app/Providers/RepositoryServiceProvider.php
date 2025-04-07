@@ -114,7 +114,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PackagePriceRepositoryInterface::class, PackagePriceRepository::class);
         $this->app->bind(SettingRepositoryInterface::class, SettingRepository::class);
         $this->app->bind(PackageTypeRepositoryInterface::class, PackageTypeRepository::class);
-        $this->app->bind(ShipperConsigneeRepositoryInterface::class, ShipperConsigneeRepository::class);
         $this->app->bind(NotificationMailRepositoryInterface::class, NotificationMailRepository::class);
         $this->app->bind(CourierAgentRepositoryInterface::class, CourierAgentRepository::class);
         $this->app->bind(CourierRepositoryInterface::class, CourierRepository::class);
