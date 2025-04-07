@@ -251,6 +251,16 @@ class RolePermissionSeeder extends Seeder
                 ],
             ],
             [
+                'group_name' => 'Air Line',
+                'permissions' => [
+                    'air-line.index',
+                    'air-line.create',
+                    'air-line.list',
+                    'air-line.edit',
+                    'air-line.delete',
+                ],
+            ],
+            [
                 'group_name' => 'Tax',
                 'permissions' => [
                     'tax.departure tax',

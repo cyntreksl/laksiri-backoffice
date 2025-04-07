@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AirLineController;
 use App\Http\Controllers\DriverAreasController;
 use App\Http\Controllers\ExceptionNameController;
 use App\Http\Controllers\OfficerController;
@@ -26,6 +27,11 @@ Route::name('setting.')->group(function () {
 
     Route::get('driver-areas/list', [DriverAreasController::class, 'list'])
         ->name('driver-area.list');
+
+    Route::resource('air-lines', AirLineController::class)->except('show', 'create', 'edit');
+
+    Route::get('air-lines/list', [AirLineController::class, 'list'])
+        ->name('air-lines.list');
 
     // Warehouse Zones
     Route::get('warehouse-zones/list', [WarehouseZoneController::class, 'list'])

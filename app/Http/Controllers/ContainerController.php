@@ -14,6 +14,7 @@ use App\Enum\WarehouseType;
 use App\Http\Requests\StoreContainerRequest;
 use App\Http\Requests\StoreUnloadingIssue;
 use App\Http\Requests\UpdateContainerRequest;
+use App\Interfaces\AirLineRepositoryInterface;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\MHBLRepositoryInterface;
@@ -33,6 +34,7 @@ class ContainerController extends Controller
         private readonly ContainerRepositoryInterface $containerRepository,
         private readonly HBLRepositoryInterface $HBLRepository,
         private readonly MHBLRepositoryInterface $MHBLRepository,
+        private readonly AirLineRepositoryInterface $airLineRepository,
     ) {}
 
     public function index()
@@ -75,6 +77,7 @@ class ContainerController extends Controller
             'airContainerOptions' => $airContainerOptions,
             'cargoTypes' => $cargoTypes,
             'warehouses' => GetDestinationBranches::run()->reject(fn ($warehouse) => $warehouse->name === 'Other'),
+            'airLines' => $this->airLineRepository->getAirLines(),
         ]);
     }
 
@@ -101,6 +104,7 @@ class ContainerController extends Controller
             'airContainerOptions' => $airContainerOptions,
             'cargoTypes' => $cargoTypes,
             'warehouses' => GetDestinationBranches::run()->reject(fn ($warehouse) => $warehouse->name === 'Other'),
+            'airLines' => $this->airLineRepository->getAirLines(),
         ]);
     }
 

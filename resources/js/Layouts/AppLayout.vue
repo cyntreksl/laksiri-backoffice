@@ -1744,9 +1744,7 @@ export default {
                     changeSidePanelTitle("Report");
                     break;
                 case "setting":
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
+                    let settingMenu = [
                         {
                             title: "Driver Zones",
                             route: "setting.driver-zones.index",
@@ -1778,13 +1776,18 @@ export default {
                         {
                             title: "Shipper & Consignee",
                             route: "setting.shipper-consignees.index",
-                        },
-                        {
-                            title: "Tax",
-                            route: "setting.taxes.index",
-                        },
+                        }
+                    ];
 
-                    );
+                    if (usePage().props.user.permissions.includes("air-line.index")) {
+                        settingMenu = [...settingMenu,{
+                            title: "Air Lines",
+                            route: "setting.air-lines.index",
+                        }];
+
+                    }
+
+                    childMenuList.splice(0, childMenuList.length, ...settingMenu);
                     changeSidePanelTitle("Setting");
                     break;
                 case "settings":
