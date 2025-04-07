@@ -26,11 +26,7 @@ class UpdateAirLineRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                Rule::unique('air_lines')
-                    ->where(function ($query) {
-                        return $query->where('branch_id', session('current_branch_id'));
-                    })
-                    ->ignore($this->route('air_line')), // Ignore the current airline being updated
+                Rule::unique('air_lines')->ignore($this->route('air_line')), // Ignore the current airline being updated
             ],
         ];
     }

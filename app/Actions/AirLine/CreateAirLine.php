@@ -14,7 +14,6 @@ class CreateAirLine
     {
         return AirLine::create([
             'name' => $data['name'],
-            'branch_id' => session('current_branch_id'),
             'created_by' => Auth::user()->id,
         ]);
     }
