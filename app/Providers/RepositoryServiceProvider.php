@@ -19,6 +19,7 @@ use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\CourierAgentRepositoryInterface;
 use App\Interfaces\CourierRepositoryInterface;
+use App\Interfaces\CurrencyRepositoryInterface;
 use App\Interfaces\CustomerRepositoryInterface;
 use App\Interfaces\DashboardRepositoryInterface;
 use App\Interfaces\DriverAreasRepositoryInterface;
@@ -61,6 +62,7 @@ use App\Repositories\ContainerRepositories;
 use App\Repositories\CountryRepository;
 use App\Repositories\CourierAgentRepository;
 use App\Repositories\CourierRepository;
+use App\Repositories\CurrencyRepository;
 use App\Repositories\CustomerRepository;
 use App\Repositories\DashboardRepository;
 use App\Repositories\DriverAreasRepository;
@@ -121,6 +123,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CourierRepositoryInterface::class, CourierRepository::class);
         $this->app->bind(AirLineRepositoryInterface::class, AirLineRepository::class);
         $this->app->bind(TaxRepositoryInterface::class, TaxRepository::class);
+        $this->app->bind(CurrencyRepositoryInterface::class, CurrencyRepository::class);
         $this->app->bind(PickupTypeRepositoryInterface::class, PickupTypeRepository::class);
 
         // call center repositories

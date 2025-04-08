@@ -3,11 +3,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
-import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import Card from "primevue/card";
-import FloatLabel from "primevue/floatlabel";
 import DataTable from "primevue/datatable";
-import DatePicker from "primevue/datepicker";
 import ContextMenu from "primevue/contextmenu";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
@@ -16,7 +13,6 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
 import {useConfirm} from "primevue/useconfirm";
-import moment from "moment";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
@@ -58,13 +54,13 @@ const menuModel = ref([
         label: "Edit",
         icon: "pi pi-fw pi-pencil",
         command: () => confirmViewEditAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.edit"),
+        disabled: !usePage().props.user.permissions.includes("air-line.edit") || !usePage().props.user.permissions.includes("air-line.do charges edit"),
     },
     {
         label: "Delete",
         icon: "pi pi-fw pi-times",
         command: () => confirmDeleteAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.delete"),
+        disabled: !usePage().props.user.permissions.includes("air-line.delete") || !usePage().props.user.permissions.includes("air-line.do charges delete"),
     },
 ]);
 
@@ -73,11 +69,6 @@ const confirmViewEditAirLine = (airLine) => {
     selectedAirLineId.value = airLine.value.id;
     showEditAirLineDialog.value = true;
     isDialogVisible.value = true;
-};
-
-const confirmAirLineDelete = (airLine) => {
-    selectedAirLineId.value = airLine.value.id;
-    showDeleteAirLineDialog.value = true;
 };
 
 const fetchAirLines = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
@@ -229,7 +220,7 @@ const confirmDeleteAirLine = (airLine) => {
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel"  @hide="selectedAirLine = null"/>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedAirLine = null"/>
                     <DataTable
                         v-model:contextMenuSelection="selectedAirLine"
                         v-model:selection="selectedAirLine"
@@ -257,11 +248,11 @@ const confirmDeleteAirLine = (airLine) => {
                                 </div>
                                 <div>
                                     <PrimaryButton
-                                        v-if="usePage().props.user.permissions.includes('air-line.create')"
+                                        v-if="usePage().props.user.permissions.includes('air-line.create') || usePage().props.user.permissions.includes('air-line.do charges create')"
                                         class="w-full"
                                         @click="confirmViewAddNewAirLine()"
                                     >
-                                       Create Air Line
+                                        Create Air Line
                                     </PrimaryButton>
                                 </div>
                             </div>
@@ -269,7 +260,7 @@ const confirmDeleteAirLine = (airLine) => {
                                 <!-- Search Field -->
                                 <IconField class="w-full sm:w-auto">
                                     <InputIcon>
-                                        <i class="pi pi-search" />
+                                        <i class="pi pi-search"/>
                                     </InputIcon>
                                     <InputText
                                         v-model="filters.global.value"
@@ -281,7 +272,7 @@ const confirmDeleteAirLine = (airLine) => {
                             </div>
                         </template>
 
-                        <template #empty> No Air Line found. </template>
+                        <template #empty> No Air Line found.</template>
 
                         <template #loading> Loading Air Lines data. Please wait.</template>
 
@@ -316,7 +307,7 @@ const confirmDeleteAirLine = (airLine) => {
 
                 <template #footer>
                     <div class="flex flex-wrap justify-end gap-2">
-                        <Button label="Cancel" class="p-button-text" @click="closeAddNewAirLineModal" />
+                        <Button label="Cancel" class="p-button-text" @click="closeAddNewAirLineModal"/>
                         <Button
                             :label="showAddNewAirLineDialog ? 'Add Air Line' : 'Update Air Line'"
                             class="p-button-primary"

@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('air_lines', function (Blueprint $table) {
+        Schema::create('air_line_do_charges', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->bigInteger('air_line_id')->unsigned();
+            $table->double('do_charge');
             $table->bigInteger('created_by');
             $table->timestamps();
             $table->softDeletes();
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('air_lines');
+        Schema::dropIfExists('air_line_do_charges');
     }
 };

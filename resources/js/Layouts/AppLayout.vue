@@ -1181,6 +1181,27 @@ export default {
                                 route: "call-center.hbls.index",
                             }
                         );
+                    } else if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'finance team')
+                    {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All HBL",
+                                route: "finance.hbls.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("hbls.hbl finance approval list")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Approve HBLs",
+                                route: "finance.hbls.approve-hbl",
+                            }
+                        );
                     }
 
                     if (usePage().props.user.permissions.includes("mhbls.index")) {
@@ -1723,7 +1744,11 @@ export default {
                     changeSidePanelTitle("Report");
                     break;
                 case "setting":
-                    let settingMenu  = [
+                    let settingMenu = [
+                        {
+                            title: "Zones",
+                            route: "setting.warehouse-zones.index",
+                        },
                         {
                             title: "Driver Zones",
                             route: "setting.driver-zones.index",
@@ -1755,7 +1780,7 @@ export default {
                         {
                             title: "Shipper & Consignee",
                             route: "setting.shipper-consignees.index",
-                        },
+                        }
                     ];
 
                     if (usePage().props.user.permissions.includes("air-line.index")) {
@@ -1765,6 +1790,29 @@ export default {
                         }];
 
                     }
+                    if (usePage().props.user.permissions.includes("tax.destination tax")) {
+                        settingMenu = [...settingMenu,{
+                            title: "Tax",
+                            route: "setting.taxes.index",
+                        }];
+
+                    }
+                    if (usePage().props.user.permissions.includes("currencies.index")) {
+                        settingMenu = [...settingMenu,{
+                            title: "Currencies",
+                            route: "setting.currencies.index",
+                        }];
+
+                    }
+                    if (usePage().props.user.permissions.includes("air-line.do charges index")) {
+                        settingMenu = [...settingMenu,{
+                            title: "Air Line DO Charges",
+                            route: "setting.air-lines.do-charges",
+                        }];
+
+                    }
+
+                    childMenuList.splice(0, childMenuList.length, ...settingMenu);
                     if (usePage().props.user.permissions.includes("pickup-type.index")){
                         settingMenu = [...settingMenu,{
                             title: "Pickup Types",

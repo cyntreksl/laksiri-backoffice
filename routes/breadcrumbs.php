@@ -163,6 +163,13 @@ Breadcrumbs::for('setting.air-lines.index', function (BreadcrumbTrail $trail) {
     $trail->push('Air Lines', route('setting.air-lines.index'));
 });
 
+// Currencies
+Breadcrumbs::for('setting.currencies.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Currencies', route('setting.currencies.index'));
+});
+
 // Driver Area
 Breadcrumbs::for('setting.driver-areas.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
@@ -175,6 +182,13 @@ Breadcrumbs::for('setting.taxes.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');
     $trail->push('Tax', route('setting.taxes.index'));
+});
+
+// Air Line DO Charge
+Breadcrumbs::for('setting.air-lines.do-charges', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Air Lines DO Charges', route('setting.air-lines.do-charges'));
 });
 
 // Driver Area > Edit

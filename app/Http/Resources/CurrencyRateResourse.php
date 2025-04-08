@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AirLineResource extends JsonResource
+class CurrencyRateResourse extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,8 +16,9 @@ class AirLineResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'do_charge' => $this->airLineDOCharge ? $this->airLineDOCharge->do_charge : 0,
+            'currency_name' => $this->currency_name,
+            'currency_symbol' => $this->currency_symbol,
+            'sl_rate' => $this->sl_rate,
         ];
     }
 }

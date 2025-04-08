@@ -15,9 +15,11 @@ class AirLineController extends Controller
         private readonly AirLineRepositoryInterface $airLineRepository,
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render('Setting/AirLine/AirLineList');
+        return Inertia::render('Setting/AirLine/AirLineList', [
+            'isDOChargesPage' => str_contains($request->path(), 'do-charges'),
+        ]);
     }
 
     public function list(Request $request)
@@ -46,5 +48,10 @@ class AirLineController extends Controller
     public function destroy(AirLine $airLine)
     {
         $this->airLineRepository->destroyAirLine($airLine);
+    }
+
+    public function doAirLineCharges()
+    {
+        return Inertia::render('Setting/AirLine/AirLineDOChargesList');
     }
 }
