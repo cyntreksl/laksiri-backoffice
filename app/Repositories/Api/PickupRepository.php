@@ -137,7 +137,10 @@ class PickupRepository implements PickupRepositoryInterface
                 $query->whereBetween('pickup_date', [$data['start_date'], $data['end_date']]);
             }
 
-            $pickups = $query->where('driver_id', auth()->id())
+            $pickups = Pickup::where('driver_id', auth()->id())
+                ->whereHas('hbl', function ($query) {
+                    $query->where('system_status', '<', 2.2);
+                })
                 ->with('hbl')
                 ->orderBy('pickup_time_end', 'desc')
                 ->get();

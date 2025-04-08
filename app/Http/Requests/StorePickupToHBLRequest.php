@@ -24,12 +24,20 @@ class StorePickupToHBLRequest extends FormRequest
     {
         return [
             'hbl_type' => ['nullable'],
+            'email' => ['nullable', 'email', 'max:254'],
+            'hbl_name' => ['required'],
+            'contact_number' => ['phone:INTERNATIONAL'],
+            'additional_mobile_number' => ['nullable', 'phone:INTERNATIONAL'],
+            'whatsapp_number' => ['required', 'phone:INTERNATIONAL'],
             'nic' => ['nullable'],
             'iq_number' => ['nullable'],
-            'consignee_name' => ['nullable'],
-            'consignee_nic' => ['nullable'],
-            'consignee_contact' => ['nullable'],
-            'consignee_address' => ['nullable'],
+            'address' => ['nullable'],
+            'consignee_name' => ['required'],
+            'consignee_nic' => ['required'],
+            'consignee_contact' => ['required', 'phone:INTERNATIONAL'],
+            'consignee_additional_mobile_number' => ['nullable', 'phone:INTERNATIONAL'],
+            'consignee_whatsapp_number' => ['nullable', 'phone:INTERNATIONAL'],
+            'consignee_address' => ['required'],
             'consignee_note' => ['nullable'],
             'warehouse' => ['nullable'],
             'freight_charge' => ['nullable', 'numeric'],
@@ -37,6 +45,8 @@ class StorePickupToHBLRequest extends FormRequest
             'other_charge' => ['nullable', 'numeric'],
             'discount' => ['nullable', 'numeric'],
             'paid_amount' => ['nullable', 'numeric'],
+            'is_departure_charges_paid' => ['required', 'boolean'],
+            'is_destination_charges_paid' => ['required', 'boolean'],
         ];
     }
 }
