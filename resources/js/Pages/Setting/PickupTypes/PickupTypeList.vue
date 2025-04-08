@@ -234,7 +234,7 @@ const confirmPickupTypeDelete = (pickupType) => {
         <div>
             <card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel"  @hide="selectedPickupType = null"/>
+
                     <DataTable
                         v-model:contextMenuSelection="selectedPickupType"
                         v-model:selection="selectedPickupType"
@@ -276,9 +276,31 @@ const confirmPickupTypeDelete = (pickupType) => {
 
                         <template #loading> Loading Pickup Type data. Please wait.</template>
 
-                        <Column field="id" header="ID" sortable></Column>
 
                         <Column field="pickup_type_name" header="Name" sortable></Column>
+
+                        <column  header="Action" >
+                            <template #body="{ data }">
+                                <Button
+                                    icon="pi pi-pencil"
+                                    outlined
+                                    rounded
+                                    class="mr-2"
+                                    @click="confirmUpdatePickupType({ value: data })"
+                                    :disabled="!usePage().props.user.permissions.includes('pickup-type.edit')"
+                                />
+                                <Button
+                                    icon="pi pi-trash"
+                                    outlined
+                                    rounded
+                                    severity="danger"
+                                    @click="confirmPickupTypeDelete({ value: data })"
+                                    :disabled="!usePage().props.user.permissions.includes('pickup-type.delete')"
+                                />
+
+                            </template>
+                        </column>
+
 
                         <template #footer> In total there are {{ pickupType ? totalRecords : 0 }} Pickup Types.</template>
 
