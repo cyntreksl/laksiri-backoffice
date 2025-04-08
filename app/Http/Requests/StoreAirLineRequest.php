@@ -27,7 +27,7 @@ class StoreAirLineRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                Rule::unique('air_lines'),
+                Rule::unique('air_lines')->whereNull('deleted_at'),
             ],
         ];
     }

@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class AirLineDoCharge extends Model
+class AirLineDOCharge extends Model
 {
     use LogsActivity, SoftDeletes;
+
+    protected $table = 'air_line_do_charges';
 
     protected $fillable = [
         'air_line_id',

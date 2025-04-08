@@ -19,10 +19,18 @@ import {debounce} from "lodash";
 import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
+import InputNumber from "primevue/inputnumber";
+
+const props = defineProps({
+    isDOChargesPage: {
+        type: Boolean,
+        default: false,
+    },
+})
 
 const cm = ref();
 const confirm = useConfirm();
-const baseUrl = ref("air-lines/list");
+const baseUrl = ref(props.isDOChargesPage ? "/air-lines/list" : "/air-lines/list");
 const loading = ref(true);
 const airLines = ref([]);
 const totalRecords = ref(0);
@@ -47,6 +55,7 @@ const filters = ref({
 
 const form = useForm({
     name: "",
+    do_charge: "",
 })
 
 const menuModel = ref([
@@ -54,18 +63,19 @@ const menuModel = ref([
         label: "Edit",
         icon: "pi pi-fw pi-pencil",
         command: () => confirmViewEditAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.edit") || !usePage().props.user.permissions.includes("air-line.do charges edit"),
+        disabled: !usePage().props.user.permissions.includes("air-line.edit") && !usePage().props.user.permissions.includes("air-line.do charges edit"),
     },
     {
         label: "Delete",
         icon: "pi pi-fw pi-times",
         command: () => confirmDeleteAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.delete") || !usePage().props.user.permissions.includes("air-line.do charges delete"),
+        disabled: !usePage().props.user.permissions.includes("air-line.delete") && !usePage().props.user.permissions.includes("air-line.do charges delete"),
     },
 ]);
 
 const confirmViewEditAirLine = (airLine) => {
     form.name = airLine.value.name;
+    form.do_charge = airLine.value.do_charge;
     selectedAirLineId.value = airLine.value.id;
     showEditAirLineDialog.value = true;
     isDialogVisible.value = true;
@@ -280,6 +290,8 @@ const confirmDeleteAirLine = (airLine) => {
 
                         <Column field="name" header="Name" sortable></Column>
 
+                        <Column v-if="isDOChargesPage" field="do_charge" header="DO Charge" sortable></Column>
+
                         <template #footer> In total there are {{ airLines ? totalRecords : 0 }} Air Lines.</template>
                     </DataTable>
                 </template>
@@ -303,6 +315,18 @@ const confirmDeleteAirLine = (airLine) => {
                         type="text"
                     />
                     <InputError :message="form.errors.name"/>
+                </div>
+
+                <div v-if="isDOChargesPage" class="mt-4">
+                    <InputText
+                        v-model="form.do_charge"
+                        class="w-full p-inputtext"
+                        placeholder="Enter DO Charge(LKR)"
+                        required
+                        type="number"
+                        :maxFractionDigits="5" :minFractionDigits="2" min="0" step="any" variant="filled"
+                    />
+                    <InputError :message="form.errors.do_charge"/>
                 </div>
 
                 <template #footer>

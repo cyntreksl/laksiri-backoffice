@@ -50,8 +50,10 @@ class AirLineController extends Controller
         $this->airLineRepository->destroyAirLine($airLine);
     }
 
-    public function doAirLineCharges()
+    public function doAirLineCharges(Request $request)
     {
-        return Inertia::render('Setting/AirLine/AirLineDOChargesList');
+        return Inertia::render('Setting/AirLine/AirLineList', [
+            'isDOChargesPage' => str_contains($request->path(), 'do-charges'),
+        ]);
     }
 }

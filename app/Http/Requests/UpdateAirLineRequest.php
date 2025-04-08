@@ -26,7 +26,7 @@ class UpdateAirLineRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                Rule::unique('air_lines')->ignore($this->route('air_line')), // Ignore the current airline being updated
+                Rule::unique('air_lines')->ignore($this->route('air_line'))->whereNull('deleted_at'), // Ignore the current airline being updated
             ],
         ];
     }
