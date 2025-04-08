@@ -13,5 +13,4 @@ interface DriverRepositoryInterface
 
     public function updatePassword(array $data);
 
-    public function getDashboardStats(array $data);
 }
