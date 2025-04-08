@@ -1813,7 +1813,25 @@ export default {
                     }
 
                     childMenuList.splice(0, childMenuList.length, ...settingMenu);
+                    if (usePage().props.user.permissions.includes("pickup-type.index")){
+                        settingMenu = [...settingMenu,{
+                            title: "Pickup Types",
+                            route: "setting.pickup-types.index",
+                        }];
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...settingMenu
+                    );
                     changeSidePanelTitle("Setting");
+                    break;
+                case "settings":
+                    childMenuList.splice(0, childMenuList.length, {
+                        title: "Zones",
+                        route: "settings.zones.index",
+                    });
+                    changeSidePanelTitle("Settings");
                     break;
             }
             activeMenu.value = menu;
