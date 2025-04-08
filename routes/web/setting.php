@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AirLineController;
+use App\Http\Controllers\CurrencyRateController;
 use App\Http\Controllers\DriverAreasController;
 use App\Http\Controllers\ExceptionNameController;
 use App\Http\Controllers\OfficerController;
@@ -66,6 +67,14 @@ Route::name('setting.')->group(function () {
 
     Route::get('taxes/list', [TaxController::class, 'list'])
         ->name('taxes.list');
+
+    Route::resource('currencies', CurrencyRateController::class)->except('show', 'create', 'edit');
+
+    Route::get('currencies/list', [CurrencyRateController::class, 'list'])
+        ->name('currencies.list');
+
+    Route::post('currencies/update-currency-rates', [CurrencyRateController::class, 'updateCurrencyRate'])
+        ->name('currencies.update-rates');
 
     // Invoice Settings
     Route::post('invoice/settings', [SettingController::class, 'updateInvoiceSettings'])

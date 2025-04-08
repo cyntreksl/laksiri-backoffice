@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateAirLineRequest extends FormRequest
+class UpdateCurrencyRateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,12 +22,19 @@ class UpdateAirLineRequest extends FormRequest
      */
     public function rules(): array
     {
+
         return [
-            'name' => [
+            'currency_name' => [
                 'required',
                 'string',
-                Rule::unique('air_lines')->ignore($this->route('air_line')), // Ignore the current airline being updated
+                Rule::unique('currency_rates', 'currency_name')->ignore($this->currency),
             ],
+            'currency_symbol' => [
+                'required',
+                'string',
+                Rule::unique('currency_rates', 'currency_symbol')->ignore($this->currency),
+            ],
+            'sl_rate' => ['required', 'numeric', 'min:0'],
         ];
     }
 }

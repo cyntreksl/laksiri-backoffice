@@ -27,9 +27,7 @@ class StoreAirLineRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                Rule::unique('air_lines')->where(function ($query) {
-                    return $query->where('branch_id', session('current_branch_id'));
-                }),
+                Rule::unique('air_lines'),
             ],
         ];
     }
