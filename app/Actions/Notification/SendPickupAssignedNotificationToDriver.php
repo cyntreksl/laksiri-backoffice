@@ -19,7 +19,7 @@ class SendPickupAssignedNotificationToDriver
         $message = "You have been assigned a new pickup with reference number: $reference_number";
         $title = 'New Pickup Assigned';
 
-        $expoToken = DeviceToken::where('driver_id', $driver_id)->first();
+        $expoToken = DeviceToken::where('user_id', $driver_id)->first();
 
         if ($expoToken instanceof DeviceToken) {
             $expoToken = $expoToken->token;
