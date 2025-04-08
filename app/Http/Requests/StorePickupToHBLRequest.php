@@ -45,6 +45,8 @@ class StorePickupToHBLRequest extends FormRequest
             'other_charge' => ['nullable', 'numeric'],
             'discount' => ['nullable', 'numeric'],
             'paid_amount' => ['nullable', 'numeric'],
+            'is_departure_charges_paid' => ['required', 'boolean'],
+            'is_destination_charges_paid' => ['required', 'boolean'],
         ];
     }
 }
