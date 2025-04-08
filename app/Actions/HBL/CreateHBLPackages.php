@@ -29,7 +29,7 @@ class CreateHBLPackages
                 $package->branch_id = GetUserCurrentBranchID::run();
                 $package->package_type = $packageData['type'] ?? $packageData['package_type'];
                 $package->length = $packageData['length'];
-                $package->width = $packageData['width'];
+                $package->width = $packageData['width'] ?? 0;
                 $package->height = $packageData['height'];
                 $package->quantity = $packageData['quantity'];
                 $package->volume = $packageData['volume'];
