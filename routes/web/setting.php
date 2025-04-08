@@ -34,6 +34,12 @@ Route::name('setting.')->group(function () {
     Route::get('air-lines/list', [AirLineController::class, 'list'])
         ->name('air-lines.list');
 
+    Route::get('air-lines/do-charges', [AirLineController::class, 'index'])
+        ->name('air-lines.do-charges');
+
+    //    Route::get('air-lines/do-charges/list', [AirLineController::class, 'doAirLineChargesList'])
+    //        ->name('air-lines.do-charges.list');
+
     // Warehouse Zones
     Route::get('warehouse-zones/list', [WarehouseZoneController::class, 'list'])
         ->name('warehouse-zones.list');

@@ -311,7 +311,7 @@ const confirmDeleteCurrency = (currency) => {
                                         class="w-full mt-3"
                                         @click="showChangeCurrencyRateDialog = true"
                                     >
-                                        Cash Received
+                                        Change currency
                                     </PrimaryButton>
                                 </div>
                             </div>

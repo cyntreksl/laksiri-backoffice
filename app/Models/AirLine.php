@@ -23,4 +23,12 @@ class AirLine extends Model
     {
         return LogOptions::defaults()->logAll()->logOnlyDirty();
     }
+
+    /**
+     * Get the airline do charges associated with airline.
+     */
+    public function airLineDOCharge()
+    {
+        return $this->hasOne(AirLineDOCharge::class);
+    }
 }
