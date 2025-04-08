@@ -11,6 +11,8 @@ class AirLineDOCharge extends Model
 {
     use LogsActivity, SoftDeletes;
 
+    protected $table = 'air_line_do_charges';
+
     protected $fillable = [
         'air_line_id',
         'do_charge',
