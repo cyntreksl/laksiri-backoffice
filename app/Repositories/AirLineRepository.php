@@ -10,7 +10,7 @@ use App\Http\Resources\AirLineResource;
 use App\Interfaces\AirLineRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\AirLine;
-use App\Models\AirLineDoCharge;
+use App\Models\AirLineDOCharge;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 

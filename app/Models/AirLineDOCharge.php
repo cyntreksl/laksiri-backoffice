@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class AirLineDoCharge extends Model
+class AirLineDOCharge extends Model
 {
     use LogsActivity, SoftDeletes;
 
