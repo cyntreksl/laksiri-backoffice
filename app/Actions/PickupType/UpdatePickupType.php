@@ -12,5 +12,7 @@ class UpdatePickupType
     public function handle(PickupType $pickupType, array $data)
     {
         $pickupType->update($data);
+
+        return $pickupType;
     }
 }

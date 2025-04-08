@@ -71,7 +71,7 @@ class PickupController extends Controller
         $this->authorize('pickups.create');
 
         return Inertia::render('Pickup/CreateJob', [
-            'pickupTypes' => PickupType::select('pickup_type_name')->get()->pluck('pickup_type_name')->toArray(),
+            'pickupTypes' => PickupType::pluck('pickup_type_name')->toArray(),
             'cargoTypes' => CargoType::cases(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
             'zones' => GetZones::run(),

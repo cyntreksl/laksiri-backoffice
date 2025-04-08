@@ -42,34 +42,13 @@ const isDialogVisible = ref(false);
 const showUpdatePickupTypeDialog = ref(false);
 const showDeletePickupTypeDialog = ref(false);
 
-const filters  = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
-    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
-    cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
-    is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
-    user: {value: null, matchMode: FilterMatchMode.EQUALS},
-    payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+const filters = ref({
+    'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
 });
 
 const form = useForm({
     pickup_type_name: "",
 })
-
-const menuModel = ref([
-    {
-        label: "Edit",
-        icon: "pi pi-fw pi-pencil",
-        command: () => confirmUpdatePickupType(selectedPickupType),
-        disabled: !usePage().props.user.permissions.includes("pickup-type.edit"),
-    },
-    {
-        label: "Delete",
-        icon: "pi pi-fw pi-trash",
-        command: () => confirmPickupTypeDelete(selectedPickupType),
-        disabled: !usePage().props.user.permissions.includes("pickup-type.delete"),
-    },
-]);
 
 const confirmUpdatePickupType = (pickupType) => {
    form.pickup_type_name = pickupType.value.pickup_type_name;
@@ -125,13 +104,6 @@ const  debouncedFetchPickupTypes = debounce((searchValue) => {
 
 watch (() => filters.value.global.value, (newValue) => {
     debouncedFetchPickupTypes(newValue);
-});
-
-const exportURL = computed(() => {
-    const params = new URLSearchParams({
-
-    }).toString();
-    return `/warehouses/export?${params}`;
 });
 
 const showAddNewPickupTypeDialog =  ref (false);

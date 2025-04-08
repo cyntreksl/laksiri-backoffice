@@ -21,11 +21,8 @@ class PickupTypeController extends Controller
         $page = $request->input('page', 1);
         $order = $request->input('sort_field', 'id');
         $dir = $request->input('sort_order', 'asc');
-        $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
-
-        return $this->pickupTypeRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+        return $this->pickupTypeRepository->dataset($limit, $page, $order, $dir);
     }
 
     public function index()
