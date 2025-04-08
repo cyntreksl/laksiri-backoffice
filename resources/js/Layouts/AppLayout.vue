@@ -1804,7 +1804,7 @@ export default {
                         }];
 
                     }
-                    if (usePage().props.user.permissions.includes("air-line.do charges index")) {
+                    if (usePage().props.user.permissions.includes("charges.air line do charges index")) {
                         settingMenu = [...settingMenu,{
                             title: "Air Line DO Charges",
                             route: "setting.air-lines.do-charges",
