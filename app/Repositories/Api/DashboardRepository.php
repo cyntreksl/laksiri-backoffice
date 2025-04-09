@@ -5,11 +5,13 @@ namespace App\Repositories\Api;
 use App\Interfaces\Api\DashboardRepositoryInterface;
 use App\Models\PickUp;
 use App\Models\PickupException;
+use App\Models\StatusLog;
 use App\Traits\ResponseAPI;
 
 class DashboardRepository implements DashboardRepositoryInterface
 {
     use ResponseAPI;
+
     public function getDashboardStats(array $data)
     {
         $driverId = auth()->user()->id;
@@ -26,22 +28,31 @@ class DashboardRepository implements DashboardRepositoryInterface
 
         $pickupExceptions = PickupException::where('driver_id', $driverId)->count();
 
-        $recentActivities = [
-            PickUp::where('driver_id', $driverId)
-                ->orderBy('pickup_date', 'desc')
-                ->limit(5)
-                ->get()
-                ->map(function ($pickup) {
-                    return [
-                        'id' => $pickup->id,
-                        'type' => 'pickup created',
-                        'reference' => $pickup->reference,
-                        'details' => 'Pickup created successfully',
-                        'timestamp' => now()->toDateTimeString(),
-                    ];
-                }),
-        ];
-        $recentActivities = collect($recentActivities)->flatten(1)->toArray();
+        $recentActivities = StatusLog::where('user_id', $driverId)
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->join('pick_ups', 'status_logs.statusable_id', '=', 'pick_ups.id')
+            ->select(
+                'status_logs.id',
+                'status_logs.statusable_type',
+                'status_logs.status',
+                'status_logs.description',
+                'status_logs.created_at',
+                'pick_ups.reference',
+            )
+            ->get()
+            ->map(function ($item) {
+                $modelName = str_replace('App\\Models\\', '', $item->statusable_type);
+
+                return [
+                    'id' => $item->id,
+                    'type' => $modelName.' created',
+                    'reference' => $item->reference,
+                    'details' => $item->status,
+                    'timestamp' => $item->created_at,
+                ];
+            })
+            ->toArray();
 
         $data = [
             'total_pickups' => $totalPickups,
@@ -50,8 +61,8 @@ class DashboardRepository implements DashboardRepositoryInterface
             'pickup_exceptions' => $pickupExceptions,
             'recent_activities' => $recentActivities,
         ];
+
         return $this->success('Success', $data);
 
     }
-
 }

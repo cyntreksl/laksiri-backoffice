@@ -31,7 +31,7 @@ class ApiRepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ExceptionNameRepositoryInterface::class, ExceptionNameRepository::class);
         $this->app->bind(PackageTypeRepositoryInterface::class, PackageTypeRepository::class);
         $this->app->bind(HblImageRepositoryInterface::class, HblImageRepository::class);
-        $this->app->bind(DashboardRepositoryInterface::class , DashboardRepository::class);
+        $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
     }
 
     public function boot(): void {}
