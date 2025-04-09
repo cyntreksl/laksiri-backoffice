@@ -1,9 +1,8 @@
 <script setup>
-import DialogModal from "@/Components/DialogModal.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import {onMounted, ref, watch} from "vue";
+import {ref, watch} from "vue";
 import {usePage} from "@inertiajs/vue3";
 import FileCard from "@/Pages/Arrival/Partials/FileCard.vue";
+import Dialog from "primevue/dialog";
 
 const props = defineProps({
     show: {
@@ -49,66 +48,31 @@ watch(() => props.unloadingIssueID, () => {
     images.value = [];
     fetchImages();
 });
-
-
-// Download an image
-const downloadImage = (url) => {
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `image-${new Date().getTime()}`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-};
 </script>
 
 <template>
-    <DialogModal :maxWidth="'7xl'" :show="show" @close="$emit('close')" :closeable="true">
-        <!-- Title -->
-        <template #title>
-            <div class="flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-gray-800">Image Viewer </h3>
-                <button
-                    class="text-gray-500 hover:text-red-500 focus:outline-none"
-                    @click="$emit('close')"
-                >
-                    <svg class="size-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 18L18 6M6 6L18 18" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </div>
-        </template>
+    <Dialog :visible="show" header="Attachments" modal @update:visible="(newValue) => $emit('update:show', newValue)">
 
-        <!-- Content -->
-        <template #content>
-            <div v-if="isLoading" class="flex justify-center items-center h-48">
-                <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none"
-                     viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0012 20c4.411 0 8-3.589 8-8H4c0 2.206 1.794 4.109 4 4.709z"></path>
-                </svg>
+        <div v-if="isLoading">
+            <i class="pi pi-spin pi-spinner flex justify-center items-center text-primary" style="font-size: 2rem"></i>
+
+            <div class="text-center text-gray-500 py-8">
+                Loading Attachments.
+            </div>
+        </div>
+
+        <div v-else>
+            <div
+                v-if="Object.keys(images).length > 0"
+                class="pt-4 transition-all duration-[.25s]">
+                <div class="grid grid-cols-4 gap-4">
+                    <FileCard v-for="file in images.slice(0, 12)" :key="file.id" :file="file" @refresh-files="fetchImages"/>
+                </div>
             </div>
 
-          <div
-              v-if="Object.keys(images).length > 0"
-              class="pt-4 transition-all duration-[.25s]">
-            <div class="grid grid-cols-4 gap-4">
-              <FileCard v-for="file in images.slice(0, 12)" :key="file.id" :file="file" @refresh-files="fetchImages"/>
+            <div v-else class="text-center text-gray-500 py-8">
+                No attachments available.
             </div>
-          </div>
-
-          <div v-else class="text-center text-gray-500 py-8">
-                No images available.
-            </div>
-        </template>
-
-        <!-- Footer -->
-        <template #footer>
-            <SecondaryButton @click="$emit('close')">
-                Close
-            </SecondaryButton>
-        </template>
-    </DialogModal>
+        </div>
+    </Dialog>
 </template>
