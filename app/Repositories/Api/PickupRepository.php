@@ -138,11 +138,10 @@ class PickupRepository implements PickupRepositoryInterface
             }
 
             $pickups = Pickup::where('driver_id', auth()->id())
-                ->orderBy('pickup_date', 'desc')
-                ->orderBy('pickup_time_end', 'desc')
                 ->whereHas('hbl', function ($query) {
                     $query->where('system_status', '<', 2.2);
                 })
+                ->orderBy('hbls.created_by', 'desc')
                 ->with('hbl')
                 ->get();
 
