@@ -74,9 +74,9 @@ const menuModel = ref([
 ]);
 
 const confirmViewEditAirLine = (airLine) => {
-    form.name = airLine.value.name;
-    form.do_charge = airLine.value.do_charge;
-    selectedAirLineId.value = airLine.value.id;
+    form.name = airLine.data.name;
+    form.do_charge = airLine.data.do_charge;
+    selectedAirLineId.value = airLine.data.id;
     showEditAirLineDialog.value = true;
     isDialogVisible.value = true;
 };
@@ -186,7 +186,7 @@ const handleEditAirLine = async () => {
 }
 
 const confirmDeleteAirLine = (airLine) => {
-    selectedAirLineId.value = airLine.value.id;
+    selectedAirLineId.value = airLine.daya.id;
     confirm.require({
         message: 'Are you sure you want to delete air line?',
         header: 'Delete Air Line?',
@@ -230,7 +230,7 @@ const confirmDeleteAirLine = (airLine) => {
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedAirLine = null"/>
+                    <ContextMenu ref="cm" @hide="selectedAirLine = null"/>
                     <DataTable
                         v-model:contextMenuSelection="selectedAirLine"
                         v-model:selection="selectedAirLine"
@@ -286,11 +286,30 @@ const confirmDeleteAirLine = (airLine) => {
 
                         <template #loading> Loading Air Lines data. Please wait.</template>
 
-                        <Column field="id" header="ID" sortable></Column>
-
                         <Column field="name" header="Name" sortable></Column>
 
                         <Column v-if="isDOChargesPage" field="do_charge" header="DO Charge" sortable></Column>
+
+                        <Column field="" header="Actions">
+                            <template #body="{ data }">
+                                <Button
+                                    icon="pi pi-pencil"
+                                    outlined
+                                    rounded
+                                    class="mr-2"
+                                    @click="confirmViewEditAirLine({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('air-line.edit') && !usePage().props.user.permissions.includes('air-line.do charges edit')"
+                                />
+                                <Button
+                                    icon="pi pi-trash"
+                                    outlined
+                                    rounded
+                                    severity="danger"
+                                    @click="confirmDeleteAirLine({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('air-line.delete') && !usePage().props.user.permissions.includes('air-line.do charges delete')"
+                                />
+                            </template>
+                        </Column>
 
                         <template #footer> In total there are {{ airLines ? totalRecords : 0 }} Air Lines.</template>
                     </DataTable>
