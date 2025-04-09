@@ -20,7 +20,7 @@ class DashboardRepository implements DashboardRepositoryInterface
         $totalPickups = PickUp::where('driver_id', $driverId)->count();
 
         $pendingPickups = PickUp::where('driver_id', $driverId)
-            ->where('system_status', PickUp::SYSTEM_STATUS_PICKUP_CREATED)
+            ->where('system_status', PickUp::SYSTEM_STATUS_DRIVER_ASSIGNED)
             ->count();
 
         $completedPickups = PickUp::where('driver_id', $driverId)
