@@ -163,11 +163,32 @@ Breadcrumbs::for('setting.air-lines.index', function (BreadcrumbTrail $trail) {
     $trail->push('Air Lines', route('setting.air-lines.index'));
 });
 
+// Currencies
+Breadcrumbs::for('setting.currencies.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Currencies', route('setting.currencies.index'));
+});
+
 // Driver Area
 Breadcrumbs::for('setting.driver-areas.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');
     $trail->push('Driver Areas', route('setting.driver-areas.index'));
+});
+
+// Taxes
+Breadcrumbs::for('setting.taxes.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Tax', route('setting.taxes.index'));
+});
+
+// Air Line DO Charge
+Breadcrumbs::for('setting.air-lines.do-charges', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Air Lines DO Charges', route('setting.air-lines.do-charges'));
 });
 
 // Driver Area > Edit
@@ -455,6 +476,13 @@ Breadcrumbs::for('courier-agents.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->push('Courier');
     $trail->push('Courier Agents', route('courier-agents.index'));
     $trail->push('Edit', route('courier-agents.edit', $id));
+});
+
+// Settings -> Exception Name
+Breadcrumbs::for('setting.pickup-types.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Pickup Types', route('setting.pickup-types.index'));
 });
 
 require_once __DIR__.'/call-center-breadcrumbs.php';

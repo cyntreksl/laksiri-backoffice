@@ -14,6 +14,11 @@ class HBLResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $totalPackages = $this->packages()->count();
+        $loadedPackages = $this->packages()->where('is_loaded', 1)->count();
+
+        $isShortLoad = $loadedPackages > 0 && $loadedPackages < $totalPackages;
+
         return [
             'id' => $this->id,
             'reference' => $this->reference,
@@ -54,7 +59,7 @@ class HBLResource extends JsonResource
                     ? $this->mhbl->reference
                     : null),
             'is_released' => $this->is_released,
-            'is_short_loaded' => $this->packages()->whereDoesntHave('containers')->exists(),
+            'is_short_loaded' => $isShortLoad,
             'payment_status' => $this->hblPayment()->latest()->first()->status ?? 'Not Updated',
             'finance_status' => $this->is_finance_release_approved ? 'Approved' : 'Not Approved',
         ];

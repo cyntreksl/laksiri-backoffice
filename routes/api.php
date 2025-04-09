@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\v1\Auth\LoginController;
 use App\Http\Controllers\Api\v1\DashboardController;
+use App\Http\Controllers\Api\v1\DeviceTokenController;
 use App\Http\Controllers\Api\v1\DriverController;
 use App\Http\Controllers\Api\v1\ExceptionNameController;
 use App\Http\Controllers\Api\v1\HBLController;
@@ -56,7 +57,7 @@ Route::domain('api.'.config('app.url'))
         Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
 
         Route::post('/hbl-images/upload', [HblImageController::class, 'upload']);
-
+        Route::post('/notifications/register-device', [DeviceTokenController::class, 'registerDevice']);
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);

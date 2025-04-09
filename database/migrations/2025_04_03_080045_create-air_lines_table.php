@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('air_lines', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('branch_id');
             $table->string('name');
             $table->bigInteger('created_by');
             $table->timestamps();

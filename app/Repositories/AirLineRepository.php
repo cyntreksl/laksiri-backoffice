@@ -10,7 +10,9 @@ use App\Http\Resources\AirLineResource;
 use App\Interfaces\AirLineRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\AirLine;
+use App\Models\AirLineDOCharge;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class AirLineRepository implements AirLineRepositoryInterface, GridJsInterface
 {
@@ -21,7 +23,7 @@ class AirLineRepository implements AirLineRepositoryInterface, GridJsInterface
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
     {
-        $query = AirLine::query();
+        $query = AirLine::query()->with('airLineDOCharge');
 
         if (! empty($search)) {
             $query->where('name', 'like', '%'.$search.'%');
@@ -42,12 +44,26 @@ class AirLineRepository implements AirLineRepositoryInterface, GridJsInterface
 
     public function createAirLine(array $data)
     {
-        return CreateAirLine::run($data);
+        $air_line = CreateAirLine::run($data);
+        $air_line->airLineDOCharge()->create([
+            'do_charge' => $data['do_charge'] ?? 0,
+            'created_by' => Auth::id(),
+        ]);
+
+        return $air_line;
     }
 
     public function updateAirLine(AirLine $airLine, array $data)
     {
         try {
+            $airLine->airLineDOCharge()->updateOrCreate(
+                ['air_line_id' => $airLine->id], // Attributes to search for
+                [
+                    'do_charge' => $data['do_charge'] ?? 0,
+                    'updated_by' => Auth::id(),
+                ] + (AirLineDOCharge::where('air_line_id', $airLine->id)->exists() ? [] : ['created_by' => Auth::id()])
+            );
+
             return UpdateAirLine::run($airLine, $data);
         } catch (\Exception $e) {
             throw new \Exception('Failed to update air line: '.$e->getMessage());

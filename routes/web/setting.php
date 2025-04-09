@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Controllers\AirLineController;
+use App\Http\Controllers\CurrencyRateController;
 use App\Http\Controllers\DriverAreasController;
 use App\Http\Controllers\ExceptionNameController;
 use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\PackagePriceController;
 use App\Http\Controllers\PackageTypeController;
+use App\Http\Controllers\PickupTypeController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TaxController;
 use App\Http\Controllers\WarehouseZoneController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +34,12 @@ Route::name('setting.')->group(function () {
 
     Route::get('air-lines/list', [AirLineController::class, 'list'])
         ->name('air-lines.list');
+
+    Route::get('air-lines/do-charges', [AirLineController::class, 'index'])
+        ->name('air-lines.do-charges');
+
+    //    Route::get('air-lines/do-charges/list', [AirLineController::class, 'doAirLineChargesList'])
+    //        ->name('air-lines.do-charges.list');
 
     // Warehouse Zones
     Route::get('warehouse-zones/list', [WarehouseZoneController::class, 'list'])
@@ -61,6 +70,19 @@ Route::name('setting.')->group(function () {
     Route::resource('package-types', PackageTypeController::class)
         ->except(['show', 'create']);
 
+    Route::resource('taxes', TaxController::class)->except('show', 'create', 'edit');
+
+    Route::get('taxes/list', [TaxController::class, 'list'])
+        ->name('taxes.list');
+
+    Route::resource('currencies', CurrencyRateController::class)->except('show', 'create', 'edit');
+
+    Route::get('currencies/list', [CurrencyRateController::class, 'list'])
+        ->name('currencies.list');
+
+    Route::post('currencies/update-currency-rates', [CurrencyRateController::class, 'updateCurrencyRate'])
+        ->name('currencies.update-rates');
+
     // Invoice Settings
     Route::post('invoice/settings', [SettingController::class, 'updateInvoiceSettings'])
         ->name('invoice.update');
@@ -76,4 +98,9 @@ Route::name('setting.')->group(function () {
         ->name('shipper-consignees.update');
     Route::delete('shipper-consignees/{id}', [OfficerController::class, 'destroy'])
         ->name('shipper-consignees.destroy');
+
+    Route::resource('pickup-types', PickupTypeController::class)->except('show', 'create', 'edit');
+    Route::get('pickup-types/list', [PickupTypeController::class, 'list'])
+        ->name('pickup-types.list');
+
 });

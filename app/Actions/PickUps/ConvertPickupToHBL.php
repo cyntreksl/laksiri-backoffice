@@ -52,6 +52,8 @@ class ConvertPickupToHBL
             'is_completed' => $request->is_completed,
             'hbl_number' => isset($request->is_completed) && $request->is_completed ? GenerateHBLNumber::run(GetUserCurrentBranchID::run()) : null,
             'cr_number' => GenerateCRNumber::run(),
+            'is_departure_charges_paid' => $request->is_departure_charges_paid,
+            'is_destination_charges_paid' => $request->is_destination_charges_paid,
         ];
 
         try {

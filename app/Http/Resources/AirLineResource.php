@@ -17,6 +17,7 @@ class AirLineResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'do_charge' => $this->airLineDOCharge ? $this->airLineDOCharge->do_charge : 0,
         ];
     }
 }

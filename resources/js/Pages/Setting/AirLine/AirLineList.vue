@@ -3,11 +3,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
-import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import Card from "primevue/card";
-import FloatLabel from "primevue/floatlabel";
 import DataTable from "primevue/datatable";
-import DatePicker from "primevue/datepicker";
 import ContextMenu from "primevue/contextmenu";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
@@ -16,17 +13,24 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
 import {useConfirm} from "primevue/useconfirm";
-import moment from "moment";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
 import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
+import InputNumber from "primevue/inputnumber";
+
+const props = defineProps({
+    isDOChargesPage: {
+        type: Boolean,
+        default: false,
+    },
+})
 
 const cm = ref();
 const confirm = useConfirm();
-const baseUrl = ref("air-lines/list");
+const baseUrl = ref(props.isDOChargesPage ? "/air-lines/list" : "/air-lines/list");
 const loading = ref(true);
 const airLines = ref([]);
 const totalRecords = ref(0);
@@ -51,6 +55,7 @@ const filters = ref({
 
 const form = useForm({
     name: "",
+    do_charge: "",
 })
 
 const menuModel = ref([
@@ -58,26 +63,22 @@ const menuModel = ref([
         label: "Edit",
         icon: "pi pi-fw pi-pencil",
         command: () => confirmViewEditAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.edit"),
+        disabled: !usePage().props.user.permissions.includes("air-line.edit") && !usePage().props.user.permissions.includes("air-line.do charges edit"),
     },
     {
         label: "Delete",
         icon: "pi pi-fw pi-times",
         command: () => confirmDeleteAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.delete"),
+        disabled: !usePage().props.user.permissions.includes("air-line.delete") && !usePage().props.user.permissions.includes("air-line.do charges delete"),
     },
 ]);
 
 const confirmViewEditAirLine = (airLine) => {
     form.name = airLine.value.name;
+    form.do_charge = airLine.value.do_charge;
     selectedAirLineId.value = airLine.value.id;
     showEditAirLineDialog.value = true;
     isDialogVisible.value = true;
-};
-
-const confirmAirLineDelete = (airLine) => {
-    selectedAirLineId.value = airLine.value.id;
-    showDeleteAirLineDialog.value = true;
 };
 
 const fetchAirLines = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
@@ -229,7 +230,7 @@ const confirmDeleteAirLine = (airLine) => {
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel"  @hide="selectedAirLine = null"/>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedAirLine = null"/>
                     <DataTable
                         v-model:contextMenuSelection="selectedAirLine"
                         v-model:selection="selectedAirLine"
@@ -257,11 +258,11 @@ const confirmDeleteAirLine = (airLine) => {
                                 </div>
                                 <div>
                                     <PrimaryButton
-                                        v-if="usePage().props.user.permissions.includes('air-line.create')"
+                                        v-if="usePage().props.user.permissions.includes('air-line.create') || usePage().props.user.permissions.includes('air-line.do charges create')"
                                         class="w-full"
                                         @click="confirmViewAddNewAirLine()"
                                     >
-                                       Create Air Line
+                                        Create Air Line
                                     </PrimaryButton>
                                 </div>
                             </div>
@@ -269,7 +270,7 @@ const confirmDeleteAirLine = (airLine) => {
                                 <!-- Search Field -->
                                 <IconField class="w-full sm:w-auto">
                                     <InputIcon>
-                                        <i class="pi pi-search" />
+                                        <i class="pi pi-search"/>
                                     </InputIcon>
                                     <InputText
                                         v-model="filters.global.value"
@@ -281,13 +282,15 @@ const confirmDeleteAirLine = (airLine) => {
                             </div>
                         </template>
 
-                        <template #empty> No Air Line found. </template>
+                        <template #empty> No Air Line found.</template>
 
                         <template #loading> Loading Air Lines data. Please wait.</template>
 
                         <Column field="id" header="ID" sortable></Column>
 
                         <Column field="name" header="Name" sortable></Column>
+
+                        <Column v-if="isDOChargesPage" field="do_charge" header="DO Charge" sortable></Column>
 
                         <template #footer> In total there are {{ airLines ? totalRecords : 0 }} Air Lines.</template>
                     </DataTable>
@@ -314,9 +317,21 @@ const confirmDeleteAirLine = (airLine) => {
                     <InputError :message="form.errors.name"/>
                 </div>
 
+                <div v-if="isDOChargesPage" class="mt-4">
+                    <InputText
+                        v-model="form.do_charge"
+                        class="w-full p-inputtext"
+                        placeholder="Enter DO Charge(LKR)"
+                        required
+                        type="number"
+                        :maxFractionDigits="5" :minFractionDigits="2" min="0" step="any" variant="filled"
+                    />
+                    <InputError :message="form.errors.do_charge"/>
+                </div>
+
                 <template #footer>
                     <div class="flex flex-wrap justify-end gap-2">
-                        <Button label="Cancel" class="p-button-text" @click="closeAddNewAirLineModal" />
+                        <Button label="Cancel" class="p-button-text" @click="closeAddNewAirLineModal"/>
                         <Button
                             :label="showAddNewAirLineDialog ? 'Add Air Line' : 'Update Air Line'"
                             class="p-button-primary"

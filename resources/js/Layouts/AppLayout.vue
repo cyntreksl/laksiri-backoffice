@@ -1746,6 +1746,10 @@ export default {
                 case "setting":
                     let settingMenu = [
                         {
+                            title: "Zones",
+                            route: "setting.warehouse-zones.index",
+                        },
+                        {
                             title: "Driver Zones",
                             route: "setting.driver-zones.index",
                         },
@@ -1786,8 +1790,40 @@ export default {
                         }];
 
                     }
+                    if (usePage().props.user.permissions.includes("tax.destination tax")) {
+                        settingMenu = [...settingMenu,{
+                            title: "Tax",
+                            route: "setting.taxes.index",
+                        }];
+
+                    }
+                    if (usePage().props.user.permissions.includes("currencies.index")) {
+                        settingMenu = [...settingMenu,{
+                            title: "Currencies",
+                            route: "setting.currencies.index",
+                        }];
+
+                    }
+                    if (usePage().props.user.permissions.includes("air-line.do charges index")) {
+                        settingMenu = [...settingMenu,{
+                            title: "Air Line DO Charges",
+                            route: "setting.air-lines.do-charges",
+                        }];
+
+                    }
 
                     childMenuList.splice(0, childMenuList.length, ...settingMenu);
+                    if (usePage().props.user.permissions.includes("pickup-type.index")){
+                        settingMenu = [...settingMenu,{
+                            title: "Pickup Types",
+                            route: "setting.pickup-types.index",
+                        }];
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...settingMenu
+                    );
                     changeSidePanelTitle("Setting");
                     break;
                 case "settings":
