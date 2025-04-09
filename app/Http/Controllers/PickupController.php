@@ -100,7 +100,7 @@ class PickupController extends Controller
         $this->authorize('pickups.edit');
 
         return Inertia::render('Pickup/EditJob', [
-            'pickupTypes' => PickupType::cases(),
+            'pickupTypes' => PickupType::pluck('pickup_type_name')->toArray(),
             'cargoTypes' => CargoType::cases(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
             'zones' => GetZones::run(),
