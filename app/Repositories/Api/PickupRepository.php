@@ -141,9 +141,11 @@ class PickupRepository implements PickupRepositoryInterface
                 ->whereHas('hbl', function ($query) {
                     $query->where('system_status', '<', 2.2);
                 })
-                ->orderBy('hbls.created_by', 'desc')
                 ->with('hbl')
-                ->get();
+                ->get()
+                ->sortByDesc(function ($pickup) {
+                    return optional($pickup->hbl)->created_by;
+                })->values();;
 
             // Transform pickups into resource format
             $completedPickupsResource = PickupResource::collection($pickups);
