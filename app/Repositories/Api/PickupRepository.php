@@ -142,13 +142,13 @@ class PickupRepository implements PickupRepositoryInterface
                     $query->where('system_status', '<', 2.2);
                 })
                 ->with('hbl')
-                ->get()
-                ->sortByDesc(function ($pickup) {
-                    return optional($pickup->hbl)->created_by;
-                })->values();
+                ->get();
+            $sortedPickups = $pickups->sortByDesc(function ($pickup) {
+                return optional($pickup->hbl)->created_by;
+            })->values();
 
             // Transform pickups into resource format
-            $completedPickupsResource = PickupResource::collection($pickups);
+            $completedPickupsResource = PickupResource::collection($sortedPickups);
 
             return $this->success('Completed pickup list received successfully!', $completedPickupsResource);
         } catch (\Exception $e) {
