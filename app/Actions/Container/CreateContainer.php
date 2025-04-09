@@ -23,6 +23,9 @@ class CreateContainer
             $data['branch_id'] = GetUserCurrentBranchID::run();
             $data['system_status'] = Container::SYSTEM_STATUS_BOOK_CONTAINER;
 
+            $data['estimated_time_of_departure'] = (isset($data['estimated_time_of_departure']) && $data['estimated_time_of_departure'] === 'Invalid date') ? null : $data['estimated_time_of_departure'];
+            $data['estimated_time_of_arrival'] = (isset($data['estimated_time_of_arrival']) && $data['estimated_time_of_arrival'] === 'Invalid date') ? null : $data['estimated_time_of_arrival'];
+
             $container = Container::create($data);
 
             $container->addStatus('Container Booked');
