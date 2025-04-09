@@ -23,6 +23,8 @@ class ConvertPickupToHBL
             ? 'Door to Door'
             : ($request->hbl_type ?? $pickup->hbl_type);
 
+        dd($request->all());
+
         $warehouse = GetBranchByName::run($request->warehouse);
         $data = [
             'cargo_type' => $request->cargo_type ?: $pickup->cargo_type,
