@@ -7,6 +7,7 @@ use App\Models\PickUp;
 use App\Models\PickupException;
 use App\Models\StatusLog;
 use App\Traits\ResponseAPI;
+use Illuminate\Support\Carbon;
 
 class DashboardRepository implements DashboardRepositoryInterface
 {
@@ -49,7 +50,7 @@ class DashboardRepository implements DashboardRepositoryInterface
                     'type' => $modelName.' created',
                     'reference' => $item->reference,
                     'details' => $item->status,
-                    'timestamp' => $item->created_at,
+                    'timestamp' => Carbon::parse($item->created_at)->format('Y-m-d H:i:s'),
                 ];
             })
             ->toArray();
