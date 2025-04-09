@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
-use App\Interfaces\Api\DriverRepositoryInterface;
+use App\Interfaces\Api\DashboardRepositoryInterface;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function __construct(
-        private readonly DriverRepositoryInterface $driverRepository,
+        private readonly DashboardRepositoryInterface $dashboardRepository,
     ) {}
 
     public function stats(Request $request)
     {
-        return $this->driverRepository->getDashboardStats($request->all());
+        return $this->dashboardRepository->getDashboardStats($request->all());
     }
 }
