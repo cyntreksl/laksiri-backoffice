@@ -2,7 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {onMounted, ref, watch} from "vue";
-import {router, useForm, usePage} from "@inertiajs/vue3";
+import {Link, router, useForm, usePage} from "@inertiajs/vue3";
 import Card from "primevue/card";
 import DataTable from "primevue/datatable";
 import ContextMenu from "primevue/contextmenu";
@@ -65,11 +65,11 @@ const menuModel = ref([
     },
 ]);
 const confirmViewEditTax = (tax) => {
-    form.name = tax.value.name;
-    form.rate = tax.value.rate;
-    form.is_active = tax.value.is_active;
-    checked.value = tax.value.is_active;
-    selectedTaxId.value = tax.value.id;
+    form.name = tax.data.name;
+    form.rate = tax.data.rate;
+    form.is_active = tax.data.is_active;
+    checked.value = tax.data.is_active;
+    selectedTaxId.value = tax.data.id;
     showEditTaxDialog.value = true;
     isDialogVisible.value = true;
 };
@@ -165,7 +165,7 @@ const handleEditTax = async () => {
     });
 }
 const confirmDeleteTax = (tax) => {
-    selectedTaxId.value = tax.value.id;
+    selectedTaxId.value = tax.data.id;
     confirm.require({
         message: 'Are you sure you want to delete tax?',
         header: 'Delete Tax?',
@@ -207,7 +207,7 @@ const confirmDeleteTax = (tax) => {
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel"  @hide="selectedTax = null"/>
+                    <ContextMenu ref="cm" @hide="selectedTax = null"/>
                     <DataTable
                         v-model:contextMenuSelection="selectedTax"
                         v-model:selection="selectedTax"
@@ -259,12 +259,32 @@ const confirmDeleteTax = (tax) => {
                         </template>
                         <template #empty> No Tax found. </template>
                         <template #loading> Loading Tax data. Please wait.</template>
-                        <Column field="id" header="ID" sortable></Column>
                         <Column field="name" header="Name" sortable></Column>
                         <Column field="rate" header="Rate" sortable></Column>
                         <Column field="is_active" header="Active">
                             <template #body="{ data }">
                                 <i :class="{ 'pi-check-circle text-green-500': data.is_active, 'pi-times-circle text-red-400': !data.is_active }" class="pi"></i>
+                            </template>
+                        </Column>
+                        <Column field="" header="Actions">
+                            <template #body="{ data }">
+                                <Button
+                                    icon="pi pi-pencil"
+                                    outlined
+                                    rounded
+                                    class="mr-2"
+                                    @click="confirmViewEditTax({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('tax.destination tax edit')"
+                                />
+                                <Button
+                                    icon="pi pi-trash"
+                                    outlined
+                                    rounded
+                                    severity="danger"
+                                    @click="confirmDeleteTax({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('tax.destination tax delete')"
+                                />
+
                             </template>
                         </Column>
                         <template #footer> In total there are {{ taxes ? totalRecords : 0 }} Air Lines.</template>
