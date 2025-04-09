@@ -68,6 +68,8 @@ class UpdateOrCreateHBL
             'pickup_id' => $data['pickup_id'] ?? null,
             'system_status' => $data['system_status'] ?? HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE,
             'status' => $status,
+            'is_departure_charges_paid' => $data['is_departure_charges_paid'],
+            'is_destination_charges_paid' => $data['is_destination_charges_paid'],
         ]);
 
         if (isset($data['paid_amount']) && isset($data['is_completed'])) {
