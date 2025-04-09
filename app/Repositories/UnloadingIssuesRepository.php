@@ -24,11 +24,11 @@ class UnloadingIssuesRepository implements GridJsInterface, UnloadingIssuesRepos
         });
 
         if (! empty($search)) {
-            $query->whereAny([
-                'hbl',
-                'hbl_name',
-                'consignee_name',
-            ], 'like', '%'.$search.'%');
+            $query->whereHas('hblPackage.hbl', function ($q) use ($search) {
+                $q->where('hbl_number', 'like', "%$search%")
+                    ->orWhere('consignee_name', 'like', "%$search%")
+                    ->orWhere('hbl_name', 'like', "%$search%");
+            });
         }
 
         // apply filters

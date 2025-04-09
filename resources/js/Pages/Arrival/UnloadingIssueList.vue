@@ -29,12 +29,14 @@ import {debounce} from "lodash";
 const baseUrl = ref("/unloading-issues-list");
 const loading = ref(true);
 const unloadingIssues = ref([]);
+const unloadingIssueId = ref(null);
 const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
 const dt = ref();
-const fromDate = ref(moment(new Date()).subtract(30, "days").toISOString().split("T")[0]);
+const fromDate = ref(moment(new Date()).subtract(365, "days").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
+const isShowImageModal = ref(false);
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -108,6 +110,16 @@ const clearFilter = () => {
 const exportCSV = () => {
     dt.value.exportCSV();
 };
+
+const handleOpenImageModal = (id) => {
+    isShowImageModal.value = true;
+    unloadingIssueId.value = id;
+}
+
+const closeImageModal = () => {
+    isShowImageModal.value = false;
+    unloadingIssueId.value = null;
+}
 </script>
 <template>
     <AppLayout v-if="usePage().props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Unloading Issues">
@@ -400,10 +412,22 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
+                        <Column :exportable="false">
+                            <template #body="slotProps">
+                                <Button v-tooltip.left="'Show Attachments'" icon="pi
+pi-paperclip" rounded severity="contrast" size="small" @click="handleOpenImageModal(slotProps.data.id)"/>
+                            </template>
+                        </Column>
+
                         <template #footer> In total there are {{ unloadingIssues ? totalRecords : 0 }} unloading issues. </template>
                     </DataTable>
                 </template>
             </Card>
         </div>
     </AppLayout>
+
+    <ImageViewModal :show="isShowImageModal"
+                    :unloadingIssueID="unloadingIssueId"
+                    @close="closeImageModal"
+                    @update:visible="isShowImageModal = $event" />
 </template>
