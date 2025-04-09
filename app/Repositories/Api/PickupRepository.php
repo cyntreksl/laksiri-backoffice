@@ -144,7 +144,7 @@ class PickupRepository implements PickupRepositoryInterface
                 ->with('hbl')
                 ->get();
             $sortedPickups = $pickups->sortByDesc(function ($pickup) {
-                return optional($pickup->hbl)->id;
+                return optional($pickup->hbl)->hbl_number;
             })->values();
 
             // Transform pickups into resource format
