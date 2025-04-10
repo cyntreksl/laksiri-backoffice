@@ -295,7 +295,6 @@ const closeImageModal = () => {
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                         :totalRecords="totalRecords"
                         :value="unloadingIssues"
-                        context-menu
                         data-key="id"
                         filter-display="menu"
                         lazy

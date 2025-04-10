@@ -14,6 +14,7 @@ import VideoPlayerModal from "@/Pages/FileManager/VideoPlayerModal.vue";
 import Card from 'primevue/card';
 import Button from 'primevue/button';
 import Image from 'primevue/image';
+import { useConfirm } from "primevue/useconfirm";
 
 const props = defineProps({
     file: {
@@ -25,12 +26,30 @@ const props = defineProps({
 
 const emit = defineEmits(['refreshFiles']);
 
+const confirm = useConfirm();
+
 const handleDeleteFile = (id) => {
-    router.delete(route('arrival.unloading-issues.destroy-image', id), {
-        onSuccess: () => {
-            emit('refreshFiles');
-            push.success('File Deleted Successfully!');
-        }
+    confirm.require({
+        message: 'Are you sure you want to proceed?',
+        header: 'Delete Attachment?',
+        icon: 'pi pi-info-circle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger',
+        },
+        accept: () => {
+            router.delete(route('arrival.unloading-issues.destroy-image', id), {
+                onSuccess: () => {
+                    emit('refreshFiles');
+                    push.success('File Deleted Successfully!');
+                }
+            });
+        },
     });
 }
 
