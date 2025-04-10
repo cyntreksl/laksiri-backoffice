@@ -19,7 +19,7 @@ import {debounce} from "lodash";
 import Tag from "primevue/tag";
 import {useConfirm} from "primevue/useconfirm";
 import ContextMenu from 'primevue/contextmenu';
-import {router, usePage} from "@inertiajs/vue3";
+import {Link, router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 
 defineProps({
@@ -231,6 +231,10 @@ const confirmThirdPartyAgentDelete = (thirdPartyAgent) => {
                                 <div class="text-lg font-medium">
                                     Third Party Agents
                                 </div>
+
+                                <Link v-if="$page.props.user.permissions.includes('third-party-agents.create')" :href="route('couriers.agents.create')">
+                                    <Button label="Create Third Party Agent" size="small" />
+                                </Link>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Button Group -->
