@@ -75,10 +75,10 @@ const menuModel = ref([
 ]);
 
 const confirmViewEditCurrency = (currency) => {
-    form.currency_name = currency.value.currency_name;
-    form.currency_symbol = currency.value.currency_symbol;
-    form.sl_rate = currency.value.sl_rate;
-    selectedCurrencyId.value = currency.value.id;
+    form.currency_name = currency.data.currency_name;
+    form.currency_symbol = currency.data.currency_symbol;
+    form.sl_rate = currency.data.sl_rate;
+    selectedCurrencyId.value = currency.data.id;
     showEditCurrencyDialog.value = true;
     isDialogVisible.value = true;
 };
@@ -227,7 +227,7 @@ const handleUpdateRates = async () => {
 
 
 const confirmDeleteCurrency = (currency) => {
-    selectedCurrencyId.value = currency.value.id;
+    selectedCurrencyId.value = currency.data.id;
     confirm.require({
         message: 'Are you sure you want to delete currency?',
         header: 'Delete Currency?',
@@ -271,7 +271,7 @@ const confirmDeleteCurrency = (currency) => {
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel"  @hide="selectedCurrency = null"/>
+                    <ContextMenu ref="cm" @hide="selectedCurrency = null"/>
                     <DataTable
                         v-model:contextMenuSelection="selectedCurrency"
                         v-model:selection="selectedCurrencies"
@@ -342,6 +342,30 @@ const confirmDeleteCurrency = (currency) => {
                         <Column field="currency_symbol" header="Currency Symbol" sortable></Column>
 
                         <Column field="sl_rate" header="SL Rate" sortable></Column>
+
+                        <Column field="" header="Actions" style="width: 10%">
+                            <template #body="{ data }">
+                                <Button
+                                    icon="pi pi-pencil"
+                                    outlined
+                                    rounded
+                                    size="small"
+                                    class="p-1 text-xs h-3 w-3 mr-1"
+                                    @click="confirmViewEditCurrency({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('currencies.edit')"
+                                />
+                                <Button
+                                    icon="pi pi-trash"
+                                    outlined
+                                    rounded
+                                    severity="danger"
+                                    size="small"
+                                    @click="confirmDeleteCurrency({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('currencies.delete')"
+                                />
+
+                            </template>
+                        </Column>
 
                         <template #footer> In total there are {{ currencies ? totalRecords : 0 }} Currencies.</template>
                     </DataTable>
