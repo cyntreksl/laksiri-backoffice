@@ -27,12 +27,12 @@ class StoreCurrencyRateRequest extends FormRequest
             'currency_name' => [
                 'required',
                 'string',
-                Rule::unique('currency_rates'),
+                Rule::unique('currency_rates')->whereNull('deleted_at'),
             ],
             'currency_symbol' => [
                 'required',
                 'string',
-                Rule::unique('currency_rates'),
+                Rule::unique('currency_rates')->whereNull('deleted_at'),
             ],
             'sl_rate' => ['required', 'numeric', 'min:0'],
         ];

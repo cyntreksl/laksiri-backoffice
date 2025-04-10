@@ -27,12 +27,12 @@ class UpdateCurrencyRateRequest extends FormRequest
             'currency_name' => [
                 'required',
                 'string',
-                Rule::unique('currency_rates', 'currency_name')->ignore($this->currency),
+                Rule::unique('currency_rates', 'currency_name')->ignore($this->currency)->whereNull('deleted_at'),
             ],
             'currency_symbol' => [
                 'required',
                 'string',
-                Rule::unique('currency_rates', 'currency_symbol')->ignore($this->currency),
+                Rule::unique('currency_rates', 'currency_symbol')->ignore($this->currency)->whereNull('deleted_at'),
             ],
             'sl_rate' => ['required', 'numeric', 'min:0'],
         ];

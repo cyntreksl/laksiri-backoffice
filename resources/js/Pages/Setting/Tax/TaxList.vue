@@ -28,7 +28,7 @@ const baseUrl = ref("taxes/list");
 const loading = ref(true);
 const taxes = ref([]);
 const totalRecords = ref(0);
-const perPage = ref(100);
+const perPage = ref(10);
 const currentPage = ref(1);
 const selectedTax = ref(null);
 const selectedTaxId = ref(null);
@@ -132,13 +132,16 @@ const onDialogShow = () => {
     document.body.classList.add('p-overflow-hidden');
 };
 const onDialogHide = () => {
-    document.body.classList.remove('p-overflow-hidden');
+  form.reset();
+  form.clearErrors()
+  document.body.classList.remove('p-overflow-hidden');
 };
 const handleAddNewTax = async () => {
     form.post(route("setting.taxes.store"), {
         onSuccess: () => {
             closeAddNewTaxModal();
             form.reset();
+            form.clearErrors()
             fetchTaxes();
             push.success('Tax created Successfully!');
         },
@@ -154,6 +157,7 @@ const handleEditTax = async () => {
         onSuccess: () => {
             closeAddNewTaxModal();
             form.reset();
+            form.clearErrors()
             fetchTaxes();
             push.success('Tax Updated Successfully!');
         },
@@ -233,13 +237,13 @@ const confirmDeleteTax = (tax) => {
                                     Tax Rates
                                 </div>
                                 <div>
-                                    <PrimaryButton
+                                    <Button
                                         v-if="usePage().props.user.permissions.includes('tax.destination tax create')"
                                         class="w-full"
                                         @click="confirmViewAddNewTax()"
                                     >
                                         Create Tax
-                                    </PrimaryButton>
+                                    </Button >
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
