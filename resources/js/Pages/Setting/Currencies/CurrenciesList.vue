@@ -147,7 +147,7 @@ const confirmViewAddNewCurrency = () => {
 
 const closeAddNewCurrencyModal = () => {
     form.reset();
-    form.clearErrors()
+    form.clearErrors();
     showAddNewCurrencyDialog.value = false;
     showEditCurrencyDialog.value = false;
     isDialogVisible.value = false;
@@ -159,7 +159,7 @@ const onDialogShow = () => {
 
 const onDialogHide = () => {
     form.reset();
-    form.clearErrors()
+    form.clearErrors();
     document.body.classList.remove('p-overflow-hidden');
 };
 
@@ -168,7 +168,7 @@ const handleAddNewCurrency = async () => {
         onSuccess: () => {
             closeAddNewCurrencyModal();
             form.reset();
-            form.clearErrors()
+            form.clearErrors();
             fetchCurrencies();
             push.success('Create Currency Successfully!');
         },

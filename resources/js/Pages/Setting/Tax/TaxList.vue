@@ -133,7 +133,7 @@ const onDialogShow = () => {
 };
 const onDialogHide = () => {
   form.reset();
-  form.clearErrors()
+  form.clearErrors();
   document.body.classList.remove('p-overflow-hidden');
 };
 const handleAddNewTax = async () => {
@@ -141,7 +141,7 @@ const handleAddNewTax = async () => {
         onSuccess: () => {
             closeAddNewTaxModal();
             form.reset();
-            form.clearErrors()
+            form.clearErrors();
             fetchTaxes();
             push.success('Tax created Successfully!');
         },
@@ -157,7 +157,7 @@ const handleEditTax = async () => {
         onSuccess: () => {
             closeAddNewTaxModal();
             form.reset();
-            form.clearErrors()
+            form.clearErrors();
             fetchTaxes();
             push.success('Tax Updated Successfully!');
         },
