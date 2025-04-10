@@ -69,7 +69,7 @@ const data = reactive({
     },
 });
 
-const baseUrl = ref("/couriers-list");
+const baseUrl = ref("couriers/list");
 
 const toggleColumnVisibility = (columnName) => {
     data.columnVisibility[columnName] = !data.columnVisibility[columnName];

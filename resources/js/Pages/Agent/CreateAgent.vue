@@ -42,10 +42,10 @@ const form = useForm({
 });
 
 const handleBranchCreate = () => {
-    form.post(route("third-party-agents.store"), {
+    form.post(route("couriers.agents.store"), {
         onSuccess: () => {
             form.reset();
-            router.visit(route("third-party-agents.index"));
+            router.visit(route("couriers.agents.index"));
             push.success('Third Party Agent added successfully!');
         },
         onError: () => {

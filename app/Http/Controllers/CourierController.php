@@ -33,9 +33,7 @@ class CourierController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Courier/CourierList',
-
-        );
+        return Inertia::render('Courier/CourierList');
     }
 
     public function list(Request $request)
@@ -56,7 +54,6 @@ class CourierController extends Controller
      */
     public function create()
     {
-
         return Inertia::render('Courier/CreateCourier', [
             'cargoTypes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
@@ -64,7 +61,6 @@ class CourierController extends Controller
             'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
             'courierAgents' => $this->CourierAgentRepository->getAllCourierAgents(),
         ]);
-
     }
 
     /**
