@@ -1,15 +1,13 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {computed, onMounted, ref, watch} from "vue";
+import { onMounted, ref, watch} from "vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Card from "primevue/card";
 import DataTable from "primevue/datatable";
-import ContextMenu from "primevue/contextmenu";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
 import Column from "primevue/column";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
 import {useConfirm} from "primevue/useconfirm";
@@ -19,7 +17,6 @@ import {debounce} from "lodash";
 import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
-import InputNumber from "primevue/inputnumber";
 
 const props = defineProps({
     isDOChargesPage: {
@@ -28,7 +25,6 @@ const props = defineProps({
     },
 })
 
-const cm = ref();
 const confirm = useConfirm();
 const baseUrl = ref(props.isDOChargesPage ? "/air-lines/list" : "/air-lines/list");
 const loading = ref(true);
@@ -41,7 +37,6 @@ const selectedAirLineId = ref(null);
 
 const isDialogVisible = ref(false);
 const showEditAirLineDialog = ref(false);
-const showDeleteAirLineDialog = ref(false);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -57,21 +52,6 @@ const form = useForm({
     name: "",
     do_charge: "",
 })
-
-const menuModel = ref([
-    {
-        label: "Edit",
-        icon: "pi pi-fw pi-pencil",
-        command: () => confirmViewEditAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.edit") && !usePage().props.user.permissions.includes("air-line.do charges edit"),
-    },
-    {
-        label: "Delete",
-        icon: "pi pi-fw pi-times",
-        command: () => confirmDeleteAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.delete") && !usePage().props.user.permissions.includes("air-line.do charges delete"),
-    },
-]);
 
 const confirmViewEditAirLine = (airLine) => {
     form.name = airLine.data.name;
@@ -107,10 +87,6 @@ const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchAirLines(currentPage.value);
-};
-
-const onRowContextMenu = (event) => {
-    cm.value.show(event.originalEvent);
 };
 
 const onSort = (event) => {
@@ -234,7 +210,6 @@ const confirmDeleteAirLine = (airLine) => {
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" @hide="selectedAirLine = null"/>
                     <DataTable
                         v-model:contextMenuSelection="selectedAirLine"
                         v-model:selection="selectedAirLine"
@@ -252,7 +227,6 @@ const confirmDeleteAirLine = (airLine) => {
                         row-hover
                         tableStyle="min-width: 50rem"
                         @page="onPageChange"
-                        @rowContextmenu="onRowContextMenu"
                         @sort="onSort">
 
                         <template #header>
@@ -317,7 +291,7 @@ const confirmDeleteAirLine = (airLine) => {
                             </template>
                         </Column>
 
-                        <template #footer> In total there are {{ airLines ? totalRecords : 0 }} Air Lines.</template>
+                        <template #footer> In total there are {{ airLines ? totalRecords : 0 }} {{ isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines' }}</template>
                     </DataTable>
                 </template>
             </Card>
