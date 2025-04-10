@@ -15,6 +15,9 @@ import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import RemovePriceRuleConfirmationModal from "@/Pages/Setting/Pricing/Partials/RemovePriceRuleConfirmationModal.vue";
+import Card from "primevue/card";
+import SelectButton from "primevue/selectbutton";
+import Fieldset from "primevue/fieldset";
 
 defineProps({
     cargoModes: {
@@ -32,9 +35,10 @@ defineProps({
 })
 
 const form = useForm({
-    destination_branch_id: null,
     cargo_mode: '',
     hbl_type: '',
+    agent_id: '',
+    destination_branch_id: null,
     price_mode: '',
     priceRules: {},
 });
@@ -162,10 +166,11 @@ const addPriceRuleData = () => {
 </script>
 
 <template>
-    <AppLayout title="Create Price Rule">
-        <template #header>Pricing</template>
+    <AppLayout title="Create Special DO Charge">
+        <template #header>Create DO Charge</template>
 
         <Breadcrumb/>
+
         <form @submit.prevent="handlePriceRuleCreate">
 
             <div class="flex items-center justify-between p-2 my-5">
@@ -207,122 +212,43 @@ const addPriceRuleData = () => {
                             </h2>
                         </div>
 
-                        <div class="ml--5 flex flex-nowrap items-start p-4 my-2 rounded bg-white border border-indigo-400 overflow-auto">
-                            <div class="bg-green-100 p-5 rounded-lg w-1/4">
-                                <InputLabel value="Cargo Mode" class="mb-2" />
-                                <div class="flex space-x-4">
-                                    <label
-                                        v-for="cargoType in cargoModes"
-                                        :key="cargoType"
-                                        class="flex space-x-2 items-center"
-                                    >
-                                        <RadioButton
-                                            v-model="form.cargo_mode"
-                                            :label="cargoType"
-                                            name="cargoType"
-                                            :value="cargoType"
-                                        />
-                                        <svg
-                                            v-if="cargoType === 'Air Cargo'"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-plane"
-                                            fill="none"
-                                            height="15"
-                                            stroke="currentColor"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            viewBox="0 0 24 24"
-                                            width="15"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path d="M0 0h24v24H0z" fill="none" stroke="none" />
-                                            <path
-                                                d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z"
-                                            />
-                                        </svg>
-                                        <svg
-                                            v-else
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
-                                            fill="none"
-                                            height="15"
-                                            stroke="currentColor"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            viewBox="0 0 24 24"
-                                            width="15"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path d="M0 0h24v24H0z" fill="none" stroke="none" />
-                                            <path
-                                                d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1"
-                                            />
-                                            <path d="M4 18l-1 -5h18l-2 4" />
-                                            <path d="M5 13v-6h8l4 6" />
-                                            <path d="M7 7v-4h-1" />
-                                        </svg>
-                                    </label>
-                                </div>
-                                <InputError :message="form.errors.cargo_mode"/>
-                            </div>
+                        <div class="flex flex-wrap space-x-8 items-center p-4 rounded border-none">
+                            <Card class="w-full border-none">
+                                <template #content>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                                        <Fieldset legend="Cargo Type" class="w-full">
+                                            <SelectButton v-model="form.cargo_mode" :options="cargoModes" name="Cargo Type">
+                                                <template #option="slotProps">
+                                                    <div class="flex items-center">
+                                                        <i v-if="slotProps.option === 'Sea Cargo'" class="ti ti-ship mr-2"></i>
+                                                        <i v-else class="ti ti-plane mr-2"></i>
+                                                        <span>{{ slotProps.option }}</span>
+                                                    </div>
+                                                </template>
+                                            </SelectButton>
+                                        </Fieldset>
 
-                            <div class="bg-blue-100 p-5 rounded-lg w-1/4 ml-2">
-                                <InputLabel value="HBL Type" class="mb-2" />
-                                <div class="flex space-x-4">
-                                    <label
-                                        v-for="hblType in hblTypes"
-                                        :key="hblType"
-                                        class="flex space-x-2 items-center"
-                                    >
-                                        <RadioButton
-                                            v-model="form.hbl_type"
-                                            :label="hblType"
-                                            name="hblType"
-                                            :value="hblType"
-                                        />
-                                    </label>
-                                </div>
-                                <InputError :message="form.errors.hbl_type"/>
-                            </div>
+                                        <Fieldset legend="Type" class="w-full">
+                                            <div class="flex items-center gap-2">
+                                                <SelectButton v-model="form.hbl_type" :options="hblTypes" name="HBL Type" class="w-full" />
+                                            </div>
+                                        </Fieldset>
 
-                            <div class="bg-amber-100 p-5 rounded-lg w-1/4 ml-2">
-                                <InputLabel value="Branch" class="mb-2" />
-                                <div class="flex space-x-4">
-                                    <label
-                                        v-for="branch in branches"
-                                        :key="branch"
-                                        class="flex space-x-2 items-center"
-                                    >
-                                        <RadioButton
-                                            v-model="form.destination_branch_id"
-                                            :label="branch.name"
-                                            name="warehouse"
-                                            :value="branch.id"
-                                        />
-                                    </label>
-                                </div>
-                                <InputError :message="form.errors.destination_branch_id"/>
-                            </div>
+                                        <Fieldset legend="Agent" class="w-full">
+                                            <select
+                                                v-model="form.agent_id"
+                                                class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-2 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
+                                            >
+                                                <option value="">Choose one</option>
+                                                <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                                                    {{ branch.name }}
+                                                </option>
+                                            </select>
+                                        </Fieldset>
+                                    </div>
+                                </template>
+                            </Card>
 
-                            <div class="bg-green-100 p-5 rounded-lg w-1/4 ml-2">
-                                <InputLabel value="Price Mode" class="mb-2" />
-                                <div class="flex space-x-4">
-                                    <label
-                                        v-for="price_mode in priceModes"
-                                        :key="price_mode"
-                                        class="flex space-x-2 items-center"
-                                    >
-                                        <RadioButton
-                                            disabled
-                                            v-model="form.price_mode"
-                                            :label="price_mode"
-                                            name="price_mode"
-                                            :value="price_mode"
-                                        />
-                                    </label>
-                                </div>
-                                <InputError :message="form.errors.price_mode"/>
-                            </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-4 my-4 gap-4">
@@ -339,9 +265,9 @@ const addPriceRuleData = () => {
                                         <PrimaryOutlineButton
                                             type="button"
                                             @click="showAddPriceRuleDialog"
-                                            :disabled="form.destination_branch_id ==null && form.cargo_mode === '' && form.hbl_type === ''"
+                                            :disabled="form.agent_id === '' && form.cargo_mode === '' && form.hbl_type === ''"
                                         >
-                                            New Price Rule <i class="fas fa-plus fa-fw fa-fw"></i>
+                                            New DO Charge <i class="fas fa-plus fa-fw fa-fw"></i>
                                         </PrimaryOutlineButton>
                                     </div>
 

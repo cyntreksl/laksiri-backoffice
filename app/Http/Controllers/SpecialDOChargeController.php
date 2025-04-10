@@ -23,7 +23,7 @@ class SpecialDOChargeController extends Controller
         return Inertia::render('Setting/SpecialDOCharge/CreateSpecialDOCharge',[
         'cargoModes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
-            'branches' => $this->branchRepository->getDestinationBranches(),
+            'branches' => $this->branchRepository->getDepartureBranches(),
         ]);
     }
 
