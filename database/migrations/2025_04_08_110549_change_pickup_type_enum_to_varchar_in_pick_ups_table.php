@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('pick_ups', function (Blueprint $table) {
-            //
+            $table->enum('pickup_type', ['urgent_pickup', 'vip_customer', 'need_trolly'])->nullable()->change();
         });
     }
 };
