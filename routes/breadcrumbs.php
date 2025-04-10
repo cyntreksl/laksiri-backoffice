@@ -419,14 +419,14 @@ Breadcrumbs::for('setting.shipper-consignees.edit', function (BreadcrumbTrail $t
 // Courier -> Third Party Agents List
 Breadcrumbs::for('couriers.agents.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Courier');
+    $trail->push('Couriers');
     $trail->push('Third Party Agents', route('couriers.agents.index'));
 });
 
 // Courier -> Third Party Agents Create
 Breadcrumbs::for('couriers.agents.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Courier');
+    $trail->push('Couriers');
     $trail->push('Third Party Agents', route('couriers.agents.index'));
     $trail->push('Third Party Agent Create ', route('couriers.agents.create'));
 });
@@ -435,7 +435,7 @@ Breadcrumbs::for('couriers.agents.create', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('couriers.agents.edit', function (BreadcrumbTrail $trail, $id) {
     $branch = Branch::find($id);
     $trail->parent('dashboard');
-    $trail->push('Courier');
+    $trail->push('Couriers');
     $trail->push('Third Party Agents', route('couriers.agents.index'));
     $trail->push('Edit Third Party Agent', route('couriers.agents.edit', $branch->id));
 });
@@ -443,28 +443,28 @@ Breadcrumbs::for('couriers.agents.edit', function (BreadcrumbTrail $trail, $id) 
 // Courier
 Breadcrumbs::for('couriers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Courier');
+    $trail->push('Couriers');
     $trail->push('List', route('couriers.index'));
 });
 
-// CourierAgents > Create
+// Couriers > Create
 Breadcrumbs::for('couriers.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Courier', route('couriers.index'));
-    $trail->push('Create', route('couriers.create'));
+    $trail->push('Couriers', route('couriers.index'));
+    $trail->push('Create Courier', route('couriers.create'));
 });
 
-// Courier > edit
+// Couriers > edit
 Breadcrumbs::for('couriers.edit', function (BreadcrumbTrail $trail, $courier) {
     $trail->parent('dashboard');
-    $trail->push('Courier', route('couriers.index'));
+    $trail->push('Couriers', route('couriers.index'));
     $trail->push('Edit Courier', route('couriers.edit', $courier->id));
 });
 
 // CourierAgents
 Breadcrumbs::for('courier-agents.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Courier');
+    $trail->push('Couriers');
     $trail->push('Courier Agents', route('courier-agents.index'));
 });
 
