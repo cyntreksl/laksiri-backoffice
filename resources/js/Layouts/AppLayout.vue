@@ -363,89 +363,16 @@
                                     <path d="M4 13h3l3 3h4l3 -3h3"/>
                                 </svg>
                             </a>
-                            <!-- Delivery -->
-<!--                            <a-->
-<!--                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"-->
-<!--                                :class="[-->
-<!--                activeMenu === 'delivery' ? 'bg-primary/10 text-primary' : '',-->
-<!--              ]"-->
-<!--                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"-->
-<!--                                x-tooltip.placement.right="'Delivery'"-->
-<!--                                @click="-->
-<!--                setMenu('delivery');-->
-<!--                openSideBar();-->
-<!--              "-->
-<!--                            >-->
-<!--                                <svg-->
-<!--                                    class="icon icon-tabler icon-tabler-trolley"-->
-<!--                                    fill="none"-->
-<!--                                    height="24"-->
-<!--                                    stroke="#2c3e50"-->
-<!--                                    stroke-linecap="round"-->
-<!--                                    stroke-linejoin="round"-->
-<!--                                    stroke-width="1.5"-->
-<!--                                    viewBox="0 0 24 24"-->
-<!--                                    width="24"-->
-<!--                                    xmlns="http://www.w3.org/2000/svg"-->
-<!--                                >-->
-<!--                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>-->
-<!--                                    <path d="M11 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>-->
-<!--                                    <path d="M6 16l3 2"/>-->
-<!--                                    <path d="M12 17l8 -12"/>-->
-<!--                                    <path d="M17 10l2 1"/>-->
-<!--                                    <path-->
-<!--                                        d="M9.592 4.695l3.306 2.104a1.3 1.3 0 0 1 .396 1.8l-3.094 4.811a1.3 1.3 0 0 1 -1.792 .394l-3.306 -2.104a1.3 1.3 0 0 1 -.396 -1.8l3.094 -4.81a1.3 1.3 0 0 1 1.792 -.394z"-->
-<!--                                    />-->
-<!--                                </svg>-->
-<!--                            </a>-->
-
-                            <!-- Reports -->
-<!--                            <a-->
-<!--                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"-->
-<!--                                :class="[-->
-<!--                activeMenu === 'report' ? 'bg-primary/10 text-primary' : '',-->
-<!--              ]"-->
-<!--                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"-->
-<!--                                x-tooltip.placement.right="'Report'"-->
-<!--                                @click="-->
-<!--                setMenu('report');-->
-<!--                openSideBar();-->
-<!--              "-->
-<!--                            >-->
-<!--                                <svg-->
-<!--                                    class="icon icon-tabler icon-tabler-clipboard-text"-->
-<!--                                    fill="none"-->
-<!--                                    height="24"-->
-<!--                                    stroke="#2c3e50"-->
-<!--                                    stroke-linecap="round"-->
-<!--                                    stroke-linejoin="round"-->
-<!--                                    stroke-width="1.5"-->
-<!--                                    viewBox="0 0 24 24"-->
-<!--                                    width="24"-->
-<!--                                    xmlns="http://www.w3.org/2000/svg"-->
-<!--                                >-->
-<!--                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>-->
-<!--                                    <path-->
-<!--                                        d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"-->
-<!--                                    />-->
-<!--                                    <path-->
-<!--                                        d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"-->
-<!--                                    />-->
-<!--                                    <path d="M9 12h6"/>-->
-<!--                                    <path d="M9 16h6"/>-->
-<!--                                </svg>-->
-<!--                            </a>-->
-
                             <!-- Courier Management -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('Courier')) || $page.props.user.permissions.includes('third-party-agents.index') || $page.props.user.permissions.includes('couriers.index') || $page.props.user.permissions.includes('couriers.create') || $page.props.user.permissions.includes('courier-agents.create')"
                                 :class="[
-                activeMenu === 'Courier' ? 'bg-primary/10 text-primary' : '',
+                activeMenu === 'courier' ? 'bg-primary/10 text-primary' : '',
               ]"
                                 class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                                 x-tooltip.placement.right="'Courier'"
                                 @click="
-                setMenu('Courier');
+                setMenu('courier');
                 openSideBar();
               "
                             >
@@ -1637,16 +1564,6 @@ export default {
                             }
                         );
                     }
-                    // if (usePage().props.user.permissions.includes("issues.index")) {
-                    //     userMenu.splice(
-                    //         2,
-                    //         0,
-                    //         {
-                    //             title: "Driver Tracking",
-                    //             route: "users.driver-tracings.index",
-                    //         }
-                    //     );
-                    // }
 
                     if (usePage().props.user.permissions.includes("roles.list")) {
                         userMenu.splice(
@@ -1665,7 +1582,7 @@ export default {
                     );
                     changeSidePanelTitle("Users");
                     break;
-                case "Courier":
+                case "courier":
                     let courierMenu = [];
                     if (usePage().props.user.permissions.includes("third-party-agents.index")){
 
@@ -1674,7 +1591,7 @@ export default {
                             0,
                             {
                                 title: "Third Party Agents",
-                                route: "third-party-agents.index",
+                                route: "couriers.agents.index",
                             }
                         );
                     }
@@ -1714,7 +1631,7 @@ export default {
                         childMenuList.length,
                         ...courierMenu
                     );
-                    changeSidePanelTitle("Courier");
+                    changeSidePanelTitle("courier");
                     break;
 
                 case "delivery":
