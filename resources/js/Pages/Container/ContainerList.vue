@@ -109,19 +109,19 @@ const fetchContainers = async (page = 1, search = "", sortField = 'created_at', 
         totalRecords.value = response.data.meta.total; // Correct total count
         currentPage.value = response.data.meta.current_page; // Correct current page
     } catch (error) {
-        console.error("Error fetching Pickups:", error);
+        console.error("Error fetching containers:", error);
     } finally {
         loading.value = false;
     }
 };
 
-const debouncedFetchPickups = debounce((searchValue) => {
+const debouncedFetchContainers = debounce((searchValue) => {
     fetchContainers(1, searchValue);
 }, 1000);
 
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
-        debouncedFetchPickups(newValue);
+        debouncedFetchContainers(newValue);
     }
 });
 

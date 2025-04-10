@@ -24,27 +24,25 @@ class UnloadingIssuesRepository implements GridJsInterface, UnloadingIssuesRepos
         });
 
         if (! empty($search)) {
-            $query->where('hbl', 'like', "%$search%");
+            $query->whereHas('hblPackage.hbl', function ($q) use ($search) {
+                $q->where('hbl_number', 'like', "%$search%")
+                    ->orWhere('consignee_name', 'like', "%$search%")
+                    ->orWhere('hbl_name', 'like', "%$search%");
+            });
         }
 
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $records = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => UnloadingIssueResource::collection($records),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $records->total(),
+                'current_page' => $records->currentPage(),
+                'perPage' => $records->perPage(),
+                'lastPage' => $records->lastPage(),
             ],
         ]);
     }

@@ -1,14 +1,13 @@
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from "vue";
-import { Link, router, usePage } from "@inertiajs/vue3";
+import { onMounted, ref, watch } from "vue";
+import { router, usePage } from "@inertiajs/vue3";
 import moment from "moment";
 import { debounce } from "lodash";
+import {useConfirm} from "primevue/useconfirm";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import DatePicker from 'primevue/datepicker';
-import DeleteMHBLConfirmationModal from "@/Pages/MHBL/Partials/DeleteMHBLConfirmationModal.vue";
 import { push } from "notivue";
-import HoldConfirmationModal from "@/Pages/HBL/Partials/HoldConfirmationModal.vue";
 import MHBLDetailModal from "@/Pages/Common/MHBLDetailModal.vue";
 import Select from "primevue/select";
 import Panel from "primevue/panel";
@@ -49,10 +48,9 @@ const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const selectedMHBLID = ref(null);
 const showConfirmViewMHBLModal = ref(false);
-const showConfirmDeleteMHBLModal = ref(false);
-const showConfirmHoldModal = ref(false);
 const cm = ref();
 const dt = ref();
+const confirm = useConfirm();
 const perPage = ref(10);
 const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
@@ -93,7 +91,7 @@ const menuModel = ref([
     {
         label: 'Delete',
         icon: 'pi pi-fw pi-trash',
-        command: () => confirmDeleteMHBL(selectedMHBL.value),
+        command: () => confirmDeleteMHBL(selectedMHBL),
         disabled: !usePage().props.user.permissions.includes("hbls.delete"),
     },
 ]);
@@ -221,46 +219,7 @@ const confirmViewMHBL = (mhbl) => {
 
 const closeModal = () => {
     showConfirmViewMHBLModal.value = false;
-    showConfirmDeleteMHBLModal.value = false;
-    showConfirmHoldModal.value = false;
     selectedMHBL.value = null;
-};
-
-const closeHoldModal = () => {
-    showConfirmHoldModal.value = false;
-};
-
-const toggleHold = (id) => {
-    router.put(
-        route("mhbls.toggle-hold", id),
-        {},
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                push.success(`Operation Successfully!`);
-                fetchMHBLs(currentPage.value);
-            },
-            onError: () => {
-                push.error("Something went wrong!");
-            },
-        }
-    );
-};
-
-const handleDeleteMHBL = (id) => {
-    router.delete(
-        route("mhbls.destroy", id),
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                push.success(`MHBL Record Deleted Successfully!`);
-                fetchMHBLs(currentPage.value);
-            },
-            onError: () => {
-                push.error("Something went wrong!");
-            },
-        }
-    );
 };
 
 const clearFilter = () => {
@@ -277,9 +236,38 @@ const clearFilter = () => {
     fetchMHBLs(currentPage.value);
 };
 
-const confirmDeleteMHBL = (id) => {
-    selectedMHBLID.value = id;
-    showConfirmDeleteMHBLModal.value = true;
+const confirmDeleteMHBL = (mhbl) => {
+    selectedMHBLID.value = mhbl.value.id;
+    confirm.require({
+        message: 'Would you like to delete this MHBL record?',
+        header: 'Delete MHBL?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            router.delete(route("mhbls.destroy", selectedMHBLID.value), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("MHBL Record Deleted Successfully!");
+                    fetchMHBLs(currentPage.value);
+                },
+                onError: () => {
+                    push.error("Something went to wrong!");
+                },
+            });
+            selectedMHBLID.value = null;
+        },
+        reject: () => {
+        }
+    });
 };
 
 const exportCSV = () => {
@@ -461,25 +449,11 @@ const exportCSV = () => {
         </div>
     </AppLayout>
 
-        <DeleteMHBLConfirmationModal
-            :show="showConfirmDeleteMHBLModal"
-            :mhbl-id="selectedMHBLID"
-            @close="closeModal"
-            @delete-mhbl="handleDeleteMHBL"
-        />
-
-        <MHBLDetailModal
-            :mhbl-id="selectedMHBLID"
-            :show="showConfirmViewMHBLModal"
-            @close="closeModal"
-        />
-
-        <HoldConfirmationModal
-            :hbl-id="selectedMHBLID"
-        :show="showConfirmHoldModal"
-        @close="closeHoldModal"
-        @toggle-hold="toggleHold"
-        />
+    <MHBLDetailModal
+        :mhbl-id="selectedMHBLID"
+        :show="showConfirmViewMHBLModal"
+        @close="closeModal"
+    />
 
 </template>
 
