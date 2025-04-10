@@ -75,10 +75,10 @@ const menuModel = ref([
 ]);
 
 const confirmViewEditCurrency = (currency) => {
-    form.currency_name = currency.value.currency_name;
-    form.currency_symbol = currency.value.currency_symbol;
-    form.sl_rate = currency.value.sl_rate;
-    selectedCurrencyId.value = currency.value.id;
+    form.currency_name = currency.data.currency_name;
+    form.currency_symbol = currency.data.currency_symbol;
+    form.sl_rate = currency.data.sl_rate;
+    selectedCurrencyId.value = currency.data.id;
     showEditCurrencyDialog.value = true;
     isDialogVisible.value = true;
 };
@@ -146,7 +146,8 @@ const confirmViewAddNewCurrency = () => {
 };
 
 const closeAddNewCurrencyModal = () => {
-    form.name = "";
+    form.reset();
+    form.clearErrors();
     showAddNewCurrencyDialog.value = false;
     showEditCurrencyDialog.value = false;
     isDialogVisible.value = false;
@@ -157,6 +158,8 @@ const onDialogShow = () => {
 };
 
 const onDialogHide = () => {
+    form.reset();
+    form.clearErrors();
     document.body.classList.remove('p-overflow-hidden');
 };
 
@@ -165,6 +168,7 @@ const handleAddNewCurrency = async () => {
         onSuccess: () => {
             closeAddNewCurrencyModal();
             form.reset();
+            form.clearErrors();
             fetchCurrencies();
             push.success('Create Currency Successfully!');
         },
@@ -199,35 +203,64 @@ const closeUpdateRatesModal = () => {
 }
 
 const handleUpdateRates = async () => {
-    const idList = selectedCurrencies.value.map((item) => item.id);
-    const response = await fetch("/currencies/update-currency-rates", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document
-                .querySelector('meta[name="csrf-token"]')
-                .getAttribute("content"),
-        },
-        body: JSON.stringify({
-            currency_ids: idList,
-            sl_rate: newCurrencyRate.value
-        }),
-    });
-
-    if (!response.ok) {
-        throw new Error("Network response was not ok.");
-    } else {
-        await fetchCurrencies();
-        showChangeCurrencyRateDialog.value = false;
-        selectedCurrencies.value = [];
-        newCurrencyRate.value = "";
-        push.success("Currency Rates Updated successfully!");
-    }
+    showChangeCurrencyRateDialog.value = false;
+    confirmUpdateRates();
 }
+
+const confirmUpdateRates = () => {
+    const idList = selectedCurrencies.value.map((item) => item.id);
+    confirm.require({
+        message: 'Are you sure you to change currency rates?',
+        header: 'Change Currency Rate?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'warn',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Update',
+            severity: 'success'
+        },
+        accept: async () => {
+            const response = await fetch("/currencies/update-currency-rates", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+                body: JSON.stringify({
+                    currency_ids: idList,
+                    sl_rate: newCurrencyRate.value
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok.");
+            } else {
+                await fetchCurrencies();
+                showChangeCurrencyRateDialog.value = false;
+                selectedCurrencies.value = [];
+                newCurrencyRate.value = "";
+                push.success("Currency Rates Updated successfully!");
+                router.visit(route(currentRoute, route().params));
+            }
+        },
+        reject: () => {
+            newCurrencyRate.value = "";
+        },
+        onHide: () => {
+            newCurrencyRate.value = "";
+        }
+    });
+};
 
 
 const confirmDeleteCurrency = (currency) => {
-    selectedCurrencyId.value = currency.value.id;
+    selectedCurrencyId.value = currency.data.id;
     confirm.require({
         message: 'Are you sure you want to delete currency?',
         header: 'Delete Currency?',
@@ -271,7 +304,7 @@ const confirmDeleteCurrency = (currency) => {
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel"  @hide="selectedCurrency = null"/>
+                    <ContextMenu ref="cm" @hide="selectedCurrency = null"/>
                     <DataTable
                         v-model:contextMenuSelection="selectedCurrency"
                         v-model:selection="selectedCurrencies"
@@ -297,23 +330,21 @@ const confirmDeleteCurrency = (currency) => {
                                 <div class="text-lg font-medium">
                                     Currencies
                                 </div>
-                                <div>
-                                    <PrimaryButton
+                                <div class="flex items-center gap-3">
+                                    <Button
                                         v-if="usePage().props.user.permissions.includes('currencies.create')"
-                                        class="w-full"
                                         @click="confirmViewAddNewCurrency()"
                                     >
                                         Create Currency
-                                    </PrimaryButton>
-                                    <PrimaryButton
+                                    </Button>
+                                    <Button
+                                        type="button"
                                         v-if="usePage().props.user.permissions.includes('currencies.edit')"
+                                        label="Change Currency" icon="pi pi-refresh"
                                         :disabled="selectedCurrencies.length === 0"
-                                        class="w-full mt-3"
-                                        @click="showChangeCurrencyRateDialog = true"
-                                    >
-                                        Change currency
-                                    </PrimaryButton>
+                                        @click="showChangeCurrencyRateDialog = true" />
                                 </div>
+
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Search Field -->
@@ -343,11 +374,35 @@ const confirmDeleteCurrency = (currency) => {
 
                         <Column field="sl_rate" header="SL Rate" sortable></Column>
 
+                        <Column field="" header="Actions" style="width: 10%">
+                            <template #body="{ data }">
+                                <Button
+                                    icon="pi pi-pencil"
+                                    outlined
+                                    rounded
+                                    size="small"
+                                    class="p-1 text-xs h-3 w-3 mr-1"
+                                    @click="confirmViewEditCurrency({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('currencies.edit')"
+                                />
+                                <Button
+                                    icon="pi pi-trash"
+                                    outlined
+                                    rounded
+                                    severity="danger"
+                                    size="small"
+                                    @click="confirmDeleteCurrency({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('currencies.delete')"
+                                />
+
+                            </template>
+                        </Column>
+
                         <template #footer> In total there are {{ currencies ? totalRecords : 0 }} Currencies.</template>
                     </DataTable>
                 </template>
             </Card>
-            <!-- Add New Air Line Dialog -->
+            <!-- Add New Currency Dialog -->
             <Dialog
                 v-model:visible="isDialogVisible"
                 modal

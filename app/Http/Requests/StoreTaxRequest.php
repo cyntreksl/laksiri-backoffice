@@ -29,7 +29,7 @@ class StoreTaxRequest extends FormRequest
                 Rule::unique('taxes')
                     ->where(function ($query) {
                         return $query->where('branch_id', session('current_branch_id'));
-                    }),
+                    })->whereNull('deleted_at'),
             ],
             'rate' => ['required', 'numeric'],
             'is_active' => ['required', 'boolean'],

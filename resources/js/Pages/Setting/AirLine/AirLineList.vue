@@ -34,7 +34,7 @@ const baseUrl = ref(props.isDOChargesPage ? "/air-lines/list" : "/air-lines/list
 const loading = ref(true);
 const airLines = ref([]);
 const totalRecords = ref(0);
-const perPage = ref(100);
+const perPage = ref(10);
 const currentPage = ref(1);
 const selectedAirLine = ref(null);
 const selectedAirLineId = ref(null);
@@ -150,6 +150,8 @@ const onDialogShow = () => {
 };
 
 const onDialogHide = () => {
+    form.reset();
+    form.clearErrors();
     document.body.classList.remove('p-overflow-hidden');
 };
 
@@ -158,6 +160,7 @@ const handleAddNewAirLine = async () => {
         onSuccess: () => {
             closeAddNewAirLineModal();
             form.reset();
+            form.clearErrors();
             fetchAirLines();
             push.success('Air Line Successfully!');
         },
@@ -174,6 +177,7 @@ const handleEditAirLine = async () => {
         onSuccess: () => {
             closeAddNewAirLineModal();
             form.reset();
+            form.clearErrors();
             fetchAirLines();
             push.success('Air Line Updated Successfully!');
         },
@@ -186,7 +190,7 @@ const handleEditAirLine = async () => {
 }
 
 const confirmDeleteAirLine = (airLine) => {
-    selectedAirLineId.value = airLine.daya.id;
+    selectedAirLineId.value = airLine.data.id;
     confirm.require({
         message: 'Are you sure you want to delete air line?',
         header: 'Delete Air Line?',
@@ -222,8 +226,8 @@ const confirmDeleteAirLine = (airLine) => {
 };
 </script>
 <template>
-    <AppLayout title="Air Lines">
-        <template #header>Air Lines</template>
+    <AppLayout :title="isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines'">
+        <template #header>{{isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines'}}</template>
 
         <Breadcrumb/>
 
@@ -254,16 +258,16 @@ const confirmDeleteAirLine = (airLine) => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Air Lines
+                                    {{isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines'}}
                                 </div>
                                 <div>
-                                    <PrimaryButton
+                                    <Button
                                         v-if="usePage().props.user.permissions.includes('air-line.create') || usePage().props.user.permissions.includes('air-line.do charges create')"
                                         class="w-full"
                                         @click="confirmViewAddNewAirLine()"
                                     >
-                                        Create Air Line
-                                    </PrimaryButton>
+                                      {{ isDOChargesPage ? 'Create Air Lines DO Charge' : 'Create Air Line' }}
+                                    </Button>
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -286,17 +290,18 @@ const confirmDeleteAirLine = (airLine) => {
 
                         <template #loading> Loading Air Lines data. Please wait.</template>
 
-                        <Column field="name" header="Name" sortable></Column>
+                        <Column field="name" header="Air Line" sortable></Column>
 
                         <Column v-if="isDOChargesPage" field="do_charge" header="DO Charge" sortable></Column>
 
-                        <Column field="" header="Actions">
+                        <Column field="" header="Actions" style="width: 10%">
                             <template #body="{ data }">
                                 <Button
                                     icon="pi pi-pencil"
                                     outlined
                                     rounded
                                     class="mr-2"
+                                    size="small"
                                     @click="confirmViewEditAirLine({ data })"
                                     :disabled="!usePage().props.user.permissions.includes('air-line.edit') && !usePage().props.user.permissions.includes('air-line.do charges edit')"
                                 />
@@ -304,6 +309,7 @@ const confirmDeleteAirLine = (airLine) => {
                                     icon="pi pi-trash"
                                     outlined
                                     rounded
+                                    size="small"
                                     severity="danger"
                                     @click="confirmDeleteAirLine({ data })"
                                     :disabled="!usePage().props.user.permissions.includes('air-line.delete') && !usePage().props.user.permissions.includes('air-line.do charges delete')"
@@ -319,7 +325,7 @@ const confirmDeleteAirLine = (airLine) => {
             <Dialog
                 v-model:visible="isDialogVisible"
                 modal
-                :header="showAddNewAirLineDialog ? 'Add New Air Line' : 'Edit Air Line'"
+                :header="isDOChargesPage ? (showAddNewAirLineDialog ? 'Add New Air Line DO Charge' : 'Edit Air Line DO Charge'): (showAddNewAirLineDialog ? 'Add New Air Line' : 'Edit Air Line')"
                 :style="{ width: '90%', maxWidth: '450px' }"
                 :block-scroll="true"
                 @hide="onDialogHide"
@@ -339,7 +345,7 @@ const confirmDeleteAirLine = (airLine) => {
                 <div v-if="isDOChargesPage" class="mt-4">
                     <InputText
                         v-model="form.do_charge"
-                        class="w-full p-inputtext"
+                        class="w-full p-input text"
                         placeholder="Enter DO Charge(LKR)"
                         required
                         type="number"
@@ -352,7 +358,7 @@ const confirmDeleteAirLine = (airLine) => {
                     <div class="flex flex-wrap justify-end gap-2">
                         <Button label="Cancel" class="p-button-text" @click="closeAddNewAirLineModal"/>
                         <Button
-                            :label="showAddNewAirLineDialog ? 'Add Air Line' : 'Update Air Line'"
+                            :label="isDOChargesPage ? (showAddNewAirLineDialog ? 'Add Air Line DO Charge' : 'Update Air Line DO Charge'): showAddNewAirLineDialog ? 'Add Air Line' : 'Update Air Line'"
                             class="p-button-primary"
                             :icon="showAddNewAirLineDialog ? 'pi pi-plus' : 'pi pi-check'"
                             @click.prevent="showAddNewAirLineDialog ? handleAddNewAirLine() : handleEditAirLine()"

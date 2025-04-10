@@ -29,7 +29,7 @@ class UpdateTaxRequest extends FormRequest
                 Rule::unique('taxes')
                     ->where(function ($query) {
                         return $query->where('branch_id', session('current_branch_id'));
-                    })
+                    })->whereNull('deleted_at')
                     ->ignore($this->route('tax')),
             ],
             'rate' => ['required', 'numeric'],
