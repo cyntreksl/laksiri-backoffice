@@ -53,6 +53,7 @@ const form = useForm({
 const confirmUpdatePickupType = (pickupType) => {
    form.pickup_type_name = pickupType.value.pickup_type_name;
    selectedPickupTypeId.value = pickupType.value.id;
+    showAddNewPickupTypeDialog.value = false;
     showUpdatePickupTypeDialog.value = true;
     isDialogVisible.value = true;
 
@@ -109,7 +110,9 @@ watch (() => filters.value.global.value, (newValue) => {
 const showAddNewPickupTypeDialog =  ref (false);
 
 const confirmViewAddNewPickupType = () => {
+    form.reset();
     showAddNewPickupTypeDialog.value = true;
+    showUpdatePickupTypeDialog.value = false;
     isDialogVisible.value = true;
 };
 
@@ -251,33 +254,32 @@ const confirmPickupTypeDelete = (pickupType) => {
 
                         <Column field="pickup_type_name" header="Name" sortable></Column>
 
-                        <column  header="Action" >
+                        <Column header="Action" class="flex justify-end">
                             <template #body="{ data }">
-                                <Button
-                                    icon="pi pi-pencil"
-                                    outlined
-                                    rounded
-                                    class="mr-2"
-                                    @click="confirmUpdatePickupType({ value: data })"
-                                    :disabled="!usePage().props.user.permissions.includes('pickup-type.edit')"
-                                />
-                                <Button
-                                    icon="pi pi-trash"
-                                    outlined
-                                    rounded
-                                    severity="danger"
-                                    @click="confirmPickupTypeDelete({ value: data })"
-                                    :disabled="!usePage().props.user.permissions.includes('pickup-type.delete')"
-                                />
-
+                                <div class="flex justify-end">
+                                    <Button
+                                        icon="pi pi-pencil"
+                                        outlined
+                                        rounded
+                                        size="small"
+                                        class="mr-2"
+                                        @click="confirmUpdatePickupType({ value: data })"
+                                        :disabled="!usePage().props.user.permissions.includes('pickup-type.edit')"
+                                    />
+                                    <Button
+                                        icon="pi pi-trash"
+                                        outlined
+                                        rounded
+                                        size="small"
+                                        severity="danger"
+                                        @click="confirmPickupTypeDelete({ value: data })"
+                                        :disabled="!usePage().props.user.permissions.includes('pickup-type.delete')"
+                                    />
+                                </div>
                             </template>
-                        </column>
-
-
+                        </Column>
                         <template #footer> In total there are {{ pickupType ? totalRecords : 0 }} Pickup Types.</template>
-
                     </DataTable>
-
                 </template>
             </card>
             <!-- Add New Pickup Type Dialog -->
@@ -293,7 +295,7 @@ const confirmPickupTypeDelete = (pickupType) => {
                 <div class="mt-4">
                     <InputText
                         v-model="form.pickup_type_name"
-                        classs ="w-full p-inputtext"
+                        class="w-full p-inputtext"
                         placeholder="Pickup Type Name"
                         required
                         type="text"
