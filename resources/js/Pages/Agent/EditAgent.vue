@@ -45,9 +45,9 @@ const form = useForm({
 });
 
 const handleBranchUpdate = () => {
-    form.put(route("third-party-agents.update", props.agent.id), {
+    form.put(route("couriers.agents.update", props.agent.id), {
         onSuccess: () => {
-            router.visit(route("third-party-agents.index"));
+            router.visit(route("couriers.agents.index"));
             push.success('Third Party Agent updated successfully!');
         },
         onError: () => {
@@ -61,7 +61,7 @@ const handleBranchUpdate = () => {
 
 <template>
     <AppLayout title="Edit Third Party Agent">
-        <template #header>Third PartyAgents</template>
+        <template #header>Third Party Agents</template>
 
         <Breadcrumb />
         <form @submit.prevent="handleBranchUpdate">
