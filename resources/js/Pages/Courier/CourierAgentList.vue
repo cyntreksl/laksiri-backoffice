@@ -1,39 +1,39 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import Card from "primevue/card";
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
-import FloatLabel from "primevue/floatlabel";
-import Button from "primevue/button";
-import IconField from "primevue/iconfield";
-import Panel from "primevue/panel";
-import DatePicker from "primevue/datepicker";
-import InputIcon from "primevue/inputicon";
-import InputText from "primevue/inputtext";
 import {onMounted, ref, watch} from "vue";
+import {useConfirm} from "primevue/useconfirm";
 import moment from "moment";
 import {FilterMatchMode} from "@primevue/core/api";
+import {Link, router, usePage} from "@inertiajs/vue3";
 import axios from "axios";
 import {debounce} from "lodash";
-import Tag from "primevue/tag";
-import {useConfirm} from "primevue/useconfirm";
-import ContextMenu from 'primevue/contextmenu';
-import {Link, router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
+import InputIcon from "primevue/inputicon";
+import Card from "primevue/card";
+import InputText from "primevue/inputtext";
+import FloatLabel from "primevue/floatlabel";
+import DataTable from "primevue/datatable";
+import Avatar from 'primevue/avatar';
+import DatePicker from "primevue/datepicker";
+import ContextMenu from "primevue/contextmenu";
+import Panel from "primevue/panel";
+import Button from "primevue/button";
+import Column from "primevue/column";
+import IconField from "primevue/iconfield";
 
-defineProps({
-    agents: {
+const props = defineProps({
+    courierAgents: {
         type: Object,
         default: () => {}
     }
 });
 
-const baseUrl = ref("/couriers/third-party-agents/list");
+const baseUrl = ref("/couriers/courier-agents/list");
 const loading = ref(true);
-const thirdPartyAgents = ref([]);
-const selectedThirdPartyAgent = ref(null);
-const selectedThirdPartyAgentID = ref(null);
+const courierAgents = ref([]);
+const selectedCourierAgent = ref(null);
+const selectedCourierAgentID = ref(null);
 const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
@@ -51,18 +51,18 @@ const menuModel = ref([
     {
         label: "Edit",
         icon: "pi pi-fw pi-pencil",
-        command: () => router.visit(route("couriers.agents.edit", selectedThirdPartyAgent.value.id)),
-        disabled: !usePage().props.user.permissions.includes("third-party-agents.edit"),
+        command: () => router.visit(route("couriers.courier-agents.edit", selectedCourierAgent.value.id)),
+        disabled: !usePage().props.user.permissions.includes("courier-agents.edit"),
     },
     {
         label: "Delete",
         icon: "pi pi-fw pi-times",
-        command: () => confirmThirdPartyAgentDelete(selectedThirdPartyAgent),
-        disabled: !usePage().props.user.permissions.includes("third-party-agents.delete"),
+        command: () => confirmCourierAgentDelete(selectedCourierAgent),
+        disabled: !usePage().props.user.permissions.includes("courier-agents.delete"),
     },
 ]);
 
-const fetchThirdPartyAgents = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+const fetchCourierAgents = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
     loading.value = true;
     try {
         const response = await axios.get(baseUrl.value, {
@@ -76,42 +76,42 @@ const fetchThirdPartyAgents = async (page = 1, search = "", sortField = 'created
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
             }
         });
-        thirdPartyAgents.value = response.data.data;
+        courierAgents.value = response.data.data;
         totalRecords.value = response.data.meta.total;
         currentPage.value = response.data.meta.current_page;
     } catch (error) {
-        console.error("Error fetching third party agents:", error);
+        console.error("Error fetching courier agents:", error);
     } finally {
         loading.value = false;
     }
 };
 
-const debouncedFetchThirdPartyAgents = debounce((searchValue) => {
-    fetchThirdPartyAgents(1, searchValue);
+const debouncedFetchCourierAgentAgents = debounce((searchValue) => {
+    fetchCourierAgents(1, searchValue);
 }, 1000);
 
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
-        debouncedFetchThirdPartyAgents(newValue);
+        debouncedFetchCourierAgentAgents(newValue);
     }
 });
 
 watch(() => fromDate.value, (newValue) => {
-    fetchThirdPartyAgents(1, filters.value.global.value);
+    fetchCourierAgents(1, filters.value.global.value);
 });
 
 watch(() => toDate.value, (newValue) => {
-    fetchThirdPartyAgents(1, filters.value.global.value);
+    fetchCourierAgents(1, filters.value.global.value);
 });
 
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchThirdPartyAgents(currentPage.value);
+    fetchCourierAgents(currentPage.value);
 };
 
 const onSort = (event) => {
-    fetchThirdPartyAgents(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+    fetchCourierAgents(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
 
 const onRowContextMenu = (event) => {
@@ -119,7 +119,7 @@ const onRowContextMenu = (event) => {
 };
 
 onMounted(() => {
-    fetchThirdPartyAgents();
+    fetchCourierAgents();
 });
 
 const clearFilter = () => {
@@ -128,29 +128,18 @@ const clearFilter = () => {
     };
     fromDate.value = moment(new Date()).subtract(12, "months").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
-    fetchThirdPartyAgents(currentPage.value);
+    fetchCourierAgents(currentPage.value);
 };
 
 const exportCSV = () => {
     dt.value.exportCSV();
 };
 
-const resolveType = (type) => {
-    switch (type) {
-        case 'Destination':
-            return 'secondary';
-        case 'Departure':
-            return 'warn';
-        default:
-            return null;
-    }
-};
-
-const confirmThirdPartyAgentDelete = (thirdPartyAgent) => {
-    selectedThirdPartyAgentID.value = thirdPartyAgent.value.id;
+const confirmCourierAgentDelete = (courierAgent) => {
+    selectedCourierAgentID.value = courierAgent.value.id;
     confirm.require({
-        message: 'Would you like to delete this third party agent record?',
-        header: 'Delete Third Party Agent?',
+        message: 'Would you like to delete this courier agent record?',
+        header: 'Delete Courier Agent?',
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
         rejectProps: {
@@ -163,17 +152,17 @@ const confirmThirdPartyAgentDelete = (thirdPartyAgent) => {
             severity: 'danger'
         },
         accept: () => {
-            router.delete(route("couriers.agents.destroy", selectedThirdPartyAgentID.value), {
+            router.delete(route("couriers.courier-agents.destroy", selectedCourierAgentID.value), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    push.success("Third Party Agent Deleted Successfully!");
-                    fetchThirdPartyAgents(currentPage.value);
+                    push.success("Courier Agent Deleted Successfully!");
+                    fetchCourierAgents(currentPage.value);
                 },
                 onError: () => {
                     push.error("Something went to wrong!");
                 },
             });
-            selectedThirdPartyAgentID.value = null;
+            selectedCourierAgentID.value = null;
         },
         reject: () => {
         }
@@ -182,8 +171,8 @@ const confirmThirdPartyAgentDelete = (thirdPartyAgent) => {
 </script>
 
 <template>
-    <AppLayout title="Third Party Agents">
-        <template #header>Third Party Agents</template>
+    <AppLayout title="Courier Agents">
+        <template #header>Courier Agents</template>
 
         <Breadcrumb/>
 
@@ -204,16 +193,16 @@ const confirmThirdPartyAgentDelete = (thirdPartyAgent) => {
 
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedThirdPartyAgent = null" />
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedCourierAgent = null" />
                     <DataTable
                         ref="dt"
-                        v-model:contextMenuSelection="selectedThirdPartyAgent"
+                        v-model:contextMenuSelection="selectedCourierAgent"
                         v-model:filters="filters"
                         :loading="loading"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                         :totalRecords="totalRecords"
-                        :value="thirdPartyAgents"
+                        :value="courierAgents"
                         context-menu
                         data-key="id"
                         filter-display="menu"
@@ -229,11 +218,11 @@ const confirmThirdPartyAgentDelete = (thirdPartyAgent) => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Third Party Agents
+                                    Courier Agents
                                 </div>
 
-                                <Link v-if="$page.props.user.permissions.includes('third-party-agents.create')" :href="route('couriers.agents.create')">
-                                    <Button label="Create Third Party Agent" size="small" />
+                                <Link v-if="$page.props.user.permissions.includes('third-party-agents.create')" :href="route('couriers.courier-agents.create')">
+                                    <Button label="Create Courier Agent" size="small" />
                                 </Link>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -273,69 +262,38 @@ const confirmThirdPartyAgentDelete = (thirdPartyAgent) => {
                             </div>
                         </template>
 
-                        <template #empty>No third party agents found.</template>
+                        <template #empty>No courier agents found.</template>
 
-                        <template #loading>Loading third party agents data. Please wait.</template>
+                        <template #loading>Loading courier agents data. Please wait.</template>
 
-                        <Column field="name" header="Name" sortable></Column>
-
-                        <Column field="type" header="Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveType(slotProps.data.type)" :value="slotProps.data.type"></Tag>
-                            </template>
-                        </Column>
-
-                        <Column field="branch_code" header="Branch Code"></Column>
-
-                        <Column field="currency" header="Currency">
-                            <template #body="slotProps">
-                                <div>{{ slotProps.data.currency_name }}</div>
-                                <div class="text-gray-500 text-sm">{{slotProps.data.country_code}}</div>
-                            </template>
-                        </Column>
-
-                        <Column field="cargo_modes" header="Cargo Modes">
-                            <template #body="slotProps">
-                                <div v-if="slotProps.data.cargo_modes">
-                                    <Tag
-                                        v-for="(mode, index) in JSON.parse(slotProps.data.cargo_modes)"
-                                        :key="index"
-                                        :value="mode"
-                                        class="mr-1 mb-1"
-                                    />
+                        <Column field="logo" header="Logo">
+                            <template #body="{ data }">
+                                <div class="flex">
+                                    <img v-if="data.logo" :alt="data.logo" :src="data.logo_url" style="width: 32px" />
+                                    <Avatar v-else icon="ti ti-truck-delivery" shape="circle" />
                                 </div>
                             </template>
                         </Column>
 
-                        <Column field="delivery_types" header="Delivery Types">
+                        <Column field="company_name" header="Company Name" sortable></Column>
+
+                        <Column field="website" header="Website">
                             <template #body="slotProps">
-                                <div v-if="slotProps.data.delivery_types">
-                                    <Tag
-                                        v-for="(type, index) in JSON.parse(slotProps.data.delivery_types)"
-                                        :key="index"
-                                        :value="type"
-                                        class="mr-1 mb-1"
-                                        severity="info"
-                                    />
-                                </div>
+                                <a :href="slotProps.data.website" class="hover:cursor-pointer hover:text-blue-500 hover:underline">{{ slotProps.data.website }}</a>
                             </template>
                         </Column>
 
-                        <Column field="package_types" header="Package Types">
+                        <Column field="contact" header="Contact">
                             <template #body="slotProps">
-                                <div v-if="slotProps.data.package_types">
-                                    <Tag
-                                        v-for="(type, index) in JSON.parse(slotProps.data.package_types)"
-                                        :key="index"
-                                        :value="type"
-                                        class="mr-1 mb-1"
-                                        severity="warn"
-                                    />
-                                </div>
+                                <div>{{ slotProps.data.email }}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.contact_number_1}}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.contact_number_2}}</div>
                             </template>
                         </Column>
 
-                        <template #footer> In total there are {{ thirdPartyAgents ? totalRecords : 0 }} third party agents. </template>
+                        <Column field="address" header="Address"></Column>
+
+                        <template #footer> In total there are {{ courierAgents ? totalRecords : 0 }} courier agents. </template>
                     </DataTable>
                 </template>
             </Card>

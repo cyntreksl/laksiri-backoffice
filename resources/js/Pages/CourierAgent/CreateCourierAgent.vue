@@ -46,10 +46,10 @@ const handleBranchCreate = () => {
         form.contact_number_2 = additionalNumberCountryCode.value + additionalNumber.value;
     }
 
-    form.post(route("courier-agents.store"), {
+    form.post(route("couriers.courier-agents.store"), {
         onSuccess: () => {
             form.reset();
-            router.visit(route("courier-agents.index"));
+            router.visit(route("couriers.courier-agents.index"));
             push.success('Courier Agent added successfully!');
         },
         onError: () => {

@@ -16,7 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 #[ScopedBy(BranchScope::class)]
 class CourierAgent extends Model
 {
-    use HasFactory, HasFile, LogsActivity,SoftDeletes;
+    use HasFactory, HasFile, LogsActivity, SoftDeletes;
 
     protected $table = 'courier_agents';
 
