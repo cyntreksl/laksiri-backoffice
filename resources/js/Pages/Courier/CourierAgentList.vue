@@ -277,7 +277,11 @@ const confirmCourierAgentDelete = (courierAgent) => {
 
                         <Column field="company_name" header="Company Name" sortable></Column>
 
-                        <Column field="website" header="Website"></Column>
+                        <Column field="website" header="Website">
+                            <template #body="slotProps">
+                                <a :href="slotProps.data.website" class="hover:cursor-pointer hover:text-blue-500 hover:underline">{{ slotProps.data.website }}</a>
+                            </template>
+                        </Column>
 
                         <Column field="contact" header="Contact">
                             <template #body="slotProps">
