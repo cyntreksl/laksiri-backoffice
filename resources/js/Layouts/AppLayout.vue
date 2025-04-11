@@ -1622,7 +1622,7 @@ export default {
                             0,
                             {
                                 title: "Courier Agents ",
-                                route: "courier-agents.index",
+                                route: "couriers.courier-agents.index",
                             }
                         );
                     }

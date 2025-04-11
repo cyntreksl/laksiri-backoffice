@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CourierAgentController;
 use App\Http\Controllers\CourierController;
 use App\Http\Controllers\ThirdPartyAgentController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,15 @@ Route::prefix('couriers')->name('couriers.')->group(function () {
             ->except('show');
 
         Route::get('list', [ThirdPartyAgentController::class, 'list'])
+            ->name('list');
+    });
+
+    Route::prefix('courier-agents')->name('courier-agents.')->group(function () {
+        Route::resource('/', CourierAgentController::class)
+            ->parameters(['' => 'courier_agent'])
+            ->except('show');
+
+        Route::get('list', [CourierAgentController::class, 'list'])
             ->name('list');
     });
 });

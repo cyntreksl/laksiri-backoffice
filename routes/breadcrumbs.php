@@ -461,25 +461,25 @@ Breadcrumbs::for('couriers.edit', function (BreadcrumbTrail $trail, $courier) {
     $trail->push('Edit Courier', route('couriers.edit', $courier->id));
 });
 
-// CourierAgents
-Breadcrumbs::for('courier-agents.index', function (BreadcrumbTrail $trail) {
+// Courier Agents
+Breadcrumbs::for('couriers.courier-agents.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Couriers');
-    $trail->push('Courier Agents', route('courier-agents.index'));
+    $trail->push('Courier Agents', route('couriers.courier-agents.index'));
 });
 
-Breadcrumbs::for('courier-agents.create', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('couriers.courier-agents.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Courier');
-    $trail->push('Courier Agents', route('courier-agents.index'));
-    $trail->push('Create', route('courier-agents.create'));
+    $trail->push('Courier Agents', route('couriers.courier-agents.index'));
+    $trail->push('Create', route('couriers.courier-agents.create'));
 });
 
-Breadcrumbs::for('courier-agents.edit', function (BreadcrumbTrail $trail, $id) {
+Breadcrumbs::for('couriers.courier-agents.edit', function (BreadcrumbTrail $trail, $id) {
     $trail->parent('dashboard');
     $trail->push('Courier');
-    $trail->push('Courier Agents', route('courier-agents.index'));
-    $trail->push('Edit', route('courier-agents.edit', $id));
+    $trail->push('Courier Agents', route('couriers.courier-agents.index'));
+    $trail->push('Edit', route('couriers.courier-agents.edit', $id));
 });
 
 // Settings -> Exception Name

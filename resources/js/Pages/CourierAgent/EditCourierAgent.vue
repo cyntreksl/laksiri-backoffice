@@ -71,9 +71,9 @@ const handleAgentUpdate = () => {
         form.contact_number_2 = additionalNumberCountryCode.value + additionalNumber.value;
     }
 
-    form.post(route("courier-agents.update", props.courierAgent.id), {
+    form.post(route("couriers.courier-agents.update", props.courierAgent.id), {
         onSuccess: () => {
-            router.visit(route("courier-agents.index"));
+            router.visit(route("couriers.courier-agents.index"));
             push.success('Courier Agent updated successfully!');
         },
         onError: () => {
