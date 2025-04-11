@@ -57,7 +57,7 @@ class CourierAgentRepository implements CourierAgentRepositoryInterface, GridJsI
             return $courierAgent;
 
         } catch (\Exception $e) {
-            throw new \Exception('Failed to create Courier Agent: '. $e->getMessage());
+            throw new \Exception('Failed to create Courier Agent: '.$e->getMessage());
         }
     }
 

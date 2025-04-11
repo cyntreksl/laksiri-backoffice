@@ -46,8 +46,8 @@ class CourierAgentController extends Controller
     public function create()
     {
         return Inertia::render('CourierAgent/CreateCourierAgent', [
-                'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
-            ]);
+            'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
+        ]);
     }
 
     /**
