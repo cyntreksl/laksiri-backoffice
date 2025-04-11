@@ -1,37 +1,29 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {computed, onMounted, ref, watch} from "vue";
+import { onMounted, ref, watch} from "vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
-import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import Card from "primevue/card";
-import FloatLabel from "primevue/floatlabel";
 import DataTable from "primevue/datatable";
-import DatePicker from "primevue/datepicker";
-import ContextMenu from "primevue/contextmenu";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
 import Column from "primevue/column";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
 import {useConfirm} from "primevue/useconfirm";
-import moment from "moment";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
 import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
-import InputNumber from "primevue/inputnumber";
 
-const cm = ref();
 const confirm = useConfirm();
 const baseUrl = ref("currencies/list");
 const loading = ref(true);
 const currencies = ref([]);
 const totalRecords = ref(0);
-const perPage = ref(100);
+const perPage = ref(10);
 const currentPage = ref(1);
 const selectedCurrency = ref(null);
 const selectedCurrencyId = ref(null);
@@ -59,21 +51,6 @@ const form = useForm({
     sl_rate: "",
 })
 
-const menuModel = ref([
-    {
-        label: "Edit",
-        icon: "pi pi-fw pi-pencil",
-        command: () => confirmViewEditCurrency(selectedCurrency),
-        disabled: !usePage().props.user.permissions.includes("currencies.edit"),
-    },
-    {
-        label: "Delete",
-        icon: "pi pi-fw pi-times",
-        command: () => confirmDeleteCurrency(selectedCurrency),
-        disabled: !usePage().props.user.permissions.includes("currencies.delete"),
-    },
-]);
-
 const confirmViewEditCurrency = (currency) => {
     form.currency_name = currency.data.currency_name;
     form.currency_symbol = currency.data.currency_symbol;
@@ -81,11 +58,6 @@ const confirmViewEditCurrency = (currency) => {
     selectedCurrencyId.value = currency.data.id;
     showEditCurrencyDialog.value = true;
     isDialogVisible.value = true;
-};
-
-const confirmCurrencyDelete = (currency) => {
-    selectedCurrencyId.value = currency.value.id;
-    showDeleteCurrencyDialog.value = true;
 };
 
 const fetchCurrencies = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
@@ -114,10 +86,6 @@ const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchCurrencies(currentPage.value);
-};
-
-const onRowContextMenu = (event) => {
-    cm.value.show(event.originalEvent);
 };
 
 const onSort = (event) => {
@@ -304,7 +272,6 @@ const confirmDeleteCurrency = (currency) => {
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" @hide="selectedCurrency = null"/>
                     <DataTable
                         v-model:contextMenuSelection="selectedCurrency"
                         v-model:selection="selectedCurrencies"
@@ -322,7 +289,6 @@ const confirmDeleteCurrency = (currency) => {
                         row-hover
                         tableStyle="min-width: 50rem"
                         @page="onPageChange"
-                        @rowContextmenu="onRowContextMenu"
                         @sort="onSort">
 
                         <template #header>

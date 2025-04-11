@@ -2,14 +2,12 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {onMounted, ref, watch} from "vue";
-import {Link, router, useForm, usePage} from "@inertiajs/vue3";
+import { router, useForm, usePage} from "@inertiajs/vue3";
 import Card from "primevue/card";
 import DataTable from "primevue/datatable";
-import ContextMenu from "primevue/contextmenu";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
 import Column from "primevue/column";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
 import {useConfirm} from "primevue/useconfirm";
@@ -22,7 +20,6 @@ import InputError from "@/Components/InputError.vue";
 import ToggleSwitch from 'primevue/toggleswitch';
 import InputLabel from "@/Components/InputLabel.vue";
 
-const cm = ref();
 const confirm = useConfirm();
 const baseUrl = ref("taxes/list");
 const loading = ref(true);
@@ -34,7 +31,6 @@ const selectedTax = ref(null);
 const selectedTaxId = ref(null);
 const isDialogVisible = ref(false);
 const showEditTaxDialog = ref(false);
-const showDeleteTaxDialog = ref(false);
 const checked = ref(false);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -50,20 +46,7 @@ const form = useForm({
     rate: 0,
     is_active: false,
 })
-const menuModel = ref([
-    {
-        label: "Edit",
-        icon: "pi pi-fw pi-pencil",
-        command: () => confirmViewEditTax(selectedTax),
-        disabled: !usePage().props.user.permissions.includes("tax.destination tax edit"),
-    },
-    {
-        label: "Delete",
-        icon: "pi pi-fw pi-times",
-        command: () => confirmDeleteTax(selectedTax),
-        disabled: !usePage().props.user.permissions.includes("tax.destination tax delete"),
-    },
-]);
+
 const confirmViewEditTax = (tax) => {
     form.name = tax.data.name;
     form.rate = tax.data.rate;
@@ -98,9 +81,6 @@ const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchTaxes(currentPage.value);
-};
-const onRowContextMenu = (event) => {
-    cm.value.show(event.originalEvent);
 };
 const onSort = (event) => {
     fetchTaxes(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
@@ -211,7 +191,6 @@ const confirmDeleteTax = (tax) => {
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" @hide="selectedTax = null"/>
                     <DataTable
                         v-model:contextMenuSelection="selectedTax"
                         v-model:selection="selectedTax"
@@ -229,12 +208,11 @@ const confirmDeleteTax = (tax) => {
                         row-hover
                         tableStyle="min-width: 50rem"
                         @page="onPageChange"
-                        @rowContextmenu="onRowContextMenu"
                         @sort="onSort">
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Tax Rates
+                                    Taxes
                                 </div>
                                 <div>
                                     <Button
@@ -263,7 +241,7 @@ const confirmDeleteTax = (tax) => {
                         </template>
                         <template #empty> No Tax found. </template>
                         <template #loading> Loading Tax data. Please wait.</template>
-                        <Column field="name" header="Name" sortable></Column>
+                        <Column field="name" header="Tax" sortable></Column>
                         <Column field="rate" header="Rate" sortable></Column>
                         <Column field="is_active" header="Active" >
                             <template #body="{ data }">
@@ -293,7 +271,7 @@ const confirmDeleteTax = (tax) => {
 
                             </template>
                         </Column>
-                        <template #footer> In total there are {{ taxes ? totalRecords : 0 }} Air Lines.</template>
+                        <template #footer> In total there are {{ taxes ? totalRecords : 0 }} Taxes.</template>
                     </DataTable>
                 </template>
             </Card>

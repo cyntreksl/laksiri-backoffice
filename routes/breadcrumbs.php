@@ -181,7 +181,7 @@ Breadcrumbs::for('setting.driver-areas.index', function (BreadcrumbTrail $trail)
 Breadcrumbs::for('setting.taxes.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');
-    $trail->push('Tax', route('setting.taxes.index'));
+    $trail->push('Taxes', route('setting.taxes.index'));
 });
 
 // Air Line DO Charge
