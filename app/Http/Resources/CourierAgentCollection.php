@@ -17,9 +17,9 @@ class CourierAgentCollection extends JsonResource
             'email' => $this->email,
             'address' => $this->address,
             'logo' => $this->logo,
+            'logo_url' => $this->logo_url,
             'invoice_header' => $this->invoice_header,
             'invoice_footer' => $this->invoice_footer,
-
         ];
     }
 }

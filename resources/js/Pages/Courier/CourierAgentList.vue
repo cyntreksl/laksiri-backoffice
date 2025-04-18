@@ -22,13 +22,6 @@ import Button from "primevue/button";
 import Column from "primevue/column";
 import IconField from "primevue/iconfield";
 
-const props = defineProps({
-    courierAgents: {
-        type: Object,
-        default: () => {}
-    }
-});
-
 const baseUrl = ref("/couriers/courier-agents/list");
 const loading = ref(true);
 const courierAgents = ref([]);
