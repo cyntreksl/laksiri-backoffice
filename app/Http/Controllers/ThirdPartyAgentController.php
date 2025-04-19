@@ -47,7 +47,7 @@ class ThirdPartyAgentController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Agent/CreateAgent', [
+        return Inertia::render('Courier/CreateThirdPartyAgent', [
             'cargoModes' => CargoType::cases(),
             'deliveryTypes' => HBLType::cases(),
             'packageTypes' => PackageType::cases(),
