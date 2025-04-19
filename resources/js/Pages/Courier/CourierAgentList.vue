@@ -79,13 +79,13 @@ const fetchCourierAgents = async (page = 1, search = "", sortField = 'created_at
     }
 };
 
-const debouncedFetchCourierAgentAgents = debounce((searchValue) => {
+const debouncedFetchCourierAgents = debounce((searchValue) => {
     fetchCourierAgents(1, searchValue);
 }, 1000);
 
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
-        debouncedFetchCourierAgentAgents(newValue);
+        debouncedFetchCourierAgents(newValue);
     }
 });
 
