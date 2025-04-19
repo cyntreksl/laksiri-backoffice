@@ -44,7 +44,7 @@ class CourierController extends Controller
         $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'hblType', 'status']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'deliveryType', 'status']);
 
         return $this->CourierRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }

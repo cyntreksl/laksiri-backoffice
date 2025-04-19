@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Actions\Courier\CreateCourier;
 use App\Actions\Courier\CreateCourierPackages;
 use App\Actions\Courier\DeleteCourier;
-use App\Actions\Courier\GetCourierByCourierNumber;
+use App\Actions\Courier\GetCourier;
 use App\Actions\Courier\UpdateCourier;
 use App\Actions\Courier\UpdateCourierStatus;
 use App\Actions\CourierPackage\UpdateCourierPackages;
@@ -58,10 +58,10 @@ class CourierRepository implements CourierRepositoryInterface, GridJsInterface
         DeleteCourier::run($courier);
     }
 
-    public function changeStatus(array $courierData, string $status)
+    public function changeStatus(array $courierData, string $status): void
     {
-        foreach ($courierData as $selectedCourier) {
-            $courier = GetCourierByCourierNumber::run($selectedCourier[2]);
+        foreach ($courierData as $var) {
+            $courier = GetCourier::run($var);
             UpdateCourierStatus::run($courier, $status);
         }
     }

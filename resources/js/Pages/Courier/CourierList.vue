@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, ref, watch} from "vue";
-import {Link, router, usePage} from "@inertiajs/vue3";
+import {Link, router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {useConfirm} from "primevue/useconfirm";
 import moment from "moment";
@@ -27,6 +27,7 @@ const baseUrl = ref("/couriers/list");
 const loading = ref(true);
 const couriers = ref([]);
 const selectedCourier = ref(null);
+const selectedCouriers = ref([]);
 const selectedCourierID = ref(null);
 const totalRecords = ref(0);
 const perPage = ref(10);
@@ -74,6 +75,9 @@ const fetchCouriers = async (page = 1, search = "", sortField = 'created_at', so
                 sort_order: sortOrder === 1 ? "asc" : "desc",
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
+                cargoMode: filters.value.cargo_type.value || "",
+                deliveryType: filters.value.hbl_type.value || "",
+                status: filters.value.status.value || "",
             }
         });
         couriers.value = response.data.data;
@@ -101,6 +105,18 @@ watch(() => fromDate.value, (newValue) => {
 });
 
 watch(() => toDate.value, (newValue) => {
+    fetchCouriers(1, filters.value.global.value);
+});
+
+watch(() => filters.value.status.value, (newValue) => {
+    fetchCouriers(1, filters.value.global.value);
+});
+
+watch(() => filters.value.hbl_type.value, (newValue) => {
+    fetchCouriers(1, filters.value.global.value);
+});
+
+watch(() => filters.value.cargo_type.value, (newValue) => {
     fetchCouriers(1, filters.value.global.value);
 });
 
@@ -214,6 +230,26 @@ const resolveStatus = (status) => {
             return null;
     }
 };
+
+const form = useForm({
+    couriers: [],
+    status: '',
+});
+
+const handleChangeStatus = () => {
+    form.couriers = selectedCouriers.value.map((item) => item.id);
+    form.post(route("couriers.change-status"), {
+        onSuccess: () => {
+            push.success('Courier status changed');
+            fetchCouriers(currentPage.value);
+        },
+        onError: () => {
+            push.error('Something went to wrong!');
+        },
+        preserveScroll: true,
+        preserveState: true,
+    });
+}
 </script>
 
 <template>
@@ -244,6 +280,7 @@ const resolveStatus = (status) => {
                         ref="dt"
                         v-model:contextMenuSelection="selectedCourier"
                         v-model:filters="filters"
+                        v-model:selection="selectedCouriers"
                         :loading="loading"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
@@ -267,9 +304,13 @@ const resolveStatus = (status) => {
                                     Couriers
                                 </div>
 
-                                <Link v-if="$page.props.user.permissions.includes('courier.create')" :href="route('couriers.create')">
-                                    <Button label="Create Courier" size="small" />
-                                </Link>
+                                <div class="flex space-x-2 items-center">
+                                    <Link v-if="$page.props.user.permissions.includes('courier.create')" :href="route('couriers.create')">
+                                        <Button label="Create Courier" size="small" />
+                                    </Link>
+
+                                    <Select v-model="form.status" :disabled="selectedCouriers.length === 0" :options="status" class="w-full md:w-56" placeholder="Select a Status" @change="handleChangeStatus"/>
+                                </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Button Group -->
@@ -311,6 +352,8 @@ const resolveStatus = (status) => {
                         <template #empty>No couriers found.</template>
 
                         <template #loading>Loading couriers data. Please wait.</template>
+
+                        <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
 
                         <Column field="courier_number" header="Courier Number" sortable></Column>
 
