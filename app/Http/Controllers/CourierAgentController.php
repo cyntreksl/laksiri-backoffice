@@ -63,12 +63,11 @@ class CourierAgentController extends Controller
     {
         $courierAgent = CourierAgent::findOrFail($id);
 
-        return Inertia::render('CourierAgent/EditCourierAgent',
+        return Inertia::render('Courier/EditCourierAgent',
             [
                 'courierAgent' => $courierAgent,
                 'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
             ]
-
         );
     }
 
