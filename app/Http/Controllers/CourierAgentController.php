@@ -22,9 +22,7 @@ class CourierAgentController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Courier/CourierAgentList', [
-            'courierAgents' => $this->courierAgentRepository->getAllCourierAgents(),
-        ]);
+        return Inertia::render('Courier/CourierAgentList');
     }
 
     public function list(Request $request)

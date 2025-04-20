@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Actions\Courier\CreateCourier;
 use App\Actions\Courier\CreateCourierPackages;
 use App\Actions\Courier\DeleteCourier;
-use App\Actions\Courier\GetCourierByCourierNumber;
+use App\Actions\Courier\GetCourier;
 use App\Actions\Courier\UpdateCourier;
 use App\Actions\Courier\UpdateCourierStatus;
 use App\Actions\CourierPackage\UpdateCourierPackages;
@@ -39,21 +39,15 @@ class CourierRepository implements CourierRepositoryInterface, GridJsInterface
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $users = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
-            'data' => CourierCollection::collection($users),
+            'data' => CourierCollection::collection($records),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $records->total(),
+                'current_page' => $records->currentPage(),
+                'perPage' => $records->perPage(),
+                'lastPage' => $records->lastPage(),
             ],
         ]);
 
@@ -64,10 +58,10 @@ class CourierRepository implements CourierRepositoryInterface, GridJsInterface
         DeleteCourier::run($courier);
     }
 
-    public function changeStatus(array $courierData, string $status)
+    public function changeStatus(array $courierData, string $status): void
     {
-        foreach ($courierData as $selectedCourier) {
-            $courier = GetCourierByCourierNumber::run($selectedCourier[2]);
+        foreach ($courierData as $var) {
+            $courier = GetCourier::run($var);
             UpdateCourierStatus::run($courier, $status);
         }
     }

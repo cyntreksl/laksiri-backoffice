@@ -22,13 +22,6 @@ import Button from "primevue/button";
 import Column from "primevue/column";
 import IconField from "primevue/iconfield";
 
-const props = defineProps({
-    courierAgents: {
-        type: Object,
-        default: () => {}
-    }
-});
-
 const baseUrl = ref("/couriers/courier-agents/list");
 const loading = ref(true);
 const courierAgents = ref([]);
@@ -86,13 +79,13 @@ const fetchCourierAgents = async (page = 1, search = "", sortField = 'created_at
     }
 };
 
-const debouncedFetchCourierAgentAgents = debounce((searchValue) => {
+const debouncedFetchCourierAgents = debounce((searchValue) => {
     fetchCourierAgents(1, searchValue);
 }, 1000);
 
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
-        debouncedFetchCourierAgentAgents(newValue);
+        debouncedFetchCourierAgents(newValue);
     }
 });
 

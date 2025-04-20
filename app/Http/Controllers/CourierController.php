@@ -38,13 +38,13 @@ class CourierController extends Controller
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'hblType', 'status']);
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'deliveryType', 'status']);
 
         return $this->CourierRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }

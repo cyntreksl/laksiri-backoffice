@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\Scopes\BranchScope;
 use App\Traits\HasFile;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Casts\Attribute as LaravelAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -35,16 +35,13 @@ class CourierAgent extends Model
 
     protected $appends = ['logo_url'];
 
-    public function logoUrl(): Attribute
+    public function LogoUrl(): LaravelAttribute
     {
-        return Attribute::get(function (): string {
-            return $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : '';
-        });
-    }
-
-    public function getLogoUrlAttribute(): string
-    {
-        return $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : '';
+        return LaravelAttribute::make(
+            get: function () {
+                return $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : '';
+            },
+        );
     }
 
     public function getActivitylogOptions(): LogOptions
