@@ -1,15 +1,23 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {onMounted, reactive, ref} from "vue";
-import {Grid, h, html} from "gridjs";
-import Popper from "vue3-popper";
+import {onMounted, ref, watch} from "vue";
 import CreateUserForm from "@/Pages/User/Partials/CreateUserForm.vue";
 import {router, usePage} from "@inertiajs/vue3";
-import notification from "@/magics/notification.js";
-import DeleteUserConfirmationModal from "@/Pages/User/Partials/DeleteUserConfirmationModal.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {push} from "notivue";
-import NoRecordsFound from "@/Components/NoRecordsFound.vue";
+import Card from "primevue/card";
+import InputText from "primevue/inputtext";
+import ContextMenu from "primevue/contextmenu";
+import Button from "primevue/button";
+import IconField from "primevue/iconfield";
+import Column from "primevue/column";
+import InputIcon from "primevue/inputicon";
+import Tag from "primevue/tag";
+import DataTable from "primevue/datatable";
+import {useConfirm} from "primevue/useconfirm";
+import {FilterMatchMode} from "@primevue/core/api";
+import axios from "axios";
+import {debounce} from "lodash";
 
 const props = defineProps({
     roles: {
@@ -35,358 +43,325 @@ const props = defineProps({
         required: false
     },
 });
-const wrapperRef = ref(null);
-let grid = null;
 
-const data = reactive({
-    UserData: {},
-    columnVisibility: {
-        id: false,
-        username: true,
-        role: true,
-        primary_branch_name: true,
-        created_at: true,
-        status: true,
-        last_login_at: true,
-        last_logout_at: false,
-        secondary_branch_names: false,
-        actions: true,
-    },
+const baseUrl = ref("/user-list");
+const loading = ref(true);
+const users = ref([]);
+const selectedUser = ref(null);
+const selectedUserID = ref(null);
+const totalRecords = ref(0);
+const perPage = ref(10);
+const currentPage = ref(1);
+const dt = ref();
+const cm = ref();
+const confirm = useConfirm();
+const showUserCreateDialog = ref(false);
+
+const filters = ref({
+    global: {value: null, matchMode: FilterMatchMode.CONTAINS},
 });
 
-const initializeGrid = () => {
-    grid = new Grid({
-        columns: createColumns(),
-        search: {
-            debounceTimeout: 1000,
-            server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`,
-            },
-        },
-        sort: {
-            multiColumn: false,
-            server: {
-                url: (prev, columns) => {
-                    if (!columns.length) return prev;
+const menuModel = ref([
+    {
+        label: "Edit",
+        icon: "pi pi-fw pi-pencil",
+        command: () => router.visit(route("users.edit", selectedUser.value.id)),
+        disabled: !usePage().props.user.permissions.includes('users.edit'),
+    },
+    {
+        label: "Delete",
+        icon: "pi pi-fw pi-times",
+        command: () => confirmUserDelete(selectedUser),
+        disabled: !usePage().props.user.permissions.includes('users.delete'),
+    },
+]);
 
-                    const col = columns[0];
-                    const dir = col.direction === 1 ? "asc" : "desc";
-                    let colName = [
-                        "id",
-                        "username",
-                        "role",
-                        "primary_branch_name",
-                        "created_at",
-                        "status",
-                        "last_login_at",
-                        "last_logout_at",
-                        "secondary_branch_names",
-                    ][col.index];
-
-                    return `${prev}&order=${colName}&dir=${dir}`;
-                },
-            },
-        },
-        pagination: {
-            limit: 10,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
-        },
-        server: {
-            url: "/user-list?",
-            then: (data) =>
-                data.data.map((item) => [
-                    item.id,
-                    item.username,
-                    item.role,
-                    item.primary_branch_name,
-                    item.created_at,
-                    item.status,
-                    item.last_login_at,
-                    item.last_logout_at,
-                    item.secondary_branch_names,
-                ]),
-            total: (data) => {
-                return data.meta.total
-            },
-        },
-    });
-
-    grid.render(wrapperRef.value);
+const fetchUsers = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+    loading.value = true;
+    try {
+        const response = await axios.get(baseUrl.value, {
+            params: {
+                page,
+                per_page: perPage.value,
+                search,
+                sort_field: sortField,
+                sort_order: sortOrder === 1 ? "asc" : "desc",
+            }
+        });
+        users.value = response.data.data;
+        totalRecords.value = response.data.meta.total;
+        currentPage.value = response.data.meta.current_page;
+    } catch (error) {
+        console.error("Error fetching users:", error);
+    } finally {
+        loading.value = false;
+    }
 };
 
-const createColumns = () => [
-    {name: "ID", hidden: !data.columnVisibility.id},
-    {name: "Username", hidden: !data.columnVisibility.username},
-    {name: "Role", hidden: !data.columnVisibility.role},
-    {
-        name: "Primary Branch Name",
-        hidden: !data.columnVisibility.primary_branch_name,
-        sort: false,
-    },
-    {name: "Created At", hidden: !data.columnVisibility.created_at},
-    {
-        name: "Status",
-        hidden: !data.columnVisibility.status,
-        formatter: (cell) =>
-            html(`<div class="${resolveStatus(cell)}">${cell}</div>`),
-    },
-    {name: "Last Login", hidden: !data.columnVisibility.last_login_at},
-    {name: "Last Logout", hidden: !data.columnVisibility.last_logout_at},
-    {
-        name: "Secondary Branches",
-        hidden: !data.columnVisibility.secondary_branch_names,
-        sort: false,
-    },
-    {
-        name: "Actions",
-        sort: false,
-        hidden: !data.columnVisibility.actions,
-        formatter: (_, row) => {
-            return h("div", {}, [
-                usePage().props.user.permissions.includes('users.edit') ?
-                    h(
-                        "a",
-                        {
-                            className:
-                                "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
-                            href: route("users.edit", row.cells[0].data),
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 512 512",
-                                    class: "size-4.5",
-                                    fill: "none",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M471 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152V424c0 48.6 39.4 88 88 88H360c48.6 0 88-39.4 88-88V312c0-13.3-10.7-24-24-24s-24 10.7-24 24V424c0 22.1-17.9 40-40 40H88c-22.1 0-40-17.9-40-40V152c0-22.1 17.9-40 40-40H200c13.3 0 24-10.7 24-24s-10.7-24-24-24H88z",
-                                        fill: "currentColor",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
-                usePage().props.user.permissions.includes('users.delete') ?
-                    h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                            onClick: () => confirmDeleteUser(row.cells[0].data),
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 448 512",
-                                    class: "size-4.5",
-                                    fill: "none",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z",
-                                        fill: "currentColor",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
-            ]);
-        },
-    },
-];
+const debouncedFetchUsers = debounce((searchValue) => {
+    fetchUsers(1, searchValue);
+}, 1000);
 
-const resolveStatus = (status) =>
-    ({
-        ACTIVE: "badge bg-success/10 text-success dark:bg-success/15",
-        DEACTIVATE: "badge bg-error/10 text-error dark:bg-error/15",
-        INACTIVE: "badge bg-warning/10 text-warning dark:bg-warning/15",
-        INVITED: "badge bg-info/10 text-info dark:bg-info/15",
-    }[status]);
+watch(() => filters.value.global.value, (newValue) => {
+    if (newValue !== null) {
+        debouncedFetchUsers(newValue);
+    }
+});
 
-const updateGridConfig = () => {
-    grid.updateConfig({
-        columns: createColumns(),
-    });
+const onPageChange = (event) => {
+    perPage.value = event.rows;
+    currentPage.value = event.page + 1;
+    fetchUsers(currentPage.value);
 };
 
-const toggleColumnVisibility = (columnName) => {
-    data.columnVisibility[columnName] = !data.columnVisibility[columnName];
-    updateGridConfig();
-    grid.forceRender();
+const onSort = (event) => {
+    fetchUsers(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+};
+
+const onRowContextMenu = (event) => {
+    cm.value.show(event.originalEvent);
 };
 
 onMounted(() => {
-    initializeGrid();
+    fetchUsers();
 });
 
-const showConfirmDeleteUserModal = ref(false);
-const userId = ref(null);
-
-const confirmDeleteUser = (id) => {
-    userId.value = id;
-    showConfirmDeleteUserModal.value = true;
+const clearFilter = () => {
+    filters.value = {
+        global: {value: null, matchMode: FilterMatchMode.CONTAINS},
+    };
+    fetchUsers(currentPage.value);
 };
 
-const closeModal = () => {
-    showConfirmDeleteUserModal.value = false;
+const exportCSV = () => {
+    dt.value.exportCSV();
 };
 
-const handleDeleteUser = () => {
-    router.delete(route("users.destroy", userId.value), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            push.success('User Deleted Successfully!');
-            userId.value = null;
-            router.visit(route("users.index"), {only: ["users"]});
+const resolveRoleIcon = (role) => {
+    switch (role.toLowerCase()) {
+        case 'admin':
+            return {
+                icon: 'ti ti-user-shield',
+                color: 'text-red-500',
+            }
+        case 'viewer':
+            return {
+                icon: 'ti ti-eye-search',
+                color: 'text-orange-500',
+            }
+        case 'driver':
+            return {
+                icon: 'ti ti-steering-wheel',
+                color: 'text-lime-500',
+            }
+        case 'call center':
+            return {
+                icon: 'ti ti-phone-ringing',
+                color: 'text-sky-500',
+            }
+        case 'bond warehouse staff':
+            return {
+                icon: 'ti ti-building-warehouse',
+                color: 'text-indigo-500',
+            }
+        case 'customer':
+            return {
+                icon: 'ti ti-user-heart',
+                color: 'text-pink-500',
+            }
+        case 'boned area':
+            return {
+                icon: 'ti ti-building-community',
+                color: 'text-rose-500',
+            }
+        case 'front office staff':
+            return {
+                icon: 'ti ti-building-cog',
+                color: 'text-violet-500',
+            }
+        case 'empty':
+            return {
+                icon: 'ti ti-mood-empty',
+                color: 'text-cyan-500',
+            }
+        case 'finance team':
+            return {
+                icon: 'ti ti-device-desktop-dollar',
+                color: 'text-teal-500',
+            }
+        default:
+            return {
+                icon: 'ti ti-user-question',
+                color: 'text-stone-500',
+            }
+    }
+};
+
+const resolveStatus = (status) =>
+    ({
+        ACTIVE: "success",
+        DEACTIVATE: "danger",
+        INACTIVE: "warn",
+        INVITED: "info",
+    }[status]);
+
+const confirmUserDelete = (user) => {
+    selectedUserID.value = user.value.id;
+    confirm.require({
+        message: 'Would you like to delete this user record?',
+        header: 'Delete User?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
         },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            router.delete(route("users.destroy", selectedUserID.value), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("User Deleted Successfully!");
+                    fetchUsers(currentPage.value);
+                },
+                onError: () => {
+                    push.error("Something went to wrong!");
+                },
+            });
+            selectedUserID.value = null;
+        },
+        reject: () => {
+        }
     });
-};
+}
 </script>
 
 <template>
-    <AppLayout title="User Management">
-        <template #header>User Management</template>
+    <AppLayout title="System Users">
+        <template #header>System Users</template>
 
         <Breadcrumb/>
 
-        <CreateUserForm :branches="branches" :roles="roles" :user-role="userRole" :user-branch="userBranch" :is-super-admin="isSuperAdmin"/>
+        <div>
+            <Card class="my-5">
+                <template #content>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedUser = null"/>
+                    <DataTable
+                        ref="dt"
+                        v-model:contextMenuSelection="selectedUser"
+                        v-model:filters="filters"
+                        :loading="loading"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="totalRecords"
+                        :value="users"
+                        context-menu
+                        data-key="id"
+                        filter-display="menu"
+                        lazy
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
+                        @page="onPageChange"
+                        @rowContextmenu="onRowContextMenu"
+                        @sort="onSort">
 
-        <div class="card mt-4">
-            <div>
-                <div class="flex items-center justify-between p-2">
-                    <h2
-                        class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        User Management
-                    </h2>
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    System Users
+                                </div>
 
-                    <div class="flex">
-                        <Popper>
-                            <button
-                                class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            >
-                                <i class="fa-solid fa-grip"></i>
-                            </button>
-                            <template #content>
-                                <div class="max-w-[16rem]">
-                                    <div
-                                        class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700"
-                                    >
-                                        <div
-                                            class="rounded-md border border-slate-150 bg-white p-4 dark:border-navy-600 dark:bg-navy-700"
-                                        >
-                                            <h3
-                                                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                                            >
-                                                Select Columns
-                                            </h3>
-                                            <p class="mt-1 text-xs+">
-                                                Choose which columns you want to see
-                                            </p>
-                                            <div
-                                                class="mt-4 flex flex-col space-y-4 text-slate-600 dark:text-navy-100"
-                                            >
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.id"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="toggleColumnVisibility('id', $event)"
-                                                    />
-                                                    <p>ID</p>
-                                                </label>
+                                <Button v-if="$page.props.user.permissions.includes('users.create')" label="Create User"
+                                        size="small"
+                                        @click="showUserCreateDialog = !showUserCreateDialog"/>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Button Group -->
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        icon="pi pi-filter-slash"
+                                        label="Clear Filters"
+                                        outlined
+                                        severity="contrast"
+                                        size="small"
+                                        type="button"
+                                        @click="clearFilter()"
+                                    />
 
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="
-                              data.columnVisibility.secondary_branch_names
-                            "
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="
-                              toggleColumnVisibility(
-                                'secondary_branch_names',
-                                $event
-                              )
-                            "
-                                                    />
-                                                    <p>Secondary Branches</p>
-                                                </label>
+                                    <Button
+                                        icon="pi pi-external-link"
+                                        label="Export"
+                                        severity="contrast"
+                                        size="small"
+                                        @click="exportCSV($event)"
+                                    />
+                                </div>
 
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.created_at"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="
-                              toggleColumnVisibility('created_at', $event)
-                            "
-                                                    />
-                                                    <p>Created At</p>
-                                                </label>
+                                <!-- Search Field -->
+                                <IconField class="w-full sm:w-auto">
+                                    <InputIcon>
+                                        <i class="pi pi-search"/>
+                                    </InputIcon>
+                                    <InputText
+                                        v-model="filters.global.value"
+                                        class="w-full"
+                                        placeholder="Keyword Search"
+                                        size="small"
+                                    />
+                                </IconField>
+                            </div>
+                        </template>
 
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.last_login_at"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="
-                              toggleColumnVisibility('last_login_at', $event)
-                            "
-                                                    />
-                                                    <p>Last Login</p>
-                                                </label>
+                        <template #empty>No users found.</template>
 
-                                                <label class="inline-flex items-center space-x-2">
-                                                    <input
-                                                        :checked="data.columnVisibility.last_logout_at"
-                                                        class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent"
-                                                        type="checkbox"
-                                                        @change="
-                              toggleColumnVisibility('last_logout_at', $event)
-                            "
-                                                    />
-                                                    <p>Last Logout</p>
-                                                </label>
-                                            </div>
-                                        </div>
+                        <template #loading>Loading users data. Please wait.</template>
+
+                        <Column field="username" header="Username" sortable></Column>
+
+                        <Column field="role" header="Role" sortable>
+                            <template #body="slotProps">
+                                <div class="flex items-center space-x-2">
+                                    <i :class="[resolveRoleIcon(slotProps.data.role).icon, resolveRoleIcon(slotProps.data.role).color]"
+                                       class="text-lg"></i>
+                                    <div :class="resolveRoleIcon(slotProps.data.role).color">{{ slotProps.data.role }}
                                     </div>
                                 </div>
                             </template>
-                        </Popper>
+                        </Column>
 
-                        <a :href="route('users.export')">
-                            <button
-                                class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.top="'Download CSV'"
-                            >
-                                <i class="fa-solid fa-cloud-arrow-down"></i>
-                            </button>
-                        </a>
-                    </div>
-                </div>
+                        <Column field="primary_branch_name" header="Primary Branch"></Column>
 
-                <div class="mt-3">
-                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
-                    </div>
-                </div>
-            </div>
+                        <Column field="created_at" header="Created At"></Column>
+
+                        <Column field="status" header="Status">
+                            <template #body="slotProps">
+                                <div v-if="slotProps.data.status">
+                                    <Tag
+                                        :severity="resolveStatus(slotProps.data.status)"
+                                        :value="slotProps.data.status"
+                                        class="mr-1 mb-1"
+                                    />
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="last_login_at" header="Last Login"></Column>
+
+                        <template #footer> In total there are {{ users ? totalRecords : 0 }} users.</template>
+                    </DataTable>
+                </template>
+            </Card>
         </div>
-
-        <DeleteUserConfirmationModal
-            :show="showConfirmDeleteUserModal"
-            @close="closeModal"
-            @delete-user="handleDeleteUser"
-        />
     </AppLayout>
+
+    <CreateUserForm :branches="branches" :is-super-admin="isSuperAdmin" :roles="roles" :user-branch="userBranch"
+                    :user-role="userRole" :visible="showUserCreateDialog"
+                    @close="showUserCreateDialog = false"
+                    @update:visible="showUserCreateDialog = $event"/>
 </template>
