@@ -27,7 +27,7 @@ class UpdateAgentRequest extends FormRequest
             'branch_code' => [
                 'required',
                 'max:10',
-                Rule::unique('branches', 'branch_code')->ignore($this->route('agent')),
+                Rule::unique('branches', 'branch_code')->ignore($this->route('third_party_agent')),
             ],
             'type' => ['required'],
             'currency_name' => ['required'],

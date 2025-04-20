@@ -61,6 +61,7 @@ class ThirdPartyAgentController extends Controller
     public function store(StoreAgentRequest $request)
     {
         $data = $request->all();
+
         $data['is_third_party_agent'] = true;
 
         $this->branchRepository->createAgent($data);
@@ -71,14 +72,14 @@ class ThirdPartyAgentController extends Controller
      */
     public function edit($id)
     {
-        $branch = Branch::find($id);
+        $thirdPartyAgent = Branch::findOrFail($id);
 
-        return Inertia::render('Agent/EditAgent', [
+        return Inertia::render('Courier/EditThirdPartyAgent', [
             'cargoModes' => CargoType::cases(),
             'deliveryTypes' => HBLType::cases(),
             'packageTypes' => PackageType::cases(),
             'branchTypes' => BranchType::cases(),
-            'agent' => $branch,
+            'agent' => $thirdPartyAgent,
         ]);
     }
 
@@ -87,7 +88,8 @@ class ThirdPartyAgentController extends Controller
      */
     public function update(UpdateAgentRequest $request, $branch)
     {
-        $branch = Branch::find($branch);
+        $branch = Branch::findOrFail($branch);
+
         $data = $request->all();
 
         $this->branchRepository->updateAgent($data, $branch);
@@ -98,7 +100,6 @@ class ThirdPartyAgentController extends Controller
      */
     public function destroy($branch)
     {
-
         $branch = Branch::find($branch);
         $branch->delete();
     }
