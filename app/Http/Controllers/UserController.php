@@ -48,10 +48,10 @@ class UserController extends Controller
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
         $query = User::withoutRole(['customer', 'driver'])
@@ -62,20 +62,15 @@ class UserController extends Controller
             $query->where('username', 'like', '%'.$search.'%');
         }
 
-        $totalUsers = $query->count();
-
-        $users = $query->orderBy($order, $dir)
-            ->skip($page)
-            ->take($limit)
-            ->get();
+        $users = $query->orderBy($order, $dir)->paginate($limit, ['*'], 'page', $page);
 
         return response()->json([
             'data' => UserCollection::collection($users),
             'meta' => [
-                'total' => $totalUsers,
-                'page' => $page,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalUsers / $limit),
+                'total' => $users->total(),
+                'current_page' => $users->currentPage(),
+                'perPage' => $users->perPage(),
+                'lastPage' => $users->lastPage(),
             ],
         ]);
     }
