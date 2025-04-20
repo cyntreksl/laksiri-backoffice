@@ -428,7 +428,7 @@ Breadcrumbs::for('couriers.agents.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Couriers');
     $trail->push('Third Party Agents', route('couriers.agents.index'));
-    $trail->push('Third Party Agent Create ', route('couriers.agents.create'));
+    $trail->push('Create Third Party Agent', route('couriers.agents.create'));
 });
 
 // Courier -> Third Party Agents Edit
