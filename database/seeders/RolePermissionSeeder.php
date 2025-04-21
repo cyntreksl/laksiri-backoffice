@@ -32,16 +32,15 @@ class RolePermissionSeeder extends Seeder
     protected function assignPermissions(): void
     {
         $role = Role::where('name', 'admin')->first();
+
         for ($i = 0; $i < count(self::defaultPermissions()); $i++) {
             $permissionGroup = self::defaultPermissions()[$i]['group_name'];
-            if ($permissionGroup !== 'Customer Queue') {
-                for ($j = 0; $j < count(self::defaultPermissions()[$i]['permissions']); $j++) {
-                    $permission = Permission::updateOrCreate([
-                        'name' => self::defaultPermissions()[$i]['permissions'][$j],
-                        'group_name' => $permissionGroup,
-                    ]);
-                    $role->givePermissionTo($permission);
-                }
+            for ($j = 0; $j < count(self::defaultPermissions()[$i]['permissions']); $j++) {
+                $permission = Permission::updateOrCreate([
+                    'name' => self::defaultPermissions()[$i]['permissions'][$j],
+                    'group_name' => $permissionGroup,
+                ]);
+                $role->givePermissionTo($permission);
             }
         }
     }
