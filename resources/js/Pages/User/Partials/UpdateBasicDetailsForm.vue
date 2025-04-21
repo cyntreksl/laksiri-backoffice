@@ -1,186 +1,172 @@
 <script setup>
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
-import { router, useForm } from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import notification from "@/magics/notification.js";
+import {router, useForm, usePage} from "@inertiajs/vue3";
+import Card from 'primevue/card';
+import {push} from "notivue";
+import Button from 'primevue/button';
+import InputIcon from "primevue/inputicon";
+import InputText from "primevue/inputtext";
+import IconField from "primevue/iconfield";
+import RadioButton from "primevue/radiobutton";
 
 const props = defineProps({
-  user: {
-    type: Object,
-    default: () => {},
-  },
-  roles: {
-    type: Object,
-    default: () => {},
-  },
-  branches: {
-    type: Object,
-    default: () => {},
-  },
+    user: {
+        type: Object,
+        default: () => {
+        },
+    },
+    roles: {
+        type: Object,
+        default: () => {
+        },
+    },
+    branches: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const form = useForm({
-  name: props.user.name,
-  username: props.user.username,
-  email: props.user.email,
-  role_id: props.user.roles[0]?.id,
+    name: props.user.name,
+    username: props.user.username,
+    email: props.user.email,
+    role_id: props.user.roles[0]?.id,
 });
 
 const handleUpdateUser = () => {
-  form.put(route("users.update", props.user.id), {
-    preserveScroll: true,
-    preserveState: true,
-    onSuccess: () => {
-      notification({
-        text: "Basic Details Updated Successfully!",
-        variant: "success",
-      });
-      router.visit(route("users.edit", props.user.id));
-    },
-    onError: () => {
-      form.reset();
-    },
-  });
+    form.put(route("users.update", props.user.id), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            push.success('Basic Details Updated Successfully!');
+            router.visit(route("users.edit", props.user.id));
+        },
+        onError: () => {
+            form.reset();
+        },
+    });
+};
+
+const resolveRoleIcon = (role) => {
+    switch (role.toLowerCase()) {
+        case 'admin':
+            return {
+                icon: 'ti ti-user-shield',
+                color: 'text-red-500',
+            }
+        case 'viewer':
+            return {
+                icon: 'ti ti-eye-search',
+                color: 'text-orange-500',
+            }
+        case 'driver':
+            return {
+                icon: 'ti ti-steering-wheel',
+                color: 'text-lime-500',
+            }
+        case 'call center':
+            return {
+                icon: 'ti ti-device-landline-phone',
+                color: 'text-sky-500',
+            }
+        case 'bond warehouse staff':
+            return {
+                icon: 'ti ti-building-warehouse',
+                color: 'text-indigo-500',
+            }
+        case 'customer':
+            return {
+                icon: 'ti ti-user-heart',
+                color: 'text-pink-500',
+            }
+        case 'boned area':
+            return {
+                icon: 'ti ti-building-community',
+                color: 'text-rose-500',
+            }
+        case 'front office staff':
+            return {
+                icon: 'ti ti-building-estate',
+                color: 'text-violet-500',
+            }
+        case 'empty':
+            return {
+                icon: 'ti ti-mood-empty',
+                color: 'text-cyan-500',
+            }
+        case 'finance team':
+            return {
+                icon: 'ti ti-device-desktop-dollar',
+                color: 'text-teal-500',
+            }
+        default:
+            return {
+                icon: 'ti ti-user-question',
+                color: 'text-stone-500',
+            }
+    }
 };
 </script>
 
 <template>
-  <div class="card px-4 py-4 sm:px-5">
-    <div>
-      <h2
-        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-      >
-        Basic Details
-      </h2>
-    </div>
     <form
-      class="grid grid-cols-2 gap-5 mt-3"
-      @submit.prevent="handleUpdateUser"
+        @submit.prevent="handleUpdateUser"
     >
-      <div>
-        <InputLabel value="Name" />
-        <label class="relative flex">
-          <input
-            v-model="form.name"
-            class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-            placeholder="Name"
-            type="text"
-          />
-          <div
-            class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-          >
-            <svg
-              class="size-4.5 transition-colors duration-200"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </div>
-        </label>
-        <InputError :message="form.errors.name" />
-      </div>
+        <Card>
+            <template #title>Basic Details</template>
+            <template #content>
+                <div class="grid grid-cols-2 gap-5 mt-3">
+                    <div>
+                        <InputLabel value="Name"/>
+                        <IconField>
+                            <InputIcon class="pi pi-user"/>
+                            <InputText v-model="form.name" class="w-full" placeholder="Enter Name"/>
+                        </IconField>
+                        <InputError :message="form.errors.name"/>
+                    </div>
 
-      <div>
-        <InputLabel value="Username" />
-        <label class="relative flex">
-          <input
-            v-model="form.username"
-            class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-            placeholder="Username"
-            type="text"
-          />
-          <div
-            class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-          >
-            <svg
-              class="size-4.5 transition-colors duration-200"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </div>
-        </label>
-        <InputError :message="form.errors.username" />
-      </div>
+                    <div>
+                        <InputLabel value="Username"/>
+                        <IconField>
+                            <InputIcon class="pi pi-user"/>
+                            <InputText v-model="form.username" class="w-full" placeholder="Enter Username"/>
+                        </IconField>
+                        <InputError :message="form.errors.username"/>
+                    </div>
 
-      <div>
-        <InputLabel value="Email" />
-        <label class="relative flex">
-          <input
-            v-model="form.email"
-            class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-            placeholder="Email Address"
-            type="email"
-          />
-          <div
-            class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"
-          >
-            <svg
-              class="size-4.5 transition-colors duration-200"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </div>
-        </label>
-        <InputError :message="form.errors.email" />
-      </div>
+                    <div class="col-span-1 sm:col-span-2">
+                        <InputLabel value="Email"/>
+                        <IconField>
+                            <InputIcon class="pi pi-envelope"/>
+                            <InputText v-model="form.email" class="w-full" placeholder="Enter Email Address"/>
+                        </IconField>
+                        <InputError :message="form.errors.email"/>
+                    </div>
 
-      <div>
-        <InputLabel value="Select Role" />
-        <div class="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 mt-1">
-          <label
-            v-for="role in roles"
-            class="inline-flex items-center space-x-2"
-          >
-            <input
-              v-model="form.role_id"
-              :value="role.id"
-              class="form-radio is-basic size-5 rounded-full border-slate-400/70 bg-slate-100 checked:!border-success checked:!bg-success hover:!border-success focus:!border-success dark:border-navy-500 dark:bg-navy-900"
-              name="role"
-              type="radio"
-            />
-            <p class="capitalize">{{ role.name }}</p>
-          </label>
-        </div>
-        <InputError :message="form.errors.role_id" />
-      </div>
-
-      <div class="flex col-span-2 justify-end">
-        <PrimaryButton
-          :class="{ 'opacity-25': form.processing }"
-          :disabled="form.processing"
-          class="ms-3"
-          type="submit"
-        >
-          Update User Basic Details
-        </PrimaryButton>
-      </div>
+                    <div class="col-span-1 sm:col-span-2">
+                        <InputLabel value="Role"/>
+                        <div class="flex flex-wrap gap-4 mt-1">
+                            <div v-for="(role, index) in roles" :key="index" class="flex items-center gap-4">
+                                <RadioButton v-model="form.role_id" :input-id="role.name" :name="role.name"
+                                             :value="role.id"/>
+                                <label :for="role.name" class="capitalize cursor-pointer">
+                                    <i :class="[resolveRoleIcon(role.name).icon, resolveRoleIcon(role.name).color, 'mr-1 text-lg']"></i>
+                                    {{ role.name }}
+                                </label>
+                            </div>
+                        </div>
+                        <InputError :message="form.errors.role_id"/>
+                    </div>
+                </div>
+            </template>
+            <template #footer>
+                <div class="inline-block float-right mt-3">
+                    <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" class="w-full"
+                            label="Save User Basic Details" type="submit"/>
+                </div>
+            </template>
+        </Card>
     </form>
-  </div>
 </template>

@@ -1,12 +1,12 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
 import UpdatePasswordForm from "@/Pages/User/Partials/UpdatePasswordForm.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import UpdateBasicDetailsForm from "@/Pages/User/Partials/UpdateBasicDetailsForm.vue";
 import UpdateBranchForm from "@/Pages/User/Partials/UpdateBranchForm.vue";
+import AppLayout from "@/Layouts/AppLayout.vue";
 
 defineProps({
-    user: {
+    userRecord: {
         type: Object,
         default: () => {
         }
@@ -29,14 +29,14 @@ defineProps({
         <template #header>User Management</template>
 
         <!-- Breadcrumb -->
-        <Breadcrumb :user="user"/>
+        <Breadcrumb :user="userRecord"/>
 
         <div class="grid grid-cols-1 mt-4 gap-4">
-            <UpdateBasicDetailsForm :user="user" :roles="roles"/>
+            <UpdateBasicDetailsForm :roles="roles" :user="userRecord"/>
 
-            <UpdatePasswordForm :user="user"/>
+            <UpdatePasswordForm :user="userRecord"/>
 
-            <UpdateBranchForm :user="user" :branches="branches"/>
+            <UpdateBranchForm :branches="branches" :user="userRecord"/>
         </div>
     </AppLayout>
 </template>
