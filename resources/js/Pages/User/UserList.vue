@@ -156,7 +156,7 @@ const resolveRoleIcon = (role) => {
             }
         case 'call center':
             return {
-                icon: 'ti ti-phone-ringing',
+                icon: 'ti ti-device-landline-phone',
                 color: 'text-sky-500',
             }
         case 'bond warehouse staff':
@@ -176,7 +176,7 @@ const resolveRoleIcon = (role) => {
             }
         case 'front office staff':
             return {
-                icon: 'ti ti-building-cog',
+                icon: 'ti ti-building-estate',
                 color: 'text-violet-500',
             }
         case 'empty':
