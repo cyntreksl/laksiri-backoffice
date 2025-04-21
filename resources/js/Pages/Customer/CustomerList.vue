@@ -1,12 +1,10 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {computed, onMounted, reactive, ref} from "vue";
-import {Grid, h, html} from "gridjs";
+import {Grid, html} from "gridjs";
 import Popper from "vue3-popper";
-import {router, usePage} from "@inertiajs/vue3";
+import {router} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import CreateDriverForm from "@/Pages/Driver/Partials/CreateDriverForm.vue";
-import DeleteDriverConfirmationModal from "@/Pages/Driver/Partials/DeleteDriverConfirmationModal.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
