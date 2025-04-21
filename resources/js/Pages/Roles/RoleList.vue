@@ -1,11 +1,15 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {Link, router} from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import {router} from "@inertiajs/vue3";
 import {ref} from "vue";
 import {push} from "notivue";
-import DeleteRoleConfirmationModal from "@/Pages/Roles/Partials/DeleteRoleConfirmationModal.vue";
+import {useConfirm} from "primevue/useconfirm";
+import Card from "primevue/card";
+import Button from "primevue/button";
+import Column from "primevue/column";
+import DataTable from "primevue/datatable";
+import Chip from 'primevue/chip';
 
 const props = defineProps({
     roles: {
@@ -15,38 +19,105 @@ const props = defineProps({
     },
 });
 
-const showConfirmDeleteRoleModal = ref(false);
-const roleId = ref(null);
-
-const confirmDeleteRole = (id) => {
-    roleId.value = id;
-    showConfirmDeleteRoleModal.value = true;
-};
-
-const closeModal = () => {
-    showConfirmDeleteRoleModal.value = false;
-    roleId.value = null;
-};
-
-const handleDeleteRole = () => {
-    router.delete(route("users.roles.destroy", roleId.value), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            push.success("Role Deleted Successfully!");
-            roleId.value = null;
-            router.visit(route("users.roles.index"));
-        },
-        onError: () => {
-            closeModal();
-            push.error("Something went to wrong!");
-        },
-    });
-};
+const perPage = ref(10);
+const dt = ref();
+const confirm = useConfirm();
 
 const formatPermissionName = (name) => {
     return name.split('.').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
+
+const resolveRoleIcon = (role) => {
+    switch (role.toLowerCase()) {
+        case 'admin':
+            return {
+                icon: 'ti ti-user-shield',
+                color: 'text-red-500',
+            }
+        case 'viewer':
+            return {
+                icon: 'ti ti-eye-search',
+                color: 'text-orange-500',
+            }
+        case 'driver':
+            return {
+                icon: 'ti ti-steering-wheel',
+                color: 'text-lime-500',
+            }
+        case 'call center':
+            return {
+                icon: 'ti ti-device-landline-phone',
+                color: 'text-sky-500',
+            }
+        case 'bond warehouse staff':
+            return {
+                icon: 'ti ti-building-warehouse',
+                color: 'text-indigo-500',
+            }
+        case 'customer':
+            return {
+                icon: 'ti ti-user-heart',
+                color: 'text-pink-500',
+            }
+        case 'boned area':
+            return {
+                icon: 'ti ti-building-community',
+                color: 'text-rose-500',
+            }
+        case 'front office staff':
+            return {
+                icon: 'ti ti-building-estate',
+                color: 'text-violet-500',
+            }
+        case 'empty':
+            return {
+                icon: 'ti ti-mood-empty',
+                color: 'text-cyan-500',
+            }
+        case 'finance team':
+            return {
+                icon: 'ti ti-device-desktop-dollar',
+                color: 'text-teal-500',
+            }
+        default:
+            return {
+                icon: 'ti ti-user-question',
+                color: 'text-stone-500',
+            }
+    }
+};
+
+const confirmRoleDelete = (id) => {
+    confirm.require({
+        message: 'Would you like to delete this role record?',
+        header: 'Delete Role?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            router.delete(route("users.roles.destroy", id), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("Role Deleted Successfully!");
+                    router.visit(route("users.roles.index"));
+                },
+                onError: () => {
+                    push.error("Something went to wrong!");
+                },
+            });
+        },
+        reject: () => {
+        }
+    });
+}
 </script>
 
 <template>
@@ -55,87 +126,82 @@ const formatPermissionName = (name) => {
 
         <Breadcrumb/>
 
-        <div class="flex justify-end mt-5">
-            <Link :href="route('users.roles.create')">
-                <PrimaryButton> Create New Role</PrimaryButton>
-            </Link>
-        </div>
-
-        <div class="card mt-4">
-            <div class="flex items-center justify-between p-2">
-                <h2
-                    class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                >
-                    Roles & Permissions
-                </h2>
-            </div>
-
-            <div class="mt-3">
-                <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                    <div
-                        class="is-scrollbar-hidden min-w-full overflow-x-auto"
+        <div>
+            <Card class="my-5">
+                <template #content>
+                    <DataTable
+                        ref="dt"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="Object.keys(roles).length"
+                        :value="roles"
+                        data-key="id"
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
                     >
-                        <table class="is-zebra w-full text-left">
-                            <thead>
-                            <tr>
-                                <th
-                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                >
-                                    Role Name
-                                </th>
-                                <th
-                                    class="bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                >
-                                    Permissions
-                                </th>
-                                <th
-                                    class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                >
-                                    Actions
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="(item, index) in roles">
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                    {{ item.name }}
-                                </td>
-                                <td class="px-4 py-3 sm:px-5 space-x-2 space-y-2">
-                                    <div
-                                        v-for="permission in item.permissions"
-                                        class="badge bg-primary/10 text-primary dark:bg-accent-light/15 dark:text-accent-light"
-                                    >
-                                        {{ formatPermissionName(permission.name) }}
+
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    Roles & Permissions
+                                </div>
+
+                                <Button label="Create New Role" size="small"
+                                        @click.prevent="() => router.visit(route('users.roles.create'))"/>
+                            </div>
+                        </template>
+
+                        <template #empty>No roles found.</template>
+
+                        <template #loading>Loading roles data. Please wait.</template>
+
+                        <Column field="name" header="Role" sortable>
+                            <template #body="slotProps">
+                                <div class="flex items-center space-x-2">
+                                    <i :class="[resolveRoleIcon(slotProps.data.name).icon, resolveRoleIcon(slotProps.data.name).color]"
+                                       class="text-lg"></i>
+                                    <div :class="resolveRoleIcon(slotProps.data.name).color">{{ slotProps.data.name.toUpperCase() }}
                                     </div>
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
-                                    <button
-                                        v-if="$page.props.user.permissions.includes('roles.delete')"
-                                        :disabled="item.name === 'admin'"
-                                        class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25 disabled:text-gray-300"
-                                        @click.prevent="confirmDeleteRole(item.id)"
-                                    >
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
+                                </div>
+                            </template>
+                        </Column>
 
-                                    <Link v-if="$page.props.user.permissions.includes('roles.edit')"
-                                          :href="route('users.roles.edit', item.id)">
-                                        <button
-                                            class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
-                                        >
-                                            <i class="fa-solid fa-edit"></i>
-                                        </button>
-                                    </Link>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+                        <Column field="permissions" header="Permissions">
+                            <template #body="slotProps">
+                                <Chip v-for="permission in slotProps.data.permissions" :label="formatPermissionName(permission.name)"  class="mr-1 mb-1 border border-sky-500 !bg-sky-100"/>
+                            </template>
+                        </Column>
+
+                        <Column field="" header="Actions" style="width: 10%">
+                            <template #body="{ data }">
+                                <Button
+                                    v-if="$page.props.user.permissions.includes('roles.edit')"
+                                    class="p-1 text-xs h-3 w-3 mr-1"
+                                    icon="pi pi-pencil"
+                                    outlined
+                                    rounded
+                                    size="small"
+                                    @click="() => router.visit(route('users.roles.edit', data.id))"
+                                />
+                                <Button
+                                    v-if="$page.props.user.permissions.includes('roles.delete')"
+                                    :disabled="data.name === 'admin'"
+                                    icon="pi pi-trash"
+                                    outlined
+                                    rounded
+                                    severity="danger"
+                                    size="small"
+                                    @click.prevent="confirmRoleDelete(data.id)"
+                                />
+                            </template>
+                        </Column>
+
+                        <template #footer> In total there are {{ roles ? Object.keys(roles).length : 0 }} roles.</template>
+                    </DataTable>
+                </template>
+            </Card>
         </div>
-
-        <DeleteRoleConfirmationModal :show="showConfirmDeleteRoleModal" @close="closeModal"
-                                     @delete-role="handleDeleteRole"/>
     </AppLayout>
 </template>
