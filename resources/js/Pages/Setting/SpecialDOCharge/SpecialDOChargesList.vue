@@ -2,7 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {computed, onMounted, ref, watch} from "vue";
-import {router, useForm, usePage} from "@inertiajs/vue3";
+import {Link, router, useForm, usePage} from "@inertiajs/vue3";
 import Card from "primevue/card";
 import DataTable from "primevue/datatable";
 import ContextMenu from "primevue/contextmenu";
@@ -255,13 +255,16 @@ const confirmDeleteTax = (tax) => {
                                     Tax Rates
                                 </div>
                                 <div>
-                                    <PrimaryButton
-                                        v-if="usePage().props.user.permissions.includes('tax.destination tax create')"
-                                        class="w-full"
-                                        @click="confirmViewAddNewDOCharge()"
-                                    >
-                                        Create DO Charge
-                                    </PrimaryButton>
+                                    <Link v-if="usePage().props.user.permissions.includes('tax.destination tax create')" :href="route('setting.special-do-charges.create')">
+                                        <PrimaryButton class="w-full">Create DO Charge</PrimaryButton>
+                                    </Link>
+<!--                                    <PrimaryButton-->
+<!--                                        v-if="usePage().props.user.permissions.includes('tax.destination tax create')"-->
+<!--                                        class="w-full"-->
+<!--                                        @click="confirmViewAddNewDOCharge()"-->
+<!--                                    >-->
+<!--                                        Create DO Charge-->
+<!--                                    </PrimaryButton>-->
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">

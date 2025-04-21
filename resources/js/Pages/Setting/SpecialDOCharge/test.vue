@@ -16,7 +16,7 @@
         class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5"
     >
         <h3 class="text-base font-medium text-slate-700 dark:text-navy-100">
-            {{ editMode ? "Edit Package" : "Add New Price Rule" }}
+            {{ editMode ? "Edit Price Rule" : "Add New Price Rule" }}
         </h3>
         <button
             class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
@@ -159,7 +159,7 @@
 </div>
 </div>
 <script setup lang="ts">
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import Checkbox from "@/Components/Checkbox.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import Checkbox from "@/Components/Checkbox.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 </script>
