@@ -18,17 +18,17 @@ class DriverAreasController extends Controller
 
     public function index()
     {
-        return Inertia::render('Setting/DriverAreaList', [
+        return Inertia::render('Setting/DriverAreas/DriverAreaList', [
             'zones' => GetZones::run(),
         ]);
     }
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
         $query = Area::with('Branch');
@@ -37,20 +37,15 @@ class DriverAreasController extends Controller
             $query->where('name', 'like', '%'.$search.'%');
         }
 
-        $DriverAreas = $query->orderBy($order, $dir)
-            ->skip($page)
-            ->take($limit)
-            ->get();
-
-        $totalDriverAres = Area::count();
+        $DriverAreas = $query->orderBy($order, $dir)->paginate($limit, ['*'], 'page', $page);
 
         return response()->json([
             'data' => DriverAreasCollection::collection($DriverAreas),
             'meta' => [
-                'total' => $totalDriverAres,
-                'page' => $page,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalDriverAres / $limit),
+                'total' => $DriverAreas->total(),
+                'current_page' => $DriverAreas->currentPage(),
+                'perPage' => $DriverAreas->perPage(),
+                'lastPage' => $DriverAreas->lastPage(),
             ],
         ]);
     }
@@ -58,15 +53,6 @@ class DriverAreasController extends Controller
     public function store(StoreDriverAreasRequest $request)
     {
         $this->driverAreasRepositoryInterface->createDriverAreas($request->all());
-    }
-
-    public function edit($id)
-    {
-        return Inertia::render('Setting/DriverAreasEdit', [
-            'driverAreas' => $this->driverAreasRepositoryInterface->getDriverAreas($id),
-            'zoneIds' => $this->driverAreasRepositoryInterface->getDriverAreaZoneIDs($id),
-            'zones' => GetZones::run(),
-        ]);
     }
 
     public function update(StoreDriverAreasRequest $request)
