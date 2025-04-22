@@ -6,8 +6,6 @@ import Popper from "vue3-popper";
 import { router } from "@inertiajs/vue3";
 import notification from "@/magics/notification.js";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import DeleteZoneConfirmationModal from "@/Pages/Settings/Partials/DeleteZoneConfirmationModal.vue";
-import CreateZoneForm from "@/Pages/Settings/Partials/CreateZoneForm.vue";
 
 const props = defineProps({
   roles: {
@@ -195,12 +193,11 @@ const handleDeleteZone = () => {
 </script>
 
 <template>
-  <AppLayout title="Zones">
-    <template #header>Settings</template>
+  <AppLayout title="Driver Zones">
+
+    <template #header>Driver Zones</template>
 
     <Breadcrumb />
-
-    <CreateZoneForm :areas="areas" />
 
     <div class="card mt-4">
       <div>
@@ -280,11 +277,5 @@ const handleDeleteZone = () => {
         </div>
       </div>
     </div>
-
-    <DeleteZoneConfirmationModal
-      :show="showConfirmDeleteZoneModal"
-      @close="closeModal"
-      @delete-zone="handleDeleteZone"
-    />
   </AppLayout>
 </template>
