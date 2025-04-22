@@ -32,20 +32,13 @@ const airLines = ref([]);
 const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
-const selectedAirLine = ref(null);
 const selectedAirLineId = ref(null);
-
 const isDialogVisible = ref(false);
 const showEditAirLineDialog = ref(false);
+const showAddNewAirLineDialog = ref(false);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
-    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
-    cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
-    is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
-    user: {value: null, matchMode: FilterMatchMode.EQUALS},
-    payments: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const form = useForm({
@@ -106,8 +99,6 @@ watch(() => filters.value.global.value, (newValue) => {
         debouncedFetchAirLines(newValue);
     }
 });
-
-const showAddNewAirLineDialog = ref(false);
 
 const confirmViewAddNewAirLine = () => {
     showAddNewAirLineDialog.value = true;
@@ -201,6 +192,7 @@ const confirmDeleteAirLine = (airLine) => {
     });
 };
 </script>
+
 <template>
     <AppLayout :title="isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines'">
         <template #header>{{isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines'}}</template>
@@ -211,14 +203,11 @@ const confirmDeleteAirLine = (airLine) => {
             <Card class="my-5">
                 <template #content>
                     <DataTable
-                        v-model:contextMenuSelection="selectedAirLine"
-                        v-model:selection="selectedAirLine"
                         :loading="loading"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                         :totalRecords="totalRecords"
                         :value="airLines"
-                        context-menu
                         dataKey="id"
                         filter-display="menu"
                         lazy
@@ -342,5 +331,4 @@ const confirmDeleteAirLine = (airLine) => {
             </Dialog>
         </div>
     </AppLayout>
-
 </template>
