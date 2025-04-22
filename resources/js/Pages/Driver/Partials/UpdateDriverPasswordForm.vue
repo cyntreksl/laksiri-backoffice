@@ -43,7 +43,7 @@ const handleUpdateDriverPassword = () => {
         @submit.prevent="handleUpdateDriverPassword"
     >
         <Card>
-            <template #title>Change Driver Credentials</template>
+            <template #title>Driver Credentials</template>
             <template #content>
                 <div class="grid grid-cols-3 gap-5 mt-3">
                     <div>
