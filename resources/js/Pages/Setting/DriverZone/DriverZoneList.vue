@@ -16,6 +16,7 @@ import Column from "primevue/column";
 import InputText from "primevue/inputtext";
 import DataTable from "primevue/datatable";
 import IconField from "primevue/iconfield";
+import CreateZoneForm from "@/Pages/Setting/DriverZone/Partials/CreateZoneForm.vue";
 
 const props = defineProps({
     roles: {
@@ -252,4 +253,8 @@ const confirmZoneDelete = (id) => {
             </Card>
         </div>
     </AppLayout>
+
+    <CreateZoneForm :areas="areas" :visible="showZoneCreateDialog"
+                    @close="showZoneCreateDialog = false"
+                    @update:visible="showZoneCreateDialog = $event"/>
 </template>
