@@ -231,7 +231,7 @@ function convertMeasurements(measureType, value) {
                             </template>
                         </Column>
 
-                        <Column field="per_package_charge" header="Package Price">
+                        <Column field="per_package_charge" header="Package Charges">
                             <template #body="slotProps">
                                 <div class="flex items-center justify-end">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
@@ -240,7 +240,7 @@ function convertMeasurements(measureType, value) {
                             </template>
                         </Column>
 
-                        <Column field="bill_price" header="Bill Price">
+                        <Column field="bill_price" header="Bill Charges">
                             <template #body="slotProps">
                                 <div class="flex items-center justify-end">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
