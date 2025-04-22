@@ -19,7 +19,7 @@ class PackagePriceController extends Controller
 
     public function index()
     {
-        return Inertia::render('Setting/PackagePricing/PriceList', [
+        return Inertia::render('Setting/PackagePricing/PackagePriceList', [
             'packageRules' => $this->packagePriceRepository->getPackagePriceRules(),
         ]);
     }
