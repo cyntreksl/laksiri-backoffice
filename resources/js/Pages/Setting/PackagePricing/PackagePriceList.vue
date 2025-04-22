@@ -240,6 +240,32 @@ function convertMeasurements(measureType, value) {
                             </template>
                         </Column>
 
+                        <Column field="bill_price" header="Bill Price">
+                            <template #body="slotProps">
+                                <div class="flex items-center justify-end">
+                                    <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
+                                    <span>{{slotProps.data.bill_price.toFixed(2)}}</span>
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="volume_charges" header="Volume Charges">
+                            <template #body="slotProps">
+                                <div class="flex items-center justify-end">
+                                    <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
+                                    <span>{{slotProps.data.volume_charges.toFixed(2)}}</span>
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="volume_charges" header="Bill VAT">
+                            <template #body="slotProps">
+                                <div class="flex items-center justify-end">
+                                    <span>{{slotProps.data.bill_vat}} %</span>
+                                </div>
+                            </template>
+                        </Column>
+
                         <Column field="destination_branch_name" header="Destination" sortable>
                             <template #body="slotProps">
                                 <Tag :severity="resolveWarehouse(slotProps.data.destination_branch_name)" :value="slotProps.data.destination_branch_name.toUpperCase()"></Tag>
