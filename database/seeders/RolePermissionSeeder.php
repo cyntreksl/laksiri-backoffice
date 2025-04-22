@@ -23,6 +23,7 @@ class RolePermissionSeeder extends Seeder
         Role::updateOrCreate(['name' => 'call center']);
         Role::updateOrCreate(['name' => 'boned area']);
         Role::updateOrCreate(['name' => 'finance Team']);
+        Role::updateOrCreate(['name' => 'front office staff']);
 
         $this->command->info('Default Roles added.');
 
