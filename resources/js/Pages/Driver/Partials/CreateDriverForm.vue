@@ -9,7 +9,6 @@ import InputText from "primevue/inputtext";
 import IconField from "primevue/iconfield";
 import Message from 'primevue/message';
 import DatePicker from 'primevue/datepicker';
-import MultiSelect from 'primevue/multiselect';
 import Button from "primevue/button";
 import moment from "moment";
 
@@ -126,7 +125,14 @@ const createDriver = () => {
 
             <div>
                 <InputLabel value="Preferred Zone"/>
-                <MultiSelect v-model="form.preferred_zone" :maxSelectedLabels="3" :options="zones" class="w-full" filter option-label="name" option-value="name" placeholder="Select Preferred Zones" />
+                <select v-model="form.preferred_zone"
+                        autocomplete="off"
+                        multiple
+                        placeholder="Preferred Zone..."
+                        x-init="$el._tom = new Tom($el,{create:true,plugins: ['caret_position','input_autogrow','remove_button']})"
+                >
+                    <option v-for="zone in zones" :key="zone.id" :value="zone.name">{{ zone.name }}</option>
+                </select>
                 <Message severity="secondary" size="small" variant="simple">Comma separated values. Auto Zone Assignments, it will come as a notification.</Message>
                 <InputError :message="form.errors.preferred_zone"/>
             </div>
