@@ -1,13 +1,12 @@
 <script setup>
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import DialogModal from "@/Components/DialogModal.vue";
 import {router, useForm} from "@inertiajs/vue3";
-import {ref} from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import {push} from "notivue";
-import TextInput from "@/Components/TextInput.vue";
+import Dialog from "primevue/dialog";
+import Button from "primevue/button";
+import MultiSelect from 'primevue/multiselect';
+import InputText from 'primevue/inputtext';
 
 const props = defineProps({
     zones: {
@@ -15,13 +14,13 @@ const props = defineProps({
         default: () => {
         },
     },
+    visible: {
+        type: Boolean,
+        default: false,
+    }
 });
 
-const confirmingDriverAreasCreation = ref(false);
-
-const closeModal = () => {
-    confirmingDriverAreasCreation.value = false;
-};
+const emit = defineEmits(["update:visible"]);
 
 const form = useForm({
     name: "",
@@ -33,6 +32,7 @@ const createDriverArea = () => {
         onSuccess: () => {
             router.visit(route("setting.driver-areas.index"));
             form.reset();
+            emit('close');
             push.success("Driver Area Created Successfully!");
         },
         preserveScroll: true,
@@ -42,63 +42,29 @@ const createDriverArea = () => {
 </script>
 
 <template>
-    <div class="flex justify-end mx-5 mt-4">
-        <PrimaryButton
-            @click="confirmingDriverAreasCreation = !confirmingDriverAreasCreation"
-        >
-            Create New Driver Area
-        </PrimaryButton>
-    </div>
+    <Dialog :style="{ width: '25rem' }" :visible="visible" header="Create New Driver Area" modal
+            @update:visible="(newValue) => $emit('update:visible', newValue)">
 
-    <DialogModal
-        :maxWidth="'5xl'"
-        :show="confirmingDriverAreasCreation"
-        @close="closeModal"
-    >
-        <template #title> Create New Driver Area</template>
-
-        <template #content>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div class="col-span-1 sm:col-span-2">
-                    <InputLabel value="Zone"/>
-                    <div class="space-x-5">
-                        <label class="block">
-                            <select
-                                v-model="form.zone_ids"
-                                autocomplete="off"
-                                class="mt-1.5 w-full"
-                                multiple
-                                placeholder="Select Zone..."
-                                x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
-                            >
-                                <option value="">Select zone...</option>
-                                <option v-for="(zone, index) in zones" :key="index" :value="zone.id">
-                                    {{ zone.name }}
-                                </option>
-                            </select>
-                        </label>
-                    </div>
-                    <InputError :message="form.errors.zone_ids"/>
-                </div>
-
-                <div class="col-span-1 sm:col-span-2">
-                    <InputLabel value="Driver Area Name"/>
-                    <TextInput v-model="form.name" class="w-full" placeholder="Driver Area Name"/>
-                    <InputError :message="form.errors.name"/>
-                </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="col-span-1 sm:col-span-2">
+                <InputLabel value="Zone"/>
+                <MultiSelect v-model="form.zone_ids" :maxSelectedLabels="3" :options="zones" class="w-full" filter option-label="name"
+                             option-value="id" placeholder="Select Zones" />
+                <InputError :message="form.errors.zone_ids"/>
             </div>
-        </template>
 
-        <template #footer>
-            <SecondaryButton @click="closeModal"> Cancel</SecondaryButton>
-            <PrimaryButton
-                :class="{ 'opacity-25': form.processing }"
-                :disabled="form.processing"
-                class="ms-3"
-                @click="createDriverArea"
-            >
-                Create Driver Area
-            </PrimaryButton>
-        </template>
-    </DialogModal>
+            <div class="col-span-1 sm:col-span-2">
+                <InputLabel value="Driver Area Name"/>
+                <InputText v-model="form.name" class="w-full" placeholder="Enter Driver Area Name" type="text"/>
+                <InputError :message="form.errors.name"/>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-5">
+            <Button label="Cancel" severity="secondary" type="button" @click="emit('close')"></Button>
+            <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" label="Create Driver Area"
+                    type="button"
+                    @click="createDriverArea"></Button>
+        </div>
+    </Dialog>
 </template>
