@@ -139,7 +139,7 @@ const addPriceRuleData = () => {
         !priceRuleItem.condition ||
         !priceRuleItem.true_action ||
         priceRuleItem.bill_price <= 0 ||
-        priceRuleItem.bill_vat <= 0 ||
+        priceRuleItem.bill_vat < 0 ||
         !priceRuleItem.volume_charges ||
         !priceRuleItem.per_package_charges
     ) {
