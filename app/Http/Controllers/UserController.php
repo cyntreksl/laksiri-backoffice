@@ -93,7 +93,7 @@ class UserController extends Controller
         return Inertia::render('User/EditUser', [
             'userRecord' => $user->load('roles', 'branches'),
             'roles' => $this->roleRepository->getRoles(),
-            'branches' => $this->branchRepository->getBranches(),
+            'branches' => $this->branchRepository->getUserBranches(),
         ]);
     }
 
