@@ -2,14 +2,15 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
-import TextInput from "@/Components/TextInput.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
-import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import {onMounted, ref, watch} from "vue";
 import {push} from "notivue";
 import AppPreLoader from "@/Components/AppPreLoader.vue";
+import Button from "primevue/button";
+import Card from "primevue/card";
+import InputText from "primevue/inputtext";
+import Checkbox from "primevue/checkbox";
 
 const props = defineProps({
     permissionGroups: {
@@ -155,79 +156,57 @@ const handleRoleUpdate = () => {
             <div class="sm:col-span-2 space-y-5">
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-5">
-                    <DangerOutlineButton @click="router.visit(route('users.roles.index'))"
-                    >Cancel
-                    </DangerOutlineButton
-                    >
-                    <PrimaryButton
-                        :class="{ 'opacity-50': form.processing }"
-                        :disabled="form.processing"
-                        class="space-x-2"
-                        type="submit"
-                    >
-                        <span>Update Role</span>
-                        <svg
-                            class="size-5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </PrimaryButton>
+                    <Button label="Cancel" severity="danger" variant="outlined" @click="router.visit(route('users.roles.index'))" />
+
+                    <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Update Role" type="submit" />
                 </div>
             </div>
             <div class="grid grid-cols-1 my-4 gap-4">
                 <div class="sm:col-span-3 space-y-5">
-                    <div class="card px-4 py-4 sm:px-5">
-                        <div>
-                            <h2
-                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Edit Role
-                            </h2>
-                        </div>
-                        <div class="grid grid-cols-1 gap-5 mt-3">
-                            <div>
-                                <InputLabel value="Role Name"/>
-                                <TextInput v-model="form.name" class="w-full" placeholder="Enter Role Name"/>
-                                <InputError :message="form.errors.name"/>
-                            </div>
+                    <Card>
+                        <template #title>Edit Role</template>
+                        <template #content>
+                            <div class="grid grid-cols-1 gap-5 mt-3">
+                                <div>
+                                    <InputLabel value="Role Name"/>
+                                    <InputText v-model="form.name" class="w-full" placeholder="Enter Role Name" type="text" />
+                                    <InputError :message="form.errors.name"/>
+                                </div>
 
-                            <div>
-                                <InputLabel value="Permissions"/>
-                                <label class="flex flex-row items-center py-3 cursor-pointer">
-                                    <input v-model="allChecked" class="text-indigo-600 focus:border-indigo-300 focus:ring-indigo-200" type="checkbox" @change="checkAllPermissions"/>
-                                    <span class="ml-2 text-gray-700 font-medium dark:text-dark-typography">All</span>
-                                </label>
-                            </div>
-
-                            <hr>
-
-                            <div v-for="(permissionGroup, index) in permissionGroups" :key="index" class="grid grid-cols-1 gap-2 bg-slate-100 px-5 rounded-lg">
-                                <div class="col-span-3 sm:col-span-1">
+                                <div>
                                     <label class="flex flex-row items-center py-3 cursor-pointer">
-                                        <input :id="`group-${index}`" v-model="groupChecked[index]" class="text-green-600 focus:border-green-300 focus:ring-green-200" type="checkbox" @change="checkGroupPermissions(index)"/>
-                                        <span class="ml-2 text-gray-700 font-bold dark:text-dark-typography">{{ permissionGroup.name }}</span>
+                                        <Checkbox v-model="allChecked" binary @change="checkAllPermissions"/>
+                                        <span class="ml-2 text-gray-700 font-medium dark:text-dark-typography">All Permissions</span>
                                     </label>
                                 </div>
-                                <div class="col-span-3 sm:col-span-2 py-3">
-                                    <div class="grid grid-cols-4 gap-4">
-                                        <label v-for="(permission, pIndex) in permissions[permissionGroup.name]" :key="pIndex" class="flex flex-row items-center cursor-pointer py-0">
-                                            <input :id="`permission-${permission.id}`" v-model="permissionChecked[permission.id]" class="text-indigo-600 focus:border-indigo-300 focus:ring-indigo-200" type="checkbox" @change="checkSinglePermission(index)"/>
-                                            <span class="ml-2 text-gray-700 dark:text-dark-typography">{{ formatPermissionName(permission.name) }}</span>
+
+                                <hr>
+
+                                <div v-for="(permissionGroup, index) in permissionGroups" :key="index"
+                                     class="grid grid-cols-1 gap-2 bg-slate-100 px-5 rounded-lg">
+                                    <div class="col-span-3 sm:col-span-1">
+                                        <label class="flex flex-row items-center py-3 cursor-pointer">
+                                            <Checkbox :id="`group-${index}`" v-model="groupChecked[index]" binary @change="checkGroupPermissions(index)"/>
+                                            <span class="ml-2 text-gray-700 font-medium dark:text-dark-typography">{{
+                                                    permissionGroup.name
+                                                }}</span>
                                         </label>
+                                    </div>
+                                    <div class="col-span-3 sm:col-span-2 py-3">
+                                        <div class="grid grid-cols-4 gap-4">
+                                            <label v-for="(permission, pIndex) in permissions[permissionGroup.name]"
+                                                   :key="pIndex" class="flex flex-row items-center cursor-pointer py-0">
+                                                <Checkbox :id="`permission-${permission.id}`" v-model="permissionChecked[permission.id]" binary class="!text-indigo-600 !focus:border-indigo-300 !focus:ring-indigo-200" @change="checkSinglePermission(index)"/>
+                                                <span class="ml-2 text-gray-700 dark:text-dark-typography">{{
+                                                        formatPermissionName(permission.name)
+                                                    }}</span>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </template>
+                    </Card>
                 </div>
             </div>
         </form>
