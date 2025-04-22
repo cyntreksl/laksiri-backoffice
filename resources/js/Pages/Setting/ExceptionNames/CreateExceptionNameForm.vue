@@ -1,19 +1,20 @@
 <script setup>
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import DialogModal from "@/Components/DialogModal.vue";
 import {router, useForm} from "@inertiajs/vue3";
-import {ref} from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import {push} from "notivue";
 import TextInput from "@/Components/TextInput.vue";
+import Dialog from "primevue/dialog";
+import Button from "primevue/button";
 
-const confirmingExceptionNameCreation = ref(false);
+const props = defineProps({
+    visible: {
+        type: Boolean,
+        default: false,
+    }
+})
 
-const closeModal = () => {
-    confirmingExceptionNameCreation.value = false;
-};
+const emit = defineEmits(["update:visible"]);
 
 const form = useForm({
     name: "",
@@ -22,8 +23,8 @@ const form = useForm({
 const createExceptionName = () => {
     form.post(route("setting.exception-names.store"), {
         onSuccess: () => {
-            closeModal()
             form.reset();
+            emit('close');
             router.visit(route("setting.exception-names.index"));
             push.success("Exception Name Created Successfully!");
         },
@@ -34,41 +35,19 @@ const createExceptionName = () => {
 </script>
 
 <template>
-    <div class="flex justify-end mx-5 mt-4">
-        <PrimaryButton
-            @click="confirmingExceptionNameCreation = !confirmingExceptionNameCreation"
-        >
-            Create New Exception Name
-        </PrimaryButton>
-    </div>
-
-    <DialogModal
-        :maxWidth="'xl'"
-        :show="confirmingExceptionNameCreation"
-        @close="closeModal"
-    >
-        <template #title> Create New Exception Name</template>
-
-        <template #content>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div class="col-span-1 sm:col-span-2">
-                    <InputLabel value="Name"/>
-                    <TextInput v-model="form.name" class="w-full" placeholder="Exception Name"/>
-                    <InputError :message="form.errors.name"/>
-                </div>
+    <Dialog :style="{ width: '25rem' }" :visible="visible" header="Create New Exception Name" modal @update:visible="(newValue) => $emit('update:visible', newValue)">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="col-span-1 sm:col-span-2">
+                <InputLabel value="Name"/>
+                <TextInput v-model="form.name" class="w-full" placeholder="Exception Name"/>
+                <InputError :message="form.errors.name"/>
             </div>
-        </template>
+        </div>
 
-        <template #footer>
-            <SecondaryButton @click="closeModal"> Cancel</SecondaryButton>
-            <PrimaryButton
-                :class="{ 'opacity-25': form.processing }"
-                :disabled="form.processing"
-                class="ms-3"
-                @click="createExceptionName"
-            >
-                Create Exception Name
-            </PrimaryButton>
-        </template>
-    </DialogModal>
+        <div class="flex justify-end gap-2 mt-5">
+            <Button label="Cancel" severity="secondary" type="button" @click="emit('close')"></Button>
+            <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" label="Create Exception Name" type="button"
+                    @click="createExceptionName"></Button>
+        </div>
+    </Dialog>
 </template>
