@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWareahouseZoneRequest;
 use App\Http\Resources\WarehouseZoneCollection;
-use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\WarehousezoneRepositoryInterface;
 use App\Models\WarehouseZone;
 use Illuminate\Http\Request;
@@ -13,21 +12,20 @@ use Inertia\Inertia;
 class WarehouseZoneController extends Controller
 {
     public function __construct(
-        private readonly BranchRepositoryInterface $branchRepository,
         private readonly WarehousezoneRepositoryInterface $warehousezoneRepository,
     ) {}
 
     public function index()
     {
-        return Inertia::render('Setting/WarehouseZoneList');
+        return Inertia::render('Setting/WarehouseZone/WarehouseZoneList');
     }
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
         $query = WarehouseZone::with('Branch');
@@ -36,20 +34,15 @@ class WarehouseZoneController extends Controller
             $query->where('name', 'like', '%'.$search.'%');
         }
 
-        $warehousezones = $query->orderBy($order, $dir)
-            ->skip($page)
-            ->take($limit)
-            ->get();
-
-        $totalwzones = WarehouseZone::count();
+        $warehousezones = $query->orderBy($order, $dir)->paginate($limit, ['*'], 'page', $page);
 
         return response()->json([
             'data' => WarehouseZoneCollection::collection($warehousezones),
             'meta' => [
-                'total' => $totalwzones,
-                'page' => $page,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalwzones / $limit),
+                'total' => $warehousezones->total(),
+                'current_page' => $warehousezones->currentPage(),
+                'perPage' => $warehousezones->perPage(),
+                'lastPage' => $warehousezones->lastPage(),
             ],
         ]);
     }
@@ -61,7 +54,7 @@ class WarehouseZoneController extends Controller
 
     public function edit($id)
     {
-        return Inertia::render('Setting/WarehousezonesEdit', [
+        return Inertia::render('Setting/WarehouseZone/WarehousezonesEdit', [
             'warehousezone' => $this->warehousezoneRepository->getWarehouseZone($id),
         ]);
     }

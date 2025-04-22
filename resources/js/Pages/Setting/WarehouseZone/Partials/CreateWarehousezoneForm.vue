@@ -15,12 +15,6 @@ defineProps({
   },
 });
 
-const confirmingWaraehousezoneCreation = ref(false);
-
-const closeModal = () => {
-  confirmingWaraehousezoneCreation.value = false;
-};
-
 const form = useForm({
   name: "",
   description: "",
@@ -40,16 +34,6 @@ const createWarehousezone = () => {
 </script>
 
 <template>
-  <div class="flex justify-end mx-5 mt-4">
-    <PrimaryButton
-      @click="
-        confirmingWaraehousezoneCreation = !confirmingWaraehousezoneCreation
-      "
-    >
-      Create New Warehouse Zone
-    </PrimaryButton>
-  </div>
-
   <DialogModal
     :maxWidth="'5xl'"
     :show="confirmingWaraehousezoneCreation"

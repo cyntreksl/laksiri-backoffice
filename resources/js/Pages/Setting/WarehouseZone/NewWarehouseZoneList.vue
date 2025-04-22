@@ -5,8 +5,6 @@ import { Grid, h, html } from "gridjs";
 import Popper from "vue3-popper";
 import { router } from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import CreateWarehousezoneForm from "@/Pages/Setting/Wareahousezones/Partials/CreateWarehousezoneForm.vue";
-import DeleteWarehousezoneConfirmationModal from "@/Pages/Setting/Wareahousezones/Partials/DeleteWarehousezoneConfirmationModal.vue";
 import moment from "moment";
 import { push } from "notivue";
 import NoRecordsFound from "@/Components/NoRecordsFound.vue";
@@ -345,9 +343,9 @@ const applyFilters = () => {
             </Popper>
 
             <button
+              class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
               x-tooltip.placement.top="'Filter result'"
               @click="showFilters = true"
-              class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
             >
               <i class="fa-solid fa-filter"></i>
             </button>
@@ -362,11 +360,5 @@ const applyFilters = () => {
         </div>
       </div>
     </div>
-
-    <DeleteWarehousezoneConfirmationModal
-      :show="showConfirmWarehouseZoneModal"
-      @close="closeModal"
-      @delete-Warehousezone="handleDeleteWarehousezone"
-    />
   </AppLayout>
 </template>
