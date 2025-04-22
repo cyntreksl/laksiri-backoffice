@@ -23,6 +23,7 @@ class RolePermissionSeeder extends Seeder
         Role::updateOrCreate(['name' => 'call center']);
         Role::updateOrCreate(['name' => 'boned area']);
         Role::updateOrCreate(['name' => 'finance Team']);
+        Role::updateOrCreate(['name' => 'clearance team']);
 
         $this->command->info('Default Roles added.');
 
@@ -43,6 +44,45 @@ class RolePermissionSeeder extends Seeder
                 $role->givePermissionTo($permission);
             }
         }
+        $bonedAreaRole = Role::where('name', 'boned area')->first();
+
+        $bonedAreaPermissions = [
+            'hbls.index',
+            'hbls.download pdf',
+            'hbls.show',
+            'container.index',
+            'container.create',
+            'container.load to container',
+            'container.upload documents',
+            'container.delete documents',
+            'container.edit',
+            'container.download documents',
+            'shipment.index',
+            'shipment.show',
+            'shipment.download manifest',
+            'doortodoor.download manifest',
+            'arrivals.index',
+            'arrivals.show',
+            'arrivals.download manifest',
+            'arrivals.unload',
+            'arrivals.mark as reached',
+            'bonded.index',
+            'bonded.show',
+            'bonded.mark as short loading',
+            'bonded.complete registration',
+            'issues.index',
+        ];
+
+        foreach ($bonedAreaPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $bonedAreaRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
+        }
+
+        $this->command->info('Permissions assigned to admin and boned area roles.');
     }
 
     public static function defaultPermissions(): array
