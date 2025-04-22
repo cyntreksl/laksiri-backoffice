@@ -14,6 +14,7 @@ import InputText from "primevue/inputtext";
 import DataTable from "primevue/datatable";
 import IconField from "primevue/iconfield";
 import CreateExceptionNameForm from "@/Pages/Setting/ExceptionNames/CreateExceptionNameForm.vue";
+import EditExceptionNameDialog from "@/Pages/Setting/ExceptionNames/EditExceptionNameDialog.vue";
 
 defineProps({
     exceptionNames: {
@@ -27,6 +28,8 @@ const confirm = useConfirm();
 const perPage = ref(10);
 const currentPage = ref(1);
 const showExceptionNameCreateDialog = ref(false);
+const showExceptionNameEditDialog = ref(false);
+const selectedExceptionName = ref({});
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -36,6 +39,11 @@ const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
 };
+
+const handleEditDialog = (data) => {
+    selectedExceptionName.value = data;
+    showExceptionNameEditDialog.value = true;
+}
 
 const confirmDeleteExceptionName = (id) => {
     confirm.require({
@@ -134,7 +142,7 @@ const confirmDeleteExceptionName = (id) => {
                                     outlined
                                     rounded
                                     size="small"
-                                    @click="confirmViewEditAirLine({ data })"
+                                    @click="handleEditDialog(data)"
                                 />
                                 <Button
                                     icon="pi pi-trash"
@@ -159,4 +167,8 @@ const confirmDeleteExceptionName = (id) => {
     <CreateExceptionNameForm :visible="showExceptionNameCreateDialog"
                              @close="showExceptionNameCreateDialog = false"
                              @update:visible="showExceptionNameCreateDialog = $event" />
+
+    <EditExceptionNameDialog :exception-name="selectedExceptionName" :visible="showExceptionNameEditDialog"
+                             @close="showExceptionNameEditDialog = false"
+                             @update:visible="showExceptionNameEditDialog = $event"/>
 </template>

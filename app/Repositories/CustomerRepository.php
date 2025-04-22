@@ -15,7 +15,10 @@ class CustomerRepository implements CustomerRepositoryInterface, GridJsInterface
         $query = User::role('customer')->currentBranch();
 
         if (! empty($search)) {
-            $query->where('username', 'like', '%'.$search.'%')->orWhere('name', 'like', '%'.$search.'%');
+            $query->where(function ($query) use ($search) {
+                $query->where('username', 'like', '%'.$search.'%')
+                    ->orWhere('name', 'like', '%'.$search.'%');
+            });
         }
 
         // apply filters
