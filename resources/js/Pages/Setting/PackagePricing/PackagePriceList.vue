@@ -258,7 +258,7 @@ function convertMeasurements(measureType, value) {
                             </template>
                         </Column>
 
-                        <Column field="volume_charges" header="Bill VAT">
+                        <Column field="bill_vat" header="Bill VAT">
                             <template #body="slotProps">
                                 <div class="flex items-center justify-end">
                                     <span>{{slotProps.data.bill_vat}} %</span>
