@@ -6,6 +6,7 @@ import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import TextInput from "@/Components/TextInput.vue";
+import {ref, watch} from "vue";
 
 defineProps({
     areas: {
@@ -21,10 +22,16 @@ defineProps({
 
 const emit = defineEmits(["update:visible"]);
 
+const selectedAreasArray = ref([]);
+
 const form = useForm({
     name: "",
     areas: "",
 });
+
+watch(selectedAreasArray, (newVal) => {
+    form.areas = newVal.join(",");
+}, { deep: true });
 
 const createZone = () => {
     form.post(route("setting.zones.store"), {
@@ -53,7 +60,7 @@ const createZone = () => {
             <div class="col-span-1 sm:col-span-2 gap-5">
                 <label class="block">
                     <InputLabel value="Zone Areas"/>
-                    <select v-model="form.areas"
+                    <select v-model="selectedAreasArray"
                             autocomplete="off"
                             multiple
                             placeholder="Zone Areas"
