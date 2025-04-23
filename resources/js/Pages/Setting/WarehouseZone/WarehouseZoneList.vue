@@ -1,9 +1,9 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, ref, watch} from "vue";
-import { router } from "@inertiajs/vue3";
+import {router} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { push } from "notivue";
+import {push} from "notivue";
 import {useConfirm} from "primevue/useconfirm";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
@@ -15,12 +15,16 @@ import Column from "primevue/column";
 import InputText from "primevue/inputtext";
 import DataTable from "primevue/datatable";
 import IconField from "primevue/iconfield";
+import CreateWarehouseZoneForm from "@/Pages/Setting/WarehouseZone/Partials/CreateWarehouseZoneForm.vue";
+import CreateDriverAreasForm from "@/Pages/Setting/DriverAreas/CreateDriverAreasForm.vue";
+import EditWarehouseZoneForm from "@/Pages/Setting/WarehouseZone/Partials/EditWarehouseZoneForm.vue";
 
 defineProps({
-  branches: {
-    type: Object,
-    default: () => {},
-  },
+    branches: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const baseUrl = ref("/warehouse-zones/list");
@@ -135,117 +139,126 @@ const confirmWarehouseZoneDelete = (id) => {
 </script>
 
 <template>
-  <AppLayout title="Warehouse Zones">
-    <template #header>Warehouse Zones</template>
+    <AppLayout title="Warehouse Zones">
+        <template #header>Warehouse Zones</template>
 
-    <Breadcrumb />
+        <Breadcrumb/>
 
-      <div>
-          <Card class="my-5">
-              <template #content>
-                  <DataTable
-                      ref="dt"
-                      v-model:filters="filters"
-                      :loading="loading"
-                      :rows="perPage"
-                      :rowsPerPageOptions="[5, 10, 20, 50, 100]"
-                      :totalRecords="totalRecords"
-                      :value="warehouseZones"
-                      data-key="id"
-                      filter-display="menu"
-                      lazy
-                      paginator
-                      removable-sort
-                      row-hover
-                      tableStyle="min-width: 50rem"
-                      @page="onPageChange"
-                      @sort="onSort">
+        <div>
+            <Card class="my-5">
+                <template #content>
+                    <DataTable
+                        ref="dt"
+                        v-model:filters="filters"
+                        :loading="loading"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="totalRecords"
+                        :value="warehouseZones"
+                        data-key="id"
+                        filter-display="menu"
+                        lazy
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
+                        @page="onPageChange"
+                        @sort="onSort">
 
-                      <template #header>
-                          <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
-                              <div class="text-lg font-medium">
-                                  Warehouse Zones
-                              </div>
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    Warehouse Zones
+                                </div>
 
-                              <Button label="Create New Warehouse Zone"
-                                      size="small"
-                                      @click="showWarehouseZoneCreateDialog = !showWarehouseZoneCreateDialog"/>
-                          </div>
-                          <div class="flex flex-col sm:flex-row justify-between gap-4">
-                              <!-- Button Group -->
-                              <div class="flex flex-col sm:flex-row gap-2">
-                                  <Button
-                                      icon="pi pi-filter-slash"
-                                      label="Clear Filters"
-                                      outlined
-                                      severity="contrast"
-                                      size="small"
-                                      type="button"
-                                      @click="clearFilter()"
-                                  />
+                                <Button label="Create New Warehouse Zone"
+                                        size="small"
+                                        @click="showWarehouseZoneCreateDialog = !showWarehouseZoneCreateDialog"/>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Button Group -->
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        icon="pi pi-filter-slash"
+                                        label="Clear Filters"
+                                        outlined
+                                        severity="contrast"
+                                        size="small"
+                                        type="button"
+                                        @click="clearFilter()"
+                                    />
 
-                                  <Button
-                                      icon="pi pi-external-link"
-                                      label="Export"
-                                      severity="contrast"
-                                      size="small"
-                                      @click="exportCSV($event)"
-                                  />
-                              </div>
+                                    <Button
+                                        icon="pi pi-external-link"
+                                        label="Export"
+                                        severity="contrast"
+                                        size="small"
+                                        @click="exportCSV($event)"
+                                    />
+                                </div>
 
-                              <!-- Search Field -->
-                              <IconField class="w-full sm:w-auto">
-                                  <InputIcon>
-                                      <i class="pi pi-search"/>
-                                  </InputIcon>
-                                  <InputText
-                                      v-model="filters.global.value"
-                                      class="w-full"
-                                      placeholder="Keyword Search"
-                                      size="small"
-                                  />
-                              </IconField>
-                          </div>
-                      </template>
+                                <!-- Search Field -->
+                                <IconField class="w-full sm:w-auto">
+                                    <InputIcon>
+                                        <i class="pi pi-search"/>
+                                    </InputIcon>
+                                    <InputText
+                                        v-model="filters.global.value"
+                                        class="w-full"
+                                        placeholder="Keyword Search"
+                                        size="small"
+                                    />
+                                </IconField>
+                            </div>
+                        </template>
 
-                      <template #empty>No warehouse zones found.</template>
+                        <template #empty>No warehouse zones found.</template>
 
-                      <template #loading>Loading warehouse zones data. Please wait.</template>
+                        <template #loading>Loading warehouse zones data. Please wait.</template>
 
-                      <Column field="name" header="Name"></Column>
+                        <Column field="name" header="Name"></Column>
 
-                      <Column field="description" header="Description"></Column>
+                        <Column field="description" header="Description"></Column>
 
-                      <Column field="branch_name" header="Branch"></Column>
+                        <Column field="branch_name" header="Branch"></Column>
 
-                      <Column field="created_at" header="Created At"></Column>
+                        <Column field="created_at" header="Created At"></Column>
 
-                      <Column field="" header="Actions" style="width: 10%">
-                          <template #body="{ data }">
-                              <div class="flex gap-2">
-                                  <Button
-                                      icon="pi pi-pencil"
-                                      outlined
-                                      rounded
-                                      size="small"
-                                      @click.prevent="handleEditDialog(data)"
-                                  />
-                                  <Button
-                                      icon="pi pi-trash"
-                                      outlined
-                                      rounded
-                                      severity="danger"
-                                      size="small"
-                                      @click="confirmWarehouseZoneDelete(data.id)"
-                                  />
-                              </div>
-                          </template>
-                      </Column>
+                        <Column field="" header="Actions" style="width: 10%">
+                            <template #body="{ data }">
+                                <div class="flex gap-2">
+                                    <Button
+                                        icon="pi pi-pencil"
+                                        outlined
+                                        rounded
+                                        size="small"
+                                        @click.prevent="handleEditDialog(data)"
+                                    />
+                                    <Button
+                                        icon="pi pi-trash"
+                                        outlined
+                                        rounded
+                                        severity="danger"
+                                        size="small"
+                                        @click="confirmWarehouseZoneDelete(data.id)"
+                                    />
+                                </div>
+                            </template>
+                        </Column>
 
-                      <template #footer> In total there are {{ warehouseZones ? totalRecords : 0 }} warehouse zones.</template>
-                  </DataTable>
-              </template>
-          </Card>
-      </div>
-  </AppLayout>
+                        <template #footer> In total there are {{ warehouseZones ? totalRecords : 0 }} warehouse zones.
+                        </template>
+                    </DataTable>
+                </template>
+            </Card>
+        </div>
+    </AppLayout>
+
+    <CreateWarehouseZoneForm :visible="showWarehouseZoneCreateDialog"
+                             @close="showWarehouseZoneCreateDialog = false"
+                             @update:visible="showWarehouseZoneCreateDialog = $event"/>
+
+    <EditWarehouseZoneForm :visible="showWarehouseZoneEditDialog" :warehouse-zone="selectedWarehouseZone"
+                           @close="showWarehouseZoneEditDialog = false"
+                           @update:visible="showWarehouseZoneEditDialog = $event"/>
 </template>
