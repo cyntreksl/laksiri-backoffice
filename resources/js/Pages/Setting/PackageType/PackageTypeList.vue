@@ -13,6 +13,8 @@ import Column from "primevue/column";
 import InputText from "primevue/inputtext";
 import DataTable from "primevue/datatable";
 import IconField from "primevue/iconfield";
+import CreatePackageTypeDialog from "@/Pages/Setting/PackageType/CreatePackageTypeDialog.vue";
+import EditPackageTypeDialog from "@/Pages/Setting/PackageType/EditPackageTypeDialog.vue";
 
 defineProps({
     packageTypes: {
@@ -27,7 +29,7 @@ const perPage = ref(10);
 const currentPage = ref(1);
 const showPackageTypeCreateDialog = ref(false);
 const showPackageTypeEditDialog = ref(false);
-const selectedExceptionName = ref({});
+const selectedPackageType = ref({});
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -39,7 +41,7 @@ const onPageChange = (event) => {
 };
 
 const handleEditDialog = (data) => {
-    selectedExceptionName.value = data;
+    selectedPackageType.value = data;
     showPackageTypeEditDialog.value = true;
 }
 
@@ -163,4 +165,12 @@ const confirmDeletePackageType = (id) => {
             </Card>
         </div>
     </AppLayout>
+
+    <CreatePackageTypeDialog :visible="showPackageTypeCreateDialog"
+                             @close="showPackageTypeCreateDialog = false"
+                             @update:visible="showPackageTypeCreateDialog = $event"/>
+
+    <EditPackageTypeDialog :package-type="selectedPackageType" :visible="showPackageTypeEditDialog"
+                           @close="showPackageTypeEditDialog = false"
+                           @update:visible="showPackageTypeEditDialog = $event"/>
 </template>

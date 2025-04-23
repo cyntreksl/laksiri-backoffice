@@ -16,7 +16,6 @@ import InputText from "primevue/inputtext";
 import DataTable from "primevue/datatable";
 import IconField from "primevue/iconfield";
 import CreateWarehouseZoneForm from "@/Pages/Setting/WarehouseZone/Partials/CreateWarehouseZoneForm.vue";
-import CreateDriverAreasForm from "@/Pages/Setting/DriverAreas/CreateDriverAreasForm.vue";
 import EditWarehouseZoneForm from "@/Pages/Setting/WarehouseZone/Partials/EditWarehouseZoneForm.vue";
 
 defineProps({
