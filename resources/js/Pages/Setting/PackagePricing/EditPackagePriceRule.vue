@@ -146,7 +146,7 @@ const handlePackagePriceRuleUpdate = () => {
 
                                 <div>
                                     <InputLabel class="mb-1" value="Destination Branch"/>
-                                    <SelectButton v-model="form.destination_branch_id" :options="branches" name="HBL Type" option-label="name" option-value="id"/>
+                                    <SelectButton v-model="form.destination_branch_id" :options="branches" name="Destination Branch" option-label="name" option-value="id"/>
                                     <InputError :message="form.errors.destination_branch_id"/>
                                 </div>
 

@@ -211,7 +211,7 @@ const resolveWarehouse = (warehouse) => {
 
                         <Column field="true_action" header="True Action"></Column>
 
-                        <Column field="false_action" header="False Action"></Column>
+                        <Column field="false_action" header="False Action" hidden></Column>
 
                         <Column field="hbl_type" header="HBL Type" sortable>
                             <template #body="slotProps">
