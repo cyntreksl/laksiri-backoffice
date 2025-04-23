@@ -150,12 +150,6 @@ Breadcrumbs::for('setting.warehouse-zones.index', function (BreadcrumbTrail $tra
     $trail->push('Warehouse Zones', route('setting.warehouse-zones.index'));
 });
 
-// Warehouse Zone > Edit
-Breadcrumbs::for('setting.warehouse-zones.edit', function (BreadcrumbTrail $trail, $id) {
-    $trail->parent('setting.warehouse-zones.index');
-    $trail->push('Update Warehouse Zone', route('setting.warehouse-zones.edit', $id));
-});
-
 // Air Lines
 Breadcrumbs::for('setting.air-lines.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
@@ -289,14 +283,14 @@ Breadcrumbs::for('setting.prices.index', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('setting.prices.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Price Rules', route('setting.prices.index'));
-    $trail->push('Create', route('setting.prices.create'));
+    $trail->push('Create Price Rule');
 });
 
 // Branches > Edit
-Breadcrumbs::for('setting.prices.edit', function (BreadcrumbTrail $trail, $id) {
+Breadcrumbs::for('setting.prices.edit', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Settings');
-    $trail->push('Edit', route('setting.prices.edit', $id));
+    $trail->push('Price Rules', route('setting.prices.index'));
+    $trail->push('Edit Price Rule');
 });
 
 // Cash settlement

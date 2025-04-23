@@ -58,7 +58,7 @@ class PriceController extends Controller
         return Inertia::render('Setting/Pricing/EditPriceRule', [
             'cargoModes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
-            'branches' => $this->branchRepository->getBranches(),
+            'branches' => $this->branchRepository->getDestinationBranches(),
             'priceRule' => $branchPrice,
         ]);
     }
