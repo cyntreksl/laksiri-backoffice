@@ -364,7 +364,7 @@ class HBLController extends Controller
 
     public function showDoorToDoorList()
     {
-        $this->authorize('hbls.index');
+        $this->authorize('hbls.show door to door list');
 
         return Inertia::render('HBL/HBLDoorToDoorList', [
             'warehouses' => GetDestinationBranches::run(),

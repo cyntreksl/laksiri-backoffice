@@ -1142,7 +1142,7 @@ export default {
                     );
                     }
 
-                    if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'admin') {
+                    if (usePage().props.user.permissions.includes("hbls.show door to door list")) {
                         hblMenu.splice(
                             2,
                             0,
