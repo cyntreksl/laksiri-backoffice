@@ -15,17 +15,19 @@ import DataTable from "primevue/datatable";
 import IconField from "primevue/iconfield";
 import Select from "primevue/select";
 import Tag from "primevue/tag";
+import CreateOfficerDialog from "@/Pages/Setting/ShippersConsignees/CreateOfficerDialog.vue";
+import CreateExceptionNameForm from "@/Pages/Setting/ExceptionNames/CreateExceptionNameForm.vue";
 
 defineProps({
-  allOfficers: {
-    type: Object,
-    default: () => {
+    allOfficers: {
+        type: Object,
+        default: () => {
+        },
     },
-  },
-  countryCodes: {
-    type: Array,
-    default: () => [],
-  }
+    countryCodes: {
+        type: Array,
+        default: () => [],
+    }
 });
 
 const confirm = useConfirm();
@@ -96,110 +98,116 @@ const resolveType = (type) => {
 </script>
 
 <template>
-  <AppLayout title="Officers">
-    <template #header>Officers</template>
+    <AppLayout title="Officers">
+        <template #header>Officers</template>
 
-    <Breadcrumb/>
+        <Breadcrumb/>
 
-      <div>
-          <Card class="my-5">
-              <template #content>
-                  <DataTable
-                      v-model:filters="filters"
-                      :rows="perPage"
-                      :rowsPerPageOptions="[5, 10, 20, 50, 100]"
-                      :totalRecords="Object.keys(allOfficers).length"
-                      :value="allOfficers"
-                      dataKey="id"
-                      filter-display="menu"
-                      paginator
-                      removable-sort
-                      row-hover
-                      tableStyle="min-width: 50rem"
-                      @page="onPageChange">
+        <div>
+            <Card class="my-5">
+                <template #content>
+                    <DataTable
+                        v-model:filters="filters"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="Object.keys(allOfficers).length"
+                        :value="allOfficers"
+                        dataKey="id"
+                        filter-display="menu"
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
+                        @page="onPageChange">
 
-                      <template #header>
-                          <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
-                              <div class="text-lg font-medium">
-                                  Shipper & Consignee Officers
-                              </div>
-                              <div>
-                                  <Button
-                                      class="w-full"
-                                      @click="showOfficerCreateDialog = !showOfficerCreateDialog"
-                                  >
-                                      Create New Officer
-                                  </Button>
-                              </div>
-                          </div>
-                          <div class="flex flex-col sm:flex-row justify-between gap-4">
-                              <!-- Search Field -->
-                              <IconField class="w-full sm:w-auto">
-                                  <InputIcon>
-                                      <i class="pi pi-search"/>
-                                  </InputIcon>
-                                  <InputText
-                                      v-model="filters.global.value"
-                                      class="w-full"
-                                      placeholder="Keyword Search"
-                                      size="small"
-                                  />
-                              </IconField>
-                          </div>
-                      </template>
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    Shipper & Consignee Officers
+                                </div>
+                                <div>
+                                    <Button
+                                        class="w-full"
+                                        @click="showOfficerCreateDialog = !showOfficerCreateDialog"
+                                    >
+                                        Create New Officer
+                                    </Button>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Search Field -->
+                                <IconField class="w-full sm:w-auto">
+                                    <InputIcon>
+                                        <i class="pi pi-search"/>
+                                    </InputIcon>
+                                    <InputText
+                                        v-model="filters.global.value"
+                                        class="w-full"
+                                        placeholder="Keyword Search"
+                                        size="small"
+                                    />
+                                </IconField>
+                            </div>
+                        </template>
 
-                      <template #empty> No Officers found.</template>
+                        <template #empty> No Officers found.</template>
 
-                      <Column field="name" header="Name">
-                          <template #body="slotProps">
-                              <div>{{ slotProps.data.name }}</div>
-                              <div class="text-gray-500 text-sm">{{slotProps.data.email}}</div>
-                              <div class="text-gray-500 text-sm">{{slotProps.data.mobile_number}}</div>
-                          </template>
-                      </Column>
+                        <Column field="name" header="Name">
+                            <template #body="slotProps">
+                                <div>{{ slotProps.data.name }}</div>
+                                <div class="text-gray-500 text-sm">{{ slotProps.data.email }}</div>
+                                <div class="text-gray-500 text-sm">{{ slotProps.data.mobile_number }}</div>
+                            </template>
+                        </Column>
 
-                      <Column field="type" header="Type">
-                          <template #body="slotProps">
-                              <Tag :severity="resolveType(slotProps.data.type)" :value="slotProps.data.type.toUpperCase()" class="text-sm"></Tag>
-                          </template>
-                          <template #filter="{ filterModel, filterCallback }">
-                              <Select v-model="filterModel.value" :options="types" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                          </template>
-                      </Column>
+                        <Column field="type" header="Type">
+                            <template #body="slotProps">
+                                <Tag :severity="resolveType(slotProps.data.type)"
+                                     :value="slotProps.data.type.toUpperCase()" class="text-sm"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="types" :showClear="true"
+                                        placeholder="Select One" style="min-width: 12rem"/>
+                            </template>
+                        </Column>
 
-                      <Column field="pp_or_nic_no" header="NIC"></Column>
+                        <Column field="pp_or_nic_no" header="NIC"></Column>
 
-                      <Column field="residency_no" header="Residency No"></Column>
+                        <Column field="residency_no" header="Residency No"></Column>
 
-                      <Column field="address" header="Address"></Column>
+                        <Column field="address" header="Address"></Column>
 
-                      <Column field="" header="Actions" style="width: 10%">
-                          <template #body="{ data }">
-                              <Button
-                                  class="mr-2"
-                                  icon="pi pi-pencil"
-                                  outlined
-                                  rounded
-                                  size="small"
-                                  @click="handleEditDialog(data)"
-                              />
-                              <Button
-                                  icon="pi pi-trash"
-                                  outlined
-                                  rounded
-                                  severity="danger"
-                                  size="small"
-                                  @click="confirmDeleteOfficer(data.id)"
-                              />
-                          </template>
-                      </Column>
+                        <Column field="" header="Actions" style="width: 10%">
+                            <template #body="{ data }">
+                                <Button
+                                    class="mr-2"
+                                    icon="pi pi-pencil"
+                                    outlined
+                                    rounded
+                                    size="small"
+                                    @click="handleEditDialog(data)"
+                                />
+                                <Button
+                                    icon="pi pi-trash"
+                                    outlined
+                                    rounded
+                                    severity="danger"
+                                    size="small"
+                                    @click="confirmDeleteOfficer(data.id)"
+                                />
+                            </template>
+                        </Column>
 
-                      <template #footer> In total there are {{ allOfficers ? Object.keys(allOfficers).length : 0 }}
-                          Officers.
-                      </template>
-                  </DataTable>
-              </template>
-          </Card>
-      </div>
-  </AppLayout>
+                        <template #footer> In total there are {{ allOfficers ? Object.keys(allOfficers).length : 0 }}
+                            Officers.
+                        </template>
+                    </DataTable>
+                </template>
+            </Card>
+        </div>
+    </AppLayout>
+
+    <CreateOfficerDialog :country-codes="countryCodes" :visible="showOfficerCreateDialog"
+                         @close="showOfficerCreateDialog = false"
+                         @update:visible="showOfficerCreateDialog = $event"/>
 </template>
