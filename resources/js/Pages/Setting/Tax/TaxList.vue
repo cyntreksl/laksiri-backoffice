@@ -32,15 +32,12 @@ const selectedTaxId = ref(null);
 const isDialogVisible = ref(false);
 const showEditTaxDialog = ref(false);
 const checked = ref(false);
+const showAddNewTaxDialog = ref(false);
+
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
-    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
-    cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
-    is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
-    user: {value: null, matchMode: FilterMatchMode.EQUALS},
-    payments: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
+
 const form = useForm({
     name: "",
     rate: 0,
@@ -56,6 +53,7 @@ const confirmViewEditTax = (tax) => {
     showEditTaxDialog.value = true;
     isDialogVisible.value = true;
 };
+
 const fetchTaxes = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
     loading.value = true;
     try {
@@ -77,45 +75,53 @@ const fetchTaxes = async (page = 1, search = "", sortField = 'id', sortOrder = 0
         loading.value = false;
     }
 };
+
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchTaxes(currentPage.value);
 };
+
 const onSort = (event) => {
     fetchTaxes(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
+
 onMounted(() => {
     fetchTaxes();
 });
+
 const debouncedFetchTaxes = debounce((searchValue) => {
     fetchTaxes(1, searchValue);
 }, 1000);
+
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
         debouncedFetchTaxes(newValue);
     }
 });
 
-const showAddNewTaxDialog = ref(false);
 const confirmViewAddNewTax = () => {
     showAddNewTaxDialog.value = true;
     isDialogVisible.value = true;
 };
+
 const closeAddNewTaxModal = () => {
     form.name = "";
     showAddNewTaxDialog.value = false;
     showEditTaxDialog.value = false;
     isDialogVisible.value = false;
 }
+
 const onDialogShow = () => {
     document.body.classList.add('p-overflow-hidden');
 };
+
 const onDialogHide = () => {
   form.reset();
   form.clearErrors();
   document.body.classList.remove('p-overflow-hidden');
 };
+
 const handleAddNewTax = async () => {
     form.post(route("setting.taxes.store"), {
         onSuccess: () => {
@@ -132,6 +138,7 @@ const handleAddNewTax = async () => {
         preserveState: true,
     });
 }
+
 const handleEditTax = async () => {
     form.put(route("setting.taxes.update", selectedTaxId.value), {
         onSuccess: () => {
@@ -148,6 +155,7 @@ const handleEditTax = async () => {
         preserveState: true,
     });
 }
+
 const confirmDeleteTax = (tax) => {
     selectedTaxId.value = tax.data.id;
     confirm.require({
@@ -192,14 +200,12 @@ const confirmDeleteTax = (tax) => {
             <Card class="my-5">
                 <template #content>
                     <DataTable
-                        v-model:contextMenuSelection="selectedTax"
                         v-model:selection="selectedTax"
                         :loading="loading"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                         :totalRecords="totalRecords"
                         :value="taxes"
-                        context-menu
                         dataKey="id"
                         filter-display="menu"
                         lazy

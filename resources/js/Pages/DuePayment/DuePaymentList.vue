@@ -582,7 +582,7 @@ const exportURL = computed(() => {
 
                         <Column field="grand_total" header="Amount">
                             <template #body="slotProps">
-                                <div class="flex items-center">
+                                <div class="flex items-center justify-end">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
                                     {{ slotProps.data.grand_total.toFixed(2) }}
                                 </div>
@@ -591,7 +591,7 @@ const exportURL = computed(() => {
 
                         <Column field="paid_amount" header="Paid">
                             <template #body="slotProps">
-                                <div class="flex items-center">
+                                <div class="flex items-center justify-end">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
                                     {{ slotProps.data.paid_amount.toFixed(2) }}
                                 </div>

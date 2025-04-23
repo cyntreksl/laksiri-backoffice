@@ -90,10 +90,10 @@ class UserController extends Controller
     {
         $this->authorize('users.edit');
 
-        return Inertia::render('User/UserEdit', [
-            'user' => $user->load('roles', 'branches'),
+        return Inertia::render('User/EditUser', [
+            'userRecord' => $user->load('roles', 'branches'),
             'roles' => $this->roleRepository->getRoles(),
-            'branches' => $this->branchRepository->getBranches(),
+            'branches' => $this->branchRepository->getUserBranches(),
         ]);
     }
 

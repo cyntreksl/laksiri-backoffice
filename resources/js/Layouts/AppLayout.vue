@@ -1633,7 +1633,6 @@ export default {
                     );
                     changeSidePanelTitle("courier");
                     break;
-
                 case "delivery":
                     childMenuList.splice(
                         0,
