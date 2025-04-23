@@ -2,19 +2,20 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {router, useForm} from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
-import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
 import {push} from "notivue";
-import Checkbox from "@/Components/Checkbox.vue";
 import RadioButton from "@/Components/RadioButton.vue";
 import {reactive, ref, watch} from "vue";
-import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
-import RemovePriceRuleConfirmationModal from "@/Pages/Setting/Pricing/Partials/RemovePriceRuleConfirmationModal.vue";
+import Button from "primevue/button";
+import Card from 'primevue/card';
+import InputText from "primevue/inputtext";
+import InputNumber from "primevue/inputnumber";
+import Dialog from "primevue/dialog";
+import Checkbox from 'primevue/checkbox';
+import Column from "primevue/column";
+import DataTable from "primevue/datatable";
+import {useConfirm} from "primevue/useconfirm";
 
 defineProps({
     cargoModes: {
@@ -31,6 +32,13 @@ defineProps({
     },
 })
 
+const showAddNewPriceRuleDialog = ref(false);
+const editMode = ref(false);
+const ruleList = ref([]);
+const priceModes = ['Weight', 'Volume'];
+const editIndex = ref(null);
+const confirm = useConfirm();
+
 const form = useForm({
     destination_branch_id: null,
     cargo_mode: '',
@@ -38,8 +46,6 @@ const form = useForm({
     price_mode: '',
     priceRules: {},
 });
-
-const ruleList = ref([]);
 
 // Define the priceRuleItem reactive object
 const priceRuleItem = reactive({
@@ -53,7 +59,6 @@ const priceRuleItem = reactive({
     is_editable: false,
 });
 
-const priceModes = ['Weight', 'Volume'];
 const handlePriceRuleCreate = () => {
     form.priceRules = ruleList.value;
     if (form.priceRules.length <= 0) {
@@ -85,8 +90,7 @@ watch([() => form.cargo_mode], ([newCargoMode]) => {
         form.price_mode = "Weight";
     }
 });
-const showAddNewPriceRuleDialog = ref(false);
-const editMode = ref(false);
+
 const showAddPriceRuleDialog = () => {
     showAddNewPriceRuleDialog.value = true;
 };
@@ -96,25 +100,35 @@ const closeAddPriceRuleModal = () => {
     restModalFields()
 };
 
-
-
-const showConfirmRemovePriceRuleModal = ref(false);
-const ruleIndex = ref(null);
 const confirmRemovePriceRule = (index) => {
-    ruleIndex.value = index;
-    showConfirmRemovePriceRuleModal.value = true;
+    confirm.require({
+        message: 'Would you like to remove this price rule?',
+        header: 'Remove Price Rule?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Remove Package',
+            severity: 'danger'
+        },
+        accept: () => {
+            handleRemovePriceRule(index)
+        },
+        reject: () => {
+        }
+    });
 };
 
-const closePriceRuleRemoveModal = () => {
-    showConfirmRemovePriceRuleModal.value = false;
+const handleRemovePriceRule = (index) => {
+    if (index !== null) {
+        ruleList.value.splice(index,1);
+    }
 };
 
-const handleRemovePriceRule = () => {
-    ruleList.value.splice(ruleIndex.value,1);
-    closePriceRuleRemoveModal();
-};
-
-const editIndex = ref(null);
 const openEditModal = (index) => {
     editMode.value = true;
     editIndex.value = index;
@@ -132,7 +146,6 @@ const restModalFields = () => {
     priceRuleItem.per_package_charges = '';
     priceRuleItem.is_editable = false;
 };
-
 
 const addPriceRuleData = () => {
     if (
@@ -159,502 +172,244 @@ const addPriceRuleData = () => {
     }
 };
 
+const onDialogShow = () => {
+    document.body.classList.add('p-overflow-hidden');
+};
+
+const onDialogHide = () => {
+    document.body.classList.remove('p-overflow-hidden');
+};
 </script>
 
 <template>
     <AppLayout title="Create Price Rule">
-        <template #header>Pricing</template>
+        <template #header>Create Price Rule</template>
 
         <Breadcrumb/>
+
         <form @submit.prevent="handlePriceRuleCreate">
 
-            <div class="flex items-center justify-between p-2 my-5">
-                <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                    Create Price Rule
-                </h2>
+            <div class="flex items-center justify-end p-2 my-5 space-x-2">
+                <Button label="Cancel" severity="danger" variant="outlined" @click="router.visit(route('setting.prices.index'))" />
 
-                <div class="flex justify-end bottom-0 space-x-5">
-                    <DangerOutlineButton @click="router.visit(route('setting.prices.index'))">Cancel</DangerOutlineButton>
-                    <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
-                                   class="space-x-2"
-                                   type="submit"
-                    >
-                        <span>Create Price Rule</span>
-                        <svg
-                            class="size-5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </PrimaryButton>
-                </div>
+                <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Create Price Rule" type="submit" />
             </div>
 
             <div class="grid grid-cols-1 mt-4 gap-4">
                 <div class="sm:col-span-3 space-y-5">
-                    <div class="card px-4 py-4 sm:px-5">
-                        <div class="grid grid-cols-2">
-                            <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                                Basic Details
-                            </h2>
-                        </div>
-
-                        <div class="ml--5 flex flex-nowrap items-start p-4 my-2 rounded bg-white border border-indigo-400 overflow-auto">
-                            <div class="bg-green-100 p-5 rounded-lg w-1/4">
-                                <InputLabel value="Cargo Mode" class="mb-2" />
-                                <div class="flex space-x-4">
-                                    <label
-                                        v-for="cargoType in cargoModes"
-                                        :key="cargoType"
-                                        class="flex space-x-2 items-center"
-                                    >
-                                        <RadioButton
-                                            v-model="form.cargo_mode"
-                                            :label="cargoType"
-                                            name="cargoType"
-                                            :value="cargoType"
-                                        />
-                                        <svg
-                                            v-if="cargoType === 'Air Cargo'"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-plane"
-                                            fill="none"
-                                            height="15"
-                                            stroke="currentColor"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            viewBox="0 0 24 24"
-                                            width="15"
-                                            xmlns="http://www.w3.org/2000/svg"
+                    <Card style="overflow: hidden">
+                        <template #header>
+                            <div class="flex flex-wrap md:flex-nowrap items-start p-4 my-2 rounded bg-white overflow-auto gap-4">
+                                <div class="bg-green-100 p-5 rounded-lg w-full md:w-1/4">
+                                    <InputLabel class="mb-2" value="Cargo Mode" />
+                                    <div class="flex flex-wrap gap-4">
+                                        <label
+                                            v-for="cargoType in cargoModes"
+                                            :key="cargoType"
+                                            class="flex space-x-2 items-center"
                                         >
-                                            <path d="M0 0h24v24H0z" fill="none" stroke="none" />
-                                            <path
-                                                d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z"
+                                            <RadioButton
+                                                v-model="form.cargo_mode"
+                                                :label="cargoType"
+                                                :value="cargoType"
+                                                name="cargoType"
                                             />
-                                        </svg>
-                                        <svg
-                                            v-else
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
-                                            fill="none"
-                                            height="15"
-                                            stroke="currentColor"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            viewBox="0 0 24 24"
-                                            width="15"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path d="M0 0h24v24H0z" fill="none" stroke="none" />
-                                            <path
-                                                d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1"
-                                            />
-                                            <path d="M4 18l-1 -5h18l-2 4" />
-                                            <path d="M5 13v-6h8l4 6" />
-                                            <path d="M7 7v-4h-1" />
-                                        </svg>
-                                    </label>
-                                </div>
-                                <InputError :message="form.errors.cargo_mode"/>
-                            </div>
-
-                            <div class="bg-blue-100 p-5 rounded-lg w-1/4 ml-2">
-                                <InputLabel value="HBL Type" class="mb-2" />
-                                <div class="flex space-x-4">
-                                    <label
-                                        v-for="hblType in hblTypes"
-                                        :key="hblType"
-                                        class="flex space-x-2 items-center"
-                                    >
-                                        <RadioButton
-                                            v-model="form.hbl_type"
-                                            :label="hblType"
-                                            name="hblType"
-                                            :value="hblType"
-                                        />
-                                    </label>
-                                </div>
-                                <InputError :message="form.errors.hbl_type"/>
-                            </div>
-
-                            <div class="bg-amber-100 p-5 rounded-lg w-1/4 ml-2">
-                                <InputLabel value="Branch" class="mb-2" />
-                                <div class="flex space-x-4">
-                                    <label
-                                        v-for="branch in branches"
-                                        :key="branch"
-                                        class="flex space-x-2 items-center"
-                                    >
-                                        <RadioButton
-                                            v-model="form.destination_branch_id"
-                                            :label="branch.name"
-                                            name="warehouse"
-                                            :value="branch.id"
-                                        />
-                                    </label>
-                                </div>
-                                <InputError :message="form.errors.destination_branch_id"/>
-                            </div>
-
-                            <div class="bg-green-100 p-5 rounded-lg w-1/4 ml-2">
-                                <InputLabel value="Price Mode" class="mb-2" />
-                                <div class="flex space-x-4">
-                                    <label
-                                        v-for="price_mode in priceModes"
-                                        :key="price_mode"
-                                        class="flex space-x-2 items-center"
-                                    >
-                                        <RadioButton
-                                            disabled
-                                            v-model="form.price_mode"
-                                            :label="price_mode"
-                                            name="price_mode"
-                                            :value="price_mode"
-                                        />
-                                    </label>
-                                </div>
-                                <InputError :message="form.errors.price_mode"/>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-4 my-4 gap-4">
-                            <div class="sm:col-span-4">
-                                <div class="p-1" style="height: 100%">
-                                    <div class="mt-4 flex justify-between items-center">
-                                        <div class="flex items-center space-x-2">
-                                            <h2
-                                                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                                            >
-                                                Price Rules
-                                            </h2>
-                                        </div>
-                                        <PrimaryOutlineButton
-                                            type="button"
-                                            @click="showAddPriceRuleDialog"
-                                            :disabled="form.destination_branch_id ==null && form.cargo_mode === '' && form.hbl_type === ''"
-                                        >
-                                            New Price Rule <i class="fas fa-plus fa-fw fa-fw"></i>
-                                        </PrimaryOutlineButton>
+                                            <i v-if="cargoType === 'Air Cargo'" class="ti ti-plane-tilt"></i>
+                                            <i v-else class="ti ti-sailboat"></i>
+                                        </label>
                                     </div>
+                                    <InputError :message="form.errors.cargo_mode"/>
+                                </div>
 
-                                    <div class="mt-5">
-                                        <div
-                                            v-if="ruleList.length > 0"
-                                            class="is-scrollbar-hidden min-w-full overflow-x-auto"
+                                <div class="bg-blue-100 p-5 rounded-lg w-full md:w-1/4">
+                                    <InputLabel class="mb-2" value="HBL Type" />
+                                    <div class="flex flex-wrap gap-4">
+                                        <label
+                                            v-for="hblType in hblTypes"
+                                            :key="hblType"
+                                            class="flex space-x-2 items-center"
                                         >
-                                            <table class="is-zebra w-full text-left">
-                                                <thead>
-                                                    <tr>
-                                                    <th
-                                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5 text-center"
-                                                    >
-                                                        <span class="hidden">Actions</span>
-                                                    </th>
-                                                    <th
-                                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                                    >
-                                                        Condition
-                                                    </th>
-                                                    <th
-                                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                                    >
-                                                        True Action
-                                                    </th>
-                                                    <th
-                                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                                    >
-                                                        Bill Price
-                                                    </th>
-                                                    <th
-                                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                                    >
-                                                        Bill VAT (%)
-                                                    </th>
-                                                    <th
-                                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                                    >
-                                                        Volume Charges
-                                                    </th>
-                                                    <th
-                                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                                    >
-                                                        Per Package Charges
-                                                    </th>
-                                                    <th
-                                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                                    >
-                                                        Editable
-                                                    </th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="(rule, index) in ruleList">
-                                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5 space-x-2">
-                                                            <button
-                                                                class="btn size-9 p-0 font-medium text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
-                                                                @click.prevent="openEditModal(index)"
-                                                            >
-                                                                <i class="fa-solid fa-edit"></i>
-                                                            </button>
-                                                            <button
-                                                                v-if="rule.condition !== '>0'"
-                                                                class="btn size-9 p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
-                                                                @click.prevent="confirmRemovePriceRule(index)"
-                                                            >
-                                                                <i class="fa-solid fa-trash"></i>
-                                                            </button>
-                                                        </td>
-                                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                            {{ rule.condition }}
-                                                        </td>
-                                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                            {{ rule.true_action }}
-                                                        </td>
-                                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                            {{ rule.bill_price }}
-                                                        </td>
-                                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                            {{ rule.bill_vat }}
-                                                        </td>
-                                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                            {{ rule.volume_charges }}
-                                                        </td>
-                                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                            {{ rule.per_package_charges }}
-                                                        </td>
-                                                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                            <template v-if="rule.is_editable">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    class="h-5 w-5 text-green-500"
-                                                                    viewBox="0 0 20 20"
-                                                                    fill="currentColor"
-                                                                >
-                                                                    <path
-                                                                        fill-rule="evenodd"
-                                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                                        clip-rule="evenodd"
-                                                                    />
-                                                                </svg>
-                                                            </template>
-                                                        </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div v-if="ruleList.length === 0"
-                                             class="text-center">
-                                            <div class="text-center mb-8">
-                                                <svg
-                                                    class="w-24 h-24 mx-auto mb-4 text-gray-400"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path
-                                                        d="M12 9l-2 2-2-2m4 2h4a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2h4m4-2l2 2 2-2"
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                    ></path>
-                                                </svg>
-                                                <p class="text-gray-600">
-                                                    No price rules. Please add price rules to view data.
-                                                </p>
-                                            </div>
-                                            <PrimaryOutlineButton
-                                                type="button"
-                                                @click="showAddPriceRuleDialog"
-                                                :disabled="form.destination_branch_id ==null && form.cargo_mode === '' && form.hbl_type === ''"
-                                            >
-                                                New Price Rule <i class="fas fa-plus fa-fw fa-fw"></i>
-                                            </PrimaryOutlineButton>
+                                            <RadioButton
+                                                v-model="form.hbl_type"
+                                                :label="hblType"
+                                                :value="hblType"
+                                                name="hblType"
+                                            />
+                                        </label>
+                                    </div>
+                                    <InputError :message="form.errors.hbl_type"/>
+                                </div>
+
+                                <div class="bg-amber-100 p-5 rounded-lg w-full md:w-1/4">
+                                    <InputLabel class="mb-2" value="Branch" />
+                                    <div class="flex flex-wrap gap-4">
+                                        <label
+                                            v-for="branch in branches"
+                                            :key="branch"
+                                            class="flex space-x-2 items-center"
+                                        >
+                                            <RadioButton
+                                                v-model="form.destination_branch_id"
+                                                :label="branch.name"
+                                                :value="branch.id"
+                                                name="warehouse"
+                                            />
+                                        </label>
+                                    </div>
+                                    <InputError :message="form.errors.destination_branch_id"/>
+                                </div>
+
+                                <div class="bg-fuchsia-100 p-5 rounded-lg w-full md:w-1/4">
+                                    <InputLabel class="mb-2" value="Price Mode" />
+                                    <div class="flex flex-wrap gap-4">
+                                        <label
+                                            v-for="price_mode in priceModes"
+                                            :key="price_mode"
+                                            class="flex space-x-2 items-center"
+                                        >
+                                            <RadioButton
+                                                v-model="form.price_mode"
+                                                :label="price_mode"
+                                                :value="price_mode"
+                                                disabled
+                                                name="price_mode"
+                                            />
+                                        </label>
+                                    </div>
+                                    <InputError :message="form.errors.price_mode"/>
+                                </div>
+                            </div>
+                        </template>
+                        <template #title>
+                            <div class="flex justify-between">
+                                <div>Price Rules</div>
+                                <Button  :disabled="form.destination_branch_id == null && form.cargo_mode === '' && form.hbl_type === ''"
+                                         icon="pi pi-plus" iconPos="left" label="New Price Rule" severity="info" type="button" variant="outlined" @click="showAddPriceRuleDialog"/>
+                            </div>
+                        </template>
+                        <template #content>
+                            <div class="mt-5">
+                                <DataTable v-if="ruleList.length > 0" :value="ruleList" tableStyle="min-width: 50rem">
+                                    <Column header="Actions">
+                                        <template #body="slotProps">
+                                            <Button v-if="slotProps.data.condition !== '>0'" icon="pi pi-times" rounded severity="danger" size="small" variant="text" @click.prevent="confirmRemovePriceRule(slotProps.index)" />
+
+                                            <Button icon="pi pi-pencil" rounded size="small" variant="text" @click.prevent="openEditModal(slotProps.index)"  />
+                                        </template>
+                                    </Column>
+
+                                    <Column field="condition" header="Condition"></Column>
+
+                                    <Column field="true_action" header="True Action"></Column>
+
+                                    <Column class="!text-right" field="bill_price" header="Bill Price">
+                                        <template #body="slotProps">
+                                            {{ slotProps.data.bill_price.toFixed(2) }}
+                                        </template>
+                                    </Column>
+                                    <Column field="bill_vat" header="Bill VAT">
+                                        <template #body="slotProps">
+                                            {{ slotProps.data.bill_vat }} %
+                                        </template>
+                                    </Column>
+                                    <Column class="!text-right" field="volume_charges" header="Volume Charges">
+                                        <template #body="slotProps">
+                                            {{ slotProps.data.volume_charges.toFixed(2) }}
+                                        </template>
+                                    </Column>
+                                    <Column class="!text-right" field="per_package_charges" header="Per Package Charges">
+                                        <template #body="slotProps">
+                                            {{ slotProps.data.per_package_charges.toFixed(2) }}
+                                        </template>
+                                    </Column>
+                                    <Column field="is_editable" header="Editable">
+                                        <template #body="{ data }">
+                                            <i :class="{ 'pi-times-circle text-red-500': !data.is_editable, 'pi-check-circle text-green-400': data.is_editable }" class="pi"></i>
+                                        </template>
+                                    </Column>
+                                </DataTable>
+                                <div v-if="ruleList.length === 0"
+                                     class="text-center">
+                                    <div class="text-center mb-8">
+                                        <div class="text-center mb-4">
+                                            <i class="pi pi-money-bill text-orange-300 animate-slow-bounce" style="font-size: 8rem"></i>
+                                            <p class="text-gray-600">
+                                                No price rules. Please add price rules to view data.
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </template>
+                    </Card>
                 </div>
             </div>
         </form>
+    </AppLayout>
 
-        <div
-            v-if="showAddNewPriceRuleDialog"
-            class="fixed px-2 inset-0 z-[100] flex flex-col items-center justify-center overflow-y-auto"
-            role="dialog"
-        >
-            <div
-                class="absolute inset-0 bg-slate-900/60 transition-opacity duration-300"
-                x-show="true"
-                @click="false"
-            ></div>
+    <Dialog v-model:visible="showAddNewPriceRuleDialog" :header="editMode ? `Edit Price Rule` : `Add New Price Rule`" :style="{ width: '60rem' }" block-scroll maximizable modal position="bottom" @hide="onDialogHide" @show="onDialogShow">
 
-            <div
-                class="relative w-auto sm:w-1/2 h-auto sm:h-1/5 md:h-fit lg:h-fit rounded-lg bg-white transition-opacity duration-300 dark:bg-navy-700"
-            >
-                <div
-                    class="flex justify-between rounded-t-lg bg-slate-200 px-4 py-3 dark:bg-navy-800 sm:px-5"
-                >
-                    <h3 class="text-base font-medium text-slate-700 dark:text-navy-100">
-                        {{ editMode ? "Edit Package" : "Add New Price Rule" }}
-                    </h3>
-                    <button
-                        class="btn -mr-1.5 size-7 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                        @click="closeAddPriceRuleModal"
-                    >
-                        <svg
-                            class="size-4.5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M6 18L18 6M6 6l12 12"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            ></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="px-4 py-4 sm:px-5">
-                    <div class="mt-4 space-y-4">
-                        <div class="grid grid-cols-4 gap-4">
-                            <div class="col-span-4 md:col-span-2">
-                                <label class="block">
-                                  <span
-                                  >Condition
-                                    <span class="text-red-500 text-sm">*</span></span
-                                  >
-                                    <input
-                                        v-model="priceRuleItem.condition"
-                                        :disabled="ruleList.length <= 0"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Type Condition"
-                                        type="text"
-                                    />
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-2">
-                                <label class="block">
-                                  <span
-                                  >True Action
-                                    <span class="text-red-500 text-sm">*</span></span
-                                  >
-                                    <input
-                                        v-model="priceRuleItem.true_action"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        type="text"
-                                        placeholder="Set True Action"
-                                    />
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-2">
-                                <label class="block">
-                                  <span
-                                  >Bill Price
-                                    <span class="text-red-500 text-sm">*</span></span
-                                  >
-                                    <input
-                                        v-model="priceRuleItem.bill_price"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0"
-                                        placeholder="0.00"
-                                        type="number"
-                                    />
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-2">
-                                <label class="block">
-                                  <span
-                                  >Bill VAT (%)
-                                    <span class="text-red-500 text-sm">*</span></span
-                                  >
-                                    <input
-                                        v-model="priceRuleItem.bill_vat"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        min="0"
-                                        placeholder="0.00"
-                                        step="any"
-                                        type="number"
-                                    />
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-2">
-                                <label class="block">
-                                  <span
-                                  >Volume Charge
-                                    <span class="text-red-500 text-sm">*</span></span
-                                  >
-                                    <input
-                                        v-model="priceRuleItem.volume_charges"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Set Volume Charges"
-                                        type="text"
-                                    />
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-2">
-                                <label class="block">
-                                  <span
-                                  >Per Package Charges
-                                    <span class="text-red-500 text-sm">*</span></span
-                                  >
-                                    <input
-                                        v-model="priceRuleItem.per_package_charges"
-                                        class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
-                                        placeholder="Set Per Package Charges"
-                                        type="text"
-                                    />
-                                </label>
-                            </div>
-                            <div class="col-span-4 md:col-span-2">
-                                <label class="block">
-                                  <span
-                                  >Is Editable
-                                  </span
-                                  >
-                                    <Checkbox class="ml-4" v-model="priceRuleItem.is_editable" :checked="priceRuleItem.is_editable"/>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="space-x-2 text-right">
-                            <SecondaryButton
-                                class="min-w-[7rem]"
-                                @click="closeAddPriceRuleModal"
-                            >
-                                Cancel
-                            </SecondaryButton>
-                            <PrimaryButton
-                                class="min-w-[7rem]"
-                                type="button"
-                                @click="addPriceRuleData"
-                            >
-                                {{ editMode ? "Edit" : "Add" }}
-                            </PrimaryButton>
-                        </div>
-                    </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2 md:col-span-1">
+                <InputLabel>
+                    Condition
+                    <span class="text-red-500 text-sm">*</span>
+                </InputLabel>
+                <InputText v-model="priceRuleItem.condition" :disabled="ruleList.length <= 0" class="w-full" placeholder="Type Condition"/>
+            </div>
+
+            <div class="col-span-2 md:col-span-1">
+                <InputLabel>
+                    True Action
+                    <span class="text-red-500 text-sm">*</span>
+                </InputLabel>
+                <InputText v-model="priceRuleItem.true_action" class="w-full" placeholder="Set True Action"/>
+            </div>
+
+            <div class="col-span-2 md:col-span-1">
+                <InputLabel>
+                    Bill Price
+                    <span class="text-red-500 text-sm">*</span>
+                </InputLabel>
+                <InputNumber v-model="priceRuleItem.bill_price" :maxFractionDigits="2" :minFractionDigits="2" class="w-full" min="0.00" placeholder="0.00" step="0.01"/>
+            </div>
+
+            <div class="col-span-2 md:col-span-1">
+                <InputLabel>
+                    Bill VAT (%)
+                    <span class="text-red-500 text-sm">*</span>
+                </InputLabel>
+                <InputNumber v-model="priceRuleItem.bill_vat" :maxFractionDigits="2" :minFractionDigits="2" class="w-full" min="0.00" placeholder="0.00" step="any"/>
+            </div>
+
+            <div class="col-span-2 md:col-span-1">
+                <InputLabel>
+                    Volume Charge
+                    <span class="text-red-500 text-sm">*</span>
+                </InputLabel>
+                <InputNumber v-model="priceRuleItem.volume_charges" :maxFractionDigits="2" :minFractionDigits="2" class="w-full" min="0.00" placeholder="Set Volume Charges" step="any"/>
+            </div>
+
+            <div class="col-span-2 md:col-span-1">
+                <InputLabel>
+                    Per Package Charges
+                    <span class="text-red-500 text-sm">*</span>
+                </InputLabel>
+                <InputNumber v-model="priceRuleItem.per_package_charges" :maxFractionDigits="2" :minFractionDigits="2" class="w-full" min="0.00" placeholder="Set Per Package Charges" step="any"/>
+            </div>
+
+            <div class="col-span-2 md:col-span-1">
+                <div class="flex items-center gap-2">
+                    <Checkbox v-model="priceRuleItem.is_editable" :checked="priceRuleItem.is_editable" binary inputId="is-editable"/>
+                    <label for="is-editable"> Editable </label>
                 </div>
             </div>
         </div>
 
-        <RemovePriceRuleConfirmationModal
-            :show="showConfirmRemovePriceRuleModal"
-            @close="closePriceRuleRemoveModal"
-            @removePriceRule="handleRemovePriceRule"
-        />
+        <template #footer>
+            <Button label="Cancel" severity="secondary" text @click="closeAddPriceRuleModal" />
+            <Button :label="editMode ? `Edi Price Rule` : `Add Price Rule`" severity="help" @click="addPriceRuleData" />
+        </template>
 
-
-    </AppLayout>
+    </Dialog>
 </template>
