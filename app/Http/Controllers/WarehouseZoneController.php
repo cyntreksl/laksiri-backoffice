@@ -12,7 +12,7 @@ use Inertia\Inertia;
 class WarehouseZoneController extends Controller
 {
     public function __construct(
-        private readonly WarehousezoneRepositoryInterface $warehousezoneRepository,
+        private readonly WarehousezoneRepositoryInterface $warehouseZoneRepository,
     ) {}
 
     public function index()
@@ -34,38 +34,31 @@ class WarehouseZoneController extends Controller
             $query->where('name', 'like', '%'.$search.'%');
         }
 
-        $warehousezones = $query->orderBy($order, $dir)->paginate($limit, ['*'], 'page', $page);
+        $warehouseZones = $query->orderBy($order, $dir)->paginate($limit, ['*'], 'page', $page);
 
         return response()->json([
-            'data' => WarehouseZoneCollection::collection($warehousezones),
+            'data' => WarehouseZoneCollection::collection($warehouseZones),
             'meta' => [
-                'total' => $warehousezones->total(),
-                'current_page' => $warehousezones->currentPage(),
-                'perPage' => $warehousezones->perPage(),
-                'lastPage' => $warehousezones->lastPage(),
+                'total' => $warehouseZones->total(),
+                'current_page' => $warehouseZones->currentPage(),
+                'perPage' => $warehouseZones->perPage(),
+                'lastPage' => $warehouseZones->lastPage(),
             ],
         ]);
     }
 
     public function store(StoreWareahouseZoneRequest $request)
     {
-        $this->warehousezoneRepository->createWarehouseZone($request->all());
-    }
-
-    public function edit($id)
-    {
-        return Inertia::render('Setting/WarehouseZone/WarehousezonesEdit', [
-            'warehousezone' => $this->warehousezoneRepository->getWarehouseZone($id),
-        ]);
+        $this->warehouseZoneRepository->createWarehouseZone($request->all());
     }
 
     public function update(StoreWareahouseZoneRequest $request)
     {
-        $this->warehousezoneRepository->editWarehouseZone($request->all());
+        $this->warehouseZoneRepository->editWarehouseZone($request->all());
     }
 
     public function delete($id)
     {
-        $this->warehousezoneRepository->destroy(WarehouseZone::find($id));
+        $this->warehouseZoneRepository->destroy(WarehouseZone::find($id));
     }
 }
