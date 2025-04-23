@@ -11,6 +11,6 @@ class GetPackageTypes
 
     public function handle()
     {
-        return PackageType::all();
+        return PackageType::latest()->get();
     }
 }
