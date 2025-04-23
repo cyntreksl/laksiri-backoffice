@@ -13,6 +13,8 @@ import Column from "primevue/column";
 import InputText from "primevue/inputtext";
 import DataTable from "primevue/datatable";
 import IconField from "primevue/iconfield";
+import CreatePackageTypeDialog from "@/Pages/Setting/PackageType/CreatePackageTypeDialog.vue";
+import CreateExceptionNameForm from "@/Pages/Setting/ExceptionNames/CreateExceptionNameForm.vue";
 
 defineProps({
     packageTypes: {
@@ -163,4 +165,8 @@ const confirmDeletePackageType = (id) => {
             </Card>
         </div>
     </AppLayout>
+
+    <CreatePackageTypeDialog :visible="showPackageTypeCreateDialog"
+                             @close="showPackageTypeCreateDialog = false"
+                             @update:visible="showPackageTypeCreateDialog = $event"/>
 </template>
