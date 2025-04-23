@@ -74,12 +74,51 @@ class RolePermissionSeeder extends Seeder
             'bonded.mark as short loading',
             'bonded.complete registration',
             'issues.index',
+            'customer-queue.show package calling queue',
+            'customer-queue.show package released list',
+            'customer-queue.show package calling screen',
         ];
 
         foreach ($bonedAreaPermissions as $permName) {
             $permission = Permission::where('name', $permName)->first();
             if ($permission) {
                 $bonedAreaRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
+        }
+        $callCenterPermissions = [
+            'hbls.index',
+            'hbls.download pdf',
+            'hbls.show',
+            'hbls.issue token',
+            'bonded.index',
+            'bonded.show',
+            'bonded.mark as short loading',
+            'bonded.complete registration',
+            'issues.index',
+            'customer-queue.issue token',
+            'customer-queue.show reception calling queue',
+            'customer-queue.show reception verified list',
+            'customer-queue.show reception calling screen',
+            'customer-queue.show document verification queue',
+            'customer-queue.show document verified list',
+            'customer-queue.show document verification calling screen',
+            'customer-queue.show package calling queue',
+            'customer-queue.show package released list',
+            'customer-queue.show package calling screen',
+            'customer-queue.show cashier calling queue',
+            'customer-queue.show cashier paid list',
+            'customer-queue.show cashier calling screen',
+            'customer-queue.show examination calling queue',
+            'customer-queue.show gate ist',
+            'customer-queue.show examination calling screen',
+        ];
+        $callCenterRole = Role::where('name', 'call center')->first();
+        foreach ($callCenterPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $callCenterRole->givePermissionTo($permission);
             } else {
                 $this->command->warn("Permission '{$permName}' not found.");
             }
