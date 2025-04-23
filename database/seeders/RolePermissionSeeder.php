@@ -33,7 +33,7 @@ class RolePermissionSeeder extends Seeder
     protected function assignPermissions(): void
     {
         $role = Role::where('name', 'admin')->first();
-        $allowedAdminPermissionGroups = ['User', 'Role', 'Pickup', 'Pickup Type'];
+        $allowedAdminPermissionGroups = ['User', 'Role', 'Pickup', 'Pickup Type','Cash Settlement','Warehouse','Container','Loaded Shipment','Unloading Issues'];
 
         for ($i = 0; $i < count(self::defaultPermissions()); $i++) {
             $permissionGroup = self::defaultPermissions()[$i]['group_name'];
