@@ -16,7 +16,7 @@ import IconField from "primevue/iconfield";
 import Select from "primevue/select";
 import Tag from "primevue/tag";
 import CreateOfficerDialog from "@/Pages/Setting/ShippersConsignees/CreateOfficerDialog.vue";
-import CreateExceptionNameForm from "@/Pages/Setting/ExceptionNames/CreateExceptionNameForm.vue";
+import EditOfficerDialog from "@/Pages/Setting/ShippersConsignees/EditOfficerDialog.vue";
 
 defineProps({
     allOfficers: {
@@ -210,4 +210,8 @@ const resolveType = (type) => {
     <CreateOfficerDialog :country-codes="countryCodes" :visible="showOfficerCreateDialog"
                          @close="showOfficerCreateDialog = false"
                          @update:visible="showOfficerCreateDialog = $event"/>
+
+    <EditOfficerDialog :country-codes="countryCodes" :officer="selectedOfficer" :visible="showOfficerEditDialog"
+                       @close="showOfficerEditDialog = false"
+                       @update:visible="showOfficerEditDialog = $event"/>
 </template>

@@ -1,14 +1,14 @@
 <script setup>
 import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import AppLayout from "@/Layouts/AppLayout.vue";
-import Breadcrumb from "@/Components/Breadcrumb.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
-import {computed, ref} from "vue";
-
+import {computed, ref, watch} from "vue";
+import Button from "primevue/button";
+import Select from "primevue/select";
+import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
+import Dialog from "primevue/dialog";
 
 const props = defineProps({
     officer: {
@@ -19,20 +19,31 @@ const props = defineProps({
     countryCodes: {
         type: Array,
         default: () => [],
+    },
+    visible: {
+        type: Boolean,
+        default: false,
     }
 });
 
+const emit = defineEmits(["update:visible"]);
+
 const splitCountryCode = (fullNumber) => {
-    for (let code of props.countryCodes) {
-        if (fullNumber.startsWith(code)) {
-            return code;
+    if (fullNumber) {
+        for (let code of props.countryCodes) {
+            if (fullNumber.startsWith(code)) {
+                return code;
+            }
         }
     }
 };
+
 const splitContactNumber = (fullNumber) => {
-    for (let code of props.countryCodes) {
-        if (fullNumber.startsWith(code)) {
-            return fullNumber.slice(code.length);
+    if (fullNumber) {
+        for (let code of props.countryCodes) {
+            if (fullNumber.startsWith(code)) {
+                return fullNumber.slice(code.length);
+            }
         }
     }
 };
@@ -52,12 +63,29 @@ const form = useForm({
     description:props.officer.description,
 });
 
+watch(() => props.officer, (newOfficer) => {
+    if (newOfficer) {
+        form.id = newOfficer.id;
+        form.name = newOfficer.name;
+        form.type = newOfficer.type;
+        form.email = newOfficer.email;
+        form.pp_or_nic_no = newOfficer.pp_or_nic_no;
+        form.residency_no = newOfficer.residency_no;
+        form.address = newOfficer.address;
+        form.description = newOfficer.description;
+
+        // Update mobile number components
+        countryCode.value = splitCountryCode(newOfficer.mobile_number) || props.countryCodes[0] || '';
+        contactNumber.value = splitContactNumber(newOfficer.mobile_number) || '';
+    }
+}, { immediate: true, deep: true });
 
 const updateOfficer = () => {
     form.put(route("setting.shipper-consignees.update", props.officer.id), {
         onSuccess: () => {
             router.visit(route("setting.shipper-consignees.index"));
             form.reset();
+            emit('close');
             push.success("Officer Updated Successfully!");
         },
         preserveScroll: true,
@@ -67,208 +95,85 @@ const updateOfficer = () => {
 </script>
 
 <template>
-    <AppLayout title="Edit Officer ">
-        <template #header>Officer Edit</template>
+    <Dialog :style="{ width: '35rem' }" :visible="visible" header="Edit Officer" modal
+            @update:visible="(newValue) => $emit('update:visible', newValue)">
+        <div class="grid grid-cols-1 gap-5">
+            <div>
+                <InputLabel for="type" value="Type"/>
+                <Select v-model="form.type" :options="['shipper', 'consignee']" class="w-full" placeholder="Select a Type" >
+                    <template #option="slotProps">
+                        {{ slotProps.option.toUpperCase() }}
+                    </template>
+                    <template #value="slotProps">
+                        {{ slotProps.value.toUpperCase() }}
+                    </template>
+                </Select>
+                <InputError :message="form.errors.type"/>
+            </div>
 
-        <!-- Breadcrumb -->
-        <Breadcrumb :ExceptionName="officer"/>
+            <div>
+                <InputLabel for="name" value="Name"/>
+                <InputText v-model="form.name" class="w-full" placeholder="Enter Officer Name" type="text"/>
+                <InputError :message="form.errors.name"/>
+            </div>
 
-        <div class="grid grid-cols-1 mt-4 gap-4">
-            <div class="card px-4 py-4 sm:px-5">
-                <div>
-                    <h2
-                        class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Update {{ officer.type }}
-                    </h2>
-                    <br/>
+            <div v-if="form.type === 'shipper'">
+                <InputLabel for="email" value="Email"/>
+                <InputText v-model="form.email" class="w-full" placeholder="Enter Officer Email" type="email"/>
+                <InputError :message="form.errors.email"/>
+            </div>
+
+            <div>
+                <InputLabel for="mobile_number" value="Mobile Number"/>
+                <div class="flex w-full">
+                    <Select
+                        v-model="countryCode"
+                        :options="countryCodes"
+                        class="!rounded-r-none !border-r-0 w-1/4"
+                        filter
+                        placeholder="Select a Country Code"
+                    />
+                    <InputText
+                        v-model="contactNumber"
+                        class="!rounded-l-none w-3/4"
+                        placeholder="123 4567 890"
+                    />
                 </div>
-                <form @submit.prevent="updateOfficer">
-                    <div class="grid grid-cols-1 sm:grid-cols-6 gap-5" v-if="officer.type === 'shipper'">
-                        <div class="col-span-3">
-                            <InputLabel for="name" value="Name"/>
-                            <div class="flex items-center border border-gray-300 rounded-md px-2">
-                                <TextInput
-                                    v-model="form.name"
-                                    id="name"
-                                    type="text"
-                                    class="w-full border-0 focus:ring-0"
-                                    placeholder="Name"
-                                />
-                            </div>
-                            <InputError :message="form.errors.name"/>
-                        </div>
+                <InputError :message="form.errors.mobile_number"/>
+            </div>
 
-                        <!-- Email Field -->
-                        <div class="col-span-3">
-                            <InputLabel for="email" value="Email"/>
-                            <div class="flex items-center border border-gray-300 rounded-md px-2">
-                                <TextInput
-                                    v-model="form.email"
-                                    id="email"
-                                    type="email"
-                                    class="w-full border-0 focus:ring-0"
-                                    placeholder="Email"
-                                />
-                            </div>
-                            <InputError :message="form.errors.email"/>
-                        </div>
+            <div>
+                <InputLabel for="pp_or_nic_no" value="PP or NIC No"/>
+                <InputText v-model="form.pp_or_nic_no" class="w-full" placeholder="Enter Officer PP or NIC No"
+                           type="text"/>
+                <InputError :message="form.errors.pp_or_nic_no"/>
+            </div>
 
-                        <!-- Mobile Number Field -->
-                        <div class="col-span-2">
-                            <div class="grid grid-cols-1 sm:grid-cols-3">
-                                <InputLabel class="col-span-3" for="mobile_number" value="Mobile Number"/>
-                                <div>
-                                    <select
-                                        v-model="countryCode"
-                                        x-init="$el._tom = new Tom($el)"
-                                        class="w-full rounded-r-0"
-                                    >
-                                        <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                            {{ countryCode }}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-span-2">
-                                    <input
-                                        v-model="contactNumber"
-                                        class="form-input rounded-l-lg w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                        placeholder="123 4567 890"
-                                        type="text"
-                                    />
-                                </div>
-                                <InputError class="col-span-3" :message="form.errors.mobile_number"/>
-                            </div>
-                        </div>
+            <div v-if="form.type === 'shipper'">
+                <InputLabel for="residency_no" value="Residency No"/>
+                <InputText v-model="form.residency_no" class="w-full" placeholder="Enter Residency No" type="text"/>
+                <InputError :message="form.errors.residency_no"/>
+            </div>
 
-                        <!-- Passport/NIC Field -->
-                        <div class="col-span-2">
-                            <InputLabel for="pp_or_nic_no" value="PP or NIC No"/>
-                            <TextInput
-                                v-model="form.pp_or_nic_no"
-                                id="pp_or_nic_no"
-                                type="text"
-                                class="w-full"
-                                placeholder="PP or NIC No"
-                            />
-                            <InputError :message="form.errors.pp_or_nic_no"/>
-                        </div>
+            <div>
+                <InputLabel for="address" value="Address"/>
+                <Textarea v-model="form.address" class="w-full" cols="30" placeholder="Type address here..." rows="4"/>
+                <InputError :message="form.errors.address"/>
+            </div>
 
-                        <!-- Residency No Field -->
-                        <div class="col-span-2">
-                            <InputLabel for="residency_no" value="Residency No"/>
-                            <TextInput
-                                v-model="form.residency_no"
-                                id="residency_no"
-                                type="text"
-                                class="w-full"
-                                placeholder="Residency No"
-                            />
-                            <InputError :message="form.errors.residency_no"/>
-                        </div>
-
-                        <!-- Address Field -->
-                        <div class="col-span-6">
-                            <InputLabel for="address" value="Address"/>
-                            <textarea
-                                v-model="form.address"
-                                id="address"
-                                class="w-full border-gray-300 rounded-md"
-                                placeholder="Type address here..."
-                                rows="3"
-                            ></textarea>
-                            <InputError :message="form.errors.address"/>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5" v-else>
-                        <div class="col-span-2">
-                            <InputLabel for="name" value="Name"/>
-                            <TextInput
-                                v-model="form.name"
-                                id="name"
-                                type="text"
-                                class="w-full"
-                                placeholder="Name"
-                            />
-                            <InputError :message="form.errors.name"/>
-                        </div>
-
-                        <!-- Passport/NIC Number Field -->
-                        <div class="col-span-1">
-                            <InputLabel for="pp_or_nic_no" value="PP or NIC No"/>
-                            <TextInput
-                                v-model="form.pp_or_nic_no"
-                                id="pp_or_nic_no"
-                                type="text"
-                                class="w-full"
-                                placeholder="PP or NIC No"
-                            />
-                            <InputError :message="form.errors.pp_or_nic_no"/>
-                        </div>
-
-                        <!-- Mobile Number Field -->
-                        <div class="col-span-1">
-                            <InputLabel for="mobile_number" value="Mobile Number"/>
-                            <div class="flex space-x-px">
-                                <select
-                                    v-model="countryCode"
-                                    class="form-select rounded-l-lg border border-slate-300 bg-white px-3 py-2 pr-9 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                >
-                                    <option v-for="code in countryCodes" :key="code" :value="code">
-                                        {{ code }}
-                                    </option>
-                                </select>
-                                <input
-                                    v-model="contactNumber"
-                                    id="mobile_number"
-                                    type="text"
-                                    class="form-input w-full border border-slate-300 bg-transparent px-3 py-2 placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 focus:z-10 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent rounded-r-lg"
-                                    placeholder="123 4567 890"
-                                />
-                            </div>
-                            <InputError :message="form.errors.mobile_number"/>
-                        </div>
-
-                        <!-- Address Field -->
-                        <div class="col-span-1">
-                            <InputLabel for="address" value="Address"/>
-                            <textarea
-                                v-model="form.address"
-                                id="address"
-                                class="w-full border-gray-300 rounded-md"
-                                placeholder="Type address here..."
-                                rows="3"
-                            ></textarea>
-                            <InputError :message="form.errors.address"/>
-                        </div>
-
-                        <!-- Note Field -->
-                        <div class="col-span-1">
-                            <InputLabel for="note" value="Note"/>
-                            <textarea
-                                v-model="form.description"
-                                id="note"
-                                class="w-full border-gray-300 rounded-md"
-                                placeholder="Type note here..."
-                                rows="3"
-                            ></textarea>
-                            <InputError :message="form.errors.description"/>
-                        </div>
-                    </div>
-                    <br/>
-                    <div class="flex col-span-2 justify-end">
-                        <PrimaryButton
-                            :class="{ 'opacity-25': form.processing }"
-                            :disabled="form.processing"
-                            class="ms-3"
-                            type="submit"
-                        >
-                            Update Officer
-                        </PrimaryButton>
-                    </div>
-                </form>
+            <div v-if="form.type === 'consignee'">
+                <InputLabel for="note" value="Note"/>
+                <Textarea v-model="form.description" class="w-full" cols="30" placeholder="Type note here..." rows="4"/>
+                <InputError :message="form.errors.description"/>
             </div>
         </div>
-    </AppLayout>
+
+        <div class="flex justify-end gap-2 mt-5">
+            <Button label="Cancel" severity="secondary" type="button" @click="emit('close')"></Button>
+            <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" label="Save Officer"
+                    type="button"
+                    @click="updateOfficer"></Button>
+        </div>
+    </Dialog>
 </template>
 
