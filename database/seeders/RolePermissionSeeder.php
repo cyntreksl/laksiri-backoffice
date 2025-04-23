@@ -189,6 +189,7 @@ class RolePermissionSeeder extends Seeder
                     'hbls.delete',
                     'hbls.hold and release',
                     'hbls.show cancelled hbls',
+                    'hbls.show door to door list',
                     'hbls.restore',
                     'hbls.download pdf',
                     'hbls.download invoice',
