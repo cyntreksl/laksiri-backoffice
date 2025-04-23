@@ -47,6 +47,7 @@ class ConvertPickupToHBL
             'freight_charge' => $request->freight_charge,
             'bill_charge' => $request->bill_charge,
             'other_charge' => $request->other_charge,
+            'destination_charge' => $request->destination_charge,
             'discount' => $request->discount,
             'paid_amount' => $request->paid_amount,
             'grand_total' => $request->grand_total,
