@@ -15,6 +15,8 @@ import Column from "primevue/column";
 import InputText from "primevue/inputtext";
 import DataTable from "primevue/datatable";
 import IconField from "primevue/iconfield";
+import CreateWarehouseZoneForm from "@/Pages/Setting/WarehouseZone/Partials/CreateWarehouseZoneForm.vue";
+import CreateDriverAreasForm from "@/Pages/Setting/DriverAreas/CreateDriverAreasForm.vue";
 
 defineProps({
   branches: {
@@ -248,4 +250,8 @@ const confirmWarehouseZoneDelete = (id) => {
           </Card>
       </div>
   </AppLayout>
+
+    <CreateWarehouseZoneForm :visible="showWarehouseZoneCreateDialog"
+                             @close="showWarehouseZoneCreateDialog = false"
+                             @update:visible="showWarehouseZoneCreateDialog = $event"/>
 </template>
