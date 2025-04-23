@@ -2,19 +2,14 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {router, useForm} from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
-import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
 import {push} from "notivue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Button from "primevue/button";
 import Card from "primevue/card";
 import InputText from "primevue/inputtext";
 import SelectButton from "primevue/selectbutton";
-import InputNumber from "primevue/inputnumber";
-import Message from "primevue/message";
 import {ref} from "vue";
 
 const props = defineProps({
@@ -47,7 +42,7 @@ const form = useForm({
     true_action: props.priceRule.true_action || '',
     false_action: props.priceRule.false_action || '',
     bill_price: props.priceRule.bill_price || null,
-    bill_vat: props.priceRule.bill_vat || null,
+    bill_vat: props.priceRule.bill_vat || 0,
     volume_charges: props.priceRule.volume_charges || '',
     per_package_charges: props.priceRule.per_package_charges || '',
     is_editable: Boolean(props.priceRule.is_editable),
@@ -74,7 +69,7 @@ const handlePriceRuleUpdate = () => {
     <AppLayout title="Edit Price Rule">
         <template #header>Edit Price Rule</template>
 
-        <Breadcrumb :id="priceRule.id"/>
+        <Breadcrumb/>
 
         <form @submit.prevent="handlePriceRuleUpdate">
 
@@ -125,7 +120,7 @@ const handlePriceRuleUpdate = () => {
 
                                 <div>
                                     <InputLabel value="Condition"/>
-                                    <InputText v-model="form.condition" class="w-full" placeholder="Type Condition" />
+                                    <InputText v-model="form.condition" :disabled="form.condition === '>0' || form.condition === '> 0'" class="w-full" placeholder="Type Condition"/>
                                     <InputError :message="form.errors.condition"/>
                                 </div>
 
