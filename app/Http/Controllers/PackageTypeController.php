@@ -26,13 +26,6 @@ class PackageTypeController extends Controller
         $this->packageTypeRepository->storePackageType($request->all());
     }
 
-    public function edit(PackageType $packageType)
-    {
-        return Inertia::render('Setting/PackageType/UpdatePackageTypeForm', [
-            'packageType' => $packageType,
-        ]);
-    }
-
     public function update(UpdatePackageTypeRequest $request, PackageType $packageType)
     {
         $this->packageTypeRepository->updatePackageType($request->all(), $packageType);
