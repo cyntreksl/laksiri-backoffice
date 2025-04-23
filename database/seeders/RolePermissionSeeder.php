@@ -33,6 +33,7 @@ class RolePermissionSeeder extends Seeder
     protected function assignPermissions(): void
     {
         $role = Role::where('name', 'admin')->first();
+        $allowedAdminPermissionGroups = ['User', 'Role', 'Pickup', 'Pickup Type'];
 
         for ($i = 0; $i < count(self::defaultPermissions()); $i++) {
             $permissionGroup = self::defaultPermissions()[$i]['group_name'];
@@ -41,7 +42,9 @@ class RolePermissionSeeder extends Seeder
                     'name' => self::defaultPermissions()[$i]['permissions'][$j],
                     'group_name' => $permissionGroup,
                 ]);
-                $role->givePermissionTo($permission);
+                if (in_array($permissionGroup, $allowedAdminPermissionGroups)) {
+                    $role->givePermissionTo($permission);
+                }
             }
         }
         $bonedAreaRole = Role::where('name', 'boned area')->first();
