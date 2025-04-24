@@ -529,7 +529,7 @@ const exportCSV = () => {
 
                         <Column field="consignee_name" header="Consignee">
                             <template #body="slotProps">
-                                <div>{{ slotProps.data.hbl_name }}</div>
+                                <div>{{ slotProps.data.consignee_name }}</div>
                                 <div class="text-gray-500 text-sm">{{slotProps.data.consignee_email}}</div>
                                 <div class="text-gray-500 text-sm">{{slotProps.data.consignee_contact}}</div>
                             </template>

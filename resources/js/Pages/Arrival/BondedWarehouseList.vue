@@ -1,24 +1,28 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {computed, onMounted, reactive, ref} from "vue";
-import {Grid, h, html} from "gridjs";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
+import {onMounted, ref, watch} from "vue";
+import {useConfirm} from "primevue/useconfirm";
 import moment from "moment";
-import FilterDrawer from "@/Components/FilterDrawer.vue";
-import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import DatePicker from "@/Components/DatePicker.vue";
-import FilterBorder from "@/Components/FilterBorder.vue";
-import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
-import Checkbox from "@/Components/Checkbox.vue";
-import Switch from "@/Components/Switch.vue";
-import FilterHeader from "@/Components/FilterHeader.vue";
+import {FilterMatchMode} from "@primevue/core/api";
 import {router, usePage} from "@inertiajs/vue3";
-import ShortLoadingConfirmationModal from "@/Pages/Arrival/Partials/ShortLoadingConfirmationModal.vue";
+import axios from "axios";
+import {debounce} from "lodash";
 import {push} from "notivue";
+import FloatLabel from "primevue/floatlabel";
+import ContextMenu from "primevue/contextmenu";
+import DataTable from "primevue/datatable";
+import InputIcon from "primevue/inputicon";
+import Tag from "primevue/tag";
+import InputText from "primevue/inputtext";
+import DatePicker from "primevue/datepicker";
+import Column from "primevue/column";
+import Button from "primevue/button";
+import IconField from "primevue/iconfield";
+import Panel from "primevue/panel";
+import Card from "primevue/card";
+import Select from "primevue/select";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
-import NoRecordsFound from "@/Components/NoRecordsFound.vue";
 
 const props = defineProps({
     hblTypes: {
@@ -27,413 +31,171 @@ const props = defineProps({
     },
 });
 
-const wrapperRef = ref(null);
-let grid = null;
-const isData = ref(false)
-const perPage = ref(10);
-const showFilters = ref(false);
-const fromDate = moment(new Date()).subtract(7, "days").format("YYYY-MM-DD");
-const toDate = moment(new Date()).format("YYYY-MM-DD");
-
-const filters = reactive({
-    fromDate: fromDate,
-    toDate: toDate,
-    deliveryType: Object.values(props.hblTypes),
-});
-
-const data = reactive({
-    columnVisibility: {
-        id: false,
-        hbl: true,
-        hbl_name: true,
-        consignee_name: true,
-        created_at: true,
-        weight: true,
-        volume: true,
-        quantity: true,
-        hbl_type: true,
-        is_short_load: true,
-        actions: true,
-    },
-});
-
 const baseUrl = ref("/bonded-warehouse-list");
+const loading = ref(true);
+const hbls = ref([]);
+const totalRecords = ref(0);
+const perPage = ref(10);
+const currentPage = ref(1);
+const showConfirmViewHBLModal = ref(false);
+const cm = ref();
+const selectedHBL = ref(null);
+const selectedHBLID = ref(null);
+const confirm = useConfirm();
+const dt = ref();
+const fromDate = ref(moment(new Date()).subtract(7, "days").toISOString().split("T")[0]);
+const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
+const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 
-const toggleColumnVisibility = (columnName) => {
-    data.columnVisibility[columnName] = !data.columnVisibility[columnName];
-    updateGridConfig();
-    grid.forceRender();
-};
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+});
 
-const initializeGrid = () => {
-    const visibleColumns = Object.keys(data.columnVisibility);
-
-    grid = new Grid({
-        columns: createColumns(),
-        search: {
-            debounceTimeout: 1000,
-            server: {
-                url: (prev, keyword) => `${prev}&search=${keyword}`,
-            },
-        },
-        sort: {
-            multiColumn: false,
-            server: {
-                url: (prev, columns) => {
-                    if (!columns.length) return prev;
-                    const col = columns[0];
-                    const dir = col.direction === 1 ? "asc" : "desc";
-                    let colName = visibleColumns[col.index];
-                    return `${prev}&order=${colName}&dir=${dir}`;
-                },
-            },
-        },
-        pagination: {
-            limit: perPage.value,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
-        },
-        server: {
-            url: constructUrl(),
-            then: (data) =>
-                data.data.map((item) => {
-                    const row = [];
-                    // row.push({id: item.id})
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                }),
-            total: (response) => {
-                if (response && response.meta) {
-                    response.meta.total > 0 ? isData.value = true : isData.value = false;
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
-
-    grid.render(wrapperRef.value);
-};
-
-const createColumns = () => [
-    {name: "ID", hidden: !data.columnVisibility.id},
-    {name: "HBL", hidden: !data.columnVisibility.hbl},
-    {name: "Name", hidden: !data.columnVisibility.hbl_name},
-    {name: "Consignee Name", hidden: !data.columnVisibility.consignee_name},
-    {name: "Created Date", hidden: !data.columnVisibility.created_at},
+const menuModel = ref([
     {
-        name: "Weight",
-        hidden: !data.columnVisibility.weight,
-        formatter: (_, row) => {
-            return html(`<div class="flex items-center">
-<svg class="icon icon-tabler icons-tabler-outline icon-tabler-weight text-info mr-2"
-                         fill="none" height="24" stroke="currentColor" stroke-linecap="round"
-                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                        <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
-                        <path
-                            d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
-                    </svg> ${row.cells[5].data}
-</div>`)
-        }
+        label: "View",
+        icon: "pi pi-fw pi-search",
+        command: () => confirmViewHBL(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes('bonded.show'),
     },
     {
-        name: "Volume",
-        hidden: !data.columnVisibility.volume,
-        formatter: (_, row) => {
-            return html(`<div class="flex items-center">
-<svg class="icon icon-tabler icons-tabler-outline icon-tabler-scale text-info mr-2"
-                         fill="none"
-                         height="24" stroke="currentColor" stroke-linecap="round"
-                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                        <path d="M7 20l10 0"/>
-                        <path d="M6 6l6 -1l6 1"/>
-                        <path d="M12 3l0 17"/>
-                        <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                        <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                    </svg> ${row.cells[6].data}
-</div>`)
-        }
+        label: "Mark As Short Loading",
+        icon: "pi pi-fw pi-flag",
+        command: () => confirmShortLoading(selectedHBL.value.id),
+        disabled: !usePage().props.user.permissions.includes('bonded.mark as short loading'),
     },
-    {name: "Quantity", hidden: !data.columnVisibility.quantity},
-    {name: "Type", hidden: !data.columnVisibility.hbl_type},
-    {
-        name: "Is Short Load",
-        hidden: !data.columnVisibility.is_short_load,
-        formatter: (_, row) => {
-            if (row.cells[9].data) {
-                return html('<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-circle-check text-error"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>')
+]);
+
+const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+    loading.value = true;
+    try {
+        const response = await axios.get(baseUrl.value, {
+            params: {
+                page,
+                per_page: perPage.value,
+                search,
+                deliveryType: filters.value.hbl_type.value || "",
+                sort_field: sortField,
+                sort_order: sortOrder === 1 ? "asc" : "desc",
+                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+                toDate: moment(toDate.value).format("YYYY-MM-DD"),
             }
-        }
-    },
-    {
-        name: "Actions",
-        sort: false,
-        hidden: !data.columnVisibility.actions,
-        formatter: (_, row) => {
-            return h("div", {}, [
-                usePage().props.user.permissions.includes('bonded.show') ?
-                    h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                            onClick: () => confirmViewHBL(row.cells[0].data),
-                            "x-tooltip..placement.bottom.primary": "'View'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class:
-                                        "size-6 icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                    fill: "none",
-                                    stroke: "currentColor",
-                                    strokeWidth: 2,
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        stroke: "none",
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                    }),
-                                    h("path", {
-                                        d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
-                // usePage().props.user.permissions.includes('bonded.complete registration') ?
-                //     h(
-                //         "button",
-                //         {
-                //             className:
-                //                 "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25",
-                //             onClick: () =>
-                //                 router.visit(
-                //                     route("arrival.unloading-points.index", {
-                //                         container: row.cells[0].data,
-                //                     })
-                //                 ),
-                //             "x-tooltip..placement.bottom.success": "'Complete Reception'",
-                //         },
-                //         [
-                //             h(
-                //                 "svg",
-                //                 {
-                //                     xmlns: "http://www.w3.org/2000/svg",
-                //                     viewBox: "0 0 24 24",
-                //                     class:
-                //                         "size-6 icon icon-tabler icons-tabler-outline icon-tabler-rosette-discount-check",
-                //                     fill: "none",
-                //                     stroke: "currentColor",
-                //                     strokeWidth: 2,
-                //                     strokeLinecap: "round",
-                //                     strokeLinejoin: "round",
-                //                 },
-                //                 [
-                //                     h("path", {
-                //                         stroke: "none",
-                //                         d: "M0 0h24v24H0z",
-                //                         fill: "none",
-                //                     }),
-                //                     h("path", {
-                //                         d: "M5 7.2a2.2 2.2 0 0 1 2.2 -2.2h1a2.2 2.2 0 0 0 1.55 -.64l.7 -.7a2.2 2.2 0 0 1 3.12 0l.7 .7c.412 .41 .97 .64 1.55 .64h1a2.2 2.2 0 0 1 2.2 2.2v1c0 .58 .23 1.138 .64 1.55l.7 .7a2.2 2.2 0 0 1 0 3.12l-.7 .7a2.2 2.2 0 0 0 -.64 1.55v1a2.2 2.2 0 0 1 -2.2 2.2h-1a2.2 2.2 0 0 0 -1.55 .64l-.7 .7a2.2 2.2 0 0 1 -3.12 0l-.7 -.7a2.2 2.2 0 0 0 -1.55 -.64h-1a2.2 2.2 0 0 1 -2.2 -2.2v-1a2.2 2.2 0 0 0 -.64 -1.55l-.7 -.7a2.2 2.2 0 0 1 0 -3.12l.7 -.7a2.2 2.2 0 0 0 .64 -1.55v-1",
-                //                     }),
-                //                     h("path", {
-                //                         d: "M9 12l2 2l4 -4",
-                //                     }),
-                //                 ]
-                //             ),
-                //         ]
-                //     ) : null,
-                usePage().props.user.permissions.includes('bonded.mark as short loading') ?
-                    row.cells[9].data === 1 ||
-                    h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-warning hover:bg-warning/20 focus:bg-warning/20 active:bg-warning/25",
-                            onClick: () => confirmShortLoading(row.cells[0].data),
-                            "x-tooltip..placement.bottom.success": "'Mark As Short Loading'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class:
-                                        "size-6 icon icon-tabler icons-tabler-outline icon-tabler-viewport-short",
-                                    fill: "none",
-                                    stroke: "currentColor",
-                                    strokeWidth: 2,
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        stroke: "none",
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M12 3v7l3 -3",
-                                    }),
-                                    h("path", {
-                                        d: "M9 7l3 3",
-                                    }),
-                                    h("path", {
-                                        d: "M12 21v-7l3 3",
-                                    }),
-                                    h("path", {
-                                        d: "M9 17l3 -3",
-                                    }),
-                                    h("path", {
-                                        d: "M18 9h1a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-1",
-                                    }),
-                                    h("path", {
-                                        d: "M6 9h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    ) : null,
-            ]);
-        },
-    },
-];
+        });
+        hbls.value = response.data.data;
+        totalRecords.value = response.data.meta.total;
+        currentPage.value = response.data.meta.current_page;
+    } catch (error) {
+        console.error("Error fetching HBLs:", error);
+    } finally {
+        loading.value = false;
+    }
+};
 
-const updateGridConfig = () => {
-    grid.updateConfig({
-        columns: createColumns(),
-    });
+const debouncedFetchHBLs = debounce((searchValue) => {
+    fetchHBLs(1, searchValue);
+}, 1000);
+
+watch(() => filters.value.global.value, (newValue) => {
+    if (newValue !== null) {
+        debouncedFetchHBLs(newValue);
+    }
+});
+
+watch(() => filters.value.hbl_type.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => fromDate.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => toDate.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+const onPageChange = (event) => {
+    perPage.value = event.rows;
+    currentPage.value = event.page + 1;
+    fetchHBLs(currentPage.value);
+};
+
+const onSort = (event) => {
+    fetchHBLs(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
 
 onMounted(() => {
-    initializeGrid();
+    fetchHBLs();
 });
 
-const constructUrl = () => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
-        }
+const resolveHBLType = (hbl) => {
+    switch (hbl.hbl_type) {
+        case 'UPB':
+            return 'secondary';
+        case 'Gift':
+            return 'warn';
+        case 'Door to Door':
+            return 'info';
+        default:
+            return null;
     }
-    return baseUrl.value + "?" + params.toString();
 };
 
-const applyFilters = () => {
-    showFilters.value = false;
-    const newUrl = constructUrl();
-    const visibleColumns = Object.keys(data.columnVisibility);
-    grid.updateConfig({
-        server: {
-            url: newUrl,
-            then: (data) =>
-                data.data.map((item) => {
-                    const row = [];
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                }),
-            total: (response) => {
-                if (response && response.meta) {
-                    response.meta.total > 0 ? isData.value = true : isData.value = false;
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
-    grid.forceRender();
+const onRowContextMenu = (event) => {
+    cm.value.show(event.originalEvent);
 };
 
-const resetFilter = () => {
-    filters.fromDate = fromDate;
-    filters.toDate = toDate;
-    filters.deliveryType = Object.values(props.hblTypes);
-    applyFilters();
-};
-
-const showConfirmShortLoadingModal = ref(false);
-const hblId = ref(null);
-
-const confirmShortLoading = (id) => {
-    hblId.value = id;
-    showConfirmShortLoadingModal.value = true;
-};
-
-const closeShortLoadingModal = () => {
-    hblId.value = null;
-    showConfirmShortLoadingModal.value = false;
-};
-
-const handleMarkAsShortLoading = () => {
-    router.get(route("arrival.hbls.mark-as-short-loading", hblId.value), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeShortLoadingModal();
-            push.success("Mark As a Short Loaded");
-            router.visit(route("arrival.bonded-warehouses.index"));
-        },
-    });
-}
-
-const showConfirmViewHBLModal = ref(false);
-
-const confirmViewHBL = async (id) => {
-    hblId.value = id;
+const confirmViewHBL = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
     showConfirmViewHBLModal.value = true;
 };
 
-const closeShowHBLModal = () => {
+const closeModal = () => {
     showConfirmViewHBLModal.value = false;
+    selectedHBLID.value = null;
 };
 
-const exportURL = computed(() => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
-        }
-    }
-    return '/bonded-warehouse/list/export' + "?" + params.toString();
-});
+const clearFilter = () => {
+    filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+    };
+    fromDate.value = moment(new Date()).subtract(7, "days").toISOString().split("T")[0];
+    toDate.value = moment(new Date()).toISOString().split("T")[0];
+    fetchHBLs(currentPage.value);
+};
 
-const handlePerPageChange = (event) => {
-    perPage.value = parseInt(event.target.value);
-
-    grid.updateConfig({
-        pagination: {
-            limit: perPage.value,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
+const confirmShortLoading = (id) => {
+    confirm.require({
+        message: 'Would you like to mark as short load this hbl record?',
+        header: 'Mark as Short Load?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
         },
+        acceptProps: {
+            label: 'Mark as Short Load',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.get(route("arrival.hbls.mark-as-short-loading", id), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("Mark As a Short Loaded");
+                    fetchHBLs(currentPage.value)
+                },
+            });
+        },
+        reject: () => {
+        }
     });
+};
 
-    grid.forceRender()
+const exportCSV = () => {
+    dt.value.exportCSV();
 };
 </script>
 <template>
@@ -442,175 +204,154 @@ const handlePerPageChange = (event) => {
 
         <Breadcrumb/>
 
-        <div class="card mt-4">
-            <div>
-                <div class="flex items-center justify-between p-2">
-                    <div class="">
-                        <div class="flex items-center">
-                            <h2
-                                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Bonded Warehouse
-                            </h2>
+        <div>
+            <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="fromDate" class="w-full" date-format="yy-mm-dd" input-id="from-date"/>
+                        <label for="from-date">From Date</label>
+                    </FloatLabel>
 
-                            <div class="flex m-3">
-                                <select class="form-select w-full rounded border border-slate-300 bg-white px-8 py-1 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent" @change="handlePerPageChange">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div
-                            class="flex items-center mt-2 text-sm text-slate-500 dark:text-gray-300"
-                        >
-                            <div
-                                class="mr-4 cursor-pointer"
-                                x-tooltip.info.placement.bottom="'Applied Filters'"
-                            >
-                                Filter Options:
-                            </div>
-                            <div class="flex -space-x-px">
-                                <div>
-                                    <div
-                                        class="mb-1 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        From Date
-                                    </div>
-                                    <div
-                                        class="tag rounded-l-none bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.fromDate }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div
-                                        class="mb-1 ml-4 tag rounded-r-none bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-100 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                    >
-                                        To Date
-                                    </div>
-                                    <div
-                                        class="tag rounded-l-none bg-warning text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                    >
-                                        {{ filters.toDate }}
-                                    </div>
-                                </div>
-                                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-                                    <div
-                                        v-for="(type, index) in filters.hblType"
-                                        v-if="filters.hblType"
-                                        :key="index"
-                                        class="mb-1 badge bg-cyan-500 text-white dark:bg-cyan-900 ml-2"
-                                    >
-                                        {{ type }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex">
-                        <ColumnVisibilityPopover v-if="false">
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.maximum_volume"
-                                    @change="toggleColumnVisibility('maximum_volume', $event)"
-                                />
-                                <span class="hover:cursor-pointer">Maximum Volume</span>
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.minimum_volume"
-                                    @change="toggleColumnVisibility('minimum_volume', $event)"
-                                />
-                                <span class="hover:cursor-pointer">Minimum Volume</span>
-                            </label>
-                        </ColumnVisibilityPopover>
-
-                        <button
-                            class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            x-tooltip.placement.top="'Filters'"
-                            @click="showFilters = true"
-                        >
-                            <i class="fa-solid fa-filter"></i>
-                        </button>
-
-                        <a :href="exportURL">
-                            <button
-                                class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.top="'Download CSV'"
-                            >
-                                <i class="fa-solid fa-cloud-arrow-down"></i>
-                            </button>
-                        </a>
-                    </div>
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="toDate" class="w-full" date-format="yy-mm-dd" input-id="to-date"/>
+                        <label for="to-date">To Date</label>
+                    </FloatLabel>
                 </div>
+            </Panel>
 
-                <div class="mt-3">
-                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div v-show="isData" ref="wrapperRef"></div>
-                        <NoRecordsFound v-show="!isData"/>
-                    </div>
-                </div>
-            </div>
+            <Card class="my-5">
+                <template #content>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedHBL = null" />
+                    <DataTable
+                        ref="dt"
+                        v-model:contextMenuSelection="selectedHBL"
+                        v-model:filters="filters"
+                        :globalFilterFields="['reference', 'hbl', 'hbl_name', 'email', 'address', 'contact_number', 'consignee_name', 'consignee_address', 'consignee_contact', 'cargo_type', 'hbl_type', 'warehouse', 'status', 'hbl_number']"
+                        :loading="loading"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="totalRecords"
+                        :value="hbls"
+                        context-menu
+                        dataKey="id"
+                        filter-display="menu"
+                        lazy
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
+                        @page="onPageChange"
+                        @rowContextmenu="onRowContextMenu"
+                        @sort="onSort">
+
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    Bonded Warehouse
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Button Group -->
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        icon="pi pi-filter-slash"
+                                        label="Clear Filters"
+                                        outlined
+                                        severity="contrast"
+                                        size="small"
+                                        type="button"
+                                        @click="clearFilter()"
+                                    />
+
+                                    <Button
+                                        icon="pi pi-external-link"
+                                        label="Export"
+                                        severity="contrast"
+                                        size="small"
+                                        @click="exportCSV($event)"
+                                    />
+                                </div>
+
+                                <!-- Search Field -->
+                                <IconField class="w-full sm:w-auto">
+                                    <InputIcon>
+                                        <i class="pi pi-search" />
+                                    </InputIcon>
+                                    <InputText
+                                        v-model="filters.global.value"
+                                        class="w-full"
+                                        placeholder="Keyword Search"
+                                        size="small"
+                                    />
+                                </IconField>
+                            </div>
+                        </template>
+
+                        <template #empty> No bonded warehouse found. </template>
+
+                        <template #loading> Loading bonded warehouse data. Please wait.</template>
+
+                        <Column field="hbl_number" header="HBL" sortable>
+                            <template #body="slotProps">
+                                <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
+                                <br v-if="slotProps.data.is_short_load">
+                                <Tag v-if="slotProps.data.is_short_load" :severity="`warn`" :value="`Short Loaded`" icon="pi pi-exclamation-triangle" size="small"></Tag>
+                            </template>
+                        </Column>
+
+                        <Column field="hbl_name" header="Name"></Column>
+
+                        <Column field="consignee_name" header="Consignee"></Column>
+
+                        <Column field="weight" header="Weight">
+                            <template #body="slotProps">
+                                <div class="flex items-center">
+                                    <i class="ti ti-scale-outline mr-1 text-blue-500" style="font-size: 1rem"></i>
+                                    {{ slotProps.data.weight.toFixed(2) }}
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="volume" header="Volume">
+                            <template #body="slotProps">
+                                <div class="flex items-center">
+                                    <i class="ti ti-scale mr-1 text-blue-500" style="font-size: 1rem"></i>
+                                    {{ slotProps.data.volume.toFixed(3) }}
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="packages_counts" header="Packages">
+                            <template #body="slotProps">
+                                <div class="flex items-center">
+                                    <i class="ti ti-package mr-1 text-blue-500" style="font-size: 1rem"></i>
+                                    {{ slotProps.data.quantity }}
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="created_at" header="Created At" sortable></Column>
+
+                        <Column field="hbl_type" header="HBL Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} bonded warehouse data.</template>
+                    </DataTable>
+                </template>
+            </Card>
         </div>
-
-        <FilterDrawer :show="showFilters" @close="showFilters = false">
-            <template #title> Filter Bonded Warehouse</template>
-
-            <template #content>
-                <div class="grid grid-cols-2  space-x-2">
-                    <!--Filter Rest Button-->
-                    <SoftPrimaryButton class="space-x-2" @click="resetFilter">
-                        <i class="fa-solid fa-refresh"></i>
-                        <span>Reset</span>
-                    </SoftPrimaryButton>
-                    <!--Filter Now Action Button-->
-                    <button class="btn border border-primary font-medium text-primary hover:bg-primary hover:text-white focus:bg-primary focus:text-white active:bg-primary/90 dark:border-accent dark:text-accent-light dark:hover:bg-accent dark:hover:text-white dark:focus:bg-accent dark:focus:text-white dark:active:bg-accent/90" @click="applyFilters">
-                        <i class="fa-solid fa-filter"></i>
-                        <span>Apply</span>
-                    </button>
-                </div>
-
-                <div>
-                    <InputLabel value="From"/>
-                    <DatePicker v-model="filters.fromDate" placeholder="Choose date..."/>
-                </div>
-
-                <div>
-                    <InputLabel value="To"/>
-                    <DatePicker v-model="filters.toDate" placeholder="Choose date..."/>
-                </div>
-
-                <FilterBorder/>
-
-                <FilterHeader value="Cargo Types"/>
-
-                <label
-                    v-for="hblType in hblTypes"
-                    :key="hblType"
-                    class="inline-flex items-center space-x-2 mt-2"
-                >
-                    <Switch
-                        v-model="filters.deliveryType"
-                        :label="hblType"
-                        :value="hblType"
-                    />
-                </label>
-            </template>
-        </FilterDrawer>
-
-        <ShortLoadingConfirmationModal :show="showConfirmShortLoadingModal" @close="closeShortLoadingModal"
-                                       @short-loading="handleMarkAsShortLoading"/>
-
-        <HBLDetailModal
-            :hbl-id="hblId"
-            :show="showConfirmViewHBLModal"
-            @close="closeShowHBLModal"
-            @update:show="showConfirmViewHBLModal = $event"
-        />
     </AppLayout>
+
+    <HBLDetailModal
+        :hbl-id="selectedHBLID"
+        :show="showConfirmViewHBLModal"
+        @close="closeModal"
+        @update:show="showConfirmViewHBLModal = $event"
+    />
 </template>
