@@ -1,10 +1,9 @@
 <script setup>
-import {computed, onMounted, ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
 import LoadedShipmentDetailModal from "@/Pages/Loading/Partials/LoadedShipmentDetailModal.vue";
-import {Link, router, usePage} from "@inertiajs/vue3";
-import {push} from "notivue";
+import {router, usePage} from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
@@ -21,6 +20,8 @@ import Select from "primevue/select";
 import InputIcon from "primevue/inputicon";
 import ContextMenu from "primevue/contextmenu";
 import IconField from "primevue/iconfield";
+import DatePicker from 'primevue/datepicker';
+import {push} from "notivue";
 
 const props = defineProps({
     cargoTypes: {
@@ -70,30 +71,33 @@ const fromDate = ref(moment(new Date()).subtract(1, "month").toISOString().split
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 const etdStartDate = ref('');
 const etdEndDate = ref('');
+const selectedContainer = ref({});
+const showConfirmLoadedShipmentModal = ref(false);
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
     cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
     container_type: {value: null, matchMode: FilterMatchMode.EQUALS},
     status: {value: null, matchMode: FilterMatchMode.EQUALS},
+    branch: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const menuModel = ref([
     {
+        label: "View",
+        icon: "ti ti-search text-lg",
+        command: () => confirmViewLoadedShipment(selectedShipment.value.id),
+        disabled: !usePage().props.user.permissions.includes('arrivals.show'),
+    },
+    {
         label: 'Download Manifest',
-        icon: 'pi pi-fw pi-download',
+        icon: 'ti ti-download text-lg',
         url: () => route("loading.loaded-containers.manifest.export", selectedShipment.value.id),
         disabled: !usePage().props.user.permissions.includes('arrivals.download manifest'),
     },
     {
-        label: "View",
-        icon: "pi pi-fw pi-search",
-        command: () => confirmViewLoadedShipment(selectedShipment),
-        disabled: !usePage().props.user.permissions.includes('arrivals.show'),
-    },
-    {
         label: "Unload",
-        icon: "pi pi-fw pi-search",
+        icon: "ti ti-wrecking-ball text-lg",
         command: () => router.visit(
             route("arrival.unloading-points.index", {
                 container: selectedShipment.value.id,
@@ -103,14 +107,14 @@ const menuModel = ref([
     },
     {
         label: "Mark As Reached",
-        icon: "pi pi-fw pi-search",
+        icon: "ti ti-navigation-check text-lg",
         command: () => router.visit(
-            route("arrival.unloading-points.index", {
-                container: selectedShipment.value.id,
-            })
-        ),
-        disabled: () => !(usePage().props.user.permissions.includes('arrivals.mark as reached') &&
-            ["REACHED"].includes(selectedShipment.value.status)),
+            route("arrival.shipments-arrivals.containers.markAsReachedContainer", selectedShipment.value.id), {
+                onSuccess: () => push.success('Mark As Reached')
+            }),
+        disabled: () =>
+            !usePage().props.user.permissions.includes('arrivals.mark as reached') ||Shipments Arrivals
+            ["REACHED"].includes(selectedShipment.value.is_reached),
     },
 ]);
 
@@ -131,6 +135,7 @@ const fetchShipmentArrivals = async (page = 1, search = "", sortField = 'created
                 status: filters.value.status.value || "",
                 etdStartDate: etdStartDate.value ? moment(etdStartDate.value).format("YYYY-MM-DD") : null,
                 etdEndDate: etdEndDate.value ? moment(etdEndDate.value).format("YYYY-MM-DD") : null,
+                branch: filters.value.branch.value || "",
             }
         });
         shipmentArrivals.value = response.data.data;
@@ -181,6 +186,10 @@ watch(() => etdEndDate.value, (newValue) => {
     fetchShipmentArrivals(1, filters.value.global.value);
 });
 
+watch(() => filters.value.branch.value, (newValue) => {
+    fetchShipmentArrivals(1, filters.value.global.value);
+});
+
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
@@ -205,6 +214,7 @@ const clearFilter = () => {
         cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
         container_type: {value: null, matchMode: FilterMatchMode.EQUALS},
         status: {value: null, matchMode: FilterMatchMode.EQUALS},
+        branch: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
     fromDate.value = moment(new Date()).subtract(1, "month").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
@@ -286,8 +296,22 @@ const exportCSV = () => {
     dt.value.exportCSV();
 };
 
-const confirmViewLoadedShipment = () => {
+const confirmViewLoadedShipment = (id) => {
+    const container = props.containers.find(
+        (container) => container.id === id
+    );
 
+    if (container) {
+        selectedContainer.value = container;
+        showConfirmLoadedShipmentModal.value = true;
+    } else {
+        console.error('Container not found with id:', id);
+    }
+};
+
+const closeModal = () => {
+    showConfirmLoadedShipmentModal.value = false;
+    selectedShipment.value = [];
 };
 </script>
 
@@ -311,7 +335,8 @@ const confirmViewLoadedShipment = () => {
                     </FloatLabel>
 
                     <FloatLabel class="w-full" variant="in">
-                        <DatePicker v-model="etdStartDate" class="w-full" date-format="yy-mm-dd" input-id="etd-start-date"/>
+                        <DatePicker v-model="etdStartDate" class="w-full" date-format="yy-mm-dd"
+                                    input-id="etd-start-date"/>
                         <label for="etd-start-date">ETD Start Date</label>
                     </FloatLabel>
 
@@ -378,7 +403,7 @@ const confirmViewLoadedShipment = () => {
                                 <!-- Search Field -->
                                 <IconField class="w-full sm:w-auto">
                                     <InputIcon>
-                                        <i class="pi pi-search" />
+                                        <i class="pi pi-search"/>
                                     </InputIcon>
                                     <InputText
                                         v-model="filters.global.value"
@@ -401,7 +426,18 @@ const confirmViewLoadedShipment = () => {
                             </template>
                             <template #filter="{ filterModel }">
                                 <Select v-model="filterModel.value" :options="containerTypes" :showClear="true"
-                                        placeholder="Select One" style="min-width: 12rem" />
+                                        placeholder="Select One" style="min-width: 12rem"/>
+                            </template>
+                        </Column>
+
+                        <Column field="branch" header="Origin">
+                            <template #filter="{ filterModel }">
+                                <Select v-model="filterModel.value"
+                                        :options="branches"
+                                        :showClear="true"
+                                        option-label="name"
+                                        option-value="id"
+                                        placeholder="Select One" style="min-width: 12rem"/>
                             </template>
                         </Column>
 
@@ -428,10 +464,6 @@ const confirmViewLoadedShipment = () => {
                             </template>
                         </Column>
 
-                        <Column field="estimated_time_of_arrival" header="ETA"></Column>
-
-                        <Column field="estimated_time_of_departure" header="ETD"></Column>
-
                         <Column field="status" header="Status">
                             <template #body="slotProps">
                                 <Tag :icon="resolveContainerStatus(slotProps.data).icon"
@@ -440,17 +472,44 @@ const confirmViewLoadedShipment = () => {
                             </template>
 
                             <template #filter="{ filterModel }">
-                                <Select v-model="filterModel.value" :options="['LOADED', 'REACHED DESTINATION', 'UNLOADED', 'IN TRANSIT', 'CONTAINER ORDERED']" :showClear="true"
+                                <Select v-model="filterModel.value"
+                                        :options="['LOADED', 'REACHED DESTINATION', 'UNLOADED', 'IN TRANSIT', 'CONTAINER ORDERED']"
+                                        :showClear="true"
                                         placeholder="Select One" style="min-width: 12rem"/>
                             </template>
                         </Column>
 
-                        <template #footer> In total there are {{ shipmentArrivals ? totalRecords : 0 }} shipment arrivals. </template>
+                        <Column field="note" header="Note"></Column>
+
+                        <Column field="is_reached" header="Is Reached">
+                            <template #body="{data}">
+                                <div class="flex items-center space-x-2">
+                                    <i :class="[
+        data.is_reached === 'REACHED' ? 'pi pi-check-circle text-success' : 'pi pi-info-circle text-warning'
+      ]">
+                                    </i>
+                                    <div :class="data.is_reached === 'REACHED' ? 'text-success' : 'text-warning'">
+                                        {{ data.is_reached }}
+                                    </div>
+                                </div>
+                            </template>
+                        </Column>
+
+                        <template #footer> In total there are {{ shipmentArrivals ? totalRecords : 0 }} shipment
+                            arrivals.
+                        </template>
                     </DataTable>
                 </template>
             </Card>
         </div>
     </AppLayout>
+
+    <LoadedShipmentDetailModal :air-container-options="airContainerOptions"
+                               :container="selectedContainer"
+                               :container-status="containerStatus"
+                               :sea-container-options="seaContainerOptions"
+                               :show="showConfirmLoadedShipmentModal"
+                               @close="closeModal" />
 </template>
 
 <style>
