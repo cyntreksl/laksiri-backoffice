@@ -22,6 +22,7 @@ import ContextMenu from "primevue/contextmenu";
 import IconField from "primevue/iconfield";
 import DatePicker from 'primevue/datepicker';
 import {push} from "notivue";
+import {useConfirm} from "primevue/useconfirm";
 
 const props = defineProps({
     cargoTypes: {
@@ -73,6 +74,7 @@ const etdStartDate = ref('');
 const etdEndDate = ref('');
 const selectedContainer = ref({});
 const showConfirmLoadedShipmentModal = ref(false);
+const confirm = useConfirm();
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -108,12 +110,33 @@ const menuModel = ref([
     {
         label: "Mark As Reached",
         icon: "ti ti-navigation-check text-lg",
-        command: () => router.visit(
-            route("arrival.shipments-arrivals.containers.markAsReachedContainer", selectedShipment.value.id), {
-                onSuccess: () => push.success('Mark As Reached')
-            }),
+        command: () => {
+            confirm.require({
+                    message: 'Would you like to mark this shipment as reached?',
+                    header: 'Mark As REACHED?',
+                    icon: 'pi pi-info-circle',
+                    rejectLabel: 'Cancel',
+                    rejectProps: {
+                        label: 'Cancel',
+                        severity: 'secondary',
+                        outlined: true
+                    },
+                    acceptProps: {
+                        label: 'Mark as Reached',
+                        severity: 'warn'
+                    },
+                    accept: () => {
+                        router.visit(
+                            route("arrival.shipments-arrivals.containers.markAsReachedContainer", selectedShipment.value.id), {
+                                onSuccess: () => push.success('Mark As Reached')
+                            })
+                    },
+                    reject: () => {
+                    }
+            });
+        },
         disabled: () =>
-            !usePage().props.user.permissions.includes('arrivals.mark as reached') ||Shipments Arrivals
+            !usePage().props.user.permissions.includes('arrivals.mark as reached') ||
             ["REACHED"].includes(selectedShipment.value.is_reached),
     },
 ]);
@@ -434,9 +457,9 @@ const closeModal = () => {
                             <template #filter="{ filterModel }">
                                 <Select v-model="filterModel.value"
                                         :options="branches"
-                                        :showClear="true"
                                         option-label="name"
                                         option-value="id"
+                                        :showClear="true"
                                         placeholder="Select One" style="min-width: 12rem"/>
                             </template>
                         </Column>
