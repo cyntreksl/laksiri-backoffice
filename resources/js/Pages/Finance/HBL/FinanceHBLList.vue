@@ -401,30 +401,70 @@ const resolvePaymentStatus = (paymentStatus) => {
     }
 };
 
-const approveHBLs = async () => {
+// const approveHBLs = async () => {
+//     const idList = selectedHBLs.value.map((item) => item.id);
+//
+//     try {
+//         const response = await fetch("/finance/finance-approved", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 "X-CSRF-TOKEN": document
+//                     .querySelector('meta[name="csrf-token"]')
+//                     .getAttribute("content"),
+//             },
+//             body: JSON.stringify({hbl_ids: idList}),
+//         });
+//
+//         if (!response.ok) {
+//             throw new Error("Network response was not ok.");
+//         } else {
+//             window.location.reload();
+//             push.success("HBLs Approved Successfully!");
+//         }
+//     } catch (error) {
+//         console.error("Error:", error);
+//     }
+// };
+
+const approveHBLs = () => {
     const idList = selectedHBLs.value.map((item) => item.id);
+    confirm.require({
+        message: 'Would you like to approve this hbl records?',
+        header: 'Approve HBLs?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Approve',
+            severity: 'success'
+        },
+        accept: async () => {
+            const response = await fetch("/finance/finance-approved", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+                body: JSON.stringify({hbl_ids: idList}),
+            });
 
-    try {
-        const response = await fetch("/finance/finance-approved", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-            },
-            body: JSON.stringify({hbl_ids: idList}),
-        });
-
-        if (!response.ok) {
-            throw new Error("Network response was not ok.");
-        } else {
-            window.location.reload();
-            push.success("HBLs Approved Successfully!");
+            if (!response.ok) {
+                throw new Error("Network response was not ok.");
+            } else {
+                window.location.reload();
+                push.success("HBLs Approved Successfully!");
+            }
+        },
+        reject: () => {
         }
-    } catch (error) {
-        console.error("Error:", error);
-    }
+    });
 };
 
 </script>
