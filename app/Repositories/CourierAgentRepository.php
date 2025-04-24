@@ -30,21 +30,16 @@ class CourierAgentRepository implements CourierAgentRepositoryInterface, GridJsI
         }
         // apply filters
         FilterFactory::apply($query, $filters);
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
 
-        $users = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
-            'data' => CourierAgentCollection::collection($users),
+            'data' => CourierAgentCollection::collection($records),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $records->total(),
+                'current_page' => $records->currentPage(),
+                'perPage' => $records->perPage(),
+                'lastPage' => $records->lastPage(),
             ],
         ]);
 
@@ -52,9 +47,9 @@ class CourierAgentRepository implements CourierAgentRepositoryInterface, GridJsI
 
     public function storeCourierAgent(array $data)
     {
-
         try {
             $courierAgent = CreateCourierAgent::run($data);
+
             if (isset($data['logo'])) {
                 $courierAgent->updateFile($data['logo'], 'logo', 'courier_agents/logo');
             }

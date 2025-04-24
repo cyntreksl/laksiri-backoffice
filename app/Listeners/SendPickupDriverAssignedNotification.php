@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Actions\Notification\SendPickupAssignedNotificationToDriver;
 use App\Events\PickupDriverAssigned;
 use App\Models\User;
 use App\Notifications\PickupDriverAssignmentNotification;
@@ -27,5 +28,8 @@ class SendPickupDriverAssignedNotification
 
         $user = User::where('contact', $contact_number)->first();
         //        Notification::send($user, new PickupDriverAssignmentNotification($pickUp));
+
+        SendPickupAssignedNotificationToDriver::run($pickUp);
+
     }
 }

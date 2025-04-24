@@ -1,10 +1,12 @@
 <script setup>
 import {useForm} from "@inertiajs/vue3";
-import notification from "@/magics/notification.js";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {push} from "notivue";
+import Card from "primevue/card";
+import Button from "primevue/button";
+import MultiSelect from "primevue/multiselect";
+import Select from "primevue/select";
 
 const props = defineProps({
     user: {
@@ -36,61 +38,32 @@ const updateUserBranch = () => {
 </script>
 
 <template>
-    <div class="card px-4 py-4 sm:px-5">
-        <div>
-            <h2
-                class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-            >
-                Change Branches
-            </h2>
-        </div>
-        <form @submit.prevent="updateUserBranch" class="grid grid-cols-2 gap-5 mt-3">
-            <div>
-                <label class="block z-50">
-                    <InputLabel value="Select Primary Branch"/>
-                    <select
-                        x-init="$el._tom = new Tom($el)"
-                        class="w-full"
-                        placeholder="Select a primary branch..."
-                        autocomplete="off"
-                        v-model="form.primary_branch_id"
-                    >
-                        <option v-for="branch in branches" :value="branch.id">{{ branch.name }}</option>
-                    </select>
-                </label>
-                <InputError :message="form.errors.primary_branch_id"/>
-            </div>
+    <form
+        @submit.prevent="updateUserBranch"
+    >
+        <Card>
+            <template #title>Change Branches</template>
+            <template #content>
+                <div class="grid grid-cols-2 gap-5 mt-3">
+                    <div>
+                        <InputLabel value="Select Primary Branch"/>
+                        <Select v-model="form.primary_branch_id" :options="branches" class="w-full" option-label="name" option-value="id" placeholder="Select a primary branch" />
+                        <InputError :message="form.errors.primary_branch_id"/>
+                    </div>
 
-            <div>
-                <label class="block z-50">
-                    <InputLabel value="Select Secondary Branch"/>
-                    <select
-                        v-model="form.secondary_branches"
-                        x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                        multiple
-                        class="w-full"
-                        placeholder="Select a secondary branch..."
-                        autocomplete="off"
-                    >
-                        <option v-for="branch in branches" :value="branch.id">{{ branch.name }}</option>
-                    </select>
-                </label>
-                <InputError :message="form.errors.secondary_branches"/>
-            </div>
-
-            <div class="flex col-span-2 justify-end">
-                <PrimaryButton
-                    type="submit"
-                    class="ms-3"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Change Branches
-                </PrimaryButton>
-            </div>
-        </form>
-    </div>
+                    <div>
+                        <InputLabel value="Select Secondary Branch"/>
+                        <MultiSelect v-model="form.secondary_branches" :maxSelectedLabels="3" :options="branches" class="w-full" display="chip" filter option-label="name" option-value="id" placeholder="Select secondary branches"/>
+                        <InputError :message="form.errors.secondary_branches"/>
+                    </div>
+                </div>
+            </template>
+            <template #footer>
+                <div class="inline-block float-right mt-3">
+                    <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" class="w-full"
+                            label="Change Branches" type="submit"/>
+                </div>
+            </template>
+        </Card>
+    </form>
 </template>

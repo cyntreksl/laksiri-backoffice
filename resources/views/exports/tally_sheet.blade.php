@@ -81,7 +81,7 @@
             <th colspan="2" style="text-align: left; font-family: 'Times New Roman',fantasy; font-size: 10px; height: 3%">SHIPMENT NO: {{$container?->reference}}</th>
         </tr>
         <tr style="font-family: 'Times New Roman',fantasy; font-size: 14px; background-color: #D8D8D8  ;">
-            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">SR</th>
+            <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">SN</th>
             <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">HBL</th>
             <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;">NAME OF CUSTOMER</th>
             <th style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 10px;"> CBM</th>

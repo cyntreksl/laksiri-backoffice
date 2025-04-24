@@ -2,14 +2,12 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {onMounted, ref, watch} from "vue";
-import {router, useForm, usePage} from "@inertiajs/vue3";
+import { router, useForm, usePage} from "@inertiajs/vue3";
 import Card from "primevue/card";
 import DataTable from "primevue/datatable";
-import ContextMenu from "primevue/contextmenu";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
 import Column from "primevue/column";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
 import {useConfirm} from "primevue/useconfirm";
@@ -22,57 +20,40 @@ import InputError from "@/Components/InputError.vue";
 import ToggleSwitch from 'primevue/toggleswitch';
 import InputLabel from "@/Components/InputLabel.vue";
 
-const cm = ref();
 const confirm = useConfirm();
 const baseUrl = ref("taxes/list");
 const loading = ref(true);
 const taxes = ref([]);
 const totalRecords = ref(0);
-const perPage = ref(100);
+const perPage = ref(10);
 const currentPage = ref(1);
 const selectedTax = ref(null);
 const selectedTaxId = ref(null);
 const isDialogVisible = ref(false);
 const showEditTaxDialog = ref(false);
-const showDeleteTaxDialog = ref(false);
 const checked = ref(false);
+const showAddNewTaxDialog = ref(false);
+
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
-    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
-    cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
-    is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
-    user: {value: null, matchMode: FilterMatchMode.EQUALS},
-    payments: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
+
 const form = useForm({
     name: "",
     rate: 0,
     is_active: false,
 })
-const menuModel = ref([
-    {
-        label: "Edit",
-        icon: "pi pi-fw pi-pencil",
-        command: () => confirmViewEditTax(selectedTax),
-        disabled: !usePage().props.user.permissions.includes("tax.destination tax edit"),
-    },
-    {
-        label: "Delete",
-        icon: "pi pi-fw pi-times",
-        command: () => confirmDeleteTax(selectedTax),
-        disabled: !usePage().props.user.permissions.includes("tax.destination tax delete"),
-    },
-]);
+
 const confirmViewEditTax = (tax) => {
-    form.name = tax.value.name;
-    form.rate = tax.value.rate;
-    form.is_active = tax.value.is_active;
-    checked.value = tax.value.is_active;
-    selectedTaxId.value = tax.value.id;
+    form.name = tax.data.name;
+    form.rate = tax.data.rate;
+    form.is_active = tax.data.is_active;
+    checked.value = tax.data.is_active;
+    selectedTaxId.value = tax.data.id;
     showEditTaxDialog.value = true;
     isDialogVisible.value = true;
 };
+
 const fetchTaxes = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
     loading.value = true;
     try {
@@ -94,51 +75,59 @@ const fetchTaxes = async (page = 1, search = "", sortField = 'id', sortOrder = 0
         loading.value = false;
     }
 };
+
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
     fetchTaxes(currentPage.value);
 };
-const onRowContextMenu = (event) => {
-    cm.value.show(event.originalEvent);
-};
+
 const onSort = (event) => {
     fetchTaxes(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
+
 onMounted(() => {
     fetchTaxes();
 });
+
 const debouncedFetchTaxes = debounce((searchValue) => {
     fetchTaxes(1, searchValue);
 }, 1000);
+
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
         debouncedFetchTaxes(newValue);
     }
 });
 
-const showAddNewTaxDialog = ref(false);
 const confirmViewAddNewTax = () => {
     showAddNewTaxDialog.value = true;
     isDialogVisible.value = true;
 };
+
 const closeAddNewTaxModal = () => {
     form.name = "";
     showAddNewTaxDialog.value = false;
     showEditTaxDialog.value = false;
     isDialogVisible.value = false;
 }
+
 const onDialogShow = () => {
     document.body.classList.add('p-overflow-hidden');
 };
+
 const onDialogHide = () => {
-    document.body.classList.remove('p-overflow-hidden');
+  form.reset();
+  form.clearErrors();
+  document.body.classList.remove('p-overflow-hidden');
 };
+
 const handleAddNewTax = async () => {
     form.post(route("setting.taxes.store"), {
         onSuccess: () => {
             closeAddNewTaxModal();
             form.reset();
+            form.clearErrors();
             fetchTaxes();
             push.success('Tax created Successfully!');
         },
@@ -149,11 +138,13 @@ const handleAddNewTax = async () => {
         preserveState: true,
     });
 }
+
 const handleEditTax = async () => {
     form.put(route("setting.taxes.update", selectedTaxId.value), {
         onSuccess: () => {
             closeAddNewTaxModal();
             form.reset();
+            form.clearErrors();
             fetchTaxes();
             push.success('Tax Updated Successfully!');
         },
@@ -164,8 +155,9 @@ const handleEditTax = async () => {
         preserveState: true,
     });
 }
+
 const confirmDeleteTax = (tax) => {
-    selectedTaxId.value = tax.value.id;
+    selectedTaxId.value = tax.data.id;
     confirm.require({
         message: 'Are you sure you want to delete tax?',
         header: 'Delete Tax?',
@@ -207,16 +199,13 @@ const confirmDeleteTax = (tax) => {
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel"  @hide="selectedTax = null"/>
                     <DataTable
-                        v-model:contextMenuSelection="selectedTax"
                         v-model:selection="selectedTax"
                         :loading="loading"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                         :totalRecords="totalRecords"
                         :value="taxes"
-                        context-menu
                         dataKey="id"
                         filter-display="menu"
                         lazy
@@ -225,21 +214,20 @@ const confirmDeleteTax = (tax) => {
                         row-hover
                         tableStyle="min-width: 50rem"
                         @page="onPageChange"
-                        @rowContextmenu="onRowContextMenu"
                         @sort="onSort">
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Tax Rates
+                                    Taxes
                                 </div>
                                 <div>
-                                    <PrimaryButton
+                                    <Button
                                         v-if="usePage().props.user.permissions.includes('tax.destination tax create')"
                                         class="w-full"
                                         @click="confirmViewAddNewTax()"
                                     >
                                         Create Tax
-                                    </PrimaryButton>
+                                    </Button >
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -259,15 +247,37 @@ const confirmDeleteTax = (tax) => {
                         </template>
                         <template #empty> No Tax found. </template>
                         <template #loading> Loading Tax data. Please wait.</template>
-                        <Column field="id" header="ID" sortable></Column>
-                        <Column field="name" header="Name" sortable></Column>
+                        <Column field="name" header="Tax" sortable></Column>
                         <Column field="rate" header="Rate" sortable></Column>
-                        <Column field="is_active" header="Active">
+                        <Column field="is_active" header="Active" >
                             <template #body="{ data }">
                                 <i :class="{ 'pi-check-circle text-green-500': data.is_active, 'pi-times-circle text-red-400': !data.is_active }" class="pi"></i>
                             </template>
                         </Column>
-                        <template #footer> In total there are {{ taxes ? totalRecords : 0 }} Air Lines.</template>
+                        <Column field="" header="Actions" style="width: 10%">
+                            <template #body="{ data }">
+                                <Button
+                                    icon="pi pi-pencil"
+                                    outlined
+                                    rounded
+                                    size="small"
+                                    class="p-1 text-xs h-3 w-3 mr-1"
+                                    @click="confirmViewEditTax({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('tax.destination tax edit')"
+                                />
+                                <Button
+                                    icon="pi pi-trash"
+                                    outlined
+                                    rounded
+                                    severity="danger"
+                                    size="small"
+                                    @click="confirmDeleteTax({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('tax.destination tax delete')"
+                                />
+
+                            </template>
+                        </Column>
+                        <template #footer> In total there are {{ taxes ? totalRecords : 0 }} Taxes.</template>
                     </DataTable>
                 </template>
             </Card>

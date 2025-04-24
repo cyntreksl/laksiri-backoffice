@@ -20,7 +20,7 @@ class ZoneController extends Controller
     public function index()
     {
 
-        return Inertia::render('Settings/Zone/ZoneList', [
+        return Inertia::render('Setting/DriverZone/DriverZoneList', [
             'areas' => $this->driverAreasRepositoryInterface->getAreas(),
         ]);
 
@@ -28,10 +28,10 @@ class ZoneController extends Controller
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 0);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'ASC');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
         $query = Zone::query()->with('areas');
@@ -40,20 +40,15 @@ class ZoneController extends Controller
             $query->searchByZoneOrArea($search);
         }
 
-        $zones = $query->orderBy($order, $dir)
-            ->skip($page)
-            ->take($limit)
-            ->get();
-
-        $totalZones = Zone::count();
+        $zones = $query->orderBy($order, $dir)->paginate($limit, ['*'], 'page', $page);
 
         return response()->json([
             'data' => ZoneCollection::collection($zones),
             'meta' => [
-                'total' => $totalZones,
-                'page' => $page,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalZones / $limit),
+                'total' => $zones->total(),
+                'current_page' => $zones->currentPage(),
+                'perPage' => $zones->perPage(),
+                'lastPage' => $zones->lastPage(),
             ],
         ]);
     }

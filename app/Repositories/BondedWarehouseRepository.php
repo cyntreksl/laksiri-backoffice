@@ -40,21 +40,15 @@ class BondedWarehouseRepository implements BondedWarehouseRepositoryInterface, G
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $records = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => BondedWarehouseCollection::collection($records),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $records->total(),
+                'current_page' => $records->currentPage(),
+                'perPage' => $records->perPage(),
+                'lastPage' => $records->lastPage(),
             ],
         ]);
     }

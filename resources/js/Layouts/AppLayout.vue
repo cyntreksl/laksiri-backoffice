@@ -363,89 +363,16 @@
                                     <path d="M4 13h3l3 3h4l3 -3h3"/>
                                 </svg>
                             </a>
-                            <!-- Delivery -->
-<!--                            <a-->
-<!--                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"-->
-<!--                                :class="[-->
-<!--                activeMenu === 'delivery' ? 'bg-primary/10 text-primary' : '',-->
-<!--              ]"-->
-<!--                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"-->
-<!--                                x-tooltip.placement.right="'Delivery'"-->
-<!--                                @click="-->
-<!--                setMenu('delivery');-->
-<!--                openSideBar();-->
-<!--              "-->
-<!--                            >-->
-<!--                                <svg-->
-<!--                                    class="icon icon-tabler icon-tabler-trolley"-->
-<!--                                    fill="none"-->
-<!--                                    height="24"-->
-<!--                                    stroke="#2c3e50"-->
-<!--                                    stroke-linecap="round"-->
-<!--                                    stroke-linejoin="round"-->
-<!--                                    stroke-width="1.5"-->
-<!--                                    viewBox="0 0 24 24"-->
-<!--                                    width="24"-->
-<!--                                    xmlns="http://www.w3.org/2000/svg"-->
-<!--                                >-->
-<!--                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>-->
-<!--                                    <path d="M11 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>-->
-<!--                                    <path d="M6 16l3 2"/>-->
-<!--                                    <path d="M12 17l8 -12"/>-->
-<!--                                    <path d="M17 10l2 1"/>-->
-<!--                                    <path-->
-<!--                                        d="M9.592 4.695l3.306 2.104a1.3 1.3 0 0 1 .396 1.8l-3.094 4.811a1.3 1.3 0 0 1 -1.792 .394l-3.306 -2.104a1.3 1.3 0 0 1 -.396 -1.8l3.094 -4.81a1.3 1.3 0 0 1 1.792 -.394z"-->
-<!--                                    />-->
-<!--                                </svg>-->
-<!--                            </a>-->
-
-                            <!-- Reports -->
-<!--                            <a-->
-<!--                                v-if="! $page.props.user.roles.includes('viewer') && usePage().props.auth.user.roles[0].name !== 'call center'"-->
-<!--                                :class="[-->
-<!--                activeMenu === 'report' ? 'bg-primary/10 text-primary' : '',-->
-<!--              ]"-->
-<!--                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"-->
-<!--                                x-tooltip.placement.right="'Report'"-->
-<!--                                @click="-->
-<!--                setMenu('report');-->
-<!--                openSideBar();-->
-<!--              "-->
-<!--                            >-->
-<!--                                <svg-->
-<!--                                    class="icon icon-tabler icon-tabler-clipboard-text"-->
-<!--                                    fill="none"-->
-<!--                                    height="24"-->
-<!--                                    stroke="#2c3e50"-->
-<!--                                    stroke-linecap="round"-->
-<!--                                    stroke-linejoin="round"-->
-<!--                                    stroke-width="1.5"-->
-<!--                                    viewBox="0 0 24 24"-->
-<!--                                    width="24"-->
-<!--                                    xmlns="http://www.w3.org/2000/svg"-->
-<!--                                >-->
-<!--                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>-->
-<!--                                    <path-->
-<!--                                        d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"-->
-<!--                                    />-->
-<!--                                    <path-->
-<!--                                        d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"-->
-<!--                                    />-->
-<!--                                    <path d="M9 12h6"/>-->
-<!--                                    <path d="M9 16h6"/>-->
-<!--                                </svg>-->
-<!--                            </a>-->
-
                             <!-- Courier Management -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('Courier')) || $page.props.user.permissions.includes('third-party-agents.index') || $page.props.user.permissions.includes('couriers.index') || $page.props.user.permissions.includes('couriers.create') || $page.props.user.permissions.includes('courier-agents.create')"
                                 :class="[
-                activeMenu === 'Courier' ? 'bg-primary/10 text-primary' : '',
+                activeMenu === 'courier' ? 'bg-primary/10 text-primary' : '',
               ]"
                                 class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                                 x-tooltip.placement.right="'Courier'"
                                 @click="
-                setMenu('Courier');
+                setMenu('courier');
                 openSideBar();
               "
                             >
@@ -711,33 +638,8 @@
                             class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             @click="toggleDarkMode"
                         >
-                            <svg
-                                v-if="isDarkMode"
-                                class="size-6 text-amber-400"
-                                fill="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    d="M11.75 3.412a.818.818 0 01-.07.917 6.332 6.332 0 00-1.4 3.971c0 3.564 2.98 6.494 6.706 6.494a6.86 6.86 0 002.856-.617.818.818 0 011.1 1.047C19.593 18.614 16.218 21 12.283 21 7.18 21 3 16.973 3 11.956c0-4.563 3.46-8.31 7.925-8.948a.818.818 0 01.826.404z"
-                                ></path>
-                            </svg>
-                            <svg
-                                v-else
-                                class="size-6 text-amber-400"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                                x-show="!$store.global.isDarkModeEnabled"
-                                x-transition:enter="transition-transform duration-200 ease-out absolute origin-top"
-                                x-transition:enter-end="scale-100 static"
-                                x-transition:enter-start="scale-75"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    clip-rule="evenodd"
-                                    d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                                    fill-rule="evenodd"
-                                ></path>
-                            </svg>
+                            <i v-if="isDarkMode" class="pi pi-moon text-amber-500"></i>
+                            <i v-else class="pi pi-sun text-emerald-500"></i>
                         </button>
 
                         <!-- Dark Mode Toggle -->
@@ -749,28 +651,6 @@
                                 class="fa-solid fa-palette bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-lg font-semibold"
                             ></i>
                         </button>
-
-                        <!-- Notification-->
-                        <div class="flex">
-                            <button
-                                class="btn relative size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                            >
-                                <svg
-                                    class="size-5 text-slate-500 dark:text-navy-100"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M15.375 17.556h-6.75m6.75 0H21l-1.58-1.562a2.254 2.254 0 01-.67-1.596v-3.51a6.612 6.612 0 00-1.238-3.85 6.744 6.744 0 00-3.262-2.437v-.379c0-.59-.237-1.154-.659-1.571A2.265 2.265 0 0012 2c-.597 0-1.169.234-1.591.65a2.208 2.208 0 00-.659 1.572v.38c-2.621.915-4.5 3.385-4.5 6.287v3.51c0 .598-.24 1.172-.67 1.595L3 17.556h12.375zm0 0v1.11c0 .885-.356 1.733-.989 2.358A3.397 3.397 0 0112 22a3.397 3.397 0 01-2.386-.976 3.313 3.313 0 01-.989-2.357v-1.111h6.75z"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="1.5"
-                                    ></path>
-                                </svg>
-                            </button>
-                        </div>
 
                         <!-- Branch-->
                         <Popper v-if="userBranches.length > 0" class="">
@@ -1215,7 +1095,7 @@ export default {
                     );
                     }
 
-                    if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'admin') {
+                    if (usePage().props.user.permissions.includes("hbls.show door to door list")) {
                         hblMenu.splice(
                             2,
                             0,
@@ -1637,16 +1517,6 @@ export default {
                             }
                         );
                     }
-                    // if (usePage().props.user.permissions.includes("issues.index")) {
-                    //     userMenu.splice(
-                    //         2,
-                    //         0,
-                    //         {
-                    //             title: "Driver Tracking",
-                    //             route: "users.driver-tracings.index",
-                    //         }
-                    //     );
-                    // }
 
                     if (usePage().props.user.permissions.includes("roles.list")) {
                         userMenu.splice(
@@ -1665,7 +1535,7 @@ export default {
                     );
                     changeSidePanelTitle("Users");
                     break;
-                case "Courier":
+                case "courier":
                     let courierMenu = [];
                     if (usePage().props.user.permissions.includes("third-party-agents.index")){
 
@@ -1674,7 +1544,7 @@ export default {
                             0,
                             {
                                 title: "Third Party Agents",
-                                route: "third-party-agents.index",
+                                route: "couriers.agents.index",
                             }
                         );
                     }
@@ -1705,7 +1575,7 @@ export default {
                             0,
                             {
                                 title: "Courier Agents ",
-                                route: "courier-agents.index",
+                                route: "couriers.courier-agents.index",
                             }
                         );
                     }
@@ -1714,9 +1584,8 @@ export default {
                         childMenuList.length,
                         ...courierMenu
                     );
-                    changeSidePanelTitle("Courier");
+                    changeSidePanelTitle("courier");
                     break;
-
                 case "delivery":
                     childMenuList.splice(
                         0,
@@ -1820,7 +1689,25 @@ export default {
                     }
 
                     childMenuList.splice(0, childMenuList.length, ...settingMenu);
+                    if (usePage().props.user.permissions.includes("pickup-type.index")){
+                        settingMenu = [...settingMenu,{
+                            title: "Pickup Types",
+                            route: "setting.pickup-types.index",
+                        }];
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...settingMenu
+                    );
                     changeSidePanelTitle("Setting");
+                    break;
+                case "settings":
+                    childMenuList.splice(0, childMenuList.length, {
+                        title: "Zones",
+                        route: "settings.zones.index",
+                    });
+                    changeSidePanelTitle("Settings");
                     break;
             }
             activeMenu.value = menu;

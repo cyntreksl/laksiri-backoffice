@@ -486,6 +486,8 @@ const exportCSV = () => {
                         <Column field="hbl_number" header="HBL" sortable>
                             <template #body="slotProps">
                                 <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
+                                <br v-if="slotProps.data.is_short_loaded">
+                                <Tag icon="pi pi-exclamation-triangle" v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`" size="small"></Tag>
                             </template>
                         </Column>
 
@@ -527,7 +529,7 @@ const exportCSV = () => {
 
                         <Column field="consignee_name" header="Consignee">
                             <template #body="slotProps">
-                                <div>{{ slotProps.data.hbl_name }}</div>
+                                <div>{{ slotProps.data.consignee_name }}</div>
                                 <div class="text-gray-500 text-sm">{{slotProps.data.consignee_email}}</div>
                                 <div class="text-gray-500 text-sm">{{slotProps.data.consignee_contact}}</div>
                             </template>
@@ -558,11 +560,6 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column field="is_short_loaded" header="">
-                            <template #body="slotProps">
-                                <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`"></Tag>
-                            </template>
-                        </Column>
 
                         <Column field="hbl_number" header="HBL Number" hidden sortable></Column>
 

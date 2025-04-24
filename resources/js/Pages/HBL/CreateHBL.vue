@@ -1229,7 +1229,7 @@ const onDialogHide = () => {
 
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.additional_charge" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled"/>
+                                        <InputNumber v-model="form.additional_charge" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled"/>
                                         <label for="bill-charge">Additional Charges</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.additional_charge"/>
@@ -1237,7 +1237,7 @@ const onDialogHide = () => {
 
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.paid_amount" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled"/>
+                                        <InputNumber v-model="form.paid_amount" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled"/>
                                         <label for="bill-charge">Paid Amount</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.paid_amount"/>

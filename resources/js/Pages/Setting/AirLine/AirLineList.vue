@@ -1,15 +1,13 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {computed, onMounted, ref, watch} from "vue";
+import { onMounted, ref, watch} from "vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Card from "primevue/card";
 import DataTable from "primevue/datatable";
-import ContextMenu from "primevue/contextmenu";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
 import Column from "primevue/column";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
 import {useConfirm} from "primevue/useconfirm";
@@ -19,7 +17,6 @@ import {debounce} from "lodash";
 import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
-import InputNumber from "primevue/inputnumber";
 
 const props = defineProps({
     isDOChargesPage: {
@@ -28,29 +25,20 @@ const props = defineProps({
     },
 })
 
-const cm = ref();
 const confirm = useConfirm();
 const baseUrl = ref(props.isDOChargesPage ? "/air-lines/list" : "/air-lines/list");
 const loading = ref(true);
 const airLines = ref([]);
 const totalRecords = ref(0);
-const perPage = ref(100);
+const perPage = ref(10);
 const currentPage = ref(1);
-const selectedAirLine = ref(null);
 const selectedAirLineId = ref(null);
-
 const isDialogVisible = ref(false);
 const showEditAirLineDialog = ref(false);
-const showDeleteAirLineDialog = ref(false);
+const showAddNewAirLineDialog = ref(false);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
-    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
-    cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
-    is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
-    user: {value: null, matchMode: FilterMatchMode.EQUALS},
-    payments: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const form = useForm({
@@ -58,25 +46,10 @@ const form = useForm({
     do_charge: "",
 })
 
-const menuModel = ref([
-    {
-        label: "Edit",
-        icon: "pi pi-fw pi-pencil",
-        command: () => confirmViewEditAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.edit") && !usePage().props.user.permissions.includes("charges.air line do charges edit"),
-    },
-    {
-        label: "Delete",
-        icon: "pi pi-fw pi-times",
-        command: () => confirmDeleteAirLine(selectedAirLine),
-        disabled: !usePage().props.user.permissions.includes("air-line.delete") && !usePage().props.user.permissions.includes("charges.air line do charges delete"),
-    },
-]);
-
 const confirmViewEditAirLine = (airLine) => {
-    form.name = airLine.value.name;
-    form.do_charge = airLine.value.do_charge;
-    selectedAirLineId.value = airLine.value.id;
+    form.name = airLine.data.name;
+    form.do_charge = airLine.data.do_charge;
+    selectedAirLineId.value = airLine.data.id;
     showEditAirLineDialog.value = true;
     isDialogVisible.value = true;
 };
@@ -109,10 +82,6 @@ const onPageChange = (event) => {
     fetchAirLines(currentPage.value);
 };
 
-const onRowContextMenu = (event) => {
-    cm.value.show(event.originalEvent);
-};
-
 const onSort = (event) => {
     fetchAirLines(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
@@ -131,8 +100,6 @@ watch(() => filters.value.global.value, (newValue) => {
     }
 });
 
-const showAddNewAirLineDialog = ref(false);
-
 const confirmViewAddNewAirLine = () => {
     showAddNewAirLineDialog.value = true;
     isDialogVisible.value = true;
@@ -150,6 +117,8 @@ const onDialogShow = () => {
 };
 
 const onDialogHide = () => {
+    form.reset();
+    form.clearErrors();
     document.body.classList.remove('p-overflow-hidden');
 };
 
@@ -158,6 +127,7 @@ const handleAddNewAirLine = async () => {
         onSuccess: () => {
             closeAddNewAirLineModal();
             form.reset();
+            form.clearErrors();
             fetchAirLines();
             push.success('Air Line Successfully!');
         },
@@ -174,6 +144,7 @@ const handleEditAirLine = async () => {
         onSuccess: () => {
             closeAddNewAirLineModal();
             form.reset();
+            form.clearErrors();
             fetchAirLines();
             push.success('Air Line Updated Successfully!');
         },
@@ -186,7 +157,7 @@ const handleEditAirLine = async () => {
 }
 
 const confirmDeleteAirLine = (airLine) => {
-    selectedAirLineId.value = airLine.value.id;
+    selectedAirLineId.value = airLine.data.id;
     confirm.require({
         message: 'Are you sure you want to delete air line?',
         header: 'Delete Air Line?',
@@ -221,25 +192,22 @@ const confirmDeleteAirLine = (airLine) => {
     });
 };
 </script>
+
 <template>
-    <AppLayout title="Air Lines">
-        <template #header>Air Lines</template>
+    <AppLayout :title="isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines'">
+        <template #header>{{isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines'}}</template>
 
         <Breadcrumb/>
 
         <div>
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedAirLine = null"/>
                     <DataTable
-                        v-model:contextMenuSelection="selectedAirLine"
-                        v-model:selection="selectedAirLine"
                         :loading="loading"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                         :totalRecords="totalRecords"
                         :value="airLines"
-                        context-menu
                         dataKey="id"
                         filter-display="menu"
                         lazy
@@ -248,22 +216,21 @@ const confirmDeleteAirLine = (airLine) => {
                         row-hover
                         tableStyle="min-width: 50rem"
                         @page="onPageChange"
-                        @rowContextmenu="onRowContextMenu"
                         @sort="onSort">
 
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Air Lines
+                                    {{isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines'}}
                                 </div>
                                 <div>
-                                    <PrimaryButton
-                                        v-if="usePage().props.user.permissions.includes('air-line.create') || usePage().props.user.permissions.includes('charges.air line do charges create')"
+                                    <Button
+                                        v-if="usePage().props.user.permissions.includes('air-line.create') || usePage().props.user.permissions.includes('air-line.do charges create')"
                                         class="w-full"
                                         @click="confirmViewAddNewAirLine()"
                                     >
-                                        Create Air Line
-                                    </PrimaryButton>
+                                      {{ isDOChargesPage ? 'Create Air Lines DO Charge' : 'Create Air Line' }}
+                                    </Button>
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -286,13 +253,34 @@ const confirmDeleteAirLine = (airLine) => {
 
                         <template #loading> Loading Air Lines data. Please wait.</template>
 
-                        <Column field="id" header="ID" sortable></Column>
-
-                        <Column field="name" header="Name" sortable></Column>
+                        <Column field="name" header="Air Line" sortable></Column>
 
                         <Column v-if="isDOChargesPage" field="do_charge" header="DO Charge" sortable></Column>
 
-                        <template #footer> In total there are {{ airLines ? totalRecords : 0 }} Air Lines.</template>
+                        <Column field="" header="Actions" style="width: 10%">
+                            <template #body="{ data }">
+                                <Button
+                                    icon="pi pi-pencil"
+                                    outlined
+                                    rounded
+                                    class="mr-2"
+                                    size="small"
+                                    @click="confirmViewEditAirLine({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('air-line.edit') && !usePage().props.user.permissions.includes('air-line.do charges edit')"
+                                />
+                                <Button
+                                    icon="pi pi-trash"
+                                    outlined
+                                    rounded
+                                    size="small"
+                                    severity="danger"
+                                    @click="confirmDeleteAirLine({ data })"
+                                    :disabled="!usePage().props.user.permissions.includes('air-line.delete') && !usePage().props.user.permissions.includes('air-line.do charges delete')"
+                                />
+                            </template>
+                        </Column>
+
+                        <template #footer> In total there are {{ airLines ? totalRecords : 0 }} {{ isDOChargesPage ? 'Air Lines DO Charges' : 'Air Lines' }}</template>
                     </DataTable>
                 </template>
             </Card>
@@ -300,7 +288,7 @@ const confirmDeleteAirLine = (airLine) => {
             <Dialog
                 v-model:visible="isDialogVisible"
                 modal
-                :header="showAddNewAirLineDialog ? 'Add New Air Line' : 'Edit Air Line'"
+                :header="isDOChargesPage ? (showAddNewAirLineDialog ? 'Add New Air Line DO Charge' : 'Edit Air Line DO Charge'): (showAddNewAirLineDialog ? 'Add New Air Line' : 'Edit Air Line')"
                 :style="{ width: '90%', maxWidth: '450px' }"
                 :block-scroll="true"
                 @hide="onDialogHide"
@@ -320,7 +308,7 @@ const confirmDeleteAirLine = (airLine) => {
                 <div v-if="isDOChargesPage" class="mt-4">
                     <InputText
                         v-model="form.do_charge"
-                        class="w-full p-inputtext"
+                        class="w-full p-input text"
                         placeholder="Enter DO Charge(LKR)"
                         required
                         type="number"
@@ -333,7 +321,7 @@ const confirmDeleteAirLine = (airLine) => {
                     <div class="flex flex-wrap justify-end gap-2">
                         <Button label="Cancel" class="p-button-text" @click="closeAddNewAirLineModal"/>
                         <Button
-                            :label="showAddNewAirLineDialog ? 'Add Air Line' : 'Update Air Line'"
+                            :label="isDOChargesPage ? (showAddNewAirLineDialog ? 'Add Air Line DO Charge' : 'Update Air Line DO Charge'): showAddNewAirLineDialog ? 'Add Air Line' : 'Update Air Line'"
                             class="p-button-primary"
                             :icon="showAddNewAirLineDialog ? 'pi pi-plus' : 'pi pi-check'"
                             @click.prevent="showAddNewAirLineDialog ? handleAddNewAirLine() : handleEditAirLine()"
@@ -343,5 +331,4 @@ const confirmDeleteAirLine = (airLine) => {
             </Dialog>
         </div>
     </AppLayout>
-
 </template>

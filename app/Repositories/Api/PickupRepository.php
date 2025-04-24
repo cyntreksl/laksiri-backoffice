@@ -137,13 +137,18 @@ class PickupRepository implements PickupRepositoryInterface
                 $query->whereBetween('pickup_date', [$data['start_date'], $data['end_date']]);
             }
 
-            $pickups = $query->where('driver_id', auth()->id())
+            $pickups = Pickup::where('driver_id', auth()->id())
+                ->whereHas('hbl', function ($query) {
+                    $query->where('system_status', '<', 2.2);
+                })
                 ->with('hbl')
-                ->orderBy('pickup_time_end', 'desc')
                 ->get();
+            $sortedPickups = $pickups->sortByDesc(function ($pickup) {
+                return optional($pickup->hbl)->hbl_number;
+            })->values();
 
             // Transform pickups into resource format
-            $completedPickupsResource = PickupResource::collection($pickups);
+            $completedPickupsResource = PickupResource::collection($sortedPickups);
 
             return $this->success('Completed pickup list received successfully!', $completedPickupsResource);
         } catch (\Exception $e) {

@@ -23,6 +23,8 @@ class RolePermissionSeeder extends Seeder
         Role::updateOrCreate(['name' => 'call center']);
         Role::updateOrCreate(['name' => 'boned area']);
         Role::updateOrCreate(['name' => 'finance Team']);
+        Role::updateOrCreate(['name' => 'front office staff']);
+        Role::updateOrCreate(['name' => 'clearance team']);
 
         $this->command->info('Default Roles added.');
 
@@ -32,18 +34,98 @@ class RolePermissionSeeder extends Seeder
     protected function assignPermissions(): void
     {
         $role = Role::where('name', 'admin')->first();
+        $allowedAdminPermissionGroups = ['User', 'Role', 'Pickup', 'HBL', 'MHBL', 'Pickup Type', 'Cash Settlement', 'Warehouse', 'Container', 'Loaded Shipment', 'Unloading Issues', 'Third Party Agent', 'Courier', 'Courier Agents', 'Air Line'];
+
         for ($i = 0; $i < count(self::defaultPermissions()); $i++) {
             $permissionGroup = self::defaultPermissions()[$i]['group_name'];
-            if ($permissionGroup !== 'Customer Queue') {
-                for ($j = 0; $j < count(self::defaultPermissions()[$i]['permissions']); $j++) {
-                    $permission = Permission::updateOrCreate([
-                        'name' => self::defaultPermissions()[$i]['permissions'][$j],
-                        'group_name' => $permissionGroup,
-                    ]);
+            for ($j = 0; $j < count(self::defaultPermissions()[$i]['permissions']); $j++) {
+                $permission = Permission::updateOrCreate([
+                    'name' => self::defaultPermissions()[$i]['permissions'][$j],
+                    'group_name' => $permissionGroup,
+                ]);
+                if (in_array($permissionGroup, $allowedAdminPermissionGroups)) {
                     $role->givePermissionTo($permission);
                 }
             }
         }
+        $bonedAreaRole = Role::where('name', 'boned area')->first();
+
+        $bonedAreaPermissions = [
+            'hbls.index',
+            'hbls.download pdf',
+            'hbls.show',
+            'container.index',
+            'container.create',
+            'container.load to container',
+            'container.upload documents',
+            'container.delete documents',
+            'container.edit',
+            'container.download documents',
+            'shipment.index',
+            'shipment.show',
+            'shipment.download manifest',
+            'doortodoor.download manifest',
+            'arrivals.index',
+            'arrivals.show',
+            'arrivals.download manifest',
+            'arrivals.unload',
+            'arrivals.mark as reached',
+            'bonded.index',
+            'bonded.show',
+            'bonded.mark as short loading',
+            'bonded.complete registration',
+            'issues.index',
+            'customer-queue.show package calling queue',
+            'customer-queue.show package released list',
+            'customer-queue.show package calling screen',
+        ];
+
+        foreach ($bonedAreaPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $bonedAreaRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
+        }
+        $callCenterPermissions = [
+            'hbls.index',
+            'hbls.download pdf',
+            'hbls.show',
+            'hbls.issue token',
+            'bonded.index',
+            'bonded.show',
+            'bonded.mark as short loading',
+            'bonded.complete registration',
+            'issues.index',
+            'customer-queue.issue token',
+            'customer-queue.show reception calling queue',
+            'customer-queue.show reception verified list',
+            'customer-queue.show reception calling screen',
+            'customer-queue.show document verification queue',
+            'customer-queue.show document verified list',
+            'customer-queue.show document verification calling screen',
+            'customer-queue.show package calling queue',
+            'customer-queue.show package released list',
+            'customer-queue.show package calling screen',
+            'customer-queue.show cashier calling queue',
+            'customer-queue.show cashier paid list',
+            'customer-queue.show cashier calling screen',
+            'customer-queue.show examination calling queue',
+            'customer-queue.show gate ist',
+            'customer-queue.show examination calling screen',
+        ];
+        $callCenterRole = Role::where('name', 'call center')->first();
+        foreach ($callCenterPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $callCenterRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
+        }
+
+        $this->command->info('Permissions assigned to admin and boned area roles.');
     }
 
     public static function defaultPermissions(): array
@@ -87,6 +169,17 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'Pickup Type',
+                'permissions' => [
+                    'pickup-type.create',
+                    'pickup-type.show',
+                    'pickup-type.edit',
+                    'pickup-type.delete',
+                    'pickup-type.index',
+                ],
+            ],
+
+            [
                 'group_name' => 'HBL',
                 'permissions' => [
                     'hbls.index',
@@ -96,6 +189,7 @@ class RolePermissionSeeder extends Seeder
                     'hbls.delete',
                     'hbls.hold and release',
                     'hbls.show cancelled hbls',
+                    'hbls.show door to door list',
                     'hbls.restore',
                     'hbls.download pdf',
                     'hbls.download invoice',

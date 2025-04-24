@@ -252,7 +252,7 @@
                     <td>{{ number_format($hbl?->freight_charge, 2) }}</td>
 
                     <td>DESTI. CHARGES</td>
-                    <td>{{ number_format($hbl?->other_charge, 2) }}</td>
+                    <td>{{ number_format($hbl?->destination_charge, 2) }}</td>
                 </tr>
                 <tr>
                     <td>TOTAL VOLUME</td>

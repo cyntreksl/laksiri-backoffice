@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Actions\Zone\GetZones;
 use App\Enum\CargoType;
-use App\Enum\PickupType;
 use App\Events\PickupCreated;
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
@@ -20,6 +19,7 @@ use App\Interfaces\SettingRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Models\PickUp;
+use App\Models\PickupType;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -71,7 +71,7 @@ class PickupController extends Controller
         $this->authorize('pickups.create');
 
         return Inertia::render('Pickup/CreateJob', [
-            'pickupTypes' => PickupType::cases(),
+            'pickupTypes' => PickupType::pluck('pickup_type_name')->toArray(),
             'cargoTypes' => CargoType::cases(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
             'zones' => GetZones::run(),
@@ -100,7 +100,7 @@ class PickupController extends Controller
         $this->authorize('pickups.edit');
 
         return Inertia::render('Pickup/EditJob', [
-            'pickupTypes' => PickupType::cases(),
+            'pickupTypes' => PickupType::pluck('pickup_type_name')->toArray(),
             'cargoTypes' => CargoType::cases(),
             'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
             'zones' => GetZones::run(),

@@ -19,7 +19,7 @@ class PackagePriceController extends Controller
 
     public function index()
     {
-        return Inertia::render('Setting/PackagePricing/PriceList', [
+        return Inertia::render('Setting/PackagePricing/PackagePriceList', [
             'packageRules' => $this->packagePriceRepository->getPackagePriceRules(),
         ]);
     }
@@ -52,7 +52,7 @@ class PackagePriceController extends Controller
         return Inertia::render('Setting/PackagePricing/EditPackagePriceRule', [
             'cargoModes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
-            'branches' => $this->branchRepository->getBranches(),
+            'branches' => $this->branchRepository->getDestinationBranches(),
             'packageRule' => $packagePrice,
         ]);
     }

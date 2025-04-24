@@ -48,21 +48,15 @@ class DriverRepository implements DriverRepositoryInterface, GridJsInterface
         // apply filters
         FilterFactory::apply($query, $filters);
 
-        $countQuery = $query;
-        $totalRecords = $countQuery->count();
-
-        $users = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $users = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => DriverCollection::collection($users),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $users->total(),
+                'current_page' => $users->currentPage(),
+                'perPage' => $users->perPage(),
+                'lastPage' => $users->lastPage(),
             ],
         ]);
 
@@ -70,9 +64,7 @@ class DriverRepository implements DriverRepositoryInterface, GridJsInterface
 
     public function updateDriverDetails(array $data, User $user): void
     {
-
         UpdateDriverDetails::run($data, $user);
-
     }
 
     public function updateDriverPassword(array $data, User $user): void

@@ -29,11 +29,11 @@ class CreateHBLPackages
                 $package->branch_id = GetUserCurrentBranchID::run();
                 $package->package_type = $packageData['type'] ?? $packageData['package_type'];
                 $package->length = $packageData['length'];
-                $package->width = $packageData['width'];
+                $package->width = $packageData['width'] ?? 0;
                 $package->height = $packageData['height'];
                 $package->quantity = $packageData['quantity'];
                 $package->volume = $packageData['volume'];
-                $package->weight = $packageData['totalWeight'] ?? $packageData['weight'];
+                $package->weight = $packageData['totalWeight'] ?? $packageData['weight'] ?? 0;
                 $package->remarks = $packageData['remarks'];
                 $package->measure_type = $packageData['measure_type'] ?? 'cm';
                 $package->save();

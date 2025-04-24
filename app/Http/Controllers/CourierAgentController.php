@@ -22,24 +22,20 @@ class CourierAgentController extends Controller
      */
     public function index()
     {
-        return Inertia::render('CourierAgent/CourierAgentList', [
-            'courierAgents' => $this->courierAgentRepository->getAllCourierAgents(),
-        ]);
+        return Inertia::render('Courier/CourierAgentList');
     }
 
     public function list(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $page = $request->input('offset', 1);
-        $order = $request->input('order', 'id');
-        $dir = $request->input('dir', 'asc');
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
         $filters = $request->only(['fromDate', 'toDate']);
 
-        $dataset = $this->courierAgentRepository->dataset($limit, $page, $order, $dir, $search, $filters);
-
-        return $dataset;
+        return $this->courierAgentRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 
     /**
@@ -47,12 +43,9 @@ class CourierAgentController extends Controller
      */
     public function create()
     {
-        return Inertia::render('CourierAgent/CreateCourierAgent',
-            [
-                'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
-            ]
-
-        );
+        return Inertia::render('Courier/CreateCourierAgent', [
+            'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
+        ]);
     }
 
     /**
@@ -60,7 +53,6 @@ class CourierAgentController extends Controller
      */
     public function store(StoreCourierAgentRequest $request)
     {
-
         $this->courierAgentRepository->storeCourierAgent($request->all());
     }
 
@@ -71,12 +63,11 @@ class CourierAgentController extends Controller
     {
         $courierAgent = CourierAgent::findOrFail($id);
 
-        return Inertia::render('CourierAgent/EditCourierAgent',
+        return Inertia::render('Courier/EditCourierAgent',
             [
                 'courierAgent' => $courierAgent,
                 'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
             ]
-
         );
     }
 
