@@ -12,7 +12,6 @@ import ContextMenu from "primevue/contextmenu";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
 import Column from "primevue/column";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Tag from "primevue/tag";
 import Panel from "primevue/panel";
 import Button from "primevue/button";
@@ -529,15 +528,9 @@ const exportURL = computed(() => {
                                     Warehouse
                                 </div>
                                 <div>
-                                    <PrimaryButton
-                                        v-if="$page.props.user.permissions.includes('warehouse.revert to cash settlement')"
-                                        :disabled="selectedHBLs.length === 0"
-                                        class="w-full"
-                                        @click="confirmRevert"
-                                    >
-                                        <i class="ti ti-arrow-back-up mr-1" style="font-size: 1.3rem"></i>
-                                        Revert To Cash Settlement
-                                    </PrimaryButton>
+                                    <Button v-if="$page.props.user.permissions.includes('warehouse.revert to cash settlement')" :disabled="selectedHBLs.length === 0" icon="ti ti-arrow-back-up text-2xl"
+                                            label="Revert To Cash Settlement"
+                                            size="small" @click="confirmRevert"/>
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">

@@ -1,12 +1,11 @@
 <script setup>
 import {computed, onMounted, ref, watch} from "vue";
-import {Link, router, usePage} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import FloatLabel from 'primevue/floatlabel';
 import {useConfirm} from "primevue/useconfirm";
 import Select from 'primevue/select';
-import Checkbox from 'primevue/checkbox';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
@@ -22,7 +21,6 @@ import axios from "axios";
 import {FilterMatchMode} from '@primevue/core/api';
 import moment from "moment";
 import {debounce} from "lodash";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import {push} from "notivue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
@@ -490,14 +488,10 @@ const approveHBLs = async () => {
                                     HBL Approval
                                 </div>
                                 <div>
-                                    <PrimaryButton
-                                        v-if="$page.props.user.permissions.includes('hbls.finance approved')"
-                                        :disabled="selectedHBLs.length === 0"
-                                        class="w-full"
-                                        @click="approveHBLs"
-                                    >
-                                        Approve
-                                    </PrimaryButton>
+                                    <Button v-if="$page.props.user.permissions.includes('hbls.finance approved')"
+                                            :disabled="selectedHBLs.length === 0" icon="pi pi-arrow-right"
+                                            icon-pos="right"
+                                            label="Approve HBL" size="small" @click="approveHBLs"/>
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">

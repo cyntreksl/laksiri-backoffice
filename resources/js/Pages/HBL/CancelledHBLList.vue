@@ -1,6 +1,6 @@
 <script setup>
 import {onMounted, ref, watch} from "vue";
-import { Link, router, usePage } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {useConfirm} from "primevue/useconfirm";
@@ -21,7 +21,6 @@ import Select from "primevue/select";
 import Tag from "primevue/tag";
 import IconField from "primevue/iconfield";
 import ContextMenu from "primevue/contextmenu";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DatePicker from "primevue/datepicker";
 import FloatLabel from "primevue/floatlabel";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
@@ -351,9 +350,9 @@ const exportCSV = () => {
                                 <div class="text-lg font-medium">
                                     Cancelled HBLs
                                 </div>
-                                <Link v-if="$page.props.user.permissions.includes('hbls.create')" :href="route('hbls.create')">
-                                    <PrimaryButton class="w-full">Create New HBL</PrimaryButton>
-                                </Link>
+                                <Button v-if="$page.props.user.permissions.includes('hbls.create')" icon="pi pi-arrow-right"
+                                        icon-pos="right"
+                                        label="Create New HBL" size="small" @click="router.visit(route('hbls.create'))"/>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Button Group -->
