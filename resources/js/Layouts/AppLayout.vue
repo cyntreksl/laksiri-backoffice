@@ -32,23 +32,7 @@
                             x-tooltip.placement.right="'Dashboard'"
                             @click="setMenu('dashboard')"
                         >
-                            <svg
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-home"
-                                fill="none"
-                                height="24"
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path d="M5 12l-2 0l9 -9l9 9l-2 0"/>
-                                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/>
-                                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
-                            </svg>
+                            <i class="ti ti-home text-2xl"></i>
                         </a>
 
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
@@ -65,25 +49,7 @@
                 openSideBar();
               "
                             >
-                                <svg
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-truck"
-                                    fill="none"
-                                    height="24"
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    viewBox="0 0 24 24"
-                                    width="24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                    <path
-                                        d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"
-                                    />
-                                </svg>
+                                <i class="ti ti-truck text-2xl"></i>
                             </a>
                             <!-- HBL -->
                             <a
@@ -98,25 +64,7 @@
                 openSideBar();
               "
                             >
-                                <svg
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-app-window"
-                                    fill="none"
-                                    height="24"
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    viewBox="0 0 24 24"
-                                    width="24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path
-                                        d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"
-                                    />
-                                    <path d="M6 8h.01"/>
-                                    <path d="M9 8h.01"/>
-                                </svg>
+                                <i class="ti ti-app-window text-2xl"></i>
                             </a>
                             <!-- Back Office -->
                             <a
@@ -133,28 +81,7 @@
                 openSideBar();
               "
                             >
-                                <svg
-                                    class="icon icon-tabler icon-tabler-building"
-                                    fill="none"
-                                    height="24"
-                                    stroke="#2c3e50"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    viewBox="0 0 24 24"
-                                    width="24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M3 21l18 0"/>
-                                    <path d="M9 8l1 0"/>
-                                    <path d="M9 12l1 0"/>
-                                    <path d="M9 16l1 0"/>
-                                    <path d="M14 8l1 0"/>
-                                    <path d="M14 12l1 0"/>
-                                    <path d="M14 16l1 0"/>
-                                    <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16"/>
-                                </svg>
+                                <i class="ti ti-building text-2xl"></i>
                             </a>
 
                             <!-- Destination Branch Arrivals -->
@@ -170,24 +97,7 @@
                 openSideBar();
               "
                             >
-                                <svg
-                                    class="icon icon-tabler icon-tabler-inbox"
-                                    fill="none"
-                                    height="24"
-                                    stroke="#2c3e50"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    viewBox="0 0 24 24"
-                                    width="24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path
-                                        d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"
-                                    />
-                                    <path d="M4 13h3l3 3h4l3 -3h3"/>
-                                </svg>
+                                <i class="ti ti-inbox text-2xl"></i>
                             </a>
 
                             <!-- Reception Verifications -->
@@ -203,7 +113,7 @@
                 openSideBar();
               "
                             >
-                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-rubber-stamp"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 17.85h-18c0 -4.05 1.421 -4.05 3.79 -4.05c5.21 0 1.21 -4.59 1.21 -6.8a4 4 0 1 1 8 0c0 2.21 -4 6.8 1.21 6.8c2.369 0 3.79 0 3.79 4.05z" /><path d="M5 21h14" /></svg>
+                                <i class="ti ti-rubber-stamp text-2xl"></i>
                             </a>
 
                             <!-- Document Verifications -->
@@ -219,7 +129,7 @@
                 openSideBar();
               "
                             >
-                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-certificate"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M15 15m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M13 17.5v4.5l2 -1.5l2 1.5v-4.5" /><path d="M10 19h-5a2 2 0 0 1 -2 -2v-10c0 -1.1 .9 -2 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -1 1.73" /><path d="M6 9l12 0" /><path d="M6 12l3 0" /><path d="M6 15l2 0" /></svg>
+                                <i class="ti ti-certificate text-2xl"></i>
                             </a>
 
                             <!-- Cashier -->
@@ -235,7 +145,7 @@
                 openSideBar();
               "
                             >
-                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-cash-register"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M21 15h-2.5c-.398 0 -.779 .158 -1.061 .439c-.281 .281 -.439 .663 -.439 1.061c0 .398 .158 .779 .439 1.061c.281 .281 .663 .439 1.061 .439h1c.398 0 .779 .158 1.061 .439c.281 .281 .439 .663 .439 1.061c0 .398 -.158 .779 -.439 1.061c-.281 .281 -.663 .439 -1.061 .439h-2.5" /><path d="M19 21v1m0 -8v1" /><path d="M13 21h-7c-.53 0 -1.039 -.211 -1.414 -.586c-.375 -.375 -.586 -.884 -.586 -1.414v-10c0 -.53 .211 -1.039 .586 -1.414c.375 -.375 .884 -.586 1.414 -.586h2m12 3.12v-1.12c0 -.53 -.211 -1.039 -.586 -1.414c-.375 -.375 -.884 -.586 -1.414 -.586h-2" /><path d="M16 10v-6c0 -.53 -.211 -1.039 -.586 -1.414c-.375 -.375 -.884 -.586 -1.414 -.586h-4c-.53 0 -1.039 .211 -1.414 .586c-.375 .375 -.586 .884 -.586 1.414v6m8 0h-8m8 0h1m-9 0h-1" /><path d="M8 14v.01" /><path d="M8 17v.01" /><path d="M12 13.99v.01" /><path d="M12 17v.01" /></svg>
+                                <i class="ti ti-cash-register text-2xl"></i>
                             </a>
 
                             <!-- Boned Area Screens -->
@@ -251,7 +161,7 @@
                 openSideBar();
               "
                             >
-                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-package"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" /><path d="M12 12l8 -4.5" /><path d="M12 12l0 9" /><path d="M12 12l-8 -4.5" /><path d="M16 5.25l-8 4.5" /></svg>
+                                <i class="ti ti-package text-2xl"></i>
                             </a>
 
                             <!-- Examination  -->
@@ -267,7 +177,7 @@
                 openSideBar();
               "
                             >
-                                <svg  class="icon icon-tabler icons-tabler-outline icon-tabler-checkup-list"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /><path d="M9 14h.01" /><path d="M9 17h.01" /><path d="M12 16l1 1l3 -3" /></svg>
+                                <i class="ti ti-checkup-list text-2xl"></i>
                             </a>
 
                             <!-- Queue Screen -->
@@ -283,18 +193,7 @@
                 openSideBar();
               "
                             >
-                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-screen-share" fill="none" height="24" stroke="currentColor"
-                                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                     width="24"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M21 12v3a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1h9"/>
-                                    <path d="M7 20l10 0"/>
-                                    <path d="M9 16l0 4"/>
-                                    <path d="M15 16l0 4"/>
-                                    <path d="M17 4h4v4"/>
-                                    <path d="M16 9l5 -5"/>
-                                </svg>
+                                <i class="ti ti-screen-share text-2xl"></i>
                             </a>
 
                             <!-- Loading -->
@@ -310,26 +209,7 @@
                 openSideBar();
               "
                             >
-                                <svg
-                                    class="icon icon-tabler icon-tabler-truck-loading"
-                                    fill="none"
-                                    height="24"
-                                    stroke="#2c3e50"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    viewBox="0 0 24 24"
-                                    width="24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M2 3h1a2 2 0 0 1 2 2v10a2 2 0 0 0 2 2h15"/>
-                                    <path
-                                        d="M9 6m0 3a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-4a3 3 0 0 1 -3 -3z"
-                                    />
-                                    <path d="M9 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                    <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                </svg>
+                                <i class="ti ti-truck-loading text-2xl"></i>
                             </a>
                             <!-- Departure Branch Arrivals -->
                             <a
@@ -344,24 +224,7 @@
                 openSideBar();
               "
                             >
-                                <svg
-                                    class="icon icon-tabler icon-tabler-inbox"
-                                    fill="none"
-                                    height="24"
-                                    stroke="#2c3e50"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    viewBox="0 0 24 24"
-                                    width="24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path
-                                        d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"
-                                    />
-                                    <path d="M4 13h3l3 3h4l3 -3h3"/>
-                                </svg>
+                                <i class="ti ti-inbox text-2xl"></i>
                             </a>
                             <!-- Courier Management -->
                             <a
@@ -376,24 +239,7 @@
                 openSideBar();
               "
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-truck-delivery"
-                                >
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                    <path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" />
-                                    <path d="M3 9l4 0" />
-                                </svg>
+                                <i class="ti ti-truck-delivery text-2xl"></i>
                             </a>
                             <!-- User Management -->
                             <a
@@ -408,24 +254,7 @@
                 openSideBar();
               "
                             >
-                                <svg
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-users"
-                                    fill="none"
-                                    height="24"
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    viewBox="0 0 24 24"
-                                    width="24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                    <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
-                                    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                    <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
-                                </svg>
+                                <i class="ti ti-users text-2xl"></i>
                             </a>
                         </template>
                     </div>
@@ -441,13 +270,7 @@
                             class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             x-tooltip.placement.right="'File Manager'"
                         >
-                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-brand-onedrive size-7" fill="none" stroke="currentColor"
-                                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                <path
-                                    d="M18.456 10.45a6.45 6.45 0 0 0 -12 -2.151a4.857 4.857 0 0 0 -4.44 5.241a4.856 4.856 0 0 0 5.236 4.444h10.751a3.771 3.771 0 0 0 3.99 -3.54a3.772 3.772 0 0 0 -3.538 -3.992z"/>
-                            </svg>
+                            <i class="ti ti-brand-onedrive text-2xl"></i>
                         </Link>
                         <!-- Settings -->
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
@@ -1062,6 +885,17 @@ export default {
                             }
                         );
                     } else if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'finance team')
+                    {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All HBL",
+                                route: "finance.hbls.index",
+                            }
+                        );
+                    }
+                    else if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'clearance team')
                     {
                         hblMenu.splice(
                             2,
