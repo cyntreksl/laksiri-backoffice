@@ -18,15 +18,17 @@ class SpecialDOCharge extends Model
         'branch_id',
         'agent_id',
         'hbl_type',
+        'cargo_type',
         'collected',
         'condition',
         'quantity_basis',
         'package_type',
+        'charge',
+        'created_by',
     ];
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->logOnlyDirty();
     }
-
 }

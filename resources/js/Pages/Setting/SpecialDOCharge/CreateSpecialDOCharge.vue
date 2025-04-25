@@ -6,14 +6,9 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
 import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
 import {push} from "notivue";
-import Checkbox from "@/Components/Checkbox.vue";
-import RadioButton from "@/Components/RadioButton.vue";
 import {reactive, ref, watch} from "vue";
 import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import RemovePriceRuleConfirmationModal from "@/Pages/Setting/Pricing/Partials/RemovePriceRuleConfirmationModal.vue";
 import Card from "primevue/card";
 import SelectButton from "primevue/selectbutton";
@@ -23,6 +18,8 @@ import Select from "primevue/select";
 import InputText from "primevue/inputtext";
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
+import InputNumber from 'primevue/inputnumber';
+import Button from "primevue/button";
 
 const props = defineProps({
     cargoModes: {
@@ -60,14 +57,13 @@ const ruleList = ref([]);
 
 // Define the priceRuleItem reactive object
 const priceRuleItem = reactive({
-    condition: '',
+    condition: 0,
     collected: '',
     quantity_basis: 1,
     package_type: '',
+    charge: 0,
 });
-
-const priceModes = ['Weight', 'Volume'];
-const handlePriceRuleCreate = () => {
+const handleDOChargeCreate = () => {
     form.priceRules = ruleList.value;
     if (form.priceRules.length <= 0) {
         push.error('Please add at least one price rule.');
@@ -75,11 +71,11 @@ const handlePriceRuleCreate = () => {
     }else{
         form.priceRules = ruleList.value;
 
-        form.post(route("setting.prices.store"), {
+        form.post(route("setting.special-do-charges.store"), {
             onSuccess: () => {
                 form.reset();
-                router.visit(route("setting.prices.index"));
-                push.success('Price rule created successfully!');
+                router.visit(route("setting.special-do-charges.index"));
+                push.success('DO Charge created successfully!');
             },
             onError: () => {
                 push.error('Something went to wrong!');
@@ -89,15 +85,6 @@ const handlePriceRuleCreate = () => {
         });
     }
 }
-
-watch([() => form.cargo_mode], ([newCargoMode]) => {
-    console.log(newCargoMode);
-    if (newCargoMode === "Sea Cargo") {
-        form.price_mode = "Volume";
-    } else if (newCargoMode === "Air Cargo") {
-        form.price_mode = "Weight";
-    }
-});
 
 watch([() => form.agent_id], ([newAgent]) => {
     filteredPackageType();
@@ -145,29 +132,38 @@ const openEditModal = (index) => {
 };
 
 const restModalFields = () => {
-    priceRuleItem.condition = '';
-    priceRuleItem.true_action = '';
-    priceRuleItem.false_action = '0';
-    priceRuleItem.bill_price = null;
-    priceRuleItem.bill_vat = null;
-    priceRuleItem.volume_charges = '';
-    priceRuleItem.per_package_charges = '';
-    priceRuleItem.is_editable = false;
+    priceRuleItem.condition = 0;
+    priceRuleItem.collected = '';
+    priceRuleItem.package_type = '';
+    priceRuleItem.charge = 0;
 };
 
 
 const addPriceRuleData = () => {
+  console.log(priceRuleItem);
     if (
-        !priceRuleItem.condition ||
-        !priceRuleItem.true_action ||
-        priceRuleItem.bill_price <= 0 ||
-        priceRuleItem.bill_vat <= 0 ||
-        !priceRuleItem.volume_charges ||
-        !priceRuleItem.per_package_charges
+        priceRuleItem.condition < 0||
+        !priceRuleItem.collected ||
+        !priceRuleItem.package_type ||
+        priceRuleItem.charge < 0
     ) {
         push.error("Please fill all required data");
         return;
     }
+  const isDuplicate = ruleList.value.some((item, index) => {
+    // Skip the current item being edited
+    if (editMode.value && index === editIndex.value) return false;
+    return (
+        item.condition === priceRuleItem.condition &&
+        item.collected === priceRuleItem.collected &&
+        item.package_type === priceRuleItem.package_type
+    );
+  });
+
+  if (isDuplicate) {
+    push.error("A similar charge rule already exists.");
+    return;
+  }
 
     if (editMode.value) {
         ruleList.value.splice(editIndex.value, 1, {...priceRuleItem});
@@ -192,24 +188,24 @@ const onDialogHide = () => {
 </script>
 
 <template>
-    <AppLayout title="Create Price Rule">
-        <template #header>Pricing</template>
+    <AppLayout title="Create DO Charge">
+        <template #header>Create DO Charge</template>
 
         <Breadcrumb/>
-        <form @submit.prevent="handlePriceRuleCreate">
+        <form @submit.prevent="handleDOChargeCreate">
 
             <div class="flex items-center justify-between p-2 my-5">
                 <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                    Create Price Rule
+                  Create DO Charge
                 </h2>
 
                 <div class="flex justify-end bottom-0 space-x-5">
-                    <DangerOutlineButton @click="router.visit(route('setting.prices.index'))">Cancel</DangerOutlineButton>
+                    <DangerOutlineButton @click="router.visit(route('special-do-charges'))">Cancel</DangerOutlineButton>
                     <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
                                    class="space-x-2"
                                    type="submit"
                     >
-                        <span>Create Price Rule</span>
+                        <span>Create DO Charge</span>
                         <svg
                             class="size-5"
                             fill="none"
@@ -283,15 +279,15 @@ const onDialogHide = () => {
                                             <h2
                                                 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
                                             >
-                                                Price Rules
+                                                DO Charges
                                             </h2>
                                         </div>
                                         <PrimaryOutlineButton
                                             type="button"
                                             @click="showAddPriceRuleDialog"
-                                            :disabled="form.agent_id ==null && form.cargo_type === '' && form.hbl_type === ''"
+                                            :disabled="form.agent_id === null && form.cargo_type === '' && form.hbl_type === ''"
                                         >
-                                            New Price Rule <i class="fas fa-plus fa-fw fa-fw"></i>
+                                            New Do Charge <i class="fas fa-plus fa-fw fa-fw"></i>
                                         </PrimaryOutlineButton>
                                     </div>
 
@@ -316,32 +312,17 @@ const onDialogHide = () => {
                                                     <th
                                                         class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                                                     >
-                                                        True Action
+                                                        Collected
                                                     </th>
                                                     <th
                                                         class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                                                     >
-                                                        Bill Price
+                                                        Quantity Basis
                                                     </th>
                                                     <th
                                                         class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
                                                     >
-                                                        Bill VAT (%)
-                                                    </th>
-                                                    <th
-                                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                                    >
-                                                        Volume Charges
-                                                    </th>
-                                                    <th
-                                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                                    >
-                                                        Per Package Charges
-                                                    </th>
-                                                    <th
-                                                        class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                                                    >
-                                                        Editable
+                                                      Charge
                                                     </th>
                                                 </tr>
                                                 </thead>
@@ -366,35 +347,13 @@ const onDialogHide = () => {
                                                         {{ rule.condition }}
                                                     </td>
                                                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                        {{ rule.true_action }}
+                                                        {{ rule.collected }}
                                                     </td>
                                                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                        {{ rule.bill_price }}
+                                                        {{ rule.package_type }}
                                                     </td>
                                                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                        {{ rule.bill_vat }}
-                                                    </td>
-                                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                        {{ rule.volume_charges }}
-                                                    </td>
-                                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                        {{ rule.per_package_charges }}
-                                                    </td>
-                                                    <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                                        <template v-if="rule.is_editable">
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                class="h-5 w-5 text-green-500"
-                                                                viewBox="0 0 20 20"
-                                                                fill="currentColor"
-                                                            >
-                                                                <path
-                                                                    fill-rule="evenodd"
-                                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                                    clip-rule="evenodd"
-                                                                />
-                                                            </svg>
-                                                        </template>
+                                                        {{rule.charge}}
                                                     </td>
                                                 </tr>
                                                 </tbody>
@@ -455,7 +414,7 @@ const onDialogHide = () => {
                         Collection Method
                         <span class="text-red-500 text-sm">*</span>
                     </InputLabel>
-                    <Select v-model="priceRuleItem.collected" :options="collectionMethods" optionLabel="name" placeholder="Select a Collection Method" class="w-full" />
+                    <Select v-model="priceRuleItem.collected" :options="collectionMethods" option-value="value" optionLabel="name" placeholder="Select a Collection Method" class="w-full" />
                 </div>
                 <div class="col-span-4 md:col-span-1">
                     <InputLabel>
@@ -463,14 +422,26 @@ const onDialogHide = () => {
                         <span class="text-red-500 text-sm">*</span>
                     </InputLabel>
                     <Select
-                        v-model="priceRuleItem.collected"
+                        v-model="priceRuleItem.package_type"
                         :options="filteredPackageType()"
                         optionLabel="name"
+                        option-value="name"
                         placeholder="Select a Collection Method"
                         class="w-full"
                     />
                 </div>
+                <div class="col-span-4 md:col-span-1">
+                    <InputLabel>
+                        Charge
+                        <span class="text-red-500 text-sm">*</span>
+                    </InputLabel>
+                    <InputNumber v-model="priceRuleItem.charge" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" min="0" placeholder="1" step="1"/>
+                </div>
             </div>
+            <template #footer>
+              <Button label="Cancel" severity="secondary" text @click="closeAddPriceRuleModal" />
+              <Button :label="editMode ? `Edit DO Charge` : `Add DO Charge`" severity="help" @click="addPriceRuleData" />
+            </template>
         </Dialog>
 
 

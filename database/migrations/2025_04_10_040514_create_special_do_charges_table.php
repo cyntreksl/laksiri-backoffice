@@ -16,10 +16,13 @@ return new class extends Migration
             $table->bigInteger('branch_id');
             $table->bigInteger('agent_id');
             $table->string('hbl_type');
+            $table->string('cargo_type');
             $table->string('collected')->default('Destination');
             $table->string('condition');
             $table->string('quantity_basis');
             $table->string('package_type');
+            $table->double('charge');
+            $table->bigInteger('created_by');
             $table->timestamps();
             $table->softDeletes();
         });
