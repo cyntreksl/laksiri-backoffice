@@ -157,6 +157,13 @@ Breadcrumbs::for('setting.air-lines.index', function (BreadcrumbTrail $trail) {
     $trail->push('Air Lines', route('setting.air-lines.index'));
 });
 
+// Special DO Charges create
+Breadcrumbs::for('setting.special-do-charges.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Create Special DO Charges', route('setting.special-do-charges.create'));
+});
+
 // Currencies
 Breadcrumbs::for('setting.currencies.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
