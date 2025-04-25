@@ -895,6 +895,17 @@ export default {
                             }
                         );
                     }
+                    else if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'clearance team')
+                    {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All HBL",
+                                route: "finance.hbls.index",
+                            }
+                        );
+                    }
 
                     if (usePage().props.user.permissions.includes("hbls.hbl finance approval list")) {
                         hblMenu.splice(
