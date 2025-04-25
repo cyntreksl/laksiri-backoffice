@@ -24,16 +24,16 @@
                         class="is-scrollbar-hidden flex grow flex-col space-y-4 overflow-y-auto pt-6"
                     >
                         <!-- Dashboard -->
-                        <a
+                        <Link
                             :class="[
                 activeMenu === 'dashboard' ? 'bg-primary/10 text-primary' : '',
               ]"
-                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-navy-600 dark:text-accent-light dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
+                            :href="route('dashboard')"
+                            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                             x-tooltip.placement.right="'Dashboard'"
-                            @click="setMenu('dashboard')"
                         >
                             <i class="ti ti-home text-2xl"></i>
-                        </a>
+                        </Link>
 
                         <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
                             <!-- Pickup -->
@@ -241,6 +241,18 @@
                             >
                                 <i class="ti ti-truck-delivery text-2xl"></i>
                             </a>
+                            <!-- Vessel Schedule -->
+                            <Link
+                                v-if="$page.props.user.permissions.includes('vessel.schedule.index')"
+                                :class="[
+                activeMenu === 'vessel' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                :href="route('clearance.vessel-schedule.index')"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Vessel Schedule'"
+                            >
+                                <i class="ti ti-container text-2xl"></i>
+                            </Link>
                             <!-- User Management -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('users')) || $page.props.user.permissions.includes('roles.list')"
@@ -791,13 +803,6 @@ export default {
 
         const setMenu = (menu) => {
             switch (menu) {
-                case "dashboard":
-                    childMenuList.splice(0, childMenuList.length, {
-                        title: "Dashboard",
-                        route: "dashboard",
-                    });
-                    changeSidePanelTitle("Dashboard");
-                    break;
                 case "pickups":
                     let pickupMenu = [];
 
