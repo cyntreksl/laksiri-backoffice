@@ -34,7 +34,7 @@ Route::get('pickups/list/export', [PickupController::class, 'export'])
 Route::get('pickups/exceptions/list/export', [PickupExceptionController::class, 'export'])
     ->name('pickups.exceptions.export');
 
-Route::get('pickups/exceptions/retry/{pickup}', [PickupExceptionController::class, 'retry'])
+Route::get('pickups/exceptions/retry-pickup/{pickup}', [PickupExceptionController::class, 'retry'])
     ->name('pickups.exceptions.retry');
 
 Route::get('pickups/get-pending-jobs-by-user/{user}', [PickupController::class, 'getPendingJobsByUser'])

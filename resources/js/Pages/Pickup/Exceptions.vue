@@ -234,7 +234,6 @@ const closeAssignDriverModal = () => {
 };
 
 const confirmPickupRetry = (pickup) => {
-    selectedPickupID.value = pickup.value.id;
     confirm.require({
         message: 'Are you sure you want to Retry Job?',
         header: 'Retry Pickup?',
@@ -250,16 +249,18 @@ const confirmPickupRetry = (pickup) => {
             severity: 'warn'
         },
         accept: () => {
-            router.get(route("pickups.exceptions.retry", selectedPickupID.value), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    push.success("Added into Pending Jobs!");
-                    router.visit(route("pickups.exceptions"), {only: ["pickups"]});
-                },
-                onError: () => {
-                    push.error("Something went to wrong!");
-                },
-            });
+            router.get(
+                route("pickups.exceptions.retry", pickup.value.pickup_id),
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success("Added into Pending Jobs!");
+                    },
+                    onError: () => {
+                        push.error("Something went wrong!");
+                    }
+                }
+            );
             selectedPickupID.value = null;
         },
         reject: () => {
