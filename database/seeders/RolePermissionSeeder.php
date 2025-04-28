@@ -388,6 +388,21 @@ class RolePermissionSeeder extends Seeder
                     'vessel.schedule.index',
                 ],
             ],
+            [
+                'group_name' => 'Charges',
+                'permissions' => [
+                    'charges.special do charges index',
+                    'charges.special do charges create',
+                    'charges.special do charges list',
+                    'charges.special do charges edit',
+                    'charges.special do charges delete',
+                    'charges.air line do charges index',
+                    'charges.air line do charges create',
+                    'charges.air line do charges list',
+                    'charges.air line do charges edit',
+                    'charges.air line do charges delete',
+                ],
+            ],
         ];
     }
 }
