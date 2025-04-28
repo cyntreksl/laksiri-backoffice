@@ -61,6 +61,10 @@ Route::middleware([
     Route::name('finance.')->prefix('finance')->group(function () {
         require_once __DIR__.'/web/finance/hbl.php';
     });
+
+    Route::name('clearance.')->prefix('clearance')->group(function () {
+        require_once __DIR__.'/web/clearance/vessel-schedule.php';
+    });
 });
 
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);

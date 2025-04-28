@@ -189,6 +189,11 @@ const resolveRoleIcon = (role) => {
                 icon: 'ti ti-device-desktop-dollar',
                 color: 'text-teal-500',
             }
+        case 'clearance team':
+            return {
+                icon: 'ti ti-backpack-off',
+                color: 'text-rose-500',
+            }
         default:
             return {
                 icon: 'ti ti-user-question',

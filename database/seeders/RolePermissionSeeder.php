@@ -381,6 +381,12 @@ class RolePermissionSeeder extends Seeder
                     'currencies.delete',
                 ],
             ],
+            [
+                'group_name' => 'Vessel Schedule',
+                'permissions' => [
+                    'vessel.schedule.index',
+                ],
+            ],
         ];
     }
 }

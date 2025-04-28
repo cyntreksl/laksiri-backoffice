@@ -94,9 +94,7 @@ const getHBLTotalSummary = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
         });
 
@@ -165,9 +163,7 @@ const getHBLPayments = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
         });
 

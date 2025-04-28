@@ -455,16 +455,15 @@ const approveHBLs = () => {
                 body: JSON.stringify({hbl_ids: idList}),
             });
 
-            if (!response.ok) {
-                throw new Error("Network response was not ok.");
-            } else {
-                window.location.reload();
-                push.success("HBLs Approved Successfully!");
-            }
-        },
-        reject: () => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok.");
+        } else {
+            window.location.reload();
+            push.success("HBLs Approved Successfully!");
         }
-    });
+    } catch (error) {
+        console.error("Error:", error);
+    }
 };
 
 </script>
