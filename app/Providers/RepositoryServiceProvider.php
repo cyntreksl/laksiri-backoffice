@@ -39,6 +39,7 @@ use App\Interfaces\PickupTypeRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\SettingRepositoryInterface;
+use App\Interfaces\SpecialDOChargeRepositoryInterface;
 use App\Interfaces\TaxRepositoryInterface;
 use App\Interfaces\UnloadingIssuesRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
@@ -82,6 +83,7 @@ use App\Repositories\PickupTypeRepository;
 use App\Repositories\PriceRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\SettingRepository;
+use App\Repositories\SpecialDOChargeRepository;
 use App\Repositories\TaxRepository;
 use App\Repositories\UnloadingIssuesRepository;
 use App\Repositories\UserRepository;
@@ -125,6 +127,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TaxRepositoryInterface::class, TaxRepository::class);
         $this->app->bind(CurrencyRepositoryInterface::class, CurrencyRepository::class);
         $this->app->bind(PickupTypeRepositoryInterface::class, PickupTypeRepository::class);
+        $this->app->bind(SpecialDOChargeRepositoryInterface::class, SpecialDOChargeRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);

@@ -1523,12 +1523,19 @@ export default {
                         }];
 
                     }
-                    if (usePage().props.user.permissions.includes("air-line.do charges index")) {
+                    if (usePage().props.user.permissions.includes("charges.air line do charges index")) {
                         settingMenu = [...settingMenu,{
                             title: "Air Line DO Charges",
                             route: "setting.air-lines.do-charges",
                         }];
 
+                    }
+
+                    if (usePage().props.user.permissions.includes("charges.special do charges index")){
+                        settingMenu= [...settingMenu,{
+                                title: "Special DO Charges ",
+                                route: "setting.special-do-charges.index",
+                            }];
                     }
 
                     childMenuList.splice(0, childMenuList.length, ...settingMenu);

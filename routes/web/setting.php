@@ -10,6 +10,7 @@ use App\Http\Controllers\PackageTypeController;
 use App\Http\Controllers\PickupTypeController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SpecialDOChargeController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\WarehouseZoneController;
 use App\Http\Controllers\ZoneController;
@@ -82,6 +83,11 @@ Route::name('setting.')->group(function () {
 
     Route::post('currencies/update-currency-rates', [CurrencyRateController::class, 'updateCurrencyRate'])
         ->name('currencies.update-rates');
+
+    Route::resource('special-do-charges', SpecialDOChargeController::class)->except('show', 'edit');
+
+    Route::get('special-do-charges/list', [SpecialDOChargeController::class, 'list'])
+        ->name('special-do-charges.list');
 
     // Invoice Settings
     Route::post('invoice/settings', [SettingController::class, 'updateInvoiceSettings'])

@@ -6,6 +6,7 @@ use App\Actions\Branch\CreateAgent;
 use App\Actions\Branch\CreateBranch;
 use App\Actions\Branch\GetAgent;
 use App\Actions\Branch\GetBranches;
+use App\Actions\Branch\GetDepartureBranches;
 use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\Branch\GetUserBranches;
 use App\Actions\Branch\UpdateAgent;
@@ -26,6 +27,11 @@ class BranchRepository implements BranchRepositoryInterface, GridJsInterface
     public function getDestinationBranches()
     {
         return GetDestinationBranches::run();
+    }
+
+    public function getDepartureBranches()
+    {
+        return GetDepartureBranches::run();
     }
 
     public function createBranch(array $data)

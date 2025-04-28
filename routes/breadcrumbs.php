@@ -157,6 +157,20 @@ Breadcrumbs::for('setting.air-lines.index', function (BreadcrumbTrail $trail) {
     $trail->push('Air Lines', route('setting.air-lines.index'));
 });
 
+// Special DO Charges create
+Breadcrumbs::for('setting.special-do-charges.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Create Special DO Charges', route('setting.special-do-charges.create'));
+});
+
+// Special DO Charges index
+Breadcrumbs::for('setting.special-do-charges.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Settings');
+    $trail->push('Special DO Charges List', route('setting.special-do-charges.index'));
+});
+
 // Currencies
 Breadcrumbs::for('setting.currencies.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

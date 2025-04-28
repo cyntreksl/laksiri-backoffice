@@ -21,4 +21,6 @@ interface BranchRepositoryInterface
     public function createAgent(array $data);
 
     public function updateAgent(array $data, Branch $branch);
+
+    public function getDepartureBranches();
 }
