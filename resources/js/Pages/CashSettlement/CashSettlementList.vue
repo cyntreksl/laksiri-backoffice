@@ -441,16 +441,16 @@ const exportURL = computed(() => {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2 mt-3">
             <SimpleOverviewWidget :count="totalRecord" bg-color="white" title="HBL Count"/>
 
-            <SimpleOverviewWidget :count="totalGrandAmount.toFixed(2)" bg-color="white" title="HBL Amount"/>
+            <SimpleOverviewWidget :count="Number(totalGrandAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })" bg-color="white" title="HBL Amount"/>
 
-            <SimpleOverviewWidget :count="totalPaidAmount.toFixed(2)" bg-color="white" title="HBL Paid Amount"/>
+            <SimpleOverviewWidget :count="Number(totalPaidAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })" bg-color="white" title="HBL Paid Amount"/>
 
             <SimpleOverviewWidget :count="countOfSelectedData" bg-color="white" title="Selected HBL Count"/>
 
-            <SimpleOverviewWidget :count="valueOfSelectedData.toFixed(2)" bg-color="white"
+            <SimpleOverviewWidget :count="Number(valueOfSelectedData).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })" bg-color="white"
                                   title="Selected HBL Amount"/>
 
-            <SimpleOverviewWidget :count="paidValueOfSelectedData.toFixed(2)" bg-color="white"
+            <SimpleOverviewWidget :count="Number(paidValueOfSelectedData).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })" bg-color="white"
                                   title="Selected HBL Paid Amount"/>
         </div>
 
