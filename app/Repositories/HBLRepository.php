@@ -94,7 +94,6 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                     ->orWhereNull('status');
             });
         }
-        $query->where('hbl_number', '=', '005000387');
 
         if (! empty($search)) {
             $query->whereAny([
