@@ -199,8 +199,8 @@ class RolePermissionSeeder extends Seeder
                     'hbls.issue token',
                     'hbls.show draft hbls',
                     'hbls.hbl finance approval list',
-                    'hbls.show finance approved hbls',
-                    'hbls.finance approved',
+                    'hbls.finance approved hbl list',
+                    'hbls.create finance approval',
                 ],
             ],
 

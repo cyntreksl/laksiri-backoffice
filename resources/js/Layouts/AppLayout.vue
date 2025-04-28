@@ -923,6 +923,17 @@ export default {
                         );
                     }
 
+                    if (usePage().props.user.permissions.includes("hbls.finance approved hbl list")) {
+                        hblMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Approved HBLs",
+                                route: "finance.hbls.approved-hbl",
+                            }
+                        );
+                    }
+
                     if (usePage().props.user.permissions.includes("mhbls.index")) {
                     hblMenu.splice(
                         2,

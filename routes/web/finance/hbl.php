@@ -2,13 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::resource('hbls', App\Http\Controllers\HBLController::class)->except(['store', 'update', 'destroy', 'create', 'edit']);
-
-Route::get('hbl-list', [App\Http\Controllers\HBLController::class, 'list']);
-
 Route::get('approve-hbls', [App\Http\Controllers\Finance\HBLController::class, 'approveHBLs'])->name('hbls.approve-hbl');
+
+Route::get('approved-hbls', [App\Http\Controllers\Finance\HBLController::class, 'approvedHBLs'])->name('hbls.approved-hbl');
 
 Route::get('approve-hbl-list', [App\Http\Controllers\Finance\HBLController::class, 'list']);
 
-Route::post('finance-approved', [App\Http\Controllers\Finance\HBLController::class, 'financeApproved'])
+Route::get('approved-hbl-list', [App\Http\Controllers\Finance\HBLController::class, 'approvedHBLList']);
+
+Route::post('finance-approval', [App\Http\Controllers\Finance\HBLController::class, 'makeFinanceApproval'])
     ->name('hbls.finance-approved');
+
+Route::post('remove-finance-approval', [App\Http\Controllers\Finance\HBLController::class, 'removeFinanceApproval'])
+    ->name('hbls.remove-finance-approved');

@@ -70,6 +70,46 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         ]);
     }
 
+    public function approvedDataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
+    {
+        $query = HBL::query()
+            ->withoutGlobalScope(BranchScope::class)
+            ->where('is_finance_release_approved', '=', true);
+
+        if (! empty($search)) {
+            $query->whereAny([
+                'reference',
+                'hbl_number',
+                'hbl_name',
+                'contact_number',
+                'consignee_name',
+                'consignee_nic',
+                'consignee_contact',
+                'iq_number',
+                'nic',
+                'email',
+            ], 'like', '%'.$search.'%');
+        }
+
+        // apply filters
+        FilterFactory::apply($query, $filters);
+
+        $countQuery = $query;
+        $totalRecords = $countQuery->count();
+
+        $hbls = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
+
+        return response()->json([
+            'data' => HBLResource::collection($hbls),
+            'meta' => [
+                'total' => $totalRecords,
+                'page' => $offset,
+                'perPage' => $limit,
+                'lastPage' => ceil($totalRecords / $limit),
+            ],
+        ]);
+    }
+
     public function financeApproved(array $hblIds)
     {
         $hblList = GetHBLsByIDs::run($hblIds);
@@ -85,5 +125,22 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         }
 
         return $this->success('Approved Successfully', []);
+    }
+
+    public function removeFinanceApproval(array $hblIds)
+    {
+        $hblList = GetHBLsByIDs::run($hblIds);
+
+        foreach ($hblList as $hbl) {
+            $hbl = HBL::find($hbl->id);
+            $hbl->is_finance_release_approved = false;
+            $hbl->finance_release_approved_by = null;
+            $hbl->finance_release_approved_date = null;
+            $hbl->addStatus('Approve Removed by Accountant');
+
+            $hbl->save();
+        }
+
+        return $this->success('Remove Approval Successfully', []);
     }
 }

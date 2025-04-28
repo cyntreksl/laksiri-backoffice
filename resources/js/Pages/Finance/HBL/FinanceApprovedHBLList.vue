@@ -49,7 +49,7 @@ const props = defineProps({
     },
 });
 
-const baseUrl = ref("/finance/approve-hbl-list");
+const baseUrl = ref("/finance/approved-hbl-list");
 const loading = ref(true);
 const hbls = ref([]);
 const totalRecords = ref(0);
@@ -401,11 +401,11 @@ const resolvePaymentStatus = (paymentStatus) => {
     }
 };
 
-const approveHBLs = () => {
+const removeApprovalHBLs = () => {
     const idList = selectedHBLs.value.map((item) => item.id);
     confirm.require({
-        message: 'Would you like to approve these HBL records?',
-        header: 'Approve HBLs?',
+        message: 'Would you like to remove approval of these HBL records?',
+        header: 'Remove Approval of HBLs?',
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
         rejectProps: {
@@ -414,12 +414,12 @@ const approveHBLs = () => {
             outlined: true
         },
         acceptProps: {
-            label: 'Approve',
+            label: 'Remove Approval',
             severity: 'success'
         },
         accept: async () => {
             try {
-                const response = await fetch("/finance/finance-approval", {
+                const response = await fetch("/finance/remove-finance-approval", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -433,12 +433,12 @@ const approveHBLs = () => {
                 if (!response.ok) {
                     throw new Error("Network response was not ok.");
                 } else {
-                    push.success("HBLs Approved Successfully!");
+                    push.success("Remove HBLs Approval Successfully!");
                     window.location.reload();
                 }
             } catch (error) {
                 console.error("Error:", error);
-                push.error("Failed to approve HBLs.");
+                push.error("Failed to remove approval HBLs.");
             }
         }
     });
@@ -448,8 +448,8 @@ const approveHBLs = () => {
 </script>
 
 <template>
-    <AppLayout title="HBL List">
-        <template #header>HBL List</template>
+    <AppLayout title="Finance Approved HBL List">
+        <template #header>Finance Approved HBL List</template>
 
         <Breadcrumb/>
 
@@ -507,16 +507,16 @@ const approveHBLs = () => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    HBL Approval
+                                    Finance Approved HBLs
                                 </div>
                                 <div>
                                     <PrimaryButton
                                         v-if="$page.props.user.permissions.includes('hbls.create finance approval')"
                                         :disabled="selectedHBLs.length === 0"
                                         class="w-full"
-                                        @click="approveHBLs"
+                                        @click="removeApprovalHBLs"
                                     >
-                                        Approve
+                                        Remove Approval
                                     </PrimaryButton>
                                 </div>
                             </div>

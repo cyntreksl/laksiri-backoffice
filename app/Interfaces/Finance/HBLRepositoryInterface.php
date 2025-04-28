@@ -9,4 +9,6 @@ interface HBLRepositoryInterface
     public function getApproveHBLs();
 
     public function financeApproved(array $hblIds);
+
+    public function removeFinanceApproval(array $hblIds);
 }
