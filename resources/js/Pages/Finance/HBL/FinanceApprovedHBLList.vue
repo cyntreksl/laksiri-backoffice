@@ -448,8 +448,8 @@ const removeApprovalHBLs = () => {
 </script>
 
 <template>
-    <AppLayout title="Finance Approved HBL List">
-        <template #header>Finance Approved HBL List</template>
+    <AppLayout title="Approved HBLs">
+        <template #header>Approved HBLs</template>
 
         <Breadcrumb/>
 
@@ -507,7 +507,7 @@ const removeApprovalHBLs = () => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Finance Approved HBLs
+                                    Approved HBLs
                                 </div>
                                 <div>
                                     <PrimaryButton

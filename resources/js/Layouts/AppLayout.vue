@@ -871,7 +871,7 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'admin') {
+                    if (usePage().props.user.permissions.includes("hbls.index") && !usePage().props.auth.user.roles[0].name === 'call center') {
                         hblMenu.splice(
                             2,
                             0,
