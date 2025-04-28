@@ -45,10 +45,16 @@ class HBLPackageObserver
 
     public function deleted(HBLPackage $hBLPackage): void
     {
-        $existPackages = $hBLPackage->hbl->packages;
-        if ($existPackages->isEmpty()) {
-            $hBLPackage->hbl->delete();
+        $hbl = $hBLPackage->hbl;
+
+        if (! $hbl) {
+            return; // No related HBL, nothing to do
         }
 
+        $existPackages = $hbl->packages;
+
+        if ($existPackages->isEmpty()) {
+            $hbl->delete();
+        }
     }
 }

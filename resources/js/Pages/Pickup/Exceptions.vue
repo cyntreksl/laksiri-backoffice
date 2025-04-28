@@ -234,7 +234,6 @@ const closeAssignDriverModal = () => {
 };
 
 const confirmPickupRetry = (pickup) => {
-    selectedPickupID.value = pickup.value.id;
     confirm.require({
         message: 'Are you sure you want to Retry Job?',
         header: 'Retry Pickup?',
@@ -250,16 +249,18 @@ const confirmPickupRetry = (pickup) => {
             severity: 'warn'
         },
         accept: () => {
-            router.get(route("pickups.exceptions.retry", selectedPickupID.value), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    push.success("Added into Pending Jobs!");
-                    router.visit(route("pickups.exceptions"), {only: ["pickups"]});
-                },
-                onError: () => {
-                    push.error("Something went to wrong!");
-                },
-            });
+            router.get(
+                route("pickups.exceptions.retry", pickup.value.pickup_id),
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success("Added into Pending Jobs!");
+                    },
+                    onError: () => {
+                        push.error("Something went wrong!");
+                    }
+                }
+            );
             selectedPickupID.value = null;
         },
         reject: () => {
@@ -267,6 +268,39 @@ const confirmPickupRetry = (pickup) => {
         }
     });
 };
+
+const handleConfirmDriverRemove = (pickupId) => {
+    confirm.require({
+        message: 'Are you certain you want to unassign the driver from this pickup?',
+        header: 'Unassign Driver?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Unassign',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.put(route("pickups.driver.unassign", pickupId), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("Driver Unassigned!");
+                    router.visit(route("pickups.exceptions"), {only: ["pickups"]});
+                },
+                onError: () => {
+                    push.error("Something went wrong!");
+                },
+            });
+        },
+        reject: () => {
+            router.visit(route("pickups.exceptions"), {only: ["pickups"]});
+        }
+    });
+}
 </script>
 <template>
     <AppLayout title="Pickup Exceptions">
@@ -432,7 +466,14 @@ const confirmPickupRetry = (pickup) => {
 
                         <Column field="driver" header="Driver">
                             <template #body="slotProps">
-                                <Chip v-if="slotProps.data.driver !== '-'" :label="slotProps.data.driver" class="!bg-blue-100" icon="ti ti-steering-wheel"/>
+                                <Chip
+                                    v-if="slotProps.data.driver !== '-'"
+                                    :label="slotProps.data.driver"
+                                    class="!bg-blue-100"
+                                    icon="ti ti-steering-wheel"
+                                    removable
+                                    @remove="handleConfirmDriverRemove(slotProps.data.id)"
+                                />
                             </template>
 
                             <template #filter="{ filterModel, filterCallback }">

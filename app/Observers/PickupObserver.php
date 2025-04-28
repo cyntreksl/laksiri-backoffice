@@ -53,11 +53,12 @@ class PickupObserver
 
     public function updated(PickUp $pickup): void
     {
-        if ($pickup->wasChanged('driver_id')) {
+        if ($pickup->isDirty('driver_id') && $pickup->driver_id !== null) {
             // Send notification email
             $this->notificationMailRepository->sendAssignDriverNotification($pickup);
         }
-        if ($pickup->wasChanged('status') && $pickup->status === PickupStatus::PROCESSING->value) {
+
+        if ($pickup->isDirty('status') && $pickup->status === PickupStatus::PROCESSING->value) {
             // Send notification email
             $this->notificationMailRepository->sendCollectedCargoNotification($pickup);
         }

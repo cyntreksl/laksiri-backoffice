@@ -456,9 +456,9 @@ const exportURL = computed(() => {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mt-4">
             <SimpleOverviewWidget :count="totalRecord" bg-color="white" title="HBL Count"/>
 
-            <SimpleOverviewWidget :count="totalGrandAmount.toFixed(2)" bg-color="white" title="HBL Amount"/>
+            <SimpleOverviewWidget :count="Number(totalGrandAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })" bg-color="white" title="HBL Amount"/>
 
-            <SimpleOverviewWidget :count="totalPaidAmount.toFixed(2)" bg-color="white" title="HBL Paid Amount"/>
+            <SimpleOverviewWidget :count="Number(totalPaidAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })" bg-color="white" title="HBL Paid Amount"/>
 
             <SimpleOverviewWidget :count="totalWeight.toFixed(2)" bg-color="white" title="Total Weights"/>
 

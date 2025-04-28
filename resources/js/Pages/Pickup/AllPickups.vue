@@ -351,6 +351,39 @@ const confirmPickupRetry = (pickup) => {
         }
     });
 };
+
+const handleConfirmDriverRemove = (pickupId) => {
+    confirm.require({
+        message: 'Are you certain you want to unassign the driver from this pickup?',
+        header: 'Unassign Driver?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Unassign',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.put(route("pickups.driver.unassign", pickupId), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("Driver Unassigned!");
+                    router.visit(route("pickups.all"), {only: ["pickups"]});
+                },
+                onError: () => {
+                    push.error("Something went wrong!");
+                },
+            });
+        },
+        reject: () => {
+            router.visit(route("pickups.all"), {only: ["pickups"]});
+        }
+    });
+}
 </script>
 <template>
     <AppLayout title="All Pickups">
@@ -521,7 +554,14 @@ const confirmPickupRetry = (pickup) => {
 
                         <Column field="driver" header="Driver">
                             <template #body="slotProps">
-                                <Chip v-if="slotProps.data.driver !== '-'" :label="slotProps.data.driver" class="!bg-blue-100" icon="ti ti-steering-wheel"/>
+                                <Chip
+                                    v-if="slotProps.data.driver !== '-'"
+                                    :label="slotProps.data.driver"
+                                    class="!bg-blue-100"
+                                    icon="ti ti-steering-wheel"
+                                    removable
+                                    @remove="handleConfirmDriverRemove(slotProps.data.id)"
+                                />
                             </template>
 
                             <template #filter="{ filterModel, filterCallback }">

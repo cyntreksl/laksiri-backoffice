@@ -25,7 +25,6 @@ import {push} from "notivue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import moment from "moment";
 import AssignDriverDialog from "@/Pages/Pickup/Partials/AssignDriverDialog.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const props = defineProps({
     drivers: {
@@ -364,6 +363,39 @@ const confirmPickupRetry = (pickup) => {
         }
     });
 };
+
+const handleConfirmDriverRemove = (pickupId) => {
+    confirm.require({
+        message: 'Are you certain you want to unassign the driver from this pickup?',
+        header: 'Unassign Driver?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Unassign',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.put(route("pickups.driver.unassign", pickupId), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("Driver Unassigned!");
+                    router.visit(route("pickups.index"), {only: ["pickups"]});
+                },
+                onError: () => {
+                    push.error("Something went wrong!");
+                },
+            });
+        },
+        reject: () => {
+            router.visit(route("pickups.index"), {only: ["pickups"]});
+        }
+    });
+}
 </script>
 <template>
     <AppLayout title="Pending Pickups">
@@ -502,7 +534,7 @@ const confirmPickupRetry = (pickup) => {
 
                         <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
 
-                        <Column field="reference" header="Reference" sortable>
+                        <Column field="reference" header="Reference" headerStyle="width: 12rem" sortable>
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.reference }}</div>
                                 <div class="text-blue-400 text-sm">{{ slotProps.data.status }}</div>
@@ -515,7 +547,13 @@ const confirmPickupRetry = (pickup) => {
                                       class="text-blue-600 underline">
                                     {{ slotProps.data.name }}
                                 </Link>
-                                <div class="text-gray-500 text-sm">{{ slotProps.data.address }}</div>
+                            </template>
+                        </Column>
+
+                        <Column field="address" header="Address" />
+
+                        <Column field="contact_number" header="Contact">
+                            <template #body="slotProps">
                                 <Link :href="`pickups/get-pending-jobs-by-user/${slotProps.data.contact_number}`"
                                       class="text-blue-600 underline text-sm">
                                     {{ slotProps.data.contact_number }}
@@ -529,7 +567,7 @@ const confirmPickupRetry = (pickup) => {
                             <template #body="slotProps">
                                 <Tag :icon="resolveCargoType(slotProps.data).icon"
                                      :severity="resolveCargoType(slotProps.data).color"
-                                     :value="slotProps.data.cargo_type" class="text-sm"></Tag>
+                                     :value="slotProps.data.cargo_type" class="text-xs"></Tag>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
                                 <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true"
@@ -543,7 +581,14 @@ const confirmPickupRetry = (pickup) => {
 
                         <Column field="driver" header="Driver">
                             <template #body="slotProps">
-                                <Chip v-if="slotProps.data.driver !== '-'" :label="slotProps.data.driver" class="!bg-blue-100" icon="ti ti-steering-wheel"/>
+                                <Chip
+                                    v-if="slotProps.data.driver !== '-'"
+                                    :label="slotProps.data.driver"
+                                    class="!bg-blue-100"
+                                    icon="ti ti-steering-wheel"
+                                    removable
+                                    @remove="handleConfirmDriverRemove(slotProps.data.id)"
+                                />
                             </template>
 
                             <template #filter="{ filterModel, filterCallback }">
@@ -552,15 +597,15 @@ const confirmPickupRetry = (pickup) => {
                             </template>
                         </Column>
 
-                        <Column field="pickup_type" header="Pickup Type"></Column>
+                        <Column field="pickup_type" header="Pickup Type" hidden></Column>
 
                         <Column field="packages" header="Packages">
                             <template #body="slotProps">
                                 <div v-if="Array.isArray(slotProps.data.packages)" class="flex flex-wrap mb-1 gap-2">
-                                    <Chip v-for="(type, index) in slotProps.data.packages" :key="index" :label="type.package_type" icon="pi pi-box"/>
+                                    <Chip v-for="(type, index) in slotProps.data.packages" :key="index" :label="type.package_type" class="text-xs" icon="pi pi-box"/>
                                 </div>
                                 <div v-else-if="typeof slotProps.data.packages === 'string'" class="flex flex-wrap mb-1 gap-2">
-                                    <Chip v-for="(type, index) in slotProps.data.packages.split(',').map(type => type.trim())" :key="index" :label="type" icon="pi pi-box"/>
+                                    <Chip v-for="(type, index) in slotProps.data.packages.split(',').map(type => type.trim())" :key="index" :label="type" class="text-xs" icon="pi pi-box"/>
                                 </div>
                                 <div v-else>
                                     {{ slotProps.data.packages || '-' }}

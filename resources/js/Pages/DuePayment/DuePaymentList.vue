@@ -398,13 +398,13 @@ const exportURL = computed(() => {
             />
 
             <SimpleOverviewWidget
-                :count="totalGrandAmount.toFixed(2)"
+                :count="Number(totalGrandAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })"
                 bg-color="white"
                 title="HBL Amount"
             />
 
             <SimpleOverviewWidget
-                :count="totalPaidAmount.toFixed(2)"
+                :count="Number(totalPaidAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })"
                 bg-color="white"
                 title="HBL Paid Amount"
             />

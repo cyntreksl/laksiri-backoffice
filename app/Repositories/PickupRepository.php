@@ -9,6 +9,7 @@ use App\Actions\PickUps\DeletePickup;
 use App\Actions\PickUps\GetPickupByIds;
 use App\Actions\PickUps\GetPickups;
 use App\Actions\PickUps\SavePickUpOrder;
+use App\Actions\PickUps\UnassignDriver;
 use App\Actions\PickUps\UpdatePickUp;
 use App\Events\PickupDriverAssigned;
 use App\Exports\PickupsExport;
@@ -187,5 +188,10 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
                 'lastPage' => $pickups->lastPage(),
             ],
         ]);
+    }
+
+    public function unassignDriverFromPickup(PickUp $pickup): void
+    {
+        UnassignDriver::run($pickup);
     }
 }
