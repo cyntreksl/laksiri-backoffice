@@ -25,7 +25,6 @@ import {push} from "notivue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import moment from "moment";
 import AssignDriverDialog from "@/Pages/Pickup/Partials/AssignDriverDialog.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const props = defineProps({
     drivers: {
@@ -331,9 +330,9 @@ const confirmPickupRetry = (pickup) => {
                                 <div class="text-lg font-medium">
                                     Pickup Exceptions
                                 </div>
-                                <Link v-if="$page.props.user.permissions.includes('pickups.create')" :href="route('pickups.create')">
-                                    <PrimaryButton class="w-full">Create New Pending Job</PrimaryButton>
-                                </Link>
+                                <Button v-if="$page.props.user.permissions.includes('pickups.create')" icon="pi pi-arrow-right"
+                                        icon-pos="right"
+                                        label="Create New Pending Job" size="small" @click="router.visit(route('pickups.create'))"/>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Button Group -->

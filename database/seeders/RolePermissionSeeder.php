@@ -352,6 +352,11 @@ class RolePermissionSeeder extends Seeder
                     'air-line.list',
                     'air-line.edit',
                     'air-line.delete',
+                    'air-line.do charges index',
+                    'air-line.do charges create',
+                    'air-line.do charges list',
+                    'air-line.do charges edit',
+                    'air-line.do charges delete',
                 ],
             ],
             [
@@ -374,21 +379,6 @@ class RolePermissionSeeder extends Seeder
                     'currencies.create',
                     'currencies.edit',
                     'currencies.delete',
-                ],
-            ],
-            [
-                'group_name' => 'Charges',
-                'permissions' => [
-                    'charges.special do charges index',
-                    'charges.special do charges create',
-                    'charges.special do charges list',
-                    'charges.special do charges edit',
-                    'charges.special do charges delete',
-                    'charges.air line do charges index',
-                    'charges.air line do charges create',
-                    'charges.air line do charges list',
-                    'charges.air line do charges edit',
-                    'charges.air line do charges delete',
                 ],
             ],
         ];

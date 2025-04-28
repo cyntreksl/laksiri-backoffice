@@ -21,7 +21,6 @@ import ContextMenu from "primevue/contextmenu";
 import Button from "primevue/button";
 import {router, usePage} from "@inertiajs/vue3";
 import IconField from "primevue/iconfield";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {useConfirm} from "primevue/useconfirm";
 import axios from "axios";
 import {debounce} from "lodash";
@@ -141,9 +140,7 @@ const getCashSettlementSummary = async () => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
             body: JSON.stringify({
                 warehouse: filters.value.warehouse.value,
@@ -388,9 +385,7 @@ const cashReceived = async () => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+                "X-CSRF-TOKEN": usePage().props.csrf,
             },
             body: JSON.stringify({hbl_ids: idList}),
         });
@@ -520,14 +515,10 @@ const exportURL = computed(() => {
                                     Cash Settlements
                                 </div>
                                 <div>
-                                    <PrimaryButton
-                                        v-if="$page.props.user.permissions.includes('cash.cash received')"
-                                        :disabled="selectedHBLs.length === 0"
-                                        class="w-full"
-                                        @click="cashReceived"
-                                    >
-                                        Cash Received
-                                    </PrimaryButton>
+                                    <Button v-if="$page.props.user.permissions.includes('cash.cash received')"
+                                            :disabled="selectedHBLs.length === 0" icon="pi pi-arrow-right"
+                                            icon-pos="right"
+                                            label="Cash Received" size="small" @click="cashReceived"/>
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
