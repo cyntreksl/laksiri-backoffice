@@ -81,6 +81,7 @@ const filters = ref({
     is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
     user: {value: null, matchMode: FilterMatchMode.EQUALS},
     payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+    driver: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const menuModel = ref([
@@ -116,6 +117,7 @@ const fetchCashSettlements = async (page = 1, search = "", sortField = 'created_
                 deliveryType: filters.value.hbl_type.value || "",
                 cargoMode: filters.value.cargo_type.value || "",
                 isHold: filters.value.is_hold.value || false,
+                driverBy: filters.value.driver.value || [],
                 sort_field: sortField,
                 sort_order: sortOrder === 1 ? "asc" : "desc",
                 createdBy: filters.value.user.value || "",
@@ -148,6 +150,7 @@ const getCashSettlementSummary = async () => {
                 cargoMode: filters.value.cargo_type.value,
                 isHold: filters.value.is_hold.value,
                 officers: filters.value.user.value,
+                driverBy: filters.value.driver.value || [],
                 paymentStatus: filters.value.payments.value,
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
@@ -204,6 +207,11 @@ watch(() => filters.value.user.value, (newValue) => {
 });
 
 watch(() => filters.value.payments.value, (newValue) => {
+    fetchCashSettlements(1, filters.value.global.value);
+    getCashSettlementSummary();
+});
+
+watch(() => filters.value.driver.value, (newValue) => {
     fetchCashSettlements(1, filters.value.global.value);
     getCashSettlementSummary();
 });
@@ -322,6 +330,7 @@ const clearFilter = () => {
         is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
         user: {value: null, matchMode: FilterMatchMode.EQUALS},
         payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+        driver: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
     fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
@@ -480,6 +489,11 @@ const exportURL = computed(() => {
                     <FloatLabel class="w-full" variant="in">
                         <Select v-model="filters.user.value" :options="officers" :showClear="true" class="w-full" input-id="user" option-label="name" option-value="id" />
                         <label for="user">Created By</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.driver.value" :options="drivers" :showClear="true" class="w-full" input-id="driver" option-label="name" option-value="id" />
+                        <label for="user">Driver</label>
                     </FloatLabel>
                 </div>
             </Panel>
