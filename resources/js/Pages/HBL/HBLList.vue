@@ -1,6 +1,6 @@
 <script setup>
 import {computed, onMounted, ref, watch} from "vue";
-import {Link, router, usePage} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import FloatLabel from 'primevue/floatlabel';
@@ -22,7 +22,6 @@ import axios from "axios";
 import {FilterMatchMode} from '@primevue/core/api';
 import moment from "moment";
 import {debounce} from "lodash";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import {push} from "notivue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
@@ -436,9 +435,9 @@ const exportCSV = () => {
                                 <div class="text-lg font-medium">
                                     All HBLs
                                 </div>
-                                <Link v-if="$page.props.user.permissions.includes('hbls.create')" :href="route('hbls.create')">
-                                    <PrimaryButton class="w-full">Create New HBL</PrimaryButton>
-                                </Link>
+                                <Button v-if="$page.props.user.permissions.includes('hbls.create')" icon="pi pi-arrow-right"
+                                        icon-pos="right"
+                                        label="Create New HBL" size="small" @click="router.visit(route('hbls.create'))"/>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Button Group -->

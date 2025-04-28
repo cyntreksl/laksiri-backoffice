@@ -16,7 +16,6 @@ import Select from "primevue/select";
 import Tag from "primevue/tag";
 import IconField from "primevue/iconfield";
 import ContextMenu from "primevue/contextmenu";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import DatePicker from "primevue/datepicker";
 import FloatLabel from "primevue/floatlabel";
@@ -461,8 +460,11 @@ const exportCSV = () => {
                                 <div class="text-lg font-medium">
                                     Door to Door HBLs
                                 </div>
+
                                 <div>
-                                    <PrimaryButton :disabled="selectedHBLs.length === 0 || !isCreateMHBL" class="w-full" @click="createMHBL">Create MHBL</PrimaryButton>
+                                    <Button :disabled="selectedHBLs.length === 0 || !isCreateMHBL" icon="pi pi-arrow-right"
+                                            icon-pos="right"
+                                            label="Create MHBL" size="small" @click="createMHBL"/>
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">

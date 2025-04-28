@@ -485,3 +485,4 @@ Breadcrumbs::for('setting.pickup-types.index', function (BreadcrumbTrail $trail)
 
 require_once __DIR__.'/call-center-breadcrumbs.php';
 require_once __DIR__.'/finance-breadcrumbs.php';
+require_once __DIR__.'/clearance-breadcrumbs.php';
