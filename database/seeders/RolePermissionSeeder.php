@@ -160,6 +160,7 @@ class RolePermissionSeeder extends Seeder
                     'pickups.edit',
                     'pickups.delete',
                     'pickups.assign driver',
+                    'pickups.unassign driver',
                     'pickups.show pickup order',
                     'pickups.update pickup order',
                     'pickups.show pickup exceptions',

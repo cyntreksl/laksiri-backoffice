@@ -210,4 +210,11 @@ class PickupController extends Controller
             return $this->HBLRepository->getHBLStatus($hbl);
         }
     }
+
+    public function unassignDriver(PickUp $pickup)
+    {
+        $this->authorize('pickups.unassign driver');
+
+        $this->pickupRepository->unassignDriverFromPickup($pickup);
+    }
 }
