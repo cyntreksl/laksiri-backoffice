@@ -86,7 +86,7 @@ Route::name('setting.')->group(function () {
 
     // Special DO Charges
     Route::resource('special-do-charges', SpecialDOChargeController::class)
-        ->except('show', 'edit');
+        ->except('show');
 
     // Invoice Settings
     Route::post('invoice/settings', [SettingController::class, 'updateInvoiceSettings'])

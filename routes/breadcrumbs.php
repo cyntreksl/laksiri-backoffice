@@ -157,18 +157,21 @@ Breadcrumbs::for('setting.air-lines.index', function (BreadcrumbTrail $trail) {
     $trail->push('Air Lines', route('setting.air-lines.index'));
 });
 
-// Special DO Charges create
-Breadcrumbs::for('setting.special-do-charges.create', function (BreadcrumbTrail $trail) {
-    $trail->parent('dashboard');
-    $trail->push('Settings');
-    $trail->push('Create Special DO Charges', route('setting.special-do-charges.create'));
-});
-
-// Special DO Charges index
+// Special DO Charges
 Breadcrumbs::for('setting.special-do-charges.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');
-    $trail->push('Special DO Charges List', route('setting.special-do-charges.index'));
+    $trail->push('Special DO Charges', route('setting.special-do-charges.index'));
+});
+
+Breadcrumbs::for('setting.special-do-charges.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('setting.special-do-charges.index');
+    $trail->push('Create Special DO Charges', route('setting.special-do-charges.create'));
+});
+
+Breadcrumbs::for('setting.special-do-charges.edit', function (BreadcrumbTrail $trail) {
+    $trail->parent('setting.special-do-charges.index');
+    $trail->push('Edit Special DO Charge');
 });
 
 // Currencies
@@ -293,14 +296,12 @@ Breadcrumbs::for('setting.prices.index', function (BreadcrumbTrail $trail) {
     $trail->push('Price Rules', route('setting.prices.index'));
 });
 
-// Branches > Create
 Breadcrumbs::for('setting.prices.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Price Rules', route('setting.prices.index'));
     $trail->push('Create Price Rule');
 });
 
-// Branches > Edit
 Breadcrumbs::for('setting.prices.edit', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Price Rules', route('setting.prices.index'));

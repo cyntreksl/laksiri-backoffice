@@ -38,7 +38,7 @@ const menuModel = ref([
     {
         label: "Edit",
         icon: "pi pi-fw pi-pencil",
-        command: () => router.visit(route("setting.prices.edit", selectedCharge.value.id)),
+        command: () => router.visit(route("setting.special-do-charges.edit", selectedCharge.value.id)),
     },
     {
         label: "Delete",
@@ -50,7 +50,7 @@ const menuModel = ref([
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
     hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
-    cargo_mode: { value: null, matchMode: FilterMatchMode.EQUALS },
+    cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
     agent: { value: null, matchMode: FilterMatchMode.EQUALS },
 });
 
@@ -190,6 +190,8 @@ const resolveHBLType = (hbl_type) => {
 
                         <Column field="collected" header="Collected"></Column>
 
+                        <Column field="package_type" header="Package Type"></Column>
+
                         <Column field="quantity_basis" header="Quantity Basis"></Column>
 
                         <Column field="hbl_type" header="HBL Type" sortable>
@@ -200,8 +202,6 @@ const resolveHBLType = (hbl_type) => {
                                 <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
-
-                        <Column field="package_type" header="Package Type"></Column>
 
                         <Column field="charge" header="Charge">
                             <template #body="slotProps">

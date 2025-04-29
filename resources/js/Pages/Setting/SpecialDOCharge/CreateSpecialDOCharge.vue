@@ -95,6 +95,7 @@ watch([() => form.agent_id], ([newAgent]) => {
 const filteredPackageType = () => {
     return props.packageTypes.filter(pkg => pkg.branch_id === form.agent_id);
 };
+
 const showAddPriceRuleDialog = () => {
     showAddDOChargeDialog.value = true;
 };
@@ -295,7 +296,7 @@ const onDialogHide = () => {
 
                                     <Column field="collected" header="Collected"></Column>
 
-                                    <Column field="package_type" header="Quantity Basis"></Column>
+                                    <Column field="package_type" header="Package Type"></Column>
 
                                     <Column class="!text-right" field="charge" header="Charge">
                                         <template #body="slotProps">
@@ -350,7 +351,7 @@ const onDialogHide = () => {
                         :options="filteredPackageType()"
                         optionLabel="name"
                         option-value="name"
-                        placeholder="Select a Collection Method"
+                        placeholder="Select a Quantity Basis"
                         class="w-full"
                     />
                 </div>

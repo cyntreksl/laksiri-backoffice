@@ -6,6 +6,7 @@ use App\Enum\CargoType;
 use App\Enum\HBLType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSpecialDoChargeRequest;
+use App\Http\Requests\UpdateSpecialDOChargeRequest;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\Finance\SpecialDOChargeRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
@@ -41,6 +42,29 @@ class SpecialDOChargeController extends Controller
     public function store(StoreSpecialDoChargeRequest $request)
     {
         $this->specialDOChargeRepository->storeSpecialDOCharge($request->all());
+    }
+
+    public function edit($id)
+    {
+        $specialDOCharge = SpecialDOCharge::findOrFail($id);
+
+        return Inertia::render('Setting/SpecialDOCharge/EditDOCharge', [
+            'cargoModes' => CargoType::cases(),
+            'hblTypes' => HBLType::cases(),
+            'branches' => $this->branchRepository->getDepartureBranches()->toArray(),
+            'packageTypes' => $this->packageTypeRepository->getPackageTypes(),
+            'charge' => $specialDOCharge,
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateSpecialDOChargeRequest $request, $id)
+    {
+        $specialDOCharge = SpecialDOCharge::findOrFail($id);
+
+        $this->specialDOChargeRepository->updateSpecialDOCharge($request->all(), $specialDOCharge);
     }
 
     public function destroy($id)
