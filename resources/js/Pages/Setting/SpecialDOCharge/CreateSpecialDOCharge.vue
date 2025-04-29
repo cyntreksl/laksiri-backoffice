@@ -203,7 +203,7 @@ const onDialogHide = () => {
         <form @submit.prevent="handleDOChargeCreate">
 
             <div class="flex items-center justify-end p-2 my-5 space-x-2">
-                <Button label="Cancel" severity="danger" variant="outlined" @click="router.visit(route('special-do-charges'))" />
+                <Button label="Cancel" severity="danger" variant="outlined" @click="router.visit(route('setting.special-do-charges.index'))" />
 
                 <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Create DO Charge" type="submit" />
             </div>

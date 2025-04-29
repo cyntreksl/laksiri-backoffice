@@ -4,13 +4,13 @@ use App\Http\Controllers\AirLineController;
 use App\Http\Controllers\CurrencyRateController;
 use App\Http\Controllers\DriverAreasController;
 use App\Http\Controllers\ExceptionNameController;
+use App\Http\Controllers\Finance\SpecialDOChargeController;
 use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\PackagePriceController;
 use App\Http\Controllers\PackageTypeController;
 use App\Http\Controllers\PickupTypeController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\SettingController;
-use App\Http\Controllers\SpecialDOChargeController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\WarehouseZoneController;
 use App\Http\Controllers\ZoneController;
@@ -84,10 +84,9 @@ Route::name('setting.')->group(function () {
     Route::post('currencies/update-currency-rates', [CurrencyRateController::class, 'updateCurrencyRate'])
         ->name('currencies.update-rates');
 
-    Route::resource('special-do-charges', SpecialDOChargeController::class)->except('show', 'edit');
-
-    Route::get('special-do-charges/list', [SpecialDOChargeController::class, 'list'])
-        ->name('special-do-charges.list');
+    // Special DO Charges
+    Route::resource('special-do-charges', SpecialDOChargeController::class)
+        ->except('show', 'edit');
 
     // Invoice Settings
     Route::post('invoice/settings', [SettingController::class, 'updateInvoiceSettings'])
@@ -96,12 +95,16 @@ Route::name('setting.')->group(function () {
     // Shipper and Consignee Settings
     Route::get('shipper-consignees', [OfficerController::class, 'index'])
         ->name('shipper-consignees.index');
+
     Route::post('shipper-consignees', [OfficerController::class, 'store'])
         ->name('shipper-consignees.store');
+
     Route::get('shipper-consignees/{id}/edit', [OfficerController::class, 'edit'])
         ->name('shipper-consignees.edit');
+
     Route::put('shipper-consignees/{id}', [OfficerController::class, 'update'])
         ->name('shipper-consignees.update');
+
     Route::delete('shipper-consignees/{id}', [OfficerController::class, 'destroy'])
         ->name('shipper-consignees.destroy');
 
