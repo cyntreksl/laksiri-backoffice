@@ -105,7 +105,7 @@ const fetchLoadedShipments = async (page = 1, search = "", sortField = 'created_
                 page,
                 per_page: perPage.value,
                 search,
-                cargoMode: filters.value.cargo_type.value || "",
+                cargoType: filters.value.cargo_type.value || "",
                 sort_field: sortField,
                 sort_order: sortOrder === 1 ? "asc" : "desc",
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
