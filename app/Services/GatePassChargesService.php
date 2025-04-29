@@ -23,6 +23,7 @@ class GatePassChargesService
             'demurrage_charge_first' => 0.00,
             'demurrage_charge_second' => 9.50,
             'demurrage_charge_third' => 10.00,
+            'slpa_charge' => 600.00,
         ],
         'Air Cargo' => [
             'port_charge' => 0.00,
@@ -33,6 +34,7 @@ class GatePassChargesService
             'demurrage_charge_second' => 8.00,
             'demurrage_charge_third' => 6.00,
             'demurrage_charge_fourth' => 24.00,
+            'slpa_charge' => 0.00,
         ],
     ];
 
@@ -141,6 +143,14 @@ class GatePassChargesService
         return [
             'rate' => round($discounted_rate, 2),
             'amount' => round($amount, 2),
+        ];
+    }
+
+    public function sLPACharge(float $grand_volume): array
+    {;
+        return [
+            'rate' => round($this->charges['slpa_charge'] * $grand_volume, 2),
+            'amount' => round($this->charges['slpa_charge'] * $grand_volume * (1 + $this->vat / 100), 2),
         ];
     }
 

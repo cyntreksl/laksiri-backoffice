@@ -80,4 +80,6 @@ interface HBLRepositoryInterface
     public function getHBLTotalSummary(HBL $hbl);
 
     public function getHBLsPackages(array $data);
+
+    public function getHBLDestinationTotalSummary(HBL $hbl);
 }
