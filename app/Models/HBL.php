@@ -169,7 +169,7 @@ class HBL extends Model
 
     public function latestHblPayment(): HasOne
     {
-        return $this->hasOne(HblPayment::class, 'hbl_id', 'id')->latestOfMany();
+        return $this->hasOne(HBLPayment::class, 'hbl_id', 'id')->latestOfMany();
     }
 
     public function scopeWarehouse(Builder $query): void
