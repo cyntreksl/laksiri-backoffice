@@ -82,7 +82,7 @@ const handleUpdatePayment = () => {
             <InputNumber v-show="(hbl?.grand_total - hbl?.paid_amount) !== 0"
                          v-model="form.paid_amount"
                          :max="hbl?.grand_total - hbl?.paid_amount"
-                         :maxFractionDigits="5"
+                         :maxFractionDigits="2"
                          :minFractionDigits="2"
                          class="w-full"
                          fluid
