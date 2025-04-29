@@ -85,7 +85,11 @@ watchEffect(() => {
 })
 
 const filteredPackageType = () => {
-    return props.packageTypes.filter(pkg => pkg.branch_id === props.charge.agent_id);
+    return [
+        ...props.packageTypes.filter(pkg => pkg.branch_id === form.agent_id),
+        { name: "DO" },
+        { name: "HBL" }
+    ];
 };
 </script>
 
