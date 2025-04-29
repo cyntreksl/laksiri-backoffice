@@ -146,13 +146,70 @@ class GatePassChargesService
         ];
     }
 
-    public function sLPACharge(float $grand_volume): array
-    {;
+    public function specialCharge(int $containerArrivalDatesCount, float $grand_volume, float $grand_weight): array
+    {
+
+        $quantity = $this->cargo_mode === 'Sea Cargo' ? ($grand_volume * 35) : $grand_weight;
+        $rate = 0.0;
+
+        $chargeBrackets = [
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][0]],
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][1]],
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][2]],
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][3]],
+        ];
+
+        foreach ($chargeBrackets as $bracket) {
+            if ($containerArrivalDatesCount <= 0) {
+                break;
+            }
+
+            $applicableDays = min($bracket['days'], $containerArrivalDatesCount);
+
+            $rate += $bracket['rate'] * $applicableDays * $quantity;
+
+            $containerArrivalDatesCount -= $applicableDays;
+        }
+
+        $amount = $rate * (1 + $this->vat / 100);
+        $discounted_rate = $rate * (100 - $this->branch_demurrage_charge_discount) / 100;
+
         return [
-            'rate' => round($this->charges['slpa_charge'] * $grand_volume, 2),
-            'amount' => round($this->charges['slpa_charge'] * $grand_volume * (1 + $this->vat / 100), 2),
+            'rate' => round($discounted_rate, 2),
+            'amount' => round($amount, 2),
         ];
     }
+
+
+    /**
+     * Get air carggo DO charge details.
+     */
+    private function airCargoDOCharge(): array
+    {
+
+    }
+
+    /**
+     * Get sea carggo DO charge details.
+     */
+    private function seaCargoDOCharge(): array
+    {
+        dd("yes");
+    }
+
+
+    /**
+     * Get DO charge details.
+     */
+    public function dOCharge(): array
+    {
+        if ($this->cargo_mode === 'Sea Cargo') {
+            return $this->seaCargoDOCharge();
+        } else {
+            return $this->airCargoDOCharge();
+        }
+    }
+
 
     /**
      * Get VAT charge details.

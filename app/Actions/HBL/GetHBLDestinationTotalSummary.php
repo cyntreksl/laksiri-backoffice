@@ -13,6 +13,7 @@ class GetHBLDestinationTotalSummary
 
     public function handle($hbl)
     {
+        dd($hbl);
         $service = new GatePassChargesService($hbl['cargo_type']);
 
         $container = $this->getContainer($hbl);
@@ -20,7 +21,7 @@ class GetHBLDestinationTotalSummary
 
         return [
             'handlingCharges' => $service->handlingCharge($hbl->packages->count()),
-            'slpaCharge' => $service->sLPACharge($hbl->packages->sum('volume')),
+            'slpaCharge' => $service->portCharge($hbl->packages->sum('volume')),
             'bondCharge' => $service->bondCharge($hbl->packages->sum('volume'), $hbl->packages->sum('weight')),
             'demurrageCharge' => $container ?
                 $service->demurrageCharge($arrivalDatesCount, $hbl->packages->sum('volume'), $hbl->packages->sum('weight'))
@@ -28,6 +29,7 @@ class GetHBLDestinationTotalSummary
                     'rate' => 0,
                     'amount' => 0
                 ],
+            'dOCharge' => $service->dOCharge(),
         ];
     }
 
