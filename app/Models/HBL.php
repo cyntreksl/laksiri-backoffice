@@ -167,6 +167,11 @@ class HBL extends Model
         return $this->HasMany(HBLPayment::class, 'hbl_id', 'id');
     }
 
+    public function latestHblPayment(): HasOne
+    {
+        return $this->hasOne(HBLPayment::class, 'hbl_id', 'id')->latestOfMany();
+    }
+
     public function scopeWarehouse(Builder $query): void
     {
         $query->whereIn('system_status', [

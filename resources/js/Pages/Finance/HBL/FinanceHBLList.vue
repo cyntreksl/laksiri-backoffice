@@ -448,8 +448,8 @@ const approveHBLs = () => {
 </script>
 
 <template>
-    <AppLayout title="HBL List">
-        <template #header>HBL List</template>
+    <AppLayout title="HBL Approval">
+        <template #header>HBL Approval</template>
 
         <Breadcrumb/>
 

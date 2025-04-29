@@ -12,7 +12,7 @@ Breadcrumbs::for('finance.hbls.index', function (BreadcrumbTrail $trail) {
 // Approve HBLs
 Breadcrumbs::for('finance.hbls.approve-hbl', function (BreadcrumbTrail $trail) {
     $trail->push('HBL');
-    $trail->push('Approve HBLs', route('finance.hbls.approve-hbl'));
+    $trail->push('HBL Approval', route('finance.hbls.approve-hbl'));
 });
 
 // Approved HBLs

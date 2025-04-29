@@ -11,7 +11,10 @@ class GetHBLPaymentStatus
 
     public function handle(float $total_paid_amount, float $grand_total): string
     {
-        if ($total_paid_amount == 0) {
+        $total_paid_amount = round($total_paid_amount, 2);
+        $grand_total = round($grand_total, 2);
+
+        if ($total_paid_amount == 0.0) {
             return HBLPaymentStatus::NOT_PAID->value;
         }
 
