@@ -93,8 +93,13 @@ watch([() => form.agent_id], ([newAgent]) => {
 });
 
 const filteredPackageType = () => {
-    return props.packageTypes.filter(pkg => pkg.branch_id === form.agent_id);
+    return [
+        ...props.packageTypes.filter(pkg => pkg.branch_id === form.agent_id),
+        { name: "DO" },
+        { name: "HBL" }
+    ];
 };
+
 const showAddPriceRuleDialog = () => {
     showAddDOChargeDialog.value = true;
 };
@@ -203,7 +208,7 @@ const onDialogHide = () => {
         <form @submit.prevent="handleDOChargeCreate">
 
             <div class="flex items-center justify-end p-2 my-5 space-x-2">
-                <Button label="Cancel" severity="danger" variant="outlined" @click="router.visit(route('special-do-charges'))" />
+                <Button label="Cancel" severity="danger" variant="outlined" @click="router.visit(route('setting.special-do-charges.index'))" />
 
                 <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Create DO Charge" type="submit" />
             </div>
@@ -276,7 +281,7 @@ const onDialogHide = () => {
                         <template #title>
                             <div class="flex justify-between">
                                 <div>DO Charges</div>
-                                <Button  :disabled="form.agent_id === null && form.cargo_type === '' && form.hbl_type === ''"
+                                <Button  :disabled="form.agent_id === null || form.cargo_type === '' || form.hbl_type === ''"
                                          icon="pi pi-plus" iconPos="left" label="New Do Charge" severity="info" type="button" variant="outlined" @click="showAddPriceRuleDialog"/>
                             </div>
                         </template>
@@ -295,7 +300,7 @@ const onDialogHide = () => {
 
                                     <Column field="collected" header="Collected"></Column>
 
-                                    <Column field="package_type" header="Quantity Basis"></Column>
+                                    <Column field="package_type" header="Package Type"></Column>
 
                                     <Column class="!text-right" field="charge" header="Charge">
                                         <template #body="slotProps">
@@ -350,7 +355,7 @@ const onDialogHide = () => {
                         :options="filteredPackageType()"
                         optionLabel="name"
                         option-value="name"
-                        placeholder="Select a Collection Method"
+                        placeholder="Select a Quantity Basis"
                         class="w-full"
                     />
                 </div>
