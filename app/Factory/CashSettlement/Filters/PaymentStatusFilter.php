@@ -12,7 +12,7 @@ class PaymentStatusFilter implements FilterInterface
         if (! is_null($value)) {
             $value = ! is_array($value) ? explode(',', $value) : $value;
 
-            return $query->whereHas('hblPayment', function (Builder $query) use ($value) {
+            return $query->whereHas('latestHblPayment', function (Builder $query) use ($value) {
                 $query->whereIn('status', $value);
             });
         }
