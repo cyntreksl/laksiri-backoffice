@@ -277,7 +277,7 @@ const onDialogHide = () => {
                         <template #title>
                             <div class="flex justify-between">
                                 <div>DO Charges</div>
-                                <Button  :disabled="form.agent_id === null && form.cargo_type === '' && form.hbl_type === ''"
+                                <Button  :disabled="form.agent_id === null || form.cargo_type === '' || form.hbl_type === ''"
                                          icon="pi pi-plus" iconPos="left" label="New Do Charge" severity="info" type="button" variant="outlined" @click="showAddPriceRuleDialog"/>
                             </div>
                         </template>
