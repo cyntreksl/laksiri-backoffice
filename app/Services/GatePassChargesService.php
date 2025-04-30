@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Actions\AirLine\GetAirLineByName;
 use App\Actions\Branch\GetBranchById;
 use App\Actions\SpecialDOCharge\GetSpecialDOChargeByAgent;
 use App\Actions\Tax\GetTaxByWarehouse;
@@ -184,11 +185,6 @@ class GatePassChargesService
     }
 
     /**
-     * Get air carggo DO charge details.
-     */
-    private function airCargoDOCharge(): array {}
-
-    /**
      * Get sea carggo DO charge details.
      */
     private function seaCargoDOCharge(HBL $hbl): array
@@ -244,6 +240,27 @@ class GatePassChargesService
     }
 
     /**
+     * Get air cargo DO charge details.
+     */
+    private function airCargoDOCharge(HBL $hbl): array
+    {
+        $container = $this->getContainer($hbl);
+        $airCargoDORule = GetAirLineByName::run($container->airline_name) ? GetAirLineByName::run($container->airline_name)->airLineDOCharge : null;
+        if ($airCargoDORule) {
+            return [
+                'rate' => $airCargoDORule->do_charge,
+                'amount' => $airCargoDORule->do_charge,
+            ];
+        } else {
+            return [
+                'rate' => 0.00,
+                'amount' => 0.00,
+            ];
+        }
+
+    }
+
+    /**
      * Get DO charge details.
      */
     public function dOCharge(HBL $hbl): array
@@ -251,7 +268,7 @@ class GatePassChargesService
         if ($this->cargo_mode === 'Sea Cargo') {
             return $this->seaCargoDOCharge($hbl);
         } else {
-            return $this->airCargoDOCharge();
+            return $this->airCargoDOCharge($hbl);
         }
     }
 
@@ -265,5 +282,10 @@ class GatePassChargesService
         return [
             'rate' => $tax ? $tax->rate : 0,
         ];
+    }
+
+    private function getContainer($hbl)
+    {
+        return $hbl->packages[0]->containers()->withoutGlobalScopes()->first() ?? $hbl->packages[0]->duplicate_containers()->withoutGlobalScopes()->first();
     }
 }

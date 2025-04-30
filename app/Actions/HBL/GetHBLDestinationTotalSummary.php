@@ -23,7 +23,7 @@ class GetHBLDestinationTotalSummary
         $demurrageCharge = $container ?
         $service->demurrageCharge($arrivalDatesCount, $hbl->packages->sum('volume'), $hbl->packages->sum('weight'))['amount'] * (1 + $vat / 100)
         : 0.00;
-        $dOCharge = $service->dOCharge($hbl)['amount'] * (1 + $vat / 100);
+        $dOCharge = $service->dOCharge($hbl)['amount'];
 
         return [
             'handlingCharges' => $handlingCharges,
