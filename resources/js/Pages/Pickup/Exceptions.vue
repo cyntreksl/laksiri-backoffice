@@ -159,8 +159,8 @@ const onRowContextMenu = (event) => {
     cm.value.show(event.originalEvent);
 };
 
-const confirmViewPickup = (hbl) => {
-    selectedPickupID.value = hbl.value.id;
+const confirmViewPickup = (pickup) => {
+    selectedPickupID.value = pickup.value.pickup_id;
     showConfirmViewPickupModal.value = true;
 };
 
