@@ -2,10 +2,8 @@
 import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import {onMounted, ref, watchEffect} from "vue";
-import DeleteHBLConfirmationModal from "@/Pages/Loading/Partials/DeleteHBLConfirmationModal.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 import MHBLDetailModal from "@/Pages/Common/MHBLDetailModal.vue";
-import DeleteMHBLConfirmationModal from "@/Pages/Loading/Partials/DeleteMHBLConfirmModal.vue";
 
 const props = defineProps({
     container: {
@@ -310,10 +308,6 @@ const handleRemoveMHBLFromContainer = () => {
             </tbody>
         </table>
     </div>
-
-    <DeleteHBLConfirmationModal :show="showConfirmDeleteHBLModal" @close="closeModal" @unload-hbl="handleRemoveHBLFromContainer"/>
-
-    <DeleteMHBLConfirmationModal :show="showConfirmDeleteMHBLModal" @close="closeConfirmDeleteMHBLModal" @unload-mhbl="handleRemoveMHBLFromContainer"/>
 
     <HBLDetailModal
         :hbl-id="hblRecord?.id"

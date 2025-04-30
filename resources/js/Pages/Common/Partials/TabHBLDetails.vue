@@ -65,7 +65,7 @@ watch(
                 <PostSkeleton v-if="isLoading" />
 
                 <SimpleOverviewWidget v-else :count="hbl?.packages_count ?? 0" class="bg-slate-100" title="Packages">
-                    <i class="ti ti-package text-emerald-500 text-3xl"></i>
+                    <i class="ti ti-packages text-emerald-500 text-3xl"></i>
                 </SimpleOverviewWidget>
 
                 <PostSkeleton v-if="isLoading" />

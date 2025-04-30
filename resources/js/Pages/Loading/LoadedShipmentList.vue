@@ -4,7 +4,6 @@ import {onMounted, ref, watch} from "vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
 import {router, usePage} from "@inertiajs/vue3";
-import LoadedShipmentDetailModal from "@/Pages/Loading/Partials/LoadedShipmentDetailModal.vue";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
@@ -21,6 +20,7 @@ import Button from "primevue/button";
 import DatePicker from "primevue/datepicker";
 import Column from "primevue/column";
 import IconField from "primevue/iconfield";
+import LoadedShipmentDetailDialog from "@/Pages/Common/Dialog/Container/Index.vue";
 
 const props = defineProps({
     cargoTypes: {
@@ -606,14 +606,9 @@ const exportCSV = () => {
         </div>
     </AppLayout>
 
-    <LoadedShipmentDetailModal
-        :air-container-options="airContainerOptions"
-        :container="loadedShipment"
-        :container-status="containerStatus"
-        :sea-container-options="seaContainerOptions"
-        :show="showConfirmLoadedShipmentModal"
-        @close="closeModal"
-    />
+    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="loadedShipment" :container-status="containerStatus" :sea-container-options="seaContainerOptions" :show="showConfirmLoadedShipmentModal"
+           @close="closeModal"
+           @update:show="showConfirmLoadedShipmentModal = $event" />
 </template>
 
 <style>
