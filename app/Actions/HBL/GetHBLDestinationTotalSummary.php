@@ -16,19 +16,23 @@ class GetHBLDestinationTotalSummary
 
         $container = $this->getContainer($hbl);
         $arrivalDatesCount = $this->calculateArrivalDatesCount($container);
+        $vat = $service->vatCharge($hbl)['rate'];
+        $handlingCharges = $service->handlingCharge($hbl->packages->count())['amount'] * (1 + $vat / 100);
+        $slpaCharge = $service->portCharge($hbl->packages->sum('volume'))['amount'] * (1 + $vat / 100);
+        $bondCharge = $service->bondCharge($hbl->packages->sum('volume'), $hbl->packages->sum('weight'))['amount'] * (1 + $vat / 100);
+        $demurrageCharge = $container ?
+        $service->demurrageCharge($arrivalDatesCount, $hbl->packages->sum('volume'), $hbl->packages->sum('weight'))['amount'] * (1 + $vat / 100)
+        : 0.00;
+        $dOCharge = $service->dOCharge($hbl)['amount'] * (1 + $vat / 100);
 
         return [
-            'handlingCharges' => $service->handlingCharge($hbl->packages->count()),
-            'slpaCharge' => $service->portCharge($hbl->packages->sum('volume')),
-            'bondCharge' => $service->bondCharge($hbl->packages->sum('volume'), $hbl->packages->sum('weight')),
-            'demurrageCharge' => $container ?
-                $service->demurrageCharge($arrivalDatesCount, $hbl->packages->sum('volume'), $hbl->packages->sum('weight'))
-                : [
-                    'rate' => 0,
-                    'amount' => 0,
-                ],
-            'dOCharge' => $service->dOCharge($hbl),
-            'vatCharge' => $service->vatCharge($hbl),
+            'handlingCharges' => $handlingCharges,
+            'slpaCharge' => $slpaCharge,
+            'bondCharge' => $bondCharge,
+            'demurrageCharge' => $demurrageCharge,
+            'dOCharge' => $dOCharge,
+            'vatCharge' => $vat,
+            'totalAmount' => $handlingCharges + $slpaCharge + $bondCharge + $demurrageCharge + $dOCharge,
         ];
     }
 

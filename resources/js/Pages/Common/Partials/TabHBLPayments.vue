@@ -13,6 +13,10 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    hblDestinationTotalSummary: {
+        type: Object,
+        default: () => ({}),
+    },
 });
 
 const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
@@ -114,71 +118,63 @@ const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
                     </p>
                 </div>
 
-                <div v-if="hblTotalSummary.freight_charge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div v-if="hblDestinationTotalSummary.handlingCharges" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
                         <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
-                            <p class="text-sm/6 font-semibold text-gray-900">Freight Charges</p>
-                            <div class="text-gray-500">
-                    <span v-for="(charge, index) in hblTotalSummary.freight_charge_operations" :key="index">
-                                    {{ charge }} <br>
-                    </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div v-if="hblTotalSummary.destination_charges" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
-                    <div class="flex min-w-0 gap-x-4">
-                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
-                        <div class="min-w-0 flex-auto">
-                            <p class="text-sm/6 font-semibold text-gray-900">Destination Charges</p>
+                            <p class="text-sm/6 font-semibold text-gray-900">Handling Charges</p>
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.destination_charges).toFixed(2) }}</p>
-                        <div v-if="hbl.is_destination_charges_paid" class="mt-1 flex items-center gap-x-1.5">
-                            <div class="flex-none rounded-full bg-emerald-500/20 p-1">
-                                <div class="size-1.5 rounded-full bg-emerald-500" />
-                            </div>
-                            <p class="text-xs/5 text-gray-500">Paid</p>
-                        </div>
+                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.handlingCharges).toFixed(2) }}</p>
                     </div>
                 </div>
 
-                <div v-if="hblTotalSummary.package_charges" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div v-if="hblDestinationTotalSummary.slpaCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
                         <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
-                            <p class="text-sm/6 font-semibold text-gray-900">Package Charges</p>
+                            <p class="text-sm/6 font-semibold text-gray-900">SLPA Charges</p>
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.package_charges).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.slpaCharge).toFixed(2) }}</p>
                     </div>
                 </div>
 
-                <div v-if="hblTotalSummary.bill_charge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div v-if="hblDestinationTotalSummary.bondCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
                         <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
-                            <p class="text-sm/6 font-semibold text-gray-900">Bill Charges</p>
+                            <p class="text-sm/6 font-semibold text-gray-900">Bond Charges</p>
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.bill_charge).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.bondCharge).toFixed(2) }}</p>
                     </div>
                 </div>
 
-                <div v-if="hblTotalSummary.additional_charge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div v-if="hblDestinationTotalSummary.demurrageCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
                         <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
-                            <p class="text-sm/6 font-semibold text-gray-900">Additional Charges</p>
+                            <p class="text-sm/6 font-semibold text-gray-900">Demurrage Charges</p>
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.additional_charge).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.demurrageCharge).toFixed(2) }}</p>
+                    </div>
+                </div>
+
+                <div v-if="hblDestinationTotalSummary.dOCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                    <div class="flex min-w-0 gap-x-4">
+                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
+                        <div class="min-w-0 flex-auto">
+                            <p class="text-sm/6 font-semibold text-gray-900">DO Charges</p>
+                        </div>
+                    </div>
+                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.dOCharge).toFixed(2) }}</p>
                     </div>
                 </div>
 
@@ -186,6 +182,17 @@ const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
         </Card>
 
         <ul class="divide-y divide-gray-100" role="list">
+            <li v-if="hblDestinationTotalSummary.totalAmount" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                <div class="flex min-w-0 gap-x-4">
+                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
+                    <div class="min-w-0 flex-auto">
+                        <p class="text-sm/6 font-semibold text-gray-900">Destination Charges</p>
+                    </div>
+                </div>
+                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.totalAmount).toFixed(2) }}</p>
+                </div>
+            </li>
             <li v-if="hblTotalSummary.vat" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                 <div class="flex min-w-0 gap-x-4">
                     <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
