@@ -8,6 +8,7 @@ import Button from "primevue/button";
 import TabPanels from "primevue/tabpanels";
 import TabHBLUnderShipment from "@/Pages/Common/Dialog/Container/Tabs/TabHBLUnderShipment.vue";
 import TabHandlingProcedure from "@/Pages/Common/Dialog/Container/Tabs/TabHandlingProcedure.vue";
+import TabMHBLUnderShipment from "@/Pages/Common/Dialog/Container/Tabs/TabMHBLUnderShipment.vue";
 
 const props = defineProps({
     show: {
@@ -87,7 +88,7 @@ const emit = defineEmits(['close']);
                     <TabHBLUnderShipment :container="container"/>
                 </TabPanel>
                 <TabPanel value="1">
-                    a
+                    <TabMHBLUnderShipment :container="container"/>
                 </TabPanel>
                 <TabPanel value="2">
                     a
