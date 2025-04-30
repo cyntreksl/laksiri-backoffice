@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Actions\Branch\GetBranchById;
+use App\Actions\SpecialDOCharge\GetSpecialDOChargeByAgent;
+use App\Actions\Tax\GetTaxByWarehouse;
+use App\Models\HBL;
 use Illuminate\Support\Facades\Auth;
 
 class GatePassChargesService
@@ -180,44 +183,87 @@ class GatePassChargesService
         ];
     }
 
-
     /**
      * Get air carggo DO charge details.
      */
-    private function airCargoDOCharge(): array
-    {
-
-    }
+    private function airCargoDOCharge(): array {}
 
     /**
      * Get sea carggo DO charge details.
      */
-    private function seaCargoDOCharge(): array
+    private function seaCargoDOCharge(HBL $hbl): array
     {
-        dd("yes");
-    }
+        $doChargeData = [
+            'agent_id' => $hbl->branch_id,
+            'cargo_type' => $hbl->cargo_type,
+            'hbl_type' => $hbl->hbl_type,
+        ];
+        $groupedRules = collect(GetSpecialDOChargeByAgent::run($doChargeData))->groupBy('package_type');
 
+        $rate = 0;
+        $amount = 0;
+        foreach ($groupedRules as $index => $ruleSet) {
+            if ($index === 'HBL' && isset($ruleSet[0])) {
+                $rate += $ruleSet[0]->charge;
+                $amount += $ruleSet[0]->charge;
+            } elseif ($index === 'DO' && isset($ruleSet[0])) {
+                $rate += $ruleSet[0]->charge;
+                $amount += $ruleSet[0]->charge;
+            } else {
+                $package_quantity = $hbl->packages
+                    ->where('package_type', $index)
+                    ->sum('quantity');
+                $groupedDORules = $ruleSet->groupBy('condition');
+                $operations = array_keys($groupedDORules->toArray());
+
+                usort($operations, function ($a, $b) {
+                    return ((int) filter_var($b, FILTER_SANITIZE_NUMBER_INT)) <=> ((int) filter_var($a, FILTER_SANITIZE_NUMBER_INT));
+                });
+                $operations = array_values(array_filter($operations, function ($operation) use ($package_quantity) {
+                    $number = floatval(substr($operation, 1));
+
+                    return $number < $package_quantity;
+                }));
+                $packageDOCharge = 0;
+                foreach ($operations as $operation) {
+                    $operation_quantity = (float) filter_var($operation, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+                    $rule = (object) $groupedDORules[$operation][0];
+                    $quantity_after_operation = $package_quantity - $operation_quantity;
+                    $packageDOCharge += ($quantity_after_operation * $rule['charge']);
+                    $package_quantity = $operation_quantity;
+                }
+                $rate += $packageDOCharge;
+                $amount += $packageDOCharge;
+            }
+        }
+
+        return [
+            'rate' => $rate,
+            'amount' => $amount,
+        ];
+    }
 
     /**
      * Get DO charge details.
      */
-    public function dOCharge(): array
+    public function dOCharge(HBL $hbl): array
     {
         if ($this->cargo_mode === 'Sea Cargo') {
-            return $this->seaCargoDOCharge();
+            return $this->seaCargoDOCharge($hbl);
         } else {
             return $this->airCargoDOCharge();
         }
     }
 
-
     /**
      * Get VAT charge details.
      */
-    public function vatCharge(): array
+    public function vatCharge(HBL $hbl): array
     {
+        $tax = GetTaxByWarehouse::run($hbl->warehouse_id);
+
         return [
-            'rate' => $this->vat,
+            'rate' => $tax ? $tax->rate : 0,
         ];
     }
 }

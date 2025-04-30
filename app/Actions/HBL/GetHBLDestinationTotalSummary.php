@@ -3,7 +3,6 @@
 namespace App\Actions\HBL;
 
 use App\Services\GatePassChargesService;
-use App\Services\PriceCalculationService;
 use Carbon\Carbon;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -13,7 +12,6 @@ class GetHBLDestinationTotalSummary
 
     public function handle($hbl)
     {
-        dd($hbl);
         $service = new GatePassChargesService($hbl['cargo_type']);
 
         $container = $this->getContainer($hbl);
@@ -27,9 +25,10 @@ class GetHBLDestinationTotalSummary
                 $service->demurrageCharge($arrivalDatesCount, $hbl->packages->sum('volume'), $hbl->packages->sum('weight'))
                 : [
                     'rate' => 0,
-                    'amount' => 0
+                    'amount' => 0,
                 ],
-            'dOCharge' => $service->dOCharge(),
+            'dOCharge' => $service->dOCharge($hbl),
+            'vatCharge' => $service->vatCharge($hbl),
         ];
     }
 
@@ -42,5 +41,4 @@ class GetHBLDestinationTotalSummary
     {
         return $container ? Carbon::parse($container['estimated_time_of_arrival'])->diffInDays(Carbon::now()->startOfDay(), false) : 0;
     }
-
 }
