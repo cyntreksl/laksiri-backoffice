@@ -10,6 +10,7 @@ import TabHBLUnderShipment from "@/Pages/Common/Dialog/Container/Tabs/TabHBLUnde
 import TabHandlingProcedure from "@/Pages/Common/Dialog/Container/Tabs/TabHandlingProcedure.vue";
 import TabMHBLUnderShipment from "@/Pages/Common/Dialog/Container/Tabs/TabMHBLUnderShipment.vue";
 import TabShipmentDetails from "@/Pages/Common/Dialog/Container/Tabs/TabShipmentDetails.vue";
+import TabDocuments from "@/Pages/Common/Dialog/Container/Tabs/TabDocuments.vue";
 
 const props = defineProps({
     show: {
@@ -95,7 +96,7 @@ const emit = defineEmits(['close']);
                     <TabShipmentDetails :air-container-options="airContainerOptions" :container="container" :container-status="containerStatus" :sea-container-options="seaContainerOptions" />
                 </TabPanel>
                 <TabPanel value="3">
-                    a
+                    <TabDocuments :container-id="container?.id" />
                 </TabPanel>
                 <TabPanel value="4">
                     <TabHandlingProcedure :container="container"/>
