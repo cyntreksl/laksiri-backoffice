@@ -5,6 +5,7 @@ import HBLPackages from "@/Pages/Common/Dialog/Container/Tables/HBLPackages.vue"
 import AddHBLModal from "@/Pages/Common/Dialog/Container/Dialog/AddHBLModal.vue";
 import {usePage} from "@inertiajs/vue3";
 import Button from "primevue/button";
+import Divider from "primevue/divider";
 
 const props = defineProps({
     container: {
@@ -169,6 +170,8 @@ watch(
             </a>
         </div>
     </div>
+
+    <Divider />
 
     <div class="flex gap-3 my-3">
         <SimpleOverviewWidget :count="hblsCount || 0" class="bg-slate-100" title="HBLs">

@@ -9,6 +9,7 @@ import TabPanels from "primevue/tabpanels";
 import TabHBLUnderShipment from "@/Pages/Common/Dialog/Container/Tabs/TabHBLUnderShipment.vue";
 import TabHandlingProcedure from "@/Pages/Common/Dialog/Container/Tabs/TabHandlingProcedure.vue";
 import TabMHBLUnderShipment from "@/Pages/Common/Dialog/Container/Tabs/TabMHBLUnderShipment.vue";
+import TabShipmentDetails from "@/Pages/Common/Dialog/Container/Tabs/TabShipmentDetails.vue";
 
 const props = defineProps({
     show: {
@@ -91,7 +92,7 @@ const emit = defineEmits(['close']);
                     <TabMHBLUnderShipment :container="container"/>
                 </TabPanel>
                 <TabPanel value="2">
-                    a
+                    <TabShipmentDetails :air-container-options="airContainerOptions" :container="container" :container-status="containerStatus" :sea-container-options="seaContainerOptions" />
                 </TabPanel>
                 <TabPanel value="3">
                     a
