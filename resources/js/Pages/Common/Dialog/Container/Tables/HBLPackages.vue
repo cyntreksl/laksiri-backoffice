@@ -3,11 +3,11 @@ import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import {computed, onMounted, ref, watchEffect} from "vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-import MHBLDetailModal from "@/Pages/Common/MHBLDetailModal.vue";
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from "primevue/button";
 import {useConfirm} from "primevue/useconfirm";
+import MHBLDetailDialog from "@/Pages/Common/Dialog/MHBL/Index.vue";
 
 const props = defineProps({
     container: {
@@ -295,9 +295,8 @@ const mergedHBLData = computed(() => {
         @update:show="showConfirmViewHBLModal = $event"
     />
 
-    <MHBLDetailModal
-        :mhbl-id="mhblId"
-        :show="showConfirmViewMHBLModal"
-        @close="closeShowMHBLModal"
-    />
+    <MHBLDetailDialog :mhbl-id="mhblId"
+                      :show="showConfirmViewMHBLModal"
+                      @close="closeShowMHBLModal"
+                      @update:show="showConfirmViewMHBLModal = $event"/>
 </template>
