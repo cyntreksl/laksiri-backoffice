@@ -82,6 +82,28 @@ const getHBLTotalSummary = async () => {
     }
 };
 
+const hblDestinationTotalSummary = ref({});
+const getHBLDestinationTotalSummary = async () => {
+    console.log(props.hblId);
+    try {
+        const response = await fetch(`/hbls/get-destination-total-summary/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok.");
+        }else{
+            hblDestinationTotalSummary.value = await response.json();
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
+
 const fetchPickup = async () => {
     isLoading.value = true;
 
@@ -113,6 +135,7 @@ watch(() => props.hblId, (newVal) => {
     if (newVal !== undefined) {
         fetchHBL();
         getHBLTotalSummary();
+        getHBLDestinationTotalSummary();
     }
 });
 
@@ -185,7 +208,7 @@ onMounted(() => {
                     <TabHBLDetails :hbl="hbl" :is-loading="isLoading" :pickup="pickup" />
                 </TabPanel>
                 <TabPanel value="1">
-                    <TabHBLPayments :hbl="hbl" :hbl-total-summary="hblTotalSummary" />
+                    <TabHBLPayments :hbl="hbl" :hbl-total-summary="hblTotalSummary" :hbl-destination-total-summary="hblDestinationTotalSummary"/>
                 </TabPanel>
                 <TabPanel value="2">
                     <TabShipment v-if="hbl" :hbl="hbl" :pickup="pickup" />
