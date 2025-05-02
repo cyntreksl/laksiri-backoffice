@@ -5,7 +5,9 @@ namespace App\Repositories\CallCenter;
 use App\Actions\Delivery\CreateHBLDelivery;
 use App\Actions\Delivery\ReleaseHBLDelivery;
 use App\Actions\Delivery\SaveDeliveryOrder;
+use App\Actions\HBL\GetHBLsByIDs;
 use App\Actions\HBL\MarkAsDriverAssigned;
+use App\Actions\HBL\UnassignDriver;
 use App\Factory\Delivery\FilterFactory;
 use App\Http\Resources\HBLDeliverResource;
 use App\Interfaces\CallCenter\DeliveryRepositoryInterface;
@@ -21,13 +23,13 @@ class DeliveryRepository implements DeliveryRepositoryInterface
 
     public function assignDriverToDeliver(array $data): void
     {
-        $hbl_ids = [];
-        foreach ($data['job_ids'] as $job_id) {
-            $hbl_ids[] = $job_id['id'];
-        }
-        MarkAsDriverAssigned::run($hbl_ids);
+        $hblList = GetHBLsByIDs::run($data['job_ids']);
 
-        CreateHBLDelivery::run($data['driver_id'], $hbl_ids);
+        foreach ($hblList as $hbl) {
+            MarkAsDriverAssigned::run($hbl);
+
+            CreateHBLDelivery::run($data['driver_id'], $hbl);
+        }
     }
 
     public function getPendingDeliverForDriver(): JsonResponse
@@ -101,5 +103,10 @@ class DeliveryRepository implements DeliveryRepositoryInterface
         ReleaseHBLDelivery::run($hbl, $data);
 
         return $this->success('HBL Delivered successfully!', [], 200);
+    }
+
+    public function unassignDriverFromDeliver(HBL $hbl): void
+    {
+        UnassignDriver::run($hbl);
     }
 }

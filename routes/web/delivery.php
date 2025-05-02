@@ -28,4 +28,7 @@ Route::name('delivery.')->group(function () {
 
     Route::put('deliver-list-update-order', [DeliverController::class, 'updateDeliverOrder'])
         ->name('update-order');
+
+    Route::put('driver/unassign/{hbl}', [DeliverController::class, 'unassignDriver'])
+        ->name('driver.unassign');
 });

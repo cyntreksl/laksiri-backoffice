@@ -7,6 +7,7 @@ use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\ReleaseDeliveryRequest;
 use App\Interfaces\CallCenter\DeliveryRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
+use App\Models\HBL;
 use App\Models\HBLDeliver;
 use App\Traits\ResponseAPI;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -59,5 +60,10 @@ class DeliverController extends Controller
     public function releaseDeliverOrder(ReleaseDeliveryRequest $request)
     {
         return $this->deliveryRepository->releaseDeliverOrder($request->all());
+    }
+
+    public function unassignDriver(HBL $hbl)
+    {
+        $this->deliveryRepository->unassignDriverFromDeliver($hbl);
     }
 }
