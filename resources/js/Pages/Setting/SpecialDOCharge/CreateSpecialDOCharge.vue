@@ -296,7 +296,11 @@ const onDialogHide = () => {
                                         </template>
                                     </Column>
 
-                                    <Column field="condition" header="Condition"></Column>
+                                    <Column field="condition" header="Condition">
+                                        <template #body="slotProps">
+                                            > {{ slotProps.data.condition }}
+                                        </template>
+                                    </Column>
 
                                     <Column field="collected" header="Collected"></Column>
 
