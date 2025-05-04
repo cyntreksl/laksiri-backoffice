@@ -31,6 +31,7 @@ class StorePickupRequest extends FormRequest
             'cargo_type' => ['required'],
             'name' => ['required', 'max:50'],
             'email' => ['nullable', 'email', 'max:50'],
+            'package_types' => ['nullable'],
             'contact_number' => ['required', 'phone:INTERNATIONAL'],
             'additional_mobile_number' => ['phone:INTERNATIONAL', 'nullable'],
             'whatsapp_number' => ['required', 'phone:INTERNATIONAL'],
