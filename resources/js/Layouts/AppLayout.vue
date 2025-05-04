@@ -438,32 +438,9 @@
                 <!-- Header Items -->
                 <div class="flex w-full items-center justify-between">
                     <!-- Left: Sidebar Toggle Button -->
-                    <div class="size-7">
-                        <button
-                            v-if="!isSidebarExpanded"
-                            class="menu-toggle ml-0.5 flex size-7 flex-col justify-center space-y-1.5 text-primary outline-none focus:outline-none dark:text-accent-light/80"
-                            @click="toggleSideBar"
-                        >
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </button>
-                        <button v-else @click="toggleSideBar">
-                            <svg
-                                class="size-6"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M15 19l-7-7 7-7"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                ></path>
-                            </svg>
-                        </button>
+                    <div>
+                        <Button v-if="!isSidebarExpanded" icon="pi pi-bars" rounded severity="contrast" variant="text" @click="toggleSideBar" />
+                        <Button v-else icon="pi pi-chevron-left" rounded severity="contrast" variant="text" @click="toggleSideBar" />
                     </div>
 
                     <!-- Right: Header buttons -->
@@ -488,218 +465,101 @@
                         </button>
 
                         <!-- Branch-->
-                        <Popper v-if="userBranches.length > 0" class="">
-                            <button
-                                class="btn space-x-1 ml-3 bg-slate-150 font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90"
-                                @click="showBranchPopper = !showBranchPopper"
-                            >
-                                <span class="text-xs">
-                                  {{ $page.props.auth.user.active_branch_name }}
-                                </span>
-                                <svg
-                                    v-if="userBranches.length > 0"
-                                    :class="showBranchPopper && 'rotate-180'"
-                                    class="size-4 transition-transform duration-200"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M19 9l-7 7-7-7"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    />
-                                </svg>
-                            </button>
-                            <template #content>
-                                <div
-                                    :class="showBranchPopper ? 'show' : ''"
-                                    class="popper-root"
-                                >
-                                    <div
-                                        class="popper-box cursor-pointer rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700"
-                                    >
-                                        <ul>
-                                            <li v-for="branch in userBranches" :key="branch">
-                                                <a
-                                                    class="flex items-center px-3 h-8 pr-12 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100"
-                                                    @click="setBranch(branch)"
-                                                >
-                                                    {{ branch }}
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
+                        <Select v-if="userBranches.length > 0" :options="userBranches" size="small" @change="setBranch($event.value)">
+                            <template #value>
+                                {{ $page.props.auth.user.active_branch_name }}
                             </template>
-                        </Popper>
+                        </Select>
 
                         <!-- Profile -->
                         <div class="flex">
-                            <button
-                                class="avatar size-12"
-                                @click="toggleProfileBar = !toggleProfileBar"
-                            >
-                                <img
-                                    :src="$page.props.auth.user.profile_photo_url"
-                                    alt="avatar"
-                                    class="rounded-full"
-                                />
-                                <span
-                                    class="absolute right-0 size-3.5 rounded-full border-2 border-white bg-success dark:border-navy-700"
-                                ></span>
-                            </button>
+                            <Avatar :image="$page.props.auth.user.profile_photo_url" class="hover:cursor-pointer" shape="circle" size="large" @click="toggle"/>
 
-                            <div
-                                :class="[toggleProfileBar ? 'show' : '']"
-                                class="popper-root fixed"
-                                data-popper-placement="left-top"
-                                style="position: fixed;
-                  inset: 0px 0px 0px auto;
-                  margin: 0px;
-                  transform: translate(-30px, 70px);
-                "
-                            >
+                            <Popover ref="op">
                                 <div
-                                    class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700"
+                                    class="flex items-center space-x-4 rounded-lg bg-slate-100 py-5 px-4 dark:bg-navy-800"
                                 >
-                                    <div
-                                        class="flex items-center space-x-4 rounded-t-lg bg-slate-100 py-5 px-4 dark:bg-navy-800"
-                                    >
-                                        <div class="avatar size-14">
-                                            <img
-                                                :src="$page.props.auth.user.profile_photo_url"
-                                                alt="avatar"
-                                                class="rounded-full"
-                                            />
-                                        </div>
-                                        <div>
-                                            <a
-                                                class="text-base font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light"
-                                                href="#"
-                                            >
-                                                {{ $page.props.auth.user.name }}
-                                            </a>
-                                            <p class="text-xs text-slate-400 dark:text-navy-300">
-                                                {{ $page.props.auth.user.email }}
-                                            </p>
-                                            <p class="text-xs text-slate-400 dark:text-navy-300">
-                                                {{ $page.props.auth.user.active_branch_name }}
-                                            </p>
-                                        </div>
+                                    <Avatar :image="$page.props.auth.user.profile_photo_url" class="hover:cursor-pointer" shape="circle" size="large" @click="toggle"/>
+                                    <div>
+                                        <a
+                                            class="text-base font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light"
+                                            href="#"
+                                        >
+                                            {{ $page.props.auth.user.name }}
+                                        </a>
+                                        <p class="text-xs text-slate-400 dark:text-navy-300">
+                                            {{ $page.props.auth.user.email }}
+                                        </p>
+                                        <p class="text-xs text-slate-400 dark:text-navy-300">
+                                            {{ $page.props.auth.user.active_branch_name }}
+                                        </p>
                                     </div>
+                                </div>
 
-                                    <div class="flex flex-col pt-2 pb-5">
-                                        <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
-                                            <a
-                                                v-if="! $page.props.user.roles.includes('viewer')"
-                                                :href="
+                                <div class="flex flex-col pt-2">
+                                    <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
+                                        <a
+                                            v-if="! $page.props.user.roles.includes('viewer')"
+                                            :href="
                         route(
                           'branches.edit',
                           $page.props.auth.user.active_branch_id
                         )
                       "
-                                                class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
-                                            >
-                                                <div
-                                                    class="flex size-8 items-center justify-center rounded-lg bg-pink-500 text-white"
-                                                >
-                                                    <svg
-                                                        class="size-4.5"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        stroke-width="1.5"
-                                                        viewBox="0 0 24 24"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path
-                                                            d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                        />
-                                                    </svg>
-                                                </div>
-
-                                                <div>
-                                                    <h2
-                                                        class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
-                                                    >
-                                                        Business Profile
-                                                    </h2>
-                                                    <div
-                                                        class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
-                                                    >
-                                                        Branch Configurations
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </template>
-
-                                        <a
-                                            :href="route('profile.show')"
                                             class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
                                         >
                                             <div
-                                                class="flex size-8 items-center justify-center rounded-lg bg-warning text-white"
+                                                class="flex size-8 items-center justify-center rounded-lg bg-pink-500 text-white"
                                             >
-                                                <svg
-                                                    class="size-4.5"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    stroke-width="2"
-                                                    viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                    ></path>
-                                                </svg>
+                                                <i class="ti ti-tool text-2xl"></i>
                                             </div>
 
                                             <div>
                                                 <h2
                                                     class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
                                                 >
-                                                    Profile
+                                                    Preferences
                                                 </h2>
                                                 <div
                                                     class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
                                                 >
-                                                    Your profile setting
+                                                    Branch Preferences
                                                 </div>
                                             </div>
                                         </a>
+                                    </template>
 
-                                        <div class="mt-3 px-4">
-                                            <form @submit.prevent="logout">
-                                                <button
-                                                    class="btn h-9 w-full space-x-2 bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                                >
-                                                    <svg
-                                                        class="size-5"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path
-                                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="1.5"
-                                                        ></path>
-                                                    </svg>
-                                                    <span>Logout</span>
-                                                </button>
-                                            </form>
+                                    <a
+                                        :href="route('profile.show')"
+                                        class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600"
+                                    >
+                                        <div
+                                            class="flex size-8 items-center justify-center rounded-lg bg-warning text-white"
+                                        >
+                                            <i class="ti ti-user-circle text-2xl"></i>
                                         </div>
+
+                                        <div>
+                                            <h2
+                                                class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light"
+                                            >
+                                                Profile
+                                            </h2>
+                                            <div
+                                                class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300"
+                                            >
+                                                Your profile setting
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    <div class="mt-3 px-4">
+                                        <form @submit.prevent="logout">
+                                            <Button class="w-full" icon="pi pi-power-off" label="Logout" type="submit" />
+                                        </form>
                                     </div>
                                 </div>
-                            </div>
+                            </Popover>
                         </div>
                     </div>
                 </div>
@@ -730,16 +590,18 @@ import Popper from "vue3-popper";
 import {Notification, Notivue} from "notivue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import ConfirmDialog from 'primevue/confirmdialog';
+import Select from 'primevue/select';
+import Popover from 'primevue/popover';
+import Avatar from 'primevue/avatar';
+import Button from 'primevue/button';
 
 export default {
     methods: {usePage},
-    components: {Notification, Breadcrumb, Notivue, Head, Link, Popper, ConfirmDialog},
+    components: {Notification, Breadcrumb, Notivue, Head, Link, Popper, ConfirmDialog, Select, Popover, Avatar, Button},
     props: {
         title: "",
     },
     setup() {
-        const toggleProfileBar = ref(false);
-
         const monochromeModeSelector = useMonochromeSelector();
         const darkModeSelector = useDarkModeSelector();
         darkModeSelector.setDarkMode();
@@ -1567,9 +1429,7 @@ export default {
         const page = usePage();
         const userBranches = page.props.userBranch;
 
-        const showBranchPopper = ref(false);
         const setBranch = (branch) => {
-            showBranchPopper.value = false;
 
             fetch("/switch-branch", {
                 method: "POST",
@@ -1599,10 +1459,15 @@ export default {
                 });
         };
 
+        const op = ref();
+
+        const toggle = (event) => {
+            op.value.toggle(event);
+        }
+
         return {
             toggleSideBar,
             toggleDarkMode,
-            toggleProfileBar,
             toggleMonochromeMode,
             isDarkMode,
             logout,
@@ -1612,12 +1477,13 @@ export default {
             activeMenu,
             userBranches,
             setBranch,
-            showBranchPopper,
             isSidebarExpanded,
             openSideBar,
             closeSideBar,
             activeTitle,
             changeSidePanelTitle,
+            toggle,
+            op,
         };
     },
 };
