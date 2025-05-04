@@ -1,10 +1,16 @@
 <script setup>
-import {Link} from "@inertiajs/vue3";
-import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
+import {router} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import { computed } from "vue";
+import {computed, ref} from "vue";
 import DashboardCard from "@/Components/Widgets/DashboardCard.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import DataView from 'primevue/dataview';
+import Button from 'primevue/button';
+import SelectButton from 'primevue/selectbutton';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Card from 'primevue/card';
+import Divider from 'primevue/divider';
 
 const props = defineProps({
     receptionQueue: {
@@ -18,6 +24,9 @@ const props = defineProps({
         }
     }
 })
+
+const layout = ref('list');
+const options = ref(['list', 'grid']);
 
 const filteredReceptionQueue = computed(() => {
     return props.receptionQueue.filter(q => q.is_reception_verified === false);
@@ -39,30 +48,92 @@ const filteredReceptionQueue = computed(() => {
                            title="Completed"/>
         </div>
 
-        <div v-if="Object.keys(filteredReceptionQueue).length > 0"
-             class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-5">
-            <Link v-for="queue in filteredReceptionQueue" :key="queue.id"
-                  :href="route('call-center.reception.create', queue.id)"
-                  class="card grow cursor-pointer hover:bg-green-300 items-center p-4 text-center sm:p-5 border w-60 rounded-lg">
-                <div class="my-5">
-                    <h1 class="text-7xl text-black font-bold">{{ queue.token }}</h1>
+        <DataView :layout="layout" :value="filteredReceptionQueue" class="my-5">
+            <template #header>
+                <div class="flex justify-between items-center">
+                    <div class="text-lg font-medium">
+                        Reception Verification Queue
+                    </div>
+                    <SelectButton v-model="layout" :allowEmpty="false" :options="options">
+                        <template #option="{ option }">
+                            <i :class="[option === 'list' ? 'pi pi-bars' : 'pi pi-table']" />
+                        </template>
+                    </SelectButton>
                 </div>
-                <div class="my-2 grow">
-                    <h3 class="text-lg font-medium text-slate-700 dark:text-navy-100">
-                        {{ queue.hbl?.hbl_number }}
-                    </h3>
-                </div>
-                <div class="mt-3 flex space-x-1">
-                    <button
-                        class="btn h-7 rounded-full bg-slate-150 px-3 text-xs+ font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
-                        {{ queue.customer }}
-                    </button>
-                </div>
-            </Link>
-        </div>
+            </template>
 
-        <div v-else class="flex justify-center mt-20 w-full">
-            <p class="text-xl">No Tokens Available</p>
-        </div>
+            <template #list="slotProps">
+                <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" :value="slotProps.items" paginator row-hover tableStyle="min-width: 50rem">
+                    <Column field="token" header="Token">
+                        <template #body="slotProps">
+                            <div class="flex items-center text-2xl">
+                                <i class="ti ti-tag mr-1 text-blue-500"></i>
+                                {{ slotProps.data.token }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="customer" header="Customer"></Column>
+                    <Column field="reference" header="Reference"></Column>
+                    <Column field="package_count" header="Packages">
+                        <template #body="slotProps">
+                            <div class="flex items-center">
+                                <i class="ti ti-package mr-1 text-blue-500" style="font-size: 1rem"></i>
+                                {{ slotProps.data.package_count }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="created_at" header="Created At"></Column>
+                    <Column field="" style="width: 10%">
+                        <template #body="{ data }">
+                            <Button
+                                class="mr-2"
+                                icon="ti ti-checks"
+                                outlined
+                                rounded
+                                size="small"
+                                variant="outlined"
+                                @click.prevent="() => router.visit(route('call-center.reception.create', data.id))"
+                            />
+                        </template>
+                    </Column>
+                </DataTable>
+            </template>
+
+            <template #grid="slotProps">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-5 p-5">
+                    <Card v-for="queue in slotProps.items" :key="queue.id"
+                          class="hover:cursor-pointer hover:bg-emerald-100 !shadow-none border" @click.prevent="() => router.visit(route('call-center.reception.create', queue.id))">
+                        <template #content>
+                            <div class="text-center">
+                                <h1 class="text-7xl text-black font-bold">{{ queue.token }}</h1>
+                            </div>
+                            <div class="my-2 grow">
+                                <h3 class="text-lg font-medium text-slate-700 dark:text-navy-100">
+                                    {{ queue.hbl?.hbl_number }}
+                                </h3>
+                            </div>
+                            <Divider />
+                            <div class="block text-xs space-y-1">
+                                <div>
+                                    <i class="pi pi-calendar mr-2 text-info"></i>
+                                    {{queue.created_at}}
+                                </div>
+
+                                <div>
+                                    <i class="pi pi-user mr-2 text-success"></i>
+                                    {{queue.customer}}
+                                </div>
+                            </div>
+                        </template>
+                    </Card>
+                </div>
+            </template>
+
+            <template #empty>
+                <div class="flex p-10 justify-center">
+                    No Tokens found.
+                </div>
+            </template>
+        </DataView>
     </AppLayout>
 </template>
