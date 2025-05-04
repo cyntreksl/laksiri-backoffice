@@ -35,6 +35,7 @@ class VesselScheduleGenerator extends Command
         // Query containers arriving this week
         $containers = Container::withoutGlobalScopes()
             ->where('estimated_time_of_arrival', '<=', $weekEnd->format('Y-m-d'))
+            ->where('cargo_type', '=', 'Sea Cargo')
             ->where('is_reached', false)
             ->get();
 
