@@ -2,7 +2,11 @@
 
 namespace App\Services;
 
+use App\Actions\AirLine\GetAirLineByName;
 use App\Actions\Branch\GetBranchById;
+use App\Actions\SpecialDOCharge\GetSpecialDOChargeByAgent;
+use App\Actions\Tax\GetTaxByWarehouse;
+use App\Models\HBL;
 use Illuminate\Support\Facades\Auth;
 
 class GatePassChargesService
@@ -23,6 +27,7 @@ class GatePassChargesService
             'demurrage_charge_first' => 0.00,
             'demurrage_charge_second' => 9.50,
             'demurrage_charge_third' => 10.00,
+            'slpa_charge' => 600.00,
         ],
         'Air Cargo' => [
             'port_charge' => 0.00,
@@ -33,6 +38,7 @@ class GatePassChargesService
             'demurrage_charge_second' => 8.00,
             'demurrage_charge_third' => 6.00,
             'demurrage_charge_fourth' => 24.00,
+            'slpa_charge' => 0.00,
         ],
     ];
 
@@ -144,13 +150,142 @@ class GatePassChargesService
         ];
     }
 
+    public function specialCharge(int $containerArrivalDatesCount, float $grand_volume, float $grand_weight): array
+    {
+
+        $quantity = $this->cargo_mode === 'Sea Cargo' ? ($grand_volume * 35) : $grand_weight;
+        $rate = 0.0;
+
+        $chargeBrackets = [
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][0]],
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][1]],
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][2]],
+            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][3]],
+        ];
+
+        foreach ($chargeBrackets as $bracket) {
+            if ($containerArrivalDatesCount <= 0) {
+                break;
+            }
+
+            $applicableDays = min($bracket['days'], $containerArrivalDatesCount);
+
+            $rate += $bracket['rate'] * $applicableDays * $quantity;
+
+            $containerArrivalDatesCount -= $applicableDays;
+        }
+
+        $amount = $rate * (1 + $this->vat / 100);
+        $discounted_rate = $rate * (100 - $this->branch_demurrage_charge_discount) / 100;
+
+        return [
+            'rate' => round($discounted_rate, 2),
+            'amount' => round($amount, 2),
+        ];
+    }
+
+    /**
+     * Get sea carggo DO charge details.
+     */
+    private function seaCargoDOCharge(HBL $hbl): array
+    {
+        $doChargeData = [
+            'agent_id' => $hbl->branch_id,
+            'cargo_type' => $hbl->cargo_type,
+            'hbl_type' => $hbl->hbl_type,
+        ];
+        $groupedRules = collect(GetSpecialDOChargeByAgent::run($doChargeData))->groupBy('package_type');
+
+        $rate = 0;
+        $amount = 0;
+        foreach ($groupedRules as $index => $ruleSet) {
+            if ($index === 'HBL' && isset($ruleSet[0])) {
+                $rate += $ruleSet[0]->charge;
+                $amount += $ruleSet[0]->charge;
+            } elseif ($index === 'DO' && isset($ruleSet[0])) {
+                $rate += $ruleSet[0]->charge;
+                $amount += $ruleSet[0]->charge;
+            } else {
+                $package_quantity = $hbl->packages
+                    ->where('package_type', $index)
+                    ->sum('quantity');
+                $groupedDORules = $ruleSet->groupBy('condition');
+                $operations = array_keys($groupedDORules->toArray());
+
+                usort($operations, function ($a, $b) {
+                    return ((int) filter_var($b, FILTER_SANITIZE_NUMBER_INT)) <=> ((int) filter_var($a, FILTER_SANITIZE_NUMBER_INT));
+                });
+                $operations = array_values(array_filter($operations, function ($operation) use ($package_quantity) {
+                    $number = floatval(substr($operation, 1));
+
+                    return $number < $package_quantity;
+                }));
+                $packageDOCharge = 0;
+                foreach ($operations as $operation) {
+                    $operation_quantity = (float) filter_var($operation, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+                    $rule = (object) $groupedDORules[$operation][0];
+                    $quantity_after_operation = $package_quantity - $operation_quantity;
+                    $packageDOCharge += ($quantity_after_operation * $rule['charge']);
+                    $package_quantity = $operation_quantity;
+                }
+                $rate += $packageDOCharge;
+                $amount += $packageDOCharge;
+            }
+        }
+
+        return [
+            'rate' => $rate,
+            'amount' => $amount,
+        ];
+    }
+
+    /**
+     * Get air cargo DO charge details.
+     */
+    private function airCargoDOCharge(HBL $hbl): array
+    {
+        $container = $this->getContainer($hbl);
+        $airCargoDORule = GetAirLineByName::run($container->airline_name) ? GetAirLineByName::run($container->airline_name)->airLineDOCharge : null;
+        if ($airCargoDORule) {
+            return [
+                'rate' => $airCargoDORule->do_charge,
+                'amount' => $airCargoDORule->do_charge,
+            ];
+        } else {
+            return [
+                'rate' => 0.00,
+                'amount' => 0.00,
+            ];
+        }
+
+    }
+
+    /**
+     * Get DO charge details.
+     */
+    public function dOCharge(HBL $hbl): array
+    {
+        if ($this->cargo_mode === 'Sea Cargo') {
+            return $this->seaCargoDOCharge($hbl);
+        } else {
+            return $this->airCargoDOCharge($hbl);
+        }
+    }
+
     /**
      * Get VAT charge details.
      */
-    public function vatCharge(): array
+    public function vatCharge(HBL $hbl): array
     {
+        $tax = GetTaxByWarehouse::run($hbl->warehouse_id);
+
         return [
-            'rate' => $this->vat,
+            'rate' => $tax ? $tax->rate : 0,
         ];
+    }
+
+    private function getContainer($hbl)
+    {
+        return $hbl->packages[0]->containers()->withoutGlobalScopes()->first() ?? $hbl->packages[0]->duplicate_containers()->withoutGlobalScopes()->first();
     }
 }

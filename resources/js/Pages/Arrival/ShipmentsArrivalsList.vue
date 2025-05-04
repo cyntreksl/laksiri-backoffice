@@ -2,7 +2,7 @@
 import {onMounted, ref, watch} from "vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
-import LoadedShipmentDetailModal from "@/Pages/Loading/Partials/LoadedShipmentDetailModal.vue";
+import LoadedShipmentDetailDialog from "@/Pages/Common/Dialog/Container/Index.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {FilterMatchMode} from "@primevue/core/api";
@@ -112,27 +112,27 @@ const menuModel = ref([
         icon: "ti ti-navigation-check text-lg",
         command: () => {
             confirm.require({
-                    message: 'Would you like to mark this shipment as reached?',
-                    header: 'Mark As REACHED?',
-                    icon: 'pi pi-info-circle',
-                    rejectLabel: 'Cancel',
-                    rejectProps: {
-                        label: 'Cancel',
-                        severity: 'secondary',
-                        outlined: true
-                    },
-                    acceptProps: {
-                        label: 'Mark as Reached',
-                        severity: 'warn'
-                    },
-                    accept: () => {
-                        router.visit(
-                            route("arrival.shipments-arrivals.containers.markAsReachedContainer", selectedShipment.value.id), {
-                                onSuccess: () => push.success('Mark As Reached')
-                            })
-                    },
-                    reject: () => {
-                    }
+                message: 'Would you like to mark this shipment as reached?',
+                header: 'Mark As REACHED?',
+                icon: 'pi pi-info-circle',
+                rejectLabel: 'Cancel',
+                rejectProps: {
+                    label: 'Cancel',
+                    severity: 'secondary',
+                    outlined: true
+                },
+                acceptProps: {
+                    label: 'Mark as Reached',
+                    severity: 'warn'
+                },
+                accept: () => {
+                    router.visit(
+                        route("arrival.shipments-arrivals.containers.markAsReachedContainer", selectedShipment.value.id), {
+                            onSuccess: () => push.success('Mark As Reached')
+                        })
+                },
+                reject: () => {
+                }
             });
         },
         disabled: () =>
@@ -527,12 +527,11 @@ const closeModal = () => {
         </div>
     </AppLayout>
 
-    <LoadedShipmentDetailModal :air-container-options="airContainerOptions"
-                               :container="selectedContainer"
-                               :container-status="containerStatus"
-                               :sea-container-options="seaContainerOptions"
-                               :show="showConfirmLoadedShipmentModal"
-                               @close="closeModal" />
+    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="selectedContainer"
+                                :container-status="containerStatus" :sea-container-options="seaContainerOptions"
+                                :show="showConfirmLoadedShipmentModal"
+                                @close="closeModal"
+                                @update:show="showConfirmLoadedShipmentModal = $event"/>
 </template>
 
 <style>

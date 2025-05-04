@@ -14,14 +14,14 @@ Breadcrumbs::for('call-center.dashboard', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('call-center.hbls.index', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
     $trail->push('HBL');
-    $trail->push('HBL List', route('call-center.hbls.index'));
+    $trail->push('HBLs', route('call-center.hbls.index'));
 });
 
 // Reception
 Breadcrumbs::for('call-center.reception.queue.hbl-list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
     $trail->push('Reception');
-    $trail->push('HBL List', route('call-center.reception.queue.hbl-list'));
+    $trail->push('HBLs', route('call-center.reception.queue.hbl-list'));
 });
 
 Breadcrumbs::for('call-center.reception.show.verified', function (BreadcrumbTrail $trail) {
@@ -46,8 +46,8 @@ Breadcrumbs::for('call-center.reception.create', function (BreadcrumbTrail $trai
 // HBLs
 Breadcrumbs::for('call-center.hbls.door-to-door-list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
-    $trail->push('HBL', route('call-center.hbls.index'));
-    $trail->push('Door to Door HBL List', route('call-center.hbls.door-to-door-list'));
+    $trail->push('HBLs', route('call-center.hbls.index'));
+    $trail->push('Door to Door HBLs', route('call-center.hbls.door-to-door-list'));
 });
 
 // Verification

@@ -32,9 +32,9 @@ class LoadedContainerController extends Controller
         $seaContainerOptions = ContainerType::getSeaCargoOptions();
         $airContainerOptions = ContainerType::getAirCargoOptions();
 
-        $containerStatuses = array_filter(ContainerStatus::cases(), function ($status) {
+        $containerStatuses = array_values(array_filter(ContainerStatus::cases(), function ($status) {
             return ! in_array($status->name, ['DRAFT', 'REQUESTED']);
-        });
+        }));
 
         return Inertia::render('Loading/LoadedShipmentList', [
             'cargoTypes' => CargoType::cases(),

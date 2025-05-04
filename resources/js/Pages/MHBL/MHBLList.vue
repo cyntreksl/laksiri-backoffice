@@ -8,7 +8,6 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import DatePicker from 'primevue/datepicker';
 import { push } from "notivue";
-import MHBLDetailModal from "@/Pages/Common/MHBLDetailModal.vue";
 import Select from "primevue/select";
 import Panel from "primevue/panel";
 import FloatLabel from "primevue/floatlabel";
@@ -22,6 +21,8 @@ import IconField from "primevue/iconfield";
 import Column from "primevue/column";
 import ContextMenu from "primevue/contextmenu";
 import { FilterMatchMode } from "@primevue/core/api";
+import MHBLDetailDialog from "@/Pages/Common/Dialog/MHBL/Index.vue";
+import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
 
 const props = defineProps({
     users: {
@@ -449,11 +450,10 @@ const exportCSV = () => {
         </div>
     </AppLayout>
 
-    <MHBLDetailModal
-        :mhbl-id="selectedMHBLID"
-        :show="showConfirmViewMHBLModal"
-        @close="closeModal"
-    />
+    <MHBLDetailDialog :mhbl-id="selectedMHBLID"
+                      :show="showConfirmViewMHBLModal"
+                      @close="closeModal"
+                      @update:show="showConfirmViewMHBLModal = $event"/>
 
 </template>
 

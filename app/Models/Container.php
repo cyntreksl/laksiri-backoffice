@@ -87,4 +87,9 @@ class Container extends Model
     {
         return $this->hasMany(HandlingProcedure::class);
     }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'target_warehouse');
+    }
 }

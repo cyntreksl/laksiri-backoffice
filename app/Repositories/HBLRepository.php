@@ -17,6 +17,7 @@ use App\Actions\HBL\GetHBLByCargoTypeWithDestinationUnloadedPackages;
 use App\Actions\HBL\GetHBLByCargoTypeWithDraftLoadedPackages;
 use App\Actions\HBL\GetHBLByCargoTypeWithUnloadedPackages;
 use App\Actions\HBL\GetHBLByReference;
+use App\Actions\HBL\GetHBLDestinationTotalSummary;
 use App\Actions\HBL\GetHBLPackageRules;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLStatusByReference;
@@ -477,5 +478,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         return response()->json([
             'hblsPackages' => $groupedPackagesArray,
         ]);
+    }
+
+    public function getHBLDestinationTotalSummary(HBL $hbl)
+    {
+        return GetHBLDestinationTotalSummary::run($hbl);
     }
 }
