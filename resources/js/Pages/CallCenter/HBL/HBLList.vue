@@ -1,19 +1,31 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
-import { Link, router, usePage } from "@inertiajs/vue3";
-import { Grid, h, html } from "gridjs";
+import {computed, onMounted, ref, watch} from "vue";
+import { router, usePage } from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SoftPrimaryButton from "@/Components/SoftPrimaryButton.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import DatePicker from "@/Components/DatePicker.vue";
-import ColumnVisibilityPopover from "@/Components/ColumnVisibilityPopover.vue";
-import Checkbox from "@/Components/Checkbox.vue";
-import Switch from "@/Components/Switch.vue";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
-import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import NoRecordsFound from "@/Components/NoRecordsFound.vue";
+import Select from "primevue/select";
+import InputIcon from "primevue/inputicon";
+import FloatLabel from "primevue/floatlabel";
+import InputText from "primevue/inputtext";
+import Panel from "primevue/panel";
+import Button from "primevue/button";
+import ContextMenu from "primevue/contextmenu";
+import Tag from "primevue/tag";
+import IconField from "primevue/iconfield";
+import DataTable from "primevue/datatable";
+import Card from "primevue/card";
+import Column from "primevue/column";
+import Checkbox from "primevue/checkbox";
+import DatePicker from "primevue/datepicker";
+import {useConfirm} from "primevue/useconfirm";
+import moment from "moment";
+import {FilterMatchMode} from "@primevue/core/api";
+import axios from "axios";
+import {debounce} from "lodash";
+import {push} from "notivue";
+import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
+import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 
 const props = defineProps({
     users: {
@@ -35,873 +47,347 @@ const props = defineProps({
     },
 });
 
-const wrapperRef = ref(null);
-let grid = null;
-const isData = ref(false)
-
-const showFilters = ref(false);
-
-const filters = reactive({
-    fromDate: "",
-    toDate: "",
-    cargoMode: [],
-    hblType: [],
-    isHold: false,
-    isDelayed: false,
-    warehouse: [],
-    createdBy: "",
-    paymentStatus: [],
-});
-
-const data = reactive({
-    columnVisibility: {
-        id: false,
-        hbl_number: true,
-        hbl_name: true,
-        consignee_name: true,
-        consignee_address: true,
-        consignee_contact: true,
-        email: false,
-        address: false,
-        contact_number: true,
-        cargo_type: true,
-        hbl_type: true,
-        warehouse: true,
-        status: false,
-        is_hold: true,
-        tokens: true,
-        finance_status: true,
-        actions: true,
-        system_status: false,
-    },
-});
-
 const baseUrl = ref("/call-center/hbl-list");
+const loading = ref(true);
+const hbls = ref([]);
+const totalRecords = ref(0);
+const perPage = ref(10);
+const currentPage = ref(1);
+const showConfirmViewHBLModal = ref(false);
+const cm = ref();
+const selectedHBL = ref(null);
+const selectedHBLID = ref(null);
+const confirm = useConfirm();
+const dt = ref();
+const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
+const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
+const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
+const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
+const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
+const showConfirmViewCallFlagModal = ref(false);
+const hblName = ref("");
+const expandedRows = ref({});
 
-const toggleColumnVisibility = (columnName) => {
-    data.columnVisibility[columnName] = !data.columnVisibility[columnName];
-    updateGridConfig();
-    grid.forceRender();
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
+    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+    cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+    is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
+    user: {value: null, matchMode: FilterMatchMode.EQUALS},
+    payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+});
+
+const menuModel = ref([
+    {
+        label: "View",
+        icon: "pi pi-fw pi-search",
+        command: () => confirmViewHBL(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.show"),
+    },
+    {
+        label: "Issue Token",
+        icon: "pi pi-fw pi-tag",
+        url: () => route(
+            "call-center.hbls.create-token",
+            selectedHBL.value.id
+        ),
+        target: "_blank",
+        visible: () => selectedHBL.value?.system_status > 4.2 && usePage().props.user.permissions.includes("hbls.issue token"),
+    },
+    {
+        label: "Call Flag",
+        icon: "pi pi-fw pi-flag",
+        command: () => confirmViewCallFlagModal(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
+    },
+    {
+        label: "Edit",
+        icon: "pi pi-fw pi-pencil",
+        command: () => router.visit(route("hbls.edit", selectedHBL.value.id)),
+        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
+    },
+    {
+        label: computed(() => (selectedHBL.value?.is_hold ? 'Release' : 'Hold')),
+        icon: computed(() => (selectedHBL.value?.is_hold ? 'pi pi-fw pi-play-circle' : 'pi pi-fw pi-pause-circle')) ,
+        command: () => confirmHBLHold(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.hold and release"),
+    },
+    {
+        label: "Download",
+        icon: "pi pi-fw pi-download",
+        url: () => route("hbls.download", selectedHBL.value.id),
+        disabled: !usePage().props.user.permissions.includes("hbls.download pdf"),
+    },
+    {
+        label: "Invoice",
+        icon: "pi pi-fw pi-receipt",
+        url: () => route("hbls.download.invoice", selectedHBL.value.id),
+        disabled: !usePage().props.user.permissions.includes("hbls.download invoice"),
+    },
+    {
+        label: "Download Baggage PDF",
+        icon: "pi pi-fw pi-shopping-bag",
+        url: () => route("hbls.download.baggage", selectedHBL.value.id),
+        disabled: !usePage().props.user.permissions.includes("hbls.download pdf"),
+    },
+    {
+        label: "Barcode",
+        icon: "pi pi-fw pi-barcode",
+        url: () => route("hbls.download.barcode", selectedHBL.value.id),
+        disabled: !usePage().props.user.permissions.includes("hbls.download barcode"),
+    },
+    {
+        label: "Delete",
+        icon: "pi pi-fw pi-times",
+        command: () => confirmHBLDelete(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.delete"),
+    },
+]);
+
+const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+    loading.value = true;
+    try {
+        const response = await axios.get(baseUrl.value, {
+            params: {
+                page,
+                per_page: perPage.value,
+                search,
+                warehouse: filters.value.warehouse.value || "",
+                deliveryType: filters.value.hbl_type.value || "",
+                cargoMode: filters.value.cargo_type.value || "",
+                isHold: filters.value.is_hold.value || false,
+                sort_field: sortField,
+                sort_order: sortOrder === 1 ? "asc" : "desc",
+                createdBy: filters.value.user.value || "",
+                paymentStatus: filters.value.payments.value || [],
+                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+                toDate: moment(toDate.value).format("YYYY-MM-DD"),
+            }
+        });
+        hbls.value = response.data.data;
+        totalRecords.value = response.data.meta.total;
+        currentPage.value = response.data.meta.current_page;
+    } catch (error) {
+        console.error("Error fetching HBLs:", error);
+    } finally {
+        loading.value = false;
+    }
 };
 
-const initializeGrid = () => {
-    const visibleColumns = Object.keys(data.columnVisibility);
+const debouncedFetchHBLs = debounce((searchValue) => {
+    fetchHBLs(1, searchValue);
+}, 1000);
 
-    grid = new Grid({
-        columns: createColumns(),
-        search: {
-            debounceTimeout: 1000,
-            server: {
-                url: (prev, keyword) => `${prev}&search=${keyword}`,
-            },
-        },
-        sort: {
-            multiColumn: false,
-            server: {
-                url: (prev, columns) => {
-                    if (!columns.length) return `${prev}&order=id&dir=desc`;
-                    const col = columns[0];
-                    const dir = col.direction === 1 ? "asc" : "desc";
-                    let colName = visibleColumns[col.index];
+watch(() => filters.value.global.value, (newValue) => {
+    if (newValue !== null) {
+        debouncedFetchHBLs(newValue);
+    }
+});
 
-                    return `${prev}&order=${colName}&dir=${dir}`;
-                },
-            },
-        },
-        pagination: {
-            limit: 10,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
-        },
-        server: {
-            url: constructUrl(),
-            then: (data) =>
-                data.data.map((item) => {
-                    const row = [];
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                }),
-            total: (response) => {
-                if (response && response.meta) {
-                    response.meta.total > 0 ? isData.value = true : isData.value = false;
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
+watch(() => filters.value.warehouse.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
 
-    grid.render(wrapperRef.value);
+watch(() => filters.value.hbl_type.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.cargo_type.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.is_hold.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.user.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.payments.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => fromDate.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => toDate.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+const onPageChange = (event) => {
+    perPage.value = event.rows;
+    currentPage.value = event.page + 1;
+    fetchHBLs(currentPage.value);
 };
 
-const createColumns = () => [
-    {
-        name: "Actions",
-        sort: false,
-        hidden: !data.columnVisibility.actions,
-        formatter: (_, row) => {
-            return h("div", { className: "flex space-x-2" }, [
-                usePage().props.user.permissions.includes("hbls.issue token") &&
-                row.cells[16].data > 4.2
-                    ? h(
-                        "a",
-                        {
-                            className:
-                                "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
-                            href: route(
-                                "call-center.hbls.create-token",
-                                row.cells[0].data
-                            ),
-                            "x-tooltip..placement.bottom.primary":
-                                "'Issue Token'",
-                            target: "_blank",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-receipt",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2m4 -14h6m-6 4h6m-2 4h2",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    )
-                    : null,
-                usePage().props.user.permissions.includes("hbls.edit")
-                    ? h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 mr-2",
-                            onClick: () =>
-                                router.visit(
-                                    route("hbls.edit", row.cells[0].data)
-                                ),
-                            "x-tooltip..placement.bottom.primary":
-                                "'Edit HBL'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-edit",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1",
-                                    }),
-                                    h("path", {
-                                        d: "M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z",
-                                    }),
-                                    h("path", {
-                                        d: "M16 5l3 3",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    )
-                    : null,
-                usePage().props.user.permissions.includes("hbls.show")
-                    ? h(
-                        "a",
-                        {
-                            className:
-                                "btn size-8 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25 mr-2",
-                            onClick: () => confirmViewHBL(row.cells[0].data),
-                            "x-tooltip..placement.bottom.primary":
-                                "'View HBL'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-eye",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0",
-                                    }),
-                                    h("path", {
-                                        d: "M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    )
-                    : null,
-                usePage().props.user.permissions.includes(
-                    "hbls.hold and release"
-                )
-                    ? h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25",
-                            onClick: () => confirmIsHold(row.cells),
-                            "x-tooltip..placement.bottom.primary": row
-                                .cells[14].data
-                                ? "'Release HBL'"
-                                : "'Hold HBL'",
-                        },
-                        [
-                            row.cells[14].data
-                                ? h(
-                                    "svg",
-                                    {
-                                        xmlns: "http://www.w3.org/2000/svg",
-                                        viewBox: "0 0 24 24",
-                                        class: "icon icon-tabler icons-tabler-outline icon-tabler-player-play",
-                                        fill: "none",
-                                        height: 24,
-                                        width: 24,
-                                        stroke: "currentColor",
-                                        strokeLinecap: "round",
-                                        strokeLinejoin: "round",
-                                    },
-                                    [
-                                        h("path", {
-                                            d: "M0 0h24v24H0z",
-                                            fill: "none",
-                                            stroke: "none",
-                                        }),
-                                        h("path", {
-                                            d: "M7 4v16l13 -8z",
-                                        }),
-                                    ]
-                                )
-                                : h(
-                                    "svg",
-                                    {
-                                        xmlns: "http://www.w3.org/2000/svg",
-                                        viewBox: "0 0 24 24",
-                                        class: "icon icon-tabler icons-tabler-outline icon-tabler-player-pause",
-                                        fill: "none",
-                                        height: 24,
-                                        width: 24,
-                                        stroke: "currentColor",
-                                        strokeLinecap: "round",
-                                        strokeLinejoin: "round",
-                                    },
-                                    [
-                                        h("path", {
-                                            d: "M0 0h24v24H0z",
-                                            fill: "none",
-                                            stroke: "none",
-                                        }),
-                                        h("path", {
-                                            d: "M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
-                                        }),
-                                        h("path", {
-                                            d: "M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z",
-                                        }),
-                                    ]
-                                ),
-                        ]
-                    )
-                    : null,
-                usePage().props.user.permissions.includes("hbls.download pdf")
-                    ? h(
-                        "a",
-                        {
-                            className:
-                                "btn size-8 p-0 text-pink-500 hover:bg-pink-500/20 focus:bg-pink-500/20 active:bg-pink-500/25",
-                            href: route("hbls.download", row.cells[0].data),
-                            "x-tooltip..placement.bottom.primary":
-                                "'Download HBL'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-download",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2",
-                                    }),
-                                    h("path", {
-                                        d: "M7 11l5 5l5 -5",
-                                    }),
-                                    h("path", {
-                                        d: "M12 4l0 12",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    )
-                    : null,
-                usePage().props.user.permissions.includes("hbls.download pdf")
-                    ? h(
-                        "a",
-                        {
-                            className:
-                                "btn size-8 p-0 text-pink-500 hover:bg-pink-500/20 focus:bg-pink-500/20 active:bg-pink-500/25",
-                            href: route("hbls.download.baggage", row.cells[0].data),
-                            "x-tooltip..placement.bottom.primary":
-                                "'Download Baggage PDF'",
-                        },
-                        [
-                            h('svg',
-                                {
-                                    xmlns: 'http://www.w3.org/2000/svg',
-                                    width: '24',
-                                    height: '24',
-                                    viewBox: '0 0 24 24',
-                                    fill: 'none',
-                                    stroke: 'currentColor',
-                                    'stroke-width': '2',
-                                    'stroke-linecap': 'round',
-                                    'stroke-linejoin': 'round',
-                                    class: 'icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf'
-                                }, [
-                                    h('path', { stroke: 'none', d: 'M0 0h24v24H0z', fill: 'none' }),
-                                    h('path', { d: 'M14 3v4a1 1 0 0 0 1 1h4' }),
-                                    h('path', { d: 'M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4' }),
-                                    h('path', { d: 'M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6' }),
-                                    h('path', { d: 'M17 18h2' }),
-                                    h('path', { d: 'M20 15h-3v6' }),
-                                    h('path', { d: 'M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z' })
-                                ]
-                            ),
-                        ]
-                    )
-                    : null,
-                usePage().props.user.permissions.includes("hbls.delete")
-                    ? h(
-                        "button",
-                        {
-                            className:
-                                "btn size-8 p-0 text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25",
-                            onClick: () =>
-                                confirmDeleteHBL(row.cells[0].data),
-                            "x-tooltip..placement.bottom.error":
-                                "'Delete HBL'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-trash",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M4 7l16 0",
-                                    }),
-                                    h("path", {
-                                        d: "M10 11l0 6",
-                                    }),
-                                    h("path", {
-                                        d: "M14 11l0 6",
-                                    }),
-                                    h("path", {
-                                        d: "M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12",
-                                    }),
-                                    h("path", {
-                                        d: "M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    )
-                    : null,
-                usePage().props.user.permissions.includes(
-                    "hbls.download invoice"
-                )
-                    ? h(
-                        "a",
-                        {
-                            className:
-                                "btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25",
-                            href: route(
-                                "hbls.download.invoice",
-                                row.cells[0].data
-                            ),
-                            "x-tooltip..placement.bottom.primary":
-                                "'Invoice'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "size-5",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    "stroke-width": 2,
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                },
-                                [
-                                    h("path", {
-                                        d: "M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    )
-                    : null,
-                usePage().props.user.permissions.includes(
-                    "hbls.download barcode"
-                )
-                    ? h(
-                        "a",
-                        {
-                            className:
-                                "btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25",
-                            href: route(
-                                "hbls.download.barcode",
-                                row.cells[0].data
-                            ),
-                            "x-tooltip..placement.bottom.primary":
-                                "'Download Barcode'",
-                        },
-                        [
-                            h(
-                                "svg",
-                                {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    viewBox: "0 0 24 24",
-                                    class: "icon icon-tabler icons-tabler-outline icon-tabler-file-barcode",
-                                    fill: "none",
-                                    height: 24,
-                                    width: 24,
-                                    stroke: "currentColor",
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                    strokeWidth: 2,
-                                },
-                                [
-                                    h("path", {
-                                        d: "M0 0h24v24H0z",
-                                        fill: "none",
-                                        stroke: "none",
-                                    }),
-                                    h("path", {
-                                        d: "M14 3v4a1 1 0 0 0 1 1h4",
-                                    }),
-                                    h("path", {
-                                        d: "M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z",
-                                    }),
-                                    h("path", {
-                                        d: "M8 13h1v3h-1z",
-                                    }),
-                                    h("path", {
-                                        d: "M12 13v3",
-                                    }),
-                                    h("path", {
-                                        d: "M15 13h1v3h-1z",
-                                    }),
-                                ]
-                            ),
-                        ]
-                    )
-                    : null,
-            ]);
-        },
-    },
-    {
-        name: "ID",
-        hidden: !data.columnVisibility.id,
-        formatter: (_, row) => {
-            return row.cells[0].data;
-        }
-    },
-    {
-        name: "HBL",
-        hidden: !data.columnVisibility.hbl_number,
-        formatter: (_, row) => {
-            return row.cells[1].data;
-        }
-    },
-    { name: "HBL Name", hidden: !data.columnVisibility.hbl_name },
-    {
-        name: "Consignee Name",
-        hidden: !data.columnVisibility.consignee_name,
-        formatter: (_, row) => {
-            return row.cells[3].data;
-        }
-    },
-    {
-        name: "Consignee Address",
-        hidden: !data.columnVisibility.consignee_address,
-        sort: false,
-        formatter: (_, row) => {
-            return row.cells[4].data;
-        }
-    },
-    {
-        name: "Consignee Contact",
-        hidden: !data.columnVisibility.consignee_contact,
-        sort: false,
-        formatter: (_, row) => {
-            return row.cells[5].data;
-        }
-    },
-    {
-        name: "Email",
-        hidden: !data.columnVisibility.email,
-        sort: false,
-        formatter: (_, row) => {
-            return row.cells[6].data;
-        }
-    },
-    {
-        name: "Address",
-        hidden: !data.columnVisibility.address,
-        sort: false,
-        formatter: (_, row) => {
-            return row.cells[7].data;
-        } },
-    {
-        name: "Contact",
-        hidden: !data.columnVisibility.contact_number,
-        sort: false,
-        formatter: (_, row) => {
-            console.log(row.cells);
-            return row.cells[8].data;
-        }
-    },
-    {
-        name: "Cargo Mode",
-        sort: false,
-        hidden: !data.columnVisibility.cargo_type,
-        formatter: (_, row) =>
-            row.cells[9].data == "Sea Cargo"
-                ? h(
-                      "span",
-                      { className: "flex" },
-                      h(
-                          "svg",
-                          {
-                              xmlns: "http://www.w3.org/2000/svg",
-                              viewBox: "0 0 24 24",
-                              class: "icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2",
-                              fill: "none",
-                              height: 24,
-                              width: 24,
-                              stroke: "currentColor",
-                              strokeLinecap: "round",
-                              strokeLinejoin: "round",
-                              strokeWidth: 2,
-                          },
-                          [
-                              h("path", {
-                                  stroke: "none",
-                                  d: "M0 0h24v24H0z",
-                                  fill: "none",
-                              }),
-                              h("path", {
-                                  d: "M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1",
-                              }),
-                              h("path", {
-                                  d: "M4 18l-1 -5h18l-2 4",
-                              }),
-                              h("path", {
-                                  d: "M5 13v-6h8l4 6",
-                              }),
-                              h("path", {
-                                  d: "M7 7v-4h-1",
-                              }),
-                          ]
-                      ),
-                      row.cells[9].data
-                  )
-                : row.cells[9].data == "Air Cargo"
-                ? h("span", { className: "flex space-x-2" }, [
-                      h(
-                          "svg",
-                          {
-                              xmlns: "http://www.w3.org/2000/svg",
-                              viewBox: "0 0 24 24",
-                              class: "icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2",
-                              fill: "none",
-                              height: 24,
-                              width: 24,
-                              stroke: "currentColor",
-                              strokeLinecap: "round",
-                              strokeLinejoin: "round",
-                              strokeWidth: 2,
-                          },
-                          [
-                              h("path", {
-                                  stroke: "none",
-                                  d: "M0 0h24v24H0z",
-                                  fill: "none",
-                              }),
-                              h("path", {
-                                  d: "M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z",
-                              }),
-                          ]
-                      ),
-                      row.cells[9].data,
-                  ])
-                : row.cells[9].data,
-    },
-    {
-        name: "HBL Type",
-        hidden: !data.columnVisibility.hbl_type,
-        formatter: (_, row) => {
-            return row.cells[10].data;
-        }
-        },
-    {
-        name: "Warehouse",
-        hidden: !data.columnVisibility.warehouse,
-        formatter: (_, row) => {
-            return row.cells[11].data;
-        }
-    },
-    {
-        name: "Status",
-        hidden: !data.columnVisibility.status,
-        formatter: (_, row) => {
-            return row.cells[12].data;
-        }
-    },
-    {
-        name: "Is Hold",
-        hidden: !data.columnVisibility.is_hold,
-        formatter: (cell) => {
-            return cell
-                ? html(`<div></div class="text-center"><svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg></div>`)
-                : null;
-        },
-        sort: false,
-    },
-    {
-        name: "Issued Token",
-        hidden: !data.columnVisibility.tokens,
-        sort: false,
-        formatter: (_, row) => {
-            return row.cells[14].data;
-        }
-    },
-    {
-        name: "Finance Status",
-        hidden: !data.columnVisibility.finance_status,
-        sort: false,
-        formatter: (_, row) => {
-            const status = String(row.cells[15].data).trim().toLowerCase();
-            const isApproved = status === "approved";
-            const badgeColor = isApproved ? "green" : "red";
-            const displayText = isApproved ? "Approved" : "Not Approved";
-
-            return html(`<span class="badge" style="background-color: ${badgeColor}; color: white; padding: 4px 8px; border-radius: 4px;">${displayText}</span>`);
-        }
-    },
-    {
-        name: "System Status",
-        hidden: !data.columnVisibility.system_status,
-        formatter: (_, row) => {
-            return row.cells[17].data;
-        }
-    },
-];
-
-const updateGridConfig = () => {
-    grid.updateConfig({
-        columns: createColumns(),
-    });
+const onSort = (event) => {
+    fetchHBLs(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
 
 onMounted(() => {
-    initializeGrid();
+    fetchHBLs();
 });
 
-const constructUrl = () => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
-        }
+const resolveHBLType = (hbl) => {
+    switch (hbl.hbl_type) {
+        case 'UPB':
+            return 'secondary';
+        case 'Gift':
+            return 'warn';
+        case 'Door to Door':
+            return 'info';
+        default:
+            return null;
     }
-    return baseUrl.value + "?" + params.toString();
 };
 
-const applyFilters = () => {
-    showFilters.value = false;
-    const newUrl = constructUrl();
-
-    const visibleColumns = Object.keys(data.columnVisibility);
-    grid.updateConfig({
-        server: {
-            url: newUrl,
-            then: (data) =>
-                data.data.map((item) => {
-                    const row = [];
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                }),
-            total: (response) => {
-                if (response && response.meta) {
-                    response.meta.total > 0 ? isData.value = true : isData.value = false;
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
-    grid.forceRender();
+const resolveCargoType = (hbl) => {
+    switch (hbl.cargo_type) {
+        case 'Sea Cargo':
+            return {
+                icon: "ti ti-sailboat",
+                color: "success",
+            };
+        case 'Air Cargo':
+            return {
+                icon: "ti ti-plane-tilt",
+                color: "info",
+            };
+        default:
+            return null;
+    }
 };
 
-const hblId = ref(null);
-const selectedHBL = ref({});
+const resolveWarehouse = (hbl) => {
+    switch (hbl.warehouse.toUpperCase()) {
+        case 'COLOMBO':
+            return 'info';
+        case 'NINTAVUR':
+            return 'danger';
+        default:
+            return null;
+    }
+};
 
-const showConfirmViewHBLModal = ref(false);
+const onRowContextMenu = (event) => {
+    cm.value.show(event.originalEvent);
+};
 
-const confirmViewHBL = async (id) => {
-    hblId.value = id;
+const confirmViewHBL = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
     showConfirmViewHBLModal.value = true;
 };
 
-const resetFilter = () => {
-    filters.fromDate = "";
-    filters.toDate = "";
-    filters.cargoMode = [];
-    filters.hblType = [];
-    filters.isHold = false;
-    filters.warehouse = [];
-    filters.createdBy = "";
-    filters.paymentStatus = [];
-    applyFilters();
-};
-
-const exportURL = computed(() => {
-    const params = new URLSearchParams();
-    for (const key in filters) {
-        if (filters.hasOwnProperty(key)) {
-            params.append(key, filters[key].toString());
-        }
-    }
-    return "/hbls/list/export" + "?" + params.toString();
-});
-
 const closeModal = () => {
     showConfirmViewHBLModal.value = false;
-    hblId.value = null;
-    selectedHBL.value = null;
+    selectedHBLID.value = null;
 };
 
-const planeIcon = ref(`
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="15"
-  height="15"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  class="icon icon-tabler icons-tabler-outline icon-tabler-plane mr-2"
->
-  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-  <path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" />
-</svg>
-`);
+const clearFilter = () => {
+    filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
+        hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+        cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+        is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
+        user: {value: null, matchMode: FilterMatchMode.EQUALS},
+        payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+    };
+    fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
+    toDate.value = moment(new Date()).toISOString().split("T")[0];
+    fetchHBLs(currentPage.value);
+};
 
-const shipIcon = ref(`
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="15"
-  height="15"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  class="icon icon-tabler icons-tabler-outline icon-tabler-ship mr-2"
->
-  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-  <path d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1" />
-  <path d="M4 18l-1 -5h18l-2 4" />
-  <path d="M5 13v-6h8l4 6" />
-  <path d="M7 7v-4h-1" />
-</svg>
-`);
+const confirmHBLDelete = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    confirm.require({
+        message: 'Would you like to delete this hbl record?',
+        header: 'Delete HBL?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            router.delete(route("hbls.destroy", selectedHBLID.value), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success("HBL record Deleted Successfully!");
+                    router.visit(route("hbls.index"), {only: ["hbls"]});
+                },
+                onError: () => {
+                    push.error("Something went to wrong!");
+                },
+            });
+            selectedHBLID.value = null;
+        },
+        reject: () => {
+        }
+    });
+};
+
+const confirmHBLHold = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    confirm.require({
+        message: `Would you like to ${hbl.value.is_hold ? 'Release' : 'Hold'} this hbl?`,
+        header: `${hbl.value.is_hold ? 'Release' : 'Hold'} HBL?`,
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: `${hbl.value.is_hold ? 'Release' : 'Hold'}`,
+            severity: 'warn'
+        },
+        accept: () => {
+            router.put(
+                route("hbls.toggle-hold", selectedHBLID.value),
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success(`Operation Successfully!`);
+                        fetchHBLs(currentPage.value);
+                    },
+                    onError: () => {
+                        push.error("Something went to wrong!");
+                    },
+                }
+            );
+            selectedHBLID.value = null;
+        },
+        reject: () => {
+        }
+    });
+};
+
+const confirmViewCallFlagModal = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    hblName.value = hbl.value.hbl_name;
+    showConfirmViewCallFlagModal.value = true;
+};
+
+const closeCallFlagModal = () => {
+    showConfirmViewCallFlagModal.value = false;
+    selectedHBLID.value = null;
+    hblName.value = "";
+};
+
+const exportCSV = () => {
+    dt.value.exportCSV();
+};
 </script>
 
 <template>
@@ -909,431 +395,211 @@ const shipIcon = ref(`
         <template #header>HBL List</template>
 
         <Breadcrumb />
-        <div class="flex justify-end mt-5">
-            <Link
-                v-if="$page.props.user.permissions.includes('hbls.create')"
-                :href="route('hbls.create')"
-            >
-                <PrimaryButton> Create New HBL</PrimaryButton>
-            </Link>
+
+        <div>
+            <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="fromDate" class="w-full" date-format="yy-mm-dd" input-id="from-date"/>
+                        <label for="from-date">From Date</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="toDate" class="w-full" date-format="yy-mm-dd" input-id="to-date"/>
+                        <label for="to-date">To Date</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.payments.value" :options="paymentStatus" :showClear="true" class="w-full" input-id="payment-status" />
+                        <label for="payment-status">Payment Status</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.user.value" :options="users" :showClear="true" class="w-full" input-id="user" option-label="name" option-value="id" />
+                        <label for="user">Created By</label>
+                    </FloatLabel>
+                </div>
+            </Panel>
+
+            <Card class="my-5">
+                <template #content>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedHBL = null" />
+                    <DataTable
+                        ref="dt"
+                        v-model:contextMenuSelection="selectedHBL"
+                        v-model:expandedRows="expandedRows"
+                        v-model:filters="filters"
+                        :globalFilterFields="['reference', 'hbl', 'hbl_name', 'email', 'address', 'contact_number', 'consignee_name', 'consignee_address', 'consignee_contact', 'cargo_type', 'hbl_type', 'warehouse', 'status', 'hbl_number']"
+                        :loading="loading"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="totalRecords"
+                        :value="hbls"
+                        context-menu
+                        dataKey="id"
+                        filter-display="menu"
+                        lazy
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
+                        @page="onPageChange"
+                        @rowContextmenu="onRowContextMenu"
+                        @sort="onSort">
+
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    All HBLs
+                                </div>
+                                <Button v-if="$page.props.user.permissions.includes('hbls.create')" icon="pi pi-arrow-right"
+                                        icon-pos="right"
+                                        label="Create New HBL" size="small" @click="router.visit(route('hbls.create'))"/>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Button Group -->
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        icon="pi pi-filter-slash"
+                                        label="Clear Filters"
+                                        outlined
+                                        severity="contrast"
+                                        size="small"
+                                        type="button"
+                                        @click="clearFilter()"
+                                    />
+
+                                    <Button
+                                        icon="pi pi-external-link"
+                                        label="Export"
+                                        severity="contrast"
+                                        size="small"
+                                        @click="exportCSV($event)"
+                                    />
+                                </div>
+
+                                <!-- Search Field -->
+                                <IconField class="w-full sm:w-auto">
+                                    <InputIcon>
+                                        <i class="pi pi-search" />
+                                    </InputIcon>
+                                    <InputText
+                                        v-model="filters.global.value"
+                                        class="w-full"
+                                        placeholder="Keyword Search"
+                                        size="small"
+                                    />
+                                </IconField>
+                            </div>
+                        </template>
+
+                        <template #empty> No hbls found. </template>
+
+                        <template #loading> Loading hbl data. Please wait.</template>
+
+                        <Column expander style="width: 5rem" />
+
+                        <Column field="hbl_number" header="HBL" sortable>
+                            <template #body="slotProps">
+                                <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
+                                <br v-if="slotProps.data.is_short_loaded">
+                                <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`" icon="pi pi-exclamation-triangle" size="small"></Tag>
+                            </template>
+                        </Column>
+
+                        <Column field="cargo_type" header="Cargo Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :icon="resolveCargoType(slotProps.data).icon" :severity="resolveCargoType(slotProps.data).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="hbl_name" header="HBL Name">
+                            <template #body="slotProps">
+                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.hbl_name}`"
+                                   class="hover:underline" target="_blank">
+                                    <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
+                                    {{ slotProps.data.hbl_name }}
+                                </a>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.email}}</div>
+                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.contact_number}`"
+                                   class="text-gray-500 hover:underline text-sm" target="_blank">
+                                    <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
+                                    {{ slotProps.data.contact_number }}
+                                </a>
+                            </template>
+                        </Column>
+
+                        <Column field="address" header="Address"></Column>
+
+                        <Column field="warehouse" header="Warehouse" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveWarehouse(slotProps.data)" :value="slotProps.data.warehouse.toUpperCase()"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="consignee_name" header="Consignee">
+                            <template #body="slotProps">
+                                <div>{{ slotProps.data.consignee_name }}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.consignee_email}}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.consignee_contact}}</div>
+                            </template>
+                        </Column>
+
+                        <Column field="consignee_address" header="Consignee Address"></Column>
+
+                        <Column field="hbl_type" header="HBL Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="is_hold" header="Hold">
+                            <template #body="{ data }">
+                                <i :class="{ 'pi-pause-circle text-yellow-500': data.is_hold, 'pi-play-circle text-green-400': !data.is_hold }" class="pi"></i>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <div class="flex items-center gap-2">
+                                    <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary inputId="is-hold"/>
+                                    <label for="is-hold"> Is Hold </label>
+                                </div>
+                            </template>
+                        </Column>
+
+                        <template #expansion="{data}">
+                            <div class="grid grid-cols-3 p-4">
+                                <InfoDisplay v-if="data.tokens" :value="data.tokens.token_number" label="Token" />
+                                <InfoDisplay v-if="data.tokens" :value="data.tokens.queue_type" label="Queue Type" />
+                                <InfoDisplay v-if="data.finance_status" :value="data.finance_status" label="Finance Status" />
+                            </div>
+                        </template>
+
+                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs. </template>
+                    </DataTable>
+                </template>
+            </Card>
         </div>
-
-        <div class="card border">
-            <h2
-                class="mt-3 ml-5 text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-            >
-                HBL Filters
-            </h2>
-            <div class="grid grid-cols-1 lg:grid-cols-7 gap-5 p-5">
-                <div class="space-y-2">
-                    <InputLabel value="From" />
-                    <DatePicker
-                        v-model="filters.fromDate"
-                        placeholder="Choose date..."
-                    />
-
-                    <InputLabel value="To" />
-                    <DatePicker
-                        v-model="filters.toDate"
-                        placeholder="Choose date..."
-                    />
-                </div>
-
-                <div>
-                    <h2
-                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Cargo Mode
-                    </h2>
-
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <Switch
-                            v-model="filters.cargoMode"
-                            label="Air Cargo"
-                            value="Air Cargo"
-                        />
-                        <div v-html="planeIcon"></div>
-                    </label>
-
-                    <label class="inline-flex items-center space-x-2 mt-2">
-                        <Switch
-                            v-model="filters.cargoMode"
-                            label="Sea Cargo"
-                            value="Sea Cargo"
-                        />
-                        <div v-html="shipIcon"></div>
-                    </label>
-                </div>
-
-                <div>
-                    <h2
-                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Delivery Type
-                    </h2>
-
-                    <label class="block items-center space-x-2 mt-2">
-                        <Switch
-                            v-model="filters.hblType"
-                            label="UPB"
-                            value="UPB"
-                        />
-                    </label>
-
-                    <label class="block items-center space-x-2 mt-2">
-                        <Switch
-                            v-model="filters.hblType"
-                            label="Gift"
-                            value="Gift"
-                        />
-                    </label>
-
-                    <label class="block items-center space-x-2 mt-2">
-                        <Switch
-                            v-model="filters.hblType"
-                            label="Door to Door"
-                            value="Door to Door"
-                        />
-                    </label>
-                </div>
-
-                <div>
-                    <h2
-                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Payment Status
-                    </h2>
-
-                    <label
-                        v-for="item in paymentStatus"
-                        :key="item"
-                        class="block items-center space-x-2 mt-2"
-                    >
-                        <Switch
-                            v-model="filters.paymentStatus"
-                            :label="item"
-                            :value="item"
-                        />
-                    </label>
-                </div>
-
-                <div>
-                    <h2
-                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Is Hold
-                    </h2>
-
-                    <label class="block items-center space-x-2 mt-2">
-                        <Switch
-                            v-model="filters.isHold"
-                            label="Is Hold"
-                            value="true"
-                        />
-                    </label>
-
-                    <h2
-                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 mt-2"
-                    >
-                        Is Delayed
-                    </h2>
-
-                    <label class="block items-center space-x-2 mt-2">
-                        <Switch
-                            v-model="filters.isDelayed"
-                            label="Is Delayed"
-                            value="true"
-                        />
-                    </label>
-                </div>
-
-                <div>
-                    <h2
-                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Warehouse
-                    </h2>
-
-                    <label
-                        v-for="warehouse in warehouses"
-                        :key="warehouse.id"
-                        class="block items-center space-x-2 mt-2"
-                    >
-                        <Switch
-                            v-model="filters.warehouse"
-                            :label="warehouse.name"
-                            :value="warehouse.name"
-                        />
-                    </label>
-                </div>
-
-                <div>
-                    <h2
-                        class="font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                    >
-                        Created By
-                    </h2>
-
-                    <select
-                        v-model="filters.createdBy"
-                        autocomplete="off"
-                        class="w-full"
-                        multiple
-                        placeholder="Select a User..."
-                        x-init="$el._tom = new Tom($el,{
-            plugins: ['remove_button'],
-            create: true,
-          })"
-                    >
-                        <option v-for="user in users" :value="user.id">
-                            {{ user.name }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="bg-slate-100 p-5 space-x-4 text-right">
-                <SoftPrimaryButton class="space-x-2" @click="applyFilters">
-                    <i class="fa-solid fa-filter"></i>
-                    <span>Apply Filters</span>
-                </SoftPrimaryButton>
-                <!--Filter Rest Button-->
-                <SoftPrimaryButton class="space-x-2" @click="resetFilter">
-                    <i class="fa-solid fa-refresh"></i>
-                    <span>Clear Filters</span>
-                </SoftPrimaryButton>
-            </div>
-        </div>
-
-        <div class="card mt-4">
-            <div>
-                <div class="flex items-center justify-between p-2">
-                    <div class="">
-                        <div class="flex">
-                            <h2
-                                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                HBL List
-                            </h2>
-                        </div>
-                    </div>
-
-                    <div class="flex">
-                        <ColumnVisibilityPopover>
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.reference"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'reference',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                    >Reference</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.hbl"
-                                    @change="
-                                        toggleColumnVisibility('hbl', $event)
-                                    "
-                                />
-                                <span class="hover:cursor-pointer">HBL</span>
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.hbl_name"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'hbl_name',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                    >HBL Name</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="
-                                        data.columnVisibility.consignee_name
-                                    "
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'consignee_name',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                    >Consignee Name</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="
-                                        data.columnVisibility.consignee_address
-                                    "
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'consignee_address',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                    >Consignee Address</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="
-                                        data.columnVisibility.consignee_contact
-                                    "
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'consignee_contact',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                    >Consignee Contact</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.email"
-                                    @change="
-                                        toggleColumnVisibility('email', $event)
-                                    "
-                                />
-                                <span class="hover:cursor-pointer">Email</span>
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.address"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'address',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                    >Address</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="
-                                        data.columnVisibility.contact_number
-                                    "
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'contact_number',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                    >Contact</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.cargo_type"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'cargo_type',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                    >Cargo Mode</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.hbl_type"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'hbl_type',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                    >HBL Type</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.warehouse"
-                                    @change="
-                                        toggleColumnVisibility(
-                                            'warehouse',
-                                            $event
-                                        )
-                                    "
-                                />
-                                <span class="hover:cursor-pointer"
-                                    >Warehouse</span
-                                >
-                            </label>
-
-                            <label class="inline-flex items-center space-x-2">
-                                <Checkbox
-                                    :checked="data.columnVisibility.status"
-                                    @change="
-                                        toggleColumnVisibility('status', $event)
-                                    "
-                                />
-                                <span class="hover:cursor-pointer">Status</span>
-                            </label>
-                        </ColumnVisibilityPopover>
-
-                        <a :href="exportURL">
-                            <button
-                                class="flex btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.top="'Download CSV'"
-                            >
-                                <i class="fa-solid fa-cloud-arrow-down"></i>
-                            </button>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="mt-3">
-                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div v-show="isData" ref="wrapperRef"></div>
-                        <NoRecordsFound v-show="!isData"/>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <HBLDetailModal
-            :hbl-id="hblId"
-            :show="showConfirmViewHBLModal"
-            @close="closeModal"
-            @update:show="showConfirmViewHBLModal = $event"
-        />
     </AppLayout>
+
+    <HBLDetailModal
+        :hbl-id="hblId"
+        :show="showConfirmViewHBLModal"
+        @close="closeModal"
+        @update:show="showConfirmViewHBLModal = $event"
+    />
+
+    <CallFlagModal
+        :caller-name="hblName"
+        :hbl-id="selectedHBLID"
+        :visible="showConfirmViewCallFlagModal"
+        @close="closeCallFlagModal"
+        @update:visible="showConfirmViewCallFlagModal = $event"/>
 </template>

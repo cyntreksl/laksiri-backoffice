@@ -48,8 +48,11 @@ class HBLResource extends JsonResource
             'packages' => $this->packages ? HBLPackageResource::collection($this->packages) : '-',
             'created_by' => $this->user?->name,
             'tokens' => isset($this->tokens[0]) && $this->tokens[0]->created_at->isToday()
-                ? 'Token number: '.$this->tokens[0]->id.' '.ucwords(strtolower(str_replace('_', ' ', $this->tokens[0]->customerQueue->type)))
-                : '',
+                ? [
+                    'token_number' => $this->tokens[0]->id,
+                    'queue_type' => ucwords(strtolower(str_replace('_', ' ', $this->tokens[0]->customerQueue->type))),
+                ]
+                : null,
             'hbl_number' => $this->hbl_number,
             'cr_number' => $this->cr_number,
             'system_status' => $this->system_status,
