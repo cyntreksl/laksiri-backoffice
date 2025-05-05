@@ -98,8 +98,13 @@ const mhbls = () => {
 
         <div class="flex items-center mt-5 space-x-2">
             <h1 class="text-3xl ml-2 font-medium text-gray-700">
-                Vessel Schedule {{ vesselSchedules?.start_date }} to {{ vesselSchedules?.end_date }}
+                Vessel Schedule
             </h1>
+            <div class="flex items-center space-x-2 text-xs text-gray-400">
+                <div>{{ vesselSchedules?.start_date }}</div>
+                <div><i class="ti ti-arrow-narrow-right text-xl"></i></div>
+                <div>{{ vesselSchedules?.end_date }}</div>
+            </div>
         </div>
 
         <div class="grid grid-cols-12 gap-4 my-5">
@@ -108,11 +113,6 @@ const mhbls = () => {
                 <template #title>
                     <div class="flex justify-between">
                         <div>
-                            <div class="flex items-center space-x-2 text-xs text-gray-400">
-                                <div>{{ vesselSchedules?.start_date }}</div>
-                                <div><i class="ti ti-arrow-narrow-right text-xl"></i></div>
-                                <div>{{ vesselSchedules?.end_date }}</div>
-                            </div>
                             <div>Available Vessels</div>
                         </div>
                     </div>
@@ -142,8 +142,8 @@ const mhbls = () => {
                                     <i class="ti ti-ship text-4xl"></i>
                                 </div>
                                 <div class="flex justify-between text-sm">
-                                    <div>ONEY344OL333333</div>
-                                    <div>12547845</div>
+                                    <div>{{ container?.bl_number }}</div>
+                                    <div>{{ container?.awb_number}}</div>
                                 </div>
                             </template>
                         </Card>
@@ -158,11 +158,11 @@ const mhbls = () => {
                         <div>
                             <div class="flex items-center space-x-2 text-xs text-gray-400">
                                 <div class="flex items-center">
-                                    <i class="ti ti-plane-departure text-xl mr-2"></i> RIYADH
+                                    <i class="ti ti-plane-departure text-xl mr-2"></i> {{selectedContainer?.branch.name}}
                                 </div>
                                 <div><i class="ti ti-arrow-narrow-right text-xl"></i></div>
                                 <div class="flex items-center">
-                                    <i class="ti ti-plane-arrival text-xl mr-2"></i> COLOMBO
+                                    <i class="ti ti-plane-arrival text-xl mr-2"></i> {{selectedContainer?.warehouse.name}}
                                 </div>
                             </div>
                             <div class="flex items-center space-x-2">
