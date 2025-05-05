@@ -22,7 +22,7 @@ const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
 });
 
-const fetchZones = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+const fetchTokens = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
     loading.value = true;
     try {
         const response = await axios.get(baseUrl.value, {
@@ -45,7 +45,7 @@ const fetchZones = async (page = 1, search = "", sortField = 'created_at', sortO
 };
 
 const debouncedFetchZones = debounce((searchValue) => {
-    fetchZones(1, searchValue);
+    fetchTokens(1, searchValue);
 }, 1000);
 
 watch(() => filters.value.global.value, (newValue) => {
@@ -57,15 +57,15 @@ watch(() => filters.value.global.value, (newValue) => {
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchZones(currentPage.value);
+    fetchTokens(currentPage.value);
 };
 
 const onSort = (event) => {
-    fetchZones(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+    fetchTokens(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
 
 onMounted(() => {
-    fetchZones();
+    fetchTokens();
 });
 
 const exportCSV = () => {
@@ -74,8 +74,8 @@ const exportCSV = () => {
 </script>
 
 <template>
-    <AppLayout title="Verified Queue List">
-        <template #header>Verified Queue List</template>
+    <AppLayout title="Verified Queue">
+        <template #header>Verified Queue</template>
 
         <Breadcrumb />
 

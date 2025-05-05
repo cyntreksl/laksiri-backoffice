@@ -96,6 +96,7 @@ const filteredReceptionQueue = computed(() => {
                             />
                         </template>
                     </Column>
+                    <template #footer> In total there are {{ slotProps.items.length }} tokens.</template>
                 </DataTable>
             </template>
 
