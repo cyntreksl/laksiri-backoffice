@@ -5,6 +5,19 @@ import Card from 'primevue/card';
 import Button from 'primevue/button';
 import {router} from "@inertiajs/vue3";
 
+const props = defineProps({
+    vesselSchedules: {
+        type: Object,
+        default: () => {
+        },
+    },
+    containers: {
+        type: Object,
+        default: () => {
+        },
+    },
+});
+
 </script>
 
 <template>
@@ -14,7 +27,7 @@ import {router} from "@inertiajs/vue3";
         <Breadcrumb/>
 
         <div class="flex items-center mt-5 space-x-2">
-            <h1 class="text-3xl ml-2 font-medium text-gray-700">Vessel Schedule</h1>
+            <h1 class="text-3xl ml-2 font-medium text-gray-700">Vessel Schedule {{vesselSchedules.start_date}} to {{vesselSchedules.end_date}}</h1>
         </div>
 
         <div class="grid grid-cols-12 gap-4 my-5">
@@ -24,41 +37,41 @@ import {router} from "@inertiajs/vue3";
                         <div>
                             <div class="flex items-center space-x-2 text-xs text-gray-400">
                                 <div>
-                                    2025-01-01
+                                    {{vesselSchedules.start_date}}
                                 </div>
                                 <div>
                                     <i class="ti ti-arrow-narrow-right text-xl"></i>
                                 </div>
-                                <div>2025-01-07</div>
+                                <div>{{vesselSchedules.end_date}}</div>
                             </div>
                             <div>
                                 Available Vessels
                             </div>
                         </div>
-                        <div>
-                            <Button aria-label="Notification" icon="pi pi-filter" rounded severity="secondary" size="small" variant="outlined" />
-                        </div>
                     </div>
                 </template>
-                <template #subtitle>2 Vessels</template>
+                <template #subtitle>{{containers.length}} Vessels</template>
                 <template #content>
                     <div class="space-y-5">
-                        <Card class="!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white border-2 border-black">
+                        <Card
+                            class="!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white border-2 border-black"
+                            v-for="(container, index) in vesselSchedules.containers"
+                        >
                             <template #content>
                                 <div class="flex justify-between text-sm">
                                     <div>
-                                        20FT General
+                                        {{container.container_type}}
                                     </div>
                                     <div>
-                                        SEA CARGO
+                                        {{container.cargo_type}}
                                     </div>
                                     <div>
-                                        COLOMBO
+                                        {{container.warehouse.name}}
                                     </div>
                                 </div>
 
                                 <div class="my-8 flex items-center justify-between">
-                                    <h1 class="text-3xl font-medium">QT-LD-000019</h1>
+                                    <h1 class="text-3xl font-medium">{{container.reference}}</h1>
                                     <i class="ti ti-ship text-4xl"></i>
                                 </div>
 
@@ -73,35 +86,7 @@ import {router} from "@inertiajs/vue3";
                             </template>
                         </Card>
 
-                        <Card class="!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white border-2 border-black">
-                            <template #content>
-                                <div class="flex justify-between text-sm">
-                                    <div>
-                                        20FT General
-                                    </div>
-                                    <div>
-                                        AIR CARGO
-                                    </div>
-                                    <div>
-                                        COLOMBO
-                                    </div>
-                                </div>
 
-                                <div class="my-8 flex items-center justify-between">
-                                    <h1 class="text-3xl font-medium">QT-LD-000020</h1>
-                                    <i class="ti ti-plane text-4xl"></i>
-                                </div>
-
-                                <div class="flex justify-between text-sm">
-                                    <div>
-                                        ONEY344OL333333
-                                    </div>
-                                    <div>
-                                        12547845
-                                    </div>
-                                </div>
-                            </template>
-                        </Card>
                     </div>
                 </template>
             </Card>
