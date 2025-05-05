@@ -1,7 +1,11 @@
 <script setup>
 import {ref} from "vue";
 import ScreenLayout from "@/Layouts/ScreenLayout.vue";
-import { usePage } from '@inertiajs/vue3';
+import {usePage} from '@inertiajs/vue3';
+import Splitter from 'primevue/splitter';
+import SplitterPanel from 'primevue/splitterpanel';
+import Card from 'primevue/card';
+import Tag from 'primevue/tag';
 
 const packageQueue = ref([]);
 const firstToken = ref({});
@@ -55,69 +59,116 @@ setInterval(getPackageQueue, 3000);
 
 <template>
     <ScreenLayout title="Package Queue">
-        <div v-if="waitingScreen" class="flex h-full w-full justify-center items-center">
-            <p class="text-9xl uppercase">
-                Waiting...
-            </p>
-        </div>
-        <div v-else class="grid grid-cols-2 grid-rows-2 h-full">
-            <div class="bg-gray-200 h-full p-5">
-                <div
-                    v-if="firstToken.token"
-                    class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-lime-300 space-y-3">
-                    <h1 class="text-5xl text-black">NOW</h1>
-                    <h1 class="text-7xl xl:text-[120px] text-black font-bold">{{ firstToken.token }}</h1>
-                    <h5 class="text-xl font-medium text-slate-700 dark:text-navy-100">
-                        <template v-for="(hbl_package, index) in firstToken.hbl_packages" :key="index">
-                            {{ hbl_package.package_type }} PKG {{ hbl_package.quantity }}<span v-if="index < firstToken.hbl_packages.length - 1"><br> </span>
+        <div class="h-screen">
+            <Splitter class="h-full mb-8 !bg-slate-50">
+                <SplitterPanel class="flex items-center justify-center">
+                    <Splitter class="h-full !bg-slate-50" layout="vertical">
+                        <SplitterPanel class="p-5">
+                            <Card v-if="firstToken.token" class="!shadow-sm !border !border-info !shadow-info !h-full rounded-2xl bg-white">
+                                <template #content>
+                                    <div class="flex justify-between items-center mb-6">
+                                        <div>
+                                            <h1 class="text-4xl text-gray-800 font-semibold tracking-tight">NOW</h1>
+                                            <h2 class="text-sm text-gray-500 mt-1">Current Token</h2>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-info">
+                                            <i class="ti ti-packages text-4xl"></i>
+                                            <span class="text-4xl font-semibold">{{ firstToken.package_count }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center mb-6">
+                                        <h1 class="text-6xl xl:text-[100px] font-extrabold text-gray-900 tracking-wide">
+                                            {{ firstToken.token }}
+                                        </h1>
+                                    </div>
+
+                                    <div class="flex flex-wrap justify-center gap-3">
+                                        <template v-for="(hbl_package, index) in firstToken.hbl_packages" :key="index">
+                                            <Tag
+                                                :value="`${hbl_package.quantity} ${hbl_package.package_type}`"
+                                                class="rounded-full px-4 py-2 text-base"
+                                                severity="info"
+                                                style="font-size: 1rem"
+                                            />
+                                        </template>
+                                    </div>
+                                </template>
+                            </Card>
+                        </SplitterPanel>
+                        <SplitterPanel class="p-5">
+                            <Card v-if="nextToken.token" class="!shadow-sm !border !border-info !shadow-info !h-full rounded-2xl bg-white">
+                                <template #content>
+                                    <div class="flex justify-between items-center mb-6">
+                                        <div>
+                                            <h1 class="text-4xl text-gray-800 font-semibold tracking-tight">NOW</h1>
+                                            <h2 class="text-sm text-gray-500 mt-1">Current Token</h2>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-info">
+                                            <i class="ti ti-packages text-4xl"></i>
+                                            <span class="text-4xl font-semibold">{{ nextToken.package_count }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center mb-6">
+                                        <h1 class="text-6xl xl:text-[100px] font-extrabold text-gray-900 tracking-wide">
+                                            {{ nextToken.token }}
+                                        </h1>
+                                    </div>
+
+                                    <div class="flex flex-wrap justify-center gap-3">
+                                        <template v-for="(hbl_package, index) in nextToken.hbl_packages" :key="index">
+                                            <Tag
+                                                :value="`${hbl_package.quantity} ${hbl_package.package_type}`"
+                                                class="rounded-full px-4 py-2 text-base"
+                                                severity="info"
+                                                style="font-size: 1rem"
+                                            />
+                                        </template>
+                                    </div>
+                                </template>
+                            </Card>
+                        </SplitterPanel>
+                    </Splitter>
+                </SplitterPanel>
+                <SplitterPanel class="p-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 p-5">
+                        <template v-for="queue in packageQueue">
+                            <Card class="!shadow-sm !border !border-info !shadow-info !h-full rounded-2xl bg-white">
+                                <template #content>
+                                    <div class="flex justify-between items-center mb-6">
+                                        <div>
+                                            <h1 class="text-4xl text-gray-800 font-semibold tracking-tight">NOW</h1>
+                                            <h2 class="text-sm text-gray-500 mt-1">Current Token</h2>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-info">
+                                            <i class="ti ti-packages text-4xl"></i>
+                                            <span class="text-4xl font-semibold">{{ queue.package_count }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center mb-6">
+                                        <h1 class="text-6xl xl:text-[100px] font-extrabold text-gray-900 tracking-wide">
+                                            {{ queue.token }}
+                                        </h1>
+                                    </div>
+
+                                    <div class="flex flex-wrap justify-center gap-3">
+                                        <template v-for="(hbl_package, index) in queue.hbl_packages" :key="index">
+                                            <Tag
+                                                :value="`${hbl_package.quantity} ${hbl_package.package_type}`"
+                                                class="rounded-full px-4 py-2 text-base"
+                                                severity="info"
+                                                style="font-size: 1rem"
+                                            />
+                                        </template>
+                                    </div>
+                                </template>
+                            </Card>
                         </template>
-                    </h5>
-
-                    <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
-                        {{ firstToken.package_count }} Packages
-                    </h3>
-                </div>
-            </div>
-
-            <div class="col-start-2 row-span-2 bg-gray-200 h-full">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 p-5">
-                    <template v-for="queue in packageQueue">
-                        <div
-                            class="card grow cursor-pointer hover:bg-info/20 items-center p-4 text-center sm:p-5 border w-50 rounded-lg">
-                            <div class="my-5">
-                                <h1 class="text-4xl text-black font-bold">{{ queue.token }}</h1>
-                            </div>
-                            <div class="my-2 grow">
-                                <h5 class="text-xl font-medium text-slate-700 dark:text-navy-100">
-                                    <template v-for="(hbl_package, index) in queue.hbl_packages" :key="index">
-                                        {{ hbl_package.package_type }} PKG {{ hbl_package.quantity }}<span v-if="index < queue.hbl_packages.length - 1"><br> </span>
-                                    </template>
-                                </h5>
-                                <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
-                                    {{ queue.package_count }} Packages
-                                </h3>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <div class="bg-gray-200 h-full p-5">
-                <div
-                    v-if="nextToken.token"
-                    class="card cursor-pointer flex flex-col justify-center items-center p-4 text-center sm:p-5 h-full rounded-lg bg-yellow-300 space-y-3">
-                    <h1 class="text-5xl text-black">NEXT</h1>
-                    <h1 class="text-7xl xl:text-[120px] text-black font-bold">{{ nextToken.token }}</h1>
-                    <h5 class="text-xl font-medium text-slate-700 dark:text-navy-100">
-                        <template v-for="(hbl_package, index) in nextToken.hbl_packages" :key="index">
-                            {{ hbl_package.package_type }} PKG {{ hbl_package.quantity }}<span v-if="index < nextToken.hbl_packages.length - 1"><br> </span>
-                        </template>
-                    </h5>
-                    <h3 class="text-2xl font-medium text-slate-700 dark:text-navy-100">
-                        {{ nextToken.package_count }} Packages
-                    </h3>
-                </div>
-            </div>
+                    </div>
+                </SplitterPanel>
+            </Splitter>
         </div>
     </ScreenLayout>
 </template>
