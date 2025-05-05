@@ -364,6 +364,20 @@ const confirmPickupRetry = (pickup) => {
     });
 };
 
+const parsePackageTypes = (str) => {
+    if (!str) return [];
+
+    if (Array.isArray(str)) return str;
+
+    try {
+        const parsed = JSON.parse(str);
+        if (Array.isArray(parsed)) return parsed;
+        return str.split(',').map(type => type.trim());
+    } catch (e) {
+        return str.split(',').map(type => type.trim());
+    }
+};
+
 const handleConfirmDriverRemove = (pickupId) => {
     confirm.require({
         message: 'Are you certain you want to unassign the driver from this pickup?',
@@ -599,16 +613,16 @@ const handleConfirmDriverRemove = (pickupId) => {
 
                         <Column field="pickup_type" header="Pickup Type" hidden></Column>
 
-                        <Column field="package_types" header="Pickup Type">
+                         <Column field="packages" header="Packages">
                             <template #body="slotProps">
-                                <div v-if="Array.isArray(slotProps.data.package_types)" class="flex flex-wrap mb-1 gap-2">
-                                    <Chip v-for="(type, index) in slotProps.data.package_types" :key="index" :label="type" icon="pi pi-box"/>
-                                </div>
-                                <div v-else-if="typeof slotProps.data.package_types === 'string'" class="flex flex-wrap mb-1 gap-2">
-                                    <Chip v-for="(type, index) in slotProps.data.package_types.split(',').map(type => type.trim())" :key="index" :label="type" icon="pi pi-box"/>
-                                </div>
-                                <div v-else>
-                                    {{ slotProps.data.package_types || '-' }}
+                                <div class="flex flex-wrap mb-1 gap-2">
+                                    <template v-if="slotProps.data.package_types">
+                                        <Chip v-for="(type, index) in parsePackageTypes(slotProps.data.package_types)" :key="index" :label="type" icon="pi pi-box"
+                                        />
+                                    </template>
+                                    <template v-else>
+                                        {{ '-' }}
+                                    </template>
                                 </div>
                             </template>
                         </Column>
