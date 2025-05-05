@@ -145,7 +145,7 @@
                 openSideBar();
               "
                             >
-                                <i class="ti ti-cash-register text-2xl"></i>
+                                <i class="ti ti-wallet text-2xl"></i>
                             </a>
 
                             <!-- Boned Area Screens -->
