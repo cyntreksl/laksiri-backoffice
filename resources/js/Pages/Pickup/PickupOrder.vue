@@ -6,7 +6,6 @@ import InputLabel from "@/Components/InputLabel.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import {reactive, ref, watch} from "vue";
 import moment from "moment";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {push} from "notivue";
 import SearchSVG from "@/../images/illustrations/search.svg";
 import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
@@ -170,27 +169,9 @@ const closeModal = () => {
 
                     <div v-if="localPickups.length > 0" class="mx-5 mb-5">
                         <div class="flex my-5 space-x-4 items-center">
-                            <PrimaryButton
-                                v-if="$page.props.user.permissions.includes('pickups.update pickup order')"
-                                :disabled="!hasOrderChanged"
-                                @click.prevent="handleSave"
-                            >
-                                Save Order
-                                <svg
-                                    class="w-6 h-6 ml-3"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.5"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    />
-                                </svg>
-                            </PrimaryButton>
+                            <Button v-if="$page.props.user.permissions.includes('pickups.update pickup order')" :disabled="!hasOrderChanged" icon="pi pi-sort-alt"
+                                    icon-pos="right"
+                                    label="Save Order" size="small" @click.prevent="handleSave" />
                             <p class="text-error">Total Records {{ localPickups.length }}</p>
                         </div>
 
@@ -255,72 +236,11 @@ const closeModal = () => {
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                        <button
-                                            :disabled="index === 0"
-                                            class="btn size-9 rounded-full p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25 disabled:pointer-events-none disabled:select-none disabled:opacity-60 disabled:text-gray-500"
-                                            @click.prevent="handleMoveUp(index)"
-                                        >
-                                            <svg
-                                                class="w-6 h-6"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="1.5"
-                                                viewBox="0 0 24 24"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                                <path
-                                                    d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18"
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                />
-                                            </svg>
-                                        </button>
-                                        <button
-                                            :disabled="index === pickups.length - 1"
-                                            class="btn size-9 rounded-full p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25 disabled:pointer-events-none disabled:select-none disabled:opacity-60 disabled:text-gray-500"
-                                            @click.prevent="handleMoveDown(index)"
-                                        >
-                                            <svg
-                                                class="w-6 h-6"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="1.5"
-                                                viewBox="0 0 24 24"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                                <path
-                                                    d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                />
-                                            </svg>
-                                        </button>
+                                        <Button :disabled="index === 0" icon="pi pi-arrow-up" rounded variant="text" @click.prevent="handleMoveUp(index)" />
+                                        <Button :disabled="index === pickups.length - 1" icon="pi pi-arrow-down" rounded variant="text" @click.prevent="handleMoveDown(index)" />
                                     </td>
                                     <td v-if="usePage().props.user.permissions.includes('pickups.show')" class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                        <button
-                                            class="btn size-9 rounded-full p-0 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
-                                            @click.prevent="confirmViewPickup(pickup.id)"
-                                        >
-                                            <svg
-                                                class="w-6 h-6"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="1.5"
-                                                viewBox="0 0 24 24"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                                <path
-                                                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                />
-                                                <path
-                                                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                />
-                                            </svg>
-                                        </button>
+                                        <Button icon="pi pi-eye" rounded severity="warn" variant="text" @click.prevent="confirmViewPickup(pickup.id)" />
                                     </td>
                                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                         {{ pickup.reference }}
