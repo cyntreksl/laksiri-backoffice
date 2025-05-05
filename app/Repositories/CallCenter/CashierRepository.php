@@ -127,20 +127,15 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             ->cashierQueue()
             ->has('token.cashierPayment');
 
-        $records = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
-
-        $totalRecords = $query->count();
+        $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => PaidCollection::collection($records),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $records->total(),
+                'current_page' => $records->currentPage(),
+                'perPage' => $records->perPage(),
+                'lastPage' => $records->lastPage(),
             ],
         ]);
     }

@@ -1,140 +1,167 @@
 <script setup>
-import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {onMounted, reactive, ref} from "vue";
-import {Grid} from "gridjs";
+import {onMounted, ref, watch} from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
-
-const wrapperRef = ref(null);
-let grid = null;
-
-const data = reactive({
-    columnVisibility: {
-        id: false,
-        hbl: true,
-        token: true,
-        customer: true,
-        reception: true,
-        package_count: true,
-        paid_at: true,
-        paid_amount: true,
-        verified_by: true,
-        note: true,
-    },
-});
+import {FilterMatchMode} from "@primevue/core/api";
+import axios from "axios";
+import {debounce} from "lodash";
+import Button from "primevue/button";
+import Card from "primevue/card";
+import Column from "primevue/column";
+import DataTable from "primevue/datatable";
 
 const baseUrl = ref("/call-center/cashier/paid/list");
+const loading = ref(true);
+const tokens = ref([]);
+const totalRecords = ref(0);
+const perPage = ref(10);
+const currentPage = ref(1);
+const dt = ref();
 
-const initializeGrid = () => {
-    const visibleColumns = Object.keys(data.columnVisibility);
-
-    grid = new Grid({
-        columns: createColumns(),
-        search: false,
-        sort: {
-            multiColumn: false,
-            server: {
-                url: (prev, columns) => {
-                    if (!columns.length) return prev;
-                    const col = columns[0];
-                    const dir = col.direction === 1 ? "asc" : "desc";
-                    let colName = visibleColumns[col.index];
-
-                    return `${prev}&order=${colName}&dir=${dir}`;
-                },
-            },
-        },
-        pagination: {
-            limit: 10,
-            server: {
-                url: (prev, page, limit) =>
-                    `${prev}&limit=${limit}&offset=${page * limit}`,
-            },
-        },
-        server: {
-            url: constructUrl(),
-            then: (data) =>
-                data.data.map((item) => {
-                    const row = [];
-                    visibleColumns.forEach((column) => {
-                        row.push(item[column]);
-                    });
-                    return row;
-                }),
-            total: (response) => {
-                if (response && response.meta) {
-                    return response.meta.total;
-                } else {
-                    throw new Error("Invalid total count in server response");
-                }
-            },
-        },
-    });
-
-    grid.render(wrapperRef.value);
-};
-
-const createColumns = () => [
-    {name: "ID", hidden: !data.columnVisibility.id},
-    {
-        name: "HBL",
-        hidden: !data.columnVisibility.hbl,
-        sort: false,
-    },
-    {name: "Token", hidden: !data.columnVisibility.token},
-    {name: "Customer", hidden: !data.columnVisibility.customer, sort: false},
-    {name: "Reception", hidden: !data.columnVisibility.reception, sort: false},
-    {name: "Packages", hidden: !data.columnVisibility.package_count, sort: false},
-    {name: "Paid At", hidden: !data.columnVisibility.paid_at},
-    {
-        name: "Paid Amount",
-        hidden: !data.columnVisibility.paid_amount,
-        formatter: (cell) => cell.toFixed(2),
-    },
-    {name: "Auth", hidden: !data.columnVisibility.verified_by},
-    {
-        name: "Note",
-        hidden: !data.columnVisibility.note,
-        formatter: (cell) => cell ? cell : '-',
-    },
-];
-
-onMounted(() => {
-    initializeGrid();
+const filters = ref({
+    global: {value: null, matchMode: FilterMatchMode.CONTAINS},
 });
 
-const constructUrl = () => {
-    const params = new URLSearchParams();
-    return baseUrl.value + "?" + params.toString();
+const fetchTokens = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+    loading.value = true;
+    try {
+        const response = await axios.get(baseUrl.value, {
+            params: {
+                page,
+                per_page: perPage.value,
+                search,
+                sort_field: sortField,
+                sort_order: sortOrder === 1 ? "asc" : "desc",
+            }
+        });
+        tokens.value = response.data.data;
+        totalRecords.value = response.data.meta.total;
+        currentPage.value = response.data.meta.current_page;
+    } catch (error) {
+        console.error("Error fetching tokens:", error);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const debouncedFetchTokens = debounce((searchValue) => {
+    fetchTokens(1, searchValue);
+}, 1000);
+
+watch(() => filters.value.global.value, (newValue) => {
+    if (newValue !== null) {
+        debouncedFetchTokens(newValue);
+    }
+});
+
+const onPageChange = (event) => {
+    perPage.value = event.rows;
+    currentPage.value = event.page + 1;
+    fetchTokens(currentPage.value);
+};
+
+const onSort = (event) => {
+    fetchTokens(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+};
+
+onMounted(() => {
+    fetchTokens();
+});
+
+const exportCSV = () => {
+    dt.value.exportCSV();
 };
 </script>
 
 <template>
-    <AppLayout title="Paid Queue List">
-        <template #header>Paid Queue List</template>
+    <AppLayout title="Paid Queue">
+        <template #header>Paid Queue</template>
 
         <Breadcrumb />
 
-        <div class="card mt-4">
-            <div>
-                <div class="flex items-center justify-between p-2">
-                    <div class="">
-                        <div class="flex">
-                            <h2
-                                class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                            >
-                                Paid Queue List
-                            </h2>
-                        </div>
-                    </div>
-                </div>
+        <div>
+            <Card class="my-5">
+                <template #content>
+                    <DataTable
+                        ref="dt"
+                        v-model:filters="filters"
+                        :loading="loading"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="totalRecords"
+                        :value="tokens"
+                        data-key="id"
+                        filter-display="menu"
+                        lazy
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
+                        @page="onPageChange"
+                        @sort="onSort">
 
-                <div class="mt-3">
-                    <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                        <div ref="wrapperRef"></div>
-                    </div>
-                </div>
-            </div>
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    Paid Queue
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <Button
+                                    icon="pi pi-external-link"
+                                    label="Export"
+                                    severity="contrast"
+                                    size="small"
+                                    @click="exportCSV($event)"
+                                />
+                            </div>
+                        </template>
+
+                        <template #empty>No tokens found.</template>
+
+                        <template #loading>Loading tokens data. Please wait.</template>
+
+                        <Column field="token" header="Token" sortable>
+                            <template #body="slotProps">
+                                <div class="flex items-center text-2xl">
+                                    <i class="ti ti-tag mr-1 text-blue-500"></i>
+                                    {{ slotProps.data.token }}
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="customer" header="Customer"></Column>
+
+                        <Column field="reception" header="Reception"></Column>
+
+                        <Column field="package_count" header="Packages">
+                            <template #body="slotProps">
+                                <div class="flex items-center">
+                                    <i class="ti ti-package mr-1 text-blue-500" style="font-size: 1rem"></i>
+                                    {{ slotProps.data.package_count }}
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="paid_at" header="Paid At" sortable></Column>
+
+                        <Column field="paid_amount" header="Paid Amount" sortable>
+                            <template #body="slotProps">
+                                <div class="flex items-center justify-end">
+                                    <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
+                                    {{ slotProps.data.paid_amount.toFixed(2) }}
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="verified_by" header="Verified By"></Column>
+
+                        <Column field="note" header="Note"></Column>
+
+                        <template #footer> In total there are {{ tokens ? totalRecords : 0 }} tokens.</template>
+                    </DataTable>
+                </template>
+            </Card>
         </div>
     </AppLayout>
 </template>
