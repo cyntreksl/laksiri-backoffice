@@ -44,13 +44,13 @@ const fetchTokens = async (page = 1, search = "", sortField = 'created_at', sort
     }
 };
 
-const debouncedFetchZones = debounce((searchValue) => {
+const debouncedFetchTokens = debounce((searchValue) => {
     fetchTokens(1, searchValue);
 }, 1000);
 
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
-        debouncedFetchZones(newValue);
+        debouncedFetchTokens(newValue);
     }
 });
 
