@@ -599,16 +599,16 @@ const handleConfirmDriverRemove = (pickupId) => {
 
                         <Column field="pickup_type" header="Pickup Type" hidden></Column>
 
-                        <Column field="packages" header="Packages">
+                        <Column field="package_types" header="Pickup Type">
                             <template #body="slotProps">
-                                <div v-if="Array.isArray(slotProps.data.packages)" class="flex flex-wrap mb-1 gap-2">
-                                    <Chip v-for="(type, index) in slotProps.data.packages" :key="index" :label="type.package_type" class="text-xs" icon="pi pi-box"/>
+                                <div v-if="Array.isArray(slotProps.data.package_types)" class="flex flex-wrap mb-1 gap-2">
+                                    <Chip v-for="(type, index) in slotProps.data.package_types" :key="index" :label="type" icon="pi pi-box"/>
                                 </div>
-                                <div v-else-if="typeof slotProps.data.packages === 'string'" class="flex flex-wrap mb-1 gap-2">
-                                    <Chip v-for="(type, index) in slotProps.data.packages.split(',').map(type => type.trim())" :key="index" :label="type" class="text-xs" icon="pi pi-box"/>
+                                <div v-else-if="typeof slotProps.data.package_types === 'string'" class="flex flex-wrap mb-1 gap-2">
+                                    <Chip v-for="(type, index) in slotProps.data.package_types.split(',').map(type => type.trim())" :key="index" :label="type" icon="pi pi-box"/>
                                 </div>
                                 <div v-else>
-                                    {{ slotProps.data.packages || '-' }}
+                                    {{ slotProps.data.package_types || '-' }}
                                 </div>
                             </template>
                         </Column>
