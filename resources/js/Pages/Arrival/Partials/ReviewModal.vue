@@ -1,14 +1,13 @@
 <script setup>
-import DialogModal from "@/Components/DialogModal.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {computed} from "vue";
-import TextInput from "@/Components/TextInput.vue";
 import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
+import Dialog from "primevue/dialog";
+import Button from "primevue/button";
+import Card from "primevue/card";
 
 const props = defineProps({
-    show: {
+    visible: {
         type: Boolean,
         default: false,
     },
@@ -24,7 +23,7 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(["update:visible"]);
 
 const countPackages = (packageHBlId) => {
     return props.warehouseArray.filter(item => item.hbl_id === packageHBlId).length;
@@ -76,108 +75,60 @@ const handleFinishUnloading = () => {
 </script>
 
 <template>
-    <DialogModal :closeable="true" :maxWidth="'2xl'" :show="show" @close="$emit('close')">
-        <template #title>
-            <div class="flex justify-between items-center">
-                <div>Unloaded Summery</div>
-                <button
-                    class="text-gray-500 jus text-right hover:text-red-500 focus:outline-none"
-                    @click="$emit('close')"
-                >
-                    <svg class="size-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 18 18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </div>
+    <Dialog :style="{ width: '50rem' }" :visible="visible" header="Unloaded Summery" modal
+            @update:visible="(newValue) => $emit('update:visible', newValue)">
 
-        </template>
-        <template #content>
+        <div class="grid grid-cols-3 gap-4 mb-4">
+            <Card
+                v-for="(packageData, index) in uniqueContainerArray"
+                :key="index"
+                class="!shadow-md !border rounded-2xl bg-white"
+            >
+                <template #content>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center justify-center w-12 h-12 bg-info/10 text-info rounded-full">
+                            <i class="ti ti-box text-2xl"></i>
+                        </div>
+                        <div>
+                            <div class="text-lg font-semibold text-gray-800">
+                                {{ packageData.hbl.hbl_number }}
+                            </div>
+                            <div class="text-sm text-success flex items-center gap-1 mt-1">
+                                <i class="ti ti-packages"></i>
+                                {{ countPackages(packageData.hbl_id) }} Packages
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </Card>
+        </div>
 
-            <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                <table class="is-hoverable w-full text-left">
-                    <thead>
-                    <tr>
-                        <th
-                            class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            #
-                        </th>
-                        <th
-                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            HBL
-                        </th>
-                        <th
-                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            Unloaded Packages
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="(packageData, index) in uniqueContainerArray"
-                        class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
-                        <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                            {{ packageData.hbl.hbl_number }}
-                        </td>
-                        <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
-                            {{ countPackages(packageData.hbl_id) }}
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div v-if="warehouseMHBLs.length > 0" class="grid grid-cols-3 gap-4">
+            <Card v-for="(mhbl, index) in warehouseMHBLs" class="!shadow-md !border rounded-2xl bg-white">
+                <template #content>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center justify-center w-12 h-12 bg-warning/10 text-warning rounded-full">
+                            <i class="ti ti-box text-2xl"></i>
+                        </div>
+                        <div>
+                            <div class="text-lg font-semibold text-gray-800">
+                                {{ mhbl.packages[0].hbl.mhbl.hbl_number || mhbl.mhblReference }}
+                            </div>
+                            <div class="text-sm text-success flex items-center gap-1 mt-1">
+                                <i class="ti ti-packages"></i>
+                                {{ mhbl.packages.length }} Packages
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </Card>
+        </div>
 
-            <div class="is-scrollbar-hidden min-w-full overflow-x-auto mt-2">
-                <table class="is-hoverable w-full text-left">
-                    <thead>
-                    <tr>
-                        <th
-                            class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            #
-                        </th>
-                        <th
-                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            MHBL
-                        </th>
-                        <th
-                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            Total Packages
-                        </th>
-                        <th
-                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            Loaded Packages
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="(mhbl, index) in warehouseMHBLs" class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
-                        <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.packages[0].hbl.mhbl.hbl_number || mhbl.mhblReference }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.packages.length }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.packages.length }}</td>
-
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </template>
-
-        <template #footer>
-            <div class="flex space-x-2">
-                <SecondaryButton @click="$emit('close')">
-                    Cancel
-                </SecondaryButton>
-                <PrimaryButton @click.prevent="handleFinishUnloading">
-                    Finish Unloading
-                </PrimaryButton>
-            </div>
-        </template>
-    </DialogModal>
+        <div class="flex justify-end gap-2 mt-5">
+            <Button label="Cancel" severity="secondary" type="button" @click="emit('close')"></Button>
+            <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" label="Finish Unload"
+                    type="button"
+                    @click="handleFinishUnloading"></Button>
+        </div>
+    </Dialog>
 </template>
