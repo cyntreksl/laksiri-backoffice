@@ -14,9 +14,13 @@ import InputNumber from "primevue/inputnumber";
 import InputText from "primevue/inputtext";
 import DatePicker from "primevue/datepicker";
 import IftaLabel from "primevue/iftalabel";
-import {useForm, usePage} from "@inertiajs/vue3";
+import {router, useForm, usePage} from "@inertiajs/vue3";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import VirtualScroller from 'primevue/virtualscroller';
+import LoadedShipmentDetailDialog from "@/Pages/Common/Dialog/Container/Index.vue";
+import {useConfirm} from "primevue/useconfirm";
+import {push} from "notivue";
 
 const props = defineProps({
     vesselSchedules: {
@@ -27,7 +31,22 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    containerStatus: {
+        type: Array,
+        default: () => [],
+    },
+    seaContainerOptions: {
+        type: Array,
+        required: true,
+    },
+    airContainerOptions: {
+        type: Array,
+        required: true,
+    },
 });
+
+const showConfirmLoadedShipmentModal = ref(false);
+const confirm = useConfirm();
 
 const form = useForm({
     do_charges: 0,
@@ -47,7 +66,6 @@ const selectedContainer = ref(props.containers[0]);
 const containerData = ref({});
 const filteredHBLS = ref([]);
 const filteredMHBLS = ref([]);
-const filteredMHBLsLHBL = ref([]);
 
 const fetchLoadedContainer = async () => {
     try {
@@ -68,9 +86,11 @@ const fetchLoadedContainer = async () => {
         console.error("Error:", error);
     }
 };
+
 onMounted(() => {
     fetchLoadedContainer();
 });
+
 watch(
     [
         () => selectedContainer.value,
@@ -79,6 +99,7 @@ watch(
         fetchLoadedContainer();
     }
 );
+
 const hbls = () => {
     const hbls = containerData.value.hbls;
     filteredHBLS.value = Object.values(hbls).filter(hbl => hbl.mhbl === null);
@@ -88,19 +109,70 @@ const mhbls = () => {
     const hbls = containerData.value.hbls;
     filteredMHBLS.value = Object.values(hbls).filter(hbl => hbl.mhbl !== null);
 }
+
+const closeModal = () => {
+    showConfirmLoadedShipmentModal.value = false;
+};
+
+const confirmVesselClear = (id) => {
+    confirm.require({
+        message: 'Are you sure you want to release this vessel?',
+        header: 'Vessel Release?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Release Vessel',
+            severity: 'warn'
+        },
+        accept: () => {
+
+        },
+        reject: () => {
+        }
+    });
+};
+
+const confirmVesselReturn = (id) => {
+    confirm.require({
+        message: 'Are you sure you want to return or reject this vessel?',
+        header: 'Vessel Return?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Release Vessel',
+            severity: 'danger'
+        },
+        accept: () => {
+
+        },
+        reject: () => {
+        }
+    });
+};
+
 </script>
 
 <template>
     <AppLayout title="Vessel Schedule">
         <template #header>Vessel Schedule</template>
 
-        <Breadcrumb />
+        <Breadcrumb/>
 
-        <div class="flex items-center mt-5 space-x-2">
-            <h1 class="text-3xl ml-2 font-medium text-gray-700">
+        <div class="mt-5 space-x-2">
+            <h1 class="text-3xl ml-1 font-medium text-gray-700">
                 Vessel Schedule
             </h1>
-            <div class="flex items-center space-x-2 text-xs text-gray-400">
+            <div class="flex items-center space-x-2 text-gray-400">
                 <div>{{ vesselSchedules?.start_date }}</div>
                 <div><i class="ti ti-arrow-narrow-right text-xl"></i></div>
                 <div>{{ vesselSchedules?.end_date }}</div>
@@ -119,35 +191,38 @@ const mhbls = () => {
                 </template>
                 <template #subtitle>{{ containers.length }} Vessels</template>
                 <template #content>
-                    <div class="space-y-5">
-                        <Card
-                            v-for="(container, index) in vesselSchedules?.containers"
-                            :key="index"
-                            @click="selectedContainer = container"
-                            :class="[
-                                '!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out border-2',
-                                selectedContainer?.reference === container.reference
-                                    ? 'bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 text-white'
-                                    : 'border-black hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white'
-                            ]"
-                        >
-                            <template #content>
-                                <div class="flex justify-between text-sm">
-                                    <div>{{ container?.container_type }}</div>
-                                    <div>{{ container?.cargo_type }}</div>
-                                    <div>{{ container?.warehouse.name }}</div>
-                                </div>
-                                <div class="my-8 flex items-center justify-between">
-                                    <h1 class="text-3xl font-medium">{{ container?.reference }}</h1>
-                                    <i class="ti ti-ship text-4xl"></i>
-                                </div>
-                                <div class="flex justify-between text-sm">
-                                    <div>{{ container?.bl_number }}</div>
-                                    <div>{{ container?.awb_number}}</div>
-                                </div>
-                            </template>
-                        </Card>
-                    </div>
+                    <VirtualScroller :item-size="vesselSchedules?.containers.length"
+                                     :items="vesselSchedules?.containers" style="height: 400px">>
+                        <template v-slot:item="{ item, options }">
+                            <Card
+                                :class="[
+'!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out border-2 mb-3',
+selectedContainer?.id === item?.id
+? '!border-none !bg-gradient-to-r !from-gray-700 !via-gray-800 !to-gray-900 !text-white'
+: 'border-black hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white'
+]"
+                                style="height: 200px"
+                                @click="selectedContainer = item"
+                            >
+                                <template #content>
+                                    <div class="flex justify-between text-sm">
+                                        <div>{{ item?.container_type }}</div>
+                                        <div>{{ item?.cargo_type }}</div>
+                                        <div>{{ item?.warehouse.name }}</div>
+                                    </div>
+                                    <div class="my-8 flex items-center justify-between">
+                                        <h1 class="text-3xl font-medium">{{ item?.reference }}</h1>
+                                        <i class="ti ti-ship text-4xl"></i>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <div>{{ item?.bl_number }}</div>
+                                        <div>{{ item?.awb_number }}</div>
+                                    </div>
+                                </template>
+                            </Card>
+                        </template>
+                    </VirtualScroller>
+
                 </template>
             </Card>
 
@@ -158,21 +233,25 @@ const mhbls = () => {
                         <div>
                             <div class="flex items-center space-x-2 text-xs text-gray-400">
                                 <div class="flex items-center">
-                                    <i class="ti ti-plane-departure text-xl mr-2"></i> {{selectedContainer?.branch.name}}
+                                    <i class="ti ti-plane-departure text-xl mr-2"></i>
+                                    {{ selectedContainer?.branch.name }}
                                 </div>
                                 <div><i class="ti ti-arrow-narrow-right text-xl"></i></div>
                                 <div class="flex items-center">
-                                    <i class="ti ti-plane-arrival text-xl mr-2"></i> {{selectedContainer?.warehouse.name}}
+                                    <i class="ti ti-plane-arrival text-xl mr-2"></i>
+                                    {{ selectedContainer?.warehouse.name }}
                                 </div>
                             </div>
                             <div class="flex items-center space-x-2">
-                                <div class="text-xl">{{selectedContainer.reference}}</div>
-                                <Button icon="pi pi-eye" rounded severity="info" size="small" variant="text" />
+                                <div class="text-xl">{{ selectedContainer.reference }}</div>
+                                <Button icon="pi pi-eye" rounded severity="info" size="small" variant="text" @click.prevent="showConfirmLoadedShipmentModal = !showConfirmLoadedShipmentModal"/>
                             </div>
                         </div>
                         <div class="space-x-2">
-                            <Button v-tooltip.left="'Clear Vessel'" icon="pi pi-check" rounded severity="success" size="small" variant="outlined" />
-                            <Button v-tooltip.left="'Mark As Return'" icon="pi pi-times" rounded severity="danger" size="small" variant="outlined" />
+                            <Button v-tooltip.left="'Clear Vessel'" icon="pi pi-check" rounded severity="success"
+                                    size="small" variant="outlined" @click.prevent="confirmVesselClear()"/>
+                            <Button v-tooltip.left="'Mark As Return'" icon="pi pi-times" rounded severity="danger"
+                                    size="small" variant="outlined" @click.prevent="confirmVesselReturn()"/>
                         </div>
                     </div>
                 </template>
@@ -188,7 +267,8 @@ const mhbls = () => {
                         <TabPanels>
                             <!-- HBLs Tab -->
                             <TabPanel value="0">
-                                <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]" :value="filteredHBLS" paginator row-hover
+                                <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]" :value="filteredHBLS"
+                                           paginator row-hover
                                            tableStyle="min-width: 50rem">
                                     <template #empty>No HBLs found.</template>
                                     <Column class="font-bold" field="hbl_number" header="HBL"></Column>
@@ -203,15 +283,16 @@ const mhbls = () => {
                                     <Column field="hbl_name" header="HBL Name">
                                         <template #body="slotProps">
                                             <div>{{ slotProps.data.hbl_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{slotProps.data.nic}}</div>
-                                            <div class="text-gray-500 text-sm">{{slotProps.data.address}}</div>
+                                            <div class="text-gray-500 text-sm">{{ slotProps.data.nic }}</div>
+                                            <div class="text-gray-500 text-sm">{{ slotProps.data.address }}</div>
                                         </template>
                                     </Column>
                                     <Column field="contact_number" header="Contact"></Column>
                                     <Column field="consignee_name" header="Consignee">
                                         <template #body="slotProps">
                                             <div>{{ slotProps.data.consignee_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{slotProps.data.consignee_address}}</div>
+                                            <div class="text-gray-500 text-sm">{{ slotProps.data.consignee_address }}
+                                            </div>
                                         </template>
                                     </Column>
                                 </DataTable>
@@ -219,7 +300,8 @@ const mhbls = () => {
 
                             <!-- HBLs Tab -->
                             <TabPanel value="1">
-                                <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]" :value="filteredMHBLS" paginator row-hover
+                                <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]" :value="filteredMHBLS"
+                                           paginator row-hover
                                            tableStyle="min-width: 50rem">
                                     <template #empty>No MHBLs found.</template>
                                     <Column class="font-bold" field="mhbl" header="MHBL">
@@ -243,8 +325,8 @@ const mhbls = () => {
                                     <Column field="hbl_name" header="Name">
                                         <template #body="slotProps">
                                             <div>{{ slotProps.data.hbl_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{slotProps.data.nic}}</div>
-                                            <div class="text-gray-500 text-sm">{{slotProps.data.address}}</div>
+                                            <div class="text-gray-500 text-sm">{{ slotProps.data.nic }}</div>
+                                            <div class="text-gray-500 text-sm">{{ slotProps.data.address }}</div>
                                         </template>
                                     </Column>
                                     <Column field="contact_number" header="Contact">
@@ -255,7 +337,8 @@ const mhbls = () => {
                                     <Column field="consignee_name" header="Consignee">
                                         <template #body="slotProps">
                                             <div>{{ slotProps.data.consignee_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{slotProps.data.consignee_address}}</div>
+                                            <div class="text-gray-500 text-sm">{{ slotProps.data.consignee_address }}
+                                            </div>
                                         </template>
                                     </Column>
                                 </DataTable>
@@ -266,54 +349,69 @@ const mhbls = () => {
                                 <div class="grid grid-cols-2 gap-5">
                                     <div>
                                         <IftaLabel>
-                                            <InputNumber v-model="form.do_charges" :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="do-charge" min="0" step="any" variant="filled" />
+                                            <InputNumber v-model="form.do_charges" :maxFractionDigits="2"
+                                                         :minFractionDigits="2" class="w-full" inputId="do-charge"
+                                                         min="0" step="any" variant="filled"/>
                                             <label for="do-charge">DO Charge</label>
                                         </IftaLabel>
-                                        <InputError :message="form.errors.do_charges" />
+                                        <InputError :message="form.errors.do_charges"/>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputNumber v-model="form.demurrage_charges" :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="demurrage-charge" min="0" step="any" variant="filled" />
+                                            <InputNumber v-model="form.demurrage_charges" :maxFractionDigits="2"
+                                                         :minFractionDigits="2" class="w-full"
+                                                         inputId="demurrage-charge" min="0" step="any"
+                                                         variant="filled"/>
                                             <label for="demurrage-charge">Demurrage Charge</label>
                                         </IftaLabel>
-                                        <InputError :message="form.errors.demurrage_charges" />
+                                        <InputError :message="form.errors.demurrage_charges"/>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputNumber v-model="form.assessment_charges" :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="assessment-charge" min="0" step="any" variant="filled" />
+                                            <InputNumber v-model="form.assessment_charges" :maxFractionDigits="2"
+                                                         :minFractionDigits="2" class="w-full"
+                                                         inputId="assessment-charge" min="0" step="any"
+                                                         variant="filled"/>
                                             <label for="assessment-charge">Assessment Charge</label>
                                         </IftaLabel>
-                                        <InputError :message="form.errors.assessment_charges" />
+                                        <InputError :message="form.errors.assessment_charges"/>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputNumber v-model="form.slap_charges" :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="slap-charge" min="0" step="any" variant="filled" />
+                                            <InputNumber v-model="form.slap_charges" :maxFractionDigits="2"
+                                                         :minFractionDigits="2" class="w-full" inputId="slap-charge"
+                                                         min="0" step="any" variant="filled"/>
                                             <label for="slap-charge">SLAP Charge</label>
                                         </IftaLabel>
-                                        <InputError :message="form.errors.slap_charges" />
+                                        <InputError :message="form.errors.slap_charges"/>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputNumber v-model="form.refund" :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="refund-charge" min="0" step="any" variant="filled" />
+                                            <InputNumber v-model="form.refund" :maxFractionDigits="2"
+                                                         :minFractionDigits="2" class="w-full" inputId="refund-charge"
+                                                         min="0" step="any" variant="filled"/>
                                             <label for="refund-charge">Refund</label>
                                         </IftaLabel>
-                                        <InputError :message="form.errors.refund" />
+                                        <InputError :message="form.errors.refund"/>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputNumber v-model="form.clearance_charges" :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="clearance-charge" min="0" step="any" variant="filled" />
+                                            <InputNumber v-model="form.clearance_charges" :maxFractionDigits="2"
+                                                         :minFractionDigits="2" class="w-full"
+                                                         inputId="clearance-charge" min="0" step="any"
+                                                         variant="filled"/>
                                             <label for="clearance-charge">Clearance Charge</label>
                                         </IftaLabel>
-                                        <InputError :message="form.errors.clearance_charges" />
+                                        <InputError :message="form.errors.clearance_charges"/>
                                     </div>
 
                                     <div class="col-span-2 text-right">
-                                        <Button icon="pi pi-save" label="Save Payments" size="small" />
+                                        <Button icon="pi pi-save" label="Save Payments" size="small"/>
                                     </div>
                                 </div>
                             </TabPanel>
@@ -323,22 +421,22 @@ const mhbls = () => {
                                 <div class="grid grid-cols-2 gap-5">
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="documentForm.name" class="w-full" variant="filled" />
+                                            <InputText v-model="documentForm.name" class="w-full" variant="filled"/>
                                             <label>Document Name</label>
                                         </IftaLabel>
-                                        <InputError :message="documentForm.errors.name" />
+                                        <InputError :message="documentForm.errors.name"/>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <DatePicker v-model="documentForm.date" class="w-full" variant="filled" />
+                                            <DatePicker v-model="documentForm.date" class="w-full" variant="filled"/>
                                             <label>Date</label>
                                         </IftaLabel>
-                                        <InputError :message="documentForm.errors.date" />
+                                        <InputError :message="documentForm.errors.date"/>
                                     </div>
 
                                     <div class="col-span-2 text-right">
-                                        <Button icon="pi pi-file-pdf" label="Generate PDF" size="small" />
+                                        <Button icon="pi pi-file-pdf" label="Generate PDF" size="small"/>
                                     </div>
                                 </div>
                             </TabPanel>
@@ -348,4 +446,8 @@ const mhbls = () => {
             </Card>
         </div>
     </AppLayout>
+
+    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="selectedContainer" :container-status="containerStatus" :sea-container-options="seaContainerOptions" :show="showConfirmLoadedShipmentModal"
+                                @close="closeModal"
+                                @update:show="showConfirmLoadedShipmentModal = $event" />
 </template>
