@@ -27,7 +27,7 @@ const props = defineProps({
         <Breadcrumb/>
 
         <div class="flex items-center mt-5 space-x-2">
-            <h1 class="text-3xl ml-2 font-medium text-gray-700">Vessel Schedule</h1>
+            <h1 class="text-3xl ml-2 font-medium text-gray-700">Vessel Schedule {{vesselSchedules.start_date}} to {{vesselSchedules.end_date}}</h1>
         </div>
 
         <div class="grid grid-cols-12 gap-4 my-5">
@@ -47,9 +47,6 @@ const props = defineProps({
                             <div>
                                 Available Vessels
                             </div>
-                        </div>
-                        <div>
-                            <Button aria-label="Notification" icon="pi pi-filter" rounded severity="secondary" size="small" variant="outlined" />
                         </div>
                     </div>
                 </template>
@@ -74,7 +71,7 @@ const props = defineProps({
                                 </div>
 
                                 <div class="my-8 flex items-center justify-between">
-                                    <h1 class="text-3xl font-medium">QT-LD-000019</h1>
+                                    <h1 class="text-3xl font-medium">{{container.reference}}</h1>
                                     <i class="ti ti-ship text-4xl"></i>
                                 </div>
 

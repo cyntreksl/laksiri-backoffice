@@ -15,7 +15,7 @@ class VesselScheduleController extends Controller
     public function index()
     {
         $vesselSchedule = $this->vesselScheduleRepository->getRecentVesselSchedule();
-        $vesselSchedule->load('containers.warehouse');
+        $vesselSchedule->load(['containers.warehouse', 'containers.hbl_packages']);
 
         return Inertia::render('Clearance/VesselSchedule/VesselScheduleList', [
             'vesselSchedules' => $vesselSchedule,
