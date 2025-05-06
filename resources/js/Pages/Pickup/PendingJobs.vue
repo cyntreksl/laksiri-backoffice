@@ -371,12 +371,16 @@ const parsePackageTypes = (str) => {
 
     try {
         const parsed = JSON.parse(str);
-        if (Array.isArray(parsed)) return parsed;
-        return str.split(',').map(type => type.trim());
+        if (Array.isArray(parsed)) {
+            return parsed.map(type => type.trim().replace(/^["']|["']$/g, ''));
+        }
     } catch (e) {
-        return str.split(',').map(type => type.trim());
+        // Fallback: split by comma
     }
+
+    return str.split(',').map(type => type.trim().replace(/^["']|["']$/g, ''));
 };
+
 
 const handleConfirmDriverRemove = (pickupId) => {
     confirm.require({

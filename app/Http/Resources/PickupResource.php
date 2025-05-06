@@ -37,7 +37,7 @@ class PickupResource extends JsonResource
             'driver' => $this->driver?->name ?: '-',
             'pickup_type' => $this->pickup_type ?: '-',
             'pickup_note' => $this->pickup_note ?: '-',
-            'packages' => $this->hbl && $this->hbl->packages->isNotEmpty() ? HBLPackageResource::collection($this->hbl->packages) : ($this->package_types ? implode(', ', json_decode($this->package_types)) : '-'),
+            'packages' => $this->hbl && $this->hbl->packages->isNotEmpty() ? HBLPackageResource::collection($this->hbl->packages) : $this->package_types ,
             'exception_note' => $this->latestPickupException && $this->latestPickupException->exceptionType ? $this->latestPickupException->exceptionType->name : '-',
             'hbl' => $this->whenLoaded('hbl', function () {
                 return new HBLResource($this->hbl);
