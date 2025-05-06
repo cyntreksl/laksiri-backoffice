@@ -53,6 +53,7 @@ const filteredHBLS = ref([]);
 const filteredMHBLS = ref([]);
 const containerPaymentData = ref({});
 const isContainerPayment = ref(false);
+const isFinanceApproved = ref(false);
 
 const form = useForm({
     container_id: selectedContainer.value.id,
@@ -184,6 +185,7 @@ const fetchContainerPayment = async () => {
             form.slpa_charge = containerPaymentData.value.slpa_charge;
             form.refund_charge = containerPaymentData.value.refund_charge;
             form.clearance_charge = containerPaymentData.value.clearance_charge;
+            isFinanceApproved.value = containerPaymentData.value.is_finance_approved;
         }else{
             form.container_id = selectedContainer.value.id;
             form.do_charge = 0;
@@ -192,6 +194,7 @@ const fetchContainerPayment = async () => {
             form.slpa_charge = 0;
             form.refund_charge = 0;
             form.clearance_charge = 0;
+            isFinanceApproved.value = false;
         }
     } catch (error) {
         console.error("Error:", error);
@@ -406,6 +409,7 @@ const handleContainerPaymentCreate = async () => {
                                                     :minFractionDigits="2"
                                                     class="w-full" inputId="do-charge"
                                                     min="0" step="any" variant="filled"
+                                                    :disabled="isFinanceApproved"
                                                 />
                                                 <label for="do-charge">DO Charge</label>
                                             </IftaLabel>
@@ -417,7 +421,7 @@ const handleContainerPaymentCreate = async () => {
                                                 <InputNumber v-model="form.demurrage_charge" :maxFractionDigits="2"
                                                              :minFractionDigits="2" class="w-full"
                                                              inputId="demurrage-charge" min="0" step="any"
-                                                             variant="filled"/>
+                                                             variant="filled" :disabled="isFinanceApproved"/>
                                                 <label for="demurrage-charge">Demurrage Charge</label>
                                             </IftaLabel>
                                             <InputError :message="form.errors.demurrage_charge"/>
@@ -428,7 +432,7 @@ const handleContainerPaymentCreate = async () => {
                                                 <InputNumber v-model="form.assessment_charge" :maxFractionDigits="2"
                                                              :minFractionDigits="2" class="w-full"
                                                              inputId="assessment-charge" min="0" step="any"
-                                                             variant="filled"/>
+                                                             variant="filled" :disabled="isFinanceApproved"/>
                                                 <label for="assessment-charge">Assessment Charge</label>
                                             </IftaLabel>
                                             <InputError :message="form.errors.assessment_charge"/>
@@ -438,7 +442,7 @@ const handleContainerPaymentCreate = async () => {
                                             <IftaLabel>
                                                 <InputNumber v-model="form.slpa_charge" :maxFractionDigits="2"
                                                              :minFractionDigits="2" class="w-full" inputId="slap-charge"
-                                                             min="0" step="any" variant="filled"/>
+                                                             min="0" step="any" variant="filled" :disabled="isFinanceApproved"/>
                                                 <label for="slap-charge">SLAP Charge</label>
                                             </IftaLabel>
                                             <InputError :message="form.errors.slpa_charge"/>
@@ -448,7 +452,7 @@ const handleContainerPaymentCreate = async () => {
                                             <IftaLabel>
                                                 <InputNumber v-model="form.refund_charge" :maxFractionDigits="2"
                                                              :minFractionDigits="2" class="w-full" inputId="refund-charge"
-                                                             min="0" step="any" variant="filled"/>
+                                                             min="0" step="any" variant="filled" :disabled="isFinanceApproved"/>
                                                 <label for="refund-charge">Refund</label>
                                             </IftaLabel>
                                             <InputError :message="form.errors.refund_charge"/>
@@ -459,13 +463,13 @@ const handleContainerPaymentCreate = async () => {
                                                 <InputNumber v-model="form.clearance_charge" :maxFractionDigits="2"
                                                              :minFractionDigits="2" class="w-full"
                                                              inputId="clearance-charge" min="0" step="any"
-                                                             variant="filled"/>
+                                                             variant="filled" :disabled="isFinanceApproved"/>
                                                 <label for="clearance-charge">Clearance Charge</label>
                                             </IftaLabel>
                                             <InputError :message="form.errors.clearance_charge"/>
                                         </div>
 
-                                        <div class="col-span-2 text-right">
+                                        <div class="col-span-2 text-right" v-if="!isFinanceApproved">
                                             <Button icon="pi pi-save" :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"  size="small" type="submit"/>
                                         </div>
                                     </div>

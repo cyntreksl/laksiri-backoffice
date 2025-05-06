@@ -259,7 +259,7 @@
 
                             <!-- Container Payments -->
                             <a
-                                v-if="$page.props.user.permissions.includes('payment-container.index')"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('payment-container'))"
                                 :class="[
                                     activeMenu === 'container-payment' ? 'bg-primary/10 text-primary' : '',
                                   ]"
@@ -962,6 +962,16 @@ export default {
                             {
                                 title: "Container Payment Refunds",
                                 route: "container-payment.showContainerPaymentRefund",
+                            }
+                        );
+                    }
+                    if (usePage().props.user.permissions.includes("payment-container.show container payment requests")) {
+                        containerPaymentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Container Payment Requests",
+                                route: "finance.container-payments.index",
                             }
                         );
                     }

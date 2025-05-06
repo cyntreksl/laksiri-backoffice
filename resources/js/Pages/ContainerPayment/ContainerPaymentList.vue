@@ -54,7 +54,7 @@ const form = useForm({
     refund_charge: 0,
     clearance_charge: 0
 });
-const containerReference = ref("")
+const containerReference = ref("");
 const confirmViewEditContainerPayment = (containerPayment) => {
     form.container_id= containerPayment.data.container_id;
     form.do_charge= containerPayment.data.do_charge;
