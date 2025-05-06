@@ -17,7 +17,9 @@ class VesselScheduleController extends Controller
     public function index()
     {
         $vesselSchedule = $this->vesselScheduleRepository->getRecentVesselSchedule();
-        $vesselSchedule->load(['containers.branch', 'containers.warehouse', 'containers.hbl_packages']);
+        if($vesselSchedule){
+            $vesselSchedule->load(['containers.branch', 'containers.warehouse', 'containers.hbl_packages']);
+        }
 
         $seaContainerOptions = ContainerType::getSeaCargoOptions();
         $airContainerOptions = ContainerType::getAirCargoOptions();
@@ -28,7 +30,7 @@ class VesselScheduleController extends Controller
 
         return Inertia::render('Clearance/VesselSchedule/VesselScheduleList', [
             'vesselSchedules' => $vesselSchedule,
-            'containers' => $vesselSchedule->containers,
+            'containers' => $vesselSchedule->containers ?? [],
             'containerStatus' => $containerStatuses,
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
