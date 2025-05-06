@@ -17,11 +17,9 @@ import {debounce} from "lodash";
 import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
-import ToggleSwitch from 'primevue/toggleswitch';
 import InputLabel from "@/Components/InputLabel.vue";
 import Panel from "primevue/panel";
 import DatePicker from "primevue/datepicker";
-import Select from "primevue/select";
 import FloatLabel from "primevue/floatlabel";
 import moment from "moment/moment.js";
 
@@ -262,129 +260,5 @@ const confirmRefundCollection = () => {
                 </DataTable>
             </template>
         </Card>
-
-        <Dialog
-            v-model:visible="isDialogVisible"
-            modal
-            header="Edit Container Payment"
-            :style="{ width: '50rem' }"
-            :block-scroll="true"
-            @hide="onDialogHide"
-            @show="onDialogShow"
-        >
-            <div class="space-y-4 grid grid-cols-2 gap-4">
-                <div class="sm:col-span-2">
-                    <InputLabel value="Container Reference" />
-                    <InputText
-                        v-model="containerReference"
-                        class="w-full"
-                        required
-                        type="text"
-                        disabled
-                    />
-                </div>
-                <div>
-                    <InputLabel value="DO Charge" />
-                    <InputText
-                        v-model="form.do_charge"
-                        class="w-full"
-                        placeholder="Enter DO Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.do_charge" />
-                </div>
-
-                <div>
-                    <InputLabel value="Demurrage Charge" />
-                    <InputText
-                        v-model="form.demurrage_charge"
-                        class="w-full"
-                        placeholder="Enter Demurrage Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.demurrage_charge" />
-                </div>
-
-                <div>
-                    <InputLabel value="Assessment Charge" />
-                    <InputText
-                        v-model="form.assessment_charge"
-                        class="w-full"
-                        placeholder="Enter Assessment Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.assessment_charge" />
-                </div>
-
-                <div>
-                    <InputLabel value="SLPA Charge" />
-                    <InputText
-                        v-model="form.slpa_charge"
-                        class="w-full"
-                        placeholder="Enter SLPA Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.slpa_charge" />
-                </div>
-
-                <div>
-                    <InputLabel value="Refund Charge" />
-                    <InputText
-                        v-model="form.refund_charge"
-                        class="w-full"
-                        placeholder="Enter Refund Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.refund_charge" />
-                </div>
-
-                <div>
-                    <InputLabel value="Clearance Charge" />
-                    <InputText
-                        v-model="form.clearance_charge"
-                        class="w-full"
-                        placeholder="Enter Clearance Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.clearance_charge" />
-                </div>
-
-            </div>
-
-            <!-- Dialog Footer -->
-            <template #footer>
-                <div class="flex flex-wrap justify-end gap-2">
-                    <Button
-                        label="Cancel"
-                        class="p-button-text"
-                        @click="closeEditContainerPaymentModal"
-                    />
-                    <Button
-                        label="Update Container Payment"
-                        class="p-button-primary"
-                        icon="pi pi-check"
-                        @click.prevent="handleEditContainerPayment()"
-                    />
-                </div>
-            </template>
-        </Dialog>
     </AppLayout>
 </template>
