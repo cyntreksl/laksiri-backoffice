@@ -2,7 +2,7 @@
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import PostSkeleton from "@/Components/PostSkeleton.vue";
-import {computed, watch} from "vue";
+import {watch} from "vue";
 import Card from 'primevue/card';
 import Avatar from 'primevue/avatar';
 
@@ -28,25 +28,6 @@ watch(
     },
     { immediate: true }
 );
-
-const parsePackageTypes = (str) => {
-    if (!str) return [];
-
-    if (Array.isArray(str)) return str;
-
-    try {
-        const parsed = JSON.parse(str);
-        if (Array.isArray(parsed)) {
-            return parsed.map(type => type.trim().replace(/^["']|["']$/g, ''));
-        }
-    } catch (e) {
-        // Fallback: comma-separated string
-    }
-
-    return str.split(',').map(type => type.trim().replace(/^["']|["']$/g, ''));
-};
-
-const packageTypes = computed(() => parsePackageTypes(props.package_type));
 </script>
 
 <template>
@@ -112,7 +93,7 @@ const packageTypes = computed(() => parsePackageTypes(props.package_type));
                         <div class="flex items-center space-x-2">
                             <i class="ti ti-package text-xl"></i>
                             <p class="text-xl uppercase font-normal">
-                                {{ packageTypes ?? '-' }}
+                                {{ item.package_type ?? '-' }}
                             </p>
                             <i
                                 v-tooltip="item.is_loaded ? 'Loaded to Shipment' : 'Not Loaded to Shipment'"
