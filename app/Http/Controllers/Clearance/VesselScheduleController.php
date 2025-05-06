@@ -17,7 +17,7 @@ class VesselScheduleController extends Controller
     public function index()
     {
         $vesselSchedule = $this->vesselScheduleRepository->getRecentVesselSchedule();
-        if($vesselSchedule){
+        if ($vesselSchedule) {
             $vesselSchedule->load(['containers.branch', 'containers.warehouse', 'containers.hbl_packages']);
         }
 
