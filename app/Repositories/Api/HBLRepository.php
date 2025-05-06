@@ -8,6 +8,8 @@ use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\GetHBLPackageRules;
+use App\Actions\HBL\UpdateHBLApi;
+use App\Actions\HBL\UpdateHBLPackages;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\Api\HBLRepositoryInterface;
 use App\Models\Branch;
@@ -80,5 +82,18 @@ class HBLRepository implements HBLRepositoryInterface
         } catch (\Exception $e) {
             throw new \Exception('Failed to get package rules '.$e->getMessage());
         }
+    }
+
+    public function updateHBL(HBL $hbl, array $data): JsonResponse
+    {
+        $hbl = UpdateHBLApi::run($hbl, $data);
+
+        $packagesData = $data['packages'] ?? [];
+        UpdateHBLPackages::run($hbl, $packagesData);
+
+        return response()->json([
+            'message' => 'HBL updated successfully.',
+            'data' => $hbl->fresh(),
+        ]);
     }
 }
