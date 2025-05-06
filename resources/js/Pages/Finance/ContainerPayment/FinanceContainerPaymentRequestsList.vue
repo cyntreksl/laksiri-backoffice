@@ -24,33 +24,23 @@ import FloatLabel from "primevue/floatlabel";
 import moment from "moment/moment.js";
 
 const confirm = useConfirm();
-const baseUrl = ref("container-payment-refund-list");
+const baseUrl = ref("container-payments-list");
 const loading = ref(true);
 const containerPayments = ref([]);
 const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
 const selectedContainerPayments = ref([]);
+const selectedContainerPaymentId = ref(null);
 const isDialogVisible = ref(false);
 const showEditContainerPaymentDialog = ref(false);
 const checked = ref(false);
+const showEditNewContainerPaymentDialog = ref(false);
 const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
-
-const form = useForm({
-    container_id: "",
-    container_reference: "",
-    do_charge: 0,
-    demurrage_charge: 0,
-    assessment_charge: 0,
-    slpa_charge: 0,
-    refund_charge: 0,
-    clearance_charge: 0
-});
-const containerReference = ref("")
 
 const fetchContainerPayments = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
     loading.value = true;
@@ -103,23 +93,6 @@ watch(() => fromDate.value, (newValue) => {
     fetchContainerPayments(1, filters.value.global.value);
 });
 
-const closeEditContainerPaymentModal = () => {
-    form.reset();
-    containerReference.value = "";
-    showEditContainerPaymentDialog.value = false;
-    isDialogVisible.value = false;
-}
-
-const onDialogShow = () => {
-    document.body.classList.add('p-overflow-hidden');
-};
-
-const onDialogHide = () => {
-    form.reset();
-    form.clearErrors();
-    document.body.classList.remove('p-overflow-hidden');
-};
-
 // Updated formatDate function with error handling and fallback options
 const formatTime = (timeStr) => {
     const date = new Date(timeStr);
@@ -134,11 +107,11 @@ const formatTime = (timeStr) => {
     return `${day}-${month}-${year} ${hours}:${minutes}`;
 };
 
-const confirmRefundCollection = () => {
+const approveContainerPayments = () => {
     const idList = selectedContainerPayments.value.map((item) => item.id);
     confirm.require({
-        message: 'Are you sure you want to mark as Collected?',
-        header: 'Mark As Collected?',
+        message: 'Are you sure you want to approve container payments?',
+        header: 'Approve Container Payments?',
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
         rejectProps: {
@@ -147,21 +120,21 @@ const confirmRefundCollection = () => {
             outlined: true
         },
         acceptProps: {
-            label: 'Mark As Collected',
+            label: 'Approve Container Payments',
             severity: 'success'
         },
         accept: async () => {
-            router.post(route("container-payment.refund-collection"), {
+            router.post(route("finance.container-payment.approve"), {
                 data: {
                     container_payments_ids: idList,
                 },
+                preserveScroll: true,
                 onSuccess: () => {
-                    push.success("Container Payment marked as collected successfully!");
+                    push.success("Container Payment Approved successfully!");
                 },
                 onError: () => {
                     push.error("Something went wrong!");
                 },
-                preserveScroll: true,
             });
             selectedContainerPayments.value = [];
             await fetchContainerPayments();
@@ -170,12 +143,13 @@ const confirmRefundCollection = () => {
             selectedContainerPayments.value = [];
         }
     });
-};
+}
+
 
 </script>
 <template>
-    <AppLayout title="Container Refunds">
-        <template #header>Container Refunds</template>
+    <AppLayout title="Container Payments Requests">
+        <template #header>Container Payments Requests</template>
         <Breadcrumb/>
 
         <div>
@@ -209,15 +183,15 @@ const confirmRefundCollection = () => {
                     <template #header>
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                             <div class="text-lg font-medium">
-                                Container Refunds
+                                Container Payment Requests
                             </div>
                             <div class="flex items-center gap-3">
                                 <Button
                                     type="button"
-                                    v-if="usePage().props.user.permissions.includes('payment-container.collect refund')"
-                                    label="Mark As Collected" icon="ti ti-cash"
+                                    v-if="usePage().props.user.permissions.includes('payment-container.approve')"
+                                    label="Approve Container Payments" icon="ti ti-cash"
                                     :disabled="selectedContainerPayments.length === 0"
-                                    @click="confirmRefundCollection" />
+                                    @click="approveContainerPayments" />
                             </div>
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -235,7 +209,7 @@ const confirmRefundCollection = () => {
                             </IconField>
                         </div>
                     </template>
-                    <template #empty> No Container Refunds found. </template>
+                    <template #empty> No Container Payment found. </template>
                     <template #loading> Loading Container Payment data. Please wait.</template>
                     <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
                     <Column field="containerReference" header="Container Reference" sortable></Column>
@@ -251,12 +225,7 @@ const confirmRefundCollection = () => {
                             {{formatTime(data.created_at)}}
                         </template>
                     </Column>
-                    <Column field="is_finance_approved" header="Finance Approval" >
-                        <template #body="{ data }">
-                            <i :class="{ 'pi-check-circle text-green-500': data.is_finance_approved, 'pi-times-circle text-red-400': !data.is_finance_approved }" class="pi"></i>
-                        </template>
-                    </Column>
-                    <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} Container Refunds.</template>
+                    <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} Container Payments.</template>
                 </DataTable>
             </template>
         </Card>

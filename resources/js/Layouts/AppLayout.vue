@@ -965,6 +965,16 @@ export default {
                             }
                         );
                     }
+                    if (usePage().props.user.permissions.includes("payment-container.show container payment requests")) {
+                        containerPaymentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Container Payment Requests",
+                                route: "finance.container-payments.index",
+                            }
+                        );
+                    }
                     childMenuList.splice(
                         0,
                         childMenuList.length,
