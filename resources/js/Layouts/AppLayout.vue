@@ -259,7 +259,7 @@
 
                             <!-- Container Payments -->
                             <a
-                                v-if="$page.props.user.permissions.includes('payment-container.index')"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('payment-container'))"
                                 :class="[
                                     activeMenu === 'container-payment' ? 'bg-primary/10 text-primary' : '',
                                   ]"
