@@ -46,4 +46,27 @@ class ContainerPaymentController extends Controller
     {
         return $this->containerPaymentRepository->delete($containerPayment);
     }
+
+    public function showContainerPaymentRefund()
+    {
+        return Inertia::render('ContainerPayment/ContainerPaymentRefundList');
+    }
+
+    public function refundList(Request $request)
+    {
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
+
+        return $this->containerPaymentRepository->refundDataset($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function markRefundAsCollected(Request $request)
+    {
+        $this->containerPaymentRepository->markRefundCollection($request['data']['container_payments_ids']);
+    }
 }

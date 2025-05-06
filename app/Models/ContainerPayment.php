@@ -23,6 +23,10 @@ class ContainerPayment extends Model
         'total',
         'is_finance_approved',
         'finance_approved_by',
+        'finance_approved_date',
+        'is_refund_collected',
+        'refund_collected_by',
+        'refund_collected_date',
         'created_by',
     ];
 

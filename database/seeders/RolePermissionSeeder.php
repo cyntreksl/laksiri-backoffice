@@ -410,8 +410,10 @@ class RolePermissionSeeder extends Seeder
                     'payment-container.create',
                     'payment-container.edit',
                     'payment-container.delete',
+                    'payment-container.refund list',
                     'payment-container.approve',
                     'payment-container.approved list',
+                    'payment-container.collect refund',
                 ],
             ],
         ];

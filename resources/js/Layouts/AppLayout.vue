@@ -955,6 +955,16 @@ export default {
                             }
                         );
                     }
+                    if (usePage().props.user.permissions.includes("payment-container.refund list")) {
+                        containerPaymentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Container Payment Refunds",
+                                route: "container-payment.showContainerPaymentRefund",
+                            }
+                        );
+                    }
                     childMenuList.splice(
                         0,
                         childMenuList.length,
