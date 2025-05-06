@@ -259,7 +259,7 @@
 
                             <!-- Container Payments -->
                             <a
-                                v-if="$page.props.user.permissions.includes('vessel.schedule.index')"
+                                v-if="$page.props.user.permissions.includes('payment-container.index')"
                                 :class="[
                                     activeMenu === 'container-payment' ? 'bg-primary/10 text-primary' : '',
                                   ]"
@@ -945,13 +945,13 @@ export default {
                     break;
                 case "container-payment":
                     let containerPaymentMenu = [];
-                    if (usePage().props.user.permissions.includes("vessel.schedule.index")) {
+                    if (usePage().props.user.permissions.includes("payment-container.index")) {
                         containerPaymentMenu.splice(
                             2,
                             0,
                             {
                                 title: "Container Payment Requests",
-                                route: "clearance.vessel-schedule.index",
+                                route: "container-payment.index",
                             }
                         );
                     }

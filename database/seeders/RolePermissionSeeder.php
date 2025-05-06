@@ -404,14 +404,14 @@ class RolePermissionSeeder extends Seeder
                 ],
             ],
             [
-                'group_name' => 'Container Payment',
+                'group_name' => 'Payment Container',
                 'permissions' => [
-                    'container-payment.index',
-                    'container-payment.create',
-                    'container-payment.edit',
-                    'container-payment.delete',
-                    'container-payment.approve',
-                    'container-payment.approved list',
+                    'payment-container.index',
+                    'payment-container.create',
+                    'payment-container.edit',
+                    'payment-container.delete',
+                    'payment-container.approve',
+                    'payment-container.approved list',
                 ],
             ],
         ];

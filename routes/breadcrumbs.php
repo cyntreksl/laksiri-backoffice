@@ -498,6 +498,13 @@ Breadcrumbs::for('setting.pickup-types.index', function (BreadcrumbTrail $trail)
     $trail->push('Pickup Types', route('setting.pickup-types.index'));
 });
 
+// Container Payment
+Breadcrumbs::for('container-payment.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Container Payment');
+    $trail->push('List', route('container-payment.index'));
+});
+
 require_once __DIR__.'/call-center-breadcrumbs.php';
 require_once __DIR__.'/finance-breadcrumbs.php';
 require_once __DIR__.'/clearance-breadcrumbs.php';

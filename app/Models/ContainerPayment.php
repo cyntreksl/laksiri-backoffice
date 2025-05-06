@@ -29,4 +29,9 @@ class ContainerPayment extends Model
     protected $casts = [
         'is_finance_approved' => 'boolean',
     ];
+
+    public function container()
+    {
+        return $this->belongsTo(Container::class, 'container_id');
+    }
 }

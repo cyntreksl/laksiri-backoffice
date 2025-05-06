@@ -10,4 +10,6 @@ interface ContainerPaymentRepositoryInterface
     public function getContainerPayment(Container $container);
 
     public function store(array $data): ContainerPayment;
+
+    public function delete(ContainerPayment $containerPayment);
 }
