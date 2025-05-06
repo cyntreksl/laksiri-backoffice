@@ -79,7 +79,7 @@ const fetchLoadedContainer = async () => {
             },
         });
         if (!response.ok) {
-            throw new Error(`Failed to fetch container ${props.container.id}`);
+            throw new Error(`Failed to fetch container ${selectedContainer.value.id}`);
         }
         containerData.value = (await response.json())[0];
         hbls();
@@ -173,18 +173,25 @@ const fetchContainerPayment = async () => {
             },
         });
         if (!response.ok) {
-            throw new Error(`Failed to fetch container ${props.container.id}`);
+            throw new Error(`Failed to fetch container payments ${selectedContainer.value.id}`);
         }
         containerPaymentData.value = (await response.json());
         isContainerPayment.value = Object.keys(containerPaymentData.value).length > 0;
         if (containerPaymentData.value && Object.keys(containerPaymentData.value).length > 0) {
-            console.log(containerPaymentData.value);
             form.do_charge = containerPaymentData.value.do_charge;
             form.demurrage_charge = containerPaymentData.value.demurrage_charge;
             form.assessment_charge = containerPaymentData.value.assessment_charge;
             form.slpa_charge = containerPaymentData.value.slpa_charge;
             form.refund_charge = containerPaymentData.value.refund_charge;
             form.clearance_charge = containerPaymentData.value.clearance_charge;
+        }else{
+            form.container_id = selectedContainer.value.id;
+            form.do_charge = 0;
+            form.demurrage_charge = 0;
+            form.assessment_charge = 0;
+            form.slpa_charge = 0;
+            form.refund_charge = 0;
+            form.clearance_charge = 0;
         }
     } catch (error) {
         console.error("Error:", error);
@@ -399,7 +406,6 @@ const handleContainerPaymentCreate = async () => {
                                                     :minFractionDigits="2"
                                                     class="w-full" inputId="do-charge"
                                                     min="0" step="any" variant="filled"
-                                                    :disabled="isContainerPayment"
                                                 />
                                                 <label for="do-charge">DO Charge</label>
                                             </IftaLabel>
@@ -411,7 +417,7 @@ const handleContainerPaymentCreate = async () => {
                                                 <InputNumber v-model="form.demurrage_charge" :maxFractionDigits="2"
                                                              :minFractionDigits="2" class="w-full"
                                                              inputId="demurrage-charge" min="0" step="any"
-                                                             variant="filled" :disabled="isContainerPayment"/>
+                                                             variant="filled"/>
                                                 <label for="demurrage-charge">Demurrage Charge</label>
                                             </IftaLabel>
                                             <InputError :message="form.errors.demurrage_charge"/>
@@ -422,7 +428,7 @@ const handleContainerPaymentCreate = async () => {
                                                 <InputNumber v-model="form.assessment_charge" :maxFractionDigits="2"
                                                              :minFractionDigits="2" class="w-full"
                                                              inputId="assessment-charge" min="0" step="any"
-                                                             variant="filled" :disabled="isContainerPayment"/>
+                                                             variant="filled"/>
                                                 <label for="assessment-charge">Assessment Charge</label>
                                             </IftaLabel>
                                             <InputError :message="form.errors.assessment_charge"/>
@@ -432,7 +438,7 @@ const handleContainerPaymentCreate = async () => {
                                             <IftaLabel>
                                                 <InputNumber v-model="form.slpa_charge" :maxFractionDigits="2"
                                                              :minFractionDigits="2" class="w-full" inputId="slap-charge"
-                                                             min="0" step="any" variant="filled" :disabled="isContainerPayment"/>
+                                                             min="0" step="any" variant="filled"/>
                                                 <label for="slap-charge">SLAP Charge</label>
                                             </IftaLabel>
                                             <InputError :message="form.errors.slpa_charge"/>
@@ -442,7 +448,7 @@ const handleContainerPaymentCreate = async () => {
                                             <IftaLabel>
                                                 <InputNumber v-model="form.refund_charge" :maxFractionDigits="2"
                                                              :minFractionDigits="2" class="w-full" inputId="refund-charge"
-                                                             min="0" step="any" variant="filled" :disabled="isContainerPayment"/>
+                                                             min="0" step="any" variant="filled"/>
                                                 <label for="refund-charge">Refund</label>
                                             </IftaLabel>
                                             <InputError :message="form.errors.refund_charge"/>
@@ -453,14 +459,14 @@ const handleContainerPaymentCreate = async () => {
                                                 <InputNumber v-model="form.clearance_charge" :maxFractionDigits="2"
                                                              :minFractionDigits="2" class="w-full"
                                                              inputId="clearance-charge" min="0" step="any"
-                                                             variant="filled" :disabled="isContainerPayment"/>
+                                                             variant="filled"/>
                                                 <label for="clearance-charge">Clearance Charge</label>
                                             </IftaLabel>
                                             <InputError :message="form.errors.clearance_charge"/>
                                         </div>
 
-                                        <div class="col-span-2 text-right" v-if="!isContainerPayment">
-                                            <Button icon="pi pi-save" label="Save Payments" size="small" type="submit"/>
+                                        <div class="col-span-2 text-right">
+                                            <Button icon="pi pi-save" :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"  size="small" type="submit"/>
                                         </div>
                                     </div>
                                 </form>
