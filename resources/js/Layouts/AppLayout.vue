@@ -254,6 +254,22 @@
                                     openSideBar();
                                   "
                             >
+                                <i class="ti ti-calendar-stats text-2xl"></i>
+                            </a>
+
+                            <!-- Container Payments -->
+                            <a
+                                v-if="$page.props.user.permissions.includes('vessel.schedule.index')"
+                                :class="[
+                                    activeMenu === 'container-payment' ? 'bg-primary/10 text-primary' : '',
+                                  ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Container Payment'"
+                                @click="
+                                    setMenu('container-payment');
+                                    openSideBar();
+                                  "
+                            >
                                 <i class="ti ti-container text-2xl"></i>
                             </a>
                             <!-- User Management -->
@@ -926,6 +942,25 @@ export default {
                         ...vesselScheduleMenu
                     );
                     changeSidePanelTitle("Vessel Schedule");
+                    break;
+                case "container-payment":
+                    let containerPaymentMenu = [];
+                    if (usePage().props.user.permissions.includes("vessel.schedule.index")) {
+                        containerPaymentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Container Payment Requests",
+                                route: "clearance.vessel-schedule.index",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...containerPaymentMenu
+                    );
+                    changeSidePanelTitle("Container Payment");
                     break;
                 case "reception":
                     let receptionMenu = [];
