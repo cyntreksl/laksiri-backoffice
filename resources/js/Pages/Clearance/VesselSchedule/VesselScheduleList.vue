@@ -47,7 +47,7 @@ const props = defineProps({
 
 const showConfirmLoadedShipmentModal = ref(false);
 const confirm = useConfirm();
-const selectedContainer = ref(props.containers[0]);
+const selectedContainer = ref(props.containers[0] ?? {});
 const containerData = ref({});
 const filteredHBLS = ref([]);
 const filteredMHBLS = ref([]);
@@ -56,7 +56,7 @@ const isContainerPayment = ref(false);
 const isFinanceApproved = ref(false);
 
 const form = useForm({
-    container_id: selectedContainer.value.id,
+    container_id: selectedContainer.value.id ?? '',
     do_charge: 0,
     demurrage_charge: 0,
     assessment_charge: 0,
@@ -227,7 +227,7 @@ const handleContainerPaymentCreate = async () => {
             </h1>
             <div class="flex items-center space-x-2 text-gray-400">
                 <div>{{ vesselSchedules?.start_date }}</div>
-                <div><i class="ti ti-arrow-narrow-right text-xl"></i></div>
+                <div><i class="ti ti-arrow-narrow-right text-xl" v-if="vesselSchedules?.end_date"></i></div>
                 <div>{{ vesselSchedules?.end_date }}</div>
             </div>
         </div>
@@ -287,16 +287,16 @@ const handleContainerPaymentCreate = async () => {
                             <div class="flex items-center space-x-2 text-xs text-gray-400">
                                 <div class="flex items-center">
                                     <i class="ti ti-plane-departure text-xl mr-2"></i>
-                                    {{ selectedContainer?.branch.name }}
+                                    {{ selectedContainer?.branch?.name ?? '' }}
                                 </div>
                                 <div><i class="ti ti-arrow-narrow-right text-xl"></i></div>
                                 <div class="flex items-center">
                                     <i class="ti ti-plane-arrival text-xl mr-2"></i>
-                                    {{ selectedContainer?.warehouse.name }}
+                                    {{ selectedContainer?.warehouse?.name ?? '' }}
                                 </div>
                             </div>
                             <div class="flex items-center space-x-2">
-                                <div class="text-xl">{{ selectedContainer.reference }}</div>
+                                <div class="text-xl">{{ selectedContainer.reference ?? '' }}</div>
                                 <Button icon="pi pi-eye" rounded severity="info" size="small" variant="text" @click.prevent="showConfirmLoadedShipmentModal = !showConfirmLoadedShipmentModal"/>
                             </div>
                         </div>
