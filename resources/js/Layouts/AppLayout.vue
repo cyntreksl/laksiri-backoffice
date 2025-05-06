@@ -242,17 +242,20 @@
                                 <i class="ti ti-truck-delivery text-2xl"></i>
                             </a>
                             <!-- Vessel Schedule -->
-                            <Link
+                            <a
                                 v-if="$page.props.user.permissions.includes('vessel.schedule.index')"
                                 :class="[
-                activeMenu === 'vessel' ? 'bg-primary/10 text-primary' : '',
-              ]"
-                                :href="route('clearance.vessel-schedule.index')"
+                                    activeMenu === 'vessel-schedule' ? 'bg-primary/10 text-primary' : '',
+                                  ]"
                                 class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                                 x-tooltip.placement.right="'Vessel Schedule'"
+                                @click="
+                                    setMenu('vessel-schedule');
+                                    openSideBar();
+                                  "
                             >
                                 <i class="ti ti-container text-2xl"></i>
-                            </Link>
+                            </a>
                             <!-- User Management -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('users')) || $page.props.user.permissions.includes('roles.list')"
@@ -904,6 +907,25 @@ export default {
                         ...backOfficeMenu
                     );
                     changeSidePanelTitle("Back Office");
+                    break;
+                case "vessel-schedule":
+                    let vesselScheduleMenu = [];
+                    if (usePage().props.user.permissions.includes("vessel.schedule.index")) {
+                        vesselScheduleMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Vessel Schedule",
+                                route: "clearance.vessel-schedule.index",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...vesselScheduleMenu
+                    );
+                    changeSidePanelTitle("Vessel Schedule");
                     break;
                 case "reception":
                     let receptionMenu = [];
