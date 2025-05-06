@@ -17,27 +17,23 @@ import {debounce} from "lodash";
 import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
-import ToggleSwitch from 'primevue/toggleswitch';
 import InputLabel from "@/Components/InputLabel.vue";
 import Panel from "primevue/panel";
 import DatePicker from "primevue/datepicker";
-import Select from "primevue/select";
 import FloatLabel from "primevue/floatlabel";
 import moment from "moment/moment.js";
 
 const confirm = useConfirm();
-const baseUrl = ref("container-payment-list");
+const baseUrl = ref("container-payment-refund-list");
 const loading = ref(true);
 const containerPayments = ref([]);
 const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
-const selectedContainerPayment = ref(null);
-const selectedContainerPaymentId = ref(null);
+const selectedContainerPayments = ref([]);
 const isDialogVisible = ref(false);
 const showEditContainerPaymentDialog = ref(false);
 const checked = ref(false);
-const showEditNewContainerPaymentDialog = ref(false);
 const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
 
 const filters = ref({
@@ -54,18 +50,7 @@ const form = useForm({
     refund_charge: 0,
     clearance_charge: 0
 });
-const containerReference = ref("");
-const confirmViewEditContainerPayment = (containerPayment) => {
-    form.container_id= containerPayment.data.container_id;
-    form.do_charge= containerPayment.data.do_charge;
-    form.demurrage_charge= containerPayment.data.demurrage_charge;
-    form.assessment_charge= containerPayment.data.assessment_charge;
-    form.slpa_charge= containerPayment.data.slpa_charge;
-    form.refund_charge= containerPayment.data.refund_charge;
-    form.clearance_charge= containerPayment.data.clearance_charge;
-    containerReference.value = containerPayment.data.containerReference;
-    isDialogVisible.value = true;
-};
+const containerReference = ref("")
 
 const fetchContainerPayments = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
     loading.value = true;
@@ -149,25 +134,11 @@ const formatTime = (timeStr) => {
     return `${day}-${month}-${year} ${hours}:${minutes}`;
 };
 
-const handleEditContainerPayment = async () => {
-    form.post(route("container-payment.store"), {
-        onSuccess: (page) => {
-            form.reset();
-            closeEditContainerPaymentModal();
-            fetchContainerPayments();
-            push.success("Container Payment Updated Successfully!");
-        },
-        onError: () => console.log("error"),
-        preserveScroll: true,
-        preserveState: true,
-    });
-}
-
-const confirmDeleteContainerPayment = (containerPayment) => {
-    selectedContainerPaymentId.value = containerPayment.data.id;
+const confirmRefundCollection = () => {
+    const idList = selectedContainerPayments.value.map((item) => item.id);
     confirm.require({
-        message: 'Are you sure you want to delete Container Payment?',
-        header: 'Delete Container Payment?',
+        message: 'Are you sure you want to mark as Collected?',
+        header: 'Mark As Collected?',
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
         rejectProps: {
@@ -176,32 +147,35 @@ const confirmDeleteContainerPayment = (containerPayment) => {
             outlined: true
         },
         acceptProps: {
-            label: 'Delete',
-            severity: 'warn'
+            label: 'Mark As Collected',
+            severity: 'success'
         },
-        accept: () => {
-            router.delete(route("container-payment.destroy", selectedContainerPaymentId.value), {
-                preserveScroll: true,
+        accept: async () => {
+            router.post(route("container-payment.refund-collection"), {
+                data: {
+                    container_payments_ids: idList,
+                },
                 onSuccess: () => {
-                    push.success("Container Payment Deleted Successfully!");
-                    const currentRoute = route().current();
-                    router.visit(route(currentRoute, route().params));
+                    push.success("Container Payment marked as collected successfully!");
                 },
                 onError: () => {
-                    push.error("Something went to wrong!");
+                    push.error("Something went wrong!");
                 },
+                preserveScroll: true,
             });
-            selectedContainerPaymentId.value = null;
+            selectedContainerPayments.value = [];
+            await fetchContainerPayments();
         },
         reject: () => {
-            selectedContainerPaymentId.value = null;
+            selectedContainerPayments.value = [];
         }
     });
 };
+
 </script>
 <template>
-    <AppLayout title="Container Payments">
-        <template #header>Container Payments</template>
+    <AppLayout title="Container Refunds">
+        <template #header>Container Refunds</template>
         <Breadcrumb/>
 
         <div>
@@ -217,7 +191,7 @@ const confirmDeleteContainerPayment = (containerPayment) => {
         <Card class="my-5">
             <template #content>
                 <DataTable
-                    v-model:selection="selectedContainerPayment"
+                    v-model:selection="selectedContainerPayments"
                     :loading="loading"
                     :rows="perPage"
                     :rowsPerPageOptions="[5, 10, 20, 50, 100]"
@@ -235,7 +209,15 @@ const confirmDeleteContainerPayment = (containerPayment) => {
                     <template #header>
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                             <div class="text-lg font-medium">
-                                Container Payments
+                                Container Refunds
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <Button
+                                    type="button"
+                                    v-if="usePage().props.user.permissions.includes('payment-container.collect refund')"
+                                    label="Mark As Collected" icon="ti ti-cash"
+                                    :disabled="selectedContainerPayments.length === 0"
+                                    @click="confirmRefundCollection" />
                             </div>
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -253,8 +235,9 @@ const confirmDeleteContainerPayment = (containerPayment) => {
                             </IconField>
                         </div>
                     </template>
-                    <template #empty> No Container Payment found. </template>
+                    <template #empty> No Container Refunds found. </template>
                     <template #loading> Loading Container Payment data. Please wait.</template>
+                    <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
                     <Column field="containerReference" header="Container Reference" sortable></Column>
                     <Column field="do_charge" header="DO Charge" sortable></Column>
                     <Column field="demurrage_charge" header="Demurrage Charge" sortable></Column>
@@ -273,156 +256,9 @@ const confirmDeleteContainerPayment = (containerPayment) => {
                             <i :class="{ 'pi-check-circle text-green-500': data.is_finance_approved, 'pi-times-circle text-red-400': !data.is_finance_approved }" class="pi"></i>
                         </template>
                     </Column>
-                    <Column field="" header="Actions" style="width: 10%">
-                        <template #body="{ data }">
-                            <Button
-                                icon="pi pi-pencil"
-                                outlined
-                                rounded
-                                size="small"
-                                class="p-1 text-xs h-3 w-3 mr-1"
-                                @click="confirmViewEditContainerPayment({ data })"
-                                :disabled="!usePage().props.user.permissions.includes('payment-container.edit')"
-                            />
-                            <Button
-                                icon="pi pi-trash"
-                                outlined
-                                rounded
-                                severity="danger"
-                                size="small"
-                                @click="confirmDeleteContainerPayment({ data })"
-                                :disabled="!usePage().props.user.permissions.includes('payment-container.delete')"
-                            />
-
-                        </template>
-                    </Column>
-                    <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} Container Payments.</template>
+                    <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} Container Refunds.</template>
                 </DataTable>
             </template>
         </Card>
-
-        <Dialog
-            v-model:visible="isDialogVisible"
-            modal
-            header="Edit Container Payment"
-            :style="{ width: '50rem' }"
-            :block-scroll="true"
-            @hide="onDialogHide"
-            @show="onDialogShow"
-        >
-            <div class="space-y-4 grid grid-cols-2 gap-4">
-                <div class="sm:col-span-2">
-                    <InputLabel value="Container Reference" />
-                    <InputText
-                        v-model="containerReference"
-                        class="w-full"
-                        required
-                        type="text"
-                        disabled
-                    />
-                </div>
-                <div>
-                    <InputLabel value="DO Charge" />
-                    <InputText
-                        v-model="form.do_charge"
-                        class="w-full"
-                        placeholder="Enter DO Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.do_charge" />
-                </div>
-
-                <div>
-                    <InputLabel value="Demurrage Charge" />
-                    <InputText
-                        v-model="form.demurrage_charge"
-                        class="w-full"
-                        placeholder="Enter Demurrage Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.demurrage_charge" />
-                </div>
-
-                <div>
-                    <InputLabel value="Assessment Charge" />
-                    <InputText
-                        v-model="form.assessment_charge"
-                        class="w-full"
-                        placeholder="Enter Assessment Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.assessment_charge" />
-                </div>
-
-                <div>
-                    <InputLabel value="SLPA Charge" />
-                    <InputText
-                        v-model="form.slpa_charge"
-                        class="w-full"
-                        placeholder="Enter SLPA Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.slpa_charge" />
-                </div>
-
-                <div>
-                    <InputLabel value="Refund Charge" />
-                    <InputText
-                        v-model="form.refund_charge"
-                        class="w-full"
-                        placeholder="Enter Refund Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.refund_charge" />
-                </div>
-
-                <div>
-                    <InputLabel value="Clearance Charge" />
-                    <InputText
-                        v-model="form.clearance_charge"
-                        class="w-full"
-                        placeholder="Enter Clearance Charge"
-                        required
-                        type="number"
-                        min="0.00"
-                        step="0.01"
-                    />
-                    <InputError :message="form.errors.clearance_charge" />
-                </div>
-
-            </div>
-
-            <!-- Dialog Footer -->
-            <template #footer>
-                <div class="flex flex-wrap justify-end gap-2">
-                    <Button
-                        label="Cancel"
-                        class="p-button-text"
-                        @click="closeEditContainerPaymentModal"
-                    />
-                    <Button
-                        label="Update Container Payment"
-                        class="p-button-primary"
-                        icon="pi pi-check"
-                        @click.prevent="handleEditContainerPayment()"
-                    />
-                </div>
-            </template>
-        </Dialog>
     </AppLayout>
 </template>

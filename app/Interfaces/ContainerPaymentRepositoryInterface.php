@@ -12,4 +12,6 @@ interface ContainerPaymentRepositoryInterface
     public function store(array $data): ContainerPayment;
 
     public function delete(ContainerPayment $containerPayment);
+
+    public function markRefundCollection(array $containerPaymentIds);
 }

@@ -152,6 +152,7 @@ class RepositoryServiceProvider extends ServiceProvider
 
         // finance repositories
         $this->app->bind(\App\Interfaces\Finance\HBLRepositoryInterface::class, \App\Repositories\Finance\HBLRepository::class);
+        $this->app->bind(\App\Interfaces\Finance\ContainerPaymentRepositoryInterface::class, \App\Repositories\Finance\ContainerPaymentRepository::class);
     }
 
     public function boot(): void {}
