@@ -47,25 +47,27 @@ const props = defineProps({
 
 const showConfirmLoadedShipmentModal = ref(false);
 const confirm = useConfirm();
+const selectedContainer = ref(props.containers[0]);
+const containerData = ref({});
+const filteredHBLS = ref([]);
+const filteredMHBLS = ref([]);
+const containerPaymentData = ref({});
+const isContainerPayment = ref(false);
 
 const form = useForm({
-    do_charges: 0,
-    demurrage_charges: 0,
-    assessment_charges: 0,
-    slap_charges: 0,
-    refund: 0,
-    clearance_charges: 0
+    container_id: selectedContainer.value.id,
+    do_charge: 0,
+    demurrage_charge: 0,
+    assessment_charge: 0,
+    slpa_charge: 0,
+    refund_charge: 0,
+    clearance_charge: 0
 });
 
 const documentForm = useForm({
     name: "",
     date: "",
 });
-
-const selectedContainer = ref(props.containers[0]);
-const containerData = ref({});
-const filteredHBLS = ref([]);
-const filteredMHBLS = ref([]);
 
 const fetchLoadedContainer = async () => {
     try {
@@ -82,6 +84,7 @@ const fetchLoadedContainer = async () => {
         containerData.value = (await response.json())[0];
         hbls();
         mhbls();
+        await fetchContainerPayment();
     } catch (error) {
         console.error("Error:", error);
     }
@@ -160,6 +163,46 @@ const confirmVesselReturn = (id) => {
     });
 };
 
+const fetchContainerPayment = async () => {
+    try {
+        const response = await fetch(`/container-payment/${selectedContainer.value.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch container ${props.container.id}`);
+        }
+        containerPaymentData.value = (await response.json());
+        isContainerPayment.value = Object.keys(containerPaymentData.value).length > 0;
+        if (containerPaymentData.value && Object.keys(containerPaymentData.value).length > 0) {
+            console.log(containerPaymentData.value);
+            form.do_charge = containerPaymentData.value.do_charge;
+            form.demurrage_charge = containerPaymentData.value.demurrage_charge;
+            form.assessment_charge = containerPaymentData.value.assessment_charge;
+            form.slpa_charge = containerPaymentData.value.slpa_charge;
+            form.refund_charge = containerPaymentData.value.refund_charge;
+            form.clearance_charge = containerPaymentData.value.clearance_charge;
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
+
+const handleContainerPaymentCreate = async () => {
+    form.post(route("container-payment.store"), {
+        onSuccess: (page) => {
+            fetchContainerPayment();
+            push.success("Container Payment Created Successfully!");
+        },
+        onError: () => console.log("error"),
+        preserveScroll: true,
+        preserveState: true,
+    });
+};
+
 </script>
 
 <template>
@@ -196,11 +239,11 @@ const confirmVesselReturn = (id) => {
                         <template v-slot:item="{ item, options }">
                             <Card
                                 :class="[
-'!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out border-2 mb-3',
-selectedContainer?.id === item?.id
-? '!border-none !bg-gradient-to-r !from-gray-700 !via-gray-800 !to-gray-900 !text-white'
-: 'border-black hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white'
-]"
+                                    '!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out border-2 mb-3',
+                                    selectedContainer?.id === item?.id
+                                    ? '!border-none !bg-gradient-to-r !from-gray-700 !via-gray-800 !to-gray-900 !text-white'
+                                    : 'border-black hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white'
+                                ]"
                                 style="height: 200px"
                                 @click="selectedContainer = item"
                             >
@@ -298,7 +341,7 @@ selectedContainer?.id === item?.id
                                 </DataTable>
                             </TabPanel>
 
-                            <!-- HBLs Tab -->
+                            <!-- MHBLs Tab -->
                             <TabPanel value="1">
                                 <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]" :value="filteredMHBLS"
                                            paginator row-hover
@@ -346,74 +389,81 @@ selectedContainer?.id === item?.id
 
                             <!-- Payments Tab -->
                             <TabPanel value="2">
-                                <div class="grid grid-cols-2 gap-5">
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.do_charges" :maxFractionDigits="2"
-                                                         :minFractionDigits="2" class="w-full" inputId="do-charge"
-                                                         min="0" step="any" variant="filled"/>
-                                            <label for="do-charge">DO Charge</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.do_charges"/>
-                                    </div>
+                                <form @submit.prevent="handleContainerPaymentCreate">
+                                    <div class="grid grid-cols-2 gap-5">
+                                        <div>
+                                            <IftaLabel>
+                                                <InputNumber
+                                                    v-model="form.do_charge"
+                                                    :maxFractionDigits="2"
+                                                    :minFractionDigits="2"
+                                                    class="w-full" inputId="do-charge"
+                                                    min="0" step="any" variant="filled"
+                                                    :disabled="isContainerPayment"
+                                                />
+                                                <label for="do-charge">DO Charge</label>
+                                            </IftaLabel>
+                                            <InputError :message="form.errors.do_charge"/>
+                                        </div>
 
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.demurrage_charges" :maxFractionDigits="2"
-                                                         :minFractionDigits="2" class="w-full"
-                                                         inputId="demurrage-charge" min="0" step="any"
-                                                         variant="filled"/>
-                                            <label for="demurrage-charge">Demurrage Charge</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.demurrage_charges"/>
-                                    </div>
+                                        <div>
+                                            <IftaLabel>
+                                                <InputNumber v-model="form.demurrage_charge" :maxFractionDigits="2"
+                                                             :minFractionDigits="2" class="w-full"
+                                                             inputId="demurrage-charge" min="0" step="any"
+                                                             variant="filled" :disabled="isContainerPayment"/>
+                                                <label for="demurrage-charge">Demurrage Charge</label>
+                                            </IftaLabel>
+                                            <InputError :message="form.errors.demurrage_charge"/>
+                                        </div>
 
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.assessment_charges" :maxFractionDigits="2"
-                                                         :minFractionDigits="2" class="w-full"
-                                                         inputId="assessment-charge" min="0" step="any"
-                                                         variant="filled"/>
-                                            <label for="assessment-charge">Assessment Charge</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.assessment_charges"/>
-                                    </div>
+                                        <div>
+                                            <IftaLabel>
+                                                <InputNumber v-model="form.assessment_charge" :maxFractionDigits="2"
+                                                             :minFractionDigits="2" class="w-full"
+                                                             inputId="assessment-charge" min="0" step="any"
+                                                             variant="filled" :disabled="isContainerPayment"/>
+                                                <label for="assessment-charge">Assessment Charge</label>
+                                            </IftaLabel>
+                                            <InputError :message="form.errors.assessment_charge"/>
+                                        </div>
 
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.slap_charges" :maxFractionDigits="2"
-                                                         :minFractionDigits="2" class="w-full" inputId="slap-charge"
-                                                         min="0" step="any" variant="filled"/>
-                                            <label for="slap-charge">SLAP Charge</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.slap_charges"/>
-                                    </div>
+                                        <div>
+                                            <IftaLabel>
+                                                <InputNumber v-model="form.slpa_charge" :maxFractionDigits="2"
+                                                             :minFractionDigits="2" class="w-full" inputId="slap-charge"
+                                                             min="0" step="any" variant="filled" :disabled="isContainerPayment"/>
+                                                <label for="slap-charge">SLAP Charge</label>
+                                            </IftaLabel>
+                                            <InputError :message="form.errors.slpa_charge"/>
+                                        </div>
 
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.refund" :maxFractionDigits="2"
-                                                         :minFractionDigits="2" class="w-full" inputId="refund-charge"
-                                                         min="0" step="any" variant="filled"/>
-                                            <label for="refund-charge">Refund</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.refund"/>
-                                    </div>
+                                        <div>
+                                            <IftaLabel>
+                                                <InputNumber v-model="form.refund_charge" :maxFractionDigits="2"
+                                                             :minFractionDigits="2" class="w-full" inputId="refund-charge"
+                                                             min="0" step="any" variant="filled" :disabled="isContainerPayment"/>
+                                                <label for="refund-charge">Refund</label>
+                                            </IftaLabel>
+                                            <InputError :message="form.errors.refund_charge"/>
+                                        </div>
 
-                                    <div>
-                                        <IftaLabel>
-                                            <InputNumber v-model="form.clearance_charges" :maxFractionDigits="2"
-                                                         :minFractionDigits="2" class="w-full"
-                                                         inputId="clearance-charge" min="0" step="any"
-                                                         variant="filled"/>
-                                            <label for="clearance-charge">Clearance Charge</label>
-                                        </IftaLabel>
-                                        <InputError :message="form.errors.clearance_charges"/>
-                                    </div>
+                                        <div>
+                                            <IftaLabel>
+                                                <InputNumber v-model="form.clearance_charge" :maxFractionDigits="2"
+                                                             :minFractionDigits="2" class="w-full"
+                                                             inputId="clearance-charge" min="0" step="any"
+                                                             variant="filled" :disabled="isContainerPayment"/>
+                                                <label for="clearance-charge">Clearance Charge</label>
+                                            </IftaLabel>
+                                            <InputError :message="form.errors.clearance_charge"/>
+                                        </div>
 
-                                    <div class="col-span-2 text-right">
-                                        <Button icon="pi pi-save" label="Save Payments" size="small"/>
+                                        <div class="col-span-2 text-right" v-if="!isContainerPayment">
+                                            <Button icon="pi pi-save" label="Save Payments" size="small" type="submit"/>
+                                        </div>
                                     </div>
-                                </div>
+                                </form>
                             </TabPanel>
 
                             <!-- Documents Tab -->
