@@ -69,6 +69,8 @@ const form = useForm({
 });
 
 const handleUpdateReleasePackages = () => {
+    form.package_queue = props.packageQueue;
+
     form.post(route("call-center.package.store"), {
         onSuccess: () => {
             router.visit(route("call-center.package.queue.list"));

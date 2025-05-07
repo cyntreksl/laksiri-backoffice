@@ -109,13 +109,13 @@ Breadcrumbs::for('call-center.examination.create', function (BreadcrumbTrail $tr
 // Boned Area
 Breadcrumbs::for('call-center.package.queue.list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
-    $trail->push('Boned Area');
-    $trail->push('Package Queue', route('call-center.package.queue.list'));
+    $trail->push('Package Queue');
+    $trail->push('Package Calling Queue', route('call-center.package.queue.list'));
 });
 
 Breadcrumbs::for('call-center.package.show.released.list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
-    $trail->push('Boned Area');
+    $trail->push('Package Queue');
     $trail->push('Released Packages', route('call-center.package.show.released.list'));
 });
 
