@@ -5,6 +5,7 @@ import PostSkeleton from "@/Components/PostSkeleton.vue";
 import {watch} from "vue";
 import Card from 'primevue/card';
 import Avatar from 'primevue/avatar';
+import InfoDisplayChip from "@/Pages/Common/Components/InfoDisplayChip.vue";
 
 const props = defineProps({
     hbl: {
@@ -253,7 +254,7 @@ watch(
 
                         <InfoDisplay :value="pickup?.created_by" label="Auth"/>
 
-                        <InfoDisplay :value="pickup?.packages" label="Package Types"/>
+                        <InfoDisplayChip :value="pickup?.packages" label="Package Types"/>
                     </div>
                 </template>
             </Card>
