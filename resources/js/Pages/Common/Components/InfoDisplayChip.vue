@@ -1,0 +1,52 @@
+<script setup>
+import { computed } from 'vue'
+
+const props = defineProps({
+    label: {
+        type: String,
+        required: true
+    },
+    value: {
+        type: [String, Array],
+        default: '-'
+    }
+})
+
+const chipItems = computed(() => {
+    if (Array.isArray(props.value)) {
+        return props.value
+    } else if (typeof props.value === 'string') {
+        let cleaned = props.value.replace(/[\[\]",]+/g, '')
+        return cleaned
+            .split(/\s{2,}|\s(?=[A-Z])/g)
+            .map(item => item.trim())
+            .filter(Boolean)
+    } else {
+        return []
+    }
+})
+</script>
+
+<template>
+    <div>
+        <p class="text-xs uppercase text-slate-400 dark:text-navy-300">
+            {{ label }}
+        </p>
+        <div class="mt-1 flex flex-wrap gap-2">
+            <template v-if="chipItems.length">
+                <span
+                    v-for="(item, index) in chipItems"
+                    :key="index"
+                    class="px-2 py-1 text-xs font-semibold rounded-full bg-slate-200 dark:bg-navy-500 text-slate-700 dark:text-navy-100"
+                >
+                    {{ item }}
+                </span>
+            </template>
+            <template v-else>
+                <span class="font-medium text-slate-700 dark:text-navy-100">
+                    -
+                </span>
+            </template>
+        </div>
+    </div>
+</template>
