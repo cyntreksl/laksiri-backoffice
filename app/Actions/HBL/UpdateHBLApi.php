@@ -27,7 +27,6 @@ class UpdateHBLApi
             'paid_amount' => $data['paid_amount'],
             'grand_total' => $data['grand_total'],
             'is_completed' => $data['is_completed'] ?? false,
-            'created_by' => auth()->id(),
         ]);
 
         if (! empty($data['paid_amount'])) {

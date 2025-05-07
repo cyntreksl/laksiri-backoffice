@@ -13,8 +13,7 @@ use App\Http\Controllers\CallCenter\DeliverController;
 use App\Http\Controllers\HandlingProcedureController;
 use Illuminate\Support\Facades\Route;
 
-Route::domain('api.'.config('app.url'))
-    ->middleware(['auth:sanctum'])
+Route::middleware(['auth:sanctum'])
     ->prefix('/v1/')->group(function () {
         Route::get('/pending-pickup-list', [PickupController::class, 'index']);
 
@@ -62,7 +61,7 @@ Route::domain('api.'.config('app.url'))
         Route::put('/update-hbl/{hbl}', [HBLController::class, 'update']);
     });
 
-Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);
+Route::prefix('/v1/')->post('/login', [LoginController::class, 'login']);
 
 Route::get('/containers/{container}/handling-procedures', [HandlingProcedureController::class, 'index'])->middleware(['web']);
 Route::post('/containers/{container}/handling-procedures', [HandlingProcedureController::class, 'store'])->middleware(['web']);

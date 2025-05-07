@@ -17,6 +17,7 @@ use App\Models\HBL;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Lcobucci\JWT\Exception;
 
 class HBLRepository implements HBLRepositoryInterface
 {
@@ -86,14 +87,32 @@ class HBLRepository implements HBLRepositoryInterface
 
     public function updateHBL(HBL $hbl, array $data): JsonResponse
     {
-        $hbl = UpdateHBLApi::run($hbl, $data);
+        try {
+            DB::beginTransaction();
 
-        $packagesData = $data['packages'] ?? [];
-        UpdateHBLPackages::run($hbl, $packagesData);
+            $hbl = UpdateHBLApi::run($hbl, $data);
 
-        return response()->json([
-            'message' => 'HBL updated successfully.',
-            'data' => $hbl->fresh(),
-        ]);
+            $packagesData = $data['packages'] ?? [];
+            UpdateHBLPackages::run($hbl, $packagesData);
+
+            DB::commit();
+
+            $hbl->load('packages');
+
+            return response()->json([
+                'message' => 'HBL updated successfully.',
+                'data' => [
+                    'hbl' => $hbl,
+                    'packages' => $hbl->packages,
+                ],
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Failed to update HBL.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
