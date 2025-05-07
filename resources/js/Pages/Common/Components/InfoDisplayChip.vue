@@ -16,15 +16,22 @@ const chipItems = computed(() => {
     if (Array.isArray(props.value)) {
         return props.value
     } else if (typeof props.value === 'string') {
-        let cleaned = props.value.replace(/[\[\]",]+/g, '')
-        return cleaned
-            .split(/\s{2,}|\s(?=[A-Z])/g)
-            .map(item => item.trim())
-            .filter(Boolean)
+        // Remove brackets
+        const cleaned = props.value.replace(/^\[|\]$/g, '')
+
+        // Match items between quotes OR items between commas, allowing spaces in values
+        const matches = cleaned.match(/"([^"]+)"|[^,]+/g)
+
+        return matches
+            ?.map(item =>
+                item.replace(/"/g, '').replace(/,/g, '').trim()
+            )
+            .filter(Boolean) || []
     } else {
         return []
     }
 })
+
 </script>
 
 <template>
