@@ -70,8 +70,8 @@ Breadcrumbs::for('call-center.verification.show.verified', function (BreadcrumbT
 
 Breadcrumbs::for('call-center.examination.show.gate-pass', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
-    $trail->push('Gate Pass');
-    $trail->push('Released', route('call-center.examination.show.gate-pass'));
+    $trail->push('Examination');
+    $trail->push('Gate Pass Tokens', route('call-center.examination.show.gate-pass'));
 });
 
 // Cashier
