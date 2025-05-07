@@ -55,4 +55,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->getHBLRules($request->all());
     }
+
+    public function completedHBL(Request $request)
+    {
+        return $this->HBLRepository->getCompletedHBL($request->all());
+    }
 }
