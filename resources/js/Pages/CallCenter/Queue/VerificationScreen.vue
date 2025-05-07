@@ -11,6 +11,8 @@ const documentVerificationQueue = ref([]);
 const firstToken = ref({});
 const nextToken = ref({});
 
+const waitingScreen = ref(false);
+
 const getDocumentVerificationQueue = async () => {
     try {
         const response = await fetch(`/call-center/get-document-verification-queue`, {
@@ -28,6 +30,10 @@ const getDocumentVerificationQueue = async () => {
             const data = await response.json();
 
             const filteredData = data.filter((item) => item.is_verified === false)
+
+            if (filteredData.length === 0) {
+                waitingScreen.value = true;
+            }
 
             if (filteredData.length > 0) {
                 firstToken.value = filteredData[0];

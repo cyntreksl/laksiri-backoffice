@@ -54,7 +54,6 @@ const getCashierQueue = async () => {
 }
 
 setInterval(getCashierQueue, 3000);
-
 </script>
 
 <template>
