@@ -9,9 +9,12 @@ import MUSIC_IMAGE from "../../../images/file-manager/music.png"
 import UNKNOWN_IMAGE from "../../../images/file-manager/php.png"
 import {router} from "@inertiajs/vue3";
 import {push} from "notivue";
-import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/vue";
 import {ref} from "vue";
 import VideoPlayerModal from "@/Pages/FileManager/VideoPlayerModal.vue";
+import DataView from 'primevue/dataview';
+import Button from 'primevue/button';
+import {useConfirm} from "primevue/useconfirm";
+import Image from 'primevue/image';
 
 const props = defineProps({
     files: {
@@ -21,20 +24,22 @@ const props = defineProps({
     }
 })
 
+const confirm = useConfirm();
+
 const isImage = (type) => {
-    return type.startsWith('image/');
+    return typeof type === 'string' && type.startsWith('image/');
 }
 
 const isVideo = (type) => {
-    return type.startsWith('video/');
+    return typeof type === 'string' && type.startsWith('video/');
 }
 
 const isPDF = (type) => {
-    return type.startsWith('application/pdf');
+    return typeof type === 'string' && type.startsWith('application/pdf');
 }
 
 const isZIP = (type) => {
-    return type.startsWith('application/zip');
+    return typeof type === 'string' && type.startsWith('application/zip');
 }
 
 const docTypes = ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
@@ -74,9 +79,28 @@ const pptTypes = [
 const isPPT = (type) => pptTypes.includes(type);
 
 const handleDeleteFile = (id) => {
-    router.delete(route('file-manager.destroy', id), {
-        onSuccess: () => {
-            push.success('File Deleted Successfully!');
+    confirm.require({
+        message: 'Would you like to delete this file?',
+        header: 'Delete File?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            router.delete(route('file-manager.destroy', id), {
+                onSuccess: () => {
+                    push.success('File Deleted Successfully!');
+                }
+            });
+        },
+        reject: () => {
         }
     });
 }
@@ -98,162 +122,90 @@ const closeModal = () => {
 </script>
 
 <template>
-    <table class="is-hoverable w-full text-left">
-        <thead>
-        <tr>
-            <th
-                class="whitespace-nowrap rounded-tl-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
-                Name
-            </th>
-            <th
-                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
-                Size
-            </th>
-            <th
-                class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
-                Type
-            </th>
+    <DataView :rows="5" :value="files" class="my-5" paginator>
+        <template #list="slotProps">
+            <div class="flex flex-col">
+                <div v-for="(item, index) in slotProps.items" :key="index">
+                    <div :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }" class="flex flex-col sm:flex-row sm:items-center p-6 gap-4">
+                        <div class="md:w-40 relative">
+                            <template v-if="isImage(item.type)">
+                                <!-- Image thumbnail -->
+                                <Image :alt="item.name" :src="item.url" class="block xl:block mx-auto border-round w-full" preview />
+                            </template>
 
-            <th
-                class="whitespace-nowrap rounded-tr-lg bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5">
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="file in files" class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500">
-            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                <div class="flex items-center space-x-4">
-                    <template v-if="isImage(file.type)">
-                        <!-- Image thumbnail -->
-                        <img :alt="file.name" :src="file.url" class="size-8">
-                    </template>
+                            <template v-else-if="isVideo(item.type)">
+                                <!-- Video thumbnail -->
+                                <video :src="item.url" class="size-8" @click="playVideoInModal(item.url)"/>
+                            </template>
 
-                    <template v-else-if="isVideo(file.type)">
-                        <!-- Video thumbnail -->
-                        <video :src="file.url" class="size-8" @click="playVideoInModal(file.url)"/>
-                    </template>
+                            <template v-else-if="isPDF(item.type)">
+                                <!-- PDF thumbnail -->
+                                <img :alt="item.name" :src="PDF_IMAGE" class="size-8">
+                            </template>
 
-                    <template v-else-if="isPDF(file.type)">
-                        <!-- PDF thumbnail -->
-                        <img :alt="file.name" :src="PDF_IMAGE" class="size-8">
-                    </template>
+                            <template v-else-if="isDocument(item.type)">
+                                <!-- DOC thumbnail -->
+                                <img :alt="item.name" :src="DOC_IMAGE" class="size-8">
+                            </template>
 
-                    <template v-else-if="isDocument(file.type)">
-                        <!-- DOC thumbnail -->
-                        <img :alt="file.name" :src="DOC_IMAGE" class="size-8">
-                    </template>
+                            <template v-else-if="isExcel(item.type)">
+                                <!-- XLSX thumbnail -->
+                                <img :alt="item.name" :src="XLS_IMAGE" class="size-8">
+                            </template>
 
-                    <template v-else-if="isExcel(file.type)">
-                        <!-- XLSX thumbnail -->
-                        <img :alt="file.name" :src="XLS_IMAGE" class="size-8">
-                    </template>
+                            <template v-else-if="isZIP(item.type)">
+                                <!-- ZIP thumbnail -->
+                                <img :alt="item.name" :src="ZIP_IMAGE" class="size-8">
+                            </template>
 
-                    <template v-else-if="isZIP(file.type)">
-                        <!-- ZIP thumbnail -->
-                        <img :alt="file.name" :src="ZIP_IMAGE" class="size-8">
-                    </template>
+                            <template v-else-if="isPPT(item.type)">
+                                <!-- PPT thumbnail -->
+                                <img :alt="item.name" :src="PPT_IMAGE" class="size-8">
+                            </template>
 
-                    <template v-else-if="isPPT(file.type)">
-                        <!-- PPT thumbnail -->
-                        <img :alt="file.name" :src="PPT_IMAGE" class="size-8">
-                    </template>
+                            <template v-else-if="isMusic(item.type)">
+                                <!-- Music thumbnail -->
+                                <img :alt="item.name" :src="MUSIC_IMAGE" class="size-8">
+                            </template>
 
-                    <template v-else-if="isMusic(file.type)">
-                        <!-- Music thumbnail -->
-                        <img :alt="file.name" :src="MUSIC_IMAGE" class="size-8">
-                    </template>
+                            <template v-else-if="isText(item.type)">
+                                <!-- TEXT thumbnail -->
+                                <img :alt="item.name" :src="TXT_IMAGE" class="size-8">
+                            </template>
 
-                    <template v-else-if="isText(file.type)">
-                        <!-- TEXT thumbnail -->
-                        <img :alt="file.name" :src="TXT_IMAGE" class="size-8">
-                    </template>
-
-                    <template v-else>
-                        <!-- Default for other types -->
-                        <img :alt="file.name" :src="UNKNOWN_IMAGE" class="size-8">
-                    </template>
-                    <span class="font-medium text-slate-700 dark:text-navy-100 cursor-pointer" @click="isVideo(file.type) && playVideoInModal(file.url)">{{ file.name }}</span>
-                </div>
-            </td>
-            <td class="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-navy-100 sm:px-5">
-                {{ file.size }}
-            </td>
-            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                {{
-                    isDocument(file.type) ? 'DOC' : isExcel(file.type) ? 'XLSX' : file.type
-                }}
-            </td>
-            <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                <Menu as="div" class="relative inline-block text-left">
-                    <div>
-                        <MenuButton
-                            class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
-                            <svg
-                                class="size-5"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                ></path>
-                            </svg>
-                        </MenuButton>
-                    </div>
-
-                    <transition enter-active-class="transition ease-out duration-100"
-                                enter-from-class="transform opacity-0 scale-95"
-                                enter-to-class="transform opacity-100 scale-100"
-                                leave-active-class="transition ease-in duration-75"
-                                leave-from-class="transform opacity-100 scale-100"
-                                leave-to-class="transform opacity-0 scale-95">
-                        <MenuItems
-                            class="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-gray-300 focus:outline-none">
-                            <div class="py-1">
-                                <MenuItem v-slot="{ active }" class="flex items-center">
-                                    <a :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'cursor-pointer block px-4 py-2 text-sm']"
-                                       :href="route('file-manager.downloads.single', file.id)">
-                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-download mr-2" fill="none" height="18"
-                                             stroke="currentColor"
-                                             stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                             width="18"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
-                                            <path d="M7 11l5 5l5 -5"/>
-                                            <path d="M12 4l0 12"/>
-                                        </svg>
-                                        Download
-                                    </a>
-                                </MenuItem>
-                                <MenuItem v-slot="{ active }" class="flex items-center">
-                                    <button :class="[active ? 'bg-red-100 text-red-600' : 'text-red-700', 'block w-full px-4 py-2 text-left text-sm']"
-                                            @click.prevent="handleDeleteFile(file.id)">
-                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-trash-x mr-2" fill="none" height="18"
-                                             stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                             viewBox="0 0 24 24" width="18"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                            <path d="M4 7h16"/>
-                                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
-                                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
-                                            <path d="M10 12l4 4m0 -4l-4 4"/>
-                                        </svg>
-                                        Delete
-                                    </button>
-                                </MenuItem>
+                            <template v-else>
+                                <!-- Default for other types -->
+                                <img :alt="item.name" :src="UNKNOWN_IMAGE" class="size-8">
+                            </template>
+<!--                            <div class="absolute bg-black/70 rounded-border" style="left: 4px; top: 4px">-->
+<!--                                <Tag :value="item.inventoryStatus" :severity="getSeverity(item)"></Tag>-->
+<!--                            </div>-->
+                        </div>
+                        <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                            <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                                <div>
+                                    <span class="font-medium text-gray-400 text-sm">{{ item.size }}</span>
+                                    <div class="text-lg font-medium mt-2" @click="isVideo(item.type) && playVideoInModal(item.url)">{{ item.name }}</div>
+                                </div>
                             </div>
-                        </MenuItems>
-                    </transition>
-                </Menu>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                            <div class="flex flex-col md:items-end gap-8">
+                                <span class="text-sm font-semibold">{{
+                                        isDocument(item.type) ? 'DOC' : isExcel(item.type) ? 'XLSX' : item.type
+                                    }}</span>
+                                <div class="flex flex-row-reverse md:flex-row gap-2">
+                                    <a :href="route('file-manager.downloads.single', item.id)">
+                                        <Button class="flex-auto md:flex-initial whitespace-nowrap" icon="pi pi-download" label="Download" size="small"></Button>
+                                    </a>
 
-    <VideoPlayerModal :selected-video-url="selectedVideoUrl" :show="isModalVisible" @close="closeModal" />
+                                    <Button icon="pi pi-trash" severity="danger" size="small" @click.prevent="handleDeleteFile(item.id)"></Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </DataView>
+
+    <VideoPlayerModal :selected-video-url="selectedVideoUrl" :show="isModalVisible" @close="closeModal"/>
 </template>

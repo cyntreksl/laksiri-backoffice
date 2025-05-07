@@ -12,12 +12,14 @@ class GetFilesWithProperties
     public function handle()
     {
         return LaksiriFile::orderBy('id', 'desc')->get()->map(function ($file) {
+            $media = $file->getFirstMedia();
+
             return [
                 'id' => $file->id,
-                'name' => $file->getFirstMedia()->name,
-                'url' => $file->getFirstMediaUrl(),
-                'type' => $file->getFirstMedia()->mime_type,
-                'size' => $file->getFirstMedia()->human_readable_size,
+                'name' => $media?->name ?? 'No file',
+                'url' => $media ? $file->getFirstMediaUrl() : null,
+                'type' => $media?->mime_type ?? null,
+                'size' => $media?->human_readable_size ?? null,
             ];
         });
     }
