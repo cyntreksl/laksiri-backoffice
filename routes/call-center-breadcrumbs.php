@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\CustomerQueue;
-use App\Models\PackageQueue;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 

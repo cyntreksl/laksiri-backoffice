@@ -5,7 +5,6 @@ namespace App\Http\Controllers\CallCenter;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CallCenter\BonedAreaRepositoryInterface;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
-use App\Models\PackageQueue;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
