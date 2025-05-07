@@ -23,13 +23,6 @@ class BonedAreaController extends Controller
         ]);
     }
 
-    public function create(PackageQueue $packageQueue)
-    {
-        return Inertia::render('CallCenter/BonedArea/ReleaseForm', [
-            'packageQueue' => $packageQueue,
-        ]);
-    }
-
     public function store(Request $request)
     {
         $this->bonedAreaRepository->releasePackage($request->all());

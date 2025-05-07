@@ -10,29 +10,43 @@ import DataView from "primevue/dataview";
 import Button from "primevue/button";
 import SelectButton from "primevue/selectbutton";
 import Tag from "primevue/tag";
+import PackageReleaseDialog from "@/Pages/CallCenter/BonedArea/PackageReleaseDialog.vue";
 
 const props = defineProps({
     packageQueue: {
         type: Object,
-        default: () => {}
+        default: () => {
+        }
     }
 })
 
 const layout = ref('list');
 const options = ref(['list', 'grid']);
+const showPackageReleaseDialog = ref(false);
+const selectedToken = ref([]);
 
 const filteredPackageQueue = computed(() => {
     return props.packageQueue.filter(q => {
         return q.is_released == false
     });
 })
+
+const handlePackageRelease = (token) => {
+    selectedToken.value = token;
+    showPackageReleaseDialog.value = true;
+}
+
+const closePackageReleaseModal = () => {
+    selectedToken.value = [];
+    showPackageReleaseDialog.value = false;
+}
 </script>
 
 <template>
     <AppLayout title="Queue List">
         <template #header>Queue List</template>
 
-        <Breadcrumb />
+        <Breadcrumb/>
 
         <DataView :layout="layout" :value="filteredPackageQueue" class="my-5">
             <template #header>
@@ -42,14 +56,15 @@ const filteredPackageQueue = computed(() => {
                     </div>
                     <SelectButton v-model="layout" :allowEmpty="false" :options="options">
                         <template #option="{ option }">
-                            <i :class="[option === 'list' ? 'pi pi-bars' : 'pi pi-table']" />
+                            <i :class="[option === 'list' ? 'pi pi-bars' : 'pi pi-table']"/>
                         </template>
                     </SelectButton>
                 </div>
             </template>
 
             <template #list="slotProps">
-                <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" :value="slotProps.items" paginator row-hover tableStyle="min-width: 50rem">
+                <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" :value="slotProps.items" paginator row-hover
+                           tableStyle="min-width: 50rem">
                     <Column field="token" header="Token">
                         <template #body="slotProps">
                             <div class="flex items-center text-2xl">
@@ -84,7 +99,7 @@ const filteredPackageQueue = computed(() => {
                                 icon="ti ti-arrow-right"
                                 rounded
                                 size="small"
-                                @click.prevent="() => router.visit(route('call-center.package.create', data.id))"
+                                @click.prevent="handlePackageRelease(data)"
                             />
                         </template>
                     </Column>
@@ -93,8 +108,11 @@ const filteredPackageQueue = computed(() => {
             </template>
 
             <template #grid="slotProps">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-5 p-5">
-                    <Card v-for="queue in slotProps.items" :key="queue.id" class="!border !border-info rounded-2xl bg-white cursor-pointer hover:bg-info/10" @click.prevent="() => router.visit(route('call-center.package.create', queue.id))">
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 my-5 p-5">
+                    <Card v-for="queue in slotProps.items" :key="queue.id"
+                          class="!border !border-info rounded-2xl bg-white cursor-pointer hover:bg-info/10"
+                          @click.prevent="handlePackageRelease(queue)">
                         <template #content>
                             <div class="flex justify-between items-center mb-6">
                                 <div class="flex items-center gap-2 text-info">
@@ -130,4 +148,8 @@ const filteredPackageQueue = computed(() => {
             </template>
         </DataView>
     </AppLayout>
+
+    <PackageReleaseDialog :package-queue="selectedToken" :visible="showPackageReleaseDialog"
+                          @close="closePackageReleaseModal"
+                          @update:visible="showPackageReleaseDialog = $event"/>
 </template>
