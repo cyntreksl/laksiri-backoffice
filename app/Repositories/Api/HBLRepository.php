@@ -113,7 +113,7 @@ class HBLRepository implements HBLRepositoryInterface
                     'location_latitude' => null,
                     'zone' => '-',
                     'driver_assigned_at' => null,
-                    'pickup_date' => $hbl->pickup_date ?? '-',
+                    'pickup_date' => $hbl->created_at ?? '-',
                     'pickup_time_start' => '-',
                     'pickup_time_end' => '-',
                     'pickup_order' => null,
@@ -140,12 +140,14 @@ class HBLRepository implements HBLRepositoryInterface
     public function completedHBLView(HBL $hbl)
     {
         $hbl->load(['packages', 'pickup', 'pickup.driver', 'pickup.driver.driverLocation', 'pickup.driver.driverLocation.branch']);
+        $response = null;
+
         if ($hbl->pickup) {
             $hbl->pickup->setRelation('hbl', $hbl);
 
-            return new PickupResource($hbl->pickup);
+            $response = new PickupResource($hbl->pickup);
         } else {
-            return [
+            $response = [
                 'id' => null,
                 'reference' => $hbl->reference ?? '-',
                 'cargo_type' => $hbl->cargo_type ?? '-',
@@ -177,6 +179,8 @@ class HBLRepository implements HBLRepositoryInterface
                 'status' => $hbl->status ?? '-',
             ];
         }
+
+        return $this->success('Completed HBL received successfully!', $response);
 
     }
 }
