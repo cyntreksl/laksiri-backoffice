@@ -88,17 +88,17 @@ class HBLRepository implements HBLRepositoryInterface
     {
         $hbls = HBL::where('system_status', '<', 2.2)
             ->where('created_by', auth()->id())
-            ->with('pickup')
+            ->with(['pickup', 'packages']) // preload needed relations
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $completedPickupsResource = null;
-        $hbls->map(function ($hbl) use (&$completedPickupsResource) {
+        $completedPickupsResource = $hbls->map(function ($hbl) {
             if ($hbl->pickup) {
                 $hbl->pickup->setRelation('hbl', $hbl);
-                $completedPickupsResource = new PickupResource($hbl->pickup);
+
+                return new PickupResource($hbl->pickup);
             } else {
-                $completedPickupsResource = [
+                return [
                     'id' => null,
                     'reference' => $hbl->reference ?? '-',
                     'cargo_type' => $hbl->cargo_type ?? '-',
@@ -129,11 +129,54 @@ class HBLRepository implements HBLRepositoryInterface
                     'cr_number' => $hbl->cr_number,
                     'status' => $hbl->status ?? '-',
                     'package_types' => \Illuminate\Support\Str::title($hbl->package_types),
+                    'driver_generated' => true,
                 ];
             }
         })->values();
 
         return $this->success('Completed pickup list received successfully!', $completedPickupsResource);
+    }
+
+    public function completedHBLView(HBL $hbl)
+    {
+        $hbl->load(['packages', 'pickup', 'pickup.driver', 'pickup.driver.driverLocation', 'pickup.driver.driverLocation.branch']);
+        if ($hbl->pickup) {
+            $hbl->pickup->setRelation('hbl', $hbl);
+
+            return new PickupResource($hbl->pickup);
+        } else {
+            return [
+                'id' => null,
+                'reference' => $hbl->reference ?? '-',
+                'cargo_type' => $hbl->cargo_type ?? '-',
+                'name' => null,
+                'email' => null,
+                'contact_number' => null,
+                'additional_mobile_number' => null,
+                'whatsapp_number' => null,
+                'address' => null,
+                'location_name' => null,
+                'location_longitude' => null,
+                'location_latitude' => null,
+                'zone' => '-',
+                'driver_assigned_at' => null,
+                'pickup_date' => $hbl->created_at ?? '-',
+                'pickup_time_start' => '-',
+                'pickup_time_end' => '-',
+                'pickup_order' => null,
+                'driver' => '-',
+                'pickup_type' => '-',
+                'pickup_note' => '-',
+                'packages' => $hbl->packages->isNotEmpty() ? HBLPackageResource::collection($hbl->packages) : [],
+                'exception_note' => '-',
+                'hbl' => new HBLResource($hbl),
+                'retry_attempts' => null,
+                'created_by' => $hbl->createdBy->name ?? '-',
+                'hbl_number' => $hbl->hbl_number,
+                'cr_number' => $hbl->cr_number,
+                'status' => $hbl->status ?? '-',
+            ];
+        }
 
     }
 }

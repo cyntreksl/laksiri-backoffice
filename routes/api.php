@@ -22,7 +22,8 @@ Route::domain('api.'.config('app.url'))
 
         Route::get('/pickups/completed/list', [PickupController::class, 'completedPickupWithHBL']);
         Route::get('/completed/list', [HBLController::class, 'completedHBL']);
-        
+        Route::get('/completed-hbl/{id}', [HBLController::class, 'completedHBLView']);
+
         Route::post('/pickup-to-hbl/{pickUp}', [PickupController::class, 'pickupToHbl']);
 
         Route::post('/pickups', [PickupController::class, 'store']);
