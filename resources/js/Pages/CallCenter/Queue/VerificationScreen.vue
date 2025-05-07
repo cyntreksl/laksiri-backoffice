@@ -2,12 +2,14 @@
 import { ref } from "vue";
 import ScreenLayout from "@/Layouts/ScreenLayout.vue";
 import { usePage } from '@inertiajs/vue3';
+import Card from "primevue/card";
+import SplitterPanel from "primevue/splitterpanel";
+import Splitter from "primevue/splitter";
+import Tag from "primevue/tag";
 
 const documentVerificationQueue = ref([]);
 const firstToken = ref({});
 const nextToken = ref({});
-
-const waitingScreen = ref(false);
 
 const getDocumentVerificationQueue = async () => {
     try {
@@ -26,10 +28,6 @@ const getDocumentVerificationQueue = async () => {
             const data = await response.json();
 
             const filteredData = data.filter((item) => item.is_verified === false)
-
-            if (filteredData.length === 0) {
-                waitingScreen.value = true;
-            }
 
             if (filteredData.length > 0) {
                 firstToken.value = filteredData[0];
@@ -51,70 +49,112 @@ setInterval(getDocumentVerificationQueue, 3000);
 
 <template>
     <ScreenLayout title="Document Verification Queue">
-        <div v-if="waitingScreen" class="flex h-full w-full justify-center items-center">
-            <p class="text-4xl sm:text-6xl lg:text-9xl uppercase text-center">
-                Waiting...
-            </p>
-        </div>
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 grid-rows-2 h-full">
-            <!-- NOW Section -->
-            <div class="bg-gray-200 h-full p-3 sm:p-5">
-                <div
-                    v-if="firstToken.token"
-                    class="card cursor-pointer flex flex-col justify-center items-center p-3 sm:p-5 text-center h-full rounded-lg bg-lime-300">
-                    <h1 class="text-4xl sm:text-5xl text-black">NOW</h1>
-                    <h1 class="text-6xl sm:text-9xl xl:text-[180px] text-black font-bold">{{ firstToken.token }}</h1>
-                    <h3 class="text-lg sm:text-2xl font-medium text-slate-700 dark:text-navy-100">
-                        {{ firstToken.hbl?.hbl_number }}
-                    </h3>
-                    <button
-                        class="btn h-7 rounded-full bg-slate-150 px-2 sm:px-3 text-xs sm:text-base font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
-                        {{ firstToken.customer }}
-                    </button>
-                </div>
-            </div>
+        <div class="h-screen">
+            <Splitter class="h-full mb-8 !bg-slate-50">
+                <SplitterPanel class="flex items-center justify-center">
+                    <Splitter class="h-full !bg-slate-50" layout="vertical">
+                        <SplitterPanel class="p-5">
+                            <Card v-if="firstToken.token" class="!shadow-sm !border !border-success !shadow-success !h-full rounded-2xl bg-white">
+                                <template #content>
+                                    <div class="flex justify-between items-center mb-6">
+                                        <div>
+                                            <h1 class="text-4xl text-gray-800 font-semibold tracking-tight">NOW</h1>
+                                            <h2 class="text-sm text-gray-500 mt-1">Current Token</h2>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-success">
+                                            <i class="ti ti-packages text-4xl"></i>
+                                            <span class="text-4xl font-semibold">{{ firstToken.package_count }}</span>
+                                        </div>
+                                    </div>
 
-            <!-- Queue Section -->
-            <div class="col-start-1 md:col-start-2 row-span-2 bg-gray-200 h-full">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-3 sm:p-5">
-                    <template v-for="queue in documentVerificationQueue">
-                        <div
-                            class="card grow cursor-pointer hover:bg-info/20 items-center p-3 sm:p-5 text-center border w-full rounded-lg">
-                            <div class="my-3 sm:my-5">
-                                <h1 class="text-5xl sm:text-8xl text-black font-bold">{{ queue.token }}</h1>
-                            </div>
-                            <div class="my-2 grow">
-                                <h3 class="text-lg sm:text-2xl font-medium text-slate-700 dark:text-navy-100">
-                                    {{ queue.hbl?.hbl_number }}
-                                </h3>
-                            </div>
-                            <div class="mt-2 sm:mt-3 flex space-x-1">
-                                <button
-                                    class="btn h-7 rounded-full bg-slate-150 px-2 sm:px-3 text-xs sm:text-base font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
-                                    {{ queue.customer }}
-                                </button>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
+                                    <div class="text-center mb-6">
+                                        <h1 class="text-6xl xl:text-[100px] font-extrabold text-gray-900 tracking-wide">
+                                            {{ firstToken.token }}
+                                        </h1>
+                                    </div>
 
-            <!-- NEXT Section -->
-            <div class="bg-gray-200 h-full p-3 sm:p-5">
-                <div
-                    v-if="nextToken.token"
-                    class="card cursor-pointer flex flex-col justify-center items-center p-3 sm:p-5 text-center h-full rounded-lg bg-yellow-300">
-                    <h1 class="text-4xl sm:text-5xl text-black">NEXT</h1>
-                    <h1 class="text-6xl sm:text-9xl xl:text-[180px] text-black font-bold">{{ nextToken.token }}</h1>
-                    <h3 class="text-lg sm:text-2xl font-medium text-slate-700 dark:text-navy-100">
-                        {{ nextToken.hbl?.hbl_number }}
-                    </h3>
-                    <button
-                        class="btn h-7 rounded-full bg-slate-150 px-2 sm:px-3 text-xs sm:text-base font-medium text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
-                        {{ nextToken.customer }}
-                    </button>
-                </div>
-            </div>
+                                    <div class="flex flex-wrap justify-center gap-3">
+                                        <template v-for="(hbl_package, index) in firstToken.hbl_packages" :key="index">
+                                            <Tag
+                                                :value="`${hbl_package.quantity} ${hbl_package.package_type}`"
+                                                class="rounded-full px-4 py-2 text-base"
+                                                severity="success"
+                                                style="font-size: 1rem"
+                                            />
+                                        </template>
+                                    </div>
+                                </template>
+                            </Card>
+                        </SplitterPanel>
+                        <SplitterPanel class="p-5">
+                            <Card v-if="nextToken.token" class="!shadow-sm !border !border-info !shadow-info !h-full rounded-2xl bg-white">
+                                <template #content>
+                                    <div class="flex justify-between items-center mb-6">
+                                        <div>
+                                            <h1 class="text-4xl text-gray-800 font-semibold tracking-tight">NEXT</h1>
+                                            <h2 class="text-sm text-gray-500 mt-1">Next Token</h2>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-info">
+                                            <i class="ti ti-packages text-4xl"></i>
+                                            <span class="text-4xl font-semibold">{{ nextToken.package_count }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center mb-6">
+                                        <h1 class="text-6xl xl:text-[100px] font-extrabold text-gray-900 tracking-wide">
+                                            {{ nextToken.token }}
+                                        </h1>
+                                    </div>
+
+                                    <div class="flex flex-wrap justify-center gap-3">
+                                        <template v-for="(hbl_package, index) in nextToken.hbl_packages" :key="index">
+                                            <Tag
+                                                :value="`${hbl_package.quantity} ${hbl_package.package_type}`"
+                                                class="rounded-full px-4 py-2 text-base"
+                                                severity="info"
+                                                style="font-size: 1rem"
+                                            />
+                                        </template>
+                                    </div>
+                                </template>
+                            </Card>
+                        </SplitterPanel>
+                    </Splitter>
+                </SplitterPanel>
+                <SplitterPanel class="p-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 p-5">
+                        <template v-for="queue in documentVerificationQueue">
+                            <Card class="!shadow-sm !border !border-warning !shadow-warning !h-full rounded-2xl bg-white">
+                                <template #content>
+                                    <div class="flex justify-end items-center mb-6">
+                                        <div class="flex items-center gap-2 text-warning">
+                                            <i class="ti ti-packages text-4xl"></i>
+                                            <span class="text-4xl font-semibold">{{ queue.package_count }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center mb-6">
+                                        <h1 class="text-6xl xl:text-[100px] font-extrabold text-gray-900 tracking-wide">
+                                            {{ queue.token }}
+                                        </h1>
+                                    </div>
+
+                                    <div class="flex flex-wrap justify-center gap-3">
+                                        <template v-for="(hbl_package, index) in queue.hbl_packages" :key="index">
+                                            <Tag
+                                                :value="`${hbl_package.quantity} ${hbl_package.package_type}`"
+                                                class="rounded-full px-4 py-2 text-base"
+                                                severity="warn"
+                                                style="font-size: 1rem"
+                                            />
+                                        </template>
+                                    </div>
+                                </template>
+                            </Card>
+                        </template>
+                    </div>
+                </SplitterPanel>
+            </Splitter>
         </div>
     </ScreenLayout>
 </template>
