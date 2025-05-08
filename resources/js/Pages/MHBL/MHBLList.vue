@@ -22,7 +22,7 @@ import Column from "primevue/column";
 import ContextMenu from "primevue/contextmenu";
 import { FilterMatchMode } from "@primevue/core/api";
 import MHBLDetailDialog from "@/Pages/Common/Dialog/MHBL/Index.vue";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 
 const props = defineProps({
     users: {

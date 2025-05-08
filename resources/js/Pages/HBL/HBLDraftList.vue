@@ -17,7 +17,7 @@ import IconField from "primevue/iconfield";
 import ContextMenu from "primevue/contextmenu";
 import DatePicker from "primevue/datepicker";
 import FloatLabel from "primevue/floatlabel";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import {useConfirm} from "primevue/useconfirm";
 import moment from "moment";
 import {FilterMatchMode} from "@primevue/core/api";

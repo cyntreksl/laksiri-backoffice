@@ -25,7 +25,7 @@ import Select from "primevue/select";
 import Chip from "primevue/chip";
 import Checkbox from "primevue/checkbox";
 import AssignDriverDialog from "@/Pages/Pickup/Partials/AssignDriverDialog.vue";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 
 const props = defineProps({

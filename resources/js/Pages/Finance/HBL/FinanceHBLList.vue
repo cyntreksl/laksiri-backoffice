@@ -23,7 +23,7 @@ import {FilterMatchMode} from '@primevue/core/api';
 import moment from "moment";
 import {debounce} from "lodash";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import {push} from "notivue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 

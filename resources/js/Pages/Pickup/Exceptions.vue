@@ -22,7 +22,7 @@ import {FilterMatchMode} from '@primevue/core/api';
 import {debounce} from "lodash";
 import {router, Link, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import moment from "moment";
 import AssignDriverDialog from "@/Pages/Pickup/Partials/AssignDriverDialog.vue";
 

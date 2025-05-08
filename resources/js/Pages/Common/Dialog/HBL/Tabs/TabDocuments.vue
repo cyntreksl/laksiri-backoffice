@@ -2,7 +2,7 @@
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import {onMounted, ref, watch} from "vue";
 import {push} from "notivue";
-import DeleteDocConfirmationModal from "@/Pages/Common/Partials/DeleteDocConfirmationModal.vue";
+import DeleteDocConfirmationModal from "@/Pages/Common/Dialog/HBL/Tabs/DeleteDocConfirmationModal.vue";
 
 const props = defineProps({
     hblId: {

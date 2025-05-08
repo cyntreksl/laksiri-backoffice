@@ -7,7 +7,7 @@ import {reactive, ref, watch} from "vue";
 import moment from "moment";
 import {push} from "notivue";
 import SearchSVG from "@/../images/illustrations/search.svg";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import Button from "primevue/button";
 import Select from "primevue/select";
 import Card from "primevue/card";

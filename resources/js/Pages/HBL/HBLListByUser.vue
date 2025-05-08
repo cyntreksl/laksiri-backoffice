@@ -22,7 +22,7 @@ import axios from "axios";
 import {FilterMatchMode} from '@primevue/core/api';
 import moment from "moment";
 import {debounce} from "lodash";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import {push} from "notivue";
 
 const props = defineProps({

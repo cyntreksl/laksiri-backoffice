@@ -2,7 +2,7 @@
 import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import {computed, onMounted, ref, watchEffect} from "vue";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from "primevue/button";
