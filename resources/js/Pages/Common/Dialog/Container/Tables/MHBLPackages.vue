@@ -1,7 +1,7 @@
 <script setup>
 import {usePage} from "@inertiajs/vue3";
 import {ref, watchEffect} from "vue";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from "primevue/button";

@@ -24,7 +24,7 @@ import IconField from "primevue/iconfield";
 import {useConfirm} from "primevue/useconfirm";
 import axios from "axios";
 import {debounce} from "lodash";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 
 const props = defineProps({

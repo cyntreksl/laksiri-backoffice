@@ -23,7 +23,7 @@ import IconField from "primevue/iconfield";
 import ContextMenu from "primevue/contextmenu";
 import DatePicker from "primevue/datepicker";
 import FloatLabel from "primevue/floatlabel";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 
 const props = defineProps({
     users: {

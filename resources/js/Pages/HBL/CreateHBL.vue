@@ -7,7 +7,7 @@ import InputError from "@/Components/InputError.vue";
 import {useConfirm} from "primevue/useconfirm";
 import {push} from "notivue";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';

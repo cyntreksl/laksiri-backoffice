@@ -18,7 +18,7 @@ import Button from "primevue/button";
 import IconField from "primevue/iconfield";
 import Select from "primevue/select";
 import Checkbox from "primevue/checkbox";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import {useConfirm} from "primevue/useconfirm";
 import moment from "moment";
 import {FilterMatchMode} from "@primevue/core/api";

@@ -22,7 +22,7 @@ import IconField from "primevue/iconfield";
 import Panel from "primevue/panel";
 import Card from "primevue/card";
 import Select from "primevue/select";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 
 const props = defineProps({
     hblTypes: {
