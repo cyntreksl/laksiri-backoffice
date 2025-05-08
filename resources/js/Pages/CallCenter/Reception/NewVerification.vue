@@ -1,12 +1,11 @@
 <script setup>
-import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import VerifyConfirmationModal from "@/Pages/CallCenter/Reception/Partials/VerifyConfirmModal.vue";
-import {ref, watch} from "vue";
+import {ref} from "vue";
 import {push} from "notivue";
 import moment from "moment";
 import HBLDetailContent from "@/Pages/Common/Partials/HBLDetailContent.vue";
@@ -25,16 +24,14 @@ const props = defineProps({
         type: Number,
         default: null
     },
-    pickupId: {
-        type: Number,
-        default: null
-    },
 })
 
 const hbl = ref({});
-const pickup = ref({});
 const hblTotalSummary = ref({});
 const isLoadingHbl = ref(false);
+const paymentRecord = ref([]);
+const isLoading = ref(false);
+const showConfirmVerifyModal = ref(false);
 
 const fetchHBL = async () => {
     isLoadingHbl.value = true;
@@ -53,32 +50,6 @@ const fetchHBL = async () => {
         } else {
             const data = await response.json();
             hbl.value = data.hbl;
-        }
-
-    } catch (error) {
-        console.log(error);
-    } finally {
-        isLoadingHbl.value = false;
-    }
-}
-
-const fetchPickup = async () => {
-    isLoadingHbl.value = true;
-
-    try {
-        const response = await fetch(`/pickups/${props.pickupId}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-            pickup.value = data;
         }
 
     } catch (error) {
@@ -125,8 +96,6 @@ const updateChecked = (doc, isChecked) => {
     form.is_checked = { ...form.is_checked, [doc]: isChecked };
 };
 
-const showConfirmVerifyModal = ref(false);
-
 const closeModal = () => {
     showConfirmVerifyModal.value = false;
 };
@@ -152,9 +121,6 @@ const handleReceptionVerify = () => {
         preserveState: true,
     });
 }
-
-const paymentRecord = ref([]);
-const isLoading = ref(false);
 
 const getHBLPayments = async () => {
     isLoading.value = true;
@@ -322,27 +288,3 @@ getHBLPayments();
         <VerifyConfirmationModal :show="showConfirmVerifyModal" @close="closeModal" @verify-customer="handleReceptionVerify"/>
     </AppLayout>
 </template>
-
-<style>
-
-.grid-container {
-    display: grid;
-    grid-template-columns: 2fr 1fr; /* 2/3 for the left, 1/3 for the right */
-    gap: 10px; /* Optional: Adds some space between the two sections */
-    height: 100vh; /* Optional: Full viewport height */
-}
-.left-section {
-    padding: 8px;
-}
-.right-section {
-    padding: 8px;
-}
-
-@media (max-width: 768px) {
-    .grid-container {
-        grid-template-columns: 1fr; /* Stacks sections one by one */
-        height: auto; /* Adjust height for mobile */
-    }
-}
-
-</style>
