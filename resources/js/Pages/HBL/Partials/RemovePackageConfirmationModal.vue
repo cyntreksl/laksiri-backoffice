@@ -1,7 +1,6 @@
 <script setup>
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import DangerButton from "@/Components/DangerButton.vue";
+import Button from "primevue/button";
 
 const props = defineProps({
     show: {
@@ -26,13 +25,9 @@ const emit = defineEmits(['close', 'removePackage']);
 
         <template #footer>
             <div class="space-x-2">
-                <SecondaryButton @click="$emit('close')">
-                    Nevermind
-                </SecondaryButton>
+                <Button label="Cancel" severity="danger" variant="outlined"  @click="$emit('close')" />
 
-                <DangerButton @click="$emit('removePackage')">
-                    Remove Package
-                </DangerButton>
+                <Button label="Remove Package"  @click="$emit('removePackage')" />
             </div>
         </template>
     </ConfirmationModal>

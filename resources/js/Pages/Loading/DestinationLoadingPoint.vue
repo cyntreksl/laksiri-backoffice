@@ -7,7 +7,6 @@ import ReviewModal from "@/Pages/Loading/Partials/ReviewModal.vue";
 import {router, usePage} from "@inertiajs/vue3";
 import ActionMessage from "@/Components/ActionMessage.vue";
 import RadioButton from "@/Components/RadioButton.vue";
-import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 
 const props = defineProps({

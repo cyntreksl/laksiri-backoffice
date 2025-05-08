@@ -2,12 +2,11 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {router, useForm} from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
-import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import {push} from "notivue";
+import Button from "primevue/button";
 
 defineProps({
     cargoModes: {
@@ -69,27 +68,9 @@ const handleBranchCreate = () => {
                 </h2>
 
                 <div class="flex justify-end bottom-0 space-x-5">
-                    <DangerOutlineButton @click="router.visit(route('branches.index'))">Cancel</DangerOutlineButton>
-                    <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
-                                   class="space-x-2"
-                                   type="submit"
-                    >
-                        <span>Create a Branch</span>
-                        <svg
-                            class="size-5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </PrimaryButton>
+                    <Button label="Cancel" severity="danger" variant="outlined"  @click="router.visit(route('branches.index'))" />
+
+                    <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Create a Branch" type="submit" />
                 </div>
             </div>
 

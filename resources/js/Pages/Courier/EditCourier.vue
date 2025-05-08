@@ -4,13 +4,13 @@ import {router, useForm, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {computed, reactive, ref, watch} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryOutlineButton from "@/Components/PrimaryOutlineButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import {push} from "notivue";
 import InputLabel from "@/Components/InputLabel.vue";
+import Button from "primevue/button";
 
 const props = defineProps({
     courier: {
@@ -1026,30 +1026,9 @@ const volumeUnit = computed(() => {
 
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-5 col-span-2">
-                    <DangerOutlineButton @click="router.visit(route('couriers.index'))">
-                        Cancel
-                    </DangerOutlineButton>
-                    <PrimaryButton
-                        :class="{ 'opacity-50': form.processing }"
-                        class="space-x-2"
-                        type="submit"
-                    >
-                        <span>Create a Courier</span>
-                        <svg
-                            class="size-5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </PrimaryButton>
+                    <Button label="Cancel" severity="danger" variant="outlined"  @click="router.visit(route('couriers.index'))" />
+
+                    <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Create a Courier" type="submit" />
                 </div>
             </div>
 

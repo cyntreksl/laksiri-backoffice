@@ -3,12 +3,12 @@ import { ref, computed, watch } from 'vue';
 import { router, useForm, usePage } from '@inertiajs/vue3';
 import ActionSection from '@/Components/ActionSection.vue';
 import ConfirmsPassword from '@/Components/ConfirmsPassword.vue';
-import DangerButton from '@/Components/DangerButton.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
+import Button from "primevue/button";
 
 const props = defineProps({
     requiresConfirmation: Boolean,
@@ -238,13 +238,8 @@ const disableTwoFactorAuthentication = () => {
                     </ConfirmsPassword>
 
                     <ConfirmsPassword @confirmed="disableTwoFactorAuthentication">
-                        <DangerButton
-                            v-if="! confirming"
-                            :class="{ 'opacity-25': disabling }"
-                            :disabled="disabling"
-                        >
-                            Disable
-                        </DangerButton>
+                        <Button v-if="! confirming" :class="{ 'opacity-25': disabling }"
+                                :disabled="disabling" label="Disable" severity="danger" />
                     </ConfirmsPassword>
                 </div>
             </div>

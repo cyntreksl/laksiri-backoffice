@@ -2,11 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import { router, useForm } from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
-import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
 import { push } from "notivue";
 import Button from "primevue/button";
 import Card from "primevue/card";
