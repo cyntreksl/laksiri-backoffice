@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\v1\UploadHblImageRequest;
 use App\Http\Resources\HblImageResource;
 use App\Interfaces\Api\HblImageRepositoryInterface;
+use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 
 class HblImageController extends Controller
 {
+    use ResponseAPI;
+
     public function __construct(
         private readonly HblImageRepositoryInterface $hblImageRepository,
     ) {}
@@ -29,15 +32,12 @@ class HblImageController extends Controller
         $result = $this->hblImageRepository->uploadImages($validatedData);
 
         if ($result['message'] === 'No images provided.') {
-            return response()->json([
-                'message' => $result['message'],
-                'data' => $result['data'],
-            ], 400);
+            return $this->error($result['message'], $result['data'], 400);
         }
 
-        return response()->json([
-            'message' => 'Images uploaded successfully.',
-            'data' => HblImageResource::collection($result['data']),
-        ]);
+        return $this->success(
+            'Images uploaded successfully.',
+            HblImageResource::collection($result['data'])
+        );
     }
 }

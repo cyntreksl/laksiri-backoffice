@@ -2,7 +2,6 @@
 import {usePage} from "@inertiajs/vue3";
 import {ref} from "vue";
 import Card from "primevue/card";
-import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 
 const props = defineProps({
     hbl: {

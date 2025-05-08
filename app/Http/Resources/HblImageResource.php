@@ -15,7 +15,7 @@ class HblImageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image_path' => asset('storage/'.$this->image_path),
+            'image_path' => $this->image_path,
             'image_type' => $this->image_type,
             'hbl_id' => $this->hbl_id,
             'hbl_packages_id' => $this->hbl_packages_id,

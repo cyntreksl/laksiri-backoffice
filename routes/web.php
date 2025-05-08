@@ -45,6 +45,7 @@ Route::middleware([
     require_once __DIR__.'/web/user.php';
     require_once __DIR__.'/web/file-manager.php';
     require_once __DIR__.'/web/courier.php';
+    require_once __DIR__.'/web/container-payment.php';
 
     // call center routes
     Route::name('call-center.')->prefix('call-center')->group(function () {
@@ -60,6 +61,7 @@ Route::middleware([
     // finance routes
     Route::name('finance.')->prefix('finance')->group(function () {
         require_once __DIR__.'/web/finance/hbl.php';
+        require_once __DIR__.'/web/finance/container-payment.php';
     });
 
     Route::name('clearance.')->prefix('clearance')->group(function () {

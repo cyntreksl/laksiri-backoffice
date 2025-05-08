@@ -403,6 +403,20 @@ class RolePermissionSeeder extends Seeder
                     'charges.air line do charges delete',
                 ],
             ],
+            [
+                'group_name' => 'Payment Container',
+                'permissions' => [
+                    'payment-container.index',
+                    'payment-container.create',
+                    'payment-container.edit',
+                    'payment-container.delete',
+                    'payment-container.refund list',
+                    'payment-container.show container payment requests',
+                    'payment-container.approve',
+                    'payment-container.approved list',
+                    'payment-container.collect refund',
+                ],
+            ],
         ];
     }
 }

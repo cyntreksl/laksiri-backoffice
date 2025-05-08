@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\CustomerQueue;
-use App\Models\PackageQueue;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
@@ -71,8 +70,8 @@ Breadcrumbs::for('call-center.verification.show.verified', function (BreadcrumbT
 
 Breadcrumbs::for('call-center.examination.show.gate-pass', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
-    $trail->push('Gate Pass');
-    $trail->push('Released', route('call-center.examination.show.gate-pass'));
+    $trail->push('Examination');
+    $trail->push('Gate Pass Tokens', route('call-center.examination.show.gate-pass'));
 });
 
 // Cashier
@@ -110,19 +109,13 @@ Breadcrumbs::for('call-center.examination.create', function (BreadcrumbTrail $tr
 // Boned Area
 Breadcrumbs::for('call-center.package.queue.list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
-    $trail->push('Boned Area');
-    $trail->push('Package Queue', route('call-center.package.queue.list'));
-});
-
-Breadcrumbs::for('call-center.package.create', function (BreadcrumbTrail $trail, PackageQueue $packageQueue) {
-    $trail->parent('call-center.dashboard');
-    $trail->push('Boned Area');
-    $trail->push('Package Release', route('call-center.package.create', $packageQueue));
+    $trail->push('Package Queue');
+    $trail->push('Package Calling Queue', route('call-center.package.queue.list'));
 });
 
 Breadcrumbs::for('call-center.package.show.released.list', function (BreadcrumbTrail $trail) {
     $trail->parent('call-center.dashboard');
-    $trail->push('Boned Area');
+    $trail->push('Package Queue');
     $trail->push('Released Packages', route('call-center.package.show.released.list'));
 });
 

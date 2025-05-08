@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreHBLRequest;
 use App\Interfaces\Api\HBLRepositoryInterface;
 use App\Models\HBL;
+use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class HBLController extends Controller
 {
+    use ResponseAPI;
+
     public function __construct(
         private readonly HBLRepositoryInterface $HBLRepository,
     ) {}
@@ -54,6 +57,21 @@ class HBLController extends Controller
     public function getHBLRules(Request $request)
     {
         return $this->HBLRepository->getHBLRules($request->all());
+    }
+
+    public function completedHBL(Request $request)
+    {
+        return $this->HBLRepository->getCompletedHBL($request->all());
+    }
+
+    public function completedHBLView(Request $request, $id)
+    {
+        $hbl = HBL::find($id);
+        if (! $hbl) {
+            return $this->error('HBL not found');
+        }
+
+        return $this->HBLRepository->completedHBLView($hbl);
     }
 
     public function update(Request $request, HBL $hbl): JsonResponse

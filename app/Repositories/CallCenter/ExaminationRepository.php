@@ -74,20 +74,15 @@ class ExaminationRepository implements ExaminationRepositoryInterface
             ->whereNotNull('left_at')
             ->has('token.verification');
 
-        $records = $query->orderBy($order, $direction)
-            ->skip($offset)
-            ->take($limit)
-            ->get();
-
-        $totalRecords = $query->count();
+        $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => ExaminationCollection::collection($records),
             'meta' => [
-                'total' => $totalRecords,
-                'page' => $offset,
-                'perPage' => $limit,
-                'lastPage' => ceil($totalRecords / $limit),
+                'total' => $records->total(),
+                'current_page' => $records->currentPage(),
+                'perPage' => $records->perPage(),
+                'lastPage' => $records->lastPage(),
             ],
         ]);
     }

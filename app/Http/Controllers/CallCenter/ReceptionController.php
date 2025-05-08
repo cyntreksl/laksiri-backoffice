@@ -51,7 +51,7 @@ class ReceptionController extends Controller
             $documents = array_filter($documents, fn ($doc) => $doc !== 'Passport');
         }
 
-        return Inertia::render('CallCenter/Reception/VerificationForm', [
+        return Inertia::render('CallCenter/Reception/Verification', [
             'customerQueue' => $customerQueue,
             'verificationDocuments' => $documents,
             'hblId' => HBL::withoutGlobalScopes()->where('reference', $customerQueue->token->reference)->first()->id,

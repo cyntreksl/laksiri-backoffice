@@ -2,7 +2,7 @@
 import {computed, onMounted, ref, watch} from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Select from "primevue/select";
 import InputIcon from "primevue/inputicon";

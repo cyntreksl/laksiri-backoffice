@@ -15,6 +15,7 @@ use App\Interfaces\CallCenter\ReceptionRepositoryInterface;
 use App\Interfaces\CallCenter\UserFeedbackRepositoryInterface;
 use App\Interfaces\CallCenter\VerificationRepositoryInterface;
 use App\Interfaces\CashSettlementInterface;
+use App\Interfaces\ContainerPaymentRepositoryInterface;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\CourierAgentRepositoryInterface;
@@ -60,6 +61,7 @@ use App\Repositories\CallCenter\ReceptionRepository;
 use App\Repositories\CallCenter\UserFeedbackRepository;
 use App\Repositories\CallCenter\VerificationRepository;
 use App\Repositories\CashSettlementRepository;
+use App\Repositories\ContainerPaymentRepository;
 use App\Repositories\ContainerRepositories;
 use App\Repositories\CountryRepository;
 use App\Repositories\CourierAgentRepository;
@@ -131,6 +133,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PickupTypeRepositoryInterface::class, PickupTypeRepository::class);
         $this->app->bind(SpecialDOChargeRepositoryInterface::class, SpecialDOChargeRepository::class);
         $this->app->bind(VesselScheduleRepositoryInterface::class, VesselScheduleRepository::class);
+        $this->app->bind(ContainerPaymentRepositoryInterface::class, ContainerPaymentRepository::class);
 
         // call center repositories
         $this->app->bind(\App\Interfaces\CallCenter\HBLRepositoryInterface::class, \App\Repositories\CallCenter\HBLRepository::class);
@@ -149,6 +152,7 @@ class RepositoryServiceProvider extends ServiceProvider
 
         // finance repositories
         $this->app->bind(\App\Interfaces\Finance\HBLRepositoryInterface::class, \App\Repositories\Finance\HBLRepository::class);
+        $this->app->bind(\App\Interfaces\Finance\ContainerPaymentRepositoryInterface::class, \App\Repositories\Finance\ContainerPaymentRepository::class);
     }
 
     public function boot(): void {}

@@ -3,12 +3,11 @@ import moment from "moment";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import draggable from 'vuedraggable'
 import ActionMessage from "@/Components/ActionMessage.vue";
-import {computed, ref, watch} from "vue";
+import {computed, ref} from "vue";
 import {router} from "@inertiajs/vue3";
 import ReviewModal from "@/Pages/Arrival/Partials/ReviewModal.vue";
 import WarningButton from "@/Components/WarningButton.vue";
 import CreateUnloadingIssueModal from "@/Pages/Arrival/Partials/CreateUnloadingIssueModal.vue";
-import DestinationAppLayout from "@/Layouts/DestinationAppLayout.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 
 const props = defineProps({
@@ -68,10 +67,10 @@ const groupedMHBLPackages = props.packagesWithMhbl
     }, {});
 
 const groupedWarehousePackages = props.packagesWithoutMhbl
-    .filter(p => p.pivot?.status  === 'draft-unload');
+    .filter(p => p.pivot?.status === 'draft-unload');
 
 const groupedWarehouseMHBLPackages = props.packagesWithMhbl
-    .filter(p => p.pivot?.status  === 'draft-unload').reduce((acc, p) => {
+    .filter(p => p.pivot?.status === 'draft-unload').reduce((acc, p) => {
         const mhblReference = p.hbl.mhbl.reference;
         if (!acc[mhblReference]) {
             acc[mhblReference] = [];
@@ -265,7 +264,8 @@ const reviewContainer = () => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <PrimaryButton :disabled="warehouseArr.length === 0 && warehouseMHBLArr.length === 0" @click.prevent="reviewContainer">
+                    <PrimaryButton :disabled="warehouseArr.length === 0 && warehouseMHBLArr.length === 0"
+                                   @click.prevent="reviewContainer">
                         Proceed to Review
                     </PrimaryButton>
                 </div>
@@ -327,7 +327,8 @@ const reviewContainer = () => {
                             </div>
                         </div>
                         <div>
-                            <ul v-if="Object.keys(filteredPackages).length > 0" class="space-y-1 font-inter font-medium">
+                            <ul v-if="Object.keys(filteredPackages).length > 0"
+                                class="space-y-1 font-inter font-medium">
                                 <li v-for="(hbl, groupIndex) in filteredPackages" :key="hbl.id">
                                     <div
                                         v-if="Object.keys(hbl.packages).length > 0"
@@ -515,7 +516,8 @@ const reviewContainer = () => {
                         </div>
 
                         <div>
-                            <ul v-if="Object.keys(filteredMHBLPackages).length > 0" class="space-y-1 font-inter font-medium">
+                            <ul v-if="Object.keys(filteredMHBLPackages).length > 0"
+                                class="space-y-1 font-inter font-medium">
                                 <li v-for="(pkg, groupIndex) in filteredMHBLPackages" :key="pkg.mhblReference">
                                     <div
                                         v-if="Object.keys(pkg.packages).length > 0"
@@ -571,7 +573,7 @@ const reviewContainer = () => {
                                     </div>
                                     <ul v-show="pkg.expanded" class="pl-4">
                                         <div :packages="pkg.packages"
-                                                   class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
+                                             class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
                                         >
                                             <div v-for="(element, index) in pkg.packages" :key="element.id">
                                                 <div class="card cursor-pointer shadow-sm">
@@ -735,8 +737,11 @@ const reviewContainer = () => {
                                             <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
                                                 <div>
                                                     <div class="flex items-center">
-                                                        <svg v-show="element.unloading_issue.length > 0" class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle text-warning mr-2" fill="none" height="24"
-                                                             stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                        <svg v-show="element.unloading_issue.length > 0"
+                                                             class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle text-warning mr-2"
+                                                             fill="none" height="24"
+                                                             stroke="currentColor" stroke-linecap="round"
+                                                             stroke-linejoin="round"
                                                              stroke-width="2" viewBox="0 0 24 24" width="24"
                                                              xmlns="http://www.w3.org/2000/svg">
                                                             <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
@@ -825,11 +830,15 @@ const reviewContainer = () => {
                                                 </p>
                                             </div>
                                             <div class="flex items-center space-x-8 px-2.5">
-                                                <WarningButton :disabled="element.unloading_issue.length > 0" @click.prevent="confirmShowCreateIssueModal(index)">
-                                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle mr-2" fill="none" height="24"
-                                                         stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                                         stroke-width="2" viewBox="0 0 24 24" width="24"
-                                                         xmlns="http://www.w3.org/2000/svg">
+                                                <WarningButton :disabled="element.unloading_issue.length > 0"
+                                                               @click.prevent="confirmShowCreateIssueModal(index)">
+                                                    <svg
+                                                        class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle mr-2"
+                                                        fill="none" height="24"
+                                                        stroke="currentColor" stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2" viewBox="0 0 24 24" width="24"
+                                                        xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                                         <path d="M12 9v4"/>
                                                         <path
@@ -911,7 +920,7 @@ const reviewContainer = () => {
                                     </div>
                                     <ul v-show="mhbl.expanded" class="pl-4">
                                         <div :packages="mhbl.packages"
-                                                   class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
+                                             class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
                                         >
                                             <div v-for="(element, index) in mhbl.packages" :key="element.id">
                                                 <div class="card cursor-pointer shadow-sm">
@@ -1007,11 +1016,16 @@ const reviewContainer = () => {
                                                             </p>
                                                         </div>
                                                         <div class="flex items-center space-x-8 px-2.5">
-                                                            <WarningButton :disabled="element.unloading_issue.length > 0" @click.prevent="confirmShowMHBLCreateIssueModal(element.id)">
-                                                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle mr-2" fill="none" height="24"
-                                                                     stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                                                     stroke-width="2" viewBox="0 0 24 24" width="24"
-                                                                     xmlns="http://www.w3.org/2000/svg">
+                                                            <WarningButton
+                                                                :disabled="element.unloading_issue.length > 0"
+                                                                @click.prevent="confirmShowMHBLCreateIssueModal(element.id)">
+                                                                <svg
+                                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle mr-2"
+                                                                    fill="none" height="24"
+                                                                    stroke="currentColor" stroke-linecap="round"
+                                                                    stroke-linejoin="round"
+                                                                    stroke-width="2" viewBox="0 0 24 24" width="24"
+                                                                    xmlns="http://www.w3.org/2000/svg">
                                                                     <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                                                     <path d="M12 9v4"/>
                                                                     <path
@@ -1053,13 +1067,15 @@ const reviewContainer = () => {
         </main>
 
         <ReviewModal
-             :show="showReviewModal"
-             :warehouse-array="warehouseArr"
-             :warehouseMHBLs="warehouseMHBLArr"
-             @close="showReviewModal = false"
+            :visible="showReviewModal"
+            :warehouse-array="warehouseArr"
+            :warehouseMHBLs="warehouseMHBLArr"
+            @close="showReviewModal = false"
+            @update:visible="showReviewModal = $event"
         />
 
-        <CreateUnloadingIssueModal :hbl-package-id="hblPackageId" :show="showUnloadingIssueModal" @close="showUnloadingIssueModal = false"/>
+        <CreateUnloadingIssueModal :hbl-package-id="hblPackageId" :show="showUnloadingIssueModal"
+                                   @close="showUnloadingIssueModal = false"/>
     </AppLayout>
 </template>
 

@@ -1,9 +1,8 @@
 <script setup>
-import {onMounted, ref, watch} from "vue";
 import Tabs from "@/Components/Tabs.vue";
-import TabHBLDetails from "@/Pages/Common/Partials/TabHBLDetails.vue";
-import TabStatus from "@/Pages/Common/Partials/TabStatus.vue";
-import TabDocuments from "@/Pages/Common/Partials/TabDocuments.vue";
+import TabHBLDetails from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLDetails.vue";
+import TabStatus from "@/Pages/Common/Dialog/HBL/Tabs/TabStatus.vue";
+import TabDocuments from "@/Pages/Common/Dialog/HBL/Tabs/TabDocuments.vue";
 
 const props = defineProps({
     hbl: {

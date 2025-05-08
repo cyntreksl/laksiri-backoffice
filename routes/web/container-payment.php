@@ -1,0 +1,17 @@
+<?php
+
+use App\Http\Controllers\ContainerPaymentController;
+use Illuminate\Support\Facades\Route;
+
+Route::resource('container-payment', ContainerPaymentController::class)
+    ->except('show');
+
+Route::get('container-payment/{container}', [ContainerPaymentController::class, 'getContainerPayment'])->name('container-payment.getContainerPayment');
+
+Route::get('container-payment-refund', [ContainerPaymentController::class, 'showContainerPaymentRefund'])->name('container-payment.showContainerPaymentRefund');
+
+Route::get('container-payment-list', [ContainerPaymentController::class, 'list']);
+
+Route::get('container-payment-refund-list', [ContainerPaymentController::class, 'refundList']);
+
+Route::post('container-payment/mark-refund-collection', [ContainerPaymentController::class, 'markRefundAsCollected'])->name('container-payment.refund-collection');

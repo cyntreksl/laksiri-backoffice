@@ -7,7 +7,7 @@ import moment from "moment";
 import Checkbox from "@/Components/Checkbox.vue";
 import PaymentModal from "@/Pages/CashSettlement/Partials/PaymentModal.vue";
 import { router, usePage } from "@inertiajs/vue3";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import Card from "primevue/card";
 import FloatLabel from "primevue/floatlabel";

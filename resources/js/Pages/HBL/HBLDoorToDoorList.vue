@@ -19,7 +19,7 @@ import ContextMenu from "primevue/contextmenu";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import DatePicker from "primevue/datepicker";
 import FloatLabel from "primevue/floatlabel";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 import {useConfirm} from "primevue/useconfirm";
 import {FilterMatchMode} from "@primevue/core/api";

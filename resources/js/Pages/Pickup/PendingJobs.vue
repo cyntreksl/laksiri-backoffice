@@ -22,7 +22,7 @@ import {FilterMatchMode} from '@primevue/core/api';
 import {debounce} from "lodash";
 import {router, Link, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import moment from "moment";
 import AssignDriverDialog from "@/Pages/Pickup/Partials/AssignDriverDialog.vue";
 
@@ -364,6 +364,24 @@ const confirmPickupRetry = (pickup) => {
     });
 };
 
+const parsePackageTypes = (str) => {
+    if (!str) return [];
+
+    if (Array.isArray(str)) return str;
+
+    try {
+        const parsed = JSON.parse(str);
+        if (Array.isArray(parsed)) {
+            return parsed.map(type => type.trim().replace(/^["']|["']$/g, ''));
+        }
+    } catch (e) {
+        // Fallback: split by comma
+    }
+
+    return str.split(',').map(type => type.trim().replace(/^["']|["']$/g, ''));
+};
+
+
 const handleConfirmDriverRemove = (pickupId) => {
     confirm.require({
         message: 'Are you certain you want to unassign the driver from this pickup?',
@@ -599,16 +617,16 @@ const handleConfirmDriverRemove = (pickupId) => {
 
                         <Column field="pickup_type" header="Pickup Type" hidden></Column>
 
-                        <Column field="packages" header="Packages">
+                         <Column field="packages" header="Packages">
                             <template #body="slotProps">
-                                <div v-if="Array.isArray(slotProps.data.packages)" class="flex flex-wrap mb-1 gap-2">
-                                    <Chip v-for="(type, index) in slotProps.data.packages" :key="index" :label="type.package_type" class="text-xs" icon="pi pi-box"/>
-                                </div>
-                                <div v-else-if="typeof slotProps.data.packages === 'string'" class="flex flex-wrap mb-1 gap-2">
-                                    <Chip v-for="(type, index) in slotProps.data.packages.split(',').map(type => type.trim())" :key="index" :label="type" class="text-xs" icon="pi pi-box"/>
-                                </div>
-                                <div v-else>
-                                    {{ slotProps.data.packages || '-' }}
+                                <div class="flex flex-wrap mb-1 gap-2">
+                                    <template v-if="slotProps.data.package_types">
+                                        <Chip v-for="(type, index) in parsePackageTypes(slotProps.data.package_types)" :key="index" :label="type" icon="pi pi-box"
+                                        />
+                                    </template>
+                                    <template v-else>
+                                        {{ '-' }}
+                                    </template>
                                 </div>
                             </template>
                         </Column>

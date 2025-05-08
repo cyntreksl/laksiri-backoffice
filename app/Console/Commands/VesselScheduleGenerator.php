@@ -37,6 +37,7 @@ class VesselScheduleGenerator extends Command
             ->where('estimated_time_of_arrival', '<=', $weekEnd->format('Y-m-d'))
             ->where('cargo_type', '=', 'Sea Cargo')
             ->where('is_reached', false)
+            ->where('status', '=', 'LOADED')
             ->get();
 
         $vesselSchedule = VesselSchedule::create([

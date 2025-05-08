@@ -7,7 +7,7 @@ import DatePicker from 'primevue/datepicker';
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {Link, router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
-import HBLDetailModal from "@/Pages/Common/HBLDetailModal.vue";
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import Select from "primevue/select";
 import InputIcon from "primevue/inputicon";
 import Card from "primevue/card";

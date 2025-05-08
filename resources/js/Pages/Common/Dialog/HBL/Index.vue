@@ -1,8 +1,5 @@
 <script setup>
 import {onMounted, ref, watch} from "vue";
-import TabHBLDetails from "@/Pages/Common/Partials/TabHBLDetails.vue";
-import TabStatus from "@/Pages/Common/Partials/TabStatus.vue";
-import TabDocuments from "@/Pages/Common/Partials/TabDocuments.vue";
 import { usePage } from '@inertiajs/vue3';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
@@ -11,8 +8,11 @@ import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
-import TabHBLPayments from "@/Pages/Common/Partials/TabHBLPayments.vue";
-import TabShipment from "@/Pages/Common/Partials/TabShipment.vue";
+import TabDocuments from "@/Pages/Common/Dialog/HBL/Tabs/TabDocuments.vue";
+import TabStatus from "@/Pages/Common/Dialog/HBL/Tabs/TabStatus.vue";
+import TabShipment from "@/Pages/Common/Dialog/HBL/Tabs/TabShipment.vue";
+import TabHBLPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLPayments.vue";
+import TabHBLDetails from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLDetails.vue";
 
 const props = defineProps({
     show: {
@@ -159,16 +159,16 @@ onMounted(() => {
 
 <template>
     <Dialog
+        :draggable="false"
         :style="{ width: '80rem' }"
         :visible="show"
+        closable
+        close-on-escape
+        dismissable-mask
+        header="Overview"
+        maximizable
         modal
         @update:visible="(newValue) => $emit('update:show', newValue)"
-        closable
-        maximizable
-        dismissable-mask
-        close-on-escape
-        header="Overview"
-        :draggable="false"
     >
         <Tabs value="0">
             <TabList>
@@ -208,7 +208,7 @@ onMounted(() => {
                     <TabHBLDetails :hbl="hbl" :is-loading="isLoading" :pickup="pickup" />
                 </TabPanel>
                 <TabPanel value="1">
-                    <TabHBLPayments :hbl="hbl" :hbl-total-summary="hblTotalSummary" :hbl-destination-total-summary="hblDestinationTotalSummary"/>
+                    <TabHBLPayments :hbl="hbl" :hbl-destination-total-summary="hblDestinationTotalSummary" :hbl-total-summary="hblTotalSummary"/>
                 </TabPanel>
                 <TabPanel value="2">
                     <TabShipment v-if="hbl" :hbl="hbl" :pickup="pickup" />
@@ -224,7 +224,7 @@ onMounted(() => {
 
         <template #footer>
             <div class="mt-3">
-                <Button @click="$emit('close')" severity="secondary" label="Cancel"/>
+                <Button label="Cancel" severity="secondary" @click="$emit('close')"/>
             </div>
         </template>
     </Dialog>

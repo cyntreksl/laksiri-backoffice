@@ -87,15 +87,14 @@ const filteredReceptionQueue = computed(() => {
                         <template #body="{ data }">
                             <Button
                                 class="mr-2"
-                                icon="ti ti-checks"
-                                outlined
+                                icon="pi pi-check"
                                 rounded
                                 size="small"
-                                variant="outlined"
                                 @click.prevent="() => router.visit(route('call-center.reception.create', data.id))"
                             />
                         </template>
                     </Column>
+                    <template #footer> In total there are {{ slotProps.items.length }} tokens.</template>
                 </DataTable>
             </template>
 

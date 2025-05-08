@@ -25,7 +25,6 @@ class PackageCollection extends JsonResource
             'released_by' => $this->releasedBy->name,
             'token' => $this->token->token,
             'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first())->hbl_number,
-            //            'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()),
         ];
     }
 }
