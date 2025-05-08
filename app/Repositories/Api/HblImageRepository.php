@@ -5,6 +5,7 @@ namespace App\Repositories\Api;
 use App\Interfaces\Api\HblImageRepositoryInterface;
 use App\Models\HBLImage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class HblImageRepository implements HblImageRepositoryInterface
 {
@@ -23,8 +24,10 @@ class HblImageRepository implements HblImageRepositoryInterface
             foreach ($data['images'] as $image) {
                 $path = $image->store('uploads', 's3');
 
+                $url = Storage::disk('s3')->url($path);
+
                 $imageData = [
-                    'image_path' => $path,
+                    'image_path' => $url,
                     'image_type' => $data['image_type'],
                     'hbl_id' => $data['hbl_id'] ?? null,
                     'hbl_packages_id' => $data['hbl_packages_id'] ?? null,
