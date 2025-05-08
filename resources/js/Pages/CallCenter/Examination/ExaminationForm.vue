@@ -2,18 +2,13 @@
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import InputError from "@/Components/InputError.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {push} from "notivue";
-import InputLabel from "@/Components/InputLabel.vue";
 import { ref } from "vue";
-import HBLDetailContent from "@/Pages/Common/Partials/HBLDetailContent.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import moment from "moment/moment.js";
 import Tab from "primevue/tab";
 import TabPanel from "primevue/tabpanel";
 import TabShipment from "@/Pages/Common/Dialog/HBL/Tabs/TabShipment.vue";
 import Card from "primevue/card";
-import InputNumber from "primevue/inputnumber";
 import TabHBLDetails from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLDetails.vue";
 import IftaLabel from "primevue/iftalabel";
 import TabHBLPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLPayments.vue";

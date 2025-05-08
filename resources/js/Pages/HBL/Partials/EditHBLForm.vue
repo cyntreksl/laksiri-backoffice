@@ -1,10 +1,7 @@
 <script setup>
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import {computed, onBeforeMount, reactive, ref, watch, onMounted} from "vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import DangerOutlineButton from "@/Components/DangerOutlineButton.vue";
 import InputError from "@/Components/InputError.vue";
-import RemovePackageConfirmationModal from "@/Pages/HBL/Partials/RemovePackageConfirmationModal.vue";
 import {push} from "notivue";
 import InputLabel from "@/Components/InputLabel.vue";
 import hblImage from "../../../../images/illustrations/hblimage.png";

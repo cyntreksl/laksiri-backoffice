@@ -2,7 +2,7 @@
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import {onMounted, ref, watch} from "vue";
 import {push} from "notivue";
-import DeleteDocConfirmationModal from "@/Pages/Common/Dialog/HBL/Tabs/DeleteDocConfirmationModal.vue";
+import {useConfirm} from "primevue/useconfirm";
 
 const props = defineProps({
     hblId: {
@@ -17,6 +17,11 @@ const props = defineProps({
 
 const isLoading = ref(false);
 const hblDocumentsRecords = ref([]);
+const confirm = useConfirm();
+const passportInput = ref(null);
+const nicInput = ref(null);
+const specialNoteInput = ref(null);
+const packingListInput = ref(null);
 
 const fetchHBLDocuments = async () => {
     isLoading.value = true;
@@ -40,11 +45,6 @@ const fetchHBLDocuments = async () => {
         isLoading.value = false;
     }
 }
-
-const passportInput = ref(null);
-const nicInput = ref(null);
-const specialNoteInput = ref(null);
-const packingListInput = ref(null);
 
 const selectNewDoc = (refName) => {
     if (refName === 'passportInput') {
@@ -101,30 +101,32 @@ const handleFileUpload = () => {
     })
 }
 
-const showConfirmDeleteDocModal = ref(false);
-const docId = ref(null);
-const docName = ref('');
-
-const confirmDeleteDoc = (id, name) => {
-    docId.value = id;
-    docName.value = name;
-    showConfirmDeleteDocModal.value = true;
-};
-
-const closeDeleteModal = () => {
-    docId.value = null;
-    docName.value = '';
-    showConfirmDeleteDocModal.value = false;
-};
-
-const handleDeleteDoc = () => {
-    router.delete(route("hbls.destroy.document", docId.value), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeDeleteModal();
-            push.success('Document Deleted Successfully!');
-            fetchHBLDocuments();
+const handleDeleteDoc = (id) => {
+    confirm.require({
+        message: 'Would you like to delete this document?',
+        header: 'Delete Document?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
         },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            router.delete(route("hbls.destroy.document", id), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success('Document Deleted Successfully!');
+                    fetchHBLDocuments();
+                },
+            });
+        },
+        reject: () => {
+        }
     });
 };
 
@@ -240,7 +242,7 @@ onMounted(() => {
                                     <button
                                         v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Copy of Passport')"
                                         class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
-                                        @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Copy of Passport').id, 'Copy of Passport')"
+                                        @click.prevent="handleDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Copy of Passport').id)"
                                     >
                                         <svg
                                             class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"
@@ -325,7 +327,7 @@ onMounted(() => {
                                     <button
                                         v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Copy of NIC')"
                                         class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
-                                        @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Copy of NIC').id, 'Copy of NIC')"
+                                        @click.prevent="handleDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Copy of NIC').id)"
                                     >
                                         <svg
                                             class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"
@@ -410,7 +412,7 @@ onMounted(() => {
                                     <button
                                         v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Packing List')"
                                         class="btn size-7 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
-                                        @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Packing List').id, 'Packing List')"
+                                        @click.prevent="handleDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Packing List').id)"
                                     >
                                         <svg
                                             class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"
@@ -496,7 +498,7 @@ onMounted(() => {
                                     <button
                                         v-if="hblDocumentsRecords.some(doc => doc.document_name === 'Special Note')"
                                         class="btn size-6 rounded-full bg-slate-150 p-0 font-medium text-slate-800 hover:bg-slate-200 hover:shadow-lg hover:shadow-slate-200/50 focus:bg-slate-200 focus:shadow-lg focus:shadow-slate-200/50 active:bg-slate-200/80 dark:bg-navy-500 dark:text-navy-50 dark:hover:bg-navy-450 dark:hover:shadow-navy-450/50 dark:focus:bg-navy-450 dark:focus:shadow-navy-450/50 dark:active:bg-navy-450/90"
-                                        @click.prevent="confirmDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Special Note').id, 'Special Note')"
+                                        @click.prevent="handleDeleteDoc(hblDocumentsRecords.find(doc => doc.document_name === 'Special Note').id)"
                                     >
                                         <svg
                                             class="size-5 icon icon-tabler icons-tabler-filled icon-tabler-trash text-error"
@@ -581,7 +583,4 @@ onMounted(() => {
             </div>
         </div>
     </div>
-
-    <DeleteDocConfirmationModal :doc-name="docName" :show="showConfirmDeleteDocModal" @close="closeDeleteModal"
-                                @delete-doc="handleDeleteDoc"/>
 </template>

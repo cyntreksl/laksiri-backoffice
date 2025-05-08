@@ -1,14 +1,13 @@
 <script setup>
 import moment from "moment";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import draggable from 'vuedraggable'
 import ActionMessage from "@/Components/ActionMessage.vue";
 import {computed, ref} from "vue";
 import {router} from "@inertiajs/vue3";
 import ReviewModal from "@/Pages/Arrival/Partials/ReviewModal.vue";
-import WarningButton from "@/Components/WarningButton.vue";
 import CreateUnloadingIssueModal from "@/Pages/Arrival/Partials/CreateUnloadingIssueModal.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import Button from "primevue/button";
 
 const props = defineProps({
     container: {
@@ -264,10 +263,9 @@ const reviewContainer = () => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <PrimaryButton :disabled="warehouseArr.length === 0 && warehouseMHBLArr.length === 0"
-                                   @click.prevent="reviewContainer">
-                        Proceed to Review
-                    </PrimaryButton>
+                    <Button :disabled="warehouseArr.length === 0 && warehouseMHBLArr.length === 0"
+                            icon="pi pi-arrow-right" icon-pos="right" label="Proceed to Review"
+                            size="small" @click.prevent="reviewContainer"/>
                 </div>
             </div>
 
@@ -830,36 +828,10 @@ const reviewContainer = () => {
                                                 </p>
                                             </div>
                                             <div class="flex items-center space-x-8 px-2.5">
-                                                <WarningButton :disabled="element.unloading_issue.length > 0"
-                                                               @click.prevent="confirmShowCreateIssueModal(index)">
-                                                    <svg
-                                                        class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle mr-2"
-                                                        fill="none" height="24"
-                                                        stroke="currentColor" stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2" viewBox="0 0 24 24" width="24"
-                                                        xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                        <path d="M12 9v4"/>
-                                                        <path
-                                                            d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
-                                                        <path d="M12 16h.01"/>
-                                                    </svg>
+                                                <Button :disabled="element.unloading_issue.length > 0" icon="pi pi-exclamation-triangle" label="Create Unloading Issue"
+                                                        severity="warn" size="small" @click.prevent="confirmShowCreateIssueModal(index)"/>
 
-                                                    Create Unloading Issue
-                                                </WarningButton>
-                                                <svg
-                                                    class=" hover:text-error icon icon-tabler icons-tabler-outline icon-tabler-corner-up-left-double"
-                                                    fill="none" height="24" stroke="currentColor" stroke-linecap="round"
-                                                    stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                                    width="24"
-                                                    x-tooltip.placement.top.error="'Click to Re-Load'"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    @click.prevent="handleReLoadToContainer(index)">
-                                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                    <path d="M19 18v-6a3 3 0 0 0 -3 -3h-7"/>
-                                                    <path d="M13 13l-4 -4l4 -4m-5 8l-4 -4l4 -4"/>
-                                                </svg>
+                                                <Button v-tooltip.left="'Click to Re-Load'" aria-label="Filter" icon="ti ti-corner-up-left-double text-2xl" rounded severity="danger" text @click.prevent="handleReLoadToContainer(index)"/>
                                             </div>
                                         </div>
                                     </div>
@@ -1016,25 +988,8 @@ const reviewContainer = () => {
                                                             </p>
                                                         </div>
                                                         <div class="flex items-center space-x-8 px-2.5">
-                                                            <WarningButton
-                                                                :disabled="element.unloading_issue.length > 0"
-                                                                @click.prevent="confirmShowMHBLCreateIssueModal(element.id)">
-                                                                <svg
-                                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle mr-2"
-                                                                    fill="none" height="24"
-                                                                    stroke="currentColor" stroke-linecap="round"
-                                                                    stroke-linejoin="round"
-                                                                    stroke-width="2" viewBox="0 0 24 24" width="24"
-                                                                    xmlns="http://www.w3.org/2000/svg">
-                                                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                                    <path d="M12 9v4"/>
-                                                                    <path
-                                                                        d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
-                                                                    <path d="M12 16h.01"/>
-                                                                </svg>
-
-                                                                Create Unloading Issue
-                                                            </WarningButton>
+                                                            <Button :disabled="element.unloading_issue.length > 0" icon="pi pi-exclamation-triangle" label="Create Unloading Issue"
+                                                                    severity="warn" size="small" @click.prevent="confirmShowMHBLCreateIssueModal(element.id)"/>
                                                         </div>
                                                     </div>
                                                 </div>

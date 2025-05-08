@@ -2,11 +2,10 @@
 import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import ActionSection from '@/Components/ActionSection.vue';
-import DangerButton from '@/Components/DangerButton.vue';
 import DialogModal from '@/Components/DialogModal.vue';
 import InputError from '@/Components/InputError.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
+import Button from "primevue/button";
 
 const confirmingUserDeletion = ref(false);
 const passwordInput = ref(null);
@@ -83,18 +82,9 @@ const closeModal = () => {
                 </template>
 
                 <template #footer>
-                    <SecondaryButton @click="closeModal">
-                        Cancel
-                    </SecondaryButton>
+                    <Button label="Cancel" severity="danger" variant="outlined"  @click="closeModal" />
 
-                    <DangerButton
-                        class="ms-3"
-                        :class="{ 'opacity-25': form.processing }"
-                        :disabled="form.processing"
-                        @click="deleteUser"
-                    >
-                        Delete Account
-                    </DangerButton>
+                    <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" label="Delete Account" @click="deleteUser" />
                 </template>
             </DialogModal>
         </template>
