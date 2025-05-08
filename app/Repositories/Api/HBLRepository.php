@@ -10,6 +10,7 @@ use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\GetHBLPackageRules;
 use App\Actions\HBL\UpdateHBLApi;
 use App\Actions\HBL\UpdateHBLPackages;
+use App\Actions\HBL\UpdateHBLPackagesApi;
 use App\Http\Resources\HBLResource;
 use App\Interfaces\Api\HBLRepositoryInterface;
 use App\Models\Branch;
@@ -93,26 +94,20 @@ class HBLRepository implements HBLRepositoryInterface
             $hbl = UpdateHBLApi::run($hbl, $data);
 
             $packagesData = $data['packages'] ?? [];
-            UpdateHBLPackages::run($hbl, $packagesData);
+            UpdateHBLPackagesApi::run($hbl, $packagesData);
 
             DB::commit();
 
             $hbl->load('packages');
 
-            return response()->json([
-                'message' => 'HBL updated successfully.',
-                'data' => [
-                    'hbl' => $hbl,
-                    'packages' => $hbl->packages,
-                ],
+            return $this->success('HBL updated successfully.', [
+                'hbl' => $hbl,
             ]);
+
         } catch (Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                'message' => 'Failed to update HBL.',
-                'error' => $e->getMessage(),
-            ], 500);
+            return $this->error('Failed to update HBL.', ['exception' => $e->getMessage()], 500);
         }
     }
 }

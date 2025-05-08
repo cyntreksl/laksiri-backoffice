@@ -29,6 +29,10 @@ class UpdateHBLPackagesApi
                 return in_array($package->id, $existPackageIds);
             });
 
+            $deletedPackages->each(function ($package) {
+                $package->delete();
+            });
+
             CreateHBLPackages::run($hbl, $newPackages);
         });
     }
