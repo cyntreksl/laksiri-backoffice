@@ -116,7 +116,7 @@ const handleUpdateContainer = () => {
         form.estimated_time_of_arrival = null;
     }
 
-    if (form.reached_date !== 'Invalid date') {
+    if (moment(form.reached_date).isValid()) {
         form.reached_date = moment(form.reached_date).format("YYYY-MM-DD");
     } else {
         form.reached_date = null;

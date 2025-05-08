@@ -1,14 +1,16 @@
 <script setup>
-import DialogModal from "@/Components/DialogModal.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {computed, ref} from "vue";
-import TextInput from "@/Components/TextInput.vue";
+import {computed} from "vue";
 import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
+import Dialog from "primevue/dialog";
+import Button from "primevue/button";
+import Card from "primevue/card";
+import Tag from 'primevue/tag';
+import IftaLabel from "primevue/iftalabel";
+import InputText from "primevue/inputtext";
 
 const props = defineProps({
-    show: {
+    visible: {
         type: Boolean,
         default: false,
     },
@@ -43,7 +45,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(["update:visible"]);
 
 const countPackages = (packageHBlId) => {
     return props.containerArray.filter(item => item.hbl_id === packageHBlId).length;
@@ -102,144 +104,99 @@ const handleCreateLoadedContainer = (printTallySheet) => {
 </script>
 
 <template>
-    <DialogModal :closeable="true" :maxWidth="'4xl'" :show="show" @close="$emit('close')">
-        <template #title>
-            <div class="flex justify-between items-center">
-                <div>Shipping Summery</div>
-                <button
-                    class="text-gray-500 jus text-right hover:text-red-500 focus:outline-none"
-                    @click="$emit('close')"
-                >
-                    <svg class="size-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 18 18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </button>
-            </div>
+    <Dialog :style="{ width: '50rem' }" :visible="visible" header="Shipping Summery" modal
+            @update:visible="(newValue) => $emit('update:visible', newValue)">
 
-        </template>
-        <template #content>
-
-            <div class="py-5 mx-2 flex items-center justify-between">
-                <div v-if="route().params.cargoType === 'Sea Cargo'" class="flex items-center space-x-2">
-                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-ship text-primary"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M2 20a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1" /><path d="M4 18l-1 -5h18l-2 4" /><path d="M5 13v-6h8l4 6" /><path d="M7 7v-4h-1" /></svg>
-                    <p>Sea Cargo</p>
+        <div class="grid grid-cols-2 my-3">
+            <div>
+                <div v-if="route().params.cargoType === 'Sea Cargo'" class="flex items-center space-x-2 text-primary">
+                    <i class="ti ti-ship text-2xl"></i>
+                    <span>Sea Cargo</span>
                 </div>
 
-                <div v-if="route().params.cargoType === 'Air Cargo'" class="flex items-center space-x-2">
-                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-plane text-warning"  fill="none"  height="24"  stroke="currentColor"  stroke-linecap="round"  stroke-linejoin="round"  stroke-width="2"  viewBox="0 0 24 24"  width="24"  xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none" stroke="none"/><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" /></svg>
-                    <p>Air Cargo</p>
+                <div v-if="route().params.cargoType === 'Air Cargo'" class="flex items-center text-warning space-x-2">
+                    <i class="ti ti-plane text-2xl"></i>
+                    <span>Air Cargo</span>
                 </div>
-
-                <TextInput v-model="form.note" placeholder="Notes" />
             </div>
 
-            <div class="is-scrollbar-hidden min-w-full overflow-x-auto">
-                <table class="is-hoverable w-full text-left">
-                    <thead>
-                    <tr>
-                        <th
-                            class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            #
-                        </th>
-                        <th
-                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            HBL
-                        </th>
-                        <th
-                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            Loaded Packages
-                        </th>
-                        <th
-                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            Total Packages
-                        </th>
-                        <th
-                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            Status
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="(packageData, index) in uniqueContainerArray" class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
-                        <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ findHblByPackageId(packageData.id).hbl_number }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                            {{ countPackages(packageData.hbl_id)}}
-                        </td>
-                        <td class="whitespace-nowrap rounded-r-lg px-4 py-3 sm:px-5">
-                            {{ loadedHBLsPackages[packageData.hbl_id].length }}
-                        </td>
-                        <td>
-                            <badge v-if="countPackages(packageData.hbl_id) < loadedHBLsPackages[packageData.hbl_id].length" class="badge bg-error/10 text-error dark:bg-error/15">Short Loaded</badge>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+            <IftaLabel>
+                <InputText v-model="form.note" class="w-full" placeholder="Type Somethings..." variant="filled" />
+                <label for="description">Note</label>
+            </IftaLabel>
+        </div>
 
-            <div v-if="!isDestinationLoading && Object.keys(loadedMHBLs).length > 0" class="is-scrollbar-hidden min-w-full overflow-x-auto mt-2">
-                <table class="is-hoverable w-full text-left">
-                    <thead>
-                    <tr>
-                        <th
-                            class="whitespace-nowrap rounded-l-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            #
-                        </th>
-                        <th
-                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            MHBL
-                        </th>
-                        <th
-                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            Loaded Packages
-                        </th>
-                        <th
-                            class="whitespace-nowrap bg-slate-200 px-4 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                            Total Packages
-                        </th>
-                        <th
-                            class="whitespace-nowrap rounded-r-lg bg-slate-200 px-3 py-3 font-semibold uppercase text-slate-800 dark:bg-navy-800 dark:text-navy-100 lg:px-5"
-                        >
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="(mhbl, index) in loadedMHBLs" class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
-                        <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">{{ index + 1 }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ mhbl.hbl_number || mhbl.reference }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ getMHBLPackageCount(mhbl.hbls) }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">{{ getMHBLPackageCount(mhbl.hbls) }}</td>
+        <div class="grid grid-cols-3 gap-4 mb-4">
+            <Card
+                v-for="(packageData, index) in uniqueContainerArray"
+                :key="index"
+                class="!shadow-md !border rounded-2xl bg-white"
+            >
+                <template #content>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center justify-center w-12 h-12 bg-info/10 text-info rounded-full">
+                            <i class="ti ti-box text-2xl"></i>
+                        </div>
+                        <div>
+                            <div class="text-lg font-semibold text-gray-800">
+                                {{ findHblByPackageId(packageData.id).hbl_number }}
+                            </div>
+                            <div class="text-sm text-success flex items-center gap-1 mt-1">
+                                <i class="ti ti-packages"></i>
+                                {{ countPackages(packageData.hbl_id) }} / {{ loadedHBLsPackages[packageData.hbl_id]?.length }} Packages
+                            </div>
+                            <Tag v-if="countPackages(packageData.hbl_id) < loadedHBLsPackages[packageData.hbl_id]?.length" class="mt-1" severity="warn" value="Short Loaded"></Tag>
+                        </div>
+                    </div>
+                </template>
+            </Card>
+        </div>
 
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </template>
+        <div v-if="!isDestinationLoading && Object.keys(loadedMHBLs).length > 0" class="grid grid-cols-3 gap-4 mb-4">
+            <Card
+                v-for="(mhbl, index) in loadedMHBLs"
+                :key="index"
+                class="!shadow-md !border rounded-2xl bg-white"
+            >
+                <template #content>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center justify-center w-12 h-12 bg-warning/10 text-warning rounded-full">
+                            <i class="ti ti-box text-2xl"></i>
+                        </div>
+                        <div>
+                            <div class="text-lg font-semibold text-gray-800">
+                                {{ mhbl.hbl_number || mhbl.reference }}
+                            </div>
+                            <div class="text-sm text-success flex items-center gap-1 mt-1">
+                                <i class="ti ti-packages"></i>
+                                {{ getMHBLPackageCount(mhbl.hbls) }} Packages
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </Card>
+        </div>
 
-        <template #footer>
-            <div class="flex space-x-2">
-                <SecondaryButton @click="$emit('close')">
-                    Cancel
-                </SecondaryButton>
-                <PrimaryButton @click.prevent="handleDownLoadTallySheet">
-                    Download Summery
-                </PrimaryButton>
-                <PrimaryButton @click.prevent="handleCreateLoadedContainer(true)">
-                    Finish Loading and Download Summery
-                </PrimaryButton>
-                <PrimaryButton @click.prevent="handleCreateLoadedContainer(false)">
-                    Finish Loading
-                </PrimaryButton>
-            </div>
-        </template>
-    </DialogModal>
+        <div class="flex justify-end space-x-2 mt-5">
+            <Button label="Cancel" severity="secondary" size="small" type="button" @click="emit('close')"></Button>
+
+            <Button icon="pi pi-download" label="Download Summery"
+                    outlined
+                    severity="info"
+                    size="small"
+                    type="button"
+                    @click.prevent="handleDownLoadTallySheet"></Button>
+
+            <Button label="Finish Loading & Download Summery" outlined
+                    severity="help"
+                    size="small"
+                    type="button"
+                    @click.prevent="handleCreateLoadedContainer(true)"></Button>
+
+            <Button icon="pi pi-check" label="Finish Loading"
+                    size="small"
+                    type="button"
+                    @click.prevent="handleCreateLoadedContainer(false)"></Button>
+        </div>
+    </Dialog>
 </template>

@@ -1967,16 +1967,15 @@ const reviewContainer = () => {
                 </div>
             </div>
         </main>
-        <ReviewModal
-            :container-array="containerArr"
-            :find-hbl-by-package-id="findHblByPackageId"
-            :show="showReviewModal"
-            :containerPackages="reviewContainerArr"
-            :loadedMHBLs="loadedMHBLs"
-            :loadedHBLsPackages="loadedHBLsPackages"
-            @close="showReviewModal = false"/>
-
-        <!--        <ReviewModal :container-array="reviewContainerArr" :find-hbl-by-package-id="findHblByPackageId"-->
-        <!--                     :show="showReviewModal" @close="showReviewModal = false"/>-->
     </AppLayout>
+
+    <ReviewModal
+        :container-array="containerArr"
+        :containerPackages="reviewContainerArr"
+        :find-hbl-by-package-id="findHblByPackageId"
+        :loadedHBLsPackages="loadedHBLsPackages"
+        :loadedMHBLs="loadedMHBLs"
+        :visible="showReviewModal"
+        @close="showReviewModal = false"
+        @update:visible="showReviewModal = $event"/>
 </template>
