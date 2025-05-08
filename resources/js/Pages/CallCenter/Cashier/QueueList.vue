@@ -84,11 +84,9 @@ const filteredCashierQueue = computed(() => {
                         <template #body="{ data }">
                             <Button
                                 class="mr-2"
-                                icon="ti ti-checks"
-                                outlined
+                                icon="pi pi-check"
                                 rounded
                                 size="small"
-                                variant="outlined"
                                 @click.prevent="() => router.visit(route('call-center.cashier.create', data.id))"
                             />
                         </template>
