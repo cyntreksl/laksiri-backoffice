@@ -1,24 +1,26 @@
 <script setup>
-import DialogModal from "@/Components/DialogModal.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {ref} from "vue";
 import {router, useForm} from "@inertiajs/vue3";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Checkbox from "@/Components/Checkbox.vue";
 import {push} from "notivue";
 import 'filepond/dist/filepond.min.css';
 import vueFilePond from "vue-filepond";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+import Dialog from "primevue/dialog";
+import Button from "primevue/button";
+import IftaLabel from "primevue/iftalabel";
+import InputText from "primevue/inputtext";
+import Select from "primevue/select";
+import Textarea from "primevue/textarea";
+import Checkbox from 'primevue/checkbox';
 
 const FilePond = vueFilePond(FilePondPluginImagePreview, FilePondPluginFileValidateType);
 
 const props = defineProps({
-    show: {
+    visible: {
         type: Boolean,
         default: false,
     },
@@ -28,7 +30,7 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(["update:visible"]);
 
 const types = ref([
     'Crashed', 'Broken', 'Opened'
@@ -60,106 +62,77 @@ const handleCreateUnloadingIssue = () => {
     })
 }
 
-const isShowFileUploadModal = ref(false);
-
-const confirmFileUpload = () => {
-    isShowFileUploadModal.value = true;
-};
-const closeFileUploadModal = () => {
-    isShowFileUploadModal.value = false;
-};
-
 const updateFiles = (files) => {
     form.files = files.map(file => file.file);
 }
 </script>
 
 <template>
-    <DialogModal :closeable="true" :maxWidth="'2xl'" :show="show" @close="$emit('close')">
-        <template #title>
-            <div class="flex justify-between items-center">
-                <div>Create Unloading Issue</div>
-                <button
-                    class="text-gray-500 jus text-right hover:text-red-500 focus:outline-none"
-                    @click="$emit('close')"
-                >
-                    <svg class="size-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 18 18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
+    <Dialog :style="{ width: '50rem' }" :visible="visible" header="Create Unloading Issue" modal
+            @update:visible="(newValue) => $emit('update:visible', newValue)">
+        <div class="grid grid-cols-2 gap-5">
+            <div class="col-span-2">
+                <IftaLabel>
+                    <InputText v-model="form.issue" class="w-full" placeholder="Type Issue" variant="filled"/>
+                    <label>Issue</label>
+                </IftaLabel>
+                <InputError :message="form.errors.issue"/>
             </div>
 
-        </template>
-        <template #content>
-            <div class="grid grid-cols-1 gap-5">
-                <div>
-                    <InputLabel value="Issue"/>
-                    <TextInput v-model="form.issue" class="w-full" placeholder="Type Issue"/>
-                    <InputError :message="form.errors.issue"/>
-                </div>
-
-                <div>
-                    <InputLabel value="Issue Type"/>
-                    <select
-                        v-model="form.type"
-                        class="form-select mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                    >
-                        <option :value="null" disabled>Select One</option>
-                        <option
-                            v-for="type in types"
-                            :key="type"
-                            :value="type"
-                        >
-                            {{ type }}
-                        </option>
-                    </select>
-                    <InputError :message="form.errors.type"/>
-                </div>
-
-                <div>
-                    <InputLabel value="RTF"/>
-                    <Checkbox v-model="form.rtf"/>
-                    <InputError :message="form.errors.rtf"/>
-                </div>
-
-                <div>
-                    <InputLabel value="Is Damage"/>
-                    <Checkbox v-model="form.is_damaged"/>
-                    <InputError :message="form.errors.is_damaged"/>
-                </div>
-
-                <div>
-                    <InputLabel value="Note"/>
-                    <textarea v-model="form.note" class="w-full h-20 border rounded p-2" placeholder="Note"></textarea>
-                    <InputError :message="form.errors.note"/>
-                </div>
-
-                <div>
-                    <InputLabel value="Upload Images"/>
-                    <FilePond
-                        name="test"
-                        ref="pond"
-                        label-idle="Drop images here or <span class='filepond--label-action'>Browse</span>"
-                        allow-multiple="true"
-                        accepted-file-types="image/jpeg, image/png, application/pdf"
-                        style="border: 2px dashed #e2e7ee; border-radius: 2px; padding: 2px;"
-                        v-on:updatefiles="updateFiles"
-                    />
-                    <InputError :message="form.errors.files"/>
-                </div>
+            <div class="col-span-2">
+                <IftaLabel>
+                    <Select v-model="form.type" :options="types" class="w-full" placeholder="Select a Type" variant="filled" />
+                    <label>Issue Type</label>
+                </IftaLabel>
+                <InputError :message="form.errors.type"/>
             </div>
-        </template>
 
-        <template #footer>
-            <div class="flex space-x-2">
-                <SecondaryButton @click="$emit('close')">
-                    Cancel
-                </SecondaryButton>
-                <PrimaryButton @click.prevent="handleCreateUnloadingIssue">
-                    Create Issue
-                </PrimaryButton>
+            <div class="col-span-2">
+                <IftaLabel>
+                                    <Textarea id="description" v-model="form.note" class="w-full" cols="30"
+                                              placeholder="Type note here..." rows="5" style="resize: none"
+                                              variant="filled"/>
+                    <label for="description">Note</label>
+                </IftaLabel>
+                <InputError :message="form.errors.note"/>
             </div>
-        </template>
-    </DialogModal>
+
+            <div>
+                <div class="flex items-center space-x-2">
+                    <Checkbox v-model="form.rtf" binary input-id="rtf"/>
+                    <label class="cursor-pointer" for="rtf">RTF</label>
+                </div>
+                <InputError :message="form.errors.rtf"/>
+            </div>
+
+            <div>
+                <div class="flex items-center space-x-2">
+                    <Checkbox v-model="form.is_damaged" binary input-id="damage"/>
+                    <label class="cursor-pointer" for="damage">Damage</label>
+                </div>
+                <InputError :message="form.errors.is_damaged"/>
+            </div>
+
+            <div class="col-span-2">
+                <InputLabel value="Upload Images"/>
+                <FilePond
+                    ref="pond"
+                    accepted-file-types="image/jpeg, image/png, application/pdf"
+                    allow-multiple="true"
+                    label-idle="Drop images here or <span class='filepond--label-action'>Browse</span>"
+                    name="test"
+                    style="border: 2px dashed #e2e7ee; border-radius: 2px; padding: 2px;"
+                    v-on:updatefiles="updateFiles"
+                />
+                <InputError :message="form.errors.files"/>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-5">
+            <Button label="Cancel" severity="secondary" type="button" @click="emit('close')"></Button>
+            <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" label="Create Issue"
+                    type="button"
+                    @click="handleCreateUnloadingIssue"></Button>
+        </div>
+    </Dialog>
 </template>
