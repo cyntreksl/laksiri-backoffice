@@ -364,10 +364,8 @@ const onDialogHide = () => {
     <AppLayout title="Create Courier">
         <template #header>Create Courier</template>
 
-        <!-- Breadcrumb -->
         <Breadcrumb/>
 
-        <!-- Create Pickup Form -->
         <form @submit.prevent="handleCourierCreate">
             <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
                 <div class="sm:col-span-2 grid grid-rows gap-4">
