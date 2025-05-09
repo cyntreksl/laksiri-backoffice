@@ -121,7 +121,7 @@ const exportCSV = () => {
 
                         <template #loading>Loading tokens data. Please wait.</template>
 
-                        <Column field="token" header="Token" sortable>
+                        <Column field="token" header="Token">
                             <template #body="slotProps">
                                 <div class="flex items-center text-2xl">
                                     <i class="ti ti-tag mr-1 text-blue-500"></i>
@@ -143,7 +143,7 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column field="verified_at" header="Verified At" sortable></Column>
+                        <Column field="verified_at" header="Verified At"></Column>
 
                         <Column field="verified_by" header="Verified By"></Column>
 

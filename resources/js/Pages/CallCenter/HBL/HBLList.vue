@@ -590,7 +590,7 @@ const exportCSV = () => {
     </AppLayout>
 
     <HBLDetailModal
-        :hbl-id="hblId"
+        :hbl-id="selectedHBLID"
         :show="showConfirmViewHBLModal"
         @close="closeModal"
         @update:show="showConfirmViewHBLModal = $event"

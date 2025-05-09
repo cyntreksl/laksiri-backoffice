@@ -121,7 +121,7 @@ const exportCSV = () => {
 
                         <template #loading>Loading tokens data. Please wait.</template>
 
-                        <Column field="token" header="Token" sortable>
+                        <Column field="token" header="Token">
                             <template #body="slotProps">
                                 <div class="flex items-center text-2xl">
                                     <i class="ti ti-tag mr-1 text-blue-500"></i>
@@ -143,9 +143,9 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column field="paid_at" header="Paid At" sortable></Column>
+                        <Column field="paid_at" header="Paid At"></Column>
 
-                        <Column field="paid_amount" header="Paid Amount" sortable>
+                        <Column field="paid_amount" header="Paid Amount">
                             <template #body="slotProps">
                                 <div class="flex items-center justify-end">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
