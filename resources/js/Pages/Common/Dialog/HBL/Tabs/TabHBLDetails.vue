@@ -207,7 +207,7 @@ watch(
                 </template>
                 <template #content>
                     <div class="flex space-x-3">
-                        <Avatar :label="pickup?.name.charAt(0)" class="mr-2 !bg-amber-200" size="xlarge" />
+                        <Avatar :label="pickup?.name?.charAt(0) ?? ''" class="mr-2 !bg-amber-200" size="xlarge" />
                         <div>
                             <p>{{ pickup?.name }}</p>
                             <p class="text-gray-500">{{ pickup?.contact_number }}</p>

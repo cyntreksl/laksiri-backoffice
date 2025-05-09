@@ -29,9 +29,6 @@ Route::middleware([
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
-    Route::get('/call-center/dashboard', [\App\Http\Controllers\CallCenter\DashboardController::class, 'index'])
-        ->name('call-center.dashboard');
-
     require_once __DIR__.'/web/arrival.php';
     require_once __DIR__.'/web/back-office.php';
     require_once __DIR__.'/web/branch.php';

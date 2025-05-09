@@ -178,15 +178,6 @@ class User extends Authenticatable
         return $this->hasMany(Pickup::class, 'consignee_id');
     }
 
-    public function getRedirectRoute(): string
-    {
-        if ($this->hasRole(['call center', 'boned area'])) {
-            return 'call-center/dashboard';
-        }
-
-        return 'dashboard';
-    }
-
     public function getActiveBranchTypeAttribute()
     {
         $data = GetUserCurrentBranch::run();
