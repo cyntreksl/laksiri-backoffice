@@ -828,10 +828,15 @@ const reviewContainer = () => {
                                                 </p>
                                             </div>
                                             <div class="flex items-center space-x-8 px-2.5">
-                                                <Button :disabled="element.unloading_issue.length > 0" icon="pi pi-exclamation-triangle" label="Create Unloading Issue"
-                                                        severity="warn" size="small" @click.prevent="confirmShowCreateIssueModal(index)"/>
+                                                <Button :disabled="element.unloading_issue.length > 0"
+                                                        icon="pi pi-exclamation-triangle" label="Create Unloading Issue"
+                                                        severity="warn" size="small"
+                                                        @click.prevent="confirmShowCreateIssueModal(index)"/>
 
-                                                <Button v-tooltip.left="'Click to Re-Load'" aria-label="Filter" icon="ti ti-corner-up-left-double text-2xl" rounded severity="danger" text @click.prevent="handleReLoadToContainer(index)"/>
+                                                <Button v-tooltip.left="'Click to Re-Load'" aria-label="Filter"
+                                                        icon="ti ti-corner-up-left-double text-2xl" rounded
+                                                        severity="danger" text
+                                                        @click.prevent="handleReLoadToContainer(index)"/>
                                             </div>
                                         </div>
                                     </div>
@@ -988,8 +993,11 @@ const reviewContainer = () => {
                                                             </p>
                                                         </div>
                                                         <div class="flex items-center space-x-8 px-2.5">
-                                                            <Button :disabled="element.unloading_issue.length > 0" icon="pi pi-exclamation-triangle" label="Create Unloading Issue"
-                                                                    severity="warn" size="small" @click.prevent="confirmShowMHBLCreateIssueModal(element.id)"/>
+                                                            <Button :disabled="element.unloading_issue.length > 0"
+                                                                    icon="pi pi-exclamation-triangle"
+                                                                    label="Create Unloading Issue"
+                                                                    severity="warn" size="small"
+                                                                    @click.prevent="confirmShowMHBLCreateIssueModal(element.id)"/>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1029,8 +1037,9 @@ const reviewContainer = () => {
             @update:visible="showReviewModal = $event"
         />
 
-        <CreateUnloadingIssueModal :hbl-package-id="hblPackageId" :show="showUnloadingIssueModal"
-                                   @close="showUnloadingIssueModal = false"/>
+        <CreateUnloadingIssueModal :hbl-package-id="hblPackageId" :visible="showUnloadingIssueModal"
+                                   @close="showUnloadingIssueModal = false"
+                                   @update:visible="showUnloadingIssueModal = $event"/>
     </AppLayout>
 </template>
 
