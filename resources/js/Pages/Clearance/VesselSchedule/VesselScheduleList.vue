@@ -21,6 +21,8 @@ import VirtualScroller from 'primevue/virtualscroller';
 import LoadedShipmentDetailDialog from "@/Pages/Common/Dialog/Container/Index.vue";
 import {useConfirm} from "primevue/useconfirm";
 import {push} from "notivue";
+import AddVesselModal from "@/Pages/Clearance/VesselSchedule/Partials/AddVesselModal.vue";
+import AddHBLModal from "@/Pages/Common/Dialog/Container/Dialog/AddHBLModal.vue";
 
 const props = defineProps({
     vesselSchedules: {
@@ -213,6 +215,19 @@ const handleContainerPaymentCreate = async () => {
     });
 };
 
+const showConfirmAddVesselModal = ref(false);
+const confirmAddVesselModal = () => {
+    showConfirmAddVesselModal.value = true;
+};
+
+const closeAddVesselModal = () => {
+    showConfirmAddVesselModal.value = false;
+}
+
+const reloadPage = () => {
+    window.location.reload();
+}
+
 </script>
 
 <template>
@@ -236,10 +251,11 @@ const handleContainerPaymentCreate = async () => {
             <!-- Container List -->
             <Card class="col-span-4 border-2 border-gray-200 !shadow-none">
                 <template #title>
-                    <div class="flex justify-between">
-                        <div>
-                            <div>Available Vessels</div>
-                        </div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-lg font-semibold">Available Vessels</div>
+                        <Button icon="pi pi-plus"
+                                label="Add Vessel To Schedule"
+                                size="small" @click.prevent="confirmAddVesselModal()"/>
                     </div>
                 </template>
                 <template #subtitle>{{ containers.length }} Vessels</template>
@@ -510,4 +526,12 @@ const handleContainerPaymentCreate = async () => {
     <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="selectedContainer" :container-status="containerStatus" :sea-container-options="seaContainerOptions" :show="showConfirmLoadedShipmentModal"
                                 @close="closeModal"
                                 @update:show="showConfirmLoadedShipmentModal = $event" />
+
+    <AddVesselModal
+        :visible="showConfirmAddVesselModal"
+        :vessel-schedule="vesselSchedules"
+        @close="closeAddVesselModal"
+        @reloadPage="reloadPage"
+        @update:visible="showConfirmAddVesselModal = $event"
+    />
 </template>

@@ -6,6 +6,8 @@ use App\Enum\ContainerStatus;
 use App\Enum\ContainerType;
 use App\Http\Controllers\Controller;
 use App\Interfaces\VesselScheduleRepositoryInterface;
+use App\Models\VesselSchedule;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class VesselScheduleController extends Controller
@@ -35,5 +37,9 @@ class VesselScheduleController extends Controller
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
         ]);
+    }
+
+    public function addVesselToSchedule(VesselSchedule $vesselSchedule, Request $request){
+        return $this->vesselScheduleRepository->addVesselToSchedule($vesselSchedule, $request['reference']);
     }
 }
