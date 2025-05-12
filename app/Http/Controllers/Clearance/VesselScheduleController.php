@@ -39,7 +39,8 @@ class VesselScheduleController extends Controller
         ]);
     }
 
-    public function addVesselToSchedule(VesselSchedule $vesselSchedule, Request $request){
+    public function addVesselToSchedule(VesselSchedule $vesselSchedule, Request $request)
+    {
         return $this->vesselScheduleRepository->addVesselToSchedule($vesselSchedule, $request['reference']);
     }
 }

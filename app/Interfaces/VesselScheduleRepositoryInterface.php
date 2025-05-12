@@ -8,5 +8,5 @@ interface VesselScheduleRepositoryInterface
 {
     public function getRecentVesselSchedule();
 
-    public function addVesselToSchedule(VesselSchedule $vesselSchedule, String $vesselReference);
+    public function addVesselToSchedule(VesselSchedule $vesselSchedule, string $vesselReference);
 }
