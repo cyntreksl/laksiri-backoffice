@@ -22,7 +22,6 @@ import LoadedShipmentDetailDialog from "@/Pages/Common/Dialog/Container/Index.vu
 import {useConfirm} from "primevue/useconfirm";
 import {push} from "notivue";
 import AddVesselModal from "@/Pages/Clearance/VesselSchedule/Partials/AddVesselModal.vue";
-import AddHBLModal from "@/Pages/Common/Dialog/Container/Dialog/AddHBLModal.vue";
 
 const props = defineProps({
     vesselSchedules: {
@@ -228,6 +227,45 @@ const reloadPage = () => {
     window.location.reload();
 }
 
+const containerId = ref('');
+const confirmRemoveContainerHold = (ContainerId) => {
+    containerId.value = ContainerId;
+    confirm.require({
+        message: `Would you like to remove this container form vessel schedule`,
+        header: `Remove container`,
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: `Remove container`,
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(
+                route("clearance.vessel-schedule.remove-vessel", props.vesselSchedules.id),
+                {containerID : containerId.value},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success(`Removed Successfully!`);
+                        reloadPage();
+                    },
+                    onError: () => {
+                        push.error("Something went to wrong!");
+                    },
+                }
+            );
+            selectedHBLID.value = null;
+        },
+        reject: () => {
+        }
+    });
+};
+
 </script>
 
 <template>
@@ -285,7 +323,15 @@ const reloadPage = () => {
                                     </div>
                                     <div class="flex justify-between text-sm">
                                         <div>{{ item?.bl_number }}</div>
-                                        <div>{{ item?.awb_number }}</div>
+                                        <Button
+                                            v-tooltip="'Remove From Vessel Schedule'"
+                                            icon="pi pi-trash"
+                                            outlined
+                                            rounded
+                                            severity="danger"
+                                            size="small"
+                                            @click.prevent="confirmRemoveContainerHold(item?.id)"
+                                        />
                                     </div>
                                 </template>
                             </Card>

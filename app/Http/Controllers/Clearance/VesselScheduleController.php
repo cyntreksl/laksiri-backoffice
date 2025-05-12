@@ -41,6 +41,11 @@ class VesselScheduleController extends Controller
 
     public function addVesselToSchedule(VesselSchedule $vesselSchedule, Request $request)
     {
-        return $this->vesselScheduleRepository->addVesselToSchedule($vesselSchedule, $request['reference']);
+        return $this->vesselScheduleRepository->addVesselToSchedule($vesselSchedule->first(), $request['reference']);
+    }
+
+    public function removeVesselFromSchedule(VesselSchedule $vesselSchedule, Request $request)
+    {
+        $this->vesselScheduleRepository->removeVesselFromSchedule($vesselSchedule->first(), $request['containerID']);
     }
 }
