@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Actions\VesselSchedule\AddContainerToVesselSchedule;
+use App\Actions\VesselSchedule\DownloadVesselSchedule;
 use App\Actions\VesselSchedule\GetRecentVesselSchedule;
 use App\Actions\VesselSchedule\RemoveContainerFromVesselSchedule;
 use App\Interfaces\VesselScheduleRepositoryInterface;
@@ -48,5 +49,10 @@ class VesselScheduleRepository implements VesselScheduleRepositoryInterface
     public function removeVesselFromSchedule(VesselSchedule $vesselSchedule, int $containerId)
     {
         return RemoveContainerFromVesselSchedule::run($vesselSchedule, $containerId);
+    }
+
+    public function downloadVesselSchedulePDF(VesselSchedule $vesselSchedule)
+    {
+        return DownloadVesselSchedule::run($vesselSchedule);
     }
 }

@@ -48,4 +48,9 @@ class VesselScheduleController extends Controller
     {
         $this->vesselScheduleRepository->removeVesselFromSchedule($vesselSchedule->first(), $request['containerID']);
     }
+
+    public function downloadVesselSchedulePDF(VesselSchedule $vesselSchedule)
+    {
+        return $this->vesselScheduleRepository->downloadVesselSchedulePDF($vesselSchedule->first());
+    }
 }

@@ -274,15 +274,28 @@ const confirmRemoveContainerHold = (ContainerId) => {
 
         <Breadcrumb/>
 
-        <div class="mt-5 space-x-2">
-            <h1 class="text-3xl ml-1 font-medium text-gray-700">
-                Vessel Schedule
-            </h1>
-            <div class="flex items-center space-x-2 text-gray-400">
-                <div>{{ vesselSchedules?.start_date }}</div>
-                <div><i class="ti ti-arrow-narrow-right text-xl" v-if="vesselSchedules?.end_date"></i></div>
-                <div>{{ vesselSchedules?.end_date }}</div>
+        <div class="mt-5 flex justify-between items-center">
+            <!-- Left Side: Title and Dates -->
+            <div>
+                <h1 class="text-3xl ml-1 font-medium text-gray-700">
+                    Vessel Schedule
+                </h1>
+                <div class="flex items-center space-x-2 text-gray-400 mt-1">
+                    <div>{{ vesselSchedules?.start_date }}</div>
+                    <div>
+                        <i class="ti ti-arrow-narrow-right text-xl" v-if="vesselSchedules?.end_date"></i>
+                    </div>
+                    <div>{{ vesselSchedules?.end_date }}</div>
+                </div>
             </div>
+
+            <a :href="route('clearance.vessel-schedule.download', vesselSchedules.id)">
+                <Button
+                    icon="pi pi-plus"
+                    label="Print Vessel Schedule"
+                    size="small"
+                />
+            </a>
         </div>
 
         <div class="grid grid-cols-12 gap-4 my-5">

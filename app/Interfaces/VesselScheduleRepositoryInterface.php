@@ -11,4 +11,6 @@ interface VesselScheduleRepositoryInterface
     public function addVesselToSchedule(VesselSchedule $vesselSchedule, string $vesselReference);
 
     public function removeVesselFromSchedule(VesselSchedule $vesselSchedule, int $containerId);
+
+    public function downloadVesselSchedulePDF(VesselSchedule $vesselSchedule);
 }
