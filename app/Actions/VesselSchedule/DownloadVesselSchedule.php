@@ -18,7 +18,7 @@ class DownloadVesselSchedule
         }, Carbon::now()->format('jS F Y'));
 
         $containerData = [];
-        foreach ($vesselSchedule->containers->load('branch', 'duplicate_hbl_packages') as $container) {
+        foreach ($vesselSchedule->clearanceContainers->load('branch', 'duplicate_hbl_packages') as $container) {
             $containerData[] = [
                 'vessel_name' => $container->vessel_name ?? '',
                 'agent' => strtoupper($container->branch->name ?? ''),

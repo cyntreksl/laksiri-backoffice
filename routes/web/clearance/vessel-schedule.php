@@ -14,3 +14,6 @@ Route::post('vessel-schedule/remove-vessel/{VesselSchedule}', [VesselScheduleCon
 
 Route::get('vessel-schedule/download/{VesselSchedule}', [VesselScheduleController::class, 'downloadVesselSchedulePDF'])
     ->name('vessel-schedule.download');
+
+Route::post('vessel-schedule/update-container/{container}', [VesselScheduleController::class, 'updateContainer'])
+    ->name('vessel-schedule.update-container');
