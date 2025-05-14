@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Clearance;
 use App\Enum\ContainerStatus;
 use App\Enum\ContainerType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateClearanceContainerRequest;
 use App\Interfaces\VesselScheduleRepositoryInterface;
 use App\Models\Container;
 use App\Models\VesselSchedule;
@@ -55,7 +56,7 @@ class VesselScheduleController extends Controller
         return $this->vesselScheduleRepository->downloadVesselSchedulePDF($vesselSchedule->first());
     }
 
-    public function updateContainer(Container $container, Request $request)
+    public function updateContainer(Container $container, UpdateClearanceContainerRequest $request)
     {
         return $this->vesselScheduleRepository->updateContainer($container, $request->all());
     }

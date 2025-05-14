@@ -63,20 +63,29 @@ class VesselScheduleRepository implements VesselScheduleRepositoryInterface
     public function updateContainer(Container $container, array $data)
     {
         try {
-            $updateData['is_reached'] = isset($data['is_reached']) ? ($data['is_reached'] ? 1 : 0) : 0;
+            $updateData['is_reached'] = $data['is_reached'];
             $updateData['reached_date'] = $data['reached_date'];
             $updateData['note'] = $data['note'];
-            $updateData['is_returned'] = isset($data['is_returned']) ? ($data['is_returned'] ? 1 : 0) : 0;
+            $updateData['is_returned'] = $data['is_returned'];
             UpdateContainer::run($container, $updateData);
-            if ($data['is_reached']) {
-                foreach ($container->hbl_packages as $package) {
+
+            $uniqueHbls = collect();
+            $processedHblIds = [];
+            foreach ($container->hbl_packages as $package) {
+                // Only process each HBL once based on its ID
+                if (! in_array($package->hbl_id, $processedHblIds)) {
                     $hbl = HBL::withoutGlobalScope(BranchScope::class)->find($package->hbl_id);
+                    $uniqueHbls->push($hbl);
+                    $processedHblIds[] = $package->hbl_id;
+                }
+            }
+            if ($data['is_reached']) {
+                foreach ($uniqueHbls as $hbl) {
                     $hbl->addStatus('Container Arrival', $container->estimated_time_of_arrival);
                 }
             }
             if ($data['is_returned']) {
-                foreach ($container->hbl_packages as $package) {
-                    $hbl = HBL::withoutGlobalScope(BranchScope::class)->find($package->hbl_id);
+                foreach ($uniqueHbls as $hbl) {
                     $hbl->addStatus('Shipment return by clearance team', Carbon::now());
                 }
             }

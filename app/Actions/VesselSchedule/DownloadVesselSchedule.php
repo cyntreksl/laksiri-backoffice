@@ -13,9 +13,7 @@ class DownloadVesselSchedule
 
     public function handle(VesselSchedule $vesselSchedule)
     {
-        $formattedDate = preg_replace_callback('/(\d{1,2})(st|nd|rd|th) (\w+) (\d{4})/', function ($matches) {
-            return str_pad($matches[1], 2, '0', STR_PAD_LEFT).$matches[2].' '.strtoupper($matches[3]).' '.$matches[4];
-        }, Carbon::now()->format('jS F Y'));
+        $formattedDate = Carbon::now()->format('dS').' '.strtoupper(Carbon::now()->format('F')).' '.Carbon::now()->format('Y');
 
         $containerData = [];
         foreach ($vesselSchedule->clearanceContainers->load('branch', 'duplicate_hbl_packages') as $container) {
@@ -26,7 +24,7 @@ class DownloadVesselSchedule
                 'bl_no' => $container->bl_number ?? '',
                 'release' => '()',
                 'quantity' => '1X'.count($container->duplicate_hbl_packages),
-                'ship_agent' => '',
+                'ship_agent' => $container->shipping_line ?? '',
                 'date' => $container->estimated_time_of_arrival ?? '',
             ];
         }

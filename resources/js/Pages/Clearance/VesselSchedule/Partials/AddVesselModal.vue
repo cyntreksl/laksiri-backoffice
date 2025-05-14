@@ -58,27 +58,6 @@ const addVesselToSchedule = async () => {
         errorMessage.value = error.message;
     }
 }
-
-// const handleLoad = (packages) => {
-//     if (!Array.isArray(packages)) {
-//         packages = [packages];
-//     }
-//
-//     router.post(route("loading.loaded-containers.store"), {
-//             container_id: props.container.id,
-//             packages,
-//         },
-//         {
-//             onSuccess: () => {
-//                 getHBLWithPackages();
-//             },
-//             onError: () => {
-//                 console.error('Something went to wrong!');
-//             },
-//             preserveScroll: true,
-//             preserveState: true,
-//         });
-// }
 </script>
 
 <template>
