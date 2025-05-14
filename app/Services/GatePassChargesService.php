@@ -245,19 +245,27 @@ class GatePassChargesService
     private function airCargoDOCharge(HBL $hbl): array
     {
         $container = $this->getContainer($hbl);
-        $airCargoDORule = GetAirLineByName::run($container->airline_name) ? GetAirLineByName::run($container->airline_name)->airLineDOCharge : null;
-        if ($airCargoDORule) {
-            return [
-                'rate' => $airCargoDORule->do_charge,
-                'amount' => $airCargoDORule->do_charge,
-            ];
-        } else {
+
+        if (! $container || ! $container->airline_name) {
             return [
                 'rate' => 0.00,
                 'amount' => 0.00,
             ];
         }
 
+        $airCargoDORule = GetAirLineByName::run($container->airline_name)?->airLineDOCharge;
+
+        if ($airCargoDORule) {
+            return [
+                'rate' => $airCargoDORule->do_charge,
+                'amount' => $airCargoDORule->do_charge,
+            ];
+        }
+
+        return [
+            'rate' => 0.00,
+            'amount' => 0.00,
+        ];
     }
 
     /**

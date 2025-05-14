@@ -1,12 +1,11 @@
 <script setup>
 import {computed, onMounted, ref, watch} from "vue";
-import {Link, router, usePage} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import FloatLabel from 'primevue/floatlabel';
 import {useConfirm} from "primevue/useconfirm";
 import Select from 'primevue/select';
-import Checkbox from 'primevue/checkbox';
 import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
@@ -22,7 +21,6 @@ import axios from "axios";
 import {FilterMatchMode} from '@primevue/core/api';
 import moment from "moment";
 import {debounce} from "lodash";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import {push} from "notivue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
@@ -372,10 +370,6 @@ const closeCallFlagModal = () => {
     hblName.value = "";
 };
 
-const exportCSV = () => {
-    dt.value.exportCSV();
-};
-
 const resolvePaymentStatus = (paymentStatus) => {
     switch (paymentStatus) {
         case 'Partial Paid':
@@ -423,9 +417,7 @@ const removeApprovalHBLs = () => {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document
-                            .querySelector('meta[name="csrf-token"]')
-                            .getAttribute("content"),
+                        "X-CSRF-TOKEN": usePage().props.csrf,
                     },
                     body: JSON.stringify({ hbl_ids: idList }),
                 });
@@ -443,8 +435,6 @@ const removeApprovalHBLs = () => {
         }
     });
 };
-
-
 </script>
 
 <template>
@@ -510,14 +500,10 @@ const removeApprovalHBLs = () => {
                                     Approved HBLs
                                 </div>
                                 <div>
-                                    <PrimaryButton
-                                        v-if="$page.props.user.permissions.includes('hbls.create finance approval')"
-                                        :disabled="selectedHBLs.length === 0"
-                                        class="w-full"
-                                        @click="removeApprovalHBLs"
-                                    >
-                                        Remove Approval
-                                    </PrimaryButton>
+                                    <Button v-if="$page.props.user.permissions.includes('hbls.create finance approval')"
+                                            :disabled="selectedHBLs.length === 0"
+                                            label="Remove Approval"
+                                            severity="danger" size="small" @click="removeApprovalHBLs"/>
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">

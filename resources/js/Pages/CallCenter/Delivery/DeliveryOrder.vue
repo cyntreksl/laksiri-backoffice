@@ -204,6 +204,7 @@ const closeModal = () => {
                                 <tbody>
                                 <tr
                                     v-for="(delivery, index) in localDeliveries"
+                                    :key="delivery.id"
                                     class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500"
                                 >
                                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
@@ -225,7 +226,9 @@ const closeModal = () => {
                                         {{ delivery.hbl.hbl_name}}
                                     </td>
                                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                                        {{delivery.hbl.address.length > 20 ? delivery.hbl.address.substring(0, 20) + "..." : delivery.hbl.address }}
+                                        {{ delivery.hbl.address && delivery.hbl.address.length > 20
+                                        ? delivery.hbl.address.substring(0, 20) + "..."
+                                        : delivery.hbl.address || '-' }}
                                     </td>
                                     <td class="whitespace-nowrap px-4 py-3 sm:px-5">
                                         {{
