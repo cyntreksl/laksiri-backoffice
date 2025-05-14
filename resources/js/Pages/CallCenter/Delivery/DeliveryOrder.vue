@@ -204,7 +204,6 @@ const closeModal = () => {
                                 <tbody>
                                 <tr
                                     v-for="(delivery, index) in localDeliveries"
-                                    v-if="delivery.hbl"
                                     :key="delivery.id"
                                     class="border-y border-transparent border-b-slate-200 dark:border-b-navy-500"
                                 >
