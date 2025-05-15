@@ -4,9 +4,7 @@ namespace App\Actions\Container\Loading;
 
 use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
-use App\Actions\Container\UpdateReferenceNumber;
 use App\Actions\HBL\HBLPackage\MarkAsLoaded;
-use App\Actions\User\GetUserCurrentBranch;
 use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\HBL;
@@ -27,7 +25,8 @@ class CreateOrUpdateLoadedContainer
             DB::beginTransaction();
 
             $container = Container::find($data['container_id']);
-            $isDestinationLoading = isset($data['isDestinationLoading']) ? $data['isDestinationLoading'] : false;
+
+            $isDestinationLoading = $data['isDestinationLoading'] ?? false;
 
             foreach ($data['packages'] as $package) {
                 $result = $container->hbl_packages()->updateExistingPivot($package['id'], [
@@ -55,30 +54,26 @@ class CreateOrUpdateLoadedContainer
 
                 $hbl_package = HBLPackage::find($package['id']);
                 $hbl = HBL::find($hbl_package->hbl_id);
-
                 $hbl->addStatus('Container Shipped');
             }
 
             UpdateContainerStatus::run($container, ContainerStatus::LOADED->value);
 
-            //            $reference = GenerateLoadingReferenceNumber::run(GetUserCurrentBranch::run()['branchName']);
-
-            //            UpdateReferenceNumber::run($container, $reference);
-
             $container->addStatus('Container Loaded');
-
             $container->addStatus('Container Shipped');
 
             // update container loading end datetime and who loaded by
-            $data = [
+            $updateData = [
                 'loading_ended_at' => now(),
                 'loading_ended_by' => auth()->id(),
                 'note' => $data['note'] ?? null,
             ];
 
-            UpdateContainer::run($container, $data);
+            $container = UpdateContainer::run($container, $updateData);
 
             DB::commit();
+
+            return $container;
         } catch (\Exception $e) {
             DB::rollBack();
             throw new \Exception('Failed to create loaded container: '.$e->getMessage());
