@@ -38,7 +38,7 @@ class ContainerObserver
                 ->with('hbl')
                 ->get()
                 ->filter(function ($package) {
-                    return $package->hbl && in_array($package->hbl->hbl_type, ['UPB', 'Gift']) && $package->weight == 0;
+                    return $package->hbl && in_array($package->hbl->hbl_type, ['UPB', 'Gift']);
                 });
 
             // Calculate total volume of these eligible HBL packages
@@ -46,8 +46,14 @@ class ContainerObserver
 
             if ($totalVolume > 0) {
                 foreach ($hblPackages as $package) {
+                    // Skip if weight is set and NOT auto-updated
+                    if ($package->weight > 0 && $package->auto_weight_updated === false) {
+                        continue;
+                    }
+
                     $hblWeight = ($shipmentWeight / $totalVolume) * $package->volume;
                     $package->weight = round($hblWeight, 2);
+                    $package->auto_weight_updated = true;
                     $package->save();
                 }
             }

@@ -32,6 +32,7 @@ class HBLPackage extends Model
         'quantity',
         'volume',
         'weight',
+        'auto_weight_updated',
         'is_loaded',
         'is_unloaded',
         'current_warehouse',
@@ -40,6 +41,18 @@ class HBLPackage extends Model
         'remarks',
         'measure_type',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'auto_weight_updated' => 'boolean',
+        ];
+    }
 
     public function hbl(): BelongsTo
     {

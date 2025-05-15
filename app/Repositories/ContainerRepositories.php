@@ -37,6 +37,7 @@ use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
 use App\Models\UnloadingIssue;
 use App\Models\UnloadingIssueFile;
+use App\Services\ContainerWeightService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -100,6 +101,8 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             if (! $container->hbl_packages()->exists()) {
                 UpdateContainerStatus::run($container, ContainerStatus::REQUESTED->value);
             }
+
+            ContainerWeightService::recalculate($container);
 
             DB::commit();
         } catch (\Exception $e) {
