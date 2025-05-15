@@ -181,46 +181,24 @@ watchEffect(() => {
     <Divider />
 
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-x-4 gap-y-8 my-5">
-        <div>
-            <label class="block">
-                <InputLabel value="Cargo Mode"/>
-                <InputText id="cargo_type" v-model="form.cargo_type" class="w-full" disabled placeholder="Enter Cargo Mode"/>
-            </label>
+
+        <!-- General Cargo Information -->
+        <div class="col-span-4">
+            <h2 class="text-lg font-semibold">
+                <i class="pi pi-info-circle text-info mr-2"></i>
+                General Information
+            </h2>
         </div>
 
-        <div v-if="form.cargo_type === 'Sea Cargo'">
-            <InputLabel value="Container Type"/>
-            <Select v-model="form.container_type" :options="containerTypes" class="w-full" placeholder="Choose One"/>
-            <InputError :message="form.errors.container_type"/>
+        <div>
+            <InputLabel value="Cargo Mode"/>
+            <InputText id="cargo_type" v-model="form.cargo_type" class="w-full" disabled placeholder="Enter Cargo Mode"/>
         </div>
 
         <div>
             <InputLabel value="Reference"/>
             <InputText id="reference" v-model="form.reference" class="w-full" placeholder="Enter Reference"/>
             <InputError :message="form.errors.reference"/>
-        </div>
-
-        <div v-if="form.cargo_type === 'Sea Cargo'">
-            <InputLabel value="Container Number"/>
-            <InputText v-model="form.container_number" class="w-full" placeholder="Enter Container Number"/>
-            <InputError :message="form.errors.container_number" />
-        </div>
-        <div v-if="form.cargo_type === 'Sea Cargo'">
-            <InputLabel value="Seal Number"/>
-            <InputText v-model="form.seal_number" class="w-full" placeholder="Enter Seal Number"/>
-            <InputError :message="form.errors.seal_number" />
-        </div>
-
-        <div v-if="form.cargo_type === 'Sea Cargo'">
-            <InputLabel value="BL Number"/>
-            <InputText v-model="form.bl_number" class="w-full" placeholder="Enter BL Number"/>
-            <InputError :message="form.errors.bl_number" />
-        </div>
-
-        <div v-else>
-            <InputLabel value="AWB Number"/>
-            <InputText v-model="form.awb_number" class="w-full" placeholder="Enter AWB Number"/>
-            <InputError :message="form.errors.awb_number" />
         </div>
 
         <div>
@@ -235,63 +213,117 @@ watchEffect(() => {
             <InputError :message="form.errors.estimated_time_of_arrival"/>
         </div>
 
-        <div>
-            <InputLabel value="Vessel Name"/>
-            <InputText v-model="form.vessel_name" class="w-full" placeholder="Enter Vessel Name"/>
-            <InputError :message="form.errors.vessel_name" />
-        </div>
-        <div>
-            <InputLabel value="Voyage Number"/>
-            <InputText v-model="form.voyage_number" class="w-full" placeholder="Enter Voyage Number"/>
-            <InputError :message="form.errors.voyage_number" />
-        </div>
-        <div>
-            <InputLabel value="Shipping Line"/>
-            <InputText v-model="form.shipping_line" class="w-full" placeholder="Enter Shipping Line"/>
-            <InputError :message="form.errors.shipping_line" />
-        </div>
-        <div>
-            <InputLabel value="Port of Loading"/>
-            <InputText v-model="form.port_of_loading" class="w-full" placeholder="Enter Port of Loading"/>
-            <InputError :message="form.errors.port_of_loading" />
-        </div>
-        <div>
-            <InputLabel value="Port of Discharge"/>
-            <InputText v-model="form.port_of_discharge" class="w-full" placeholder="Enter Port of Discharge"/>
-            <InputError :message="form.errors.port_of_discharge" />
-        </div>
-        <div>
-            <InputLabel value="Loading Started Time"/>
-            <InputText v-model="form.loading_started_at" class="w-full" disabled/>
-            <InputError :message="form.errors.loading_started_at" />
-        </div>
-        <div>
-            <InputLabel value="Loading End Time"/>
-            <InputText v-model="form.loading_ended_at" class="w-full" disabled/>
-            <InputError :message="form.errors.loading_ended_at" />
-        </div>
-        <template v-if="form.cargo_type === 'Air Cargo'">
+        <!-- Sea Cargo Specific -->
+        <template v-if="form.cargo_type === 'Sea Cargo'">
+            <div class="col-span-4">
+                <h2 class="text-lg font-semibold">
+                    <i class="pi pi-info-circle text-info mr-2"></i>
+                    Sea Cargo Information
+                </h2>
+            </div>
+
+            <div>
+                <InputLabel value="Container Type"/>
+                <Select v-model="form.container_type" :options="containerTypes" class="w-full" placeholder="Choose One"/>
+                <InputError :message="form.errors.container_type"/>
+            </div>
+
+            <div>
+                <InputLabel value="Container Number"/>
+                <InputText v-model="form.container_number" class="w-full" placeholder="Enter Container Number"/>
+                <InputError :message="form.errors.container_number"/>
+            </div>
+
+            <div>
+                <InputLabel value="Seal Number"/>
+                <InputText v-model="form.seal_number" class="w-full" placeholder="Enter Seal Number"/>
+                <InputError :message="form.errors.seal_number"/>
+            </div>
+
+            <div>
+                <InputLabel value="BL Number"/>
+                <InputText v-model="form.bl_number" class="w-full" placeholder="Enter BL Number"/>
+                <InputError :message="form.errors.bl_number"/>
+            </div>
+
+            <div>
+                <InputLabel value="Vessel Name"/>
+                <InputText v-model="form.vessel_name" class="w-full" placeholder="Enter Vessel Name"/>
+                <InputError :message="form.errors.vessel_name"/>
+            </div>
+
+            <div>
+                <InputLabel value="Voyage Number"/>
+                <InputText v-model="form.voyage_number" class="w-full" placeholder="Enter Voyage Number"/>
+                <InputError :message="form.errors.voyage_number"/>
+            </div>
+
+            <div>
+                <InputLabel value="Shipping Line"/>
+                <InputText v-model="form.shipping_line" class="w-full" placeholder="Enter Shipping Line"/>
+                <InputError :message="form.errors.shipping_line"/>
+            </div>
+
+            <div>
+                <InputLabel value="Port of Loading"/>
+                <InputText v-model="form.port_of_loading" class="w-full" placeholder="Enter Port of Loading"/>
+                <InputError :message="form.errors.port_of_loading"/>
+            </div>
+
+            <div>
+                <InputLabel value="Port of Discharge"/>
+                <InputText v-model="form.port_of_discharge" class="w-full" placeholder="Enter Port of Discharge"/>
+                <InputError :message="form.errors.port_of_discharge"/>
+            </div>
+        </template>
+
+        <!-- Air Cargo Specific -->
+        <template v-else-if="form.cargo_type === 'Air Cargo'">
+            <div class="col-span-4">
+                <h2 class="text-lg font-semibold">
+                    <i class="pi pi-info-circle text-info mr-2"></i>
+                    Air Cargo Information
+                </h2>
+            </div>
+
+            <div>
+                <InputLabel value="AWB Number"/>
+                <InputText v-model="form.awb_number" class="w-full" placeholder="Enter AWB Number"/>
+                <InputError :message="form.errors.awb_number"/>
+            </div>
+
             <div>
                 <InputLabel value="Flight Number"/>
                 <InputText v-model="form.flight_number" class="w-full" placeholder="Enter Flight Number"/>
-                <InputError :message="form.errors.flight_number" />
+                <InputError :message="form.errors.flight_number"/>
             </div>
+
             <div>
                 <InputLabel value="Airline Name"/>
                 <InputText v-model="form.airline_name" class="w-full" placeholder="Enter Airline Name"/>
-                <InputError :message="form.errors.airline_name" />
+                <InputError :message="form.errors.airline_name"/>
             </div>
+
             <div>
                 <InputLabel value="Airport of Departure"/>
                 <InputText v-model="form.airport_of_departure" class="w-full" placeholder="Enter Airport of Departure"/>
-                <InputError :message="form.errors.airport_of_departure" />
+                <InputError :message="form.errors.airport_of_departure"/>
             </div>
+
             <div>
                 <InputLabel value="Airport of Arrival"/>
                 <InputText v-model="form.airport_of_arrival" class="w-full" placeholder="Enter Airport of Arrival"/>
-                <InputError :message="form.errors.airport_of_arrival" />
+                <InputError :message="form.errors.airport_of_arrival"/>
             </div>
         </template>
+
+        <!-- Common Final Details -->
+        <div class="col-span-4">
+            <h2 class="text-lg font-semibold">
+                <i class="pi pi-info-circle text-info mr-2"></i>
+                Shipment Status
+            </h2>
+        </div>
 
         <div>
             <InputLabel value="Last Status"/>
@@ -306,6 +338,18 @@ watchEffect(() => {
         </div>
 
         <div>
+            <InputLabel value="Loading Started Time"/>
+            <InputText v-model="form.loading_started_at" class="w-full" disabled/>
+            <InputError :message="form.errors.loading_started_at"/>
+        </div>
+
+        <div>
+            <InputLabel value="Loading End Time"/>
+            <InputText v-model="form.loading_ended_at" class="w-full" disabled/>
+            <InputError :message="form.errors.loading_ended_at"/>
+        </div>
+
+        <div>
             <InputLabel value="Reached Date"/>
             <DatePicker v-model="form.reached_date" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set Reached Date" show-icon/>
             <InputError :message="form.errors.reached_date"/>
@@ -313,8 +357,10 @@ watchEffect(() => {
 
         <div class="flex items-center gap-2">
             <Checkbox v-model="form.is_reached" binary inputId="is_reached" />
-            <label class="font-medium text-sm" for="is_reached"> Reached Destination? </label>
+            <label class="font-medium text-sm" for="is_reached">Reached Destination?</label>
             <InputError :message="form.errors.is_reached"/>
         </div>
+
     </div>
+
 </template>
