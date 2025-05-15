@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CompletePaymentRequest;
 use App\Interfaces\Finance\ContainerPaymentRepositoryInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -57,5 +58,10 @@ class ContainerPaymentController extends Controller
     public function revokeContainerPaymentsApprovals(Request $request)
     {
         $this->containerPaymentRepository->revokeContainerPaymentsApprovals($request['data']['container_payments_ids']);
+    }
+
+    public function completePayment(CompletePaymentRequest $request)
+    {
+        $this->containerPaymentRepository->completePayments($request->all());
     }
 }

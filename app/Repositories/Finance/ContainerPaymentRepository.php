@@ -3,6 +3,7 @@
 namespace App\Repositories\Finance;
 
 use App\Actions\ContainerPayment\ApproveContainerPayments;
+use App\Actions\ContainerPayment\CompleteContainerPayments;
 use App\Actions\ContainerPayment\RevokeContainerPaymentApprovals;
 use App\Factory\ContainerPayment\FilterFactory;
 use App\Http\Resources\ContainerPaymentResource;
@@ -49,7 +50,7 @@ class ContainerPaymentRepository implements ContainerPaymentRepositoryInterface,
     public function approvedPaymentsDataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
     {
         $query = ContainerPayment::query()->where(function ($query) {
-            $query->where('is_finance_approved', '=', '1');
+            $query->where('is_finance_approved', '=', '1')->where('is_paid', '=', '0');
         });
 
         if (! empty($search)) {
@@ -77,5 +78,10 @@ class ContainerPaymentRepository implements ContainerPaymentRepositoryInterface,
     public function revokeContainerPaymentsApprovals(array $containerPaymentIds)
     {
         return RevokeContainerPaymentApprovals::run($containerPaymentIds);
+    }
+
+    public function completePayments(array $data)
+    {
+        return CompleteContainerPayments::run($data);
     }
 }

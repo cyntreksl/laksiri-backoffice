@@ -169,7 +169,19 @@ const closeShowPaidModal = () => {
 
 const handleMarkAsPaid = () => {
     form.paymentsIds = selectedContainerPayments.value.map((item) => item.id);
-    console.log(selectedContainerPayments.value, form.data());
+    form.post(route("finance.container-payment.complete-payment"), {
+        onSuccess: () => {
+            closeShowPaidModal();
+            form.reset();
+            fetchContainerPayments();
+            push.success("Container Payment Completed Successfully!");
+        },
+        onError: () => {
+            push.error("Something went to wrong!");
+        },
+        preserveScroll: true,
+        preserveState: true
+    });
 }
 
 

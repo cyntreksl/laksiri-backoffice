@@ -15,3 +15,5 @@ Route::get('approved-container-payments', [ContainerPaymentController::class, 'a
 Route::get('approved-container-payments-list', [ContainerPaymentController::class, 'approvedList']);
 
 Route::post('container-payment/revoke-approval', [ContainerPaymentController::class, 'revokeContainerPaymentsApprovals'])->name('container-payment.revoke-approval');
+
+Route::post('container-payment/complete-payment', [ContainerPaymentController::class, 'completePayment'])->name('container-payment.complete-payment');
