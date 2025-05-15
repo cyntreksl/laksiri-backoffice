@@ -30,5 +30,27 @@ class ContainerObserver
                 $hbl->addStatus('Container '.ucwords(strtolower(ContainerStatus::REACHED_DESTINATION->value)));
             }
         }
+
+        if ($container->wasChanged('shipment_weight')) {
+            $shipmentWeight = $container->shipment_weight;
+
+            $hblPackages = $container->hbl_packages()
+                ->with('hbl')
+                ->get()
+                ->filter(function ($package) {
+                    return $package->hbl && in_array($package->hbl->hbl_type, ['UPB', 'Gift']) && $package->weight == 0;
+                });
+
+            // Calculate total volume of these eligible HBL packages
+            $totalVolume = $hblPackages->sum('volume');
+
+            if ($totalVolume > 0) {
+                foreach ($hblPackages as $package) {
+                    $hblWeight = ($shipmentWeight / $totalVolume) * $package->volume;
+                    $package->weight = round($hblWeight, 2);
+                    $package->save();
+                }
+            }
+        }
     }
 }

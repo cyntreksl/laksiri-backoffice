@@ -6,6 +6,7 @@ import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
+import InputNumber from "primevue/inputnumber";
 import Select from "primevue/select";
 import DatePicker from "primevue/datepicker";
 import Checkbox from 'primevue/checkbox';
@@ -100,17 +101,18 @@ const form = useForm({
     airport_of_arrival: props.container.airport_of_arrival,
     cargo_class: props.container.cargo_class,
     loading_ended_at: props.container.loading_ended_at,
-    loading_started_at: props.container.loading_started_at
+    loading_started_at: props.container.loading_started_at,
+    shipment_weight: props.container.shipment_weight
 });
 
 const handleUpdateContainer = () => {
-    if (form.estimated_time_of_departure !== 'Invalid date') {
+    if (moment(form.estimated_time_of_departure).isValid()) {
         form.estimated_time_of_departure = moment(form.estimated_time_of_departure).format("YYYY-MM-DD");
     } else {
         form.estimated_time_of_departure = null;
     }
 
-    if (form.estimated_time_of_arrival !== 'Invalid date') {
+    if (moment(form.estimated_time_of_arrival).isValid()) {
         form.estimated_time_of_arrival = moment(form.estimated_time_of_arrival).format("YYYY-MM-DD");
     } else {
         form.estimated_time_of_arrival = null;
@@ -202,7 +204,7 @@ watchEffect(() => {
         </div>
 
         <div>
-            <InputLabel value="EDT"/>
+            <InputLabel value="ETD"/>
             <DatePicker v-model="form.estimated_time_of_departure" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set EDT" show-icon/>
             <InputError :message="form.errors.estimated_time_of_departure"/>
         </div>
@@ -274,6 +276,12 @@ watchEffect(() => {
                 <InputLabel value="Port of Discharge"/>
                 <InputText v-model="form.port_of_discharge" class="w-full" placeholder="Enter Port of Discharge"/>
                 <InputError :message="form.errors.port_of_discharge"/>
+            </div>
+
+            <div>
+                <InputLabel value="Shipment Weight"/>
+                <InputNumber v-model="form.shipment_weight" :maxFractionDigits="2" :minFractionDigits="2" class="w-full" min="0" placeholder="Enter Shipment Weight" step="any" />
+                <InputError :message="form.errors.shipment_weight"/>
             </div>
         </template>
 

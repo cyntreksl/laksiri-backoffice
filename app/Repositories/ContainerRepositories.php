@@ -255,10 +255,13 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     {
         try {
             $data['is_reached'] = isset($data['is_reached']) ? ($data['is_reached'] ? 1 : 0) : 0;
+
             UpdateContainer::run($container, $data);
+
             if ($data['is_reached']) {
                 foreach ($container->hbl_packages as $package) {
                     $hbl = HBL::withoutGlobalScope(BranchScope::class)->find($package->hbl_id);
+
                     $hbl->addStatus('Container Arrival', $container->estimated_time_of_arrival);
                 }
             }
