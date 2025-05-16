@@ -95,4 +95,32 @@ class ContainerPaymentRepository implements ContainerPaymentRepositoryInterface,
     {
         return UpdateContainersRefundCollection::run($containerPaymentIds);
     }
+
+    public function completedDataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
+    {
+        $query = ContainerPayment::query()->where(function ($query) {
+            $query->where('is_paid', '=', '1')->where('is_refund_collected', '=', '0');
+        });
+
+        if (! empty($search)) {
+            $query->whereHas('container', function ($q) use ($search) {
+                $q->where('reference', 'like', '%'.$search.'%');
+            });
+        }
+
+        $container_payments = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
+
+        // apply filters
+        FilterFactory::apply($query, $filters);
+
+        return response()->json([
+            'data' => ContainerPaymentResource::collection($container_payments),
+            'meta' => [
+                'total' => $container_payments->total(),
+                'current_page' => $container_payments->currentPage(),
+                'perPage' => $container_payments->perPage(),
+                'lastPage' => $container_payments->lastPage(),
+            ],
+        ]);
+    }
 }

@@ -415,6 +415,7 @@ class RolePermissionSeeder extends Seeder
                     'payment-container.approve',
                     'payment-container.approved list',
                     'payment-container.collect refund',
+                    'payment-container.completed payment requests',
                 ],
             ],
         ];

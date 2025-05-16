@@ -987,6 +987,17 @@ export default {
                             }
                         );
                     }
+
+                    if (usePage().props.user.permissions.includes("payment-container.completed payment requests")) {
+                        containerPaymentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Completed Container Payment Requests",
+                                route: "container-payment.showCompletedContainerPayment",
+                            }
+                        );
+                    }
                     childMenuList.splice(
                         0,
                         childMenuList.length,

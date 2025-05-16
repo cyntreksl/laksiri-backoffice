@@ -15,3 +15,7 @@ Route::get('container-payment-list', [ContainerPaymentController::class, 'list']
 Route::get('container-payment-refund-list', [ContainerPaymentController::class, 'refundList']);
 
 Route::post('container-payment/mark-refund-collection', [ContainerPaymentController::class, 'markRefundAsCollected'])->name('container-payment.refund-collection');
+
+Route::get('completed-container-payment', [ContainerPaymentController::class, 'showCompletedContainerPayment'])->name('container-payment.showCompletedContainerPayment');
+
+Route::get('container-payment-completed-list', [ContainerPaymentController::class, 'completedList']);
