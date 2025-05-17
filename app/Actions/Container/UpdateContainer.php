@@ -16,6 +16,8 @@ class UpdateContainer
     {
         try {
             $container->update($data);
+
+            return $container;
         } catch (\Exception $e) {
             throw new \Exception('Failed to update container: '.$e->getMessage());
         }

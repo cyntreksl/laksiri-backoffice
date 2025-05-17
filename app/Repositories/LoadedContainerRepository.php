@@ -20,6 +20,7 @@ use App\Interfaces\LoadedContainerRepositoryInterface;
 use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\Scopes\BranchScope;
+use App\Services\ContainerWeightService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 
@@ -45,7 +46,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
                 $hblNumbers = array_unique(array_column($data['packages'], 'hbl_id'));
                 $this->notificationMailRepository->sendShipmentDepartureNotification($hblNumbers);
 
-                return $container;
+                ContainerWeightService::recalculate($container);
             }
         } catch (\Exception $e) {
             throw new \Exception('Failed to create loaded container: '.$e->getMessage());

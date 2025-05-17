@@ -175,7 +175,7 @@ pipelines:
 #              <<: *unit-tests
 
   branches:
-    master:
+    staging:
       - parallel:
           - step:
               <<: *short-commit
