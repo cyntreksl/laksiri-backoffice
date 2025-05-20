@@ -21,6 +21,9 @@ import VirtualScroller from 'primevue/virtualscroller';
 import LoadedShipmentDetailDialog from "@/Pages/Common/Dialog/Container/Index.vue";
 import {useConfirm} from "primevue/useconfirm";
 import {push} from "notivue";
+import AddVesselModal from "@/Pages/Clearance/VesselSchedule/Partials/AddVesselModal.vue";
+import Checkbox from "primevue/checkbox";
+import moment from "moment/moment.js";
 
 const props = defineProps({
     vesselSchedules: {
@@ -213,6 +216,131 @@ const handleContainerPaymentCreate = async () => {
     });
 };
 
+const showConfirmAddVesselModal = ref(false);
+const confirmAddVesselModal = () => {
+    showConfirmAddVesselModal.value = true;
+};
+
+const closeAddVesselModal = () => {
+    showConfirmAddVesselModal.value = false;
+}
+
+const reloadPage = () => {
+    window.location.reload();
+}
+
+const containerId = ref('');
+const confirmRemoveContainerHold = (ContainerId) => {
+    containerId.value = ContainerId;
+    confirm.require({
+        message: `Would you like to remove this container form vessel schedule`,
+        header: `Remove container`,
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: `Remove container`,
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(
+                route("clearance.vessel-schedule.remove-vessel", props.vesselSchedules.id),
+                {containerID : containerId.value},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success(`Removed Successfully!`);
+                        reloadPage();
+                    },
+                    onError: () => {
+                        push.error("Something went to wrong!");
+                    },
+                }
+            );
+            selectedHBLID.value = null;
+        },
+        reject: () => {
+        }
+    });
+};
+
+const updateForm = useForm({
+    cargo_type: selectedContainer.value.cargo_type,
+    reference: selectedContainer.value.reference,
+    awb_number: selectedContainer.value.awb_number,
+    estimated_time_of_departure: selectedContainer.value.estimated_time_of_departure,
+    estimated_time_of_arrival: selectedContainer.value.estimated_time_of_arrival,
+    status: selectedContainer.value.status,
+    note: selectedContainer.value.note,
+    is_reached: Boolean(selectedContainer.value.is_reached),
+    reached_date: selectedContainer.value.reached_date,
+    container_type:  selectedContainer.value.container_type,
+    bl_number: selectedContainer.value.bl_number,
+    container_number: selectedContainer.value.container_number,
+    seal_number: selectedContainer.value.seal_number,
+    vessel_name: selectedContainer.value.vessel_name,
+    voyage_number: selectedContainer.value.voyage_number,
+    shipping_line: selectedContainer.value.shipping_line,
+    port_of_loading: selectedContainer.value.port_of_loading,
+    port_of_discharge: selectedContainer.value.port_of_discharge,
+    flight_number: selectedContainer.value.flight_number,
+    airline_name: selectedContainer.value.airline_name,
+    airport_of_departure: selectedContainer.value.airport_of_departure,
+    airport_of_arrival: selectedContainer.value.airport_of_arrival,
+    cargo_class: selectedContainer.value.cargo_class,
+    loading_ended_at: selectedContainer.value.loading_ended_at,
+    loading_started_at: selectedContainer.value.loading_started_at,
+    is_returned: Boolean(selectedContainer.value.is_returned),
+});
+
+watch(() => updateForm.is_reached, (newValue) => {
+    if (newValue) {
+        updateForm.is_returned = false;
+    }
+});
+
+watch(() => updateForm.is_returned, (newValue) => {
+    if (newValue) {
+        updateForm.is_reached = false;
+        updateForm.reached_date = '';
+    }
+});
+
+const handleUpdateContainer = () => {
+    if (updateForm.estimated_time_of_departure !== 'Invalid date') {
+        updateForm.estimated_time_of_departure = moment(updateForm.estimated_time_of_departure).format("YYYY-MM-DD");
+    } else {
+        updateForm.estimated_time_of_departure = null;
+    }
+
+    if (updateForm.estimated_time_of_arrival !== 'Invalid date') {
+        updateForm.estimated_time_of_arrival = moment(updateForm.estimated_time_of_arrival).format("YYYY-MM-DD");
+    } else {
+        updateForm.estimated_time_of_arrival = null;
+    }
+
+    if (moment(updateForm.reached_date).isValid()) {
+        updateForm.reached_date = moment(updateForm.reached_date).format("YYYY-MM-DD");
+    } else {
+        updateForm.reached_date = null;
+    }
+
+    updateForm.post(route("clearance.vessel-schedule.update-container", selectedContainer.value.id), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            reloadPage();
+            push.success('Container Updated Successfully!');
+        },
+        onError: () => {
+            updateForm.reset();
+        }
+    });
+}
 </script>
 
 <template>
@@ -221,31 +349,45 @@ const handleContainerPaymentCreate = async () => {
 
         <Breadcrumb/>
 
-        <div class="mt-5 space-x-2">
-            <h1 class="text-3xl ml-1 font-medium text-gray-700">
-                Vessel Schedule
-            </h1>
-            <div class="flex items-center space-x-2 text-gray-400">
-                <div>{{ vesselSchedules?.start_date }}</div>
-                <div><i class="ti ti-arrow-narrow-right text-xl" v-if="vesselSchedules?.end_date"></i></div>
-                <div>{{ vesselSchedules?.end_date }}</div>
+        <div class="mt-5 flex justify-between items-center">
+            <!-- Left Side: Title and Dates -->
+            <div>
+                <h1 class="text-3xl ml-1 font-medium text-gray-700">
+                    Vessel Schedule
+                </h1>
+                <div class="flex items-center space-x-2 text-gray-400 mt-1">
+                    <div>{{ vesselSchedules?.start_date }}</div>
+                    <div>
+                        <i class="ti ti-arrow-narrow-right text-xl" v-if="vesselSchedules?.end_date"></i>
+                    </div>
+                    <div>{{ vesselSchedules?.end_date }}</div>
+                </div>
             </div>
+
+            <a :href="route('clearance.vessel-schedule.download', vesselSchedules.id)">
+                <Button
+                    icon="pi pi-plus"
+                    label="Print Vessel Schedule"
+                    size="small"
+                />
+            </a>
         </div>
 
         <div class="grid grid-cols-12 gap-4 my-5">
             <!-- Container List -->
             <Card class="col-span-4 border-2 border-gray-200 !shadow-none">
                 <template #title>
-                    <div class="flex justify-between">
-                        <div>
-                            <div>Available Vessels</div>
-                        </div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-lg font-semibold">Available Vessels</div>
+                        <Button icon="pi pi-plus"
+                                label="Add Vessel To Schedule"
+                                size="small" @click.prevent="confirmAddVesselModal()"/>
                     </div>
                 </template>
                 <template #subtitle>{{ containers.length }} Vessels</template>
                 <template #content>
-                    <VirtualScroller :item-size="vesselSchedules?.containers.length"
-                                     :items="vesselSchedules?.containers" style="height: 400px">>
+                    <VirtualScroller :item-size="vesselSchedules?.clearance_containers.length"
+                                     :items="vesselSchedules?.clearance_containers" style="height: 400px">>
                         <template v-slot:item="{ item, options }">
                             <Card
                                 :class="[
@@ -269,7 +411,15 @@ const handleContainerPaymentCreate = async () => {
                                     </div>
                                     <div class="flex justify-between text-sm">
                                         <div>{{ item?.bl_number }}</div>
-                                        <div>{{ item?.awb_number }}</div>
+                                        <Button
+                                            v-tooltip="'Remove From Vessel Schedule'"
+                                            icon="pi pi-trash"
+                                            outlined
+                                            rounded
+                                            severity="danger"
+                                            size="small"
+                                            @click.prevent="confirmRemoveContainerHold(item?.id)"
+                                        />
                                     </div>
                                 </template>
                             </Card>
@@ -315,7 +465,8 @@ const handleContainerPaymentCreate = async () => {
                             <Tab value="0">HBLS</Tab>
                             <Tab value="1">MHBLs</Tab>
                             <Tab value="2">Payments</Tab>
-                            <Tab value="3">Documents</Tab>
+                            <Tab value="3">Shipment Details</Tab>
+                            <Tab value="4">Documents</Tab>
                         </TabList>
                         <TabPanels>
                             <!-- HBLs Tab -->
@@ -478,6 +629,161 @@ const handleContainerPaymentCreate = async () => {
 
                             <!-- Documents Tab -->
                             <TabPanel value="3">
+                                <div class="grid grid-cols-4 gap-5">
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.cargo_type" class="w-full" variant="filled" disabled/>
+                                            <label>Cargo Mode</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.container_type" class="w-full" variant="filled" disabled/>
+                                            <label>Container Type</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.reference" class="w-full" variant="filled" disabled/>
+                                            <label>Reference</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.container_number" class="w-full" variant="filled" disabled/>
+                                            <label>Container Number</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.seal_number" class="w-full" variant="filled" disabled/>
+                                            <label>Seal Number</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.bl_number" class="w-full" variant="filled" disabled/>
+                                            <label>BL Number</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.estimated_time_of_departure" class="w-full" variant="filled" disabled/>
+                                            <label>EDT</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.estimated_time_of_arrival" class="w-full" variant="filled" disabled/>
+                                            <label>ETA</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.vessel_name" class="w-full" variant="filled" disabled/>
+                                            <label>Vessel Name</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.voyage_number" class="w-full" variant="filled" disabled/>
+                                            <label>Voyage Number</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.shipping_line" class="w-full" variant="filled" disabled/>
+                                            <label>Shipping Line</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.port_of_loading" class="w-full" variant="filled" disabled/>
+                                            <label>Port of Loading</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.port_of_discharge" class="w-full" variant="filled" disabled/>
+                                            <label>Port of Discharge</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.loading_started_at" class="w-full" variant="filled" disabled/>
+                                            <label>Loading Started Time</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.loading_ended_at" class="w-full" variant="filled" disabled/>
+                                            <label>Loading End Time</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.status" class="w-full" variant="filled" disabled/>
+                                            <label>Last Status</label>
+                                        </IftaLabel>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <InputText v-model="updateForm.note" class="w-full" variant="filled"  placeholder="Type something..."/>
+                                            <label>note</label>
+                                        </IftaLabel>
+                                        <InputError :message="updateForm.errors.note"/>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <DatePicker v-model="updateForm.reached_date" class="w-full" variant="filled" date-format="yy-mm-dd" icon-display="input" placeholder="Set Reached Date" show-icon/>
+                                            <label>Reached Date</label>
+                                        </IftaLabel>
+                                        <InputError :message="updateForm.errors.reached_date"/>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <Checkbox v-model="updateForm.is_reached" binary inputId="is_reached" />
+                                            <label class="font-medium text-sm ml-5" for="is_reached"> Reached Destination? </label>
+                                        </IftaLabel>
+                                        <InputError :message="updateForm.errors.is_reached"/>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <Checkbox v-model="updateForm.is_returned" binary inputId="is_reached" />
+                                            <label class="font-medium text-sm ml-5" for="is_reached"> Is Returned? </label>
+                                        </IftaLabel>
+                                        <InputError :message="updateForm.errors.is_returned"/>
+                                    </div>
+
+                                    <div class="text-right col-span-4 md:col-span-4">
+                                        <Button :class="{ 'opacity-25': updateForm.processing }"
+                                                :disabled="updateForm.processing" icon="pi pi-save" label="Save Changes"
+                                                severity="info" size="small" @click="handleUpdateContainer"/>
+                                    </div>
+                                </div>
+                            </TabPanel>
+
+                            <!-- Documents Tab -->
+                            <TabPanel value="4">
                                 <div class="grid grid-cols-2 gap-5">
                                     <div>
                                         <IftaLabel>
@@ -510,4 +816,12 @@ const handleContainerPaymentCreate = async () => {
     <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="selectedContainer" :container-status="containerStatus" :sea-container-options="seaContainerOptions" :show="showConfirmLoadedShipmentModal"
                                 @close="closeModal"
                                 @update:show="showConfirmLoadedShipmentModal = $event" />
+
+    <AddVesselModal
+        :visible="showConfirmAddVesselModal"
+        :vessel-schedule="vesselSchedules"
+        @close="closeAddVesselModal"
+        @reloadPage="reloadPage"
+        @update:visible="showConfirmAddVesselModal = $event"
+    />
 </template>

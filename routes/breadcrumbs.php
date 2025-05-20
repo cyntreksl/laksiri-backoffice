@@ -512,6 +512,13 @@ Breadcrumbs::for('container-payment.showContainerPaymentRefund', function (Bread
     $trail->push('Refund List', route('container-payment.showContainerPaymentRefund'));
 });
 
+// Completed Container Payment
+Breadcrumbs::for('container-payment.showCompletedContainerPayment', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Container Payment');
+    $trail->push('Completed List', route('container-payment.showCompletedContainerPayment'));
+});
+
 require_once __DIR__.'/call-center-breadcrumbs.php';
 require_once __DIR__.'/finance-breadcrumbs.php';
 require_once __DIR__.'/clearance-breadcrumbs.php';

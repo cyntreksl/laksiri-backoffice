@@ -69,4 +69,22 @@ class ContainerPaymentController extends Controller
     {
         $this->containerPaymentRepository->markRefundCollection($request['data']['container_payments_ids']);
     }
+
+    public function showCompletedContainerPayment()
+    {
+        return Inertia::render('ContainerPayment/ContainerPaymentCompletedList');
+    }
+
+    public function completedList(Request $request)
+    {
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
+
+        return $this->containerPaymentRepository->completedDataset($limit, $page, $order, $dir, $search, $filters);
+    }
 }

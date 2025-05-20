@@ -955,6 +955,7 @@ export default {
                             }
                         );
                     }
+
                     if (usePage().props.user.permissions.includes("payment-container.refund list")) {
                         containerPaymentMenu.splice(
                             2,
@@ -972,6 +973,28 @@ export default {
                             {
                                 title: "Container Payment Requests",
                                 route: "finance.container-payments.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("payment-container.approved list")) {
+                        containerPaymentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Approved Container Payment Requests",
+                                route: "finance.approved-container-payments",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("payment-container.completed payment requests")) {
+                        containerPaymentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Completed Container Payment Requests",
+                                route: "container-payment.showCompletedContainerPayment",
                             }
                         );
                     }
