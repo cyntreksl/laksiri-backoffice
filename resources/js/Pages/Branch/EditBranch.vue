@@ -11,6 +11,7 @@ import {QuillEditor} from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import {ref} from "vue";
+import Select from 'primevue/select';
 
 const props = defineProps({
     cargoModes: {
@@ -50,13 +51,17 @@ const props = defineProps({
     countryNames: {
         type: Array,
         default: () => []
-    }
-
+    },
+    timezones: {
+        type: Array,
+        default: () => [],
+    },
 })
 
 const form = useForm({
     name: props.branch.name,
     branch_code: props.branch.branch_code,
+    timezone: props.branch.timezone,
     type: props.branch.type || null,
     currency_name: props.branch.currency_name || '',
     currency_symbol: props.branch.currency_symbol || '',
@@ -177,8 +182,6 @@ const clearSealFileInput = () => {
 const updateChecked = (notification, isChecked) => {
     settingForm.notification = { ...settingForm.notification, [notification]: isChecked };
 };
-
-
 </script>
 
 <template>
@@ -302,6 +305,14 @@ const updateChecked = (notification, isChecked) => {
 
                             </label>
                             <InputError :message="form.errors.country"/>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block">
+                                <InputLabel value="Timezone"/>
+                                <Select v-model="form.timezone" :options="timezones" checkmark class="w-full" filter placeholder="Select a Timezone"/>
+                            </label>
+                            <InputError :message="form.errors.timezone"/>
                         </div>
 
                         <div class="sm:col-span-4">

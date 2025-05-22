@@ -69,6 +69,7 @@ class BranchController extends Controller
             'countryCodes' => $this->countryRepository->getAllPhoneCodes(),
             'countryNames' => $this->countryRepository->getAllCountries(),
             'notificationTypes' => NotificationType::cases(),
+            'timezones' => Branch::timezones(),
         ]);
     }
 

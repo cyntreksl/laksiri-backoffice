@@ -26,6 +26,7 @@ class Branch extends Model
         'currency_symbol',
         'country_code',
         'country',
+        'timezone',
         'cargo_modes',
         'delivery_types',
         'package_types',
@@ -60,5 +61,10 @@ class Branch extends Model
     public function warehouseZones(): HasMany
     {
         return $this->hasMany(WarehouseZone::class);
+    }
+
+    public static function timezones(): array
+    {
+        return timezone_identifiers_list();
     }
 }
