@@ -248,8 +248,8 @@ const exportCSV = () => {
 };
 </script>
 <template>
-    <AppLayout v-if="$page.props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Containers">
-        <template #header>Containers</template>
+    <AppLayout v-if="$page.props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Shipments">
+        <template #header>Shipments</template>
 
         <Breadcrumb/>
 
@@ -306,7 +306,7 @@ const exportCSV = () => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Containers
+                                    Shipments
                                 </div>
                                 <div>
                                     <Button
@@ -355,9 +355,9 @@ const exportCSV = () => {
                             </div>
                         </template>
 
-                        <template #empty>No containers found.</template>
+                        <template #empty>No shipments found.</template>
 
-                        <template #loading>Loading containers data. Please wait.</template>
+                        <template #loading>Loading shipments data. Please wait.</template>
 
                         <Column field="container_type" header="Container Type" sortable>
                             <template #body="slotProps">
@@ -418,7 +418,7 @@ const exportCSV = () => {
     </AppLayout>
 
     <AppLayout v-else title="Containers">
-        <template #header>Containers</template>
+        <template #header>Shipments</template>
 
         <Breadcrumb/>
 
@@ -475,7 +475,7 @@ const exportCSV = () => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Containers
+                                    Shipments
                                 </div>
                                 <div>
                                     <Button
@@ -524,9 +524,9 @@ const exportCSV = () => {
                             </div>
                         </template>
 
-                        <template #empty>No containers found.</template>
+                        <template #empty>No shipments found.</template>
 
-                        <template #loading>Loading containers data. Please wait.</template>
+                        <template #loading>Loading shipments data. Please wait.</template>
 
                         <Column field="container_type" header="Container Type" sortable>
                             <template #body="slotProps">
@@ -579,7 +579,7 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <template #footer> In total there are {{ containers ? totalRecords : 0 }} containers. </template>
+                        <template #footer> In total there are {{ containers ? totalRecords : 0 }} shipments. </template>
                     </DataTable>
                 </template>
             </Card>

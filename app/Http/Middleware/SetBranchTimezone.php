@@ -20,7 +20,7 @@ class SetBranchTimezone
     {
         if (Auth::check()) {
             $branch = GetUserCurrentBranch::run();
-            
+
             if ($branch && $branch['timezone']) {
                 Config::set('app.timezone', $branch['timezone']);
                 date_default_timezone_set($branch['timezone']);

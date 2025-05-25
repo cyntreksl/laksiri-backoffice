@@ -247,25 +247,25 @@ Breadcrumbs::for('setting.driver-zones.index', function (BreadcrumbTrail $trail)
     $trail->push('Driver Zones', route('setting.driver-zones.index'));
 });
 
-// Loading > Container Index
+// Loading > Shipments Index
 Breadcrumbs::for('loading.loading-containers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Loading');
-    $trail->push('Containers', route('loading.loading-containers.index'));
+    $trail->push('Shipments', route('loading.loading-containers.index'));
 });
 
-// Loading > Container Create
+// Loading > Shipments Create
 Breadcrumbs::for('loading.loading-containers.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Loading', route('loading.loading-containers.index'));
-    $trail->push('Containers Create', route('loading.loading-containers.create'));
+    $trail->push('Shipments Create', route('loading.loading-containers.create'));
 });
 
-// Loading > Container Edit
+// Loading > Shipments Edit
 Breadcrumbs::for('loading.loading-containers.edit', function (BreadcrumbTrail $trail, Container $container) {
     $trail->parent('dashboard');
     $trail->push('Loading', route('loading.loading-containers.index'));
-    $trail->push('Container Edit', route('loading.loading-containers.edit', $container->id));
+    $trail->push('Shipments Edit', route('loading.loading-containers.edit', $container->id));
 });
 
 // Branches

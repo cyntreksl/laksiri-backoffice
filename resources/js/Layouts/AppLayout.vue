@@ -1231,7 +1231,7 @@ export default {
                             2,
                             0,
                             {
-                                title: "Containers",
+                                title: "Shipments",
                                 route: "loading.loading-containers.index",
                             }
                         );
