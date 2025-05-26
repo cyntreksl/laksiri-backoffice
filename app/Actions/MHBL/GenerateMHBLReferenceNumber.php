@@ -18,20 +18,25 @@ class GenerateMHBLReferenceNumber
             $branch_code = session('current_branch_code')
                 ?? Branch::where('id', Auth::user()->primary_branch_id)->pluck('branch_code')->first();
 
-            // Lock the table for update to prevent duplicates
-            $last_mhbl = MHBL::whereNotNull('reference')
-                ->lockForUpdate()
-                ->latest()
-                ->first();
+            do {
+                // Lock the table for update to prevent duplicates
+                $last_mhbl = MHBL::whereNotNull('reference')
+                    ->lockForUpdate()
+                    ->latest()
+                    ->first();
 
-            $next_number = 1;
+                $next_number = 1;
 
-            if ($last_mhbl) {
-                $last_number = (int) substr($last_mhbl->reference, strpos($last_mhbl->reference, 'REF') + 3);
-                $next_number = $last_number + 1;
-            }
+                if ($last_mhbl) {
+                    $last_number = (int) substr($last_mhbl->reference, strpos($last_mhbl->reference, 'REF') + 3);
+                    $next_number = $last_number + 1;
+                }
 
-            $reference = $branch_code.'-REF'.str_pad($next_number, 6, '0', STR_PAD_LEFT);
+                $reference = $branch_code.'-REF'.str_pad($next_number, 6, '0', STR_PAD_LEFT);
+
+                // Check if the reference already exists
+                $exists = MHBL::where('reference', $reference)->exists();
+            } while ($exists); // Keep trying until we find a unique reference
 
             return $reference;
         });
