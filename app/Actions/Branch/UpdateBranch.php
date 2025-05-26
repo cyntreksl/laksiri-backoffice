@@ -29,6 +29,7 @@ class UpdateBranch
             'cargo_modes' => json_encode($data['cargo_modes']),
             'delivery_types' => json_encode($data['delivery_types']),
             'package_types' => json_encode($data['package_types']),
+            'is_prepaid' => $data['is_prepaid'],
         ]);
 
         if (session('current_branch_id') === $branch->id) {

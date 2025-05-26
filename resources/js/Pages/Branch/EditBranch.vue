@@ -73,6 +73,7 @@ const form = useForm({
     cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
     delivery_types: JSON.parse(props.branch.delivery_types) || [],
     package_types: JSON.parse(props.branch.package_types) || [],
+    is_prepaid: Number(props.branch.is_prepaid),
 });
 
 const handleBranchUpdate = () => {
@@ -315,10 +316,22 @@ const updateChecked = (notification, isChecked) => {
                             <InputError :message="form.errors.timezone"/>
                         </div>
 
-                        <div class="sm:col-span-4">
+                        <div class="sm:col-span-2">
                             <InputLabel value="Email"/>
                             <TextInput v-model="form.email" class="w-full" placeholder="Enter Email" type="email"/>
                             <InputError :message="form.errors.email"/>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block">
+                                <InputLabel value="Payment Type"/>
+                                <Select v-model="form.is_prepaid"
+                                        :options="[{value: 1, label: 'Prepaid'}, {value: 0, label: 'Postpaid'}]"
+                                        checkmark
+                                        class="w-full"
+                                        option-label="label" option-value="value" placeholder="Select Payment Type"/>
+                            </label>
+                            <InputError :message="form.errors.is_prepaid"/>
                         </div>
                     </div>
                 </div>

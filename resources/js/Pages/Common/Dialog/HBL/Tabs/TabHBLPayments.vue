@@ -125,7 +125,7 @@ const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.handlingCharges).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.handlingCharges).toFixed(2) }}</p>
                     </div>
                 </div>
 
@@ -137,7 +137,7 @@ const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.slpaCharge).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.slpaCharge).toFixed(2) }}</p>
                     </div>
                 </div>
 
@@ -149,7 +149,7 @@ const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.bondCharge).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.bondCharge).toFixed(2) }}</p>
                     </div>
                 </div>
 
@@ -161,7 +161,7 @@ const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.demurrageCharge).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.demurrageCharge).toFixed(2) }}</p>
                     </div>
                 </div>
 
@@ -173,7 +173,7 @@ const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.dOCharge).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.dOCharge).toFixed(2) }}</p>
                     </div>
                 </div>
 
@@ -189,7 +189,7 @@ const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
                     </div>
                 </div>
                 <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                    <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblDestinationTotalSummary.totalAmount).toFixed(2) }}</p>
+                    <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.totalAmount).toFixed(2) }}</p>
                 </div>
             </li>
             <li v-if="hblTotalSummary.vat" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
