@@ -171,7 +171,7 @@ watchEffect(() => {
             </h3>
         </div>
         <div class="flex items-center space-x-2">
-            <Button icon="pi pi-trash" label="Delete Shipment"
+            <Button :disabled="container.status === 'IN TRANSIT' || container.status === 'REACHED DESTINATION'" icon="pi pi-trash" label="Delete Shipment"
                     severity="danger" size="small" @click.prevent="handleDeleteLoadedShipment" />
 
             <Button :class="{ 'opacity-25': form.processing }"
