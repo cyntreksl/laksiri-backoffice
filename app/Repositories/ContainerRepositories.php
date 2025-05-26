@@ -16,6 +16,7 @@ use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\ContainerDocument\DeleteDocument;
 use App\Actions\ContainerDocument\DownloadDocument;
 use App\Actions\ContainerDocument\UploadDocument;
+use App\Actions\HBL\UpdateHBLSystemStatus;
 use App\Actions\MHBL\GetMHBLById;
 use App\Actions\Setting\GetSettings;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
@@ -242,6 +243,15 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     {
         try {
             DB::beginTransaction();
+
+            $hbls = $container
+                ->hbl_packages
+                ->pluck('hbl')
+                ->unique();
+
+            foreach ($hbls as $hbl) {
+                UpdateHBLSystemStatus::run($hbl, HBL::SYSTEM_STATUS_CASH_RECEIVED, "HBL {$hbl->reference} has been deleted from container {$container->reference}");
+            }
 
             UnloadHBLPackages::run($container);
 
