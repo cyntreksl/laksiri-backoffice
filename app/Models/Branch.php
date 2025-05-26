@@ -35,6 +35,7 @@ class Branch extends Model
         'container_delays',
         'maximum_demurrage_discount',
         'country',
+        'is_prepaid',
         'is_third_party_agent',
     ];
 
