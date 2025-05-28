@@ -287,6 +287,18 @@
                             >
                                 <i class="ti ti-users text-2xl"></i>
                             </a>
+                            <!-- Branches -->
+                            <Link
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('branches')) || $page.props.user.permissions.includes('branches.list')"
+                                :class="[
+                activeMenu === 'branches' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                :href="route('branches.index')"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Branches'"
+                            >
+                                <i class="ti ti-git-branch text-2xl"></i>
+                            </Link>
                         </template>
                     </div>
 
