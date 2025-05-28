@@ -247,39 +247,37 @@ Breadcrumbs::for('setting.driver-zones.index', function (BreadcrumbTrail $trail)
     $trail->push('Driver Zones', route('setting.driver-zones.index'));
 });
 
-// Loading > Container Index
+// Loading > Shipments Index
 Breadcrumbs::for('loading.loading-containers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Loading');
-    $trail->push('Containers', route('loading.loading-containers.index'));
+    $trail->push('Shipments', route('loading.loading-containers.index'));
 });
 
-// Loading > Container Create
+// Loading > Shipments Create
 Breadcrumbs::for('loading.loading-containers.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Loading', route('loading.loading-containers.index'));
-    $trail->push('Containers Create', route('loading.loading-containers.create'));
+    $trail->push('Shipments Create', route('loading.loading-containers.create'));
 });
 
-// Loading > Container Edit
+// Loading > Shipments Edit
 Breadcrumbs::for('loading.loading-containers.edit', function (BreadcrumbTrail $trail, Container $container) {
     $trail->parent('dashboard');
     $trail->push('Loading', route('loading.loading-containers.index'));
-    $trail->push('Container Edit', route('loading.loading-containers.edit', $container->id));
+    $trail->push('Shipments Edit', route('loading.loading-containers.edit', $container->id));
 });
 
 // Branches
 Breadcrumbs::for('branches.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Branchs');
-    $trail->push('List', route('branches.index'));
+    $trail->push('Branches', route('branches.index'));
 });
 
 // Branches > Create
 Breadcrumbs::for('branches.create', function (BreadcrumbTrail $trail) {
     $trail->parent('branches.index');
-    $trail->push('Branch');
-    $trail->push('Create', route('branches.create'));
+    $trail->push('Create Branch', route('branches.create'));
 });
 
 // Branches > Edit
@@ -510,6 +508,13 @@ Breadcrumbs::for('container-payment.showContainerPaymentRefund', function (Bread
     $trail->parent('dashboard');
     $trail->push('Container Payment');
     $trail->push('Refund List', route('container-payment.showContainerPaymentRefund'));
+});
+
+// Completed Container Payment
+Breadcrumbs::for('container-payment.showCompletedContainerPayment', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Container Payment');
+    $trail->push('Completed List', route('container-payment.showCompletedContainerPayment'));
 });
 
 require_once __DIR__.'/call-center-breadcrumbs.php';

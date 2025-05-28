@@ -16,6 +16,7 @@ class GetUserCurrentBranch
         $branchId = session('current_branch_id');
         $branchType = session('current_branch_type');
         $branchCode = session('current_branch_code');
+        $timezone = session('current_branch_timezone');
 
         //      For API
         if (empty($branchId) || is_null($branchId)) {
@@ -24,6 +25,7 @@ class GetUserCurrentBranch
             $branchName = $primaryBranch->name;
             $branchType = $primaryBranch->type;
             $branchCode = $primaryBranch->branch_code;
+            $timezone = $primaryBranch->timezone;
         }
 
         return [
@@ -31,6 +33,7 @@ class GetUserCurrentBranch
             'branchId' => $branchId,
             'branchType' => $branchType,
             'branchCode' => $branchCode,
+            'timezone' => $timezone,
         ];
     }
 }

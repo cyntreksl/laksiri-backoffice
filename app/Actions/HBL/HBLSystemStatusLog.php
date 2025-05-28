@@ -11,12 +11,12 @@ class HBLSystemStatusLog
 {
     use AsAction;
 
-    public function handle(HBL $HBL, float $status): HBLStatusChange
+    public function handle(HBL $HBL, float $status, ?string $message = null): HBLStatusChange
     {
         $HBLStatus = new HBLStatusChange;
         $HBLStatus->hbl_id = $HBL->id;
         $HBLStatus->title = $this->title($status);
-        $HBLStatus->message = sprintf($this->message($status), $HBL->hbl);
+        $HBLStatus->message = $message ?? sprintf($this->message($status), $HBL->hbl);
         $HBLStatus->created_by = Auth::id();
         $HBLStatus->save();
 

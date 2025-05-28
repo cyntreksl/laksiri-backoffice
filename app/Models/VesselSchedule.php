@@ -34,4 +34,16 @@ class VesselSchedule extends Model
             'container_id'
         );
     }
+
+    public function clearanceContainers(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Container::class,
+            VesselScheduleContainer::class,
+            'vessel_schedule_id',
+            'id',
+            'id',
+            'container_id'
+        )->where('is_reached', false)->where('is_returned', false);
+    }
 }

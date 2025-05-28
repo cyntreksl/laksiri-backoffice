@@ -12,6 +12,6 @@ class GetBranches
 
     public function handle(): Collection|array
     {
-        return Branch::all();
+        return Branch::where('is_third_party_agent', false)->get();
     }
 }

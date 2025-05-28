@@ -104,7 +104,7 @@ const handleCreateLoadedContainer = (printTallySheet) => {
 </script>
 
 <template>
-    <Dialog :style="{ width: '50rem' }" :visible="visible" header="Shipping Summery" modal
+    <Dialog :style="{ width: '50rem' }" :visible="visible" header="Shipping Tally Sheet" modal
             @update:visible="(newValue) => $emit('update:visible', newValue)">
 
         <div class="grid grid-cols-2 my-3">
@@ -180,14 +180,14 @@ const handleCreateLoadedContainer = (printTallySheet) => {
         <div class="flex justify-end space-x-2 mt-5">
             <Button label="Cancel" severity="secondary" size="small" type="button" @click="emit('close')"></Button>
 
-            <Button icon="pi pi-download" label="Download Summery"
+            <Button icon="pi pi-download" label="Download Tally Sheet"
                     outlined
                     severity="info"
                     size="small"
                     type="button"
                     @click.prevent="handleDownLoadTallySheet"></Button>
 
-            <Button label="Finish Loading & Download Summery" outlined
+            <Button label="Finish Loading & Download Tally Sheet" outlined
                     severity="help"
                     size="small"
                     type="button"

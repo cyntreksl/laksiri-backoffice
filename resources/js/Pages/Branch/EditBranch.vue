@@ -11,6 +11,7 @@ import {QuillEditor} from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import {ref} from "vue";
+import Select from 'primevue/select';
 
 const props = defineProps({
     cargoModes: {
@@ -50,13 +51,17 @@ const props = defineProps({
     countryNames: {
         type: Array,
         default: () => []
-    }
-
+    },
+    timezones: {
+        type: Array,
+        default: () => [],
+    },
 })
 
 const form = useForm({
     name: props.branch.name,
     branch_code: props.branch.branch_code,
+    timezone: props.branch.timezone,
     type: props.branch.type || null,
     currency_name: props.branch.currency_name || '',
     currency_symbol: props.branch.currency_symbol || '',
@@ -68,6 +73,7 @@ const form = useForm({
     cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
     delivery_types: JSON.parse(props.branch.delivery_types) || [],
     package_types: JSON.parse(props.branch.package_types) || [],
+    is_prepaid: Number(props.branch.is_prepaid),
 });
 
 const handleBranchUpdate = () => {
@@ -177,8 +183,6 @@ const clearSealFileInput = () => {
 const updateChecked = (notification, isChecked) => {
     settingForm.notification = { ...settingForm.notification, [notification]: isChecked };
 };
-
-
 </script>
 
 <template>
@@ -304,10 +308,30 @@ const updateChecked = (notification, isChecked) => {
                             <InputError :message="form.errors.country"/>
                         </div>
 
-                        <div class="sm:col-span-4">
+                        <div class="sm:col-span-2">
+                            <label class="block">
+                                <InputLabel value="Timezone"/>
+                                <Select v-model="form.timezone" :options="timezones" checkmark class="w-full" filter placeholder="Select a Timezone"/>
+                            </label>
+                            <InputError :message="form.errors.timezone"/>
+                        </div>
+
+                        <div class="sm:col-span-2">
                             <InputLabel value="Email"/>
                             <TextInput v-model="form.email" class="w-full" placeholder="Enter Email" type="email"/>
                             <InputError :message="form.errors.email"/>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block">
+                                <InputLabel value="Payment Type"/>
+                                <Select v-model="form.is_prepaid"
+                                        :options="[{value: 1, label: 'Prepaid'}, {value: 0, label: 'Postpaid'}]"
+                                        checkmark
+                                        class="w-full"
+                                        option-label="label" option-value="value" placeholder="Select Payment Type"/>
+                            </label>
+                            <InputError :message="form.errors.is_prepaid"/>
                         </div>
                     </div>
                 </div>

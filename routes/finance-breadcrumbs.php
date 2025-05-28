@@ -27,3 +27,10 @@ Breadcrumbs::for('finance.container-payments.index', function (BreadcrumbTrail $
     $trail->push('Container Payment');
     $trail->push('Requests List', route('finance.container-payments.index'));
 });
+
+// Container Payment
+Breadcrumbs::for('finance.approved-container-payments', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Container Payment');
+    $trail->push('Approved List', route('finance.approved-container-payments'));
+});

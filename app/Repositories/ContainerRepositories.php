@@ -16,6 +16,7 @@ use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\ContainerDocument\DeleteDocument;
 use App\Actions\ContainerDocument\DownloadDocument;
 use App\Actions\ContainerDocument\UploadDocument;
+use App\Actions\HBL\UpdateHBLSystemStatus;
 use App\Actions\MHBL\GetMHBLById;
 use App\Actions\Setting\GetSettings;
 use App\Actions\UnloadingIssue\CreateUnloadingIssue;
@@ -37,6 +38,7 @@ use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
 use App\Models\UnloadingIssue;
 use App\Models\UnloadingIssueFile;
+use App\Services\ContainerWeightService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -100,6 +102,8 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             if (! $container->hbl_packages()->exists()) {
                 UpdateContainerStatus::run($container, ContainerStatus::REQUESTED->value);
             }
+
+            ContainerWeightService::recalculate($container);
 
             DB::commit();
         } catch (\Exception $e) {
@@ -240,6 +244,15 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         try {
             DB::beginTransaction();
 
+            $hbls = $container
+                ->hbl_packages
+                ->pluck('hbl')
+                ->unique();
+
+            foreach ($hbls as $hbl) {
+                UpdateHBLSystemStatus::run($hbl, HBL::SYSTEM_STATUS_CASH_RECEIVED, "HBL {$hbl->reference} has been deleted from container {$container->reference}");
+            }
+
             UnloadHBLPackages::run($container);
 
             UpdateContainerStatus::run($container, ContainerStatus::REQUESTED->value);
@@ -255,10 +268,13 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     {
         try {
             $data['is_reached'] = isset($data['is_reached']) ? ($data['is_reached'] ? 1 : 0) : 0;
+
             UpdateContainer::run($container, $data);
+
             if ($data['is_reached']) {
                 foreach ($container->hbl_packages as $package) {
                     $hbl = HBL::withoutGlobalScope(BranchScope::class)->find($package->hbl_id);
+
                     $hbl->addStatus('Container Arrival', $container->estimated_time_of_arrival);
                 }
             }

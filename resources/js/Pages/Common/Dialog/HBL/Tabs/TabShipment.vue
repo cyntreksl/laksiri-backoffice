@@ -2,6 +2,7 @@
 import {onMounted, ref, watch} from "vue";
 import NotFound from '@/../images/illustrations/empty-girl-box.svg';
 import LongVehicle from '@/../images/illustrations/long-vehicle.png';
+import CargoPlane from '@/../images/illustrations/cargo-plane.png';
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import {usePage} from '@inertiajs/vue3';
 import Card from "primevue/card";
@@ -87,7 +88,10 @@ const resolveCargoType = (cargoType) => {
                             <Chip :label="container?.container_type" class="!bg-amber-200" icon="pi pi-arrows-h"/>
                         </div>
                     </div>
-                    <img :src="LongVehicle" alt="image"
+                    <img v-if="container?.cargo_type === 'Sea Cargo'" :src="LongVehicle" alt="image"
+                         class="w-1/4"/>
+
+                    <img v-if="container?.cargo_type === 'Air Cargo'" :src="CargoPlane" alt="image"
                          class="w-1/4"/>
                 </div>
 
