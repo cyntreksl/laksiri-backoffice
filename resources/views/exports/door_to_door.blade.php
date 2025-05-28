@@ -227,7 +227,7 @@
                     <td rowspan="{{ $packageCount > 5 ? $packageCount-3 : 2 }}" style="font-size: 11px; text-align: center; border-top: 0; vertical-align: top">
                         @if($item[15] && $item[16])
                             <b>
-                                DOHA & {{ $item[13] }}
+                                {{ $branch['branchCode'] }} & {{ $item[13] }}
                                 <br>
                                 PAID
                             </b>

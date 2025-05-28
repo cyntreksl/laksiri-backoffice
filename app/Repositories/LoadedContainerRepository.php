@@ -9,6 +9,7 @@ use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Loading\GetLoadedContainerWithHblsById;
 use App\Actions\MHBL\GetUnloadedMHBLWithHBLsByRef;
 use App\Actions\Setting\GetSettings;
+use App\Actions\User\GetUserCurrentBranch;
 use App\Enum\ContainerStatus;
 use App\Exports\DoorToDoorManifestExport;
 use App\Exports\LoadedContainerManifestExport;
@@ -127,7 +128,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
         $view = ($cargoType === 'air cargo') ? 'exports.air_cargo' : 'exports.shipments';
 
-        $pdf = PDF::loadView($view, ['data' => $data, 'container' => $container, 'settings' => $settings, 'giftCount' => $giftCount, 'upbCount' => $upbCount]);
+        $pdf = PDF::loadView($view, ['data' => $data, 'container' => $container, 'settings' => $settings, 'giftCount' => $giftCount, 'upbCount' => $upbCount, 'branch' => GetUserCurrentBranch::run()]);
         $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
@@ -161,7 +162,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             }
         }
 
-        $pdf = PDF::loadView('exports.door_to_door', ['groupedData' => $groupedData, 'data' => $data, 'container' => $container, 'settings' => $settings]);
+        $pdf = PDF::loadView('exports.door_to_door', ['groupedData' => $groupedData, 'data' => $data, 'container' => $container, 'settings' => $settings, 'branch' => GetUserCurrentBranch::run()]);
         $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
