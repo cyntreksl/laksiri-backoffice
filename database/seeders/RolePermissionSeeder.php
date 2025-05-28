@@ -142,6 +142,16 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'Branch',
+                'permissions' => [
+                    'branches.create',
+                    'branches.list',
+                    'branches.edit',
+                    'branches.delete',
+                ],
+            ],
+
+            [
                 'group_name' => 'Role',
                 'permissions' => [
                     'roles.create',

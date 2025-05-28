@@ -271,15 +271,13 @@ Breadcrumbs::for('loading.loading-containers.edit', function (BreadcrumbTrail $t
 // Branches
 Breadcrumbs::for('branches.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Branchs');
-    $trail->push('List', route('branches.index'));
+    $trail->push('Branches', route('branches.index'));
 });
 
 // Branches > Create
 Breadcrumbs::for('branches.create', function (BreadcrumbTrail $trail) {
     $trail->parent('branches.index');
-    $trail->push('Branch');
-    $trail->push('Create', route('branches.create'));
+    $trail->push('Create Branch', route('branches.create'));
 });
 
 // Branches > Edit
