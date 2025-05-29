@@ -71,7 +71,7 @@ const menuModel = ref([
             cargoType: selectedContainer.value.cargo_type,
         })),
         disabled: () => !(usePage().props.user.permissions.includes('container.load to container') &&
-            ["DRAFT", "LOADING", "Container Ordered"].includes(selectedContainer.value.status)),
+            ["DRAFT", "LOADING", "CONTAINER ORDERED"].includes(selectedContainer.value.status)),
     },
 ]);
 
@@ -215,7 +215,7 @@ const resolveContainerStatus = (container) => {
                 icon: "ti ti-package",
                 color: "info",
             };
-        case 'Container Ordered':
+        case 'CONTAINER ORDERED':
             return {
                 icon: "ti ti-clock-play",
                 color: "secondary",
