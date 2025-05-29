@@ -18,4 +18,6 @@ interface HBLRepositoryInterface
     public function getCompletedHBL(array $data);
 
     public function completedHBLView(HBL $hbl);
+
+    public function updateHBL(HBL $hbl, array $data): JsonResponse;
 }

@@ -60,6 +60,8 @@ Route::domain('api.'.config('app.url'))
 
         Route::post('/hbl-images/upload', [HblImageController::class, 'upload']);
         Route::post('/notifications/register-device', [DeviceTokenController::class, 'registerDevice']);
+
+        Route::put('/update-hbl/{hbl}', [HBLController::class, 'update']);
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);

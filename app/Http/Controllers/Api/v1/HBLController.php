@@ -73,4 +73,9 @@ class HBLController extends Controller
 
         return $this->HBLRepository->completedHBLView($hbl);
     }
+
+    public function update(Request $request, HBL $hbl): JsonResponse
+    {
+        return $this->HBLRepository->updateHBL($hbl, $request->all());
+    }
 }

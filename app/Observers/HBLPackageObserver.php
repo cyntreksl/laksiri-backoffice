@@ -53,7 +53,8 @@ class HBLPackageObserver
 
         $existPackages = $hbl->packages;
 
-        if ($existPackages->isEmpty()) {
+        // Only delete HBL if there are no packages AND it's not an API request
+        if ($existPackages->isEmpty() && ! request()->is('v1/*')) {
             $hbl->delete();
         }
     }
