@@ -168,6 +168,7 @@ onMounted(() => {
         header="Overview"
         maximizable
         modal
+        @afterHide="emit('close')"
         @update:visible="(newValue) => $emit('update:show', newValue)"
     >
         <Tabs value="0">
