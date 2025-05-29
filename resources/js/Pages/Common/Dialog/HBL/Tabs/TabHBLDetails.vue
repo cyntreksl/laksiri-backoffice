@@ -32,9 +32,9 @@ watch(
 </script>
 
 <template>
-    <div v-if="hbl && Object.keys(hbl).length > 0" class="grid grid-cols-12 gap-5">
-        <div class="col-span-6 space-y-4">
-            <PostSkeleton v-if="isLoading" />
+    <div v-if="hbl && Object.keys(hbl).length > 0" class="grid grid-cols-12 gap-5 lg:gap-5 md:gap-3 sm:gap-2">
+        <div class="col-span-12 lg:col-span-6 md:col-span-12 sm:col-span-12 space-y-4">
+            <PostSkeleton v-if="isLoading"/>
 
             <Card v-else class="!bg-emerald-50 !border !border-emerald-200 !shadow-none">
                 <template #content>
@@ -48,7 +48,7 @@ watch(
                         </p>
                     </div>
 
-                    <div class="grid grid-cols-5 mt-10 gap-1">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 mt-10 gap-1">
                         <InfoDisplay :value="hbl?.reference" label="Job Ref"/>
 
                         <InfoDisplay :value="hbl?.hbl_number" label="HBL Number"/>
@@ -62,27 +62,31 @@ watch(
                 </template>
             </Card>
 
-            <div class="grid grid-cols-3 gap-5">
-                <PostSkeleton v-if="isLoading" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                <PostSkeleton v-if="isLoading"/>
 
                 <SimpleOverviewWidget v-else :count="hbl?.packages_count ?? 0" class="bg-slate-100" title="Packages">
                     <i class="ti ti-packages text-emerald-500 text-3xl"></i>
                 </SimpleOverviewWidget>
 
-                <PostSkeleton v-if="isLoading" />
+                <PostSkeleton v-if="isLoading"/>
 
-                <SimpleOverviewWidget v-else :count="hbl?.packages_sum_volume != null ? hbl.packages_sum_volume.toFixed(3) : '0.00'" class="bg-slate-100" title="Volume">
+                <SimpleOverviewWidget v-else
+                                      :count="hbl?.packages_sum_volume != null ? hbl.packages_sum_volume.toFixed(3) : '0.00'"
+                                      class="bg-slate-100" title="Volume">
                     <i class="ti ti-scale text-emerald-500 text-3xl"></i>
                 </SimpleOverviewWidget>
 
-                <PostSkeleton v-if="isLoading" />
+                <PostSkeleton v-if="isLoading"/>
 
-                <SimpleOverviewWidget v-else :count="hbl?.packages_sum_weight != null ? hbl.packages_sum_weight.toFixed(2) : '0.00'" class="bg-slate-100" title="Weight">
+                <SimpleOverviewWidget v-else
+                                      :count="hbl?.packages_sum_weight != null ? hbl.packages_sum_weight.toFixed(2) : '0.00'"
+                                      class="bg-slate-100" title="Weight">
                     <i class="ti ti-weight text-emerald-500 text-3xl"></i>
                 </SimpleOverviewWidget>
             </div>
 
-            <PostSkeleton v-if="isLoading" />
+            <PostSkeleton v-if="isLoading"/>
 
             <template v-else>
                 <Card
@@ -102,7 +106,7 @@ watch(
                             ></i>
                         </div>
 
-                        <div class="grid grid-cols-4 mt-1 gap-2">
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-1 gap-2">
                             <InfoDisplay :value="`${item.length ?? 0} CM`" label="Length"/>
 
                             <InfoDisplay :value="item.width ?? 0" label="Width"/>
@@ -124,8 +128,8 @@ watch(
             </template>
         </div>
 
-        <div class="col-span-3 space-y-5">
-            <PostSkeleton v-if="isLoading" />
+        <div class="col-span-12 lg:col-span-3 md:col-span-6 sm:col-span-12 space-y-5">
+            <PostSkeleton v-if="isLoading"/>
 
             <Card v-else class="border">
                 <template #title>
@@ -136,7 +140,7 @@ watch(
                 </template>
                 <template #content>
                     <div class="flex space-x-3">
-                        <Avatar :label="hbl?.hbl_name.charAt(0)" class="mr-2 !bg-emerald-200" size="xlarge" />
+                        <Avatar :label="hbl?.hbl_name.charAt(0)" class="mr-2 !bg-emerald-200" size="xlarge"/>
                         <div>
                             <p>{{ hbl?.hbl_name }}</p>
                             <p class="text-gray-500">{{ hbl?.contact_number }}</p>
@@ -159,8 +163,8 @@ watch(
             </Card>
         </div>
 
-        <div class="col-span-3 space-y-5">
-            <PostSkeleton v-if="isLoading" />
+        <div class="col-span-12 lg:col-span-3 md:col-span-6 sm:col-span-12 space-y-5">
+            <PostSkeleton v-if="isLoading"/>
 
             <Card v-else class="border">
                 <template #title>
@@ -171,7 +175,7 @@ watch(
                 </template>
                 <template #content>
                     <div class="flex space-x-3">
-                        <Avatar :label="hbl?.consignee_name.charAt(0)" class="mr-2 !bg-emerald-200" size="xlarge" />
+                        <Avatar :label="hbl?.consignee_name.charAt(0)" class="mr-2 !bg-emerald-200" size="xlarge"/>
                         <div>
                             <p>{{ hbl?.consignee_name }}</p>
                             <p class="text-gray-500">{{ hbl?.consignee_contact }}</p>
@@ -183,7 +187,8 @@ watch(
 
                         <InfoDisplay :value="hbl?.consignee_nic" label="NIC / PP No"/>
 
-                        <InfoDisplay :value="hbl?.consignee_additional_mobile_number" label="Additional Contact Number"/>
+                        <InfoDisplay :value="hbl?.consignee_additional_mobile_number"
+                                     label="Additional Contact Number"/>
 
                         <InfoDisplay :value="hbl?.consignee_whatsapp_number" label="Whatsapp Number"/>
 
@@ -195,8 +200,8 @@ watch(
     </div>
 
     <div v-else class="grid grid-cols-12 gap-5">
-        <div class="col-span-4 space-y-5">
-            <PostSkeleton v-if="isLoading" />
+        <div class="col-span-12 lg:col-span-4 md:col-span-6 sm:col-span-12 space-y-5">
+            <PostSkeleton v-if="isLoading"/>
 
             <Card v-else>
                 <template #title>
@@ -207,7 +212,7 @@ watch(
                 </template>
                 <template #content>
                     <div class="flex space-x-3">
-                        <Avatar :label="pickup?.name?.charAt(0) ?? ''" class="mr-2 !bg-amber-200" size="xlarge" />
+                        <Avatar :label="pickup?.name?.charAt(0) ?? ''" class="mr-2 !bg-amber-200" size="xlarge"/>
                         <div>
                             <p>{{ pickup?.name }}</p>
                             <p class="text-gray-500">{{ pickup?.contact_number }}</p>
@@ -226,12 +231,12 @@ watch(
             </Card>
         </div>
 
-        <div class="col-span-8 space-y-4">
-            <PostSkeleton v-if="isLoading" />
+        <div class="col-span-12 lg:col-span-8 md:col-span-6 sm:col-span-12 space-y-4">
+            <PostSkeleton v-if="isLoading"/>
 
             <Card v-else class="!bg-amber-50 !border !border-amber-200 !shadow-none">
                 <template #content>
-                    <div class="grid grid-cols-4 gap-10">
+                    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-10">
                         <InfoDisplay :value="pickup?.reference" label="Job Ref"/>
 
                         <InfoDisplay :value="pickup?.cargo_type" label="Cargo Mode"/>

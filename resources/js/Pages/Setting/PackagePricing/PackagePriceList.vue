@@ -231,16 +231,16 @@ function convertMeasurements(measureType, value) {
                             </template>
                         </Column>
 
-                        <Column field="per_package_charge" header="Package Charges">
+                        <Column field="per_package_charge" header="Package Charges" header-class="!text-right">
                             <template #body="slotProps">
                                 <div class="flex items-center justify-end">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
-                                    <span>{{slotProps.data.per_package_charge.toFixed(2)}}</span>
+                                    <span>{{ slotProps.data.per_package_charge.toFixed(2) }}</span>
                                 </div>
                             </template>
                         </Column>
 
-                        <Column field="bill_price" header="Bill Charges">
+                        <Column field="bill_price" header="Bill Charges" header-class="!text-right">
                             <template #body="slotProps">
                                 <div class="flex items-center justify-end">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
@@ -249,7 +249,7 @@ function convertMeasurements(measureType, value) {
                             </template>
                         </Column>
 
-                        <Column field="volume_charges" header="Volume Charges">
+                        <Column field="volume_charges" header="Volume Charges" header-class="!text-right">
                             <template #body="slotProps">
                                 <div class="flex items-center justify-end">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
@@ -258,7 +258,7 @@ function convertMeasurements(measureType, value) {
                             </template>
                         </Column>
 
-                        <Column field="bill_vat" header="Bill VAT">
+                        <Column field="bill_vat" header="Bill VAT" header-class="!text-right">
                             <template #body="slotProps">
                                 <div class="flex items-center justify-end">
                                     <span>{{slotProps.data.bill_vat}} %</span>

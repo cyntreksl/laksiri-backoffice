@@ -8,6 +8,8 @@ use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\GetHBLPackageRules;
+use App\Actions\HBL\UpdateHBLApi;
+use App\Actions\HBL\UpdateHBLPackagesApi;
 use App\Http\Resources\HBLPackageResource;
 use App\Http\Resources\HBLResource;
 use App\Http\Resources\PickupResource;
@@ -17,6 +19,7 @@ use App\Models\HBL;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Lcobucci\JWT\Exception;
 
 class HBLRepository implements HBLRepositoryInterface
 {
@@ -182,5 +185,30 @@ class HBLRepository implements HBLRepositoryInterface
 
         return $this->success('Completed HBL received successfully!', $response);
 
+    }
+
+    public function updateHBL(HBL $hbl, array $data): JsonResponse
+    {
+        try {
+            DB::beginTransaction();
+
+            $hbl = UpdateHBLApi::run($hbl, $data);
+
+            $packagesData = $data['packages'] ?? [];
+            UpdateHBLPackagesApi::run($hbl, $packagesData);
+
+            DB::commit();
+
+            $hbl->load('packages');
+
+            return $this->success('HBL updated successfully.', [
+                'hbl' => $hbl,
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return $this->error('Failed to update HBL.', ['exception' => $e->getMessage()], 500);
+        }
     }
 }

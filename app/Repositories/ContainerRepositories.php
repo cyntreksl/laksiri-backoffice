@@ -45,10 +45,8 @@ use Dompdf\Options;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use ZipArchive;
 
 class ContainerRepositories implements ContainerRepositoryInterface, GridJsInterface
 {
@@ -136,61 +134,6 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         }
     }
 
-    //    public function abandonedBatchHBLDownload(Container $container)
-    //    {
-    //        // Define the PDF and ZIP directories
-    //        $pdfDirectory = public_path('pdf/');
-    //        $zipDirectory = public_path('zip/');
-    //
-    //        // Ensure the PDF directory exists and clean it
-    //        if (! File::exists($pdfDirectory)) {
-    //            File::makeDirectory($pdfDirectory, 0755, true);
-    //        } else {
-    //            $pdfFile = new Filesystem();
-    //            $pdfFile->cleanDirectory($pdfDirectory);
-    //        }
-    //
-    //        // Ensure the ZIP directory exists
-    //        if (! File::exists($zipDirectory)) {
-    //            File::makeDirectory($zipDirectory, 0755, true);
-    //        }
-    //
-    //        $container = GetLoadedContainerById::run($container);
-    //
-    //        foreach ($container->hbls as $hbl) {
-    //            // create random filename for pdfs
-    //            $filename = $container->reference.'_'.date('Y_m_d_h_i_s').'_'.Str::random(10);
-    //            // save pdfs
-    //            PDF::loadView('pdf.hbls.hbl', [
-    //                'hbl' => $hbl,
-    //            ])->save($pdfDirectory.$filename.'.pdf');
-    //        }
-    //
-    //        // create new ZipArchive instance
-    //        $zip = new ZipArchive;
-    //        // creating file name for zip archive file
-    //        $zip_filename = $container->reference.'_'.date('Y_m_d_h_i_s').'.zip';
-    //        $zipPath = $zipDirectory.$zip_filename;
-    //
-    //        if (File::exists($zipPath)) {
-    //            File::delete($zipPath);
-    //        }
-    //
-    //        if ($zip->open($zipPath, ZipArchive::CREATE) === true) {
-    //
-    //            $files = File::files($pdfDirectory);
-    //
-    //            foreach ($files as $value) {
-    //                $relativeNameInZipFile = basename($value);
-    //                $zip->addFile($value, $relativeNameInZipFile);
-    //            }
-    //
-    //            $zip->close();
-    //        }
-    //
-    //        return response()->download($zipPath);
-    //    }
-
     public function batchHBLDownload(Container $container): BinaryFileResponse
     {
         // Define the PDF directory
@@ -255,8 +198,11 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
             UnloadHBLPackages::run($container);
 
+            $container->addStatus('Shipment Deleted', 'Shipment has been deleted');
+
             UpdateContainerStatus::run($container, ContainerStatus::REQUESTED->value);
 
+            $container->addStatus('Shipment Re-Ordered', 'Shipment has been re-ordered');
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();

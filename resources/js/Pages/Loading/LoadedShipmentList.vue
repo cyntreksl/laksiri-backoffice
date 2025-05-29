@@ -237,7 +237,7 @@ const resolveContainerStatus = (container) => {
                 icon: "ti ti-package",
                 color: "info",
             };
-        case 'Container Ordered':
+        case 'CONTAINER ORDERED':
             return {
                 icon: "ti ti-clock-play",
                 color: "secondary",

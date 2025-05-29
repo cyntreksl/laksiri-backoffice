@@ -4,7 +4,7 @@ namespace App\Enum;
 
 enum ContainerStatus: string
 {
-    case REQUESTED = 'REQUESTED';
+    case REQUESTED = 'CONTAINER ORDERED';
     case DRAFT = 'DRAFT';
     case LOADING = 'LOADING';
     case UNLOADED = 'UNLOADED'; // shipment unloaded at bonded warehouse

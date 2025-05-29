@@ -11,7 +11,9 @@ class GetHBLByReference
 
     public function handle(string $reference)
     {
-        $hbl = HBL::where('reference', $reference)->firstOrFail();
+        $hbl = HBL::where('reference', $reference)
+            ->orWhere('hbl_number', $reference)
+            ->firstOrFail();
 
         return response()->json($hbl);
     }

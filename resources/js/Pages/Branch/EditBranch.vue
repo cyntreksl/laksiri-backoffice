@@ -2,16 +2,23 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputError from "@/Components/InputError.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
 import {push} from "notivue";
-import {QuillEditor} from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import SecondaryButton from "@/Components/SecondaryButton.vue";
 import {ref} from "vue";
 import Select from 'primevue/select';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
+import IftaLabel from 'primevue/iftalabel';
+import InputText  from 'primevue/inputtext';
+import InputNumber   from 'primevue/inputnumber';
+import MultiSelect from 'primevue/multiselect';
+import Button from "primevue/button";
+import Textarea from 'primevue/textarea';
+import Checkbox from 'primevue/checkbox';
 
 const props = defineProps({
     cargoModes: {
@@ -191,320 +198,154 @@ const updateChecked = (notification, isChecked) => {
 
         <Breadcrumb :branch="branch"/>
 
-        <div class="grid grid-cols-1 sm:grid-cols-6 mt-4 gap-4">
-            <div class="sm:col-span-3 space-y-5 mb-10">
+        <Tabs class="my-5" value="0">
+            <TabList>
+                <Tab value="0">General</Tab>
+                <Tab value="1">Invoice</Tab>
+                <Tab value="2">Notification</Tab>
+            </TabList>
+            <TabPanels>
+                <TabPanel value="0">
+                    <div class="grid grid-cols-12 gap-5 my-3">
+                        <div class="col-span-12">
+                            <h3 class="text-lg font-medium">General Configuration</h3>
+                        </div>
 
-                <div class="flex items-center justify-between p-2 my-5">
-                    <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                        Edit Branch
-                    </h2>
-
-                    <div class="flex justify-end bottom-0 space-x-5">
-                        <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
-                                       class="space-x-2"
-                                       type="submit"
-                                       @click="handleBranchUpdate"
-                        >
-                            <span>Update Branch</span>
-                            <svg
-                                class="size-5"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-                            </svg>
-                        </PrimaryButton>
-                    </div>
-                </div>
-
-                <div class="card px-4 py-4 sm:px-5">
-                    <div class="grid grid-cols-2">
-                        <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                            Basic Details
-                        </h2>
-                    </div>
-                    <div class="grid sm:grid-cols-4 gap-5 mt-3">
-                        <div class="sm:col-span-2">
-                            <InputLabel value="Name"/>
-                            <TextInput v-model="form.name" class="w-full"/>
+                        <div class="col-span-12 sm:col-span-4">
+                            <IftaLabel>
+                                <InputText id="name" v-model="form.name" class="w-full" variant="filled" />
+                                <label for="name">Name</label>
+                            </IftaLabel>
                             <InputError :message="form.errors.name"/>
                         </div>
 
-                        <div class="sm:col-span-1">
-                            <InputLabel value="Branch Code"/>
-                            <TextInput v-model="form.branch_code" class="w-full"/>
+                        <div class="col-span-12 sm:col-span-2">
+                            <IftaLabel>
+                                <InputText id="branch-code" v-model="form.branch_code" class="w-full" variant="filled" />
+                                <label for="branch-code">Branch Code</label>
+                            </IftaLabel>
                             <InputError :message="form.errors.branch_code"/>
                         </div>
 
-                        <div class="sm:col-span-1">
-                            <label class="block">
-                                <InputLabel value="Type"/>
-                                <select
-                                    v-model="form.type"
-                                    class="form-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:bg-navy-700 dark:hover:border-navy-400 dark:focus:border-accent"
-                                >
-                                    <option :value="null" disabled>
-                                        Select Type
-                                    </option>
-                                    <option v-for="(branchType, index) in branchTypes" :key="index"
-                                            :value="branchType">
-                                        {{ branchType }}
-                                    </option>
-                                </select>
-                            </label>
-                            <InputError :message="form.errors.type"/>
-                        </div>
-
-                        <div class="sm:col-span-2">
-                            <InputLabel value="Currency Name"/>
-                            <TextInput v-model="form.currency_name" class="w-full" placeholder="Sri Lankan Rupee"/>
+                        <div class="col-span-12 sm:col-span-4">
+                            <IftaLabel>
+                                <InputText id="currency-name" v-model="form.currency_name" class="w-full" placeholder="Sri Lankan Rupee" variant="filled" />
+                                <label for="currency-name">Currency Name</label>
+                            </IftaLabel>
                             <InputError :message="form.errors.currency_name"/>
                         </div>
 
-                        <div class="sm:col-span-1">
-                            <InputLabel value="Currency Symbol"/>
-                            <TextInput v-model="form.currency_symbol" class="w-full" placeholder="LKR"/>
+                        <div class="col-span-12 sm:col-span-2">
+                            <IftaLabel>
+                                <InputText id="currency-symbol" v-model="form.currency_symbol" class="w-full" placeholder="LKR" variant="filled" />
+                                <label for="currency-symbol">Currency Symbol</label>
+                            </IftaLabel>
                             <InputError :message="form.errors.currency_symbol"/>
                         </div>
 
-                        <div class="sm:col-span-1">
-                            <label class="block">
-                                <InputLabel value="Country Code"/>
-                                <select
-                                    v-model="form.country_code"
-                                    x-init="$el._tom = new Tom($el)"
-                                    class="w-full"
-                                >
-                                    <option v-for="(countryCode, index) in countryCodes" :key="index" :value="countryCode">
-                                        {{ countryCode }}
-                                    </option>
-                                </select>
-
-                            </label>
-                            <InputError :message="form.errors.country_code"/>
-                        </div>
-
-                        <div class="sm:col-span-2">
-                            <label class="block">
-                                <InputLabel value="Country"/>
-                                <select
-                                    v-model="form.country"
-                                    x-init="$el._tom = new Tom($el)"
-                                    class="w-full"
-                                >
-                                    <option v-for="(countryName, index) in countryNames" :key="index" :value="countryName">
-                                        {{ countryName }}
-                                    </option>
-                                </select>
-
-                            </label>
+                        <div class="col-span-12 sm:col-span-4">
+                            <IftaLabel>
+                                <Select v-model="form.country" :options="countryNames" checkmark class="w-full" filter inputId="country" variant="filled"/>
+                                <label for="country">Country</label>
+                            </IftaLabel>
                             <InputError :message="form.errors.country"/>
                         </div>
 
-                        <div class="sm:col-span-2">
-                            <label class="block">
-                                <InputLabel value="Timezone"/>
-                                <Select v-model="form.timezone" :options="timezones" checkmark class="w-full" filter placeholder="Select a Timezone"/>
-                            </label>
+                        <div class="col-span-12 sm:col-span-2">
+                            <IftaLabel>
+                                <Select v-model="form.country_code" :options="countryCodes" checkmark class="w-full" filter inputId="country-code" variant="filled"/>
+                                <label for="country-code">Country Code</label>
+                            </IftaLabel>
+                            <InputError :message="form.errors.country_code"/>
+                        </div>
+
+                        <div class="col-span-12 sm:col-span-4">
+                            <IftaLabel>
+                                <Select v-model="form.timezone" :options="timezones" checkmark class="w-full" filter inputId="timezone" variant="filled"/>
+                                <label for="timezone">Timezone</label>
+                            </IftaLabel>
                             <InputError :message="form.errors.timezone"/>
                         </div>
 
-                        <div class="sm:col-span-2">
-                            <InputLabel value="Email"/>
-                            <TextInput v-model="form.email" class="w-full" placeholder="Enter Email" type="email"/>
+                        <div class="col-span-12 sm:col-span-2">
+                            <IftaLabel>
+                                <Select v-model="form.is_prepaid" :options="[{value: 1, label: 'Prepaid'}, {value: 0, label: 'Postpaid'}]" checkmark class="w-full" inputId="payment-type" option-label="label" option-value="value" variant="filled"/>
+                                <label for="payment-type">Payment Type</label>
+                            </IftaLabel>
+                            <InputError :message="form.errors.is_prepaid"/>
+                        </div>
+
+                        <div class="col-span-12 sm:col-span-2">
+                            <IftaLabel>
+                                <Select v-model="form.type" :options="branchTypes" checkmark class="w-full" inputId="type" variant="filled"/>
+                                <label for="type">Type</label>
+                            </IftaLabel>
+                            <InputError :message="form.errors.type"/>
+                        </div>
+
+                        <div class="col-span-12 sm:col-span-4">
+                            <IftaLabel>
+                                <InputText id="email" v-model="form.email" class="w-full" placeholder="Enter Branch Email Address" type="email" variant="filled" />
+                                <label for="email">Email</label>
+                            </IftaLabel>
                             <InputError :message="form.errors.email"/>
                         </div>
 
-                        <div class="sm:col-span-2">
-                            <label class="block">
-                                <InputLabel value="Payment Type"/>
-                                <Select v-model="form.is_prepaid"
-                                        :options="[{value: 1, label: 'Prepaid'}, {value: 0, label: 'Postpaid'}]"
-                                        checkmark
-                                        class="w-full"
-                                        option-label="label" option-value="value" placeholder="Select Payment Type"/>
-                            </label>
-                            <InputError :message="form.errors.is_prepaid"/>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card px-4 py-4 sm:px-5">
-                    <div class="grid grid-cols-2">
-                        <h2
-                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                        >
-                            Shipments
-                        </h2>
-                    </div>
-
-                    <div class="grid sm:grid-cols-4 gap-5 mt-3">
-                        <div class="sm:col-span-2">
-                            <InputLabel value="Container Delay Dates" />
-                            <TextInput
-                                v-model="form.container_delays"
-                                class="w-full"
-                                placeholder="Enter No of Days"
-                                type="number"
-                                min="0"
-                            />
-                            <InputError :message="form.errors.container_delays" />
+                        <div class="col-span-12 sm:col-span-3">
+                            <IftaLabel>
+                                <MultiSelect v-model="form.package_types" :options="packageTypes" class="w-full" inputId="package-type" variant="filled" />
+                                <label for="package-type">Package Type</label>
+                            </IftaLabel>
+                            <InputError :message="form.errors.package_types"/>
                         </div>
 
-                        <div v-if="usePage().props.currentBranch.type === 'Destination'" class="sm:col-span-2">
-                            <InputLabel value="Maximum Demurrage Discount (%)" />
-                            <TextInput
-                                v-model="form.maximum_demurrage_discount"
-                                class="w-full"
-                                type="number"
-                                min="0"
-                            />
-                            <InputError :message="form.errors.maximum_demurrage_discount" />
+                        <div class="col-span-12 sm:col-span-3">
+                            <IftaLabel>
+                                <MultiSelect v-model="form.delivery_types" :options="deliveryTypes" class="w-full" inputId="delivery-type" variant="filled" />
+                                <label for="delivery-type">Delivery Type</label>
+                            </IftaLabel>
+                            <InputError :message="form.errors.delivery_types"/>
                         </div>
-                  </div>
-                </div>
 
-                <div class="card px-4 py-4 sm:px-5">
-                    <div class="grid grid-cols-2">
-                        <h2
-                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                        >
-                            Cargo Modes
-                        </h2>
-                    </div>
-                    <div class="my-5">
-                        <div class="space-x-5">
-                            <label class="block">
-                                <span>Select Cargo Modes</span>
-                                <select
-                                    v-model="form.cargo_modes"
-                                    autocomplete="off"
-                                    class="mt-1.5 w-full"
-                                    multiple
-                                    placeholder="Select a Cargo Mode..."
-                                    x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
-                                >
-                                    <option value="">Select a Cargo Mode...</option>
-                                    <option v-for="(cargoMode, index) in cargoModes" :key="index"
-                                            :value="cargoMode">{{ cargoMode }}
-                                    </option>
-                                </select>
-                            </label>
+                        <div class="col-span-12 sm:col-span-3">
+                            <IftaLabel>
+                                <MultiSelect v-model="form.cargo_modes" :options="cargoModes" class="w-full" inputId="cargo-mode" variant="filled" />
+                                <label for="cargo-mode">Cargo Mode</label>
+                            </IftaLabel>
+                            <InputError :message="form.errors.cargo_modes"/>
                         </div>
-                        <InputError :message="form.errors.cargo_modes"/>
-                    </div>
-                </div>
 
-                <div class="card px-4 py-4 sm:px-5">
-                    <div class="grid grid-cols-2">
-                        <h2
-                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                        >
-                            Delivery Types
-                        </h2>
-                    </div>
-                    <div class="my-5">
-                        <div class="space-x-5">
-                            <label class="block">
-                                <span>Select Delivery Types</span>
-                                <select
-                                    v-model="form.delivery_types"
-                                    autocomplete="off"
-                                    class="mt-1.5 w-full"
-                                    multiple
-                                    placeholder="Select a Delivery Type..."
-                                    x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
-                                >
-                                    <option value="">Select a Delivery Type...</option>
-                                    <option v-for="(deliveryType, index) in deliveryTypes" :key="index"
-                                            :value="deliveryType">{{ deliveryType }}
-                                    </option>
-                                </select>
-                            </label>
+                        <div class="col-span-12">
+                            <h3 class="text-lg font-medium">Shipment Configuration</h3>
                         </div>
-                        <InputError :message="form.errors.delivery_types"/>
-                    </div>
-                </div>
 
-                <div class="card px-4 py-4 sm:px-5">
-                    <div class="grid grid-cols-2">
-                        <h2
-                            class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100"
-                        >
-                            Package Types
-                        </h2>
-                    </div>
-                    <div class="my-5">
-                        <div class="space-x-5">
-                            <label class="block">
-                                <span>Select Package Types</span>
-                                <select
-                                    v-model="form.package_types"
-                                    autocomplete="off"
-                                    class="mt-1.5 w-full"
-                                    multiple
-                                    placeholder="Select a Package Type..."
-                                    x-init="$el._tom = new Tom($el, {plugins: ['remove_button']})"
-                                >
-                                    <option value="">Select a Package Type...</option>
-                                    <option v-for="(packageType, index) in packageTypes" :key="index"
-                                            :value="packageType">{{ packageType }}
-                                    </option>
-                                </select>
-                            </label>
+                        <div class="col-span-12 sm:col-span-4">
+                            <IftaLabel>
+                                <InputNumber v-model="form.container_delays" fluid inputId="shipment-delay" min="0" placeholder="Enter No of Days" suffix=" days" variant="filled" />
+                                <label for="shipment-delay">Shipment Delay Days</label>
+                            </IftaLabel>
+                            <InputError :message="form.errors.container_delays"/>
                         </div>
-                        <InputError :message="form.errors.package_types"/>
+
+                        <div v-if="usePage().props.currentBranch.type === 'Destination'" class="col-span-12 sm:col-span-4">
+                            <IftaLabel>
+                                <InputNumber v-model="form.maximum_demurrage_discount" fluid inputId="demurrage-discount" min="0" suffix=" days" variant="filled" />
+                                <label for="demurrage-discount">Maximum Demurrage Discount (%)</label>
+                            </IftaLabel>
+                            <InputError :message="form.errors.maximum_demurrage_discount"/>
+                        </div>
+
+                        <div class="col-span-12 flex justify-end">
+                            <Button :disabled="form.processing" label="Update Branch" @click="handleBranchUpdate" />
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="sm:col-span-3 space-y-5 mb-10">
-
-                <div class="flex items-center justify-between p-2 my-5">
-                    <h2 class="text-base font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                        Invoice Settings
-                    </h2>
-
-                    <div class="flex justify-end bottom-0 space-x-5">
-                        <PrimaryButton :class="{ 'opacity-50': form.processing }" :disabled="form.processing"
-                                       class="space-x-2"
-                                       type="submit"
-                                       @click="handleSettingUpdate"
-                        >
-                            <span>Update Invoice</span>
-                            <svg
-                                class="size-5"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-                            </svg>
-                        </PrimaryButton>
-                    </div>
-                </div>
-
-                <div class="card px-4 py-4 sm:px-5">
-                    <div class="grid grid-cols-2">
-                        <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                            Invoice Logo (Max: 600px x 600px)
-                        </h2>
-                    </div>
-                    <div class="grid sm:grid-cols-4 gap-5 mt-3">
-                        <div class="sm:col-span-4">
+                </TabPanel>
+                <TabPanel value="1">
+                    <div class="grid grid-cols-12 gap-5 my-3">
+                        <div class="col-span-12 sm:col-span-6">
+                            <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
+                                Invoice Logo (Max: 600px x 600px)
+                            </h2>
                             <div>
                                 <input
                                     id="photo"
@@ -527,91 +368,18 @@ const updateChecked = (notification, isChecked) => {
                     />
                                 </div>
 
-                                <SecondaryButton class="mt-2 me-2" type="button" @click.prevent="selectNewPhoto">
+                                <Button class="mt-2 me-2" size="small" type="button" @click.prevent="selectNewPhoto">
                                     Select A New Logo
-                                </SecondaryButton>
+                                </Button>
 
                                 <InputError :message="settingForm.errors.logo" class="mt-2" />
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="card px-4 py-4 sm:px-5">
-                    <div class="grid grid-cols-2">
-                        <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                            Invoice Header
-                        </h2>
-                    </div>
-                    <div class="grid sm:grid-cols-4 gap-5 mt-3">
-                        <div class="sm:col-span-4">
-                            <div class="sm:col-span-2 mb-4">
-                                <TextInput v-model="settingForm.invoice_header_title" class="w-full"
-                                           placeholder="Enter Header Title"/>
-                                <InputError :message="settingForm.errors.invoice_header_title"/>
-                            </div>
-                        </div>
-
-                        <div class="sm:col-span-4">
-                            <div class="sm:col-span-2 mb-4">
-                                <TextInput v-model="settingForm.invoice_header_subtitle"
-                                           class="w-full"
-                                           placeholder="Enter Header Subtitle"/>
-                                <InputError :message="settingForm.errors.invoice_header_subtitle"/>
-                            </div>
-                        </div>
-
-                        <div class="sm:col-span-4">
-                            <div class="sm:col-span-2 mb-4">
-                                <TextInput v-model="settingForm.invoice_header_address"
-                                           class="w-full"
-                                           placeholder="Enter Header Address"/>
-                                <InputError :message="settingForm.errors.invoice_header_address"/>
-                            </div>
-                        </div>
-
-                        <div class="sm:col-span-4">
-                            <div class="sm:col-span-2 mb-4">
-                                <TextInput v-model="settingForm.invoice_header_telephone"
-                                           class="w-full"
-                                           placeholder="Enter Header Telphones"/>
-                                <InputError :message="settingForm.errors.invoice_header_telephone"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card px-4 py-4 sm:px-5">
-                    <div class="grid grid-cols-2">
-                        <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                            Invoice Footer
-                        </h2>
-                    </div>
-                    <div class="grid sm:grid-cols-4 gap-5 mt-3">
-                        <div class="sm:col-span-4">
-                            <div class="sm:col-span-2 mb-4">
-                                <TextInput v-model="settingForm.invoice_footer_title" class="w-full"
-                                           placeholder="Enter Footer Title"/>
-                                <InputError :message="settingForm.errors.invoice_footer_title"/>
-                            </div>
-
-                            <label class="block">
-                                <QuillEditor v-model:content="settingForm.invoice_footer_text"
-                                             content-type="html" placeholder="Enter Footer Text"/>
-                                <InputError :message="settingForm.errors.invoice_footer_text"/>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <!-- seal -->
-                <div class="card px-4 py-4 sm:px-5">
-                    <div class="grid grid-cols-2">
-                        <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                            Manifest Seal (Max: 600px x 600px)
-                        </h2>
-                    </div>
-                    <div class="grid sm:grid-cols-4 gap-5 mt-3">
-                        <div class="sm:col-span-4">
+                        <div class="col-span-12 sm:col-span-6">
+                            <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
+                                Manifest Seal (Max: 600px x 600px)
+                            </h2>
                             <div>
                                 <input
                                     id="seal"
@@ -634,41 +402,91 @@ const updateChecked = (notification, isChecked) => {
                     />
                                 </div>
 
-                                <SecondaryButton class="mt-2 me-2" type="button" @click.prevent="selectNewSeal">
+                                <Button class="mt-2 me-2" size="small" type="button" @click.prevent="selectNewSeal">
                                     Select A New Seal
-                                </SecondaryButton>
+                                </Button>
 
                                 <InputError :message="settingForm.errors.seal" class="mt-2" />
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Notifications -->
-                <div class="card px-4 py-4 sm:px-5">
-                    <div class="grid grid-cols-2">
-                        <h2 class="text-lg font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100">
-                            Notification
-                        </h2>
+                        <div class="col-span-12 sm:col-span-6">
+                            <IftaLabel>
+                                <InputText id="invoice-header-title" v-model="settingForm.invoice_header_title" class="w-full" variant="filled" />
+                                <label for="invoice-header-title">Invoice Header Title</label>
+                            </IftaLabel>
+                            <InputError :message="settingForm.errors.invoice_header_title"/>
+                        </div>
+
+                        <div class="col-span-12 sm:col-span-6">
+                            <IftaLabel>
+                                <InputText id="invoice-header-subtitle" v-model="settingForm.invoice_header_subtitle" class="w-full" variant="filled" />
+                                <label for="invoice-header-subtitle">Invoice Header Subtitle</label>
+                            </IftaLabel>
+                            <InputError :message="settingForm.errors.invoice_header_subtitle"/>
+                        </div>
+
+                        <div class="col-span-12 sm:col-span-6">
+                            <IftaLabel>
+                                <InputText id="invoice-header-address" v-model="settingForm.invoice_header_address" class="w-full" variant="filled" />
+                                <label for="invoice-header-address">Invoice Header Address</label>
+                            </IftaLabel>
+                            <InputError :message="settingForm.errors.invoice_header_address"/>
+                        </div>
+
+                        <div class="col-span-12 sm:col-span-6">
+                            <IftaLabel>
+                                <InputText id="invoice-header-telephone" v-model="settingForm.invoice_header_telephone" class="w-full" variant="filled" />
+                                <label for="invoice-header-telephone">Invoice Header Telephone</label>
+                            </IftaLabel>
+                            <InputError :message="settingForm.errors.invoice_header_telephone"/>
+                        </div>
+
+                        <div class="col-span-12 sm:col-span-6">
+                            <IftaLabel>
+                                <InputText id="invoice-footer-title" v-model="settingForm.invoice_footer_title" class="w-full" variant="filled" />
+                                <label for="invoice-footer-title">Invoice Footer Title</label>
+                            </IftaLabel>
+                            <InputError :message="settingForm.errors.invoice_footer_title"/>
+                        </div>
+
+                        <div class="col-span-12 sm:col-span-6">
+                            <IftaLabel>
+                                <Textarea id="invoice-footer-title" v-model="settingForm.invoice_footer_text" class="w-full" cols="30" placeholder="Enter Footer Text" rows="5" style="resize: none" variant="filled" />
+                                <label for="invoice-footer-title">Invoice Footer Text</label>
+                            </IftaLabel>
+                            <InputError :message="settingForm.errors.invoice_footer_text"/>
+                        </div>
+
+                        <div class="col-span-12 flex justify-end">
+                            <Button :disabled="form.processing" label="Update Invoice" @click="handleSettingUpdate" />
+                        </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-4 mt-4">
-                        <InputLabel
+                </TabPanel>
+                <TabPanel value="2">
+                    <div class="flex flex-wrap gap-4 my-5">
+                        <div
                             v-for="(notification, index) in notificationTypes"
-                            :key="index"
-                            class="cursor-pointer"
+                            :key="notification"
+                            class="flex items-center gap-2"
                         >
-                            <input
-                                :checked="settingForm.notification[notification] || false"
-                                class="form-checkbox is-basic size-5 rounded border-slate-400/70 checked:border-primary checked:bg-primary hover:border-primary focus:border-primary dark:border-navy-400 dark:checked:border-accent dark:checked:bg-accent dark:hover:border-accent dark:focus:border-accent mr-3"
-                                type="checkbox"
-                                @change="(event) => updateChecked(notification, event.target.checked)"
+                            <Checkbox
+                                v-model="settingForm.notification[notification]"
+                                :binary="true"
+                                :inputId="`notification-${index}`"
                             />
-                            {{ notification }}
-                        </InputLabel>
+                            <label :for="`notification-${index}`">
+                                {{ notification }}
+                            </label>
+                        </div>
+                        <InputError :message="settingForm.errors.notification" class="mt-1" />
                     </div>
-                    <InputError class="mt-1" :message="settingForm.errors.notification" />
-                </div>
-            </div>
-        </div>
+
+                    <div class="flex justify-end">
+                        <Button :disabled="form.processing" label="Update Notification" @click="handleSettingUpdate" />
+                    </div>
+                </TabPanel>
+            </TabPanels>
+        </Tabs>
     </AppLayout>
 </template>
