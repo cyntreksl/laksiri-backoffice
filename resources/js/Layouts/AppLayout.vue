@@ -241,14 +241,14 @@
                             >
                                 <i class="ti ti-truck-delivery text-2xl"></i>
                             </a>
-                            <!-- Vessel Schedule -->
+                            <!-- Vessel Schedules -->
                             <a
                                 v-if="$page.props.user.permissions.includes('vessel.schedule.index')"
                                 :class="[
                                     activeMenu === 'vessel-schedule' ? 'bg-primary/10 text-primary' : '',
                                   ]"
                                 class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.right="'Vessel Schedule'"
+                                x-tooltip.placement.right="'Vessel Schedules'"
                                 @click="
                                     setMenu('vessel-schedule');
                                     openSideBar();
@@ -943,7 +943,7 @@ export default {
                             2,
                             0,
                             {
-                                title: "Vessel Schedule",
+                                title: "Vessel Schedules",
                                 route: "clearance.vessel-schedule.index",
                             }
                         );
@@ -953,7 +953,7 @@ export default {
                         childMenuList.length,
                         ...vesselScheduleMenu
                     );
-                    changeSidePanelTitle("Vessel Schedule");
+                    changeSidePanelTitle("Vessel Schedules");
                     break;
                 case "container-payment":
                     let containerPaymentMenu = [];

@@ -7,6 +7,8 @@ use App\Models\VesselSchedule;
 
 interface VesselScheduleRepositoryInterface
 {
+    public function getAllVesselSchedules();
+
     public function getRecentVesselSchedule();
 
     public function addVesselToSchedule(VesselSchedule $vesselSchedule, string $vesselReference);

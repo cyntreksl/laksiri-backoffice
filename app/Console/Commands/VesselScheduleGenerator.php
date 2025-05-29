@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Enum\CargoType;
+use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\VesselSchedule;
 use Carbon\Carbon;
@@ -21,23 +23,23 @@ class VesselScheduleGenerator extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Generate a vessel schedule with containers arriving this week';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        // Get current week's start (Monday) and end (Sunday)
+        // Get the current week's start (Monday) and end (Sunday)
         $weekStart = Carbon::now()->startOfWeek();
         $weekEnd = Carbon::now()->endOfWeek();
 
         // Query containers arriving this week
         $containers = Container::withoutGlobalScopes()
             ->where('estimated_time_of_arrival', '<=', $weekEnd->format('Y-m-d'))
-            ->where('cargo_type', '=', 'Sea Cargo')
+            ->where('cargo_type', '=', CargoType::SEA_CARGO->value)
             ->where('is_reached', false)
-            ->where('status', '=', 'LOADED')
+            ->where('status', '=', ContainerStatus::LOADED->value)
             ->get();
 
         $vesselSchedule = VesselSchedule::create([

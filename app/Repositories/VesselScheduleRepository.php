@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\Container\UpdateContainer;
 use App\Actions\VesselSchedule\AddContainerToVesselSchedule;
 use App\Actions\VesselSchedule\DownloadVesselSchedule;
+use App\Actions\VesselSchedule\GetAllVesselSchedules;
 use App\Actions\VesselSchedule\GetRecentVesselSchedule;
 use App\Actions\VesselSchedule\RemoveContainerFromVesselSchedule;
 use App\Interfaces\VesselScheduleRepositoryInterface;
@@ -16,6 +17,11 @@ use Carbon\Carbon;
 
 class VesselScheduleRepository implements VesselScheduleRepositoryInterface
 {
+    public function getAllVesselSchedules()
+    {
+        return GetAllVesselSchedules::run();
+    }
+
     public function getRecentVesselSchedule()
     {
         return GetRecentVesselSchedule::run();
