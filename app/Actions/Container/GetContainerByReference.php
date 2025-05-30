@@ -3,6 +3,7 @@
 namespace App\Actions\Container;
 
 use App\Enum\CargoType;
+use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\VesselScheduleContainer;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -16,6 +17,7 @@ class GetContainerByReference
         $container = Container::where('reference', $reference)
             ->with('warehouse')
             ->where('is_reached', false)
+            ->where('status', ContainerStatus::IN_TRANSIT->value)
             ->where('cargo_type', '=', CargoType::SEA_CARGO->value)
             ->first();
 
