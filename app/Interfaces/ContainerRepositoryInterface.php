@@ -51,4 +51,6 @@ interface ContainerRepositoryInterface
     public function deleteUnloadingIssueFile(UnloadingIssueFile $unloadingIssueFile);
 
     public function downloadSingleUnloadingIssueFile(string $id);
+
+    public function getContainerByReference(string $reference);
 }

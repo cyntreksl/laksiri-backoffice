@@ -10,10 +10,10 @@ Route::prefix('vessel-schedule')->name('vessel-schedule.')->group(function () {
     Route::get('/{vessel_schedule}', [VesselScheduleController::class, 'show'])
         ->name('show');
 
-    Route::post('add-vessel/{vessel_schedule}', [VesselScheduleController::class, 'addVesselToSchedule'])
+    Route::post('add-vessel/{vessel_schedule}', [VesselScheduleController::class, 'addContainerToSchedule'])
         ->name('add-vessel');
 
-    Route::post('remove-vessel/{vessel_schedule}', [VesselScheduleController::class, 'removeVesselFromSchedule'])
+    Route::post('remove-vessel/{vessel_schedule}', [VesselScheduleController::class, 'removeContainerFromSchedule'])
         ->name('remove-vessel');
 
     Route::get('download/{vessel_schedule}', [VesselScheduleController::class, 'downloadVesselSchedulePDF'])

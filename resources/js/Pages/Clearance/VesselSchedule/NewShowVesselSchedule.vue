@@ -44,6 +44,8 @@ const props = defineProps({
     },
 });
 
+console.log(props.vesselSchedule)
+
 const showConfirmLoadedShipmentModal = ref(false);
 const confirm = useConfirm();
 const selectedContainer = ref(props.vesselSchedule?.clearance_containers[0] ?? {});
@@ -53,8 +55,6 @@ const filteredMHBLS = ref([]);
 const containerPaymentData = ref({});
 const isContainerPayment = ref(false);
 const isFinanceApproved = ref(false);
-const containerId = ref('');
-const showConfirmAddVesselModal = ref(false);
 
 const form = useForm({
     container_id: selectedContainer.value.id ?? '',
@@ -187,7 +187,7 @@ const fetchContainerPayment = async () => {
             form.refund_charge = containerPaymentData.value.refund_charge;
             form.clearance_charge = containerPaymentData.value.clearance_charge;
             isFinanceApproved.value = containerPaymentData.value.is_finance_approved;
-        } else {
+        }else{
             form.container_id = selectedContainer.value.id;
             form.do_charge = 0;
             form.demurrage_charge = 0;
@@ -214,6 +214,7 @@ const handleContainerPaymentCreate = async () => {
     });
 };
 
+const showConfirmAddVesselModal = ref(false);
 const confirmAddVesselModal = () => {
     showConfirmAddVesselModal.value = true;
 };
@@ -226,11 +227,12 @@ const reloadPage = () => {
     window.location.reload();
 }
 
+const containerId = ref('');
 const confirmRemoveContainerHold = (ContainerId) => {
     containerId.value = ContainerId;
     confirm.require({
-        message: `Would you like to remove this shipment form this vessel schedule?`,
-        header: `Remove Shipment?`,
+        message: `Would you like to remove this container form vessel schedule`,
+        header: `Remove container`,
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
         rejectProps: {
@@ -245,7 +247,7 @@ const confirmRemoveContainerHold = (ContainerId) => {
         accept: () => {
             router.post(
                 route("clearance.vessel-schedule.remove-vessel", props.vesselSchedule.id),
-                {containerID: containerId.value},
+                {containerID : containerId.value},
                 {
                     preserveScroll: true,
                     onSuccess: () => {
@@ -274,7 +276,7 @@ const updateForm = useForm({
     note: selectedContainer.value.note,
     is_reached: Boolean(selectedContainer.value.is_reached),
     reached_date: selectedContainer.value.reached_date,
-    container_type: selectedContainer.value.container_type,
+    container_type:  selectedContainer.value.container_type,
     bl_number: selectedContainer.value.bl_number,
     container_number: selectedContainer.value.container_number,
     seal_number: selectedContainer.value.seal_number,
@@ -375,8 +377,6 @@ const groupedShipments = computed(() => {
 
     return sortedGroups;
 });
-
-selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
 </script>
 
 <template>
@@ -407,8 +407,8 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                 <Button
                     icon="pi pi-download"
                     label="Download Vessel Schedule"
-                    size="small"
                     severity="help"
+                    size="small"
                 />
             </a>
         </div>
@@ -426,49 +426,51 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                 </template>
                 <template #subtitle>{{ vesselSchedule?.clearance_containers.length }} Shipment(s)</template>
                 <template #content>
-                    <VirtualScroller :item-size="170" :items="groupedShipments" style="height: 400px">
+                    <VirtualScroller :item-size="150" :items="groupedShipments" style="height: 400px">
                         <template v-slot:item="{ item: dayGroup }">
                             <div class="mb-4">
                                 <h2 class="text-base font-semibold mb-2">
                                     {{ dayGroup.day }} ({{ dayGroup.items.length }})
                                 </h2>
-                                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                                    <div v-for="item in dayGroup.items" :key="item.id" :class="['flex flex-col space-y-3 rounded-xl p-4 bg-gradient-to-tr hover:cursor-pointer', selectedContainer?.id === item?.id ? 'from-purple-700 to-purple-500' : 'from-violet-700 to-violet-500']"
-                                         style="height: 170px"
-                                         @click="selectedContainer = item">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center space-x-1 rounded-lg bg-violet-500 px-2 py-1">
-                                                <div :class="['h-4 w-4 rounded-md ', selectedContainer?.id === item?.id ? 'animate-spin bg-green-300' : 'animate-none bg-orange-300']"></div>
-                                                <div class="text-white text-xs">{{ item?.container_type }}
+                                <div v-for="item in dayGroup.items" :key="item.id" class="grid grid-cols-1">
+                                    <Card
+                                        :class="[
+                                            '!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out border-2 mb-3',
+                                            selectedContainer?.id === item?.id
+                                            ? '!border-none !bg-gradient-to-r !from-gray-700 !via-gray-800 !to-gray-900 !text-white'
+                                            : 'border-black hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white'
+                                        ]"
+                                        style="height: 150px"
+                                        @click="selectedContainer = item"
+                                    >
+                                        <template #content>
+                                            <div class="grid grid-rows-3 text-sm space-y-2">
+                                                <div class="flex justify-between">
+                                                    <div>{{ item?.container_type }}</div>
+                                                    <div>{{ item?.cargo_type }}</div>
+                                                    <div>{{ item?.warehouse.name }}</div>
+                                                </div>
+                                                <div class="flex items-center justify-between text-xl">
+                                                    <h1 class="font-medium">{{ item?.reference }}</h1>
+                                                    <i class="ti ti-ship"></i>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <div>
+                                                        <i class="ti ti-calendar"></i>
+                                                        {{ item?.estimated_time_of_arrival }}
+                                                    </div>
+                                                    <Button
+                                                        v-tooltip="'Remove From Vessel Schedule'"
+                                                        icon="pi pi-trash"
+                                                        rounded
+                                                        severity="danger"
+                                                        size="small"
+                                                        @click.prevent="confirmRemoveContainerHold(item?.id)"
+                                                    />
                                                 </div>
                                             </div>
-                                            <div class="text-violet-300 text-xs">
-                                                {{ moment(item?.estimated_time_of_arrival).format('DD MMM YYYY') }}
-                                            </div>
-                                        </div>
-                                        <h2 class="text-lg font-medium text-white">{{ item?.reference }}</h2>
-                                        <div class="flex justify-between">
-                                            <i class="ti ti-ship text-2xl text-white"></i>
-                                            <div class="flex space-x-4 items-center">
-                                                <div class="flex items-center space-x-1 text-violet-300">
-                                                    <div class="text-xs">{{ item?.cargo_type }}</div>
-                                                </div>
-                                                <div class="flex items-center space-x-1 text-white">
-                                                    <div class="text-xs uppercase">{{ item?.warehouse.name }}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="flex justify-between items-center space-x-4">
-                                            <div class="h-2 rounded-full bg-violet-500 flex-1">
-                                                <div
-                                                    class="w-[100%] h-2 rounded-full from-green-300 to-green-400 bg-gradient-to-l"></div>
-                                            </div>
-                                            <div v-tooltip="'Remove From Vessel Schedule'"
-                                                 class="text-red-300 text-xs whitespace-nowrap cursor-pointer"
-                                                 @click.prevent="confirmRemoveContainerHold(item?.id)">Remove
-                                            </div>
-                                        </div>
-                                    </div>
+                                        </template>
+                                    </Card>
                                 </div>
                             </div>
                         </template>
@@ -901,11 +903,9 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
         </div>
     </AppLayout>
 
-    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="selectedContainer"
-                                :container-status="containerStatus" :sea-container-options="seaContainerOptions"
-                                :show="showConfirmLoadedShipmentModal"
+    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="selectedContainer" :container-status="containerStatus" :sea-container-options="seaContainerOptions" :show="showConfirmLoadedShipmentModal"
                                 @close="closeModal"
-                                @update:show="showConfirmLoadedShipmentModal = $event"/>
+                                @update:show="showConfirmLoadedShipmentModal = $event" />
 
     <AddVesselModal
         :vessel-schedule="vesselSchedule"
