@@ -1,827 +1,170 @@
 <script setup>
-import {onMounted, ref, watch} from "vue";
+import {computed, ref} from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Card from 'primevue/card';
 import Button from 'primevue/button';
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
-import Tab from 'primevue/tab';
-import TabPanels from 'primevue/tabpanels';
-import TabPanel from 'primevue/tabpanel';
-import InputError from "@/Components/InputError.vue";
-import InputNumber from "primevue/inputnumber";
-import InputText from "primevue/inputtext";
 import DatePicker from "primevue/datepicker";
-import IftaLabel from "primevue/iftalabel";
-import {router, useForm, usePage} from "@inertiajs/vue3";
+import {router} from "@inertiajs/vue3";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
-import VirtualScroller from 'primevue/virtualscroller';
-import LoadedShipmentDetailDialog from "@/Pages/Common/Dialog/Container/Index.vue";
-import {useConfirm} from "primevue/useconfirm";
-import {push} from "notivue";
-import AddVesselModal from "@/Pages/Clearance/VesselSchedule/Partials/AddVesselModal.vue";
-import Checkbox from "primevue/checkbox";
-import moment from "moment/moment.js";
+import moment from "moment";
+import Panel from "primevue/panel";
+import FloatLabel from "primevue/floatlabel";
 
 const props = defineProps({
     vesselSchedules: {
         type: Object,
         default: () => ({}),
     },
-    containers: {
-        type: Object,
-        default: () => ({}),
-    },
-    containerStatus: {
-        type: Array,
-        default: () => [],
-    },
-    seaContainerOptions: {
-        type: Array,
-        required: true,
-    },
-    airContainerOptions: {
-        type: Array,
-        required: true,
-    },
 });
 
-const showConfirmLoadedShipmentModal = ref(false);
-const confirm = useConfirm();
-const selectedContainer = ref(props.containers[0] ?? {});
-const containerData = ref({});
-const filteredHBLS = ref([]);
-const filteredMHBLS = ref([]);
-const containerPaymentData = ref({});
-const isContainerPayment = ref(false);
-const isFinanceApproved = ref(false);
+const perPage = ref(10);
+const currentPage = ref(1);
 
-const form = useForm({
-    container_id: selectedContainer.value.id ?? '',
-    do_charge: 0,
-    demurrage_charge: 0,
-    assessment_charge: 0,
-    slpa_charge: 0,
-    refund_charge: 0,
-    clearance_charge: 0
+const fromDate = ref(moment(new Date()).subtract(12, "months").toISOString().split("T")[0]);
+const toDate = ref(moment(new Date()).add(2, "weeks").toISOString().split("T")[0]);
+
+// Filtered schedules based on fromDate and toDate
+const filteredSchedules = computed(() => {
+    return Object.values(props.vesselSchedules).filter(item => {
+        return moment(item.start_date).isSameOrAfter(fromDate.value) && moment(item.end_date).isSameOrBefore(toDate.value);
+    });
 });
 
-const documentForm = useForm({
-    name: "",
-    date: "",
-});
-
-const fetchLoadedContainer = async () => {
-    try {
-        const response = await fetch(`/loaded-containers/get-container/${selectedContainer.value.id}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-            },
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch container ${selectedContainer.value.id}`);
-        }
-        containerData.value = (await response.json())[0];
-        hbls();
-        mhbls();
-        await fetchContainerPayment();
-    } catch (error) {
-        console.error("Error:", error);
-    }
+const onPageChange = (event) => {
+    perPage.value = event.rows;
+    currentPage.value = event.page + 1;
 };
 
-onMounted(() => {
-    fetchLoadedContainer();
+const latestRecordId = computed(() => {
+    if (!filteredSchedules.value.length) return null;
+
+    return filteredSchedules.value.reduce((latest, item) => {
+        return new Date(item.created_at) > new Date(latest.created_at) ? item : latest;
+    }).id;
 });
 
-watch(
-    [
-        () => selectedContainer.value,
-    ],
-    ([selectedContainer]) => {
-        fetchLoadedContainer();
+const rowClass = (data) => {
+    if (data.id === latestRecordId.value) {
+        return '!bg-green-100';
     }
-);
-
-const hbls = () => {
-    const hbls = containerData.value.hbls;
-    filteredHBLS.value = Object.values(hbls).filter(hbl => hbl.mhbl === null);
 }
 
-const mhbls = () => {
-    const hbls = containerData.value.hbls;
-    filteredMHBLS.value = Object.values(hbls).filter(hbl => hbl.mhbl !== null);
-}
-
-const closeModal = () => {
-    showConfirmLoadedShipmentModal.value = false;
+const clearFilter = () => {
+    fromDate.value = moment(new Date()).subtract(7, "days").toISOString().split("T")[0];
+    toDate.value = moment(new Date()).toISOString().split("T")[0];
 };
 
-const confirmVesselClear = (id) => {
-    confirm.require({
-        message: 'Are you sure you want to release this vessel?',
-        header: 'Vessel Release?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Release Vessel',
-            severity: 'warn'
-        },
-        accept: () => {
-
-        },
-        reject: () => {
-        }
-    });
+const exportCSV = () => {
+    dt.value.exportCSV();
 };
-
-const confirmVesselReturn = (id) => {
-    confirm.require({
-        message: 'Are you sure you want to return or reject this vessel?',
-        header: 'Vessel Return?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Release Vessel',
-            severity: 'danger'
-        },
-        accept: () => {
-
-        },
-        reject: () => {
-        }
-    });
-};
-
-const fetchContainerPayment = async () => {
-    try {
-        const response = await fetch(`/container-payment/${selectedContainer.value.id}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-            },
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch container payments ${selectedContainer.value.id}`);
-        }
-        containerPaymentData.value = (await response.json());
-        isContainerPayment.value = Object.keys(containerPaymentData.value).length > 0;
-        if (containerPaymentData.value && Object.keys(containerPaymentData.value).length > 0) {
-            form.do_charge = containerPaymentData.value.do_charge;
-            form.demurrage_charge = containerPaymentData.value.demurrage_charge;
-            form.assessment_charge = containerPaymentData.value.assessment_charge;
-            form.slpa_charge = containerPaymentData.value.slpa_charge;
-            form.refund_charge = containerPaymentData.value.refund_charge;
-            form.clearance_charge = containerPaymentData.value.clearance_charge;
-            isFinanceApproved.value = containerPaymentData.value.is_finance_approved;
-        }else{
-            form.container_id = selectedContainer.value.id;
-            form.do_charge = 0;
-            form.demurrage_charge = 0;
-            form.assessment_charge = 0;
-            form.slpa_charge = 0;
-            form.refund_charge = 0;
-            form.clearance_charge = 0;
-            isFinanceApproved.value = false;
-        }
-    } catch (error) {
-        console.error("Error:", error);
-    }
-};
-
-const handleContainerPaymentCreate = async () => {
-    form.post(route("container-payment.store"), {
-        onSuccess: (page) => {
-            fetchContainerPayment();
-            push.success("Container Payment Created Successfully!");
-        },
-        onError: () => console.log("error"),
-        preserveScroll: true,
-        preserveState: true,
-    });
-};
-
-const showConfirmAddVesselModal = ref(false);
-const confirmAddVesselModal = () => {
-    showConfirmAddVesselModal.value = true;
-};
-
-const closeAddVesselModal = () => {
-    showConfirmAddVesselModal.value = false;
-}
-
-const reloadPage = () => {
-    window.location.reload();
-}
-
-const containerId = ref('');
-const confirmRemoveContainerHold = (ContainerId) => {
-    containerId.value = ContainerId;
-    confirm.require({
-        message: `Would you like to remove this container form vessel schedule`,
-        header: `Remove container`,
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: `Remove container`,
-            severity: 'warn'
-        },
-        accept: () => {
-            router.post(
-                route("clearance.vessel-schedule.remove-vessel", props.vesselSchedules.id),
-                {containerID : containerId.value},
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        push.success(`Removed Successfully!`);
-                        reloadPage();
-                    },
-                    onError: () => {
-                        push.error("Something went to wrong!");
-                    },
-                }
-            );
-            selectedHBLID.value = null;
-        },
-        reject: () => {
-        }
-    });
-};
-
-const updateForm = useForm({
-    cargo_type: selectedContainer.value.cargo_type,
-    reference: selectedContainer.value.reference,
-    awb_number: selectedContainer.value.awb_number,
-    estimated_time_of_departure: selectedContainer.value.estimated_time_of_departure,
-    estimated_time_of_arrival: selectedContainer.value.estimated_time_of_arrival,
-    status: selectedContainer.value.status,
-    note: selectedContainer.value.note,
-    is_reached: Boolean(selectedContainer.value.is_reached),
-    reached_date: selectedContainer.value.reached_date,
-    container_type:  selectedContainer.value.container_type,
-    bl_number: selectedContainer.value.bl_number,
-    container_number: selectedContainer.value.container_number,
-    seal_number: selectedContainer.value.seal_number,
-    vessel_name: selectedContainer.value.vessel_name,
-    voyage_number: selectedContainer.value.voyage_number,
-    shipping_line: selectedContainer.value.shipping_line,
-    port_of_loading: selectedContainer.value.port_of_loading,
-    port_of_discharge: selectedContainer.value.port_of_discharge,
-    flight_number: selectedContainer.value.flight_number,
-    airline_name: selectedContainer.value.airline_name,
-    airport_of_departure: selectedContainer.value.airport_of_departure,
-    airport_of_arrival: selectedContainer.value.airport_of_arrival,
-    cargo_class: selectedContainer.value.cargo_class,
-    loading_ended_at: selectedContainer.value.loading_ended_at,
-    loading_started_at: selectedContainer.value.loading_started_at,
-    is_returned: Boolean(selectedContainer.value.is_returned),
-});
-
-watch(() => updateForm.is_reached, (newValue) => {
-    if (newValue) {
-        updateForm.is_returned = false;
-    }
-});
-
-watch(() => updateForm.is_returned, (newValue) => {
-    if (newValue) {
-        updateForm.is_reached = false;
-        updateForm.reached_date = '';
-    }
-});
-
-const handleUpdateContainer = () => {
-    if (updateForm.estimated_time_of_departure !== 'Invalid date') {
-        updateForm.estimated_time_of_departure = moment(updateForm.estimated_time_of_departure).format("YYYY-MM-DD");
-    } else {
-        updateForm.estimated_time_of_departure = null;
-    }
-
-    if (updateForm.estimated_time_of_arrival !== 'Invalid date') {
-        updateForm.estimated_time_of_arrival = moment(updateForm.estimated_time_of_arrival).format("YYYY-MM-DD");
-    } else {
-        updateForm.estimated_time_of_arrival = null;
-    }
-
-    if (moment(updateForm.reached_date).isValid()) {
-        updateForm.reached_date = moment(updateForm.reached_date).format("YYYY-MM-DD");
-    } else {
-        updateForm.reached_date = null;
-    }
-
-    updateForm.post(route("clearance.vessel-schedule.update-container", selectedContainer.value.id), {
-        preserveScroll: true,
-        preserveState: true,
-        onSuccess: () => {
-            reloadPage();
-            push.success('Container Updated Successfully!');
-        },
-        onError: () => {
-            updateForm.reset();
-        }
-    });
-}
 </script>
 
 <template>
-    <AppLayout title="Vessel Schedule">
-        <template #header>Vessel Schedule</template>
+    <AppLayout title="Vessel Schedules">
+        <template #header>Vessel Schedules</template>
 
         <Breadcrumb/>
 
-        <div class="mt-5 flex justify-between items-center">
-            <!-- Left Side: Title and Dates -->
-            <div>
-                <h1 class="text-3xl ml-1 font-medium text-gray-700">
-                    Vessel Schedule
-                </h1>
-                <div class="flex items-center space-x-2 text-gray-400 mt-1">
-                    <div>{{ vesselSchedules?.start_date }}</div>
-                    <div>
-                        <i class="ti ti-arrow-narrow-right text-xl" v-if="vesselSchedules?.end_date"></i>
-                    </div>
-                    <div>{{ vesselSchedules?.end_date }}</div>
+        <div>
+            <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="fromDate" class="w-full" date-format="yy-mm-dd" input-id="from-date"/>
+                        <label for="from-date">From Date</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <DatePicker v-model="toDate" class="w-full" date-format="yy-mm-dd" input-id="to-date"/>
+                        <label for="to-date">To Date</label>
+                    </FloatLabel>
                 </div>
-            </div>
+            </Panel>
 
-            <a :href="route('clearance.vessel-schedule.download', vesselSchedules.id)">
-                <Button
-                    icon="pi pi-plus"
-                    label="Print Vessel Schedule"
-                    size="small"
-                />
-            </a>
-        </div>
-
-        <div class="grid grid-cols-12 gap-4 my-5">
-            <!-- Container List -->
-            <Card class="col-span-4 border-2 border-gray-200 !shadow-none">
-                <template #title>
-                    <div class="flex justify-between items-center">
-                        <div class="text-lg font-semibold">Available Vessels</div>
-                        <Button icon="pi pi-plus"
-                                label="Add Vessel To Schedule"
-                                size="small" @click.prevent="confirmAddVesselModal()"/>
-                    </div>
-                </template>
-                <template #subtitle>{{ containers.length }} Vessels</template>
+            <Card class="my-5">
                 <template #content>
-                    <VirtualScroller :item-size="vesselSchedules?.clearance_containers.length"
-                                     :items="vesselSchedules?.clearance_containers" style="height: 400px">>
-                        <template v-slot:item="{ item, options }">
-                            <Card
-                                :class="[
-                                    '!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out border-2 mb-3',
-                                    selectedContainer?.id === item?.id
-                                    ? '!border-none !bg-gradient-to-r !from-gray-700 !via-gray-800 !to-gray-900 !text-white'
-                                    : 'border-black hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white'
-                                ]"
-                                style="height: 200px"
-                                @click="selectedContainer = item"
-                            >
-                                <template #content>
-                                    <div class="flex justify-between text-sm">
-                                        <div>{{ item?.container_type }}</div>
-                                        <div>{{ item?.cargo_type }}</div>
-                                        <div>{{ item?.warehouse.name }}</div>
-                                    </div>
-                                    <div class="my-8 flex items-center justify-between">
-                                        <h1 class="text-3xl font-medium">{{ item?.reference }}</h1>
-                                        <i class="ti ti-ship text-4xl"></i>
-                                    </div>
-                                    <div class="flex justify-between text-sm">
-                                        <div>{{ item?.bl_number }}</div>
-                                        <Button
-                                            v-tooltip="'Remove From Vessel Schedule'"
-                                            icon="pi pi-trash"
-                                            outlined
-                                            rounded
-                                            severity="danger"
-                                            size="small"
-                                            @click.prevent="confirmRemoveContainerHold(item?.id)"
-                                        />
-                                    </div>
-                                </template>
-                            </Card>
+                    <DataTable
+                        :row-class="rowClass"
+                        :rows="perPage"
+                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                        :totalRecords="Object.keys(filteredSchedules).length"
+                        :value="filteredSchedules"
+                        data-key="id"
+                        filter-display="menu"
+                        lazy
+                        paginator
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
+                        @page="onPageChange"
+                    >
+
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    Vessel Schedules
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Button Group -->
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        icon="pi pi-filter-slash"
+                                        label="Clear Filters"
+                                        outlined
+                                        severity="contrast"
+                                        size="small"
+                                        type="button"
+                                        @click="clearFilter()"
+                                    />
+
+                                    <Button
+                                        icon="pi pi-external-link"
+                                        label="Export"
+                                        severity="contrast"
+                                        size="small"
+                                        @click="exportCSV($event)"
+                                    />
+                                </div>
+                            </div>
                         </template>
-                    </VirtualScroller>
 
-                </template>
-            </Card>
+                        <template #empty> No vessel schedules found.</template>
 
-            <!-- Tabs Panel -->
-            <Card class="col-span-8 border-2 border-gray-200 !shadow-none">
-                <template #title>
-                    <div class="flex justify-between">
-                        <div>
-                            <div class="flex items-center space-x-2 text-xs text-gray-400">
-                                <div class="flex items-center">
-                                    <i class="ti ti-plane-departure text-xl mr-2"></i>
-                                    {{ selectedContainer?.branch?.name ?? '' }}
-                                </div>
-                                <div><i class="ti ti-arrow-narrow-right text-xl"></i></div>
-                                <div class="flex items-center">
-                                    <i class="ti ti-plane-arrival text-xl mr-2"></i>
-                                    {{ selectedContainer?.warehouse?.name ?? '' }}
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <div class="text-xl">{{ selectedContainer.reference ?? '' }}</div>
-                                <Button icon="pi pi-eye" rounded severity="info" size="small" variant="text" @click.prevent="showConfirmLoadedShipmentModal = !showConfirmLoadedShipmentModal"/>
-                            </div>
-                        </div>
-                        <div class="space-x-2">
-                            <Button v-tooltip.left="'Clear Vessel'" icon="pi pi-check" rounded severity="success"
-                                    size="small" variant="outlined" @click.prevent="confirmVesselClear()"/>
-                            <Button v-tooltip.left="'Mark As Return'" icon="pi pi-times" rounded severity="danger"
-                                    size="small" variant="outlined" @click.prevent="confirmVesselReturn()"/>
-                        </div>
-                    </div>
-                </template>
+                        <template #loading> Loading vessel schedules data. Please wait.</template>
 
-                <template #content>
-                    <Tabs value="0">
-                        <TabList>
-                            <Tab value="0">HBLS</Tab>
-                            <Tab value="1">MHBLs</Tab>
-                            <Tab value="2">Payments</Tab>
-                            <Tab value="3">Shipment Details</Tab>
-                            <Tab value="4">Documents</Tab>
-                        </TabList>
-                        <TabPanels>
-                            <!-- HBLs Tab -->
-                            <TabPanel value="0">
-                                <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]" :value="filteredHBLS"
-                                           paginator row-hover
-                                           tableStyle="min-width: 50rem">
-                                    <template #empty>No HBLs found.</template>
-                                    <Column class="font-bold" field="hbl_number" header="HBL"></Column>
-                                    <Column field="packages_count" header="Packages">
-                                        <template #body="slotProps">
-                                            <div class="flex items-center">
-                                                <i class="ti ti-package mr-1 text-blue-500" style="font-size: 1rem"></i>
-                                                {{ slotProps.data.packages_count }}
-                                            </div>
-                                        </template>
-                                    </Column>
-                                    <Column field="hbl_name" header="HBL Name">
-                                        <template #body="slotProps">
-                                            <div>{{ slotProps.data.hbl_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.nic }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.address }}</div>
-                                        </template>
-                                    </Column>
-                                    <Column field="contact_number" header="Contact"></Column>
-                                    <Column field="consignee_name" header="Consignee">
-                                        <template #body="slotProps">
-                                            <div>{{ slotProps.data.consignee_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.consignee_address }}
-                                            </div>
-                                        </template>
-                                    </Column>
-                                </DataTable>
-                            </TabPanel>
+                        <Column field="reference" header="Date">
+                            <template #body="slotProps">
+                                <i class="ti ti-calendar"></i>
+                                {{slotProps.data.start_date}} -
+                                <i class="ti ti-calendar"></i>
+                                {{slotProps.data.end_date}}
+                            </template>
+                        </Column>
 
-                            <!-- MHBLs Tab -->
-                            <TabPanel value="1">
-                                <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]" :value="filteredMHBLS"
-                                           paginator row-hover
-                                           tableStyle="min-width: 50rem">
-                                    <template #empty>No MHBLs found.</template>
-                                    <Column class="font-bold" field="mhbl" header="MHBL">
-                                        <template #body="{data}">
-                                            {{ data.mhbl.hbl_number || data.mhbl.reference || '-' }}
-                                        </template>
-                                    </Column>
-                                    <Column field="hbl_number" header="HBL">
-                                        <template #body="{data}">
-                                            {{ data.hbl_number || '-' }}
-                                        </template>
-                                    </Column>
-                                    <Column field="packages_count" header="Packages">
-                                        <template #body="{data}">
-                                            <div class="flex items-center">
-                                                <i class="ti ti-package mr-1 text-blue-500" style="font-size: 1rem"></i>
-                                                {{ data.packages_count }}
-                                            </div>
-                                        </template>
-                                    </Column>
-                                    <Column field="hbl_name" header="Name">
-                                        <template #body="slotProps">
-                                            <div>{{ slotProps.data.hbl_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.nic }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.address }}</div>
-                                        </template>
-                                    </Column>
-                                    <Column field="contact_number" header="Contact">
-                                        <template #body="{data}">
-                                            {{ data.contact_number || '-' }}
-                                        </template>
-                                    </Column>
-                                    <Column field="consignee_name" header="Consignee">
-                                        <template #body="slotProps">
-                                            <div>{{ slotProps.data.consignee_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.consignee_address }}
-                                            </div>
-                                        </template>
-                                    </Column>
-                                </DataTable>
-                            </TabPanel>
+                        <Column field="reference" header="Shipments">
+                            <template #body="slotProps">
+                                {{slotProps.data?.clearance_containers.length || 0}}
+                            </template>
+                        </Column>
 
-                            <!-- Payments Tab -->
-                            <TabPanel value="2">
-                                <form @submit.prevent="handleContainerPaymentCreate">
-                                    <div class="grid grid-cols-2 gap-5">
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber
-                                                    v-model="form.do_charge"
-                                                    :maxFractionDigits="2"
-                                                    :minFractionDigits="2"
-                                                    class="w-full" inputId="do-charge"
-                                                    min="0" step="any" variant="filled"
-                                                    :disabled="isFinanceApproved"
-                                                />
-                                                <label for="do-charge">DO Charge</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.do_charge"/>
-                                        </div>
+                        <Column field="" style="width: 10%">
+                            <template #body="{ data }">
+                                <Button
+                                    class="mr-2"
+                                    icon="pi pi-arrow-right"
+                                    rounded
+                                    size="small"
+                                    @click="router.visit(route('clearance.vessel-schedule.show', data.id))"
+                                />
+                            </template>
+                        </Column>
 
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber v-model="form.demurrage_charge" :maxFractionDigits="2"
-                                                             :minFractionDigits="2" class="w-full"
-                                                             inputId="demurrage-charge" min="0" step="any"
-                                                             variant="filled" :disabled="isFinanceApproved"/>
-                                                <label for="demurrage-charge">Demurrage Charge</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.demurrage_charge"/>
-                                        </div>
-
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber v-model="form.assessment_charge" :maxFractionDigits="2"
-                                                             :minFractionDigits="2" class="w-full"
-                                                             inputId="assessment-charge" min="0" step="any"
-                                                             variant="filled" :disabled="isFinanceApproved"/>
-                                                <label for="assessment-charge">Assessment Charge</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.assessment_charge"/>
-                                        </div>
-
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber v-model="form.slpa_charge" :maxFractionDigits="2"
-                                                             :minFractionDigits="2" class="w-full" inputId="slap-charge"
-                                                             min="0" step="any" variant="filled" :disabled="isFinanceApproved"/>
-                                                <label for="slap-charge">SLAP Charge</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.slpa_charge"/>
-                                        </div>
-
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber v-model="form.refund_charge" :maxFractionDigits="2"
-                                                             :minFractionDigits="2" class="w-full" inputId="refund-charge"
-                                                             min="0" step="any" variant="filled" :disabled="isFinanceApproved"/>
-                                                <label for="refund-charge">Refund</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.refund_charge"/>
-                                        </div>
-
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber v-model="form.clearance_charge" :maxFractionDigits="2"
-                                                             :minFractionDigits="2" class="w-full"
-                                                             inputId="clearance-charge" min="0" step="any"
-                                                             variant="filled" :disabled="isFinanceApproved"/>
-                                                <label for="clearance-charge">Clearance Charge</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.clearance_charge"/>
-                                        </div>
-
-                                        <div class="col-span-2 text-right" v-if="!isFinanceApproved">
-                                            <Button icon="pi pi-save" :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"  size="small" type="submit"/>
-                                        </div>
-                                    </div>
-                                </form>
-                            </TabPanel>
-
-                            <!-- Documents Tab -->
-                            <TabPanel value="3">
-                                <div class="grid grid-cols-4 gap-5">
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.cargo_type" class="w-full" variant="filled" disabled/>
-                                            <label>Cargo Mode</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.container_type" class="w-full" variant="filled" disabled/>
-                                            <label>Container Type</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.reference" class="w-full" variant="filled" disabled/>
-                                            <label>Reference</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.container_number" class="w-full" variant="filled" disabled/>
-                                            <label>Container Number</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.seal_number" class="w-full" variant="filled" disabled/>
-                                            <label>Seal Number</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.bl_number" class="w-full" variant="filled" disabled/>
-                                            <label>BL Number</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.estimated_time_of_departure" class="w-full" variant="filled" disabled/>
-                                            <label>EDT</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.estimated_time_of_arrival" class="w-full" variant="filled" disabled/>
-                                            <label>ETA</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.vessel_name" class="w-full" variant="filled" disabled/>
-                                            <label>Vessel Name</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.voyage_number" class="w-full" variant="filled" disabled/>
-                                            <label>Voyage Number</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.shipping_line" class="w-full" variant="filled" disabled/>
-                                            <label>Shipping Line</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.port_of_loading" class="w-full" variant="filled" disabled/>
-                                            <label>Port of Loading</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.port_of_discharge" class="w-full" variant="filled" disabled/>
-                                            <label>Port of Discharge</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.loading_started_at" class="w-full" variant="filled" disabled/>
-                                            <label>Loading Started Time</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.loading_ended_at" class="w-full" variant="filled" disabled/>
-                                            <label>Loading End Time</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.status" class="w-full" variant="filled" disabled/>
-                                            <label>Last Status</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.note" class="w-full" variant="filled"  placeholder="Type something..."/>
-                                            <label>note</label>
-                                        </IftaLabel>
-                                        <InputError :message="updateForm.errors.note"/>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <DatePicker v-model="updateForm.reached_date" class="w-full" variant="filled" date-format="yy-mm-dd" icon-display="input" placeholder="Set Reached Date" show-icon/>
-                                            <label>Reached Date</label>
-                                        </IftaLabel>
-                                        <InputError :message="updateForm.errors.reached_date"/>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <Checkbox v-model="updateForm.is_reached" binary inputId="is_reached" />
-                                            <label class="font-medium text-sm ml-5" for="is_reached"> Reached Destination? </label>
-                                        </IftaLabel>
-                                        <InputError :message="updateForm.errors.is_reached"/>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <Checkbox v-model="updateForm.is_returned" binary inputId="is_reached" />
-                                            <label class="font-medium text-sm ml-5" for="is_reached"> Is Returned? </label>
-                                        </IftaLabel>
-                                        <InputError :message="updateForm.errors.is_returned"/>
-                                    </div>
-
-                                    <div class="text-right col-span-4 md:col-span-4">
-                                        <Button :class="{ 'opacity-25': updateForm.processing }"
-                                                :disabled="updateForm.processing" icon="pi pi-save" label="Save Changes"
-                                                severity="info" size="small" @click="handleUpdateContainer"/>
-                                    </div>
-                                </div>
-                            </TabPanel>
-
-                            <!-- Documents Tab -->
-                            <TabPanel value="4">
-                                <div class="grid grid-cols-2 gap-5">
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="documentForm.name" class="w-full" variant="filled"/>
-                                            <label>Document Name</label>
-                                        </IftaLabel>
-                                        <InputError :message="documentForm.errors.name"/>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <DatePicker v-model="documentForm.date" class="w-full" variant="filled"/>
-                                            <label>Date</label>
-                                        </IftaLabel>
-                                        <InputError :message="documentForm.errors.date"/>
-                                    </div>
-
-                                    <div class="col-span-2 text-right">
-                                        <Button icon="pi pi-file-pdf" label="Generate PDF" size="small"/>
-                                    </div>
-                                </div>
-                            </TabPanel>
-                        </TabPanels>
-                    </Tabs>
+                        <template #footer> In total there are {{ vesselSchedules ? Object.keys(filteredSchedules).length : 0 }} vessel schedules. </template>
+                    </DataTable>
                 </template>
             </Card>
         </div>
     </AppLayout>
-
-    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="selectedContainer" :container-status="containerStatus" :sea-container-options="seaContainerOptions" :show="showConfirmLoadedShipmentModal"
-                                @close="closeModal"
-                                @update:show="showConfirmLoadedShipmentModal = $event" />
-
-    <AddVesselModal
-        :visible="showConfirmAddVesselModal"
-        :vessel-schedule="vesselSchedules"
-        @close="closeAddVesselModal"
-        @reloadPage="reloadPage"
-        @update:visible="showConfirmAddVesselModal = $event"
-    />
 </template>
