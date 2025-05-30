@@ -15,5 +15,9 @@ class AddContainerToVesselSchedule
         $vesselSchedule->scheduleContainers()->create([
             'container_id' => $container->id,
         ]);
+
+        $vesselSchedule->update([
+            'status' => 'USER_GENERATED',
+        ]);
     }
 }

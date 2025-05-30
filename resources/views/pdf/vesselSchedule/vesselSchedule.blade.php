@@ -63,6 +63,15 @@
         .page-break {
             page-break-after: always;
         }
+        .footer {
+            position: fixed;
+            bottom: 5px;
+            left: 0;
+            right: 0;
+            font-size: 7pt;
+            font-style: italic;
+            color: #bdbbbb;
+        }
     </style>
 </head>
 <body>
@@ -81,7 +90,7 @@
 
     <div class="header">
         <h1>VESSEL SCHEDULE</h1>
-        <div class="date">{{ $formattedDate }}</div>
+        <div class="date">{{ \Illuminate\Support\Carbon::now()->toDateString() }}</div>
     </div>
 
     <table>
@@ -127,5 +136,13 @@
         NOTE : VESSEL ARRIVE DATE SUBJECT TO CHANGE
     </div>
 @endfor
+
+<div class="footer">
+    @if($vesselSchedule->status === 'SYSTEM_GENERATED')
+        System Generated PDF (Printed on {{ \Illuminate\Support\Carbon::now()->toDateTimeString() }}) #{{$vesselSchedule->id}}
+    @else
+        User Generated PDF (Printed on {{ \Illuminate\Support\Carbon::now()->toDateTimeString() }}) #{{$vesselSchedule->id}}
+    @endif
+</div>
 </body>
 </html>

@@ -18,6 +18,7 @@ class VesselSchedule extends Model
     protected $fillable = [
         'start_date',
         'end_date',
+        'status',
     ];
 
     public function getActivitylogOptions(): LogOptions

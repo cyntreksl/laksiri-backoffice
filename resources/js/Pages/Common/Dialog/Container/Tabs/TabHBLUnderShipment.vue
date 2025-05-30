@@ -3,7 +3,7 @@ import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue"
 import {ref, watch} from "vue";
 import HBLPackages from "@/Pages/Common/Dialog/Container/Tables/HBLPackages.vue";
 import AddHBLModal from "@/Pages/Common/Dialog/Container/Dialog/AddHBLModal.vue";
-import {usePage} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import Button from "primevue/button";
 import Divider from "primevue/divider";
 
@@ -161,12 +161,11 @@ watch(
             </h3>
         </div>
         <div class="flex items-center space-x-2">
-            <Button :disabled="usePage().props.user?.roles[0] !== 'admin'" icon="pi pi-plus"
+            <Button v-if="usePage().props.user?.roles[0] === 'admin'" icon="pi pi-plus"
                     label="Add HBL To Shipment" size="small" @click.prevent="confirmAddHBLModal"/>
 
-            <a :href="route('loading.hbls.batch-downloads', container.id)">
-                <Button :disabled="container.status !== 'LOADED'" icon="pi pi-print"
-                        label="Print All HBL" severity="info" size="small"/>
+            <a v-if="container.status === 'LOADED'" :href="route('loading.hbls.batch-downloads', container.id)">
+                <Button icon="pi pi-print" label="Print All HBL" severity="info" size="small"/>
             </a>
         </div>
     </div>

@@ -403,7 +403,7 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                 </div>
             </div>
 
-            <a :href="route('clearance.vessel-schedule.download', vesselSchedule.id)">
+            <a :href="route('clearance.vessel-schedule.download', vesselSchedule?.id)">
                 <Button
                     icon="pi pi-download"
                     label="Download Vessel Schedule"
