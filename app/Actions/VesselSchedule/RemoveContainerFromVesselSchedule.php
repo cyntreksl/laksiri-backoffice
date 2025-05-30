@@ -11,6 +11,10 @@ class RemoveContainerFromVesselSchedule
 
     public function handle(VesselSchedule $vesselSchedule, int $containerId)
     {
+        $vesselSchedule->update([
+            'status' => 'USER_GENERATED',
+        ]);
+
         return $vesselSchedule->scheduleContainers()
             ->where('container_id', $containerId)
             ->delete();

@@ -13,7 +13,11 @@ class AddContainerToVesselSchedule
     public function handle(VesselSchedule $vesselSchedule, Container $container)
     {
         $vesselSchedule->scheduleContainers()->create([
-            'container_id' => $container['id'],
+            'container_id' => $container->id,
+        ]);
+
+        $vesselSchedule->update([
+            'status' => 'USER_GENERATED',
         ]);
     }
 }

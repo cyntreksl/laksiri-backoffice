@@ -1,7 +1,7 @@
 <script setup>
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import {ref, watch} from "vue";
-import {usePage} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import Button from "primevue/button";
 import MHBLPackages from "@/Pages/Common/Dialog/Container/Tables/MHBLPackages.vue";
 import AddMHBLModal from "@/Pages/Common/Dialog/Container/Dialog/AddMHBLModal.vue";
@@ -104,12 +104,11 @@ watch(() => containerData.value, () => {
             </h3>
         </div>
         <div class="flex items-center space-x-2">
-            <Button :disabled="usePage().props.user?.roles[0] !== 'admin'" icon="pi pi-plus"
+            <Button v-if="usePage().props.user?.roles[0] === 'admin'" icon="pi pi-plus"
                     label="Add MHBL To Shipment" size="small" @click.prevent="confirmAddMHBLModal" />
 
-            <a :href="route('loading.loaded-containers.doorToDoor.export', container.id)">
-                <Button v-if="filteredHBLSPackagesCount > 0" icon="pi pi-print"
-                        label="Print Manifest" severity="info" size="small"/>
+            <a v-if="filteredHBLSPackagesCount > 0" :href="route('loading.loaded-containers.doorToDoor.export', container.id)">
+                <Button icon="pi pi-print" label="Print Manifest" severity="info" size="small" @click.prevent="router.visit()"/>
             </a>
         </div>
     </div>
