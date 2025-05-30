@@ -20,20 +20,28 @@ class VesselScheduleController extends Controller
 
     public function index()
     {
-        $vesselSchedule = $this->vesselScheduleRepository->getRecentVesselSchedule();
-        if ($vesselSchedule) {
-            $vesselSchedule->load(['clearanceContainers.branch', 'clearanceContainers.warehouse', 'clearanceContainers.hbl_packages']);
-        }
+        return Inertia::render('Clearance/VesselSchedule/VesselScheduleList', [
+            'vesselSchedules' => $this->vesselScheduleRepository->getAllVesselSchedules(),
+        ]);
+    }
+
+    public function show(VesselSchedule $vesselSchedule)
+    {
+        $vesselSchedule->load([
+            'clearanceContainers.branch',
+            'clearanceContainers.warehouse',
+            'clearanceContainers.hbl_packages',
+        ]);
 
         $seaContainerOptions = ContainerType::getSeaCargoOptions();
         $airContainerOptions = ContainerType::getAirCargoOptions();
 
         $containerStatuses = array_values(array_filter(ContainerStatus::cases(), function ($status) {
-            return ! in_array($status->name, ['DRAFT', 'REQUESTED']);
+            return ! in_array($status->name, [ContainerStatus::DRAFT->value, ContainerStatus::REQUESTED->value]);
         }));
 
-        return Inertia::render('Clearance/VesselSchedule/VesselScheduleList', [
-            'vesselSchedules' => $vesselSchedule,
+        return Inertia::render('Clearance/VesselSchedule/ShowVesselSchedule', [
+            'vesselSchedule' => $vesselSchedule,
             'containers' => $vesselSchedule->clearanceContainers ?? [],
             'containerStatus' => $containerStatuses,
             'seaContainerOptions' => $seaContainerOptions,

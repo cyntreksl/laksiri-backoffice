@@ -3,17 +3,22 @@
 use App\Http\Controllers\Clearance\VesselScheduleController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/vessel-schedule', [VesselScheduleController::class, 'index'])
-    ->name('vessel-schedule.index');
+Route::prefix('vessel-schedule')->name('vessel-schedule.')->group(function () {
+    Route::get('/', [VesselScheduleController::class, 'index'])
+        ->name('index');
 
-Route::post('vessel-schedule/add-vessel/{VesselSchedule}', [VesselScheduleController::class, 'addVesselToSchedule'])
-    ->name('vessel-schedule.add-vessel');
+    Route::get('/{vessel_schedule}', [VesselScheduleController::class, 'show'])
+        ->name('show');
 
-Route::post('vessel-schedule/remove-vessel/{VesselSchedule}', [VesselScheduleController::class, 'removeVesselFromSchedule'])
-    ->name('vessel-schedule.remove-vessel');
+    Route::post('add-vessel/{vessel_schedule}', [VesselScheduleController::class, 'addVesselToSchedule'])
+        ->name('add-vessel');
 
-Route::get('vessel-schedule/download/{VesselSchedule}', [VesselScheduleController::class, 'downloadVesselSchedulePDF'])
-    ->name('vessel-schedule.download');
+    Route::post('remove-vessel/{vessel_schedule}', [VesselScheduleController::class, 'removeVesselFromSchedule'])
+        ->name('remove-vessel');
 
-Route::post('vessel-schedule/update-container/{container}', [VesselScheduleController::class, 'updateContainer'])
-    ->name('vessel-schedule.update-container');
+    Route::get('download/{vessel_schedule}', [VesselScheduleController::class, 'downloadVesselSchedulePDF'])
+        ->name('download');
+
+    Route::post('update-container/{container}', [VesselScheduleController::class, 'updateContainer'])
+        ->name('update-container');
+});

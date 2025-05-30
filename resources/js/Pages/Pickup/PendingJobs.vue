@@ -329,41 +329,6 @@ const closeAssignDriverModal = () => {
     selectedPickups.value = [];
 };
 
-const confirmPickupRetry = (pickup) => {
-    selectedPickupID.value = pickup.value.id;
-    confirm.require({
-        message: 'Are you sure you want to Retry Job?',
-        header: 'Retry Pickup?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Retry',
-            severity: 'warn'
-        },
-        accept: () => {
-            router.get(route("pickups.exceptions.retry", selectedPickupID.value), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    push.success("Added into Pending Jobs!");
-                    router.visit(route("pickups.index"), {only: ["pickups"]});
-                },
-                onError: () => {
-                    push.error("Something went to wrong!");
-                },
-            });
-            selectedPickupID.value = null;
-        },
-        reject: () => {
-            selectedPickupID.value = null;
-        }
-    });
-};
-
 const parsePackageTypes = (str) => {
     if (!str) return [];
 
