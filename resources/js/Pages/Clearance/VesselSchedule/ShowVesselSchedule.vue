@@ -119,10 +119,10 @@ const closeModal = () => {
     showConfirmLoadedShipmentModal.value = false;
 };
 
-const confirmVesselClear = (id) => {
+const confirmShipmentClear = () => {
     confirm.require({
-        message: 'Are you sure you want to release this vessel?',
-        header: 'Vessel Release?',
+        message: 'Are you sure you want to release this shipment?',
+        header: 'Shipment Release?',
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
         rejectProps: {
@@ -131,7 +131,7 @@ const confirmVesselClear = (id) => {
             outlined: true
         },
         acceptProps: {
-            label: 'Release Vessel',
+            label: 'Release',
             severity: 'warn'
         },
         accept: () => {
@@ -142,10 +142,10 @@ const confirmVesselClear = (id) => {
     });
 };
 
-const confirmVesselReturn = (id) => {
+const confirmShipmentReturn = () => {
     confirm.require({
-        message: 'Are you sure you want to return or reject this vessel?',
-        header: 'Vessel Return?',
+        message: 'Are you sure you want to return or reject this shipment?',
+        header: 'Shipment Return?',
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
         rejectProps: {
@@ -154,7 +154,7 @@ const confirmVesselReturn = (id) => {
             outlined: true
         },
         acceptProps: {
-            label: 'Release Vessel',
+            label: 'Return',
             severity: 'danger'
         },
         accept: () => {
@@ -500,9 +500,9 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                         </div>
                         <div class="flex flex-col sm:flex-row gap-2">
                             <Button label="Clear Shipment" severity="success"
-                                    size="small" @click.prevent="confirmVesselClear()"/>
+                                    size="small" @click.prevent="confirmShipmentClear()"/>
                             <Button label="Mark as a return" severity="danger"
-                                    size="small" variant="outlined" @click.prevent="confirmVesselReturn()"/>
+                                    size="small" variant="outlined" @click.prevent="confirmShipmentReturn()"/>
                         </div>
                     </div>
                 </template>
