@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Card from 'primevue/card';
@@ -26,7 +26,7 @@ import Checkbox from "primevue/checkbox";
 import moment from "moment";
 
 const props = defineProps({
-    vesselSchedules: {
+    vesselSchedule: {
         type: Object,
         default: () => ({}),
     },
@@ -248,7 +248,7 @@ const confirmRemoveContainerHold = (ContainerId) => {
         },
         accept: () => {
             router.post(
-                route("clearance.vessel-schedule.remove-vessel", props.vesselSchedules.id),
+                route("clearance.vessel-schedule.remove-vessel", props.vesselSchedule.id),
                 {containerID : containerId.value},
                 {
                     preserveScroll: true,
@@ -341,6 +341,44 @@ const handleUpdateContainer = () => {
         }
     });
 }
+
+// Using Moment.js for grouped shipments
+const groupedShipments = computed(() => {
+    if (!props.vesselSchedule?.clearance_containers) {
+        return [];
+    }
+
+    const groups = {};
+
+    props.vesselSchedule.clearance_containers.forEach(item => {
+        // Ensure estimated_time_of_arrival is valid before processing
+        if (!item.estimated_time_of_arrival || !moment(item.estimated_time_of_arrival).isValid()) {
+            return;
+        }
+
+        const m = moment(item.estimated_time_of_arrival);
+        const dayOfWeek = m.format('dddd'); // 'Monday', 'Tuesday', etc.
+        const fullDate = m.format('MMM Do, YYYY'); // 'Jun 2nd, 2025' or similar (adjust format as needed)
+        const groupingKey = m.format('YYYY-MM-DD'); // Use a date string for consistent grouping regardless of time
+
+        if (!groups[groupingKey]) {
+            groups[groupingKey] = {
+                day: dayOfWeek,
+                date: fullDate,
+                momentObject: m.startOf('day'), // Store moment object for sorting by date
+                items: []
+            };
+        }
+        groups[groupingKey].items.push(item);
+    });
+
+    // Convert the object to an array and sort them by the date
+    const sortedGroups = Object.keys(groups)
+        .map(key => groups[key])
+        .sort((a, b) => a.momentObject.diff(b.momentObject)); // Sort using moment objects
+
+    return sortedGroups;
+});
 </script>
 
 <template>
@@ -350,89 +388,100 @@ const handleUpdateContainer = () => {
         <Breadcrumb/>
 
         <div class="mt-5 flex justify-between items-center">
-            <!-- Left Side: Title and Dates -->
             <div>
-                <h1 class="text-3xl ml-1 font-medium text-gray-700">
-                    Vessel Schedule
-                </h1>
-                <div class="flex items-center space-x-2 text-gray-400 mt-1">
-                    <div>{{ vesselSchedules?.start_date }}</div>
+                <p class="text-gray-800">Schedule for</p>
+                <div class="flex items-center space-x-2 text-2xl text-gray-800 mt-1">
                     <div>
-                        <i v-if="vesselSchedules?.end_date" class="ti ti-arrow-narrow-right text-xl"></i>
+                        <i class="ti ti-calendar"></i>
+                        {{ vesselSchedule?.start_date }}
                     </div>
-                    <div>{{ vesselSchedules?.end_date }}</div>
+                    <div>
+                        <i v-if="vesselSchedule?.end_date" class="ti ti-arrow-narrow-right"></i>
+                    </div>
+                    <div>
+                        <i class="ti ti-calendar"></i>
+                        {{ vesselSchedule?.end_date }}
+                    </div>
                 </div>
             </div>
 
-            <a :href="route('clearance.vessel-schedule.download', vesselSchedules.id)">
+            <a :href="route('clearance.vessel-schedule.download', vesselSchedule.id)">
                 <Button
-                    icon="pi pi-plus"
-                    label="Print Vessel Schedule"
+                    icon="pi pi-download"
+                    label="Download Vessel Schedule"
                     size="small"
+                    severity="help"
                 />
             </a>
         </div>
 
         <div class="grid grid-cols-12 gap-4 my-5">
             <!-- Container List -->
-            <Card class="col-span-4 border-2 border-gray-200 !shadow-none">
+            <Card class="col-span-12 lg:col-span-3 border-2 border-gray-200 !shadow-none">
                 <template #title>
-                    <div class="flex justify-between items-center">
-                        <div class="text-lg font-semibold">Available Vessels</div>
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+                        <div class="text-base font-semibold">Available Shipments</div>
                         <Button icon="pi pi-plus"
-                                label="Add Vessel To Schedule"
+                                label="Add Shipment"
                                 size="small" @click.prevent="confirmAddVesselModal()"/>
                     </div>
                 </template>
-                <template #subtitle>{{ containers.length }} Vessels</template>
+                <template #subtitle>{{ containers.length }} Shipment(s)</template>
                 <template #content>
-                    <VirtualScroller :item-size="vesselSchedules?.clearance_containers.length"
-                                     :items="vesselSchedules?.clearance_containers" style="height: 400px">>
-                        <template v-slot:item="{ item, options }">
-                            <Card
-                                :class="[
-                                    '!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out border-2 mb-3',
-                                    selectedContainer?.id === item?.id
-                                    ? '!border-none !bg-gradient-to-r !from-gray-700 !via-gray-800 !to-gray-900 !text-white'
-                                    : 'border-black hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white'
-                                ]"
-                                style="height: 200px"
-                                @click="selectedContainer = item"
-                            >
-                                <template #content>
-                                    <div class="flex justify-between text-sm">
-                                        <div>{{ item?.container_type }}</div>
-                                        <div>{{ item?.cargo_type }}</div>
-                                        <div>{{ item?.warehouse.name }}</div>
-                                    </div>
-                                    <div class="my-8 flex items-center justify-between">
-                                        <h1 class="text-3xl font-medium">{{ item?.reference }}</h1>
-                                        <i class="ti ti-ship text-4xl"></i>
-                                    </div>
-                                    <div class="flex justify-between text-sm">
-                                        <div>{{ item?.bl_number }}</div>
-                                        <Button
-                                            v-tooltip="'Remove From Vessel Schedule'"
-                                            icon="pi pi-trash"
-                                            outlined
-                                            rounded
-                                            severity="danger"
-                                            size="small"
-                                            @click.prevent="confirmRemoveContainerHold(item?.id)"
-                                        />
-                                    </div>
-                                </template>
-                            </Card>
+                    <VirtualScroller :item-size="150" :items="groupedShipments" style="height: 400px">
+                        <template v-slot:item="{ item: dayGroup }">
+                            <div class="mb-4">
+                                <h2 class="text-lg font-semibold mb-2">
+                                    {{ dayGroup.day }} ({{ dayGroup.items.length }} Shipments)
+                                </h2>
+                                <div v-for="item in dayGroup.items" :key="item.id">
+                                    <Card
+                                        :class="[
+                                            '!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out border-2 mb-3',
+                                            selectedContainer?.id === item?.id
+                                            ? '!border-none !bg-gradient-to-r !from-gray-700 !via-gray-800 !to-gray-900 !text-white'
+                                            : 'border-black hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white'
+                                        ]"
+                                        style="height: 150px"
+                                        @click="selectedContainer = item"
+                                    >
+                                        <template #content>
+                                            <div class="flex justify-between text-sm">
+                                                <div>{{ item?.container_type }}</div>
+                                                <div>{{ item?.cargo_type }}</div>
+                                                <div>{{ item?.warehouse.name }}</div>
+                                            </div>
+                                            <div class="my-2 flex items-center justify-between text-xl">
+                                                <h1 class="font-medium">{{ item?.reference }}</h1>
+                                                <i class="ti ti-ship"></i>
+                                            </div>
+                                            <div class="flex justify-between text-sm">
+                                                <div>
+                                                    <i class="ti ti-calendar"></i>
+                                                    {{ item?.estimated_time_of_arrival }}
+                                                </div>
+                                                <Button
+                                                    v-tooltip="'Remove From Vessel Schedule'"
+                                                    icon="pi pi-trash"
+                                                    rounded
+                                                    severity="danger"
+                                                    size="small"
+                                                    @click.prevent="confirmRemoveContainerHold(item?.id)"
+                                                />
+                                            </div>
+                                        </template>
+                                    </Card>
+                                </div>
+                            </div>
                         </template>
                     </VirtualScroller>
-
                 </template>
             </Card>
 
             <!-- Tabs Panel -->
-            <Card class="col-span-8 border-2 border-gray-200 !shadow-none">
+            <Card class="col-span-12 lg:col-span-9 border-2 border-gray-200 !shadow-none">
                 <template #title>
-                    <div class="flex justify-between">
+                    <div class="flex flex-col md:flex-row md:justify-between gap-4">
                         <div>
                             <div class="flex items-center space-x-2 text-xs text-gray-400">
                                 <div class="flex items-center">
@@ -447,13 +496,14 @@ const handleUpdateContainer = () => {
                             </div>
                             <div class="flex items-center space-x-2">
                                 <div class="text-xl">{{ selectedContainer.reference ?? '' }}</div>
-                                <Button icon="pi pi-eye" rounded severity="info" size="small" variant="text" @click.prevent="showConfirmLoadedShipmentModal = !showConfirmLoadedShipmentModal"/>
+                                <Button icon="pi pi-eye" rounded severity="info" size="small" variant="text"
+                                        @click.prevent="showConfirmLoadedShipmentModal = !showConfirmLoadedShipmentModal"/>
                             </div>
                         </div>
-                        <div class="space-x-2">
-                            <Button v-tooltip.left="'Clear Vessel'" icon="pi pi-check" rounded severity="success"
-                                    size="small" variant="outlined" @click.prevent="confirmVesselClear()"/>
-                            <Button v-tooltip.left="'Mark As Return'" icon="pi pi-times" rounded severity="danger"
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <Button label="Clear Shipment" severity="success"
+                                    size="small" @click.prevent="confirmVesselClear()"/>
+                            <Button label="Mark as a return" severity="danger"
                                     size="small" variant="outlined" @click.prevent="confirmVesselReturn()"/>
                         </div>
                     </div>
@@ -471,87 +521,99 @@ const handleUpdateContainer = () => {
                         <TabPanels>
                             <!-- HBLs Tab -->
                             <TabPanel value="0">
-                                <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]" :value="filteredHBLS"
-                                           paginator row-hover
-                                           tableStyle="min-width: 50rem">
-                                    <template #empty>No HBLs found.</template>
-                                    <Column class="font-bold" field="hbl_number" header="HBL"></Column>
-                                    <Column field="packages_count" header="Packages">
-                                        <template #body="slotProps">
-                                            <div class="flex items-center">
-                                                <i class="ti ti-package mr-1 text-blue-500" style="font-size: 1rem"></i>
-                                                {{ slotProps.data.packages_count }}
-                                            </div>
-                                        </template>
-                                    </Column>
-                                    <Column field="hbl_name" header="HBL Name">
-                                        <template #body="slotProps">
-                                            <div>{{ slotProps.data.hbl_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.nic }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.address }}</div>
-                                        </template>
-                                    </Column>
-                                    <Column field="contact_number" header="Contact"></Column>
-                                    <Column field="consignee_name" header="Consignee">
-                                        <template #body="slotProps">
-                                            <div>{{ slotProps.data.consignee_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.consignee_address }}
-                                            </div>
-                                        </template>
-                                    </Column>
-                                </DataTable>
+                                <div class="overflow-x-auto">
+                                    <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                                               :value="filteredHBLS"
+                                               paginator row-hover
+                                               tableStyle="min-width: 50rem">
+                                        <template #empty>No HBLs found.</template>
+                                        <Column class="font-bold" field="hbl_number" header="HBL"></Column>
+                                        <Column field="packages_count" header="Packages">
+                                            <template #body="slotProps">
+                                                <div class="flex items-center">
+                                                    <i class="ti ti-package mr-1 text-blue-500"
+                                                       style="font-size: 1rem"></i>
+                                                    {{ slotProps.data.packages_count }}
+                                                </div>
+                                            </template>
+                                        </Column>
+                                        <Column field="hbl_name" header="HBL Name">
+                                            <template #body="slotProps">
+                                                <div>{{ slotProps.data.hbl_name }}</div>
+                                                <div class="text-gray-500 text-sm">{{ slotProps.data.nic }}</div>
+                                                <div class="text-gray-500 text-sm">{{ slotProps.data.address }}</div>
+                                            </template>
+                                        </Column>
+                                        <Column field="contact_number" header="Contact"></Column>
+                                        <Column field="consignee_name" header="Consignee">
+                                            <template #body="slotProps">
+                                                <div>{{ slotProps.data.consignee_name }}</div>
+                                                <div class="text-gray-500 text-sm">{{
+                                                        slotProps.data.consignee_address
+                                                    }}
+                                                </div>
+                                            </template>
+                                        </Column>
+                                    </DataTable>
+                                </div>
                             </TabPanel>
 
                             <!-- MHBLs Tab -->
                             <TabPanel value="1">
-                                <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]" :value="filteredMHBLS"
-                                           paginator row-hover
-                                           tableStyle="min-width: 50rem">
-                                    <template #empty>No MHBLs found.</template>
-                                    <Column class="font-bold" field="mhbl" header="MHBL">
-                                        <template #body="{data}">
-                                            {{ data.mhbl.hbl_number || data.mhbl.reference || '-' }}
-                                        </template>
-                                    </Column>
-                                    <Column field="hbl_number" header="HBL">
-                                        <template #body="{data}">
-                                            {{ data.hbl_number || '-' }}
-                                        </template>
-                                    </Column>
-                                    <Column field="packages_count" header="Packages">
-                                        <template #body="{data}">
-                                            <div class="flex items-center">
-                                                <i class="ti ti-package mr-1 text-blue-500" style="font-size: 1rem"></i>
-                                                {{ data.packages_count }}
-                                            </div>
-                                        </template>
-                                    </Column>
-                                    <Column field="hbl_name" header="Name">
-                                        <template #body="slotProps">
-                                            <div>{{ slotProps.data.hbl_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.nic }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.address }}</div>
-                                        </template>
-                                    </Column>
-                                    <Column field="contact_number" header="Contact">
-                                        <template #body="{data}">
-                                            {{ data.contact_number || '-' }}
-                                        </template>
-                                    </Column>
-                                    <Column field="consignee_name" header="Consignee">
-                                        <template #body="slotProps">
-                                            <div>{{ slotProps.data.consignee_name }}</div>
-                                            <div class="text-gray-500 text-sm">{{ slotProps.data.consignee_address }}
-                                            </div>
-                                        </template>
-                                    </Column>
-                                </DataTable>
+                                <div class="overflow-x-auto">
+                                    <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]"
+                                               :value="filteredMHBLS"
+                                               paginator row-hover
+                                               tableStyle="min-width: 50rem">
+                                        <template #empty>No MHBLs found.</template>
+                                        <Column class="font-bold" field="mhbl" header="MHBL">
+                                            <template #body="{data}">
+                                                {{ data.mhbl.hbl_number || data.mhbl.reference || '-' }}
+                                            </template>
+                                        </Column>
+                                        <Column field="hbl_number" header="HBL">
+                                            <template #body="{data}">
+                                                {{ data.hbl_number || '-' }}
+                                            </template>
+                                        </Column>
+                                        <Column field="packages_count" header="Packages">
+                                            <template #body="{data}">
+                                                <div class="flex items-center">
+                                                    <i class="ti ti-package mr-1 text-blue-500"
+                                                       style="font-size: 1rem"></i>
+                                                    {{ data.packages_count }}
+                                                </div>
+                                            </template>
+                                        </Column>
+                                        <Column field="hbl_name" header="Name">
+                                            <template #body="slotProps">
+                                                <div>{{ slotProps.data.hbl_name }}</div>
+                                                <div class="text-gray-500 text-sm">{{ slotProps.data.nic }}</div>
+                                                <div class="text-gray-500 text-sm">{{ slotProps.data.address }}</div>
+                                            </template>
+                                        </Column>
+                                        <Column field="contact_number" header="Contact">
+                                            <template #body="{data}">
+                                                {{ data.contact_number || '-' }}
+                                            </template>
+                                        </Column>
+                                        <Column field="consignee_name" header="Consignee">
+                                            <template #body="slotProps">
+                                                <div>{{ slotProps.data.consignee_name }}</div>
+                                                <div class="text-gray-500 text-sm">{{
+                                                        slotProps.data.consignee_address
+                                                    }}
+                                                </div>
+                                            </template>
+                                        </Column>
+                                    </DataTable>
+                                </div>
                             </TabPanel>
 
                             <!-- Payments Tab -->
                             <TabPanel value="2">
                                 <form @submit.prevent="handleContainerPaymentCreate">
-                                    <div class="grid grid-cols-2 gap-5">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                         <div>
                                             <IftaLabel>
                                                 <InputNumber
@@ -569,7 +631,8 @@ const handleUpdateContainer = () => {
 
                                         <div>
                                             <IftaLabel>
-                                                <InputNumber v-model="form.demurrage_charge" :disabled="isFinanceApproved"
+                                                <InputNumber v-model="form.demurrage_charge"
+                                                             :disabled="isFinanceApproved"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full" inputId="demurrage-charge" min="0"
                                                              step="any" variant="filled"/>
@@ -580,7 +643,8 @@ const handleUpdateContainer = () => {
 
                                         <div>
                                             <IftaLabel>
-                                                <InputNumber v-model="form.assessment_charge" :disabled="isFinanceApproved"
+                                                <InputNumber v-model="form.assessment_charge"
+                                                             :disabled="isFinanceApproved"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full" inputId="assessment-charge" min="0"
                                                              step="any" variant="filled"/>
@@ -592,7 +656,8 @@ const handleUpdateContainer = () => {
                                         <div>
                                             <IftaLabel>
                                                 <InputNumber v-model="form.slpa_charge" :disabled="isFinanceApproved"
-                                                             :maxFractionDigits="2" :minFractionDigits="2" class="w-full"
+                                                             :maxFractionDigits="2" :minFractionDigits="2"
+                                                             class="w-full"
                                                              inputId="slap-charge" min="0" step="any" variant="filled"/>
                                                 <label for="slap-charge">SLAP Charge</label>
                                             </IftaLabel>
@@ -602,8 +667,10 @@ const handleUpdateContainer = () => {
                                         <div>
                                             <IftaLabel>
                                                 <InputNumber v-model="form.refund_charge" :disabled="isFinanceApproved"
-                                                             :maxFractionDigits="2" :minFractionDigits="2" class="w-full"
-                                                             inputId="refund-charge" min="0" step="any" variant="filled"/>
+                                                             :maxFractionDigits="2" :minFractionDigits="2"
+                                                             class="w-full"
+                                                             inputId="refund-charge" min="0" step="any"
+                                                             variant="filled"/>
                                                 <label for="refund-charge">Refund</label>
                                             </IftaLabel>
                                             <InputError :message="form.errors.refund_charge"/>
@@ -611,7 +678,8 @@ const handleUpdateContainer = () => {
 
                                         <div>
                                             <IftaLabel>
-                                                <InputNumber v-model="form.clearance_charge" :disabled="isFinanceApproved"
+                                                <InputNumber v-model="form.clearance_charge"
+                                                             :disabled="isFinanceApproved"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full" inputId="clearance-charge" min="0"
                                                              step="any" variant="filled"/>
@@ -620,131 +688,149 @@ const handleUpdateContainer = () => {
                                             <InputError :message="form.errors.clearance_charge"/>
                                         </div>
 
-                                        <div v-if="!isFinanceApproved" class="col-span-2 text-right">
-                                            <Button :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'" icon="pi pi-save"  size="small" type="submit"/>
+                                        <div v-if="!isFinanceApproved" class="col-span-1 md:col-span-2 text-right">
+                                            <Button :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"
+                                                    icon="pi pi-save" size="small" type="submit"/>
                                         </div>
                                     </div>
                                 </form>
                             </TabPanel>
 
-                            <!-- Documents Tab -->
+                            <!-- Shipment Details Tab -->
                             <TabPanel value="3">
-                                <div class="grid grid-cols-4 gap-5">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.cargo_type" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.cargo_type" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Cargo Mode</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.container_type" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.container_type" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Container Type</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.reference" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.reference" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Reference</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.container_number" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.container_number" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Container Number</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.seal_number" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.seal_number" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Seal Number</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.bl_number" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.bl_number" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>BL Number</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.estimated_time_of_departure" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.estimated_time_of_departure" class="w-full"
+                                                       disabled variant="filled"/>
                                             <label>EDT</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.estimated_time_of_arrival" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.estimated_time_of_arrival" class="w-full"
+                                                       disabled variant="filled"/>
                                             <label>ETA</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.vessel_name" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.vessel_name" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Vessel Name</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.voyage_number" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.voyage_number" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Voyage Number</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.shipping_line" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.shipping_line" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Shipping Line</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.port_of_loading" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.port_of_loading" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Port of Loading</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.port_of_discharge" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.port_of_discharge" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Port of Discharge</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.loading_started_at" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.loading_started_at" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Loading Started Time</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.loading_ended_at" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.loading_ended_at" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Loading End Time</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.status" class="w-full" disabled variant="filled"/>
+                                            <InputText v-model="updateForm.status" class="w-full" disabled
+                                                       variant="filled"/>
                                             <label>Last Status</label>
                                         </IftaLabel>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <InputText v-model="updateForm.note" class="w-full" placeholder="Type something..."  variant="filled"/>
+                                            <InputText v-model="updateForm.note" class="w-full"
+                                                       placeholder="Type something..." variant="filled"/>
                                             <label>note</label>
                                         </IftaLabel>
                                         <InputError :message="updateForm.errors.note"/>
@@ -752,7 +838,9 @@ const handleUpdateContainer = () => {
 
                                     <div>
                                         <IftaLabel>
-                                            <DatePicker v-model="updateForm.reached_date" class="w-full" date-format="yy-mm-dd" icon-display="input" placeholder="Set Reached Date" show-icon variant="filled"/>
+                                            <DatePicker v-model="updateForm.reached_date" class="w-full"
+                                                        date-format="yy-mm-dd" icon-display="input"
+                                                        placeholder="Set Reached Date" show-icon variant="filled"/>
                                             <label>Reached Date</label>
                                         </IftaLabel>
                                         <InputError :message="updateForm.errors.reached_date"/>
@@ -760,21 +848,23 @@ const handleUpdateContainer = () => {
 
                                     <div>
                                         <IftaLabel>
-                                            <Checkbox v-model="updateForm.is_reached" binary inputId="is_reached" />
-                                            <label class="font-medium text-sm ml-5" for="is_reached"> Reached Destination? </label>
+                                            <Checkbox v-model="updateForm.is_reached" binary inputId="is_reached"/>
+                                            <label class="font-medium text-sm ml-5" for="is_reached"> Reached
+                                                Destination? </label>
                                         </IftaLabel>
                                         <InputError :message="updateForm.errors.is_reached"/>
                                     </div>
 
                                     <div>
                                         <IftaLabel>
-                                            <Checkbox v-model="updateForm.is_returned" binary inputId="is_reached" />
-                                            <label class="font-medium text-sm ml-5" for="is_reached"> Is Returned? </label>
+                                            <Checkbox v-model="updateForm.is_returned" binary inputId="is_reached"/>
+                                            <label class="font-medium text-sm ml-5" for="is_reached"> Is
+                                                Returned? </label>
                                         </IftaLabel>
                                         <InputError :message="updateForm.errors.is_returned"/>
                                     </div>
 
-                                    <div class="text-right col-span-4 md:col-span-4">
+                                    <div class="text-right col-span-1 sm:col-span-2 lg:col-span-4">
                                         <Button :class="{ 'opacity-25': updateForm.processing }"
                                                 :disabled="updateForm.processing" icon="pi pi-save" label="Save Changes"
                                                 severity="info" size="small" @click="handleUpdateContainer"/>
@@ -784,7 +874,7 @@ const handleUpdateContainer = () => {
 
                             <!-- Documents Tab -->
                             <TabPanel value="4">
-                                <div class="grid grid-cols-2 gap-5">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <div>
                                         <IftaLabel>
                                             <InputText v-model="documentForm.name" class="w-full" variant="filled"/>
@@ -801,7 +891,7 @@ const handleUpdateContainer = () => {
                                         <InputError :message="documentForm.errors.date"/>
                                     </div>
 
-                                    <div class="col-span-2 text-right">
+                                    <div class="col-span-1 md:col-span-2 text-right">
                                         <Button icon="pi pi-file-pdf" label="Generate PDF" size="small"/>
                                     </div>
                                 </div>
@@ -818,7 +908,7 @@ const handleUpdateContainer = () => {
                                 @update:show="showConfirmLoadedShipmentModal = $event" />
 
     <AddVesselModal
-        :vessel-schedule="vesselSchedules"
+        :vessel-schedule="vesselSchedule"
         :visible="showConfirmAddVesselModal"
         @close="closeAddVesselModal"
         @reloadPage="reloadPage"
