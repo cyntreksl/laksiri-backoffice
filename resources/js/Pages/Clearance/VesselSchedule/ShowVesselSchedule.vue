@@ -119,52 +119,6 @@ const closeModal = () => {
     showConfirmLoadedShipmentModal.value = false;
 };
 
-const confirmShipmentClear = () => {
-    confirm.require({
-        message: 'Are you sure you want to release this shipment?',
-        header: 'Shipment Release?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Release',
-            severity: 'warn'
-        },
-        accept: () => {
-
-        },
-        reject: () => {
-        }
-    });
-};
-
-const confirmShipmentReturn = () => {
-    confirm.require({
-        message: 'Are you sure you want to return or reject this shipment?',
-        header: 'Shipment Return?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Return',
-            severity: 'danger'
-        },
-        accept: () => {
-
-        },
-        reject: () => {
-        }
-    });
-};
-
 const fetchContainerPayment = async () => {
     try {
         const response = await fetch(`/container-payment/${selectedContainer.value.id}`, {
@@ -226,7 +180,7 @@ const reloadPage = () => {
     window.location.reload();
 }
 
-const confirmRemoveContainerHold = (ContainerId) => {
+const confirmRemoveContainer = (ContainerId) => {
     containerId.value = ContainerId;
     confirm.require({
         message: `Would you like to remove this shipment form this vessel schedule?`,
@@ -465,7 +419,7 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                                             </div>
                                             <div v-tooltip="'Remove From Vessel Schedule'"
                                                  class="text-red-300 text-xs whitespace-nowrap cursor-pointer"
-                                                 @click.prevent="confirmRemoveContainerHold(item?.id)">Remove
+                                                 @click.prevent="confirmRemoveContainer(item?.id)">Remove
                                             </div>
                                         </div>
                                     </div>
@@ -498,12 +452,8 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                                         @click.prevent="showConfirmLoadedShipmentModal = !showConfirmLoadedShipmentModal"/>
                             </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row gap-2">
-                            <Button label="Clear Shipment" severity="success"
-                                    size="small" @click.prevent="confirmShipmentClear()"/>
-                            <Button label="Mark as a return" severity="danger"
-                                    size="small" variant="outlined" @click.prevent="confirmShipmentReturn()"/>
-                        </div>
+                        <Button icon="pi pi-file-pdf" label="Download Release PDF" severity="success"
+                                size="small"/>
                     </div>
                 </template>
 
@@ -514,7 +464,6 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                             <Tab value="1">MHBLs</Tab>
                             <Tab value="2">Payments</Tab>
                             <Tab value="3">Shipment Details</Tab>
-                            <Tab value="4">Documents</Tab>
                         </TabList>
                         <TabPanels>
                             <!-- HBLs Tab -->
@@ -866,31 +815,6 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                                         <Button :class="{ 'opacity-25': updateForm.processing }"
                                                 :disabled="updateForm.processing" icon="pi pi-save" label="Save Changes"
                                                 severity="info" size="small" @click="handleUpdateContainer"/>
-                                    </div>
-                                </div>
-                            </TabPanel>
-
-                            <!-- Documents Tab -->
-                            <TabPanel value="4">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="documentForm.name" class="w-full" variant="filled"/>
-                                            <label>Document Name</label>
-                                        </IftaLabel>
-                                        <InputError :message="documentForm.errors.name"/>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <DatePicker v-model="documentForm.date" class="w-full" variant="filled"/>
-                                            <label>Date</label>
-                                        </IftaLabel>
-                                        <InputError :message="documentForm.errors.date"/>
-                                    </div>
-
-                                    <div class="col-span-1 md:col-span-2 text-right">
-                                        <Button icon="pi pi-file-pdf" label="Generate PDF" size="small"/>
                                     </div>
                                 </div>
                             </TabPanel>

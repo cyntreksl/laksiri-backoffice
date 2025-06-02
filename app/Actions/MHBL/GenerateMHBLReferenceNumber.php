@@ -20,7 +20,8 @@ class GenerateMHBLReferenceNumber
 
             do {
                 // Lock the table for update to prevent duplicates
-                $last_mhbl = MHBL::whereNotNull('reference')
+                $last_mhbl = MHBL::withTrashed()
+                    ->whereNotNull('reference')
                     ->lockForUpdate()
                     ->latest()
                     ->first();
@@ -35,7 +36,7 @@ class GenerateMHBLReferenceNumber
                 $reference = $branch_code.'-REF'.str_pad($next_number, 6, '0', STR_PAD_LEFT);
 
                 // Check if the reference already exists
-                $exists = MHBL::where('reference', $reference)->exists();
+                $exists = MHBL::withTrashed()->where('reference', $reference)->exists();
             } while ($exists); // Keep trying until we find a unique reference
 
             return $reference;
