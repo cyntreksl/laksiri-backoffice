@@ -18,4 +18,6 @@ interface VesselScheduleRepositoryInterface
     public function downloadVesselSchedulePDF(VesselSchedule $vesselSchedule);
 
     public function updateContainer(Container $container, array $data);
+
+    public function downloadShipmentReleasePDF(Container $container);
 }

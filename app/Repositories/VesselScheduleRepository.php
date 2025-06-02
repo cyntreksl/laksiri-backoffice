@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Actions\Container\UpdateContainer;
 use App\Actions\VesselSchedule\AddContainerToVesselSchedule;
+use App\Actions\VesselSchedule\DownloadShipmentRelease;
 use App\Actions\VesselSchedule\DownloadVesselSchedule;
 use App\Actions\VesselSchedule\GetAllVesselSchedules;
 use App\Actions\VesselSchedule\GetRecentVesselSchedule;
@@ -76,5 +77,10 @@ class VesselScheduleRepository implements VesselScheduleRepositoryInterface
         } catch (\Exception $e) {
             throw new \Exception('Failed to update container: '.$e->getMessage());
         }
+    }
+
+    public function downloadShipmentReleasePDF(Container $container)
+    {
+        return DownloadShipmentRelease::run($container);
     }
 }

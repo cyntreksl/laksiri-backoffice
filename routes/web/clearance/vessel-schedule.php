@@ -21,4 +21,7 @@ Route::prefix('vessel-schedule')->name('vessel-schedule.')->group(function () {
 
     Route::post('update-container/{container}', [VesselScheduleController::class, 'updateContainer'])
         ->name('update-container');
+
+    Route::get('download-shipment-release-pdf/{container}', [VesselScheduleController::class, 'downloadShipmentReleasePDF'])
+        ->name('download-shipment-release-pdf');
 });
