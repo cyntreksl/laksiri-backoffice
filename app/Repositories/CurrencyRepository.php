@@ -16,7 +16,7 @@ class CurrencyRepository implements CurrencyRepositoryInterface, GridJsInterface
 {
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
     {
-        $query = Currency::query();
+        $query = Currency::query()->latest();
 
         if (! empty($search)) {
             $query->whereAny([

@@ -19,6 +19,8 @@ class CurrencyRateResourse extends JsonResource
             'currency_name' => $this->currency_name,
             'currency_symbol' => $this->currency_symbol,
             'sl_rate' => $this->sl_rate,
+            'created_at' => $this->created_at->toDateTimeString(),
+            'updated_by' => $this->creator?->name,
         ];
     }
 }

@@ -7,6 +7,7 @@ import Card from "primevue/card";
 import DataTable from "primevue/datatable";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
+import Select from "primevue/select";
 import Column from "primevue/column";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
@@ -18,10 +19,18 @@ import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
 
+const props = defineProps({
+    branchCurrencies: {
+        type: Array,
+        default: () => [],
+    }
+})
+
 const confirm = useConfirm();
 const baseUrl = ref("currencies/list");
 const loading = ref(true);
 const currencies = ref([]);
+const latestCurrencyRates = ref([]);
 const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
@@ -75,6 +84,54 @@ const fetchCurrencies = async (page = 1, search = "", sortField = 'id', sortOrde
         currencies.value = response.data.data;
         totalRecords.value = response.data.meta.total;
         currentPage.value = response.data.meta.current_page;
+
+        // Filter only the latest per currency_name (based on created_at or id)
+        // const latestMap = new Map();
+        //
+        // currencies.value.forEach(item => {
+        //     const key = item.currency_name;
+        //     if (!latestMap.has(key)) {
+        //         latestMap.set(key, item);
+        //     } else {
+        //         const existing = latestMap.get(key);
+        //         const isNewer = new Date(item.created_at) > new Date(existing.created_at);
+        //         if (isNewer) {
+        //             latestMap.set(key, item);
+        //         }
+        //     }
+        // });
+        //
+        // latestCurrencyRates.value = Array.from(latestMap.values());
+
+        const grouped = {};
+        currencies.value.forEach(item => {
+            const key = item.currency_name;
+            if (!grouped[key]) grouped[key] = [];
+            grouped[key].push(item);
+        });
+
+        // For each group, sort by created_at descending, pick the latest and previous, and calculate % change
+        const result = Object.values(grouped).map(records => {
+            records.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            const latest = records[0];
+            const previous = records[1];
+
+            if (latest && previous) {
+                const diff = latest.sl_rate - previous.sl_rate;
+                const percentChange = (diff / previous.sl_rate) * 100;
+                // latest.rate_change_percent = parseFloat(percentChange.toFixed(2));
+                latest.change_flag = diff > 0 ? 'increase' : diff < 0 ? 'decrease' : 'no-change';
+            } else {
+                latest.rate_change_percent = null; // No comparison possible
+            }
+
+            return latest;
+        });
+
+        latestCurrencyRates.value = result;
+
+        console.log(latestCurrencyRates.value)
     } catch (error) {
         console.error("Error fetching Currencies:", error);
     } finally {
@@ -262,10 +319,17 @@ const confirmDeleteCurrency = (currency) => {
         }
     });
 };
+
+watch(() => form.currency_name, (newVal) => {
+    const selected = props.branchCurrencies.find(
+        currency => currency.currency_name === newVal
+    );
+    form.currency_symbol = selected ? selected.currency_symbol : '';
+});
 </script>
 <template>
-    <AppLayout title="Currencies">
-        <template #header>Currencies</template>
+    <AppLayout title="Currency Rates">
+        <template #header>Currency Rates</template>
 
         <Breadcrumb/>
 
@@ -273,14 +337,11 @@ const confirmDeleteCurrency = (currency) => {
             <Card class="my-5">
                 <template #content>
                     <DataTable
-                        v-model:contextMenuSelection="selectedCurrency"
-                        v-model:selection="selectedCurrencies"
                         :loading="loading"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                         :totalRecords="totalRecords"
                         :value="currencies"
-                        context-menu
                         dataKey="id"
                         filter-display="menu"
                         lazy
@@ -294,24 +355,24 @@ const confirmDeleteCurrency = (currency) => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Currencies
+                                    Currency Rates
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <Button
                                         v-if="usePage().props.user.permissions.includes('currencies.create')"
                                         @click="confirmViewAddNewCurrency()"
                                     >
-                                        Create Currency
+                                        Create Currency Rate
                                     </Button>
-                                    <Button
-                                        type="button"
-                                        v-if="usePage().props.user.permissions.includes('currencies.edit')"
-                                        label="Change Currency" icon="pi pi-refresh"
-                                        :disabled="selectedCurrencies.length === 0"
-                                        @click="showChangeCurrencyRateDialog = true" />
+<!--                                    <Button-->
+<!--                                        type="button"-->
+<!--                                        v-if="usePage().props.user.permissions.includes('currencies.edit')"-->
+<!--                                        label="Change Currency Rate" icon="pi pi-refresh"-->
+<!--                                        :disabled="selectedCurrencies.length === 0"-->
+<!--                                        @click="showChangeCurrencyRateDialog = true" />-->
                                 </div>
-
                             </div>
+
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Search Field -->
                                 <IconField class="w-full sm:w-auto">
@@ -326,45 +387,81 @@ const confirmDeleteCurrency = (currency) => {
                                     />
                                 </IconField>
                             </div>
+
+                            <div id="widget" class="grid gap-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
+                                <div
+                                    v-for="(rate, index) in latestCurrencyRates"
+                                    v-if="latestCurrencyRates"
+                                    :key="index"
+                                    class="h-48 rounded-lg bg-white p-4 flex flex-col items-center justify-center"
+                                >
+                                    <div class="flex flex-col space-x-2">
+                                        <i v-if="rate.change_flag === 'increase'" class="ti ti-trending-up text-3xl text-center text-green-500"></i>
+                                        <i v-else-if="rate.change_flag === 'decrease'" class="ti ti-trending-down text-3xl text-center text-red-500"></i>
+                                        <i v-else class="ti ti-trending-up text-3xl text-center text-green-500"></i>
+                                        <div class="text-center text-4xl font-bold">{{rate?.sl_rate.toFixed(2)}}</div>
+                                        <div class="my-2 text-center text-gray-500">
+                                            {{rate?.currency_name}}
+                                        </div>
+<!--                                        <div class="flex items-center">-->
+<!--                                            <div class="mx-auto flex items-center">-->
+<!--                                                <i v-if="rate.change_flag === 'increase'" class="ti ti-arrow-up-right text-lg text-green-500"></i>-->
+<!--                                                <i v-else-if="rate.change_flag === 'decrease'" class="ti ti-arrow-down-left text-lg text-red-500"></i>-->
+<!--                                                <i v-else class="ti ti-arrow-up-right text-lg text-green-500"></i>-->
+<!--                                                <span>{{rate?.rate_change_percent || 0}}%</span>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+                                    </div>
+                                </div>
+                            </div>
+
                         </template>
 
-                        <template #empty> No Currency found. </template>
+                        <template #empty> No Currency Rates found. </template>
 
-                        <template #loading> Loading Currencies data. Please wait.</template>
-
-                        <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
+                        <template #loading> Loading Currency Rates data. Please wait.</template>
 
                         <Column field="currency_name" header="Currency Name" sortable></Column>
 
                         <Column field="currency_symbol" header="Currency Symbol" sortable></Column>
 
-                        <Column field="sl_rate" header="SL Rate" sortable></Column>
-
-                        <Column field="" header="Actions" style="width: 10%">
-                            <template #body="{ data }">
-                                <Button
-                                    icon="pi pi-pencil"
-                                    outlined
-                                    rounded
-                                    size="small"
-                                    class="p-1 text-xs h-3 w-3 mr-1"
-                                    @click="confirmViewEditCurrency({ data })"
-                                    :disabled="!usePage().props.user.permissions.includes('currencies.edit')"
-                                />
-                                <Button
-                                    icon="pi pi-trash"
-                                    outlined
-                                    rounded
-                                    severity="danger"
-                                    size="small"
-                                    @click="confirmDeleteCurrency({ data })"
-                                    :disabled="!usePage().props.user.permissions.includes('currencies.delete')"
-                                />
-
+                        <Column field="sl_rate" header="SL Rate" header-class="!flex justify-end" sortable>
+                            <template #body="slotProps">
+                                <div class="flex justify-end">
+                                    {{ slotProps.data.sl_rate.toFixed(2) }}
+                                </div>
                             </template>
                         </Column>
 
-                        <template #footer> In total there are {{ currencies ? totalRecords : 0 }} Currencies.</template>
+                        <Column field="created_at" header="Created At" sortable></Column>
+
+                        <Column field="updated_by" header="Updated By" sortable />
+
+<!--                        <Column field="" header="Actions" style="width: 10%">-->
+<!--                            <template #body="{ data }">-->
+<!--                                <Button-->
+<!--                                    icon="pi pi-pencil"-->
+<!--                                    outlined-->
+<!--                                    rounded-->
+<!--                                    size="small"-->
+<!--                                    class="p-1 text-xs h-3 w-3 mr-1"-->
+<!--                                    @click="confirmViewEditCurrency({ data })"-->
+<!--                                    :disabled="!usePage().props.user.permissions.includes('currencies.edit')"-->
+<!--                                />-->
+<!--                                <Button-->
+<!--                                    icon="pi pi-trash"-->
+<!--                                    outlined-->
+<!--                                    rounded-->
+<!--                                    severity="danger"-->
+<!--                                    size="small"-->
+<!--                                    @click="confirmDeleteCurrency({ data })"-->
+<!--                                    :disabled="!usePage().props.user.permissions.includes('currencies.delete')"-->
+<!--                                />-->
+
+<!--                            </template>-->
+<!--                        </Column>-->
+
+                        <template #footer> In total there are {{ currencies ? totalRecords : 0 }} Currency Rates.</template>
                     </DataTable>
                 </template>
             </Card>
@@ -372,19 +469,20 @@ const confirmDeleteCurrency = (currency) => {
             <Dialog
                 v-model:visible="isDialogVisible"
                 modal
-                :header="showAddNewCurrencyDialog ? 'Add New Currency' : 'Edit Currency'"
+                :header="showAddNewCurrencyDialog ? 'New Currency Rate' : 'Edit Currency Rate'"
                 :style="{ width: '90%', maxWidth: '450px' }"
                 :block-scroll="true"
                 @hide="onDialogHide"
                 @show="onDialogShow"
             >
                 <div class="mt-4">
-                    <InputText
+                    <Select
                         v-model="form.currency_name"
-                        class="w-full p-inputtext"
-                        placeholder="Enter Currency Name"
-                        required
-                        type="text"
+                        :options="branchCurrencies"
+                        class="w-full"
+                        option-label="currency_name"
+                        option-value="currency_name"
+                        placeholder="Currency Name"
                     />
                     <InputError :message="form.errors.currency_name"/>
                 </div>
@@ -392,8 +490,9 @@ const confirmDeleteCurrency = (currency) => {
                     <InputText
                         v-model="form.currency_symbol"
                         class="w-full p-inputtext"
-                        placeholder="Enter Currency Symbol"
+                        disabled
                         required
+                        placeholder="Currency Symbol"
                         type="text"
                     />
                     <InputError :message="form.errors.currency_symbol"/>
@@ -414,7 +513,7 @@ const confirmDeleteCurrency = (currency) => {
                     <div class="flex flex-wrap justify-end gap-2">
                         <Button label="Cancel" class="p-button-text" @click="closeAddNewCurrencyModal" />
                         <Button
-                            :label="showAddNewCurrencyDialog ? 'Add Currency' : 'Update Currency'"
+                            :label="showAddNewCurrencyDialog ? 'Add Currency Rate' : 'Update Currency Rate'"
                             class="p-button-primary"
                             :icon="showAddNewCurrencyDialog ? 'pi pi-plus' : 'pi pi-check'"
                             @click.prevent="showAddNewCurrencyDialog ? handleAddNewCurrency() : handleEditCurrency()"
