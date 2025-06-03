@@ -366,10 +366,10 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         }
     }
 
-    public function getContainerByReference(string $reference)
+    public function getContainerByReference(string $reference, string|int $vesselScheduleId)
     {
         try {
-            return GetContainerByReference::run($reference);
+            return GetContainerByReference::run($reference, $vesselScheduleId);
         } catch (\Exception $exception) {
             throw new \Exception('Failed to getting container: '.$exception->getMessage());
         }

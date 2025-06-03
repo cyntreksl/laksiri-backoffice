@@ -52,5 +52,5 @@ interface ContainerRepositoryInterface
 
     public function downloadSingleUnloadingIssueFile(string $id);
 
-    public function getContainerByReference(string $reference);
+    public function getContainerByReference(string $reference, string|int $vesselScheduleId);
 }
