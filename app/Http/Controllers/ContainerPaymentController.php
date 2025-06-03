@@ -27,7 +27,7 @@ class ContainerPaymentController extends Controller
         $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
+        $filters = $request->only(['fromDate']);
 
         return $this->containerPaymentRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
@@ -60,7 +60,7 @@ class ContainerPaymentController extends Controller
         $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
+        $filters = $request->only(['fromDate']);
 
         return $this->containerPaymentRepository->refundDataset($limit, $page, $order, $dir, $search, $filters);
     }
@@ -83,7 +83,7 @@ class ContainerPaymentController extends Controller
         $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
+        $filters = $request->only(['fromDate']);
 
         return $this->containerPaymentRepository->completedDataset($limit, $page, $order, $dir, $search, $filters);
     }

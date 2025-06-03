@@ -26,7 +26,7 @@ class ContainerPaymentResource extends JsonResource
             'clearance_charge' => $this->clearance_charge,
             'total' => $this->total,
             'is_finance_approved' => $this->is_finance_approved,
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->toDateTimeString(),
         ];
     }
 }
