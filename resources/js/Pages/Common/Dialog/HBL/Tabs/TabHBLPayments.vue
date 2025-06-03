@@ -18,7 +18,20 @@ const props = defineProps({
     },
 });
 
-const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
+const page = usePage();
+
+const isPrepaid = ref(page.props.currentBranch.is_prepaid)
+const currencyRate = ref(page.props.currentBranchCurrencyRate.sl_rate || 1)
+const currencySymbol = ref(page.props.currentBranch.currency_symbol || '')
+
+const formatCurrency = (amount) => {
+    const symbol = isPrepaid.value ? currencySymbol.value : 'LKR';
+    const rate = isPrepaid.value ? 1 : (currencyRate.value);
+    return `${symbol} ${new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(amount * rate)}`;
+}
 </script>
 
 <template>
@@ -119,79 +132,85 @@ const currencySymbol = ref(usePage().props.currentBranch.currency_symbol || '');
 
                 <div v-if="hblDestinationTotalSummary.handlingCharges" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
-                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
                             <p class="text-sm/6 font-semibold text-gray-900">Handling Charges</p>
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.handlingCharges).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">
+                            {{formatCurrency(hblDestinationTotalSummary.handlingCharges)}}
+                        </p>
                     </div>
                 </div>
 
                 <div v-if="hblDestinationTotalSummary.slpaCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
-                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
                             <p class="text-sm/6 font-semibold text-gray-900">SLPA Charges</p>
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.slpaCharge).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">
+                            {{formatCurrency(hblDestinationTotalSummary.slpaCharge)}}
+                        </p>
                     </div>
                 </div>
 
                 <div v-if="hblDestinationTotalSummary.bondCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
-                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
                             <p class="text-sm/6 font-semibold text-gray-900">Bond Charges</p>
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.bondCharge).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">
+                            {{formatCurrency(hblDestinationTotalSummary.bondCharge)}}
+                        </p>
                     </div>
                 </div>
 
                 <div v-if="hblDestinationTotalSummary.demurrageCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
-                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
                             <p class="text-sm/6 font-semibold text-gray-900">Demurrage Charges</p>
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.demurrageCharge).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">
+                            {{formatCurrency(hblDestinationTotalSummary.demurrageCharge)}}
+                        </p>
                     </div>
                 </div>
 
                 <div v-if="hblDestinationTotalSummary.dOCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
-                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
                             <p class="text-sm/6 font-semibold text-gray-900">DO Charges</p>
                         </div>
                     </div>
                     <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.dOCharge).toFixed(2) }}</p>
+                        <p class="text-sm/6 text-gray-900">
+                            {{formatCurrency(hblDestinationTotalSummary.dOCharge)}}
+                        </p>
                     </div>
                 </div>
 
+                <div v-if="hblDestinationTotalSummary.totalAmount" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                    <div class="flex min-w-0 gap-x-4">
+                        <div class="min-w-0 flex-auto">
+                            <p class="text-sm/6 font-semibold text-gray-900">Total</p>
+                        </div>
+                    </div>
+                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                        <p class="text-sm/6 text-gray-900">
+                            {{formatCurrency(hblDestinationTotalSummary.totalAmount)}}
+                        </p>
+                    </div>
+                </div>
             </template>
         </Card>
 
         <ul class="divide-y divide-gray-100" role="list">
-            <li v-if="hblDestinationTotalSummary.totalAmount" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
-                <div class="flex min-w-0 gap-x-4">
-                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
-                    <div class="min-w-0 flex-auto">
-                        <p class="text-sm/6 font-semibold text-gray-900">Destination Charges</p>
-                    </div>
-                </div>
-                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                    <p class="text-sm/6 text-gray-900">{{ $page.props.currentBranch.is_prepaid ? currencySymbol : 'LKR' }} {{ parseFloat(hblDestinationTotalSummary.totalAmount).toFixed(2) }}</p>
-                </div>
-            </li>
             <li v-if="hblTotalSummary.vat" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                 <div class="flex min-w-0 gap-x-4">
                     <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
