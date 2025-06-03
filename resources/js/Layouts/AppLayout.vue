@@ -1439,118 +1439,92 @@ export default {
                 case "setting":
                     let settingMenu = [];
 
-                    if (usePage().props.user.permissions.includes("manage_zones")) {
-                        settingMenu = [...settingMenu,{
+                    const settingsPermissionMenuMap = [
+                        {
+                            permission: "manage_zones",
                             title: "Zones",
-                            route: "setting.warehouse-zones.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("manage_driver_zones")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.warehouse-zones.index"
+                        },
+                        {
+                            permission: "manage_driver_zones",
                             title: "Driver Zones",
-                            route: "setting.driver-zones.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("manage_driver_areas")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.driver-zones.index"
+                        },
+                        {
+                            permission: "manage_driver_areas",
                             title: "Driver Areas",
-                            route: "setting.driver-areas.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("manage_warehouse_zones")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.driver-areas.index"
+                        },
+                        {
+                            permission: "manage_warehouse_zones",
                             title: "Warehouse Zones",
-                            route: "setting.warehouse-zones.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("manage_pricing")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.warehouse-zones.index"
+                        },
+                        {
+                            permission: "manage_pricing",
                             title: "Pricing",
-                            route: "setting.prices.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("manage_package_pricing")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.prices.index"
+                        },
+                        {
+                            permission: "manage_package_pricing",
                             title: "Package Pricing",
-                            route: "setting.package-prices.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("manage_exceptions")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.package-prices.index"
+                        },
+                        {
+                            permission: "manage_exceptions",
                             title: "Exceptions",
-                            route: "setting.exception-names.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("manage_package_types")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.exception-names.index"
+                        },
+                        {
+                            permission: "manage_package_types",
                             title: "Package Types",
-                            route: "setting.package-types.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("manage_shippers_and_consignees")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.package-types.index"
+                        },
+                        {
+                            permission: "manage_shippers_and_consignees",
                             title: "Shipper & Consignee",
-                            route: "setting.shipper-consignees.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("air-line.index")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.shipper-consignees.index"
+                        },
+                        {
+                            permission: "air-line.index",
                             title: "Air Lines",
-                            route: "setting.air-lines.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("tax.destination tax")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.air-lines.index"
+                        },
+                        {
+                            permission: "tax.destination tax",
                             title: "Tax",
-                            route: "setting.taxes.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("currencies.index")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.taxes.index"
+                        },
+                        {
+                            permission: "currencies.index",
                             title: "Currencies",
-                            route: "setting.currencies.index",
-                        }];
-                    }
-
-                    if (usePage().props.user.permissions.includes("charges.air line do charges index")) {
-                        settingMenu = [...settingMenu,{
+                            route: "setting.currencies.index"
+                        },
+                        {
+                            permission: "charges.air line do charges index",
                             title: "Air Line DO Charges",
-                            route: "setting.air-lines.do-charges",
-                        }];
-                    }
+                            route: "setting.air-lines.do-charges"
+                        },
+                        {
+                            permission: "charges.special do charges index",
+                            title: "Special DO Charges",
+                            route: "setting.special-do-charges.index"
+                        },
+                        {
+                            permission: "pickup-type.index",
+                            title: "Pickup Types",
+                            route: "setting.pickup-types.index"
+                        }
+                    ];
 
-                    if (usePage().props.user.permissions.includes("charges.special do charges index")){
-                        settingMenu= [...settingMenu,{
-                                title: "Special DO Charges ",
-                                route: "setting.special-do-charges.index",
-                            }];
-                    }
+                    settingsPermissionMenuMap.forEach(({ permission, title, route }) => {
+                        if (usePage().props.user.permissions.includes(permission)) {
+                            settingMenu.push({ title, route });
+                        }
+                    });
 
                     childMenuList.splice(0, childMenuList.length, ...settingMenu);
 
-                    if (usePage().props.user.permissions.includes("pickup-type.index")){
-                        settingMenu = [...settingMenu,{
-                            title: "Pickup Types",
-                            route: "setting.pickup-types.index",
-                        }];
-                    }
-
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        ...settingMenu
-                    );
                     changeSidePanelTitle("Settings");
                     break;
                 case "settings":

@@ -24,7 +24,26 @@ const dt = ref();
 const confirm = useConfirm();
 
 const formatPermissionName = (name) => {
-    return name.split('.').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    // Check if the name contains a dot (first type) or underscore (second type)
+    if (name.includes('.')) {
+        // The first type: 'group.permission_name'
+        let parts = name.split('.');
+
+        // Process each part: capitalize the first letter and replace underscores with spaces
+        return parts.map(part =>
+            part.split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')
+        ).join(' ');
+    } else if (name.includes('_')) {
+        // Split by underscores, capitalize each word, and join with spaces
+        return name.split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
+
+    // Fallback for other cases
+    return name.charAt(0).toUpperCase() + name.slice(1);
 };
 
 const resolveRoleIcon = (role) => {
