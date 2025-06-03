@@ -1437,72 +1437,97 @@ export default {
                     changeSidePanelTitle("Report");
                     break;
                 case "setting":
-                    let settingMenu = [
-                        {
+                    let settingMenu = [];
+
+                    if (usePage().props.user.permissions.includes("manage_zones")) {
+                        settingMenu = [...settingMenu,{
                             title: "Zones",
                             route: "setting.warehouse-zones.index",
-                        },
-                        {
+                        }];
+                    }
+
+                    if (usePage().props.user.permissions.includes("manage_driver_zones")) {
+                        settingMenu = [...settingMenu,{
                             title: "Driver Zones",
                             route: "setting.driver-zones.index",
-                        },
-                        {
+                        }];
+                    }
+
+                    if (usePage().props.user.permissions.includes("manage_driver_areas")) {
+                        settingMenu = [...settingMenu,{
                             title: "Driver Areas",
                             route: "setting.driver-areas.index",
-                        },
-                        {
+                        }];
+                    }
+
+                    if (usePage().props.user.permissions.includes("manage_warehouse_zones")) {
+                        settingMenu = [...settingMenu,{
                             title: "Warehouse Zones",
                             route: "setting.warehouse-zones.index",
-                        },
-                        {
+                        }];
+                    }
+
+                    if (usePage().props.user.permissions.includes("manage_pricing")) {
+                        settingMenu = [...settingMenu,{
                             title: "Pricing",
                             route: "setting.prices.index",
-                        },
-                        {
+                        }];
+                    }
+
+                    if (usePage().props.user.permissions.includes("manage_package_pricing")) {
+                        settingMenu = [...settingMenu,{
                             title: "Package Pricing",
                             route: "setting.package-prices.index",
-                        },
-                        {
+                        }];
+                    }
+
+                    if (usePage().props.user.permissions.includes("manage_exceptions")) {
+                        settingMenu = [...settingMenu,{
                             title: "Exceptions",
                             route: "setting.exception-names.index",
-                        },
-                        {
+                        }];
+                    }
+
+                    if (usePage().props.user.permissions.includes("manage_package_types")) {
+                        settingMenu = [...settingMenu,{
                             title: "Package Types",
                             route: "setting.package-types.index",
-                        },
-                        {
+                        }];
+                    }
+
+                    if (usePage().props.user.permissions.includes("manage_shippers_and_consignees")) {
+                        settingMenu = [...settingMenu,{
                             title: "Shipper & Consignee",
                             route: "setting.shipper-consignees.index",
-                        }
-                    ];
+                        }];
+                    }
 
                     if (usePage().props.user.permissions.includes("air-line.index")) {
                         settingMenu = [...settingMenu,{
                             title: "Air Lines",
                             route: "setting.air-lines.index",
                         }];
-
                     }
+
                     if (usePage().props.user.permissions.includes("tax.destination tax")) {
                         settingMenu = [...settingMenu,{
                             title: "Tax",
                             route: "setting.taxes.index",
                         }];
-
                     }
+
                     if (usePage().props.user.permissions.includes("currencies.index")) {
                         settingMenu = [...settingMenu,{
                             title: "Currencies",
                             route: "setting.currencies.index",
                         }];
-
                     }
+
                     if (usePage().props.user.permissions.includes("charges.air line do charges index")) {
                         settingMenu = [...settingMenu,{
                             title: "Air Line DO Charges",
                             route: "setting.air-lines.do-charges",
                         }];
-
                     }
 
                     if (usePage().props.user.permissions.includes("charges.special do charges index")){
@@ -1513,18 +1538,20 @@ export default {
                     }
 
                     childMenuList.splice(0, childMenuList.length, ...settingMenu);
+
                     if (usePage().props.user.permissions.includes("pickup-type.index")){
                         settingMenu = [...settingMenu,{
                             title: "Pickup Types",
                             route: "setting.pickup-types.index",
                         }];
                     }
+
                     childMenuList.splice(
                         0,
                         childMenuList.length,
                         ...settingMenu
                     );
-                    changeSidePanelTitle("Setting");
+                    changeSidePanelTitle("Settings");
                     break;
                 case "settings":
                     childMenuList.splice(0, childMenuList.length, {
