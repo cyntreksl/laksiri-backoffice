@@ -24,6 +24,8 @@ import {push} from "notivue";
 import AddVesselModal from "@/Pages/Clearance/VesselSchedule/Partials/AddVesselModal.vue";
 import Checkbox from "primevue/checkbox";
 import moment from "moment";
+import RefundList from "@/Pages/Clearance/VesselSchedule/RefundList.vue";
+import Skeleton from 'primevue/skeleton';
 
 const props = defineProps({
     vesselSchedule: {
@@ -55,6 +57,7 @@ const isContainerPayment = ref(false);
 const isFinanceApproved = ref(false);
 const containerId = ref('');
 const showConfirmAddVesselModal = ref(false);
+const loadingContainerData = ref(false);
 
 const form = useForm({
     container_id: selectedContainer.value.id ?? '',
@@ -66,12 +69,8 @@ const form = useForm({
     clearance_charge: 0
 });
 
-const documentForm = useForm({
-    name: "",
-    date: "",
-});
-
 const fetchLoadedContainer = async () => {
+    loadingContainerData.value = true;
     try {
         const response = await fetch(`/loaded-containers/get-container/${selectedContainer.value.id}`, {
             method: "GET",
@@ -89,6 +88,8 @@ const fetchLoadedContainer = async () => {
         await fetchContainerPayment();
     } catch (error) {
         console.error("Error:", error);
+    }finally {
+        loadingContainerData.value = false;
     }
 };
 
@@ -431,7 +432,7 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
             </Card>
 
             <!-- Tabs Panel -->
-            <Card class="col-span-12 lg:col-span-9 border-2 border-gray-200 !shadow-none">
+            <Card v-if="!loadingContainerData" class="col-span-12 lg:col-span-9 border-2 border-gray-200 !shadow-none">
                 <template #title>
                     <div class="flex flex-col md:flex-row md:justify-between gap-4">
                         <div>
@@ -643,6 +644,8 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                                         </div>
                                     </div>
                                 </form>
+
+                                <RefundList :container-id="selectedContainer.id"/>
                             </TabPanel>
 
                             <!-- Shipment Details Tab -->
@@ -824,6 +827,25 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                     </Tabs>
                 </template>
             </Card>
+
+            <div v-else class="col-span-12 lg:col-span-9 !shadow-none">
+               <Card>
+                   <template #content>
+                       <div class="flex mb-4">
+                           <div>
+                               <Skeleton class="mb-2" width="10rem"></Skeleton>
+                               <Skeleton class="mb-2" width="5rem"></Skeleton>
+                               <Skeleton height=".5rem"></Skeleton>
+                           </div>
+                       </div>
+                       <Skeleton height="150px" width="100%"></Skeleton>
+                       <div class="flex justify-between mt-4">
+                           <Skeleton height="2rem" width="4rem"></Skeleton>
+                           <Skeleton height="2rem" width="4rem"></Skeleton>
+                       </div>
+                   </template>
+               </Card>
+            </div>
         </div>
     </AppLayout>
 
