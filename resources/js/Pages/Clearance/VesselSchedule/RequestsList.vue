@@ -1,18 +1,18 @@
 <script setup>
-import {useConfirm} from "primevue/useconfirm";
 import {onMounted, ref, watch} from "vue";
+import { router, usePage} from "@inertiajs/vue3";
+import DataTable from "primevue/datatable";
+import InputIcon from "primevue/inputicon";
+import InputText from "primevue/inputtext";
+import Column from "primevue/column";
+import Button from "primevue/button";
+import IconField from "primevue/iconfield";
+import {useConfirm} from "primevue/useconfirm";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
-import moment from "moment";
 import {debounce} from "lodash";
-import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
-import Column from "primevue/column";
-import InputText from "primevue/inputtext";
-import IconField from "primevue/iconfield";
-import Button from "primevue/button";
-import InputIcon from "primevue/inputicon";
-import DataTable from "primevue/datatable";
+import moment from "moment";
 
 const props = defineProps({
     containerId: {
@@ -22,9 +22,9 @@ const props = defineProps({
 })
 
 const confirm = useConfirm();
-const baseUrl = ref("/container-payment-refund-list");
+const baseUrl = ref("/get-container-payment-request-list");
 const loading = ref(true);
-const containerRefunds = ref([]);
+const containerPayments = ref([]);
 const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
@@ -35,7 +35,7 @@ const filters = ref({
     created_at: { value: null, matchMode: FilterMatchMode.EQUALS },
 });
 
-const fetchContainerRefunds = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
+const fetchContainerPaymentRequests = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
     loading.value = true;
     try {
         const response = await axios.get(baseUrl.value, {
@@ -50,8 +50,8 @@ const fetchContainerRefunds = async (page = 1, search = "", sortField = 'id', so
                     : null,
             }
         });
-        containerRefunds.value = response.data.data.filter(item => item.container_id === props.containerId)
-        totalRecords.value = containerRefunds.value.length;
+        containerPayments.value = response.data.data.filter(item => item.container_id === props.containerId)
+        totalRecords.value = containerPayments.value.length;
         currentPage.value = response.data.meta.current_page;
     } catch (error) {
         console.error("Error fetching Container Payments:", error);
@@ -60,26 +60,22 @@ const fetchContainerRefunds = async (page = 1, search = "", sortField = 'id', so
     }
 };
 
-watch(() => filters.value.created_at.value, (newValue) => {
-    fetchContainerRefunds(1, filters.value.global.value);
-});
-
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchContainerRefunds(currentPage.value);
+    fetchContainerPaymentRequests(currentPage.value);
 };
 
 const onSort = (event) => {
-    fetchContainerRefunds(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+    fetchContainerPaymentRequests(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
 
 onMounted(() => {
-    fetchContainerRefunds();
+    fetchContainerPaymentRequests();
 });
 
 const debouncedFetchContainerPayments = debounce((searchValue) => {
-    fetchContainerRefunds(1, searchValue);
+    fetchContainerPaymentRequests(1, searchValue);
 }, 1000);
 
 watch(() => filters.value.global.value, (newValue) => {
@@ -88,11 +84,15 @@ watch(() => filters.value.global.value, (newValue) => {
     }
 });
 
-const confirmRefundCollection = () => {
+watch(() => filters.value.created_at.value, (newValue) => {
+    fetchContainerPaymentRequests(1, filters.value.global.value);
+});
+
+const approveContainerPayments = () => {
     const idList = selectedContainerPayments.value.map((item) => item.id);
     confirm.require({
-        message: 'Are you sure you want to mark as Collected?',
-        header: 'Mark As Collected?',
+        message: 'Are you sure you want to approve container payments?',
+        header: 'Approve Container Payments?',
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
         rejectProps: {
@@ -101,50 +101,49 @@ const confirmRefundCollection = () => {
             outlined: true
         },
         acceptProps: {
-            label: 'Mark As Collected',
+            label: 'Approve Container Payments',
             severity: 'success'
         },
         accept: async () => {
-            router.post(route("container-payment.refund-collection"), {
+            router.post(route("finance.container-payment.approve"), {
                 data: {
                     container_payments_ids: idList,
                 },
+                preserveScroll: true,
                 onSuccess: () => {
-                    push.success("Container Payment marked as collected successfully!");
+                    push.success("Container Payment Approved successfully!");
                 },
                 onError: () => {
                     push.error("Something went wrong!");
                 },
-                preserveScroll: true,
             });
             selectedContainerPayments.value = [];
-            await fetchContainerRefunds();
+            await fetchContainerPaymentRequests();
         },
         reject: () => {
             selectedContainerPayments.value = [];
         }
     });
-};
+}
 
 const clearFilter = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         created_at: { value: null, matchMode: FilterMatchMode.EQUALS },
     };
-    fetchContainerRefunds(currentPage.value);
+    fetchContainerPaymentRequests(currentPage.value);
 };
 </script>
-
 <template>
     <DataTable
-        class="border border-emerald-400 rounded-lg p-5 mt-5"
         v-model:filters="filters"
         v-model:selection="selectedContainerPayments"
         :loading="loading"
         :rows="perPage"
         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
         :totalRecords="totalRecords"
-        :value="containerRefunds"
+        :value="containerPayments"
+        class="border border-emerald-400 rounded-lg p-5 mt-5"
         dataKey="id"
         filter-display="menu"
         lazy
@@ -157,15 +156,15 @@ const clearFilter = () => {
         <template #header>
             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                 <div class="text-lg font-medium">
-                    Container Refunds
+                    Container Payment Requests
                 </div>
                 <div class="flex items-center gap-3">
                     <Button
-                        v-if="usePage().props.user.permissions.includes('payment-container.collect refund')"
+                        v-if="usePage().props.user.permissions.includes('payment-container.approve')"
                         :disabled="selectedContainerPayments.length === 0"
-                        icon="ti ti-cash" label="Mark As Collected"
+                        icon="ti ti-cash" label="Approve Container Payments"
                         type="button"
-                        @click="confirmRefundCollection" />
+                        @click="approveContainerPayments" />
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -195,9 +194,9 @@ const clearFilter = () => {
                 </IconField>
             </div>
         </template>
-        <template #empty> No Container Refunds found. </template>
-        <template #loading> Loading Container Refunds data. Please wait.</template>
-        <Column v-if="usePage().props.user.permissions.includes('payment-container.collect refund')" headerStyle="width: 3rem" selectionMode="multiple"></Column>
+        <template #empty> No Container Payment Request found. </template>
+        <template #loading> Loading Container Payment Request data. Please wait.</template>
+        <Column v-if="usePage().props.user.permissions.includes('payment-container.approve')" headerStyle="width: 3rem" selectionMode="multiple"></Column>
         <Column field="do_charge" header="DO Charge" header-class="!text-right">
             <template #body="slotProps">
                 <div class="text-right">
@@ -255,6 +254,6 @@ const clearFilter = () => {
                 </div>
             </template>
         </Column>
-        <template #footer> In total there are {{ containerRefunds ? totalRecords : 0 }} container Refunds.</template>
+        <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} container payments requests.</template>
     </DataTable>
 </template>

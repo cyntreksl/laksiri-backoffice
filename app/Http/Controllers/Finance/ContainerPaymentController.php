@@ -14,24 +14,6 @@ class ContainerPaymentController extends Controller
         private readonly ContainerPaymentRepositoryInterface $containerPaymentRepository,
     ) {}
 
-    public function index()
-    {
-        return Inertia::render('Finance/ContainerPayment/FinanceContainerPaymentRequestsList');
-    }
-
-    public function list(Request $request)
-    {
-        $limit = $request->input('per_page', 10);
-        $page = $request->input('page', 1);
-        $order = $request->input('sort_field', 'id');
-        $dir = $request->input('sort_order', 'asc');
-        $search = $request->input('search', null);
-
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
-
-        return $this->containerPaymentRepository->dataset($limit, $page, $order, $dir, $search, $filters);
-    }
-
     public function approveContainerPayments(Request $request)
     {
         $this->containerPaymentRepository->approveContainerPayments($request['data']['container_payments_ids']);

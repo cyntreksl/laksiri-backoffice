@@ -963,7 +963,7 @@ export default {
                             0,
                             {
                                 title: "Payment Requests",
-                                route: "container-payment.index",
+                                route: "container-payment.request",
                             }
                         );
                     }
@@ -984,7 +984,7 @@ export default {
                             0,
                             {
                                 title: "Payment Requests",
-                                route: "finance.container-payments.index",
+                                route: "container-payment.request",
                             }
                         );
                     }
