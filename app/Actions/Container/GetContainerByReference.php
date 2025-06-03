@@ -12,7 +12,7 @@ class GetContainerByReference
 {
     use AsAction;
 
-    public function handle(string $reference)
+    public function handle(string $reference, string|int $vesselScheduleId)
     {
         $container = Container::where('reference', $reference)
             ->with('warehouse')
@@ -35,7 +35,9 @@ class GetContainerByReference
             ], 422);
         }
 
-        $is_scheduled_container = VesselScheduleContainer::where('container_id', $container->id)->exists();
+        $is_scheduled_container = VesselScheduleContainer::where('vessel_schedule_id', $vesselScheduleId)
+            ->where('container_id', $container->id)
+            ->exists();
 
         if ($is_scheduled_container) {
             return response()->json([

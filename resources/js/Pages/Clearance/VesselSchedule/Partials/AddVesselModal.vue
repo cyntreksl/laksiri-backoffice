@@ -30,7 +30,7 @@ const getContainer = async () => {
     container.value = null;
 
     try {
-        const response = await fetch(`/containers/get-container-by-reference/${containerRef.value}`, {
+        const response = await fetch(`/containers/get-container-by-reference/${containerRef.value}?vesselScheduleId=${props.vesselSchedule.id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
