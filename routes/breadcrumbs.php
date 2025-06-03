@@ -178,7 +178,7 @@ Breadcrumbs::for('setting.special-do-charges.edit', function (BreadcrumbTrail $t
 Breadcrumbs::for('setting.currencies.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');
-    $trail->push('Currencies', route('setting.currencies.index'));
+    $trail->push('Currency Rates', route('setting.currencies.index'));
 });
 
 // Driver Area

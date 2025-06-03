@@ -39,7 +39,7 @@
     <p>Dear Sir,</p>
 
     <!-- Container Details -->
-    <table class="w-full text-sm font-medium border-b">
+    <table class="w-full text-sm font-bold border-b">
         <tr>
             <td class="py-2 w-1/4">CONTAINER NO:</td>
             <td class="py-2 w-1/4">{{$container?->container_type}}</td>
@@ -50,7 +50,7 @@
             <td class="py-2">VESSEL NAME & DATE:</td>
             <td class="py-2">{{$container?->vessel_name}}</td>
             <td class="py-2">OF</td>
-            <td class="py-2">02/03/2025</td>
+            <td class="py-2">{{$container?->estimated_time_of_arrival}}</td>
         </tr>
         <tr>
             <td class="py-2">BILL OF LADING NO:</td>
