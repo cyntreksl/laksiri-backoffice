@@ -5,7 +5,7 @@ namespace App\Actions\VesselSchedule;
 use App\Actions\Setting\GetSettings;
 use App\Models\Container;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Spatie\Browsershot\Browsershot;
+use Wnx\SidecarBrowsershot\BrowsershotLambda;
 
 class DownloadShipmentRelease
 {
@@ -22,7 +22,7 @@ class DownloadShipmentRelease
 
         $filePath = storage_path("app/public/{$filename}");
 
-        Browsershot::html($template)
+        BrowsershotLambda::html($template)
             ->format('A4')
             ->save($filePath);
 
