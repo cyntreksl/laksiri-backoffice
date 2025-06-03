@@ -26,6 +26,7 @@ import Checkbox from "primevue/checkbox";
 import moment from "moment";
 import RefundList from "@/Pages/Clearance/VesselSchedule/RefundList.vue";
 import Skeleton from 'primevue/skeleton';
+import RequestsList from "@/Pages/Clearance/VesselSchedule/RequestsList.vue";
 
 const props = defineProps({
     vesselSchedule: {
@@ -644,6 +645,8 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                                         </div>
                                     </div>
                                 </form>
+
+                                <RequestsList :container-id="selectedContainer.id"/>
 
                                 <RefundList :container-id="selectedContainer.id"/>
                             </TabPanel>
