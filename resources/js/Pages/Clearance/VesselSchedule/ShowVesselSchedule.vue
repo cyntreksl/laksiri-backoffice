@@ -452,8 +452,10 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                                         @click.prevent="showConfirmLoadedShipmentModal = !showConfirmLoadedShipmentModal"/>
                             </div>
                         </div>
-                        <Button icon="pi pi-file-pdf" label="Download Release PDF" severity="success"
-                                size="small"/>
+                        <a :href="route('clearance.vessel-schedule.download-shipment-release-pdf', selectedContainer.id)">
+                            <Button icon="pi pi-file-pdf" label="Download Release PDF" severity="success"
+                                    size="small"/>
+                        </a>
                     </div>
                 </template>
 

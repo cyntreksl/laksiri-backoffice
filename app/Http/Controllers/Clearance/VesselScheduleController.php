@@ -65,4 +65,9 @@ class VesselScheduleController extends Controller
     {
         return $this->vesselScheduleRepository->updateContainer($container, $request->all());
     }
+
+    public function downloadShipmentReleasePDF(Container $container)
+    {
+        return $this->vesselScheduleRepository->downloadShipmentReleasePDF($container);
+    }
 }

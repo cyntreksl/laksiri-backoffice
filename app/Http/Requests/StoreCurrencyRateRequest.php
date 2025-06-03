@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Currency;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreCurrencyRateRequest extends FormRequest
 {
@@ -27,14 +27,29 @@ class StoreCurrencyRateRequest extends FormRequest
             'currency_name' => [
                 'required',
                 'string',
-                Rule::unique('currency_rates')->whereNull('deleted_at'),
             ],
             'currency_symbol' => [
                 'required',
                 'string',
-                Rule::unique('currency_rates')->whereNull('deleted_at'),
             ],
-            'sl_rate' => ['required', 'numeric', 'min:0'],
+            'sl_rate' => [
+                'required',
+                'numeric',
+                'min:0',
+                function ($attribute, $value, $fail) {
+                    $currencyName = $this->input('currency_name');
+                    $today = now()->toDateString();
+
+                    $exists = Currency::where('currency_name', $currencyName)
+                        ->whereDate('created_at', $today)
+                        ->where('sl_rate', $value)
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('The same SL rate value already exists today for this currency.');
+                    }
+                },
+            ],
         ];
     }
 }

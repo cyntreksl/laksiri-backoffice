@@ -3,7 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Actions\Branch\GetBranchById;
+use App\Actions\CurrencyRate\GetLatestCurrencyRateByBranchCurrencyCode;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\BranchType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
@@ -33,10 +35,19 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $currentBranch = Auth::check() ? GetBranchById::run(GetUserCurrentBranchID::run()) : null;
+
+        $currencyRate = null;
+
+        if ($currentBranch && $currentBranch->type === BranchType::DEPARTURE->value) {
+            $currencyRate = GetLatestCurrencyRateByBranchCurrencyCode::run($currentBranch->currency_symbol);
+        }
+
         return [
             ...parent::share($request),
             'userBranch' => Auth::check() ? Auth::user()->branches()->pluck('name')->toArray() : [],
-            'currentBranch' => Auth::check() ? GetBranchById::run(GetUserCurrentBranchID::run()) : [],
+            'currentBranch' => $currentBranch,
+            'currentBranchCurrencyRate' => $currencyRate,
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

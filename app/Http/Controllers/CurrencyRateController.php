@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Branch\GetBranches;
 use App\Http\Requests\StoreCurrencyRateRequest;
 use App\Http\Requests\UpdateCurrencyRateRequest;
 use App\Interfaces\CurrencyRepositoryInterface;
@@ -17,7 +18,21 @@ class CurrencyRateController extends Controller
 
     public function index()
     {
-        return Inertia::render('Setting/Currencies/CurrenciesList');
+        $data = collect(GetBranches::run())
+            ->filter(function ($branch) {
+                return $branch['currency_name'] !== 'Sri Lankan Rupee'
+                    && strtolower($branch['currency_symbol']) !== 'lkr';
+            })
+            ->map(function ($branch) {
+                return [
+                    'currency_name' => $branch['currency_name'],
+                    'currency_symbol' => $branch['currency_symbol'],
+                ];
+            })->values();
+
+        return Inertia::render('Setting/Currencies/CurrenciesList', [
+            'branchCurrencies' => $data->toArray(),
+        ]);
     }
 
     public function list(Request $request)
