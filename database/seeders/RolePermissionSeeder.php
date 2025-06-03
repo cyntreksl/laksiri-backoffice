@@ -33,7 +33,11 @@ class RolePermissionSeeder extends Seeder
 
     protected function assignPermissions(): void
     {
+        // Clear all existing permissions first
+        Permission::query()->delete();
+
         $role = Role::where('name', 'admin')->first();
+
         $allowedAdminPermissionGroups = ['User', 'Role', 'Pickup', 'HBL', 'MHBL', 'Pickup Type', 'Cash Settlement', 'Warehouse', 'Container', 'Loaded Shipment', 'Unloading Issues', 'Third Party Agent', 'Courier', 'Courier Agents', 'Air Line'];
 
         for ($i = 0; $i < count(self::defaultPermissions()); $i++) {
@@ -42,12 +46,14 @@ class RolePermissionSeeder extends Seeder
                 $permission = Permission::updateOrCreate([
                     'name' => self::defaultPermissions()[$i]['permissions'][$j],
                     'group_name' => $permissionGroup,
+                    'guard_name' => 'web',
                 ]);
                 if (in_array($permissionGroup, $allowedAdminPermissionGroups)) {
                     $role->givePermissionTo($permission);
                 }
             }
         }
+
         $bonedAreaRole = Role::where('name', 'boned area')->first();
 
         $bonedAreaPermissions = [
@@ -88,6 +94,7 @@ class RolePermissionSeeder extends Seeder
                 $this->command->warn("Permission '{$permName}' not found.");
             }
         }
+
         $callCenterPermissions = [
             'hbls.index',
             'hbls.download pdf',
@@ -115,7 +122,9 @@ class RolePermissionSeeder extends Seeder
             'customer-queue.show gate ist',
             'customer-queue.show examination calling screen',
         ];
+
         $callCenterRole = Role::where('name', 'call center')->first();
+
         foreach ($callCenterPermissions as $permName) {
             $permission = Permission::where('name', $permName)->first();
             if ($permission) {
@@ -131,6 +140,74 @@ class RolePermissionSeeder extends Seeder
     public static function defaultPermissions(): array
     {
         return [
+            [
+                'group_name' => 'Settings',
+                'permissions' => [
+                    'pickup-type.create',
+                    'pickup-type.show',
+                    'pickup-type.edit',
+                    'pickup-type.delete',
+                    'pickup-type.index',
+
+                    'air-line.index',
+                    'air-line.create',
+                    'air-line.list',
+                    'air-line.edit',
+                    'air-line.delete',
+
+                    'air-line.do charges index',
+                    'air-line.do charges create',
+                    'air-line.do charges list',
+                    'air-line.do charges edit',
+                    'air-line.do charges delete',
+
+                    'tax.departure tax',
+                    'tax.departure tax create',
+                    'tax.departure tax edit',
+                    'tax.departure tax delete',
+
+                    'tax.destination tax',
+                    'tax.destination tax create',
+                    'tax.destination tax edit',
+                    'tax.destination tax delete',
+
+                    'currencies.index',
+                    'currencies.create',
+                    'currencies.edit',
+                    'currencies.delete',
+
+                    'charges.special do charges index',
+                    'charges.special do charges create',
+                    'charges.special do charges list',
+                    'charges.special do charges edit',
+                    'charges.special do charges delete',
+
+                    'charges.air line do charges index',
+                    'charges.air line do charges create',
+                    'charges.air line do charges list',
+                    'charges.air line do charges edit',
+                    'charges.air line do charges delete',
+
+                    'manage_zones',
+
+                    'manage_driver_zones',
+
+                    'manage_driver_areas',
+
+                    'manage_warehouse_zones',
+
+                    'manage_pricing',
+
+                    'manage_package_pricing',
+
+                    'manage_exceptions',
+
+                    'manage_package_types',
+
+                    'manage_shippers_and_consignees',
+                ],
+            ],
+
             [
                 'group_name' => 'User',
                 'permissions' => [
@@ -176,17 +253,6 @@ class RolePermissionSeeder extends Seeder
                     'pickups.show pickup exceptions',
                     'pickups.retry',
                     'pickups.index',
-                ],
-            ],
-
-            [
-                'group_name' => 'Pickup Type',
-                'permissions' => [
-                    'pickup-type.create',
-                    'pickup-type.show',
-                    'pickup-type.edit',
-                    'pickup-type.delete',
-                    'pickup-type.index',
                 ],
             ],
 
@@ -355,64 +421,14 @@ class RolePermissionSeeder extends Seeder
                     'courier-agents.delete',
                 ],
             ],
-            [
-                'group_name' => 'Air Line',
-                'permissions' => [
-                    'air-line.index',
-                    'air-line.create',
-                    'air-line.list',
-                    'air-line.edit',
-                    'air-line.delete',
-                    'air-line.do charges index',
-                    'air-line.do charges create',
-                    'air-line.do charges list',
-                    'air-line.do charges edit',
-                    'air-line.do charges delete',
-                ],
-            ],
-            [
-                'group_name' => 'Tax',
-                'permissions' => [
-                    'tax.departure tax',
-                    'tax.departure tax create',
-                    'tax.departure tax edit',
-                    'tax.departure tax delete',
-                    'tax.destination tax',
-                    'tax.destination tax create',
-                    'tax.destination tax edit',
-                    'tax.destination tax delete',
-                ],
-            ],
-            [
-                'group_name' => 'Currency',
-                'permissions' => [
-                    'currencies.index',
-                    'currencies.create',
-                    'currencies.edit',
-                    'currencies.delete',
-                ],
-            ],
+
             [
                 'group_name' => 'Vessel Schedule',
                 'permissions' => [
                     'vessel.schedule.index',
                 ],
             ],
-            [
-                'group_name' => 'Charges',
-                'permissions' => [
-                    'charges.special do charges index',
-                    'charges.special do charges create',
-                    'charges.special do charges list',
-                    'charges.special do charges edit',
-                    'charges.special do charges delete',
-                    'charges.air line do charges index',
-                    'charges.air line do charges create',
-                    'charges.air line do charges list',
-                    'charges.air line do charges edit',
-                    'charges.air line do charges delete',
-                ],
-            ],
+
             [
                 'group_name' => 'Payment Container',
                 'permissions' => [
