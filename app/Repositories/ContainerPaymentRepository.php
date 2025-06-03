@@ -34,7 +34,7 @@ class ContainerPaymentRepository implements ContainerPaymentRepositoryInterface,
     {
         $query = ContainerPayment::query()->where(function ($query) {
             $query->where('is_finance_approved', '=', '0');
-        });
+        })->latest();
 
         if (! empty($search)) {
             $query->whereHas('container', function ($q) use ($search) {
@@ -42,10 +42,9 @@ class ContainerPaymentRepository implements ContainerPaymentRepositoryInterface,
             });
         }
 
-        $container_payments = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
-
-        // apply filters
         FilterFactory::apply($query, $filters);
+
+        $container_payments = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => ContainerPaymentResource::collection($container_payments),
@@ -75,10 +74,9 @@ class ContainerPaymentRepository implements ContainerPaymentRepositoryInterface,
             });
         }
 
-        $container_payments = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
-
-        // apply filters
         FilterFactory::apply($query, $filters);
+
+        $container_payments = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => ContainerPaymentResource::collection($container_payments),

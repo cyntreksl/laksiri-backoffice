@@ -507,14 +507,14 @@ Breadcrumbs::for('container-payment.index', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('container-payment.showContainerPaymentRefund', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Container Payment');
-    $trail->push('Refund List', route('container-payment.showContainerPaymentRefund'));
+    $trail->push('Refunds', route('container-payment.showContainerPaymentRefund'));
 });
 
 // Completed Container Payment
 Breadcrumbs::for('container-payment.showCompletedContainerPayment', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Container Payment');
-    $trail->push('Completed List', route('container-payment.showCompletedContainerPayment'));
+    $trail->push('Completed', route('container-payment.showCompletedContainerPayment'));
 });
 
 require_once __DIR__.'/call-center-breadcrumbs.php';

@@ -264,7 +264,7 @@
                                     activeMenu === 'container-payment' ? 'bg-primary/10 text-primary' : '',
                                   ]"
                                 class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.right="'Container Payment'"
+                                x-tooltip.placement.right="'Container Payments'"
                                 @click="
                                     setMenu('container-payment');
                                     openSideBar();
@@ -962,7 +962,7 @@ export default {
                             2,
                             0,
                             {
-                                title: "Container Payment Requests",
+                                title: "Payment Requests",
                                 route: "container-payment.index",
                             }
                         );
@@ -973,7 +973,7 @@ export default {
                             2,
                             0,
                             {
-                                title: "Container Payment Refunds",
+                                title: "Refunds",
                                 route: "container-payment.showContainerPaymentRefund",
                             }
                         );
@@ -983,7 +983,7 @@ export default {
                             2,
                             0,
                             {
-                                title: "Container Payment Requests",
+                                title: "Payment Requests",
                                 route: "finance.container-payments.index",
                             }
                         );
@@ -994,7 +994,7 @@ export default {
                             2,
                             0,
                             {
-                                title: "Approved Container Payment Requests",
+                                title: "Approved Payment Requests",
                                 route: "finance.approved-container-payments",
                             }
                         );
@@ -1005,7 +1005,7 @@ export default {
                             2,
                             0,
                             {
-                                title: "Completed Container Payment Requests",
+                                title: "Completed Payment Requests",
                                 route: "container-payment.showCompletedContainerPayment",
                             }
                         );
@@ -1015,7 +1015,7 @@ export default {
                         childMenuList.length,
                         ...containerPaymentMenu
                     );
-                    changeSidePanelTitle("Container Payment");
+                    changeSidePanelTitle("Container Payments");
                     break;
                 case "reception":
                     let receptionMenu = [];
