@@ -87,4 +87,22 @@ class ContainerPaymentController extends Controller
 
         return $this->containerPaymentRepository->completedDataset($limit, $page, $order, $dir, $search, $filters);
     }
+
+    public function paymentRequestList()
+    {
+        return Inertia::render('ContainerPayment/RequestsList');
+    }
+
+    public function requestList(Request $request)
+    {
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate']);
+
+        return $this->containerPaymentRepository->requestDataset($limit, $page, $order, $dir, $search, $filters);
+    }
 }
