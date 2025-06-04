@@ -21,9 +21,8 @@ import ToggleSwitch from 'primevue/toggleswitch';
 import InputLabel from "@/Components/InputLabel.vue";
 import Panel from "primevue/panel";
 import DatePicker from "primevue/datepicker";
-import Select from "primevue/select";
 import FloatLabel from "primevue/floatlabel";
-import moment from "moment/moment.js";
+import moment from "moment";
 
 const confirm = useConfirm();
 const baseUrl = ref("container-payment-list");

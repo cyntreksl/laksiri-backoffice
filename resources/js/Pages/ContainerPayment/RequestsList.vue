@@ -102,7 +102,7 @@ const approveContainerPayments = () => {
             severity: 'success'
         },
         accept: async () => {
-            router.post(route("finance.container-payment.approve"), {
+            router.post(route("container-payment.approve"), {
                 data: {
                     container_payments_ids: idList,
                 },

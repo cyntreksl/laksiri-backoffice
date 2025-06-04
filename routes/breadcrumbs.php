@@ -523,6 +523,12 @@ Breadcrumbs::for('container-payment.request', function (BreadcrumbTrail $trail) 
     $trail->push('Requests', route('container-payment.request'));
 });
 
+Breadcrumbs::for('approved-container-payments', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Container Payments');
+    $trail->push('Approved Payments', route('approved-container-payments'));
+});
+
 require_once __DIR__.'/call-center-breadcrumbs.php';
 require_once __DIR__.'/finance-breadcrumbs.php';
 require_once __DIR__.'/clearance-breadcrumbs.php';

@@ -995,7 +995,7 @@ export default {
                             0,
                             {
                                 title: "Approved Payment Requests",
-                                route: "finance.approved-container-payments",
+                                route: "approved-container-payments",
                             }
                         );
                     }
