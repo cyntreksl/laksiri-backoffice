@@ -139,12 +139,20 @@ watch(
                     </div>
                 </template>
                 <template #content>
-                    <div class="flex space-x-3">
-                        <Avatar :label="hbl?.hbl_name.charAt(0)" class="mr-2 !bg-emerald-200" size="xlarge"/>
-                        <div>
-                            <p>{{ hbl?.hbl_name }}</p>
-                            <p class="text-gray-500">{{ hbl?.contact_number }}</p>
-                            <p class="text-gray-500">{{ hbl?.email }}</p>
+                    <div class="flex items-start gap-4">
+                        <!-- Fixed width avatar -->
+                        <Avatar
+                            :label="hbl?.hbl_name?.charAt(0)"
+                            class="!bg-emerald-200 flex-shrink-0"
+                            size="xlarge"
+                            style="width: 64px; height: 64px"
+                        />
+
+                        <!-- Flexible content area -->
+                        <div class="flex flex-col min-w-0 flex-grow">
+                            <p class="font-medium text-gray-900 truncate">{{ hbl?.hbl_name }}</p>
+                            <p class="text-gray-500 text-sm truncate">{{ hbl?.contact_number }}</p>
+                            <p class="text-gray-500 text-sm break-all">{{ hbl?.email }}</p>
                         </div>
                     </div>
 
@@ -174,11 +182,19 @@ watch(
                     </div>
                 </template>
                 <template #content>
-                    <div class="flex space-x-3">
-                        <Avatar :label="hbl?.consignee_name.charAt(0)" class="mr-2 !bg-emerald-200" size="xlarge"/>
-                        <div>
-                            <p>{{ hbl?.consignee_name }}</p>
-                            <p class="text-gray-500">{{ hbl?.consignee_contact }}</p>
+                    <div class="flex items-start gap-4">
+                        <!-- Fixed width avatar -->
+                        <Avatar
+                            :label="hbl?.consignee_name.charAt(0)"
+                            class="!bg-emerald-200 flex-shrink-0"
+                            size="xlarge"
+                            style="width: 64px; height: 64px"
+                        />
+
+                        <!-- Flexible content area -->
+                        <div class="flex flex-col min-w-0 flex-grow">
+                            <p class="font-medium text-gray-900 truncate">{{ hbl?.consignee_name }}</p>
+                            <p class="text-gray-500 text-sm truncate">{{ hbl?.consignee_contact }}</p>
                         </div>
                     </div>
 
