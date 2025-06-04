@@ -9,7 +9,7 @@ class GetLatestCurrencyRateByBranchCurrencyCode
 {
     use AsAction;
 
-    public function handle(string $currencyCode): Currency
+    public function handle(string $currencyCode): ?Currency
     {
         return Currency::where('currency_symbol', $currencyCode)->latest()->first();
     }

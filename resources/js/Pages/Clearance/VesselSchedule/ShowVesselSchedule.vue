@@ -25,7 +25,6 @@ import AddVesselModal from "@/Pages/Clearance/VesselSchedule/Partials/AddVesselM
 import Checkbox from "primevue/checkbox";
 import moment from "moment";
 import RefundList from "@/Pages/Clearance/VesselSchedule/RefundList.vue";
-import Skeleton from 'primevue/skeleton';
 import RequestsList from "@/Pages/Clearance/VesselSchedule/RequestsList.vue";
 
 const props = defineProps({
@@ -332,7 +331,20 @@ const groupedShipments = computed(() => {
     return sortedGroups;
 });
 
-selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
+watch(
+    () => groupedShipments.value,
+    (newVal) => {
+        if (newVal.length > 0) {
+            selectedContainer.value = newVal[0]?.items[0] ?? null;
+        }
+    },
+    { immediate: true }
+);
+
+const isPaymentInputDisabled = computed(() => {
+    return isFinanceApproved.value ||
+        usePage().props.auth.user.roles[0]?.name === 'Finance Team';
+});
 </script>
 
 <template>
@@ -433,7 +445,7 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
             </Card>
 
             <!-- Tabs Panel -->
-            <Card v-if="!loadingContainerData" class="col-span-12 lg:col-span-9 border-2 border-gray-200 !shadow-none">
+            <Card class="col-span-12 lg:col-span-9 border-2 border-gray-200 !shadow-none">
                 <template #title>
                     <div class="flex flex-col md:flex-row md:justify-between gap-4">
                         <div>
@@ -462,7 +474,7 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                 </template>
 
                 <template #content>
-                    <Tabs value="0">
+                    <Tabs v-if="selectedContainer" value="0">
                         <TabList>
                             <Tab value="0">HBLS</Tab>
                             <Tab value="1">MHBLs</Tab>
@@ -569,7 +581,7 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                                             <IftaLabel>
                                                 <InputNumber
                                                     v-model="form.do_charge"
-                                                    :disabled="isFinanceApproved"
+                                                    :disabled="isPaymentInputDisabled"
                                                     :maxFractionDigits="2"
                                                     :minFractionDigits="2" class="w-full"
                                                     inputId="do-charge" min="0" step="any"
@@ -583,7 +595,7 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                                         <div>
                                             <IftaLabel>
                                                 <InputNumber v-model="form.demurrage_charge"
-                                                             :disabled="isFinanceApproved"
+                                                             :disabled="isPaymentInputDisabled"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full" inputId="demurrage-charge" min="0"
                                                              step="any" variant="filled"/>
@@ -595,7 +607,7 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                                         <div>
                                             <IftaLabel>
                                                 <InputNumber v-model="form.assessment_charge"
-                                                             :disabled="isFinanceApproved"
+                                                             :disabled="isPaymentInputDisabled"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full" inputId="assessment-charge" min="0"
                                                              step="any" variant="filled"/>
@@ -606,7 +618,7 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
 
                                         <div>
                                             <IftaLabel>
-                                                <InputNumber v-model="form.slpa_charge" :disabled="isFinanceApproved"
+                                                <InputNumber v-model="form.slpa_charge" :disabled="isPaymentInputDisabled"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full"
                                                              inputId="slap-charge" min="0" step="any" variant="filled"/>
@@ -617,7 +629,7 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
 
                                         <div>
                                             <IftaLabel>
-                                                <InputNumber v-model="form.refund_charge" :disabled="isFinanceApproved"
+                                                <InputNumber v-model="form.refund_charge" :disabled="isPaymentInputDisabled"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full"
                                                              inputId="refund-charge" min="0" step="any"
@@ -630,7 +642,7 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                                         <div>
                                             <IftaLabel>
                                                 <InputNumber v-model="form.clearance_charge"
-                                                             :disabled="isFinanceApproved"
+                                                             :disabled="isPaymentInputDisabled"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full" inputId="clearance-charge" min="0"
                                                              step="any" variant="filled"/>
@@ -639,10 +651,12 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                                             <InputError :message="form.errors.clearance_charge"/>
                                         </div>
 
-                                        <div v-if="!isFinanceApproved" class="col-span-1 md:col-span-2 text-right">
-                                            <Button :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"
-                                                    icon="pi pi-save" size="small" type="submit"/>
-                                        </div>
+                                        <template v-if="$page.props.auth.user.roles[0]?.name !== 'Finance Team'">
+                                            <div v-if="!isFinanceApproved"  class="col-span-1 md:col-span-2 text-right">
+                                                <Button :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"
+                                                        icon="pi pi-save" size="small" type="submit"/>
+                                            </div>
+                                        </template>
                                     </div>
                                 </form>
 
@@ -830,25 +844,6 @@ selectedContainer.value = groupedShipments.value[0]?.items[0] ?? null;
                     </Tabs>
                 </template>
             </Card>
-
-            <div v-else class="col-span-12 lg:col-span-9 !shadow-none">
-               <Card>
-                   <template #content>
-                       <div class="flex mb-4">
-                           <div>
-                               <Skeleton class="mb-2" width="10rem"></Skeleton>
-                               <Skeleton class="mb-2" width="5rem"></Skeleton>
-                               <Skeleton height=".5rem"></Skeleton>
-                           </div>
-                       </div>
-                       <Skeleton height="150px" width="100%"></Skeleton>
-                       <div class="flex justify-between mt-4">
-                           <Skeleton height="2rem" width="4rem"></Skeleton>
-                           <Skeleton height="2rem" width="4rem"></Skeleton>
-                       </div>
-                   </template>
-               </Card>
-            </div>
         </div>
     </AppLayout>
 
