@@ -20,10 +20,3 @@ Breadcrumbs::for('finance.hbls.approved-hbl', function (BreadcrumbTrail $trail) 
     $trail->push('HBL');
     $trail->push('Approved HBLs', route('finance.hbls.approved-hbl'));
 });
-
-// Container Payment
-Breadcrumbs::for('finance.approved-container-payments', function (BreadcrumbTrail $trail) {
-    $trail->parent('dashboard');
-    $trail->push('Container Payment');
-    $trail->push('Approved List', route('finance.approved-container-payments'));
-});

@@ -3,8 +3,11 @@
 namespace App\Repositories;
 
 use App\Actions\Container\GetContainerPayment;
+use App\Actions\ContainerPayment\ApproveContainerPayments;
+use App\Actions\ContainerPayment\CompleteContainerPayments;
 use App\Actions\ContainerPayment\CreateContainerPayment;
 use App\Actions\ContainerPayment\DeleteContainerPayment;
+use App\Actions\ContainerPayment\RevokeContainerPaymentApprovals;
 use App\Actions\ContainerPayment\UpdateContainersRefundCollection;
 use App\Factory\ContainerPayment\FilterFactory;
 use App\Http\Resources\ContainerPaymentResource;
@@ -146,5 +149,47 @@ class ContainerPaymentRepository implements ContainerPaymentRepositoryInterface,
                 'lastPage' => $container_payments->lastPage(),
             ],
         ]);
+    }
+
+    public function approveContainerPayments(array $containerPaymentIds)
+    {
+        return ApproveContainerPayments::run($containerPaymentIds);
+    }
+
+    public function approvedPaymentsDataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
+    {
+        $query = ContainerPayment::query()->where(function ($query) {
+            $query->where('is_finance_approved', '=', '1')->where('is_paid', '=', '0');
+        })->latest();
+
+        if (! empty($search)) {
+            $query->whereHas('container', function ($q) use ($search) {
+                $q->where('reference', 'like', '%'.$search.'%');
+            });
+        }
+
+        FilterFactory::apply($query, $filters);
+
+        $container_payments = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
+
+        return response()->json([
+            'data' => ContainerPaymentResource::collection($container_payments),
+            'meta' => [
+                'total' => $container_payments->total(),
+                'current_page' => $container_payments->currentPage(),
+                'perPage' => $container_payments->perPage(),
+                'lastPage' => $container_payments->lastPage(),
+            ],
+        ]);
+    }
+
+    public function revokeContainerPaymentsApprovals(array $containerPaymentIds)
+    {
+        return RevokeContainerPaymentApprovals::run($containerPaymentIds);
+    }
+
+    public function completePayments(array $data)
+    {
+        return CompleteContainerPayments::run($data);
     }
 }

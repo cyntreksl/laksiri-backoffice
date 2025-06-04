@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CompletePaymentRequest;
 use App\Interfaces\ContainerPaymentRepositoryInterface;
 use App\Models\Container;
 use App\Models\ContainerPayment;
@@ -104,5 +105,38 @@ class ContainerPaymentController extends Controller
         $filters = $request->only(['fromDate']);
 
         return $this->containerPaymentRepository->requestDataset($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function approveContainerPayments(Request $request)
+    {
+        $this->containerPaymentRepository->approveContainerPayments($request['data']['container_payments_ids']);
+    }
+
+    public function approvedContainerPayments()
+    {
+        return Inertia::render('ContainerPayment/ApprovedList');
+    }
+
+    public function approvedList(Request $request)
+    {
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate']);
+
+        return $this->containerPaymentRepository->approvedPaymentsDataset($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function revokeContainerPaymentsApprovals(Request $request)
+    {
+        $this->containerPaymentRepository->revokeContainerPaymentsApprovals($request['data']['container_payments_ids']);
+    }
+
+    public function completePayment(CompletePaymentRequest $request)
+    {
+        $this->containerPaymentRepository->completePayments($request->all());
     }
 }
