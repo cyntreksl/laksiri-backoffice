@@ -69,8 +69,7 @@ Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginCo
 Route::get('/containers/{container}/handling-procedures', [HandlingProcedureController::class, 'index'])->middleware(['web']);
 Route::post('/containers/{container}/handling-procedures', [HandlingProcedureController::class, 'store'])->middleware(['web']);
 
-
-//dev purposes only
+// dev purposes only
 Route::prefix('/v1/')->post('/login', [LoginController::class, 'login']);
 Route::middleware(['auth:sanctum'])
     ->prefix('/v1/')->group(function () {
