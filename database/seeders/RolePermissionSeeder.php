@@ -15,6 +15,7 @@ class RolePermissionSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create roles
+        Role::updateOrCreate(['name' => 'super-admin']);
         Role::updateOrCreate(['name' => 'admin']);
         Role::updateOrCreate(['name' => 'empty']);
         Role::updateOrCreate(['name' => 'viewer']);
@@ -36,9 +37,38 @@ class RolePermissionSeeder extends Seeder
         // Clear all existing permissions first
         Permission::query()->delete();
 
-        $role = Role::where('name', 'admin')->first();
+        $superAdminRole = Role::where('name', 'super admin')->first();
 
-        $allowedAdminPermissionGroups = ['User', 'Role', 'Pickup', 'HBL', 'MHBL', 'Pickup Type', 'Cash Settlement', 'Warehouse', 'Container', 'Loaded Shipment', 'Unloading Issues', 'Third Party Agent', 'Courier', 'Courier Agents', 'Air Line'];
+        // Create all permissions and assign to super admin
+        foreach (self::defaultPermissions() as $permissionGroup) {
+            foreach ($permissionGroup['permissions'] as $permName) {
+                $permission = Permission::updateOrCreate([
+                    'name' => $permName,
+                    'group_name' => $permissionGroup['group_name'],
+                    'guard_name' => 'web',
+                ]);
+                $superAdminRole->givePermissionTo($permission);
+            }
+        }
+
+        $adminRole = Role::where('name', 'admin')->first();
+
+        $allowedAdminPermissionGroups = [
+            'User',
+            'Role',
+            'Pickup',
+            'HBL',
+            'MHBL',
+            'Cash Settlement',
+            'Warehouse',
+            'Container',
+            'Loaded Shipment',
+            'Unloading Issues',
+            'Third Party Agent',
+            'Courier',
+            'Courier Agents',
+            'Settings',
+        ];
 
         for ($i = 0; $i < count(self::defaultPermissions()); $i++) {
             $permissionGroup = self::defaultPermissions()[$i]['group_name'];
@@ -49,7 +79,7 @@ class RolePermissionSeeder extends Seeder
                     'guard_name' => 'web',
                 ]);
                 if (in_array($permissionGroup, $allowedAdminPermissionGroups)) {
-                    $role->givePermissionTo($permission);
+                    $adminRole->givePermissionTo($permission);
                 }
             }
         }
@@ -129,6 +159,117 @@ class RolePermissionSeeder extends Seeder
             $permission = Permission::where('name', $permName)->first();
             if ($permission) {
                 $callCenterRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
+        }
+
+        $financeTeamRole = Role::where('name', 'finance Team')->first();
+
+        $financeTeamPermissions = [
+            'air-line.index',
+            'air-line.create',
+            'air-line.list',
+            'air-line.edit',
+            'air-line.delete',
+
+            'air-line.do charges index',
+            'air-line.do charges create',
+            'air-line.do charges list',
+            'air-line.do charges edit',
+            'air-line.do charges delete',
+
+            'tax.departure tax',
+            'tax.departure tax create',
+            'tax.departure tax edit',
+            'tax.departure tax delete',
+
+            'tax.destination tax',
+            'tax.destination tax create',
+            'tax.destination tax edit',
+            'tax.destination tax delete',
+
+            'currencies.index',
+            'currencies.create',
+            'currencies.edit',
+            'currencies.delete',
+
+            'charges.special do charges index',
+            'charges.special do charges create',
+            'charges.special do charges list',
+            'charges.special do charges edit',
+            'charges.special do charges delete',
+
+            'charges.air line do charges index',
+            'charges.air line do charges create',
+            'charges.air line do charges list',
+            'charges.air line do charges edit',
+            'charges.air line do charges delete',
+
+            'hbls.index',
+            'hbls.show',
+            'hbls.hold and release',
+            'hbls.download pdf',
+            'hbls.download invoice',
+            'hbls.download barcode',
+            'hbls.hbl finance approval list',
+            'hbls.finance approved hbl list',
+            'hbls.create finance approval',
+
+            'arrivals.index',
+            'arrivals.show',
+            'arrivals.download manifest',
+
+            'vessel.schedule.index',
+
+            'payment-container.index',
+            'payment-container.refund list',
+            'payment-container.show container payment requests',
+            'payment-container.approve',
+            'payment-container.approved list',
+            'payment-container.collect refund',
+            'payment-container.completed payment requests',
+        ];
+
+        foreach ($financeTeamPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $financeTeamRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
+        }
+
+        $clearanceTeamRole = Role::where('name', 'clearance team')->first();
+
+        $clearanceTeamPermissions = [
+            'hbls.index',
+            'hbls.show',
+            'hbls.hold and release',
+            'hbls.download pdf',
+            'hbls.download invoice',
+            'hbls.download barcode',
+
+            'arrivals.index',
+            'arrivals.show',
+            'arrivals.download manifest',
+
+            'vessel.schedule.index',
+
+            'payment-container.index',
+            'payment-container.create',
+            'payment-container.edit',
+            'payment-container.delete',
+            'payment-container.refund list',
+            'payment-container.show container payment requests',
+            'payment-container.approved list',
+            'payment-container.completed payment requests',
+        ];
+
+        foreach ($clearanceTeamPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $clearanceTeamRole->givePermissionTo($permission);
             } else {
                 $this->command->warn("Permission '{$permName}' not found.");
             }
