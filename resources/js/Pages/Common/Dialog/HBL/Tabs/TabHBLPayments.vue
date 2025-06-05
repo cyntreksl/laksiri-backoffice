@@ -19,9 +19,12 @@ const props = defineProps({
 });
 
 const page = usePage();
-
 const isPrepaid = ref(page.props.currentBranch.is_prepaid)
-const currencyRate = ref(page.props.currentBranchCurrencyRate.sl_rate || 1)
+const currencyRate = ref(
+    page.props.currentBranchCurrencyRate && page.props.currentBranchCurrencyRate.sl_rate
+        ? page.props.currentBranchCurrencyRate.sl_rate
+        : 1
+)
 const currencySymbol = ref(page.props.currentBranch.currency_symbol || '')
 
 const formatCurrency = (amount) => {
