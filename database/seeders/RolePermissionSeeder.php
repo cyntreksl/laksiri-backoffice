@@ -37,7 +37,7 @@ class RolePermissionSeeder extends Seeder
         // Clear all existing permissions first
         Permission::query()->delete();
 
-        $superAdminRole = Role::where('name', 'super admin')->first();
+        $superAdminRole = Role::where('name', 'super-admin')->first();
 
         // Create all permissions and assign to super admin
         foreach (self::defaultPermissions() as $permissionGroup) {

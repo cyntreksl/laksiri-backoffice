@@ -83,7 +83,7 @@ const filters = ref({
     cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
     container_type: {value: null, matchMode: FilterMatchMode.EQUALS},
     status: {
-        value: ['clearance team', 'Finance Team'].includes(userRole) ? 'IN TRANSIT' : null,
+        value: ['clearance team', 'finance Team'].includes(userRole) ? 'IN TRANSIT' : null,
         matchMode: FilterMatchMode.EQUALS
     },
     branch: {value: null, matchMode: FilterMatchMode.EQUALS},
