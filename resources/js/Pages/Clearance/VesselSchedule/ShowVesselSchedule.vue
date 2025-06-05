@@ -343,7 +343,7 @@ watch(
 
 const isPaymentInputDisabled = computed(() => {
     return isFinanceApproved.value ||
-        usePage().props.auth.user.roles[0]?.name === 'Finance Team';
+        usePage().props.auth.user.roles[0]?.name === 'finance Team';
 });
 </script>
 
@@ -651,7 +651,7 @@ const isPaymentInputDisabled = computed(() => {
                                             <InputError :message="form.errors.clearance_charge"/>
                                         </div>
 
-                                        <template v-if="$page.props.auth.user.roles[0]?.name !== 'Finance Team'">
+                                        <template v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team'">
                                             <div v-if="!isFinanceApproved"  class="col-span-1 md:col-span-2 text-right">
                                                 <Button :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"
                                                         icon="pi pi-save" size="small" type="submit"/>
