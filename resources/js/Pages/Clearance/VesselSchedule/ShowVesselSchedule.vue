@@ -24,13 +24,11 @@ import {push} from "notivue";
 import AddVesselModal from "@/Pages/Clearance/VesselSchedule/Partials/AddVesselModal.vue";
 import Checkbox from "primevue/checkbox";
 import moment from "moment";
+import RefundList from "@/Pages/Clearance/VesselSchedule/RefundList.vue";
+import RequestsList from "@/Pages/Clearance/VesselSchedule/RequestsList.vue";
 
 const props = defineProps({
     vesselSchedule: {
-        type: Object,
-        default: () => ({}),
-    },
-    containers: {
         type: Object,
         default: () => ({}),
     },
@@ -50,13 +48,16 @@ const props = defineProps({
 
 const showConfirmLoadedShipmentModal = ref(false);
 const confirm = useConfirm();
-const selectedContainer = ref(props.containers[0] ?? {});
+const selectedContainer = ref(props.vesselSchedule?.clearance_containers[0] ?? {});
 const containerData = ref({});
 const filteredHBLS = ref([]);
 const filteredMHBLS = ref([]);
 const containerPaymentData = ref({});
 const isContainerPayment = ref(false);
 const isFinanceApproved = ref(false);
+const containerId = ref('');
+const showConfirmAddVesselModal = ref(false);
+const loadingContainerData = ref(false);
 
 const form = useForm({
     container_id: selectedContainer.value.id ?? '',
@@ -68,12 +69,8 @@ const form = useForm({
     clearance_charge: 0
 });
 
-const documentForm = useForm({
-    name: "",
-    date: "",
-});
-
 const fetchLoadedContainer = async () => {
+    loadingContainerData.value = true;
     try {
         const response = await fetch(`/loaded-containers/get-container/${selectedContainer.value.id}`, {
             method: "GET",
@@ -91,6 +88,8 @@ const fetchLoadedContainer = async () => {
         await fetchContainerPayment();
     } catch (error) {
         console.error("Error:", error);
+    }finally {
+        loadingContainerData.value = false;
     }
 };
 
@@ -121,52 +120,6 @@ const closeModal = () => {
     showConfirmLoadedShipmentModal.value = false;
 };
 
-const confirmVesselClear = (id) => {
-    confirm.require({
-        message: 'Are you sure you want to release this vessel?',
-        header: 'Vessel Release?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Release Vessel',
-            severity: 'warn'
-        },
-        accept: () => {
-
-        },
-        reject: () => {
-        }
-    });
-};
-
-const confirmVesselReturn = (id) => {
-    confirm.require({
-        message: 'Are you sure you want to return or reject this vessel?',
-        header: 'Vessel Return?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Release Vessel',
-            severity: 'danger'
-        },
-        accept: () => {
-
-        },
-        reject: () => {
-        }
-    });
-};
-
 const fetchContainerPayment = async () => {
     try {
         const response = await fetch(`/container-payment/${selectedContainer.value.id}`, {
@@ -189,7 +142,7 @@ const fetchContainerPayment = async () => {
             form.refund_charge = containerPaymentData.value.refund_charge;
             form.clearance_charge = containerPaymentData.value.clearance_charge;
             isFinanceApproved.value = containerPaymentData.value.is_finance_approved;
-        }else{
+        } else {
             form.container_id = selectedContainer.value.id;
             form.do_charge = 0;
             form.demurrage_charge = 0;
@@ -216,7 +169,6 @@ const handleContainerPaymentCreate = async () => {
     });
 };
 
-const showConfirmAddVesselModal = ref(false);
 const confirmAddVesselModal = () => {
     showConfirmAddVesselModal.value = true;
 };
@@ -229,12 +181,11 @@ const reloadPage = () => {
     window.location.reload();
 }
 
-const containerId = ref('');
-const confirmRemoveContainerHold = (ContainerId) => {
+const confirmRemoveContainer = (ContainerId) => {
     containerId.value = ContainerId;
     confirm.require({
-        message: `Would you like to remove this container form vessel schedule`,
-        header: `Remove container`,
+        message: `Would you like to remove this shipment form this vessel schedule?`,
+        header: `Remove Shipment?`,
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
         rejectProps: {
@@ -249,7 +200,7 @@ const confirmRemoveContainerHold = (ContainerId) => {
         accept: () => {
             router.post(
                 route("clearance.vessel-schedule.remove-vessel", props.vesselSchedule.id),
-                {containerID : containerId.value},
+                {containerID: containerId.value},
                 {
                     preserveScroll: true,
                     onSuccess: () => {
@@ -278,7 +229,7 @@ const updateForm = useForm({
     note: selectedContainer.value.note,
     is_reached: Boolean(selectedContainer.value.is_reached),
     reached_date: selectedContainer.value.reached_date,
-    container_type:  selectedContainer.value.container_type,
+    container_type: selectedContainer.value.container_type,
     bl_number: selectedContainer.value.bl_number,
     container_number: selectedContainer.value.container_number,
     seal_number: selectedContainer.value.seal_number,
@@ -379,6 +330,21 @@ const groupedShipments = computed(() => {
 
     return sortedGroups;
 });
+
+watch(
+    () => groupedShipments.value,
+    (newVal) => {
+        if (newVal.length > 0) {
+            selectedContainer.value = newVal[0]?.items[0] ?? null;
+        }
+    },
+    { immediate: true }
+);
+
+const isPaymentInputDisabled = computed(() => {
+    return isFinanceApproved.value ||
+        usePage().props.auth.user.roles[0]?.name === 'finance Team';
+});
 </script>
 
 <template>
@@ -405,7 +371,7 @@ const groupedShipments = computed(() => {
                 </div>
             </div>
 
-            <a :href="route('clearance.vessel-schedule.download', vesselSchedule.id)">
+            <a :href="route('clearance.vessel-schedule.download', vesselSchedule?.id)">
                 <Button
                     icon="pi pi-download"
                     label="Download Vessel Schedule"
@@ -426,51 +392,51 @@ const groupedShipments = computed(() => {
                                 size="small" @click.prevent="confirmAddVesselModal()"/>
                     </div>
                 </template>
-                <template #subtitle>{{ containers.length }} Shipment(s)</template>
+                <template #subtitle>{{ vesselSchedule?.clearance_containers.length }} Shipment(s)</template>
                 <template #content>
-                    <VirtualScroller :item-size="150" :items="groupedShipments" style="height: 400px">
+                    <VirtualScroller :item-size="170" :items="groupedShipments" style="height: 400px">
                         <template v-slot:item="{ item: dayGroup }">
                             <div class="mb-4">
-                                <h2 class="text-lg font-semibold mb-2">
-                                    {{ dayGroup.day }} ({{ dayGroup.items.length }} Shipments)
+                                <h2 class="text-base font-semibold mb-2">
+                                    {{ dayGroup.day }} ({{ dayGroup.items.length }})
                                 </h2>
-                                <div v-for="item in dayGroup.items" :key="item.id">
-                                    <Card
-                                        :class="[
-                                            '!bg-transparent cursor-pointer !shadow-none transition-all duration-300 ease-in-out border-2 mb-3',
-                                            selectedContainer?.id === item?.id
-                                            ? '!border-none !bg-gradient-to-r !from-gray-700 !via-gray-800 !to-gray-900 !text-white'
-                                            : 'border-black hover:bg-gradient-to-r hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 hover:text-white'
-                                        ]"
-                                        style="height: 150px"
-                                        @click="selectedContainer = item"
-                                    >
-                                        <template #content>
-                                            <div class="flex justify-between text-sm">
-                                                <div>{{ item?.container_type }}</div>
-                                                <div>{{ item?.cargo_type }}</div>
-                                                <div>{{ item?.warehouse.name }}</div>
-                                            </div>
-                                            <div class="my-2 flex items-center justify-between text-xl">
-                                                <h1 class="font-medium">{{ item?.reference }}</h1>
-                                                <i class="ti ti-ship"></i>
-                                            </div>
-                                            <div class="flex justify-between text-sm">
-                                                <div>
-                                                    <i class="ti ti-calendar"></i>
-                                                    {{ item?.estimated_time_of_arrival }}
+                                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                                    <div v-for="item in dayGroup.items" :key="item.id" :class="['flex flex-col space-y-3 rounded-xl p-4 bg-gradient-to-tr hover:cursor-pointer', selectedContainer?.id === item?.id ? 'from-purple-700 to-purple-500' : 'from-violet-700 to-violet-500']"
+                                         style="height: 170px"
+                                         @click="selectedContainer = item">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-1 rounded-lg bg-violet-500 px-2 py-1">
+                                                <div :class="['h-4 w-4 rounded-md ', selectedContainer?.id === item?.id ? 'animate-spin bg-green-300' : 'animate-none bg-orange-300']"></div>
+                                                <div class="text-white text-xs">{{ item?.container_type }}
                                                 </div>
-                                                <Button
-                                                    v-tooltip="'Remove From Vessel Schedule'"
-                                                    icon="pi pi-trash"
-                                                    rounded
-                                                    severity="danger"
-                                                    size="small"
-                                                    @click.prevent="confirmRemoveContainerHold(item?.id)"
-                                                />
                                             </div>
-                                        </template>
-                                    </Card>
+                                            <div class="text-violet-300 text-xs">
+                                                {{ moment(item?.estimated_time_of_arrival).format('DD MMM YYYY') }}
+                                            </div>
+                                        </div>
+                                        <h2 class="text-lg font-medium text-white">{{ item?.reference }}</h2>
+                                        <div class="flex justify-between">
+                                            <i class="ti ti-ship text-2xl text-white"></i>
+                                            <div class="flex space-x-4 items-center">
+                                                <div class="flex items-center space-x-1 text-violet-300">
+                                                    <div class="text-xs">{{ item?.cargo_type }}</div>
+                                                </div>
+                                                <div class="flex items-center space-x-1 text-white">
+                                                    <div class="text-xs uppercase">{{ item?.warehouse.name }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex justify-between items-center space-x-4">
+                                            <div class="h-2 rounded-full bg-violet-500 flex-1">
+                                                <div
+                                                    class="w-[100%] h-2 rounded-full from-green-300 to-green-400 bg-gradient-to-l"></div>
+                                            </div>
+                                            <div v-tooltip="'Remove From Vessel Schedule'"
+                                                 class="text-red-300 text-xs whitespace-nowrap cursor-pointer"
+                                                 @click.prevent="confirmRemoveContainer(item?.id)">Remove
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -500,23 +466,20 @@ const groupedShipments = computed(() => {
                                         @click.prevent="showConfirmLoadedShipmentModal = !showConfirmLoadedShipmentModal"/>
                             </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row gap-2">
-                            <Button label="Clear Shipment" severity="success"
-                                    size="small" @click.prevent="confirmVesselClear()"/>
-                            <Button label="Mark as a return" severity="danger"
-                                    size="small" variant="outlined" @click.prevent="confirmVesselReturn()"/>
-                        </div>
+                        <a :href="route('clearance.vessel-schedule.download-shipment-release-pdf', selectedContainer.id)">
+                            <Button icon="pi pi-file-pdf" label="Download Release PDF" severity="success"
+                                    size="small"/>
+                        </a>
                     </div>
                 </template>
 
                 <template #content>
-                    <Tabs value="0">
+                    <Tabs v-if="selectedContainer" value="0">
                         <TabList>
                             <Tab value="0">HBLS</Tab>
                             <Tab value="1">MHBLs</Tab>
                             <Tab value="2">Payments</Tab>
                             <Tab value="3">Shipment Details</Tab>
-                            <Tab value="4">Documents</Tab>
                         </TabList>
                         <TabPanels>
                             <!-- HBLs Tab -->
@@ -618,7 +581,7 @@ const groupedShipments = computed(() => {
                                             <IftaLabel>
                                                 <InputNumber
                                                     v-model="form.do_charge"
-                                                    :disabled="isFinanceApproved"
+                                                    :disabled="isPaymentInputDisabled"
                                                     :maxFractionDigits="2"
                                                     :minFractionDigits="2" class="w-full"
                                                     inputId="do-charge" min="0" step="any"
@@ -632,7 +595,7 @@ const groupedShipments = computed(() => {
                                         <div>
                                             <IftaLabel>
                                                 <InputNumber v-model="form.demurrage_charge"
-                                                             :disabled="isFinanceApproved"
+                                                             :disabled="isPaymentInputDisabled"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full" inputId="demurrage-charge" min="0"
                                                              step="any" variant="filled"/>
@@ -644,7 +607,7 @@ const groupedShipments = computed(() => {
                                         <div>
                                             <IftaLabel>
                                                 <InputNumber v-model="form.assessment_charge"
-                                                             :disabled="isFinanceApproved"
+                                                             :disabled="isPaymentInputDisabled"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full" inputId="assessment-charge" min="0"
                                                              step="any" variant="filled"/>
@@ -655,7 +618,7 @@ const groupedShipments = computed(() => {
 
                                         <div>
                                             <IftaLabel>
-                                                <InputNumber v-model="form.slpa_charge" :disabled="isFinanceApproved"
+                                                <InputNumber v-model="form.slpa_charge" :disabled="isPaymentInputDisabled"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full"
                                                              inputId="slap-charge" min="0" step="any" variant="filled"/>
@@ -666,7 +629,7 @@ const groupedShipments = computed(() => {
 
                                         <div>
                                             <IftaLabel>
-                                                <InputNumber v-model="form.refund_charge" :disabled="isFinanceApproved"
+                                                <InputNumber v-model="form.refund_charge" :disabled="isPaymentInputDisabled"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full"
                                                              inputId="refund-charge" min="0" step="any"
@@ -679,7 +642,7 @@ const groupedShipments = computed(() => {
                                         <div>
                                             <IftaLabel>
                                                 <InputNumber v-model="form.clearance_charge"
-                                                             :disabled="isFinanceApproved"
+                                                             :disabled="isPaymentInputDisabled"
                                                              :maxFractionDigits="2" :minFractionDigits="2"
                                                              class="w-full" inputId="clearance-charge" min="0"
                                                              step="any" variant="filled"/>
@@ -688,12 +651,18 @@ const groupedShipments = computed(() => {
                                             <InputError :message="form.errors.clearance_charge"/>
                                         </div>
 
-                                        <div v-if="!isFinanceApproved" class="col-span-1 md:col-span-2 text-right">
-                                            <Button :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"
-                                                    icon="pi pi-save" size="small" type="submit"/>
-                                        </div>
+                                        <template v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team'">
+                                            <div v-if="!isFinanceApproved"  class="col-span-1 md:col-span-2 text-right">
+                                                <Button :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"
+                                                        icon="pi pi-save" size="small" type="submit"/>
+                                            </div>
+                                        </template>
                                     </div>
                                 </form>
+
+                                <RequestsList :container-id="selectedContainer.id"/>
+
+                                <RefundList :container-id="selectedContainer.id"/>
                             </TabPanel>
 
                             <!-- Shipment Details Tab -->
@@ -871,31 +840,6 @@ const groupedShipments = computed(() => {
                                     </div>
                                 </div>
                             </TabPanel>
-
-                            <!-- Documents Tab -->
-                            <TabPanel value="4">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="documentForm.name" class="w-full" variant="filled"/>
-                                            <label>Document Name</label>
-                                        </IftaLabel>
-                                        <InputError :message="documentForm.errors.name"/>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <DatePicker v-model="documentForm.date" class="w-full" variant="filled"/>
-                                            <label>Date</label>
-                                        </IftaLabel>
-                                        <InputError :message="documentForm.errors.date"/>
-                                    </div>
-
-                                    <div class="col-span-1 md:col-span-2 text-right">
-                                        <Button icon="pi pi-file-pdf" label="Generate PDF" size="small"/>
-                                    </div>
-                                </div>
-                            </TabPanel>
                         </TabPanels>
                     </Tabs>
                 </template>
@@ -903,9 +847,11 @@ const groupedShipments = computed(() => {
         </div>
     </AppLayout>
 
-    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="selectedContainer" :container-status="containerStatus" :sea-container-options="seaContainerOptions" :show="showConfirmLoadedShipmentModal"
+    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="selectedContainer"
+                                :container-status="containerStatus" :sea-container-options="seaContainerOptions"
+                                :show="showConfirmLoadedShipmentModal"
                                 @close="closeModal"
-                                @update:show="showConfirmLoadedShipmentModal = $event" />
+                                @update:show="showConfirmLoadedShipmentModal = $event"/>
 
     <AddVesselModal
         :vessel-schedule="vesselSchedule"

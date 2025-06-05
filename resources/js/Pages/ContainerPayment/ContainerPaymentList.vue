@@ -21,9 +21,8 @@ import ToggleSwitch from 'primevue/toggleswitch';
 import InputLabel from "@/Components/InputLabel.vue";
 import Panel from "primevue/panel";
 import DatePicker from "primevue/datepicker";
-import Select from "primevue/select";
 import FloatLabel from "primevue/floatlabel";
-import moment from "moment/moment.js";
+import moment from "moment";
 
 const confirm = useConfirm();
 const baseUrl = ref("container-payment-list");
@@ -270,7 +269,16 @@ const confirmDeleteContainerPayment = (containerPayment) => {
                     </Column>
                     <Column field="is_finance_approved" header="Finance Approval" >
                         <template #body="{ data }">
-                            <i :class="{ 'pi-check-circle text-green-500': data.is_finance_approved, 'pi-times-circle text-red-400': !data.is_finance_approved }" class="pi"></i>
+                            <div class="flex items-center justify-center">
+                                <div v-if="data.is_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
+                            </div>
                         </template>
                     </Column>
                     <Column field="" header="Actions" style="width: 10%">

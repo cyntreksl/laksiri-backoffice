@@ -18,10 +18,8 @@ import {push} from "notivue";
 import Dialog from "primevue/dialog";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import Panel from "primevue/panel";
 import DatePicker from "primevue/datepicker";
-import FloatLabel from "primevue/floatlabel";
-import moment from "moment/moment.js";
+import moment from "moment";
 
 const confirm = useConfirm();
 const baseUrl = ref("approved-container-payments-list");
@@ -31,18 +29,14 @@ const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
 const selectedContainerPayments = ref([]);
-const selectedContainerPaymentId = ref(null);
-const isDialogVisible = ref(false);
-const showEditContainerPaymentDialog = ref(false);
-const checked = ref(false);
-const showEditNewContainerPaymentDialog = ref(false);
-const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
+const showMarkAsPaidModal = ref(false);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    created_at: { value: null, matchMode: FilterMatchMode.EQUALS },
 });
 
-const fetchContainerPayments = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
+const fetchContainerApprovedPayments = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
     loading.value = true;
     try {
         const response = await axios.get(baseUrl.value, {
@@ -52,7 +46,9 @@ const fetchContainerPayments = async (page = 1, search = "", sortField = 'id', s
                 search,
                 sort_field: sortField,
                 sort_order: sortOrder === 1 ? "desc" : "asc",
-                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+                fromDate: filters.value.created_at?.value
+                    ? moment(filters.value.created_at.value).format("YYYY-MM-DD")
+                    : null,
             }
         });
         containerPayments.value = response.data.data;
@@ -68,19 +64,19 @@ const fetchContainerPayments = async (page = 1, search = "", sortField = 'id', s
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchContainerPayments(currentPage.value);
+    fetchContainerApprovedPayments(currentPage.value);
 };
 
 const onSort = (event) => {
-    fetchContainerPayments(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+    fetchContainerApprovedPayments(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
 
 onMounted(() => {
-    fetchContainerPayments();
+    fetchContainerApprovedPayments();
 });
 
 const debouncedFetchContainerPayments = debounce((searchValue) => {
-    fetchContainerPayments(1, searchValue);
+    fetchContainerApprovedPayments(1, searchValue);
 }, 1000);
 
 watch(() => filters.value.global.value, (newValue) => {
@@ -89,23 +85,9 @@ watch(() => filters.value.global.value, (newValue) => {
     }
 });
 
-watch(() => fromDate.value, (newValue) => {
-    fetchContainerPayments(1, filters.value.global.value);
+watch(() => filters.value.created_at.value, (newValue) => {
+    fetchContainerApprovedPayments(1, filters.value.global.value);
 });
-
-// Updated formatDate function with error handling and fallback options
-const formatTime = (timeStr) => {
-    const date = new Date(timeStr);
-
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const year = String(date.getFullYear()).slice(-2); // Get last 2 digits of year
-
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-
-    return `${day}-${month}-${year} ${hours}:${minutes}`;
-};
 
 const revokeContainerPayments = () => {
     const idList = selectedContainerPayments.value.map((item) => item.id);
@@ -124,7 +106,7 @@ const revokeContainerPayments = () => {
             severity: 'warn'
         },
         accept: async () => {
-            router.post(route("finance.container-payment.revoke-approval"), {
+            router.post(route("container-payment.revoke-approval"), {
                 data: {
                     container_payments_ids: idList,
                 },
@@ -137,7 +119,7 @@ const revokeContainerPayments = () => {
                 },
             });
             selectedContainerPayments.value = [];
-            await fetchContainerPayments();
+            await fetchContainerApprovedPayments();
         },
         reject: () => {
             selectedContainerPayments.value = [];
@@ -149,8 +131,6 @@ const form = useForm({
     paymentsIds: [],
     payment_received_by: "",
 });
-
-const showMarkAsPaidModal = ref(false);
 
 const onDialogShow = () => {
     document.body.classList.add('p-overflow-hidden');
@@ -169,11 +149,11 @@ const closeShowPaidModal = () => {
 
 const handleMarkAsPaid = () => {
     form.paymentsIds = selectedContainerPayments.value.map((item) => item.id);
-    form.post(route("finance.container-payment.complete-payment"), {
+    form.post(route("container-payment.complete-payment"), {
         onSuccess: () => {
             closeShowPaidModal();
             form.reset();
-            fetchContainerPayments();
+            fetchContainerApprovedPayments();
             push.success("Container Payment Completed Successfully!");
         },
         onError: () => {
@@ -184,27 +164,25 @@ const handleMarkAsPaid = () => {
     });
 }
 
-
+const clearFilter = () => {
+    filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        created_at: { value: null, matchMode: FilterMatchMode.EQUALS },
+    };
+    fetchContainerPaymentRequests(currentPage.value);
+};
 </script>
 <template>
-    <AppLayout title="Container Payments Requests">
-        <template #header>Container Payments Requests</template>
+    <AppLayout title="Container Approved Payments">
+        <template #header>Container Approved Payments</template>
+
         <Breadcrumb/>
 
-        <div>
-            <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    <FloatLabel class="w-full" variant="in">
-                        <DatePicker v-model="fromDate" class="w-full" date-format="yy-mm-dd" input-id="from-date"/>
-                        <label for="from-date">Created Date</label>
-                    </FloatLabel>
-                </div>
-            </Panel>
-        </div>
         <Card class="my-5">
             <template #content>
                 <DataTable
                     v-model:selection="selectedContainerPayments"
+                    v-model:filters="filters"
                     :loading="loading"
                     :rows="perPage"
                     :rowsPerPageOptions="[5, 10, 20, 50, 100]"
@@ -222,7 +200,7 @@ const handleMarkAsPaid = () => {
                     <template #header>
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                             <div class="text-lg font-medium">
-                                Container Payment Requests
+                                Container Approved Payments
                             </div>
                             <div class="flex items-center gap-3">
                                 <Button
@@ -240,6 +218,18 @@ const handleMarkAsPaid = () => {
                             </div>
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between gap-4">
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <Button
+                                    icon="pi pi-filter-slash"
+                                    label="Clear Filters"
+                                    outlined
+                                    severity="contrast"
+                                    size="small"
+                                    type="button"
+                                    @click="clearFilter()"
+                                />
+                            </div>
+
                             <!-- Search Field -->
                             <IconField class="w-full sm:w-auto">
                                 <InputIcon>
@@ -254,23 +244,65 @@ const handleMarkAsPaid = () => {
                             </IconField>
                         </div>
                     </template>
-                    <template #empty> No Container Payment found. </template>
-                    <template #loading> Loading Container Payment data. Please wait.</template>
-                    <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
+                    <template #empty> No Container Approved Payments found. </template>
+                    <template #loading> Loading Container Approved Payments data. Please wait.</template>
+                    <Column v-if="usePage().props.user.permissions.includes('payment-container.approve')" headerStyle="width: 3rem" selectionMode="multiple"></Column>
                     <Column field="containerReference" header="Container Reference" sortable></Column>
-                    <Column field="do_charge" header="DO Charge" sortable></Column>
-                    <Column field="demurrage_charge" header="Demurrage Charge" sortable></Column>
-                    <Column field="assessment_charge" header="Assessment Charge" sortable></Column>
-                    <Column field="slpa_charge" header="SLPA Charge" sortable></Column>
-                    <Column field="refund_charge" header="Refund Charge" sortable></Column>
-                    <Column field="clearance_harge" header="Clearance Charge" sortable></Column>
-                    <Column field="total" header="Total" sortable></Column>
-                    <Column field="created_at" header="Created Date" sortable>
-                        <template #body="{ data }">
-                            {{formatTime(data.created_at)}}
+                    <Column field="do_charge" header="DO Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.do_charge.toFixed(2) }}
+                            </div>
                         </template>
                     </Column>
-                    <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} Container Payments.</template>
+                    <Column field="demurrage_charge" header="Demurrage Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.demurrage_charge.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="assessment_charge" header="Assessment Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.assessment_charge.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="slpa_charge" header="SLPA Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.slpa_charge.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="refund_charge" header="Refund Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.refund_charge.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="clearance_charge" header="Clearance Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.clearance_charge.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="total" header="Total" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.total.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="created_at" header="Created At" sortable>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <DatePicker v-model="filterModel.value" class="w-full" date-format="yy-mm-dd" placeholder="Set Date"/>
+                        </template>
+                    </Column>
+                    <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} Container Approved Payments.</template>
                 </DataTable>
             </template>
         </Card>
@@ -285,7 +317,7 @@ const handleMarkAsPaid = () => {
             @hide="onDialogHide"
             @show="onDialogShow"
         >
-            <div class="mt-4">
+            <div>
                 <InputLabel value="Payment Received By"/>
                 <InputText
                     v-model="form.payment_received_by"

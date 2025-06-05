@@ -58,7 +58,6 @@ Route::middleware([
     // finance routes
     Route::name('finance.')->prefix('finance')->group(function () {
         require_once __DIR__.'/web/finance/hbl.php';
-        require_once __DIR__.'/web/finance/container-payment.php';
     });
 
     Route::name('clearance.')->prefix('clearance')->group(function () {

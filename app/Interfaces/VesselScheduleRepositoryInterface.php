@@ -11,11 +11,13 @@ interface VesselScheduleRepositoryInterface
 
     public function getRecentVesselSchedule();
 
-    public function addVesselToSchedule(VesselSchedule $vesselSchedule, string $vesselReference);
+    public function addContainerToSchedule(VesselSchedule $vesselSchedule, int $containerId);
 
-    public function removeVesselFromSchedule(VesselSchedule $vesselSchedule, int $containerId);
+    public function removeContainerFromSchedule(VesselSchedule $vesselSchedule, int $containerId);
 
     public function downloadVesselSchedulePDF(VesselSchedule $vesselSchedule);
 
     public function updateContainer(Container $container, array $data);
+
+    public function downloadShipmentReleasePDF(Container $container);
 }

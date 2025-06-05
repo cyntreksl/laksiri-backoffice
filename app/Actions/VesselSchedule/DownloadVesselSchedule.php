@@ -4,7 +4,6 @@ namespace App\Actions\VesselSchedule;
 
 use App\Models\VesselSchedule;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class DownloadVesselSchedule
@@ -13,9 +12,8 @@ class DownloadVesselSchedule
 
     public function handle(VesselSchedule $vesselSchedule)
     {
-        $formattedDate = Carbon::now()->format('dS').' '.strtoupper(Carbon::now()->format('F')).' '.Carbon::now()->format('Y');
-
         $containerData = [];
+
         foreach ($vesselSchedule->clearanceContainers->load('branch', 'duplicate_hbl_packages') as $container) {
             $containerData[] = [
                 'vessel_name' => $container->vessel_name ?? '',
@@ -28,9 +26,10 @@ class DownloadVesselSchedule
                 'date' => $container->estimated_time_of_arrival ?? '',
             ];
         }
+
         $pdf = Pdf::loadView('pdf.vesselSchedule.vesselSchedule', [
-            'formattedDate' => $formattedDate,
             'containers' => $containerData,
+            'vesselSchedule' => $vesselSchedule,
         ])->setPaper('a4', 'landscape');
 
         $filename = 'vessel-schedule.pdf';

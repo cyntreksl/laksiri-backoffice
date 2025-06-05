@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CompletePaymentRequest;
 use App\Interfaces\ContainerPaymentRepositoryInterface;
 use App\Models\Container;
 use App\Models\ContainerPayment;
@@ -27,7 +28,7 @@ class ContainerPaymentController extends Controller
         $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
+        $filters = $request->only(['fromDate']);
 
         return $this->containerPaymentRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
@@ -60,7 +61,7 @@ class ContainerPaymentController extends Controller
         $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
+        $filters = $request->only(['fromDate']);
 
         return $this->containerPaymentRepository->refundDataset($limit, $page, $order, $dir, $search, $filters);
     }
@@ -83,8 +84,59 @@ class ContainerPaymentController extends Controller
         $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'drivers', 'officers', 'paymentStatus', 'deliveryType', 'warehouse']);
+        $filters = $request->only(['fromDate']);
 
         return $this->containerPaymentRepository->completedDataset($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function paymentRequestList()
+    {
+        return Inertia::render('ContainerPayment/RequestsList');
+    }
+
+    public function requestList(Request $request)
+    {
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate']);
+
+        return $this->containerPaymentRepository->requestDataset($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function approveContainerPayments(Request $request)
+    {
+        $this->containerPaymentRepository->approveContainerPayments($request['data']['container_payments_ids']);
+    }
+
+    public function approvedContainerPayments()
+    {
+        return Inertia::render('ContainerPayment/ApprovedList');
+    }
+
+    public function approvedList(Request $request)
+    {
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate']);
+
+        return $this->containerPaymentRepository->approvedPaymentsDataset($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function revokeContainerPaymentsApprovals(Request $request)
+    {
+        $this->containerPaymentRepository->revokeContainerPaymentsApprovals($request['data']['container_payments_ids']);
+    }
+
+    public function completePayment(CompletePaymentRequest $request)
+    {
+        $this->containerPaymentRepository->completePayments($request->all());
     }
 }

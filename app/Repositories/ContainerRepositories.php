@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Actions\Container\CreateContainer;
+use App\Actions\Container\GetContainerByReference;
 use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Loading\GetLoadedContainers;
 use App\Actions\Container\MarkAsReached;
@@ -362,6 +363,15 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             return DownloadSingleUnloadingIssueFile::run($id);
         } catch (\Exception $exception) {
             throw new \Exception('Failed to download file: '.$exception->getMessage());
+        }
+    }
+
+    public function getContainerByReference(string $reference, string|int $vesselScheduleId)
+    {
+        try {
+            return GetContainerByReference::run($reference, $vesselScheduleId);
+        } catch (\Exception $exception) {
+            throw new \Exception('Failed to getting container: '.$exception->getMessage());
         }
     }
 }

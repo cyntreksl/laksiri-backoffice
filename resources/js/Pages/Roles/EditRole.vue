@@ -111,12 +111,26 @@ const checkSinglePermission = (index) => {
 };
 
 const formatPermissionName = (name) => {
-    // Remove the first word before the first dot
-    let parts = name.split('.');
-    parts.shift(); // Remove the first part
+    // Check if the name contains a dot (first type) or underscore (second type)
+    if (name.includes('.')) {
+        // The first type: 'group.permission_name'
+        let parts = name.split('.');
 
-    // Capitalize the first letter of each remaining word and join them with a space
-    return parts.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        // Process each part: capitalize the first letter and replace underscores with spaces
+        return parts.map(part =>
+            part.split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')
+        ).join(' ');
+    } else if (name.includes('_')) {
+        // Split by underscores, capitalize each word, and join with spaces
+        return name.split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
+
+    // Fallback for other cases
+    return name.charAt(0).toUpperCase() + name.slice(1);
 };
 
 const form = useForm({

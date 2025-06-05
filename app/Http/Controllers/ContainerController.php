@@ -290,4 +290,9 @@ class ContainerController extends Controller
     {
         return $this->MHBLRepository->getUnloadedMHBLHBL($request->all()['reference']);
     }
+
+    public function getContainerByReference(Request $request, string $reference)
+    {
+        return $this->containerRepository->getContainerByReference($reference, $request->vesselScheduleId);
+    }
 }

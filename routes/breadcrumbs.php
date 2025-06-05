@@ -178,7 +178,7 @@ Breadcrumbs::for('setting.special-do-charges.edit', function (BreadcrumbTrail $t
 Breadcrumbs::for('setting.currencies.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Settings');
-    $trail->push('Currencies', route('setting.currencies.index'));
+    $trail->push('Currency Rates', route('setting.currencies.index'));
 });
 
 // Driver Area
@@ -507,14 +507,26 @@ Breadcrumbs::for('container-payment.index', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('container-payment.showContainerPaymentRefund', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Container Payment');
-    $trail->push('Refund List', route('container-payment.showContainerPaymentRefund'));
+    $trail->push('Refunds', route('container-payment.showContainerPaymentRefund'));
 });
 
 // Completed Container Payment
 Breadcrumbs::for('container-payment.showCompletedContainerPayment', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Container Payment');
-    $trail->push('Completed List', route('container-payment.showCompletedContainerPayment'));
+    $trail->push('Container Payments');
+    $trail->push('Completed', route('container-payment.showCompletedContainerPayment'));
+});
+
+Breadcrumbs::for('container-payment.request', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Container Payments');
+    $trail->push('Requests', route('container-payment.request'));
+});
+
+Breadcrumbs::for('approved-container-payments', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Container Payments');
+    $trail->push('Approved Payments', route('approved-container-payments'));
 });
 
 require_once __DIR__.'/call-center-breadcrumbs.php';

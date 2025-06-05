@@ -2,7 +2,6 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {onMounted, ref, watch} from "vue";
-import { router, useForm, usePage} from "@inertiajs/vue3";
 import Card from "primevue/card";
 import DataTable from "primevue/datatable";
 import InputIcon from "primevue/inputicon";
@@ -10,32 +9,22 @@ import InputText from "primevue/inputtext";
 import Column from "primevue/column";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
-import {useConfirm} from "primevue/useconfirm";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
-import {push} from "notivue";
-import Dialog from "primevue/dialog";
-import InputError from "@/Components/InputError.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import Panel from "primevue/panel";
 import DatePicker from "primevue/datepicker";
-import FloatLabel from "primevue/floatlabel";
-import moment from "moment/moment.js";
+import moment from "moment";
 
-const confirm = useConfirm();
-const baseUrl = ref("container-payment-completed-list");
+const baseUrl = ref("/container-payment-completed-list");
 const loading = ref(true);
 const containerPayments = ref([]);
 const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
-const isDialogVisible = ref(false);
-const checked = ref(false);
-const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    created_at: { value: null, matchMode: FilterMatchMode.EQUALS },
 });
 
 const fetchContainerPayments = async (page = 1, search = "", sortField = 'id', sortOrder = 0) => {
@@ -48,7 +37,9 @@ const fetchContainerPayments = async (page = 1, search = "", sortField = 'id', s
                 search,
                 sort_field: sortField,
                 sort_order: sortOrder === 1 ? "desc" : "asc",
-                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+                fromDate: filters.value.created_at?.value
+                    ? moment(filters.value.created_at.value).format("YYYY-MM-DD")
+                    : null,
             }
         });
         containerPayments.value = response.data.data;
@@ -85,43 +76,28 @@ watch(() => filters.value.global.value, (newValue) => {
     }
 });
 
-watch(() => fromDate.value, (newValue) => {
+watch(() => filters.value.created_at.value, (newValue) => {
     fetchContainerPayments(1, filters.value.global.value);
 });
 
-// Updated formatDate function with error handling and fallback options
-const formatTime = (timeStr) => {
-    const date = new Date(timeStr);
-
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const year = String(date.getFullYear()).slice(-2); // Get last 2 digits of year
-
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-
-    return `${day}-${month}-${year} ${hours}:${minutes}`;
+const clearFilter = () => {
+    filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        created_at: { value: null, matchMode: FilterMatchMode.EQUALS },
+    };
+    fetchContainerPayments(currentPage.value);
 };
-
 </script>
 <template>
     <AppLayout title="Completed Container Payments">
         <template #header>Completed Container Payments</template>
+
         <Breadcrumb/>
 
-        <div>
-            <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    <FloatLabel class="w-full" variant="in">
-                        <DatePicker v-model="fromDate" class="w-full" date-format="yy-mm-dd" input-id="from-date"/>
-                        <label for="from-date">Created Date</label>
-                    </FloatLabel>
-                </div>
-            </Panel>
-        </div>
         <Card class="my-5">
             <template #content>
                 <DataTable
+                    v-model:filters="filters"
                     :loading="loading"
                     :rows="perPage"
                     :rowsPerPageOptions="[5, 10, 20, 50, 100]"
@@ -139,10 +115,22 @@ const formatTime = (timeStr) => {
                     <template #header>
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                             <div class="text-lg font-medium">
-                                Completed Container Payment
+                                Completed Container Payments
                             </div>
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between gap-4">
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <Button
+                                    icon="pi pi-filter-slash"
+                                    label="Clear Filters"
+                                    outlined
+                                    severity="contrast"
+                                    size="small"
+                                    type="button"
+                                    @click="clearFilter()"
+                                />
+                            </div>
+
                             <!-- Search Field -->
                             <IconField class="w-full sm:w-auto">
                                 <InputIcon>
@@ -157,27 +145,78 @@ const formatTime = (timeStr) => {
                             </IconField>
                         </div>
                     </template>
-                    <template #empty> No Container Refunds found. </template>
-                    <template #loading> Loading Container Payment data. Please wait.</template>
+                    <template #empty> No Completed Container Payments found. </template>
+                    <template #loading> Loading Completed Container Payments data. Please wait.</template>
                     <Column field="containerReference" header="Container Reference" sortable></Column>
-                    <Column field="do_charge" header="DO Charge" sortable></Column>
-                    <Column field="demurrage_charge" header="Demurrage Charge" sortable></Column>
-                    <Column field="assessment_charge" header="Assessment Charge" sortable></Column>
-                    <Column field="slpa_charge" header="SLPA Charge" sortable></Column>
-                    <Column field="refund_charge" header="Refund Charge" sortable></Column>
-                    <Column field="clearance_harge" header="Clearance Charge" sortable></Column>
-                    <Column field="total" header="Total" sortable></Column>
-                    <Column field="created_at" header="Created Date" sortable>
-                        <template #body="{ data }">
-                            {{formatTime(data.created_at)}}
+                    <Column field="do_charge" header="DO Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.do_charge.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="demurrage_charge" header="Demurrage Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.demurrage_charge.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="assessment_charge" header="Assessment Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.assessment_charge.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="slpa_charge" header="SLPA Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.slpa_charge.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="refund_charge" header="Refund Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.refund_charge.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="clearance_charge" header="Clearance Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.clearance_charge.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="total" header="Total" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.total.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="created_at" header="Created At" sortable>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <DatePicker v-model="filterModel.value" class="w-full" date-format="yy-mm-dd" placeholder="Set Date"/>
                         </template>
                     </Column>
                     <Column field="is_finance_approved" header="Finance Approval" >
                         <template #body="{ data }">
-                            <i :class="{ 'pi-check-circle text-green-500': data.is_finance_approved, 'pi-times-circle text-red-400': !data.is_finance_approved }" class="pi"></i>
+                            <div class="flex items-center justify-center">
+                                <div v-if="data.is_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
+                            </div>
                         </template>
                     </Column>
-                    <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} Container Refunds.</template>
+                    <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} Completed Container Payments.</template>
                 </DataTable>
             </template>
         </Card>

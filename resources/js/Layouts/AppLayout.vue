@@ -264,7 +264,7 @@
                                     activeMenu === 'container-payment' ? 'bg-primary/10 text-primary' : '',
                                   ]"
                                 class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-                                x-tooltip.placement.right="'Container Payment'"
+                                x-tooltip.placement.right="'Container Payments'"
                                 @click="
                                     setMenu('container-payment');
                                     openSideBar();
@@ -962,8 +962,8 @@ export default {
                             2,
                             0,
                             {
-                                title: "Container Payment Requests",
-                                route: "container-payment.index",
+                                title: "Payment Requests",
+                                route: "container-payment.request",
                             }
                         );
                     }
@@ -973,7 +973,7 @@ export default {
                             2,
                             0,
                             {
-                                title: "Container Payment Refunds",
+                                title: "Refunds",
                                 route: "container-payment.showContainerPaymentRefund",
                             }
                         );
@@ -983,8 +983,8 @@ export default {
                             2,
                             0,
                             {
-                                title: "Container Payment Requests",
-                                route: "finance.container-payments.index",
+                                title: "Payment Requests",
+                                route: "container-payment.request",
                             }
                         );
                     }
@@ -994,8 +994,8 @@ export default {
                             2,
                             0,
                             {
-                                title: "Approved Container Payment Requests",
-                                route: "finance.approved-container-payments",
+                                title: "Approved Payment Requests",
+                                route: "approved-container-payments",
                             }
                         );
                     }
@@ -1005,7 +1005,7 @@ export default {
                             2,
                             0,
                             {
-                                title: "Completed Container Payment Requests",
+                                title: "Completed Payment Requests",
                                 route: "container-payment.showCompletedContainerPayment",
                             }
                         );
@@ -1015,7 +1015,7 @@ export default {
                         childMenuList.length,
                         ...containerPaymentMenu
                     );
-                    changeSidePanelTitle("Container Payment");
+                    changeSidePanelTitle("Container Payments");
                     break;
                 case "reception":
                     let receptionMenu = [];
@@ -1437,94 +1437,95 @@ export default {
                     changeSidePanelTitle("Report");
                     break;
                 case "setting":
-                    let settingMenu = [
+                    let settingMenu = [];
+
+                    const settingsPermissionMenuMap = [
                         {
+                            permission: "manage_zones",
                             title: "Zones",
-                            route: "setting.warehouse-zones.index",
+                            route: "setting.warehouse-zones.index"
                         },
                         {
+                            permission: "manage_driver_zones",
                             title: "Driver Zones",
-                            route: "setting.driver-zones.index",
+                            route: "setting.driver-zones.index"
                         },
                         {
+                            permission: "manage_driver_areas",
                             title: "Driver Areas",
-                            route: "setting.driver-areas.index",
+                            route: "setting.driver-areas.index"
                         },
                         {
+                            permission: "manage_warehouse_zones",
                             title: "Warehouse Zones",
-                            route: "setting.warehouse-zones.index",
+                            route: "setting.warehouse-zones.index"
                         },
                         {
+                            permission: "manage_pricing",
                             title: "Pricing",
-                            route: "setting.prices.index",
+                            route: "setting.prices.index"
                         },
                         {
+                            permission: "manage_package_pricing",
                             title: "Package Pricing",
-                            route: "setting.package-prices.index",
+                            route: "setting.package-prices.index"
                         },
                         {
+                            permission: "manage_exceptions",
                             title: "Exceptions",
-                            route: "setting.exception-names.index",
+                            route: "setting.exception-names.index"
                         },
                         {
+                            permission: "manage_package_types",
                             title: "Package Types",
-                            route: "setting.package-types.index",
+                            route: "setting.package-types.index"
                         },
                         {
+                            permission: "manage_shippers_and_consignees",
                             title: "Shipper & Consignee",
-                            route: "setting.shipper-consignees.index",
+                            route: "setting.shipper-consignees.index"
+                        },
+                        {
+                            permission: "air-line.index",
+                            title: "Air Lines",
+                            route: "setting.air-lines.index"
+                        },
+                        {
+                            permission: "tax.destination tax",
+                            title: "Tax",
+                            route: "setting.taxes.index"
+                        },
+                        {
+                            permission: "currencies.index",
+                            title: "Currencies",
+                            route: "setting.currencies.index"
+                        },
+                        {
+                            permission: "charges.air line do charges index",
+                            title: "Air Line DO Charges",
+                            route: "setting.air-lines.do-charges"
+                        },
+                        {
+                            permission: "charges.special do charges index",
+                            title: "Special DO Charges",
+                            route: "setting.special-do-charges.index"
+                        },
+                        {
+                            permission: "pickup-type.index",
+                            title: "Pickup Types",
+                            route: "setting.pickup-types.index"
                         }
                     ];
 
-                    if (usePage().props.user.permissions.includes("air-line.index")) {
-                        settingMenu = [...settingMenu,{
-                            title: "Air Lines",
-                            route: "setting.air-lines.index",
-                        }];
-
-                    }
-                    if (usePage().props.user.permissions.includes("tax.destination tax")) {
-                        settingMenu = [...settingMenu,{
-                            title: "Tax",
-                            route: "setting.taxes.index",
-                        }];
-
-                    }
-                    if (usePage().props.user.permissions.includes("currencies.index")) {
-                        settingMenu = [...settingMenu,{
-                            title: "Currencies",
-                            route: "setting.currencies.index",
-                        }];
-
-                    }
-                    if (usePage().props.user.permissions.includes("charges.air line do charges index")) {
-                        settingMenu = [...settingMenu,{
-                            title: "Air Line DO Charges",
-                            route: "setting.air-lines.do-charges",
-                        }];
-
-                    }
-
-                    if (usePage().props.user.permissions.includes("charges.special do charges index")){
-                        settingMenu= [...settingMenu,{
-                                title: "Special DO Charges ",
-                                route: "setting.special-do-charges.index",
-                            }];
-                    }
+                    settingsPermissionMenuMap.forEach(({ permission, title, route }) => {
+                        if (usePage().props.user.permissions.includes(permission)) {
+                            settingMenu.push({ title, route });
+                        }
+                    });
 
                     childMenuList.splice(0, childMenuList.length, ...settingMenu);
-                    if (usePage().props.user.permissions.includes("pickup-type.index")){
-                        settingMenu = [...settingMenu,{
-                            title: "Pickup Types",
-                            route: "setting.pickup-types.index",
-                        }];
-                    }
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        ...settingMenu
-                    );
-                    changeSidePanelTitle("Setting");
+
+                    changeSidePanelTitle("Settings");
                     break;
                 case "settings":
                     childMenuList.splice(0, childMenuList.length, {

@@ -27,11 +27,9 @@ class VesselScheduleController extends Controller
 
     public function show(VesselSchedule $vesselSchedule)
     {
-        $vesselSchedule->load([
-            'clearanceContainers.branch',
-            'clearanceContainers.warehouse',
-            'clearanceContainers.hbl_packages',
-        ]);
+        $vesselSchedule->load(['clearanceContainers' => function ($query) {
+            $query->with(['branch', 'warehouse', 'hbl_packages']);
+        }]);
 
         $seaContainerOptions = ContainerType::getSeaCargoOptions();
         $airContainerOptions = ContainerType::getAirCargoOptions();
@@ -42,30 +40,34 @@ class VesselScheduleController extends Controller
 
         return Inertia::render('Clearance/VesselSchedule/ShowVesselSchedule', [
             'vesselSchedule' => $vesselSchedule,
-            'containers' => $vesselSchedule->clearanceContainers ?? [],
             'containerStatus' => $containerStatuses,
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
         ]);
     }
 
-    public function addVesselToSchedule(VesselSchedule $vesselSchedule, Request $request)
+    public function addContainerToSchedule(Request $request, VesselSchedule $vesselSchedule)
     {
-        return $this->vesselScheduleRepository->addVesselToSchedule($vesselSchedule->first(), $request['reference']);
+        return $this->vesselScheduleRepository->addContainerToSchedule($vesselSchedule, $request['containerId']);
     }
 
-    public function removeVesselFromSchedule(VesselSchedule $vesselSchedule, Request $request)
+    public function removeContainerFromSchedule(Request $request, VesselSchedule $vesselSchedule)
     {
-        $this->vesselScheduleRepository->removeVesselFromSchedule($vesselSchedule->first(), $request['containerID']);
+        $this->vesselScheduleRepository->removeContainerFromSchedule($vesselSchedule, $request['containerID']);
     }
 
     public function downloadVesselSchedulePDF(VesselSchedule $vesselSchedule)
     {
-        return $this->vesselScheduleRepository->downloadVesselSchedulePDF($vesselSchedule->first());
+        return $this->vesselScheduleRepository->downloadVesselSchedulePDF($vesselSchedule);
     }
 
     public function updateContainer(Container $container, UpdateClearanceContainerRequest $request)
     {
         return $this->vesselScheduleRepository->updateContainer($container, $request->all());
+    }
+
+    public function downloadShipmentReleasePDF(Container $container)
+    {
+        return $this->vesselScheduleRepository->downloadShipmentReleasePDF($container);
     }
 }

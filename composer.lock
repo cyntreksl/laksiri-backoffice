@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b5c682404c78f47e87b2cf64d7437a67",
+    "content-hash": "5dc369a7bffe68f5346555a51a8bf7e0",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2008,6 +2008,64 @@
             "time": "2023-12-03T19:50:20+00:00"
         },
         {
+            "name": "hammerstone/sidecar",
+            "version": "v0.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aarondfrancis/sidecar.git",
+                "reference": "91a7001be31b16b51536aad42b14797653c3d862"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aarondfrancis/sidecar/zipball/91a7001be31b16b51536aad42b14797653c3d862",
+                "reference": "91a7001be31b16b51536aad42b14797653c3d862",
+                "shasum": ""
+            },
+            "require": {
+                "aws/aws-sdk-php": "^3.216.1",
+                "guzzlehttp/guzzle": "^6.5.8|^7.2",
+                "illuminate/console": "^8|^9|^10|^11|^12.0",
+                "illuminate/filesystem": "^8|^9|^10|^11|^12.0",
+                "illuminate/support": "^8|^9|^10|^11|^12.0",
+                "maennchen/zipstream-php": "^3.1",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.3.3",
+                "orchestra/testbench": "^5|^6|^7|^8|^9|^10.0",
+                "phpunit/phpunit": ">=8.5.23|^9|^10"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Hammerstone\\Sidecar\\Providers\\SidecarServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Hammerstone\\Sidecar\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aaron Francis",
+                    "email": "aaron@hammerstone.dev"
+                }
+            ],
+            "description": "A Laravel package to deploy Lambda functions alongside your main application.",
+            "support": {
+                "issues": "https://github.com/aarondfrancis/sidecar/issues",
+                "source": "https://github.com/aarondfrancis/sidecar/tree/v0.7.0"
+            },
+            "time": "2025-05-07T23:03:51+00:00"
+        },
+        {
             "name": "inertiajs/inertia-laravel",
             "version": "v1.3.2",
             "source": {
@@ -3791,29 +3849,29 @@
         },
         {
             "name": "maatwebsite/excel",
-            "version": "3.1.62",
+            "version": "3.1.64",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SpartnerNL/Laravel-Excel.git",
-                "reference": "decfb9140161fcc117571e47e35ddf27983189ce"
+                "reference": "e25d44a2d91da9179cd2d7fec952313548597a79"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/decfb9140161fcc117571e47e35ddf27983189ce",
-                "reference": "decfb9140161fcc117571e47e35ddf27983189ce",
+                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/e25d44a2d91da9179cd2d7fec952313548597a79",
+                "reference": "e25d44a2d91da9179cd2d7fec952313548597a79",
                 "shasum": ""
             },
             "require": {
                 "composer/semver": "^3.3",
                 "ext-json": "*",
-                "illuminate/support": "5.8.*||^6.0||^7.0||^8.0||^9.0||^10.0||^11.0",
+                "illuminate/support": "5.8.*||^6.0||^7.0||^8.0||^9.0||^10.0||^11.0||^12.0",
                 "php": "^7.0||^8.0",
-                "phpoffice/phpspreadsheet": "^1.29.7",
+                "phpoffice/phpspreadsheet": "^1.29.9",
                 "psr/simple-cache": "^1.0||^2.0||^3.0"
             },
             "require-dev": {
                 "laravel/scout": "^7.0||^8.0||^9.0||^10.0",
-                "orchestra/testbench": "^6.0||^7.0||^8.0||^9.0",
+                "orchestra/testbench": "^6.0||^7.0||^8.0||^9.0||^10.0",
                 "predis/predis": "^1.1"
             },
             "type": "library",
@@ -3856,7 +3914,7 @@
             ],
             "support": {
                 "issues": "https://github.com/SpartnerNL/Laravel-Excel/issues",
-                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.62"
+                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.64"
             },
             "funding": [
                 {
@@ -3868,7 +3926,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-01-04T12:14:36+00:00"
+            "time": "2025-02-24T11:12:50+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -5117,20 +5175,20 @@
         },
         {
             "name": "phpoffice/phpspreadsheet",
-            "version": "1.29.9",
+            "version": "1.29.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PhpSpreadsheet.git",
-                "reference": "ffb47b639649fc9c8a6fa67977a27b756592ed85"
+                "reference": "c80041b1628c4f18030407134fe88303661d4e4e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/ffb47b639649fc9c8a6fa67977a27b756592ed85",
-                "reference": "ffb47b639649fc9c8a6fa67977a27b756592ed85",
+                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/c80041b1628c4f18030407134fe88303661d4e4e",
+                "reference": "c80041b1628c4f18030407134fe88303661d4e4e",
                 "shasum": ""
             },
             "require": {
-                "composer/pcre": "^3.3",
+                "composer/pcre": "^1||^2||^3",
                 "ext-ctype": "*",
                 "ext-dom": "*",
                 "ext-fileinfo": "*",
@@ -5217,9 +5275,9 @@
             ],
             "support": {
                 "issues": "https://github.com/PHPOffice/PhpSpreadsheet/issues",
-                "source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/1.29.9"
+                "source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/1.29.10"
             },
-            "time": "2025-01-26T04:55:00+00:00"
+            "time": "2025-02-08T02:56:14+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -6534,6 +6592,74 @@
                 "source": "https://github.com/MyIntervals/PHP-CSS-Parser/tree/v8.7.0"
             },
             "time": "2024-10-27T17:38:32+00:00"
+        },
+        {
+            "name": "spatie/browsershot",
+            "version": "5.0.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/browsershot.git",
+                "reference": "9e5ae15487b3cdc3eb03318c1c8ac38971f60e58"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/browsershot/zipball/9e5ae15487b3cdc3eb03318c1c8ac38971f60e58",
+                "reference": "9e5ae15487b3cdc3eb03318c1c8ac38971f60e58",
+                "shasum": ""
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "ext-json": "*",
+                "php": "^8.2",
+                "spatie/temporary-directory": "^2.0",
+                "symfony/process": "^6.0|^7.0"
+            },
+            "require-dev": {
+                "pestphp/pest": "^3.0",
+                "spatie/image": "^3.6",
+                "spatie/pdf-to-text": "^1.52",
+                "spatie/phpunit-snapshot-assertions": "^4.2.3|^5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Browsershot\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://github.com/freekmurze",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Convert a webpage to an image or pdf using headless Chrome",
+            "homepage": "https://github.com/spatie/browsershot",
+            "keywords": [
+                "chrome",
+                "convert",
+                "headless",
+                "image",
+                "pdf",
+                "puppeteer",
+                "screenshot",
+                "webpage"
+            ],
+            "support": {
+                "source": "https://github.com/spatie/browsershot/tree/5.0.10"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-05-15T07:10:57+00:00"
         },
         {
             "name": "spatie/image",
@@ -9718,6 +9844,92 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.11.0"
             },
             "time": "2022-06-03T18:03:27+00:00"
+        },
+        {
+            "name": "wnx/sidecar-browsershot",
+            "version": "v2.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stefanzweifel/sidecar-browsershot.git",
+                "reference": "20c5a56c34298f7edb7334890e919c0521a7f467"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stefanzweifel/sidecar-browsershot/zipball/20c5a56c34298f7edb7334890e919c0521a7f467",
+                "reference": "20c5a56c34298f7edb7334890e919c0521a7f467",
+                "shasum": ""
+            },
+            "require": {
+                "hammerstone/sidecar": "^0.4 || ^0.5 || ^0.6 || ^0.7",
+                "illuminate/contracts": "^10.0 || ^11.0 || ^12.0",
+                "php": "^8.2",
+                "spatie/browsershot": "^4.0 || ^5.0",
+                "spatie/laravel-package-tools": "^1.9.2"
+            },
+            "require-dev": {
+                "ext-imagick": "*",
+                "laravel/pint": "^1.13",
+                "league/flysystem-aws-s3-v3": "^1.0|^2.0|^3.0",
+                "nunomaduro/collision": "^7.0|^8.0",
+                "orchestra/testbench": "^8.0|^9.0|^10.0",
+                "pestphp/pest": "^2.0|^3.0",
+                "pestphp/pest-plugin-laravel": "^2.0|^3.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpunit/phpunit": "^10 | ^11.0",
+                "spatie/image": "^3.3",
+                "spatie/pixelmatch-php": "dev-main"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "SidecarBrowsershot": "Wnx\\SidecarBrowsershot\\Facades\\SidecarBrowsershot"
+                    },
+                    "providers": [
+                        "Wnx\\SidecarBrowsershot\\SidecarBrowsershotServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Wnx\\SidecarBrowsershot\\": "src",
+                    "Wnx\\SidecarBrowsershot\\Database\\Factories\\": "database/factories"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stefan Zweifel",
+                    "email": "stefan@stefanzweifel.dev",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Sidecar function to run Browsershot on Lambda.",
+            "homepage": "https://github.com/stefanzweifel/sidecar-browsershot",
+            "keywords": [
+                "browsershot",
+                "lambda",
+                "laravel",
+                "sidecar",
+                "sidecar-browsershot",
+                "wnx"
+            ],
+            "support": {
+                "issues": "https://github.com/stefanzweifel/sidecar-browsershot/issues",
+                "source": "https://github.com/stefanzweifel/sidecar-browsershot/tree/v2.6.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/stefanzweifel",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-05-08T06:40:32+00:00"
         }
     ],
     "packages-dev": [
@@ -13050,12 +13262,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
