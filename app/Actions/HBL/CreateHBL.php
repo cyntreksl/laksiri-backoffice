@@ -55,7 +55,7 @@ class CreateHBL
         ]);
 
         if (isset($data['paid_amount'])) {
-            UpdateHBLPayments::run($data['paid_amount'], $hbl);
+            UpdateHBLPayments::run($data, $hbl);
         }
 
         return $hbl;
