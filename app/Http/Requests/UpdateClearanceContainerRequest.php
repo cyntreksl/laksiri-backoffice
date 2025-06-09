@@ -34,6 +34,12 @@ class UpdateClearanceContainerRequest extends FormRequest
             $rules['reached_date'] = ['nullable', 'date'];
         }
 
+        if ($this->input('is_returned') === true || $this->input('is_returned') === 'true' || $this->input('is_returned') === 1 || $this->input('is_returned') === '1') {
+            $rules['return_date'] = ['required', 'date'];
+        } else {
+            $rules['return_date'] = ['nullable', 'date'];
+        }
+
         return $rules;
     }
 }
