@@ -77,7 +77,7 @@ class UpdateOrCreateHBL
         ]);
 
         if (isset($data['paid_amount']) && isset($data['is_completed'])) {
-            UpdateHBLPayments::run($data['paid_amount'], $hbl);
+            UpdateHBLPayments::run($data, $hbl);
         }
 
         return $hbl;
