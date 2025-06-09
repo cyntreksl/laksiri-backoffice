@@ -28,7 +28,7 @@ const currencyRate = ref(
 const currencySymbol = ref(page.props.currentBranch.currency_symbol || '')
 
 const formatCurrency = (amount) => {
-    const symbol = isPrepaid.value ? currencySymbol.value : 'LKR';
+    const symbol = isPrepaid.value ? 'LKR' : currencySymbol.value;
     const rate = isPrepaid.value ? 1 : (currencyRate.value);
     return `${symbol} ${new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 2,
@@ -53,21 +53,22 @@ const formatCurrency = (amount) => {
 
                 <div v-if="hblTotalSummary.freight_charge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
-                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
                             <p class="text-sm/6 font-semibold text-gray-900">Freight Charges</p>
-                            <div class="text-gray-500">
+                            <div class="text-gray-500 text-xs">
                     <span v-for="(charge, index) in hblTotalSummary.freight_charge_operations" :key="index">
                                     {{ charge }} <br>
                     </span>
                             </div>
                         </div>
                     </div>
+                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.freight_charge).toFixed(2) }}</p>
+                    </div>
                 </div>
 
                 <div v-if="hblTotalSummary.destination_charges" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
-                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
                             <p class="text-sm/6 font-semibold text-gray-900">Destination Charges</p>
                         </div>
@@ -80,12 +81,17 @@ const formatCurrency = (amount) => {
                             </div>
                             <p class="text-xs/5 text-gray-500">Paid</p>
                         </div>
+                        <div v-else class="mt-1 flex items-center gap-x-1.5">
+                            <div class="flex-none rounded-full bg-red-500/20 p-1">
+                                <div class="size-1.5 rounded-full bg-red-500" />
+                            </div>
+                            <p class="text-xs/5 text-gray-500">Unpaid</p>
+                        </div>
                     </div>
                 </div>
 
                 <div v-if="hblTotalSummary.package_charges" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
-                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
                             <p class="text-sm/6 font-semibold text-gray-900">Package Charges</p>
                         </div>
@@ -97,7 +103,6 @@ const formatCurrency = (amount) => {
 
                 <div v-if="hblTotalSummary.bill_charge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
-                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
                             <p class="text-sm/6 font-semibold text-gray-900">Bill Charges</p>
                         </div>
@@ -109,7 +114,6 @@ const formatCurrency = (amount) => {
 
                 <div v-if="hblTotalSummary.additional_charge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
-                        <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                         <div class="min-w-0 flex-auto">
                             <p class="text-sm/6 font-semibold text-gray-900">Additional Charges</p>
                         </div>
@@ -216,7 +220,6 @@ const formatCurrency = (amount) => {
         <ul class="divide-y divide-gray-100" role="list">
             <li v-if="hblTotalSummary.vat" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                 <div class="flex min-w-0 gap-x-4">
-                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                     <div class="min-w-0 flex-auto">
                         <p class="text-sm/6 font-semibold text-gray-900">VAT</p>
                     </div>
@@ -228,7 +231,6 @@ const formatCurrency = (amount) => {
 
             <li v-if="hblTotalSummary.discount" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                 <div class="flex min-w-0 gap-x-4">
-                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                     <div class="min-w-0 flex-auto">
                         <p class="text-sm/6 font-semibold text-gray-900">Discount</p>
                     </div>
@@ -240,7 +242,6 @@ const formatCurrency = (amount) => {
 
             <li class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                 <div class="flex min-w-0 gap-x-4">
-                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                     <div class="min-w-0 flex-auto">
                         <p class="text-sm/6 font-semibold text-gray-900">Grand Total</p>
                     </div>
@@ -252,7 +253,6 @@ const formatCurrency = (amount) => {
 
             <li class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                 <div class="flex min-w-0 gap-x-4">
-                    <!--                    <img class="size-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />-->
                     <div class="min-w-0 flex-auto">
                         <p class="text-sm/6 font-semibold text-gray-900">Paid Amount</p>
                     </div>

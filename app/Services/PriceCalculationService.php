@@ -70,8 +70,8 @@ class PriceCalculationService
         }
 
         return array_merge($data, [
-            'additional_charge' => $hbl['additional_charge'] ?? 0,
-            'discount' => $hbl['discount'] ?? 0,
+            'additional_charge' => $hbl->latestHblPayment->additional_charge ?? 0,
+            'discount' => $hbl->latestHblPayment->discount ?? 0,
         ]);
     }
 
