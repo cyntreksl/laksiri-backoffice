@@ -242,20 +242,17 @@
                                 <i class="ti ti-truck-delivery text-2xl"></i>
                             </a>
                             <!-- Vessel Schedules -->
-                            <a
+                            <Link
                                 v-if="$page.props.user.permissions.includes('vessel.schedule.index')"
                                 :class="[
-                                    activeMenu === 'vessel-schedule' ? 'bg-primary/10 text-primary' : '',
+                                    activeMenu === 'clearance' ? 'bg-primary/10 text-primary' : '',
                                   ]"
                                 class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
                                 x-tooltip.placement.right="'Vessel Schedules'"
-                                @click="
-                                    setMenu('vessel-schedule');
-                                    openSideBar();
-                                  "
+                                :href="route('clearance.vessel-schedule.index')"
                             >
                                 <i class="ti ti-calendar-stats text-2xl"></i>
-                            </a>
+                            </Link>
 
                             <!-- Container Payments -->
                             <a
@@ -935,25 +932,6 @@ export default {
                         ...backOfficeMenu
                     );
                     changeSidePanelTitle("Back Office");
-                    break;
-                case "vessel-schedule":
-                    let vesselScheduleMenu = [];
-                    if (usePage().props.user.permissions.includes("vessel.schedule.index")) {
-                        vesselScheduleMenu.splice(
-                            2,
-                            0,
-                            {
-                                title: "Vessel Schedules",
-                                route: "clearance.vessel-schedule.index",
-                            }
-                        );
-                    }
-                    childMenuList.splice(
-                        0,
-                        childMenuList.length,
-                        ...vesselScheduleMenu
-                    );
-                    changeSidePanelTitle("Vessel Schedules");
                     break;
                 case "container-payment":
                     let containerPaymentMenu = [];

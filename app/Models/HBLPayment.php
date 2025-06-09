@@ -20,7 +20,24 @@ class HBLPayment extends Model
     protected $table = 'hbl_payments';
 
     protected $fillable = [
-        'branch_id', 'hbl_id', 'grand_total', 'paid_amount', 'status', 'created_by',
+        'branch_id',
+        'hbl_id',
+        'grand_total',
+        'paid_amount',
+        'status',
+        'created_by',
+        'base_currency',
+        'currency_rate',
+        'currency_code',
+        'freight_charge',
+        'bill_charge',
+        'other_charge',
+        'discount',
+        'additional_charge',
+        'do_charge',
+        'destination_charge',
+        'is_departure_charges_paid',
+        'is_destination_charges_paid',
     ];
 
     public function getActivitylogOptions(): LogOptions

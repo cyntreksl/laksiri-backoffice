@@ -113,7 +113,11 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         $old_paid_amount = $hbl->paid_amount;
         $total_paid_amount = $old_paid_amount + $new_paid_amount;
 
-        UpdateHBLPayments::run($total_paid_amount, $hbl);
+        $paymentData = array_merge($data, [
+            'paid_amount' => $total_paid_amount,
+        ]);
+
+        UpdateHBLPayments::run($paymentData, $hbl);
     }
 
     public function export(array $filters)
