@@ -7,7 +7,9 @@ use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
 use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
+use App\Actions\HBL\GetHBLDestinationTotalSummary;
 use App\Actions\HBL\GetHBLPackageRules;
+use App\Actions\HBL\GetHBLTotalSummary;
 use App\Actions\HBL\UpdateHBLApi;
 use App\Actions\HBL\UpdateHBLPackagesApi;
 use App\Http\Resources\HBLPackageResource;
@@ -210,5 +212,15 @@ class HBLRepository implements HBLRepositoryInterface
 
             return $this->error('Failed to update HBL.', ['exception' => $e->getMessage()], 500);
         }
+    }
+
+    public function getHBLTotalSummary(HBL $hbl)
+    {
+        return GetHBLTotalSummary::run($hbl);
+    }
+
+    public function getHBLDestinationTotalSummary(HBL $hbl)
+    {
+        return GetHBLDestinationTotalSummary::run($hbl);
     }
 }
