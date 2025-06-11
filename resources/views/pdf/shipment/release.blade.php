@@ -81,7 +81,7 @@
     <!-- Request -->
     <p>Please grant permission to transfer the above container from the Colombo Port to the <strong>Laksiri Seva (Pvt) Ltd</strong>, U.P.B. Bonded Warehouse at No.66, New Nuge Road, Peliyagoda.</p>
 
-    <p>This container / said to contain {{$container?->hbl_packages->count()}} packages personal effects <strong>{{$container->port_of_loading ? $container->port_of_loading : '..........................................................'}}</strong> No objection to removal to Laksiri Seva U.P.B. Bonded Warehouse under Customs Supervision.</p>
+    <p>This container / said to contain <strong>{{$container?->hbl_packages->count()}} packages</strong> personal effects <strong>{{$container->port_of_loading ? $container->port_of_loading : '..........................................................'}}</strong> No objection to removal to Laksiri Seva U.P.B. Bonded Warehouse under Customs Supervision.</p>
 
     <p>Thanking you,</p>
 
