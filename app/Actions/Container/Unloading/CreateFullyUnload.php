@@ -5,9 +5,11 @@ namespace App\Actions\Container\Unloading;
 use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\HBL\HBLPackage\MarkAsFullyUnloaded;
+use App\Actions\HBL\HBLPackage\UpdateHBLPackage;
 use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\HBL;
+use App\Models\HBLPackage;
 use App\Models\Scopes\BranchScope;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -36,11 +38,20 @@ class CreateFullyUnload
 
                 // Run the MarkAsUnloaded action for the package ID
                 MarkAsFullyUnloaded::run($package['id']);
+
+                $hbl_package = HBLPackage::find($package['id']);
+
+                UpdateHBLPackage::run($hbl_package, [
+                    'unloaded_by' => auth()->id(),
+                    'unloaded_at' => now(),
+                ]);
             }
+
             $hbls = collect($data['packages'])
                 ->pluck('hbl')
                 ->unique('id')
                 ->values();
+
             foreach ($hbls as $hbl) {
                 $hbl = HBL::find($hbl['id']);
 

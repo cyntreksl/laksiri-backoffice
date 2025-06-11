@@ -2,6 +2,7 @@
 
 namespace App\Actions\UnloadingIssue;
 
+use App\Actions\HBL\HBLPackage\UpdateHBLPackage;
 use App\Models\HBL;
 use App\Models\HBLPackage;
 use App\Models\Scopes\BranchScope;
@@ -25,6 +26,10 @@ class CreateUnloadingIssue
 
                 if ($data['rtf']) {
                     $hbl = HBL::withoutGlobalScope(BranchScope::class)->find($hbl_package->hbl_id);
+
+                    UpdateHBLPackage::run($hbl_package, [
+                        'is_rtf' => true,
+                    ]);
 
                     $hbl->addStatus('Blocked By RTF');
                 }

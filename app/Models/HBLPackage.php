@@ -22,24 +22,32 @@ class HBLPackage extends Model
     protected $table = 'hbl_packages';
 
     protected $fillable = [
-        'hbl_id',
-        'package_rule',
         'branch_id',
+        'hbl_id',
         'package_type',
         'length',
         'width',
         'height',
         'quantity',
-        'volume',
         'weight',
-        'auto_weight_updated',
+        'volume',
+        'remarks',
         'is_loaded',
         'is_unloaded',
+        'package_rule',
+        'measure_type',
         'current_warehouse',
         'is_de_loaded',
         'is_de_unloaded',
-        'remarks',
-        'measure_type',
+        'auto_weight_updated',
+        'loaded_at',
+        'unloaded_at',
+        'loaded_by',
+        'unloaded_by',
+        'airport_of_departure',
+        'airport_of_arrival',
+        'is_hold',
+        'is_rtf',
     ];
 
     /**
@@ -51,6 +59,10 @@ class HBLPackage extends Model
     {
         return [
             'auto_weight_updated' => 'boolean',
+            'is_hold' => 'boolean',
+            'is_rtf' => 'boolean',
+            'loaded_at' => 'datetime',
+            'unloaded_at' => 'datetime',
         ];
     }
 
