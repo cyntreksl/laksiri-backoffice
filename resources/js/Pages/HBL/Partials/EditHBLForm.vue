@@ -361,7 +361,7 @@ const grandTotalWeight = computed(() => {
 
 const totalChargeableWeight = computed(() => {
     return form.packages.reduce((acc, pkg) => {
-        const chargeableWeight = Math.max(pkg.volumetricWeight || 0, pkg.totalWeight || 0);
+        const chargeableWeight = Math.max(pkg.volumetricWeight || pkg.volumetric_weight || 0, pkg.totalWeight || pkg.weight || 0);
         return acc + chargeableWeight;
     }, 0);
 });
@@ -494,6 +494,12 @@ onBeforeMount(() => {
 
 const calculatePayment = async () => {
     try {
+        const chargeableWeights = packageList.value.map(pkg => {
+            return Math.max(pkg.volumetric_weight || pkg.volumetricWeight, pkg.weight || pkg.totalWeight);
+        });
+
+        const totalChargeableWeight = chargeableWeights.reduce((acc, curr) => acc + curr, 0);
+
         const response = await fetch(`/hbls/calculate-payment`, {
             method: "POST",
             headers: {
@@ -505,7 +511,7 @@ const calculatePayment = async () => {
                 hbl_type: form.hbl_type,
                 warehouse: form.warehouse,
                 grand_total_volume: grandTotalVolume.value,
-                grand_total_weight: grandTotalWeight.value,
+                grand_total_weight: totalChargeableWeight,
                 package_list_length: packageList.value.length,
                 package_list: packageList.value,
                 is_active_package: form.is_active_package,
@@ -1261,6 +1267,19 @@ const handleCopyFromHBLToConsignee = async () => {
                                                         Weight
                                                     </h3>
                                                     <p class="ml-4">{{ grandTotalWeight.toFixed(2) }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li v-if="form.cargo_type === 'Air Cargo'" class="flex py-3">
+                                        <div class="flex flex-1 flex-col">
+                                            <div>
+                                                <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                    <h3>
+                                                        Chargeable Weight
+                                                    </h3>
+                                                    <p class="ml-4">{{ totalChargeableWeight.toFixed(2) }}</p>
                                                 </div>
                                             </div>
                                         </div>
