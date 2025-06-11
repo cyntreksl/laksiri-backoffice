@@ -2,7 +2,9 @@
 
 namespace App\Exports;
 
+use App\Actions\Branch\GetBranchByName;
 use App\Actions\MHBL\GetMHBLById;
+use App\Enum\WarehouseType;
 use App\Models\Container;
 use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
@@ -56,11 +58,23 @@ class LoadedContainerManifestExport
                     }
                 }
             }
-            $warehouse = $mhbl->hbls[0]->warehouse_id
-                ? ($mhbl->hbls[0]->warehouse_id === 2 ? 'CMB' : ($mhbl->hbls[0]->warehouse_id === 3 ? 'NTR' : null))
-                : ($mhbl->hbls[0]->warehouse
-                    ? ($mhbl->hbls[0]->warehouse === 'COLOMBO' ? 'CMB' : ($mhbl->hbls[0]->warehouse === 'NINTAVUR' ? 'NTR' : null))
-                    : null);
+
+            $warehouse = null;
+
+            if ($mhbl->hbls[0]->warehouse_id) {
+                $warehouse = match ($mhbl->hbls[0]->warehouse_id) {
+                    GetBranchByName::run(WarehouseType::COLOMBO->value)['id'] => 'CMB',
+                    GetBranchByName::run(WarehouseType::NINTAVUR->value)['id'] => 'NTR',
+                    default => null,
+                };
+            } elseif ($mhbl->hbls[0]->warehouse) {
+                $warehouse = match (ucwords($mhbl->hbls[0]->warehouse)) {
+                    WarehouseType::COLOMBO->value => 'CMB',
+                    WarehouseType::NINTAVUR->value => 'NTR',
+                    default => null,
+                };
+            }
+
             $data[] = [
                 $mhbl->hbl_number ?: $mhbl->reference,
                 $mhbl->shipper->name ?? '',
@@ -88,11 +102,22 @@ class LoadedContainerManifestExport
         // HBL packages
         foreach ($loadedHBLPackages as $hblData) {
             $hbl = $hblData['hbl'];
-            $warehouse = $hbl->warehouse_id
-                ? ($hbl->warehouse_id === 2 ? 'CMB' : ($hbl->warehouse_id === 3 ? 'NTR' : null))
-                : ($hbl->warehouse
-                    ? ($hbl->warehouse === 'COLOMBO' ? 'CMB' : ($hbl->warehouse === 'NINTAVUR' ? 'NTR' : null))
-                    : null);
+
+            $warehouse = null;
+
+            if ($hbl->warehouse_id) {
+                $warehouse = match ($hbl->warehouse_id) {
+                    GetBranchByName::run(WarehouseType::COLOMBO->value)['id'] => 'CMB',
+                    GetBranchByName::run(WarehouseType::NINTAVUR->value)['id'] => 'NTR',
+                    default => null,
+                };
+            } elseif ($hbl->warehouse) {
+                $warehouse = match (ucwords($hbl->warehouse)) {
+                    WarehouseType::COLOMBO->value => 'CMB',
+                    WarehouseType::NINTAVUR->value => 'NTR',
+                    default => null,
+                };
+            }
 
             $isHBLFullLoad = $hbl->packages->every(fn ($package) => $package->duplicate_containers->isNotEmpty());
             $hblLoadedContainers = $hbl->packages

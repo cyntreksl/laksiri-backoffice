@@ -11,6 +11,6 @@ class GetBranchByName
 
     public function handle($name): Branch
     {
-        return Branch::whereName($name)->firstOrFail();
+        return Branch::where('name', 'LIKE', $name)->firstOrFail();
     }
 }
