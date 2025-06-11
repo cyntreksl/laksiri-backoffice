@@ -227,6 +227,7 @@ const packageItem = reactive({
     quantity: 1,
     volume: 0,
     volumetricWeight: 0,
+    chargeableWeight: 0,
     totalWeight: 0,
     remarks: "",
     packageRule: 0,
@@ -305,6 +306,9 @@ const addPackageData = () => {
         push.error("Please fill all required data");
         return;
     }
+
+    // Calculate chargeableWeight before adding to the list
+    packageItem.chargeableWeight = Math.max(packageItem.volumetricWeight, packageItem.totalWeight);
 
     if (editMode.value) {
         packageList.value.splice(editIndex.value, 1, {...packageItem});
@@ -489,6 +493,13 @@ const calculatePayment = async () => {
                 break;
             } else form.is_active_package = false;
         }
+
+        const chargeableWeights = packageList.value.map(pkg => {
+            return Math.max(pkg.volumetricWeight, pkg.totalWeight);
+        });
+
+        const totalChargeableWeight = chargeableWeights.reduce((acc, curr) => acc + curr, 0);
+
         const response = await fetch(`/hbls/calculate-payment`, {
             method: "POST",
             headers: {
@@ -500,7 +511,7 @@ const calculatePayment = async () => {
                 hbl_type: form.hbl_type,
                 warehouse: form.warehouse,
                 grand_total_volume: grandTotalVolume.value,
-                grand_total_weight: grandTotalWeight.value,
+                grand_total_weight: totalChargeableWeight,
                 package_list_length: packageList.value.length,
                 package_list: packageList.value,
                 is_active_package: form.is_active_package,
@@ -871,6 +882,13 @@ const onDialogShow = () => {
 const onDialogHide = () => {
     document.body.classList.remove('p-overflow-hidden');
 };
+
+const totalChargeableWeight = computed(() => {
+    return packageList.value.reduce((acc, pkg) => {
+        const chargeableWeight = Math.max(pkg.volumetricWeight, pkg.totalWeight);
+        return acc + chargeableWeight;
+    }, 0);
+});
 </script>
 
 <template>
@@ -1154,7 +1172,7 @@ const onDialogHide = () => {
                                 </Column>
                                 <Column v-if="form.cargo_type === 'Air Cargo'" field="volumetricWeight" header="Volumetric Weight">
                                     <template #body="slotProps">
-                                        {{ slotProps.data.volumetricWeight.toFixed(2) }} kg
+                                        {{ slotProps.data.volumetricWeight.toFixed(3) }} kg
                                     </template>
                                 </Column>
                                 <Column field="volume" header="Volume (M.CU)"></Column>
@@ -1315,6 +1333,19 @@ const onDialogHide = () => {
                                                             Weight
                                                         </h3>
                                                         <p class="ml-4">{{ grandTotalWeight.toFixed(2) }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li v-if="form.cargo_type === 'Air Cargo'" class="flex py-3">
+                                            <div class="flex flex-1 flex-col">
+                                                <div>
+                                                    <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                        <h3>
+                                                            Chargeable Weight
+                                                        </h3>
+                                                        <p class="ml-4">{{ totalChargeableWeight.toFixed(2) }}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1524,7 +1555,7 @@ const onDialogHide = () => {
                 <div class="col-span-2">
                     <InputLabel value="Total Weight" />
                     <InputNumber v-model="packageItem.totalWeight" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" min="0" placeholder="1" step="1"/>
-                    <Message v-if="form.cargo_type === 'Air Cargo'" severity="secondary" size="small" variant="simple">Volumetric Weight {{packageItem.volumetricWeight.toFixed(2)}} kg</Message>
+                    <Message v-if="form.cargo_type === 'Air Cargo'" severity="secondary" size="small" variant="simple">Volumetric Weight {{packageItem.volumetricWeight.toFixed(3)}} kg</Message>
                 </div>
 
                 <div class="col-span-4">

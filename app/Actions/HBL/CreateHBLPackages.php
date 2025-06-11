@@ -3,6 +3,7 @@
 namespace App\Actions\HBL;
 
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\CargoType;
 use App\Models\HBL;
 use App\Models\HBLPackage;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +34,13 @@ class CreateHBLPackages
                 $package->height = $packageData['height'];
                 $package->quantity = $packageData['quantity'];
                 $package->volume = $packageData['volume'];
-                $package->weight = $packageData['totalWeight'] ?? $packageData['weight'] ?? 0;
+                if ($hbl->cargo_type === CargoType::AIR_CARGO->value) {
+                    $package->weight = number_format($packageData['chargeableWeight'] ?? 0, 3);
+                } else {
+                    $package->weight = number_format($packageData['totalWeight'] ?? $packageData['weight'] ?? 0, 3);
+                }
+                $package->actual_weight = $packageData['totalWeight'] ?? $packageData['weight'] ?? 0;
+                $package->volumetric_weight = number_format($packageData['volumetricWeight'] ?? 0, 3);
                 $package->remarks = $packageData['remarks'];
                 $package->measure_type = $packageData['measure_type'] ?? 'cm';
                 $package->save();
