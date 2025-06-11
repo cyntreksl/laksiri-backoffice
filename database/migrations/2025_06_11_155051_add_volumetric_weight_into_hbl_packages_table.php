@@ -12,9 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('hbl_packages', function (Blueprint $table) {
-            $table->double('volumetric_weight')
-                ->after('weight')
-                ->default(0);
+            $table->after('weight', function (Blueprint $table) {
+                $table->double('actual_weight')
+                    ->default(0);
+                $table->double('volumetric_weight')
+                    ->default(0);
+            });
         });
     }
 
@@ -24,7 +27,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('hbl_packages', function (Blueprint $table) {
-            $table->dropColumn('volumetric_weight');
+            $table->dropColumn(['actual_weight', 'volumetric_weight']);
         });
     }
 };

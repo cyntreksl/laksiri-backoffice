@@ -227,6 +227,7 @@ const packageItem = reactive({
     quantity: 1,
     volume: 0,
     volumetricWeight: 0,
+    chargeableWeight: 0,
     totalWeight: 0,
     remarks: "",
     packageRule: 0,
@@ -305,6 +306,9 @@ const addPackageData = () => {
         push.error("Please fill all required data");
         return;
     }
+
+    // Calculate chargeableWeight before adding to the list
+    packageItem.chargeableWeight = Math.max(packageItem.volumetricWeight, packageItem.totalWeight);
 
     if (editMode.value) {
         packageList.value.splice(editIndex.value, 1, {...packageItem});
