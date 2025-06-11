@@ -25,3 +25,5 @@ yarn-error.log
 .scribe
 public/uploads
 package-lock.json
+
+.cursor/

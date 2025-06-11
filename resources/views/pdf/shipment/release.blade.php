@@ -81,7 +81,7 @@
     <!-- Request -->
     <p>Please grant permission to transfer the above container from the Colombo Port to the <strong>Laksiri Seva (Pvt) Ltd</strong>, U.P.B. Bonded Warehouse at No.66, New Nuge Road, Peliyagoda.</p>
 
-    <p>This container / said to contain ................ 85 ............................ packages personal effects shipped from ..................................... <strong>{{$container?->port_of_loading}}</strong>............................................... No objection to removal to Laksiri Seva U.P.B. Bonded Warehouse under Customs Supervision.</p>
+    <p>This container / said to contain {{$container?->hbl_packages->count()}} packages personal effects <strong>{{$container->port_of_loading ? $container->port_of_loading : '..........................................................'}}</strong> No objection to removal to Laksiri Seva U.P.B. Bonded Warehouse under Customs Supervision.</p>
 
     <p>Thanking you,</p>
 
@@ -90,18 +90,18 @@
         <div class="w-1/2 space-y-2">
             <p class="mb-0">Yours faithfully,<br><strong>LAKSIRI SEVA (PVT) LTD.</strong></p>
             <p class="mb-0">Manager</p>
-            <p>Rizvi Latiff</p>
+            <p>{{ auth()->user()->name }}</p>
             <p class="mb-5">Permission granted</p>
             <p class="mb-0">..........................................................</p>
             <p class="text-sm italic">S.D.D.C. (Laksiri Seva)<br>U.P.B. Bonded Warehouse</p>
         </div>
 
         <!-- Customs Office -->
-        <div class="w-1/2 border border-gray-300 p-4 text-center">
-            <p class="text-sm font-medium mb-2">NO OBJECTION FOR REMOVAL <br> TO LAKSIRI BOND UNDER CUSTOMS <br> SUPERVISION SUBJECT TO OF SDDC LAKSIRI</p>
-            <p class="mb-0">..........................................................</p>
-            <p class="text-xs mb-2">SDDC/CO/SC (Baggage Office)</p>
-        </div>
+{{--        <div class="w-1/2 border border-gray-300 p-4 text-center">--}}
+{{--            <p class="text-sm font-medium mb-2">NO OBJECTION FOR REMOVAL <br> TO LAKSIRI BOND UNDER CUSTOMS <br> SUPERVISION SUBJECT TO OF SDDC LAKSIRI</p>--}}
+{{--            <p class="mb-0">..........................................................</p>--}}
+{{--            <p class="text-xs mb-2">SDDC/CO/SC (Baggage Office)</p>--}}
+{{--        </div>--}}
     </div>
 
     <!-- Footer -->

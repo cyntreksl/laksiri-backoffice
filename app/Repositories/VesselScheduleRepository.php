@@ -50,8 +50,10 @@ class VesselScheduleRepository implements VesselScheduleRepositoryInterface
         try {
             $updateData['is_reached'] = $data['is_reached'];
             $updateData['reached_date'] = $data['reached_date'];
+            $updateData['return_date'] = $data['return_date'];
             $updateData['note'] = $data['note'];
             $updateData['is_returned'] = $data['is_returned'];
+
             UpdateContainer::run($container, $updateData);
 
             $uniqueHbls = collect();

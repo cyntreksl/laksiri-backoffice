@@ -30,7 +30,7 @@ class UpdateHBLApi
         ]);
 
         if (! empty($data['paid_amount'])) {
-            UpdateHBLPayments::run($data['paid_amount'], $hbl);
+            UpdateHBLPayments::run($data, $hbl);
         }
 
         return $hbl;

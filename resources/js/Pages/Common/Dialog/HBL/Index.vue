@@ -34,6 +34,7 @@ const emit = defineEmits(['close']);
 const hbl = ref({});
 const pickup = ref({});
 const hblTotalSummary = ref({});
+const hblDestinationTotalSummary = ref({});
 const isLoading = ref(false);
 
 const fetchHBL = async () => {
@@ -82,7 +83,6 @@ const getHBLTotalSummary = async () => {
     }
 };
 
-const hblDestinationTotalSummary = ref({});
 const getHBLDestinationTotalSummary = async () => {
     console.log(props.hblId);
     try {
@@ -130,7 +130,6 @@ const fetchPickup = async () => {
     }
 }
 
-// Watchers for prop changes
 watch(() => props.hblId, (newVal) => {
     if (newVal !== undefined) {
         fetchHBL();
@@ -145,7 +144,6 @@ watch(() => props.pickupId, (newVal) => {
     }
 });
 
-// Run after component is mounted
 onMounted(() => {
     if (props.hblId !== null) {
         fetchHBL();

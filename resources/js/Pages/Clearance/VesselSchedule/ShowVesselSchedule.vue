@@ -26,6 +26,7 @@ import Checkbox from "primevue/checkbox";
 import moment from "moment";
 import RefundList from "@/Pages/Clearance/VesselSchedule/RefundList.vue";
 import RequestsList from "@/Pages/Clearance/VesselSchedule/RequestsList.vue";
+import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 
 const props = defineProps({
     vesselSchedule: {
@@ -220,31 +221,10 @@ const confirmRemoveContainer = (ContainerId) => {
 };
 
 const updateForm = useForm({
-    cargo_type: selectedContainer.value.cargo_type,
-    reference: selectedContainer.value.reference,
-    awb_number: selectedContainer.value.awb_number,
-    estimated_time_of_departure: selectedContainer.value.estimated_time_of_departure,
-    estimated_time_of_arrival: selectedContainer.value.estimated_time_of_arrival,
-    status: selectedContainer.value.status,
     note: selectedContainer.value.note,
     is_reached: Boolean(selectedContainer.value.is_reached),
-    reached_date: selectedContainer.value.reached_date,
-    container_type: selectedContainer.value.container_type,
-    bl_number: selectedContainer.value.bl_number,
-    container_number: selectedContainer.value.container_number,
-    seal_number: selectedContainer.value.seal_number,
-    vessel_name: selectedContainer.value.vessel_name,
-    voyage_number: selectedContainer.value.voyage_number,
-    shipping_line: selectedContainer.value.shipping_line,
-    port_of_loading: selectedContainer.value.port_of_loading,
-    port_of_discharge: selectedContainer.value.port_of_discharge,
-    flight_number: selectedContainer.value.flight_number,
-    airline_name: selectedContainer.value.airline_name,
-    airport_of_departure: selectedContainer.value.airport_of_departure,
-    airport_of_arrival: selectedContainer.value.airport_of_arrival,
-    cargo_class: selectedContainer.value.cargo_class,
-    loading_ended_at: selectedContainer.value.loading_ended_at,
-    loading_started_at: selectedContainer.value.loading_started_at,
+    reached_date: selectedContainer.value?.reached_date,
+    return_date: selectedContainer.value?.return_date,
     is_returned: Boolean(selectedContainer.value.is_returned),
 });
 
@@ -260,6 +240,20 @@ watch(() => updateForm.is_returned, (newValue) => {
         updateForm.reached_date = '';
     }
 });
+
+watch(
+    () => selectedContainer.value,
+    (newContainer) => {
+        fetchLoadedContainer();
+        // Update the form fields when selectedContainer changes
+        updateForm.note = newContainer?.note ?? '';
+        updateForm.is_reached = Boolean(newContainer?.is_reached);
+        updateForm.is_returned = Boolean(newContainer?.is_returned);
+        updateForm.reached_date = newContainer?.reached_date ?? null;
+        updateForm.return_date = newContainer?.return_date ?? null;
+    },
+    { deep: true }
+);
 
 const handleUpdateContainer = () => {
     if (updateForm.estimated_time_of_departure !== 'Invalid date') {
@@ -278,6 +272,12 @@ const handleUpdateContainer = () => {
         updateForm.reached_date = moment(updateForm.reached_date).format("YYYY-MM-DD");
     } else {
         updateForm.reached_date = null;
+    }
+
+    if (moment(updateForm.return_date).isValid()) {
+        updateForm.return_date = moment(updateForm.return_date).format("YYYY-MM-DD");
+    } else {
+        updateForm.return_date = null;
     }
 
     updateForm.post(route("clearance.vessel-schedule.update-container", selectedContainer.value.id), {
@@ -667,140 +667,30 @@ const isPaymentInputDisabled = computed(() => {
 
                             <!-- Shipment Details Tab -->
                             <TabPanel value="3">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.cargo_type" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Cargo Mode</label>
-                                        </IftaLabel>
-                                    </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-10">
 
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.container_type" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Container Type</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.reference" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Reference</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.container_number" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Container Number</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.seal_number" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Seal Number</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.bl_number" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>BL Number</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.estimated_time_of_departure" class="w-full"
-                                                       disabled variant="filled"/>
-                                            <label>EDT</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.estimated_time_of_arrival" class="w-full"
-                                                       disabled variant="filled"/>
-                                            <label>ETA</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.vessel_name" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Vessel Name</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.voyage_number" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Voyage Number</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.shipping_line" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Shipping Line</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.port_of_loading" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Port of Loading</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.port_of_discharge" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Port of Discharge</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.loading_started_at" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Loading Started Time</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.loading_ended_at" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Loading End Time</label>
-                                        </IftaLabel>
-                                    </div>
-
-                                    <div>
-                                        <IftaLabel>
-                                            <InputText v-model="updateForm.status" class="w-full" disabled
-                                                       variant="filled"/>
-                                            <label>Last Status</label>
-                                        </IftaLabel>
-                                    </div>
+                                    <InfoDisplay :value="selectedContainer.cargo_type" label="Cargo Mode"/>
+                                    <InfoDisplay :value="selectedContainer.container_type" label="Container Type"/>
+                                    <InfoDisplay :value="selectedContainer.reference" label="Reference"/>
+                                    <InfoDisplay :value="selectedContainer.container_number" label="Container Number"/>
+                                    <InfoDisplay :value="selectedContainer.seal_number" label="Seal Number"/>
+                                    <InfoDisplay :value="selectedContainer.bl_number" label="BL Number"/>
+                                    <InfoDisplay :value="selectedContainer.estimated_time_of_departure" label="EDT"/>
+                                    <InfoDisplay :value="selectedContainer.estimated_time_of_arrival" label="ETA"/>
+                                    <InfoDisplay :value="selectedContainer.vessel_name" label="Vessel Name"/>
+                                    <InfoDisplay :value="selectedContainer.voyage_number" label="Voyage Number"/>
+                                    <InfoDisplay :value="selectedContainer.shipping_line" label="Shipping Line"/>
+                                    <InfoDisplay :value="selectedContainer.port_of_loading" label="Port of Loading"/>
+                                    <InfoDisplay :value="selectedContainer.port_of_discharge" label="Port of Discharge"/>
+                                    <InfoDisplay :value="selectedContainer.loading_started_at" label="Loading Started Time"/>
+                                    <InfoDisplay :value="selectedContainer.loading_ended_at" label="Loading End Time"/>
+                                    <InfoDisplay :value="selectedContainer.status" label="Last Status"/>
 
                                     <div>
                                         <IftaLabel>
                                             <InputText v-model="updateForm.note" class="w-full"
                                                        placeholder="Type something..." variant="filled"/>
-                                            <label>note</label>
+                                            <label>Note</label>
                                         </IftaLabel>
                                         <InputError :message="updateForm.errors.note"/>
                                     </div>
@@ -813,6 +703,16 @@ const isPaymentInputDisabled = computed(() => {
                                             <label>Reached Date</label>
                                         </IftaLabel>
                                         <InputError :message="updateForm.errors.reached_date"/>
+                                    </div>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <DatePicker v-model="updateForm.return_date" class="w-full"
+                                                        date-format="yy-mm-dd" icon-display="input"
+                                                        placeholder="Set Return Date" show-icon variant="filled"/>
+                                            <label>Return Date</label>
+                                        </IftaLabel>
+                                        <InputError :message="updateForm.errors.return_date"/>
                                     </div>
 
                                     <div>
