@@ -92,9 +92,19 @@ watch(
                 <Card
                     v-for="item in hbl.packages"
                     v-if="hbl && hbl.packages && hbl.packages.length > 0" :key="item.id"
-                    class="!bg-white !border !border-neutral-300 !shadow-md !rounded-md"
+                    :class="[item.is_hold ? '!bg-orange-100' : '!bg-white', '!border !border-neutral-300 !shadow-md !rounded-md']"
                 >
                     <template #content>
+                        <div v-if="item.is_hold" class="flex items-center text-xs text-orange-800">
+                            <i class="pi pi-exclamation-triangle mr-1"></i>
+                            <span>This Package is on hold</span>
+                        </div>
+
+                        <div v-if="item.is_rtf" class="flex items-center text-xs text-orange-800">
+                            <i class="pi pi-exclamation-triangle mr-1"></i>
+                            <span>This Package is on RTF</span>
+                        </div>
+
                         <div class="flex items-center space-x-2">
                             <i class="ti ti-package text-xl"></i>
                             <p class="text-xl uppercase font-normal">

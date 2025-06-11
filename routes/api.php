@@ -13,7 +13,7 @@ use App\Http\Controllers\CallCenter\DeliverController;
 use App\Http\Controllers\HandlingProcedureController;
 use Illuminate\Support\Facades\Route;
 
-Route::domain('api.'.config('app.url'))
+Route::domain(app()->environment('local') ? null : 'api.'.parse_url(config('app.url'), PHP_URL_HOST))
     ->middleware(['auth:sanctum'])
     ->prefix('/v1/')->group(function () {
         Route::get('/pending-pickup-list', [PickupController::class, 'index']);
@@ -62,6 +62,10 @@ Route::domain('api.'.config('app.url'))
         Route::post('/notifications/register-device', [DeviceTokenController::class, 'registerDevice']);
 
         Route::put('/update-hbl/{hbl}', [HBLController::class, 'update']);
+
+        Route::get('/hbls/get-total-summary/{hbl}', [HBLController::class, 'getHBLTotalSummary'])->name('api.hbls.get-hbl-total-summary');
+        Route::get('/hbls/get-destination-total-summary/{hbl}', [HBLController::class, 'getHBLDestinationTotalSummary'])->name('api.hbls.get-destination hbl-total-summary');
+
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);

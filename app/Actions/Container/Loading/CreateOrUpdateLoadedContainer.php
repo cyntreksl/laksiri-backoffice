@@ -5,6 +5,7 @@ namespace App\Actions\Container\Loading;
 use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\HBL\HBLPackage\MarkAsLoaded;
+use App\Actions\HBL\HBLPackage\UpdateHBLPackage;
 use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\HBL;
@@ -33,6 +34,7 @@ class CreateOrUpdateLoadedContainer
                     'status' => 'loaded',
                     'loaded_by' => auth()->id(),
                 ]);
+
                 $container->duplicate_hbl_packages()->updateExistingPivot($package['id'], [
                     'status' => 'loaded',
                     'loaded_by' => auth()->id(),
@@ -53,6 +55,14 @@ class CreateOrUpdateLoadedContainer
                 MarkAsLoaded::run($package['id'], $isDestinationLoading);
 
                 $hbl_package = HBLPackage::find($package['id']);
+
+                UpdateHBLPackage::run($hbl_package, [
+                    'loaded_by' => auth()->id(),
+                    'loaded_at' => now(),
+                    'airport_of_departure' => $container?->airport_of_departure,
+                    'airport_of_arrival' => $container?->airport_of_arrival,
+                ]);
+
                 $hbl = HBL::find($hbl_package->hbl_id);
                 $hbl->addStatus('Container Shipped');
             }

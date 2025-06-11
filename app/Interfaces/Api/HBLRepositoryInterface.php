@@ -20,4 +20,8 @@ interface HBLRepositoryInterface
     public function completedHBLView(HBL $hbl);
 
     public function updateHBL(HBL $hbl, array $data): JsonResponse;
+
+    public function getHBLTotalSummary(HBL $hbl);
+
+    public function getHBLDestinationTotalSummary(HBL $hbl);
 }
