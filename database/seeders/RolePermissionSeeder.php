@@ -26,6 +26,7 @@ class RolePermissionSeeder extends Seeder
         Role::updateOrCreate(['name' => 'finance Team']);
         Role::updateOrCreate(['name' => 'front office staff']);
         Role::updateOrCreate(['name' => 'clearance team']);
+        Role::updateOrCreate(['name' => 'gate-security']);
 
         $this->command->info('Default Roles added.');
 
@@ -70,6 +71,41 @@ class RolePermissionSeeder extends Seeder
             'Settings',
         ];
 
+        $excludedAdminPermissions = [
+            'air-line.index',
+            'air-line.create',
+            'air-line.list',
+            'air-line.edit',
+            'air-line.delete',
+            'tax.departure tax',
+            'tax.departure tax create',
+            'tax.departure tax edit',
+            'tax.departure tax delete',
+            'tax.destination tax',
+            'tax.destination tax create',
+            'tax.destination tax edit',
+            'tax.destination tax delete',
+            'currencies.index',
+            'currencies.create',
+            'currencies.edit',
+            'currencies.delete',
+            'air-line.do charges index',
+            'air-line.do charges create',
+            'air-line.do charges list',
+            'air-line.do charges edit',
+            'air-line.do charges delete',
+            'charges.special do charges index',
+            'charges.special do charges create',
+            'charges.special do charges list',
+            'charges.special do charges edit',
+            'charges.special do charges delete',
+            'charges.air line do charges index',
+            'charges.air line do charges create',
+            'charges.air line do charges list',
+            'charges.air line do charges edit',
+            'charges.air line do charges delete',
+        ];
+
         for ($i = 0; $i < count(self::defaultPermissions()); $i++) {
             $permissionGroup = self::defaultPermissions()[$i]['group_name'];
             for ($j = 0; $j < count(self::defaultPermissions()[$i]['permissions']); $j++) {
@@ -79,7 +115,9 @@ class RolePermissionSeeder extends Seeder
                     'guard_name' => 'web',
                 ]);
                 if (in_array($permissionGroup, $allowedAdminPermissionGroups)) {
-                    $adminRole->givePermissionTo($permission);
+                    if (! in_array($permission->name, $excludedAdminPermissions)) {
+                        $adminRole->givePermissionTo($permission);
+                    }
                 }
             }
         }
@@ -270,6 +308,23 @@ class RolePermissionSeeder extends Seeder
             $permission = Permission::where('name', $permName)->first();
             if ($permission) {
                 $clearanceTeamRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
+        }
+
+        $securityRole = Role::where('name', 'gate-security')->first();
+
+        $securityPermissions = [
+            'mark-shipment-arrived-to-warehouse',
+            'mark-shipment-depart-from-warehouse',
+            'mark-gate-pass',
+        ];
+
+        foreach ($securityPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $securityRole->givePermissionTo($permission);
             } else {
                 $this->command->warn("Permission '{$permName}' not found.");
             }
@@ -535,6 +590,7 @@ class RolePermissionSeeder extends Seeder
                     'customer-queue.show examination calling screen',
                 ],
             ],
+
             [
                 'group_name' => 'Third Party Agent',
                 'permissions' => [
@@ -544,6 +600,7 @@ class RolePermissionSeeder extends Seeder
                     'third-party-agents.delete',
                 ],
             ],
+
             [
                 'group_name' => 'Courier',
                 'permissions' => [
@@ -553,6 +610,7 @@ class RolePermissionSeeder extends Seeder
                     'courier.delete',
                 ],
             ],
+
             [
                 'group_name' => 'Courier Agents',
                 'permissions' => [
@@ -583,6 +641,15 @@ class RolePermissionSeeder extends Seeder
                     'payment-container.approved list',
                     'payment-container.collect refund',
                     'payment-container.completed payment requests',
+                ],
+            ],
+
+            [
+                'group_name' => 'Warehouse Gate Control',
+                'permissions' => [
+                    'mark-shipment-arrived-to-warehouse',
+                    'mark-shipment-depart-from-warehouse',
+                    'mark-gate-pass',
                 ],
             ],
         ];
