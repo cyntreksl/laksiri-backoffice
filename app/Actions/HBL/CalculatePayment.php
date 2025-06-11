@@ -60,10 +60,10 @@ class CalculatePayment
             $vat = $package_Price_Rule->bill_vat ? $package_Price_Rule->bill_vat / 100 : 0;
 
             return [
-                'freight_charge' => 0,
+                'freight_charge' => number_format((float) $package_charges, 3, '.', ''),
                 'bill_charge' => number_format((float) $package_Price_Rule->bill_price, 3, '.', ''),
                 'other_charge' => number_format((float) $otherCharge, 3, '.', ''),
-                'package_charges' => number_format((float) $package_charges, 3, '.', ''),
+                'package_charges' => 0,
                 'destination_charges' => number_format((float) $destinationCharges, 3, '.', ''),
                 'is_editable' => 'true',
                 'vat' => $vat,

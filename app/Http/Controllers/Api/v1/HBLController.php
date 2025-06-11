@@ -78,4 +78,14 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->updateHBL($hbl, $request->all());
     }
+
+    public function getHBLTotalSummary(HBL $hbl)
+    {
+        return $this->HBLRepository->getHBLTotalSummary($hbl);
+    }
+
+    public function getHBLDestinationTotalSummary(HBL $hbl)
+    {
+        return $this->HBLRepository->getHBLDestinationTotalSummary($hbl);
+    }
 }
