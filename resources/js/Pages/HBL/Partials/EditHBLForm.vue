@@ -231,6 +231,8 @@ const resetModal = () => {
     packageItem.quantity = 0;
     packageItem.volume = 0;
     packageItem.weight = 0;
+    packageItem.volumetricWeight = 0;
+    packageItem.actualWeight = 0;
     packageItem.remarks = "";
 };
 
@@ -253,6 +255,8 @@ const packageItem = reactive({
     quantity: 0,
     volume: 0,
     weight: 0,
+    volumetricWeight: 0,
+    actualWeight: 0,
     remarks: "",
     measure_type: "cm"
 });
@@ -303,8 +307,9 @@ watch(
         () => packageItem.height,
         () => packageItem.quantity,
         () => packageItem.measure_type,
+        () => form.cargo_type,
     ],
-    ([newLength, newWidth, newHeight, newQuantity, newMeasureType]) => {
+    ([newLength, newWidth, newHeight, newQuantity, newMeasureType, newCargoType]) => {
         // Convert dimensions from cm to meters
         const lengthMeters = newLength / 100; // 1 cm = 0.01 meters
         const widthMeters = newWidth / 100;
@@ -314,6 +319,15 @@ watch(
         const volumeCubicMeters =
             lengthMeters * widthMeters * heightMeters * newQuantity;
 
+        // Calculate volumetric weight (L × W × H in cm) / 6000 for air cargo only
+        if (newCargoType === 'Air Cargo') {
+            const lengthCM = convertMeasurementstocm(newMeasureType, newLength);
+            const widthCM = convertMeasurementstocm(newMeasureType, newWidth);
+            const heightCM = convertMeasurementstocm(newMeasureType, newHeight);
+            packageItem.volumetricWeight = (lengthCM * widthCM * heightCM * newQuantity) / 6000;
+        } else {
+            packageItem.volumetricWeight = 0;
+        }
 
         // Update reactive properties
         packageItem.volume = (newLength*newWidth*newHeight*newQuantity).toFixed(3);
@@ -343,7 +357,14 @@ const grandTotalVolume = computed(() => {
 
 const grandTotalWeight = computed(() => {
     return form.packages.reduce((acc, pack) => {
-        return acc + pack.weight;
+        return acc + (pack.weight || 0);
+    }, 0);
+});
+
+const totalChargeableWeight = computed(() => {
+    return form.packages.reduce((acc, pkg) => {
+        const chargeableWeight = Math.max(pkg.volumetricWeight || pkg.volumetric_weight || 0, pkg.totalWeight || pkg.weight || 0);
+        return acc + chargeableWeight;
     }, 0);
 });
 
@@ -362,7 +383,7 @@ const addPackageData = () => {
     }
 
     if (form.cargo_type === 'Air Cargo') {
-        if (packageItem.totalWeight <= 0) {
+        if (packageItem.totalWeight <= 0 && packageItem.volumetricWeight <= 0) {
             push.error("Please fill the total weight");
             return;
         }
@@ -382,13 +403,9 @@ const addPackageData = () => {
         calculatePayment();
     } else {
         const newItem = {...packageItem};
-        newItem['package_type']=newItem.type;
+        newItem['package_type'] = newItem.type;
         packageList.value.push(newItem);
         form.packages = packageList.value;
-
-        const volume = parseFloat(newItem.volume) || 0;
-        grandTotalWeight.value += parseFloat(newItem.totalWeight);
-        grandTotalVolume.value = grandTotalVolume.value += parseFloat(volume.toFixed(3));
         calculatePayment();
     }
     closeAddPackageModal();
@@ -488,6 +505,18 @@ onBeforeMount(() => {
 
 const calculatePayment = async () => {
     try {
+        let totalChargeableWeight = 0;
+
+        if (form.cargo_type === 'Air Cargo') {
+            const chargeableWeights = packageList.value.map(pkg => {
+                return Math.max(pkg.volumetric_weight || pkg.volumetricWeight, pkg.weight || pkg.totalWeight);
+            });
+
+            totalChargeableWeight = chargeableWeights.reduce((acc, curr) => acc + curr, 0);
+        } else {
+            totalChargeableWeight = grandTotalWeight.value;
+        }
+
         const response = await fetch(`/hbls/calculate-payment`, {
             method: "POST",
             headers: {
@@ -499,7 +528,7 @@ const calculatePayment = async () => {
                 hbl_type: form.hbl_type,
                 warehouse: form.warehouse,
                 grand_total_volume: grandTotalVolume.value,
-                grand_total_weight: grandTotalWeight.value,
+                grand_total_weight: totalChargeableWeight,
                 package_list_length: packageList.value.length,
                 package_list: packageList.value,
                 is_active_package: form.is_active_package,
@@ -592,6 +621,13 @@ const openEditModal = (index) => {
     // populate packageItem with existing data for editing
     Object.assign(packageItem, packageList.value[index]);
     packageItem.type = packageList.value[index].package_type;
+
+    // Handle the case where volumetric_weight comes from DB
+    if (packageList.value[index].volumetric_weight) {
+        packageItem.volumetricWeight = packageList.value[index].volumetric_weight;
+    }
+
+    // Convert measurements to current unit
     packageItem.length = convertMeasurements(packageItem.measure_type,packageItem.length).toFixed(2);
     packageItem.width = convertMeasurements(packageItem.measure_type,packageItem.width).toFixed(2);
     packageItem.height = convertMeasurements(packageItem.measure_type,packageItem.height).toFixed(2);
@@ -1099,9 +1135,14 @@ const handleCopyFromHBLToConsignee = async () => {
                                 </template>
                             </Column>
                             <Column field="quantity" header="Quantity"></Column>
-                            <Column field="weight" header="Weight">
+                            <Column field="weight" header="Actual Weight">
                                 <template #body="slotProps">
-                                    {{ slotProps.data.weight.toFixed(3) }}
+                                    {{ form.cargo_type === 'Air Cargo' ? (slotProps.data.actual_weight || 0).toFixed(3) :  (slotProps.data.weight || 0).toFixed(3)}}
+                                </template>
+                            </Column>
+                            <Column v-if="form.cargo_type === 'Air Cargo'" field="volumetricWeight" header="Volumetric Weight">
+                                <template #body="slotProps">
+                                    {{ (slotProps.data.volumetricWeight || slotProps.data.volumetric_weight || 0).toFixed(3) }} kg
                                 </template>
                             </Column>
                             <Column field="volume" header="Volume (M.CU)"></Column>
@@ -1247,6 +1288,19 @@ const handleCopyFromHBLToConsignee = async () => {
                                         </div>
                                     </li>
 
+                                    <li v-if="form.cargo_type === 'Air Cargo'" class="flex py-3">
+                                        <div class="flex flex-1 flex-col">
+                                            <div>
+                                                <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                    <h3>
+                                                        Chargeable Weight
+                                                    </h3>
+                                                    <p class="ml-4">{{ totalChargeableWeight.toFixed(2) }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
                                     <li class="flex py-3">
                                         <div class="flex flex-1 flex-col">
                                             <div>
@@ -1382,7 +1436,8 @@ const handleCopyFromHBLToConsignee = async () => {
 
             <div class="col-span-2">
                 <InputLabel value="Total Weight" />
-                <InputNumber v-model="packageItem.totalWeight" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
+                <InputNumber v-model="packageItem.actual_weight" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" min="0.00" placeholder="1.00" step="0.01"/>
+                <Message v-if="form.cargo_type === 'Air Cargo'" severity="secondary" size="small" variant="simple">Volumetric Weight {{packageItem.volumetricWeight.toFixed(2)}} kg</Message>
             </div>
 
             <div class="col-span-4">
