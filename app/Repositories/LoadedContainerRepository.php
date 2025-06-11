@@ -113,22 +113,34 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.pdf';
 
         $export = new LoadedContainerManifestExport($container);
+
         $settings = GetSettings::run();
 
         $data = array_filter($export->prepareData(), function ($item) {
             return isset($item[0]) && $item[0] !== '';
         });
+
         usort($data, function ($a, $b) {
             return $a[0] <=> $b[0];
         });
+
         $giftCount = count(array_filter($data, fn ($item) => strtolower($item[11]) === 'gift'));
+
         $upbCount = count(array_filter($data, fn ($item) => $item[11] === 'UPB'));
 
         $cargoType = strtolower(trim($container->cargo_type));
 
         $view = ($cargoType === 'air cargo') ? 'exports.air_cargo' : 'exports.shipments';
 
-        $pdf = PDF::loadView($view, ['data' => $data, 'container' => $container, 'settings' => $settings, 'giftCount' => $giftCount, 'upbCount' => $upbCount, 'branch' => GetUserCurrentBranch::run()]);
+        $pdf = PDF::loadView($view, [
+            'data' => $data,
+            'container' => $container,
+            'settings' => $settings,
+            'giftCount' => $giftCount,
+            'upbCount' => $upbCount,
+            'branch' => GetUserCurrentBranch::run(),
+        ]);
+
         $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
