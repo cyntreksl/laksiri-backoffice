@@ -7,6 +7,7 @@ use App\Models\ContainerDocument;
 use App\Models\HBL;
 use App\Models\UnloadingIssue;
 use App\Models\UnloadingIssueFile;
+use Illuminate\Http\JsonResponse;
 
 interface ContainerRepositoryInterface
 {
@@ -53,4 +54,8 @@ interface ContainerRepositoryInterface
     public function downloadSingleUnloadingIssueFile(string $id);
 
     public function getContainerByReference(string $reference, string|int $vesselScheduleId);
+
+    public function getAfterDispatchShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse;
+
+    public function updateInboundShipmentStatus(Container $container);
 }
