@@ -2,8 +2,10 @@
 
 namespace App\Actions\HBL;
 
+use App\Models\Branch;
 use App\Models\HBL;
 use App\Models\MHBL;
+use Illuminate\Support\Facades\Auth;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class GenerateHBLNumber
@@ -12,21 +14,48 @@ class GenerateHBLNumber
 
     public function handle($currentBranchId)
     {
-        $last_hbl = HBL::where('branch_id', $currentBranchId)->latest()->first();
-        $last_mhbl = MHBL::where('branch_id', $currentBranchId)->latest()->first();
-        if ($last_mhbl && (int) $last_mhbl->hbl_number > (int) $last_hbl->hbl_number) {
-            $next_number = $last_mhbl->hbl_number ? ((int) substr($last_mhbl->hbl_number, 3) + 1) : 1;
-        } else {
-            $next_number = $last_hbl ? ((int) substr($last_hbl->hbl_number, 3) + 1) : 1;
-        }
+        $branchCode = $this->getBranchCode($currentBranchId);
+        $nextNumber = $this->getNextAvailableNumber($currentBranchId);
+
         do {
-            $hbl_number = strtoupper(str_pad($currentBranchId, 3, '0', STR_PAD_LEFT)).str_pad($next_number, 6, '0', STR_PAD_LEFT);
-            $exists = HBL::withoutGlobalScopes()->where('hbl_number', $hbl_number)->exists();
-            $exists_mhbl = MHBL::withoutGlobalScopes()->where('hbl_number', $hbl_number)->exists();
-            $next_number++;
-        } while ($exists || $exists_mhbl);
+            $hblNumber = strtoupper(str_pad($branchCode, 3, '0', STR_PAD_LEFT)) .
+                str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
 
-        return $hbl_number;
+            $exists = HBL::withoutGlobalScopes()->where('hbl_number', $hblNumber)->exists();
+            $existsInMHBL = MHBL::withoutGlobalScopes()->where('hbl_number', $hblNumber)->exists();
 
+            $nextNumber++;
+        } while ($exists || $existsInMHBL);
+
+        return $hblNumber;
+    }
+
+    private function getNextAvailableNumber($branchId)
+    {
+        $lastHBL = HBL::where('branch_id', $branchId)->latest()->first();
+        $lastMHBL = MHBL::where('branch_id', $branchId)->latest()->first();
+
+        $hblNumber = $this->extractNumberFromHBL($lastHBL?->hbl_number);
+        $mhblNumber = $this->extractNumberFromHBL($lastMHBL?->hbl_number);
+
+        return max($hblNumber, $mhblNumber) + 1;
+    }
+
+    private function extractNumberFromHBL(?string $hblNumber): int
+    {
+        if (!$hblNumber || strlen($hblNumber) < 6) {
+            return 0;
+        }
+
+        $numberPart = substr($hblNumber, -6);
+        return is_numeric($numberPart) ? (int) $numberPart : 0;
+    }
+
+    private function getBranchCode($branchId): string
+    {
+        $branchId = $branchId ?: Auth::user()->primary_branch_id;
+        $branch = Branch::withoutGlobalScopes()->find($branchId);
+
+        return $branch?->branch_code ?? '000';
     }
 }
