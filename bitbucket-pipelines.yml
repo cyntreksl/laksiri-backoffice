@@ -65,15 +65,14 @@ definitions:
         deployment: $DEPLOYMENT_ENVIRONMENT
         script:
           - mkdir -p ~/.ssh
-          - echo $SSH_PRIVATE_KEY | base64 -d > ~/.ssh/id_rsa
+          - echo $EC2_SSH_KEY_BASE64 | base64 -d > ~/.ssh/id_rsa
           - chmod 600 ~/.ssh/id_rsa
-          - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
-          - scp application.zip $SSH_USER@$SERVER_HOST:/tmp/app.zip
-          - ssh $SSH_USER@$SERVER_HOST << EOF
+          - ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+          - scp application.zip $EC2_USER@$HOST:/tmp/app.zip
+          - ssh $EC2_USER@$HOST << EOF
             set -e
-            unzip -o /tmp/app.zip -d $DEPLOYMENT_PATH
-            cd $DEPLOYMENT_PATH
-            cp .env.$DEPLOYMENT_ENVIRONMENT .env
+            unzip -o /tmp/app.zip -d $DEPLOY_PATH
+            cd $DEPLOY_PATH
             composer install --no-dev --optimize-autoloader
             php artisan migrate --force
             php artisan config:clear
@@ -95,8 +94,9 @@ pipelines:
       - step: *package-application
       - step:
           <<: *deploy
+          deployment: staging
           variables:
-            DEPLOYMENT_ENVIRONMENT: 'staging'
+            DEPLOYMENT_ENV: 'staging'
 
     deploy-to-production:
       - step: *install-dependencies
@@ -105,8 +105,9 @@ pipelines:
       - step: *package-application
       - step:
           <<: *deploy
+          deployment: production
           variables:
-            DEPLOYMENT_ENVIRONMENT: 'production'
+            DEPLOYMENT_ENV: 'production'
 
   branches:
     staging:
@@ -116,8 +117,9 @@ pipelines:
       - step: *package-application
       - step:
           <<: *deploy
+          deployment: staging
           variables:
-            DEPLOYMENT_ENVIRONMENT: 'staging'
+            DEPLOYMENT_ENV: 'staging'
 
     master:
       - step: *install-dependencies
@@ -126,5 +128,6 @@ pipelines:
       - step: *package-application
       - step:
           <<: *deploy
+          deployment: production
           variables:
-            DEPLOYMENT_ENVIRONMENT: 'production'
+            DEPLOYMENT_ENV: 'production'
