@@ -50,6 +50,14 @@ class Courier extends Model
         'consignee_note',
         'status',
         'created_by',
+        'amount',
+        'discount_amount',
+        'tax_amount',
+        'grand_total',
+        'tax_method',
+        'tax_value',
+        'discount_method',
+        'discount_value',
     ];
 
     public function getActivitylogOptions(): LogOptions

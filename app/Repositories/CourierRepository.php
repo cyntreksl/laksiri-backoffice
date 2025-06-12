@@ -30,7 +30,7 @@ class CourierRepository implements CourierRepositoryInterface, GridJsInterface
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = Courier::query();
+        $query = Courier::with('courierAgent');
 
         if (! empty($search)) {
             $query->where('courier_number', 'like', '%'.$search.'%');

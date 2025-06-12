@@ -357,6 +357,27 @@ const handleChangeStatus = () => {
 
                         <Column field="courier_number" header="Courier Number" sortable></Column>
 
+                        <Column field="agent.company_name" header="Courier Agent" sortable>
+                        </Column>
+
+                        <Column field="cargo_type" header="Cargo Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :icon="resolveCargoType(slotProps.data.cargo_type).icon" :severity="resolveCargoType(slotProps.data.cargo_type).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
+                            </template>
+                            <template #filter="{ filterModel }">
+                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="hbl_type" header="HBL Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveHBLType(slotProps.data.hbl_type)" :value="slotProps.data.hbl_type"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
                         <Column field="name" header="Name" sortable>
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.name }}</div>
@@ -371,14 +392,7 @@ const handleChangeStatus = () => {
 
                         <Column field="iq_number" header="IQ Number"></Column>
 
-                        <Column field="cargo_type" header="Cargo Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :icon="resolveCargoType(slotProps.data.cargo_type).icon" :severity="resolveCargoType(slotProps.data.cargo_type).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
-                            </template>
-                            <template #filter="{ filterModel }">
-                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
+
 
                         <Column field="consignee" header="Consignee">
                             <template #body="slotProps">
@@ -392,14 +406,7 @@ const handleChangeStatus = () => {
 
                         <Column field="consignee_note" header="Consignee Note"></Column>
 
-                        <Column field="hbl_type" header="HBL Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveHBLType(slotProps.data.hbl_type)" :value="slotProps.data.hbl_type"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
+
 
                         <Column field="courier_agent" header="Courier Agent"></Column>
 

@@ -90,14 +90,33 @@ const form = useForm({
     consignee_note: "",
     packages: {},
     is_active_package: false,
+    amount: 0,
+    discount_method: 'Fixed',
+    discount_value: 0,
+    tax_method: 'Fixed',
+    tax_value: 0,
 });
 
 const resetCreateForm = () => {
+    // Reset package data
     packageList.value = [];
+    grandTotalWeight.value = 0;
+    grandTotalVolume.value = 0;
+
+    // Reset contact numbers
     countryCode.value = findCountryCodeByBranch(currentBranch);
     consignee_countryCode.value = '+94';
     contactNumber.value = "";
     consignee_contact.value = "";
+
+    // Reset modal states
+    showAddNewPackageDialog.value = false;
+    editMode.value = false;
+    editIndex.value = null;
+    selectedType.value = "";
+
+    // Reset package item to default state
+    restModalFields();
 }
 
 const handleCourierCreate = () => {
@@ -107,13 +126,21 @@ const handleCourierCreate = () => {
     } else {
         form.post(route("couriers.store"), {
             onSuccess: (page) => {
+                // Reset form data
                 form.reset();
+
+                // Reset all reactive variables and UI state
                 resetCreateForm();
+
+                // Show success message
                 push.success("Courier Created Successfully!");
             },
-            onError: () => console.log("error"),
+            onError: (errors) => {
+                console.log("Courier creation failed:", errors);
+                push.error("Failed to create courier. Please check the form and try again.");
+            },
             preserveScroll: true,
-            preserveState: true,
+            preserveState: false, // Changed to false to ensure clean state
         });
     }
 };
@@ -358,6 +385,43 @@ const onDialogShow = () => {
 const onDialogHide = () => {
     document.body.classList.remove('p-overflow-hidden');
 };
+
+const discountTypes = ['Fixed', 'Percentage']
+const taxTypes = ['Fixed', 'Percentage']
+
+const parseValue = (val) => parseFloat(val) || 0
+
+const calculatedDiscount = computed(() => {
+    let amount = parseValue(form.amount)
+    let discount = parseValue(form.discount_value)
+
+    if (form.discount_method === 'Percentage') {
+        return amount * discount / 100
+    }
+    return discount
+})
+
+const calculatedTax = computed(() => {
+    let amount = parseValue(form.amount)
+    let discountedAmount = amount - calculatedDiscount.value
+    let tax = parseValue(form.tax_value)
+
+    if (form.tax_method === 'Percentage') {
+        return discountedAmount * tax / 100
+    }
+    return tax
+})
+
+const grandTotal = computed(() => {
+    let amount = parseValue(form.amount)
+    return (amount - calculatedDiscount.value + calculatedTax.value).toFixed(2)
+})
+
+const formatCurrency = (val) => {
+    if (!val) return '0.00'
+    return Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 </script>
 
 <template>
@@ -647,8 +711,84 @@ const onDialogHide = () => {
                             </div>
                         </template>
                     </Card>
+
+                    <Card class="mt-4">
+                        <template #title>
+                            Payment Details
+                        </template>
+                        <template #content>
+                            <div class="grid grid-cols-2 gap-5 mt-5">
+
+                                <!-- 1st Line: Enter Amount -->
+                                <div class="col-span-3">
+                                    <InputLabel class="mb-2" value="Amount" />
+                                    <IconField>
+                                        <InputIcon class="pi pi-dollar" />
+                                        <InputText v-model="form.amount" class="w-full" placeholder="Enter Amount" />
+                                    </IconField>
+                                    <InputError :message="form.errors.amount" />
+                                </div>
+
+                                <!-- 2nd Line: Discount -->
+                                <div class="col-span-3">
+                                    <InputLabel class="mb-2" value="Discount" />
+                                    <div class="grid grid-cols-3 gap-3 items-center">
+                                        <div class="col-span-1">
+                                            <Select v-model="form.discount_method" :options="discountTypes" class="w-full"
+                                                    placeholder="Type" />
+                                        </div>
+                                        <div class="col-span-2">
+                                            <InputText v-model="form.discount_value" class="w-full" placeholder="Enter Discount" />
+                                        </div>
+                                    </div>
+                                    <InputError :message="form.errors.discount_value" />
+                                </div>
+
+                                <!-- 3rd Line: Tax -->
+                                <div class="col-span-3">
+                                    <InputLabel class="mb-2" value="Tax" />
+                                    <div class="grid grid-cols-3 gap-3 items-center">
+                                        <div class="col-span-1">
+                                            <Select v-model="form.tax_method" :options="taxTypes" class="w-full"
+                                                    placeholder="Type" />
+                                        </div>
+                                        <div class="col-span-2">
+                                            <InputText v-model="form.tax_value" class="w-full" placeholder="Enter Tax" />
+                                        </div>
+                                    </div>
+                                    <InputError :message="form.errors.tax_value" />
+                                </div>
+
+                                <!-- 4th Line: Grand Total -->
+                                <div class="col-span-3 mt-5 p-4 bg-gray-100 rounded">
+                                    <div class="grid grid-cols-2 gap-4 text-lg font-semibold">
+
+                                        <div class="text-gray-700">Amount</div>
+                                        <div class="text-right">{{ formatCurrency(form.amount) }}</div>
+
+                                        <div class="text-gray-700">Discount  <span class="text-xs">({{ form.discount_method === 'Percentage' ? form.discount_value + '%' : 'Fixed' }})</span></div>
+                                        <div class="text-right">
+                                            <span>-{{ formatCurrency(calculatedDiscount) }}</span>
+                                        </div>
+
+                                        <div class="text-gray-700">Tax  <span class="text-xs">({{ form.tax_method === 'Percentage' ? form.tax_value + '%' : 'Fixed' }})</span></div>
+                                        <div class="text-right">
+                                            <span>+{{ formatCurrency(calculatedTax) }}</span>
+                                        </div>
+
+                                        <div class="text-gray-900 border-t border-gray-300 pt-2">Grand Total</div>
+                                        <div class="text-right text-blue-600 border-t border-gray-300 pt-2">{{ grandTotal }}</div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </template>
+                    </Card>
                 </div>
             </div>
+
+
 
             <div class="grid grid-cols-1 sm:grid-cols-6 my-6 gap-4">
                 <!-- Empty grid columns for spacing -->

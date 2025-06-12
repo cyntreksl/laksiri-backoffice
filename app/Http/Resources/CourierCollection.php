@@ -31,6 +31,10 @@ class CourierCollection extends JsonResource
             'hbl_type' => $this->hbl_type,
             'status' => $this->status,
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
+            'agent' => $this->courierAgent ? [
+                'id' => $this->courierAgent->id,
+                'company_name' => $this->courierAgent->company_name,
+            ] : null,
         ];
     }
 }
