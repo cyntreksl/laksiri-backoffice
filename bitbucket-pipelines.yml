@@ -11,7 +11,7 @@ definitions:
         MYSQL_PASSWORD: $DB_PASSWORD
     redis:
       image: redis:6.2
-      memory: 512m
+      memory: 512  # Fixed: changed from string to integer
 
   steps:
     - step: &install-dependencies
@@ -61,7 +61,7 @@ definitions:
           - application.zip
 
     - step: &deploy
-        name: Deploy to Environment
+        name: Deploy to $DEPLOYMENT_ENVIRONMENT
         deployment: $DEPLOYMENT_ENVIRONMENT
         script:
           - mkdir -p ~/.ssh
@@ -81,11 +81,32 @@ definitions:
             EOF
 
 pipelines:
-  default:
-    - step: *install-dependencies
-    - step: *build-frontend
-    - step: *run-tests
-    - step: *package-application
+  pull-requests:
+    '**':
+      - step: *install-dependencies
+      - step: *build-frontend
+      - step: *run-tests
+
+  custom:
+    deploy-to-staging:
+      - step: *install-dependencies
+      - step: *build-frontend
+      - step: *run-tests
+      - step: *package-application
+      - step:
+          <<: *deploy
+          variables:
+            DEPLOYMENT_ENVIRONMENT: 'staging'
+
+    deploy-to-production:
+      - step: *install-dependencies
+      - step: *build-frontend
+      - step: *run-tests
+      - step: *package-application
+      - step:
+          <<: *deploy
+          variables:
+            DEPLOYMENT_ENVIRONMENT: 'production'
 
   branches:
     staging:
@@ -98,7 +119,7 @@ pipelines:
           variables:
             DEPLOYMENT_ENVIRONMENT: 'staging'
 
-    production:
+    master:
       - step: *install-dependencies
       - step: *build-frontend
       - step: *run-tests
