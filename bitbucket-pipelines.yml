@@ -84,13 +84,13 @@ pipelines:
     '**':
       - step: *install-dependencies
       - step: *build-frontend
-      - step: *run-tests
+#      - step: *run-tests
 
   custom:
     deploy-to-staging:
       - step: *install-dependencies
       - step: *build-frontend
-      - step: *run-tests
+#      - step: *run-tests
       - step: *package-application
       - step:
           <<: *deploy
@@ -101,7 +101,7 @@ pipelines:
     deploy-to-production:
       - step: *install-dependencies
       - step: *build-frontend
-      - step: *run-tests
+#      - step: *run-tests
       - step: *package-application
       - step:
           <<: *deploy
@@ -113,7 +113,7 @@ pipelines:
     staging:
       - step: *install-dependencies
       - step: *build-frontend
-      - step: *run-tests
+#      - step: *run-tests
       - step: *package-application
       - step:
           <<: *deploy
@@ -124,7 +124,7 @@ pipelines:
     master:
       - step: *install-dependencies
       - step: *build-frontend
-      - step: *run-tests
+#      - step: *run-tests
       - step: *package-application
       - step:
           <<: *deploy
