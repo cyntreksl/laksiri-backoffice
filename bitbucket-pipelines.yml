@@ -16,7 +16,7 @@ definitions:
   steps:
     - step: &composer
         name: Composer & Migrations
-        image: php:8.2-fpm
+        image: php:8.3-fpm
         services:
           - mysql
           - redis
@@ -54,7 +54,7 @@ definitions:
 
     - step: &test
         name: Testing Application
-        image: php:8.2-fpm
+        image: php:8.3-fpm
         script:
           #- sed -i 's/DB_HOST=127.0.0.1/DB_HOST=mysql/g' .env
           - cat .env
@@ -68,7 +68,7 @@ definitions:
 
     - step: &unit-tests
         name: Laravel Unit Tests
-        image: php:8.2-fpm
+        image: php:8.3-fpm
         script:
           - cat .env
           - docker-php-ext-install pdo_mysql
@@ -81,7 +81,7 @@ definitions:
 
     - step: &standards
         name: Checking Code Standards - PSR2
-        image: php:8.2-fpm
+        image: php:8.3-fpm
         script:
           - vendor/bin/pint --test
         services:
@@ -138,6 +138,60 @@ definitions:
         artifacts:
           - .short-commit
 
+    - step: &deploy-staging
+        name: Deploy to AWS (Staging)
+        image: atlassian/default-image:2
+        deployment: Staging
+        script:
+          - mkdir -p ~/.ssh
+          - echo $EC2_SSH_KEY_BASE64 | base64 -d > ~/.ssh/id_rsa
+          - chmod 600 ~/.ssh/id_rsa
+          - ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+
+          # Copy files
+          - scp application.zip $EC2_USER@$HOST:/tmp/app.zip
+
+          # Remote deploy script
+          - ssh $EC2_USER@$HOST << EOF
+            unzip -o /tmp/app.zip -d $DEPLOY_PATH
+            cd $DEPLOY_PATH
+            cp .env.staging .env
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            EOF
+        artifacts:
+          - .env
+          -
+    - step: &deploy-prod
+        name: Deploy to AWS (Staging)
+        image: atlassian/default-image:2
+        deployment: Production
+        script:
+          - mkdir -p ~/.ssh
+          - echo $EC2_SSH_KEY_BASE64 | base64 -d > ~/.ssh/id_rsa
+          - chmod 600 ~/.ssh/id_rsa
+          - ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+
+          # Copy files
+          - scp application.zip $EC2_USER@$HOST:/tmp/app.zip
+
+          # Remote deploy script
+          - ssh $EC2_USER@$HOST << EOF
+            unzip -o /tmp/app.zip -d $DEPLOY_PATH
+            cd $DEPLOY_PATH
+            cp .env.staging .env
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            EOF
+        artifacts:
+          - .env
+
 
 push-staging: &push-test
   step:
@@ -160,7 +214,7 @@ pipelines:
               <<: *standards
           - step:
               <<: *build
-          - <<: *push-test
+          - <<: *deploy-staging
 
   pull-requests:
     '**':
@@ -189,7 +243,23 @@ pipelines:
 #          <<: *test
       - step:
           <<: *build
-      - <<: *push-test
+      - <<: *deploy-staging
+
+    master:
+      - parallel:
+          - step:
+              <<: *short-commit
+          - step:
+              <<: *composer
+      - step:
+          <<: *frontend
+#      - step:
+#          <<: *standards
+#      - step:
+#          <<: *test
+      - step:
+          <<: *build
+      - <<: *deploy-prod
 
 
 
