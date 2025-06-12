@@ -27,6 +27,13 @@ class StoreBranchPriceRequest extends FormRequest
             'cargo_mode' => ['required'],
             'hbl_type' => ['required'],
             'price_mode' => ['required'],
+            'priceRules' => ['required', 'array', 'min:1'],
+            'priceRules.*.condition' => ['required', 'string'],
+            'priceRules.*.true_action' => ['required', 'string'],
+            'priceRules.*.bill_price' => ['required', 'numeric', 'min:0'],
+            'priceRules.*.bill_vat' => ['required', 'numeric', 'min:0'],
+            'priceRules.*.volume_charges' => ['required', 'numeric', 'min:0'],
+            'priceRules.*.per_package_charges' => ['required', 'numeric', 'min:0'],
         ];
     }
 
@@ -39,6 +46,31 @@ class StoreBranchPriceRequest extends FormRequest
     {
         return [
             'destination_branch_id' => 'destination branch',
+            'priceRules.*.condition' => 'condition',
+            'priceRules.*.true_action' => 'true action',
+            'priceRules.*.bill_price' => 'bill price',
+            'priceRules.*.bill_vat' => 'bill vat',
+            'priceRules.*.volume_charges' => 'volume charges',
+            'priceRules.*.per_package_charges' => 'per package charges',
         ];
+    }
+
+    /**
+     * Configure the validator instance.
+     *
+     * @param  \Illuminate\Validation\Validator  $validator
+     * @return void
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $priceRules = $this->input('priceRules', []);
+            $conditions = array_column($priceRules, 'condition');
+
+            // Check for duplicate conditions in the request
+            if (count($conditions) !== count(array_unique($conditions))) {
+                $validator->errors()->add('priceRules', 'Duplicate conditions are not allowed.');
+            }
+        });
     }
 }
