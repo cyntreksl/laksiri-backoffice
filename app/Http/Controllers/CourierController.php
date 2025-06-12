@@ -72,11 +72,42 @@ class CourierController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Change Courier Status
+     *
+     * Updates the status of one or more couriers. Supports bulk status changes.
+     *
+     * @group Courier Management
+     *
+     * @bodyParam couriers array required Array of courier IDs to update. Example: [1, 2, 3]
+     * @bodyParam status string required New status for the couriers. Must be one of: pending, on courier, delivered. Example: delivered
+     *
+     * @response 302 scenario="Success" Redirects back with success message
+     * @response 302 scenario="Error" Redirects back with error message
+     * @response 422 scenario="Validation Error" {
+     *   "message": "The given data was invalid.",
+     *   "errors": {
+     *     "couriers": ["Please select at least one courier."],
+     *     "status": ["Please select a status."]
+     *   }
+     * }
      */
     public function changeCourierStatus(UpdateCourierStatusRequest $request)
     {
-        $this->CourierRepository->changeStatus($request['couriers'], $request['status']);
+        $this->authorize('courier.edit');
+
+        try {
+            $this->CourierRepository->changeStatus($request['couriers'], $request['status']);
+
+            $courierCount = count($request['couriers']);
+            $message = $courierCount === 1
+                ? 'Courier status updated successfully!'
+                : "{$courierCount} couriers status updated successfully!";
+
+            return redirect()->back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update courier status. Please try again.');
+        }
     }
 
     /**

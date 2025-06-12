@@ -14,7 +14,8 @@ Route::prefix('couriers')->name('couriers.')->group(function () {
         ->name('list');
 
     Route::post('change-status', [CourierController::class, 'changeCourierStatus'])
-        ->name('change-status');
+        ->name('change-status')
+        ->middleware('can:courier.edit');
 
     Route::prefix('third-party-agents')->name('agents.')->group(function () {
         Route::resource('/', ThirdPartyAgentController::class)
