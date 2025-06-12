@@ -30,6 +30,9 @@ definitions:
           - php -r "file_exists('.env') || copy('.env.example', '.env');"
           - composer install --no-interaction
           - php artisan key:generate
+        artifacts:
+          - .env
+          - vendor/**
 
     - step: &build-frontend
         name: Build Frontend Assets
