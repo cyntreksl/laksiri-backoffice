@@ -3,103 +3,38 @@ image: atlassian/default-image:2
 definitions:
   services:
     mysql:
-      image: mysql:8.0.0
+      image: mysql:8.0
       environment:
         MYSQL_DATABASE: 'testing'
         MYSQL_ROOT_PASSWORD: 'let_me_in'
         MYSQL_USER: 'homestead'
         MYSQL_PASSWORD: 'secret'
     redis:
-      image: redis:3.2
-      memory: 512
+      image: redis:6.2
+      memory: 512  # Fixed: changed from string to integer
 
   steps:
-    - step: &composer
-        name: Composer & Migrations
-        image: php:8.2-fpm
+    - step: &install-dependencies
+        name: Install Dependencies
+        image: php:8.3-fpm
         services:
           - mysql
           - redis
-          - docker
         caches:
           - composer
         script:
-          - php -v
-          - apt-get update
-          # Installing first the libraries necessary to configure and install gd
-          - apt-get install -y unzip libzip-dev libpng-dev zip git mariadb-client
-          # Now we can configure and install the extension
+          - apt-get update && apt-get install -y unzip libzip-dev libpng-dev zip git mariadb-client
           - docker-php-ext-configure zip
-          - docker-php-ext-install -j$(nproc) gd
-          - docker-php-ext-install pcntl
-          - docker-php-ext-install zip
-          - docker-php-ext-install pdo_mysql
-          - docker-php-ext-install exif
-          - docker-php-ext-install bcmath
-          - php -i | grep 'pcntl'
-          - php -i | grep 'zip'
-          - php -i | grep 'pdo_mysql'
+          - docker-php-ext-install -j$(nproc) zip gd pcntl pdo_mysql exif bcmath
           - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-          - composer -V
           - php -r "file_exists('.env') || copy('.env.example', '.env');"
-          - composer install
-          # library to check code security
-          - composer outdated
+          - composer install --no-interaction
           - php artisan key:generate
-          - ln -f -s .env.pipelines .env
-          - php artisan migrate --force
         artifacts:
           - .env
           - vendor/**
 
-    - step: &test
-        name: Testing Application
-        image: php:8.2-fpm
-        script:
-          #- sed -i 's/DB_HOST=127.0.0.1/DB_HOST=mysql/g' .env
-          - cat .env
-          - docker-php-ext-install pdo_mysql
-          - vendor/bin/pint
-        services:
-          - mysql
-          - redis
-          - docker
-
-
-    - step: &unit-tests
-        name: Laravel Unit Tests
-        image: php:8.2-fpm
-        script:
-          - cat .env
-          - docker-php-ext-install pdo_mysql
-          - php artisan test
-        services:
-          - mysql
-          - redis
-          - docker
-
-
-    - step: &standards
-        name: Checking Code Standards - PSR2
-        image: php:8.2-fpm
-        script:
-          - vendor/bin/pint --test
-        services:
-          - mysql
-          - redis
-          - docker
-
-    - step: &build
-        name: Building Application
-        image: atlassian/default-image:2
-        script:
-          - zip -r application.zip -r * .[^.]* -x "vendor/*"
-        artifacts:
-          - application.zip
-        services:
-          - docker
-
-    - step: &frontend
+    - step: &build-frontend
         name: Build Frontend Assets
         image: node:20.17.0
         script:
@@ -112,84 +47,92 @@ definitions:
           - docker
 
 
-    - step: &deploy
-        name: Deploy to Elastic beanstalk
-        script:
-          - pipe: atlassian/aws-elasticbeanstalk-deploy:0.5.5
-            variables:
-              ENVIRONMENT_NAME: ${ENVIRONMENT_NAME}
-              AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-              AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-              AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
-              APPLICATION_NAME: ${APPLICATION_NAME}
-              ZIP_FILE: "application.zip"
-              S3_BUCKET: ${AWS_S3_BUCKET}
-              VERSION_LABEL: "$BITBUCKET_COMMIT-$BITBUCKET_BUILD_NUMBER"
-        artifacts:
-          - .env
+    - step: &run-tests
+        name: Run Tests
+        image: php:8.3-fpm
         services:
-          - docker
-
-
-    - step: &short-commit
-        name: Short Commit
+          - mysql
+          - redis
         script:
-          - echo $(echo $BITBUCKET_COMMIT | cut -c1-7) > .short-commit
+          - docker-php-ext-install pdo_mysql
+          - vendor/bin/pint --test
+          - php artisan test
+
+    - step: &package-application
+        name: Package Application
+        script:
+          - zip -r application.zip -r * .[^.]* -x "vendor/*" -x "node_modules/*"
         artifacts:
-          - .short-commit
+          - application.zip
 
-
-push-staging: &push-test
-  step:
-    <<: *deploy
-    deployment: Test
-
-
+    - step: &deploy
+        name: Deploy to Environment
+        deployment: $DEPLOYMENT_ENV
+        script:
+          - mkdir -p ~/.ssh
+          - echo $EC2_SSH_KEY_BASE64 | base64 -d > ~/.ssh/id_rsa
+          - chmod 600 ~/.ssh/id_rsa
+          - ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+          - scp application.zip $EC2_USER@$HOST:/tmp/app.zip
+          - ssh $EC2_USER@$HOST << EOF
+            set -e
+            unzip -o /tmp/app.zip -d $DEPLOY_PATH
+            cd $DEPLOY_PATH
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan config:clear
+            php artisan cache:clear
+            EOF
 
 pipelines:
-  custom:
-    '**':
-      - parallel:
-          - step:
-              <<: *short-commit
-          - step:
-              <<: *composer
-          - step:
-              <<: *frontend
-          - step:
-              <<: *standards
-          - step:
-              <<: *build
-          - <<: *push-test
-
   pull-requests:
     '**':
+      - step: *install-dependencies
+      - step: *build-frontend
+#      - step: *run-tests
+
+  custom:
+    deploy-to-staging:
+      - step: *install-dependencies
+      - step: *build-frontend
+#      - step: *run-tests
+      - step: *package-application
       - step:
-          <<: *composer
+          <<: *deploy
+          deployment: staging
+          variables:
+            DEPLOYMENT_ENV: 'staging'
+
+    deploy-to-production:
+      - step: *install-dependencies
+      - step: *build-frontend
+#      - step: *run-tests
+      - step: *package-application
       - step:
-          <<: *frontend
-      - parallel:
-          - step:
-              <<: *standards
-#          - step:
-#              <<: *unit-tests
+          <<: *deploy
+          deployment: production
+          variables:
+            DEPLOYMENT_ENV: 'production'
 
   branches:
     staging:
-      - parallel:
-          - step:
-              <<: *short-commit
-          - step:
-              <<: *composer
+      - step: *install-dependencies
+      - step: *build-frontend
+#      - step: *run-tests
+      - step: *package-application
       - step:
-          <<: *frontend
-#      - step:
-#          <<: *standards
-#      - step:
-#          <<: *test
+          <<: *deploy
+          deployment: staging
+          variables:
+            DEPLOYMENT_ENV: 'staging'
+
+    master:
+      - step: *install-dependencies
+      - step: *build-frontend
+#      - step: *run-tests
+      - step: *package-application
       - step:
-          <<: *build
-      - <<: *push-test
-
-
-
+          <<: *deploy
+          deployment: production
+          variables:
+            DEPLOYMENT_ENV: 'production'

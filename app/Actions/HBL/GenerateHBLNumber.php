@@ -18,7 +18,7 @@ class GenerateHBLNumber
         $nextNumber = $this->getNextAvailableNumber($currentBranchId);
 
         do {
-            $hblNumber = strtoupper(str_pad($branchCode, 3, '0', STR_PAD_LEFT)) .
+            $hblNumber = strtoupper(str_pad($branchCode, 3, '0', STR_PAD_LEFT)).
                 str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
 
             $exists = HBL::withoutGlobalScopes()->where('hbl_number', $hblNumber)->exists();
@@ -43,11 +43,12 @@ class GenerateHBLNumber
 
     private function extractNumberFromHBL(?string $hblNumber): int
     {
-        if (!$hblNumber || strlen($hblNumber) < 6) {
+        if (! $hblNumber || strlen($hblNumber) < 6) {
             return 0;
         }
 
         $numberPart = substr($hblNumber, -6);
+
         return is_numeric($numberPart) ? (int) $numberPart : 0;
     }
 

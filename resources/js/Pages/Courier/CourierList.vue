@@ -24,6 +24,7 @@ import Select from "primevue/select";
 import Tag from "primevue/tag";
 import Dialog from "primevue/dialog";
 import Message from "primevue/message";
+import CourierDetailModal from "./Components/CourierDetailModal.vue";
 
 const baseUrl = ref("/couriers/list");
 const loading = ref(true);
@@ -42,6 +43,8 @@ const cm = ref();
 const confirm = useConfirm();
 const showStatusDialog = ref(false);
 const newStatus = ref('');
+const showCourierDetailModal = ref(false);
+const selectedCourierForView = ref(null);
 const fromDate = ref(moment(new Date()).subtract(12, "months").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 
@@ -54,10 +57,36 @@ const filters = ref({
 
 const menuModel = ref([
     {
+        label: "View Courier Bill",
+        icon: "pi pi-fw pi-eye",
+        command: () => openCourierDetailModal(),
+    },
+    {
+        separator: true
+    },
+    {
         label: "Edit",
         icon: "pi pi-fw pi-pencil",
         command: () => router.visit(route("couriers.edit", selectedCourier.value.id)),
         disabled: !usePage().props.user.permissions.includes("courier.edit"),
+    },
+    {
+        label: "Change Status",
+        icon: "pi pi-fw pi-refresh",
+        command: () => openStatusDialog(),
+        disabled: !usePage().props.user.permissions.includes("courier.edit"),
+    },
+    {
+        label: "Download",
+        icon: "pi pi-fw pi-download",
+        url: () => route("couriers.download", selectedCourier.value.id),
+        disabled: !usePage().props.user.permissions.includes("courier.download pdf"),
+    },
+    {
+        label: "Invoice",
+        icon: "pi pi-fw pi-receipt",
+        url: () => route("couriers.download.invoice", selectedCourier.value.id),
+        disabled: !usePage().props.user.permissions.includes("courier.download invoice"),
     },
     {
         separator: true
@@ -295,6 +324,20 @@ const handleBulkStatusChange = () => {
     form.status = form.status;
     openBulkStatusDialog();
 };
+
+const openCourierDetailModal = () => {
+    if (selectedCourier.value) {
+        selectedCourierForView.value = selectedCourier.value.id;
+        showCourierDetailModal.value = true;
+    } else {
+        push.error('Please select a courier first');
+    }
+};
+
+const closeCourierDetailModal = () => {
+    showCourierDetailModal.value = false;
+    selectedCourierForView.value = null;
+};
 </script>
 
 <template>
@@ -514,5 +557,13 @@ const handleBulkStatusChange = () => {
                 </div>
             </template>
         </Dialog>
+
+        <!-- Courier Detail Modal -->
+        <CourierDetailModal
+            :show="showCourierDetailModal"
+            :courier-id="selectedCourierForView"
+            @close="closeCourierDetailModal"
+            @update:show="showCourierDetailModal = $event"
+        />
     </AppLayout>
 </template>
