@@ -39,7 +39,7 @@ definitions:
         script:
           - npm config set registry https://registry.npmjs.org/
           - npm config set strict-ssl false
-          - npx npm-request-retry -a ci
+          - npx ci
           - npm run build
         artifacts:
           - public/build/
