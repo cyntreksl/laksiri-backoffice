@@ -33,7 +33,7 @@ definitions:
 
     - step: &build-frontend
         name: Build Frontend
-        image: node:20
+        image: node:20.17.0
         caches:
           - node
         script:
@@ -41,6 +41,7 @@ definitions:
           - npm run build
         artifacts:
           - public/build/
+        
 
     - step: &run-tests
         name: Run Tests
