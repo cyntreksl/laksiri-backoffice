@@ -32,17 +32,16 @@ definitions:
           - php artisan key:generate
 
     - step: &build-frontend
-        name: Build Frontend
+        name: Build Frontend Assets
         image: node:20.17.0
-        caches:
-          - node
         script:
-          - npm config set registry https://registry.npmjs.org/
-          - npm config set strict-ssl false
-          - npx ci
+          - npm ci
           - npm run build
         artifacts:
-          - public/build/
+          - public/build/assets/*
+          - public/build/*
+        services:
+          - docker
 
 
     - step: &run-tests
