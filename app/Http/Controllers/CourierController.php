@@ -72,6 +72,34 @@ class CourierController extends Controller
     }
 
     /**
+     * Display the specified courier with packages.
+     *
+     * @group Courier Management
+     *
+     * @urlParam courier integer required The ID of the courier. Example: 1
+     *
+     * @response 200 {
+     *   "id": 1,
+     *   "courier_number": "CR-2024-001",
+     *   "cargo_type": "Sea Cargo",
+     *   "hbl_type": "UPB",
+     *   "name": "John Doe",
+     *   "email": "john@example.com",
+     *   "amount": 1000.00,
+     *   "discount_amount": 100.00,
+     *   "tax_amount": 45.00,
+     *   "grand_total": 945.00,
+     *   "packages": [...]
+     * }
+     */
+    public function show(Courier $courier)
+    {
+        return response()->json(
+            $courier->load(['packages', 'courierAgent'])
+        );
+    }
+
+    /**
      * Change Courier Status
      *
      * Updates the status of one or more couriers. Supports bulk status changes.

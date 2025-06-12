@@ -6,12 +6,16 @@ use App\Http\Controllers\ThirdPartyAgentController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('couriers')->name('couriers.')->group(function () {
-    Route::resource('/', CourierController::class)
-        ->parameters(['' => 'courier'])
-        ->except('show');
-
     Route::get('list', [CourierController::class, 'list'])
         ->name('list');
+
+    Route::get('/', [CourierController::class, 'index'])->name('index');
+    Route::get('/create', [CourierController::class, 'create'])->name('create');
+    Route::post('/', [CourierController::class, 'store'])->name('store');
+    Route::get('/{courier}', [CourierController::class, 'show'])->name('show');
+    Route::get('/{courier}/edit', [CourierController::class, 'edit'])->name('edit');
+    Route::put('/{courier}', [CourierController::class, 'update'])->name('update');
+    Route::delete('/{courier}', [CourierController::class, 'destroy'])->name('destroy');
 
     Route::post('change-status', [CourierController::class, 'changeCourierStatus'])
         ->name('change-status')
