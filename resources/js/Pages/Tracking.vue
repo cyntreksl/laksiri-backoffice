@@ -94,14 +94,7 @@ const hblStatusColor = (status) => {
 
 <template>
     <Head title="Tracking"/>
-    <div class="text-right m-2">
-        <Link
-            :href="route('login')"
-            class="btn bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-        >
-            Back To Login
-        </Link>
-    </div>
+
 
     <div class="min-h-100vh flex grow bg-slate-50 dark:bg-navy-900">
         <div class="flex w-full place-items-center justify-center">

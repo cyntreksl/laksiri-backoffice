@@ -74,4 +74,9 @@ class Courier extends Model
     {
         return $this->hasOne(CourierAgent::class, 'id', 'courier_agent');
     }
+
+    public function branch(): HasOne
+    {
+        return $this->hasOne(Branch::class, 'id', 'branch_id');
+    }
 }

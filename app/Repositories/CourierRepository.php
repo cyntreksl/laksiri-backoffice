@@ -5,6 +5,8 @@ namespace App\Repositories;
 use App\Actions\Courier\CreateCourier;
 use App\Actions\Courier\CreateCourierPackages;
 use App\Actions\Courier\DeleteCourier;
+use App\Actions\Courier\DownloadCourierInvoicePDF;
+use App\Actions\Courier\DownloadCourierPDF;
 use App\Actions\Courier\GetCourier;
 use App\Actions\Courier\UpdateCourier;
 use App\Actions\Courier\UpdateCourierStatus;
@@ -72,7 +74,7 @@ class CourierRepository implements CourierRepositoryInterface, GridJsInterface
                 \Log::error("Failed to update courier status for courier ID: {$courierId}", [
                     'error' => $e->getMessage(),
                     'user_id' => auth()->id(),
-                    'status' => $status
+                    'status' => $status,
                 ]);
                 throw $e; // Re-throw to handle in controller
             }
@@ -88,5 +90,15 @@ class CourierRepository implements CourierRepositoryInterface, GridJsInterface
         UpdateCourierPackages::run($courier, $packagesData);
 
         return $courier;
+    }
+
+    public function downloadCourier(Courier $courier)
+    {
+        return DownloadCourierPDF::run($courier);
+    }
+
+    public function downloadCourierInvoice(Courier $courier)
+    {
+        return DownloadCourierInvoicePDF::run($courier);
     }
 }

@@ -17,7 +17,7 @@ class UpdateCourierStatus
         $courier->update(['status' => $status]);
 
         // Add status log for tracking
-        $courier->addStatus("Status changed from '{$oldStatus}' to '{$status}' by " . auth()->user()->name);
+        $courier->addStatus("Status changed from '{$oldStatus}' to '{$status}' by ".auth()->user()->name);
 
         // Refresh the model to get updated data
         $courier->refresh();
