@@ -5,10 +5,10 @@ definitions:
     mysql:
       image: mysql:8.0
       environment:
-        MYSQL_DATABASE: $DB_DATABASE
-        MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
-        MYSQL_USER: $DB_USERNAME
-        MYSQL_PASSWORD: $DB_PASSWORD
+        MYSQL_DATABASE: 'testing'
+        MYSQL_ROOT_PASSWORD: 'let_me_in'
+        MYSQL_USER: 'homestead'
+        MYSQL_PASSWORD: 'secret'
     redis:
       image: redis:6.2
       memory: 512  # Fixed: changed from string to integer
