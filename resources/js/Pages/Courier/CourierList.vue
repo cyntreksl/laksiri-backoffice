@@ -22,6 +22,8 @@ import DatePicker from "primevue/datepicker";
 import DataTable from "primevue/datatable";
 import Select from "primevue/select";
 import Tag from "primevue/tag";
+import Dialog from "primevue/dialog";
+import Message from "primevue/message";
 
 const baseUrl = ref("/couriers/list");
 const loading = ref(true);
@@ -38,6 +40,8 @@ const status = ref(['pending', 'on courier', 'delivered']);
 const dt = ref();
 const cm = ref();
 const confirm = useConfirm();
+const showStatusDialog = ref(false);
+const newStatus = ref('');
 const fromDate = ref(moment(new Date()).subtract(12, "months").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 
@@ -54,6 +58,9 @@ const menuModel = ref([
         icon: "pi pi-fw pi-pencil",
         command: () => router.visit(route("couriers.edit", selectedCourier.value.id)),
         disabled: !usePage().props.user.permissions.includes("courier.edit"),
+    },
+    {
+        separator: true
     },
     {
         label: "Delete",
@@ -236,20 +243,58 @@ const form = useForm({
     status: '',
 });
 
+const openStatusDialog = () => {
+    if (selectedCourier.value) {
+        newStatus.value = selectedCourier.value.status;
+        showStatusDialog.value = true;
+    } else {
+        push.error('Please select a courier first');
+    }
+};
+
+const openBulkStatusDialog = () => {
+    if (selectedCouriers.value.length > 0) {
+        newStatus.value = '';
+        showStatusDialog.value = true;
+    }
+};
+
+const closeStatusDialog = () => {
+    showStatusDialog.value = false;
+    newStatus.value = '';
+};
+
 const handleChangeStatus = () => {
-    form.couriers = selectedCouriers.value.map((item) => item.id);
+    if (selectedCourier.value) {
+        // Single courier status change
+        form.couriers = [selectedCourier.value.id];
+    } else {
+        // Bulk courier status change
+        form.couriers = selectedCouriers.value.map((item) => item.id);
+    }
+
+    form.status = newStatus.value;
+
     form.post(route("couriers.change-status"), {
         onSuccess: () => {
-            push.success('Courier status changed');
+            push.success('Courier status changed successfully!');
             fetchCouriers(currentPage.value);
+            closeStatusDialog();
+            selectedCouriers.value = [];
+            selectedCourier.value = null;
         },
         onError: () => {
-            push.error('Something went to wrong!');
+            push.error('Failed to change courier status!');
         },
         preserveScroll: true,
         preserveState: true,
     });
-}
+};
+
+const handleBulkStatusChange = () => {
+    form.status = form.status;
+    openBulkStatusDialog();
+};
 </script>
 
 <template>
@@ -309,7 +354,7 @@ const handleChangeStatus = () => {
                                         <Button label="Create Courier" size="small" />
                                     </Link>
 
-                                    <Select v-model="form.status" :disabled="selectedCouriers.length === 0" :options="status" class="w-full md:w-56" placeholder="Select a Status" @change="handleChangeStatus"/>
+                                    <Button :disabled="selectedCouriers.length === 0" icon="pi pi-refresh" label="Change Status" size="small" variant="outlined" @click="openBulkStatusDialog"/>
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -357,6 +402,27 @@ const handleChangeStatus = () => {
 
                         <Column field="courier_number" header="Courier Number" sortable></Column>
 
+                        <Column field="agent.company_name" header="Courier Agent" sortable>
+                        </Column>
+
+                        <Column field="cargo_type" header="Cargo Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :icon="resolveCargoType(slotProps.data.cargo_type).icon" :severity="resolveCargoType(slotProps.data.cargo_type).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
+                            </template>
+                            <template #filter="{ filterModel }">
+                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="hbl_type" header="HBL Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveHBLType(slotProps.data.hbl_type)" :value="slotProps.data.hbl_type"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
                         <Column field="name" header="Name" sortable>
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.name }}</div>
@@ -371,14 +437,7 @@ const handleChangeStatus = () => {
 
                         <Column field="iq_number" header="IQ Number"></Column>
 
-                        <Column field="cargo_type" header="Cargo Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :icon="resolveCargoType(slotProps.data.cargo_type).icon" :severity="resolveCargoType(slotProps.data.cargo_type).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
-                            </template>
-                            <template #filter="{ filterModel }">
-                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
+
 
                         <Column field="consignee" header="Consignee">
                             <template #body="slotProps">
@@ -391,17 +450,6 @@ const handleChangeStatus = () => {
                         <Column field="consignee_address" header="Consignee Address"></Column>
 
                         <Column field="consignee_note" header="Consignee Note"></Column>
-
-                        <Column field="hbl_type" header="HBL Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveHBLType(slotProps.data.hbl_type)" :value="slotProps.data.hbl_type"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
-
-                        <Column field="courier_agent" header="Courier Agent"></Column>
 
                         <Column field="status" header="Status" sortable>
                             <template #body="slotProps">
@@ -417,5 +465,54 @@ const handleChangeStatus = () => {
                 </template>
             </Card>
         </div>
+
+        <!-- Status Change Dialog -->
+        <Dialog v-model:visible="showStatusDialog" :style="{ width: '450px' }" header="Change Courier Status" modal>
+            <div class="flex flex-col gap-4">
+                <Message v-if="selectedCourier" severity="info" variant="simple">
+                    <span>Change status for courier: <strong>{{ selectedCourier.courier_number }}</strong></span>
+                </Message>
+
+                <Message v-else-if="selectedCouriers.length > 0" severity="info" variant="simple">
+                    <span>Change status for <strong>{{ selectedCouriers.length }}</strong> selected couriers</span>
+                </Message>
+
+                <div class="flex flex-col gap-2">
+                    <label for="status-select" class="font-medium">Select New Status</label>
+                    <Select
+                        id="status-select"
+                        v-model="newStatus"
+                        :options="status"
+                        class="w-full"
+                        placeholder="Select a Status"
+                    >
+                        <template #option="slotProps">
+                            <div class="flex items-center gap-2">
+                                <Tag :severity="resolveStatus(slotProps.option)" :value="slotProps.option.toUpperCase()"></Tag>
+                            </div>
+                        </template>
+                        <template #value="slotProps">
+                            <div v-if="slotProps.value" class="flex items-center gap-2">
+                                <Tag :severity="resolveStatus(slotProps.value)" :value="slotProps.value.toUpperCase()"></Tag>
+                            </div>
+                            <span v-else>{{ slotProps.placeholder }}</span>
+                        </template>
+                    </Select>
+                </div>
+            </div>
+
+            <template #footer>
+                <div class="flex justify-end gap-2">
+                    <Button label="Cancel" severity="secondary" text @click="closeStatusDialog" />
+                    <Button
+                        :disabled="!newStatus || form.processing"
+                        :loading="form.processing"
+                        label="Update Status"
+                        severity="success"
+                        @click="handleChangeStatus"
+                    />
+                </div>
+            </template>
+        </Dialog>
     </AppLayout>
 </template>

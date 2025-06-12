@@ -37,6 +37,14 @@ class StoreCourierRequest extends FormRequest
             'consignee_contact' => ['required', 'phone:INTERNATIONAL'],
             'consignee_address' => ['required'],
             'consignee_note' => ['nullable'],
+            'amount' => ['nullable', 'numeric', 'min:0'],
+            'discount_amount' => ['nullable', 'numeric', 'min:0'],
+            'tax_amount' => ['nullable', 'numeric', 'min:0'],
+            'tax_method' => ['nullable'],
+            'tax_value' => ['nullable', 'numeric', 'min:0'],
+            'discount_method' => ['nullable'],
+            'discount_value' => ['nullable', 'numeric', 'min:0'],
+
         ];
     }
 }

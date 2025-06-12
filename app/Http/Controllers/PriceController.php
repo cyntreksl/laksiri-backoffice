@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateBranchPriceRequest;
 use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Models\BranchPrice;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class PriceController extends Controller
@@ -45,7 +46,50 @@ class PriceController extends Controller
      */
     public function store(StoreBranchPriceRequest $request)
     {
+        $this->validatePriceRules($request->all());
+
         $this->priceRepository->createPriceRule($request->all());
+    }
+
+    private function validatePriceRules(array $data)
+    {
+        // Check if this combination exists in a database
+        $existingRules = BranchPrice::where([
+            'destination_branch_id' => $data['destination_branch_id'],
+            'cargo_mode' => $data['cargo_mode'],
+            'hbl_type' => $data['hbl_type'],
+            'price_mode' => $data['price_mode'],
+        ])->get();
+
+        // If no existing rules, the first rule must be ">0"
+        if ($existingRules->isEmpty() && $data['priceRules'][0]['condition'] !== '>0') {
+            throw ValidationException::withMessages([
+                'priceRules' => 'The first condition for a new combination must be ">0"',
+            ]);
+        }
+
+        // If existing rules exist, check if the "> 0" condition is being added again
+        if ($existingRules->isNotEmpty()) {
+            $hasGtZeroInDb = $existingRules->contains('condition', '>0');
+            $hasGtZeroInRequest = collect($data['priceRules'])->contains('condition', '>0');
+
+            if ($hasGtZeroInDb && $hasGtZeroInRequest) {
+                throw ValidationException::withMessages([
+                    'priceRules' => 'A ">0" condition already exists for this combination',
+                ]);
+            }
+        }
+
+        // Check for duplicate conditions against a database
+        $existingConditions = $existingRules->pluck('condition')->toArray();
+        $newConditions = array_column($data['priceRules'], 'condition');
+
+        $duplicates = array_intersect($existingConditions, $newConditions);
+        if (! empty($duplicates)) {
+            throw ValidationException::withMessages([
+                'priceRules' => 'The following conditions already exist: '.implode(', ', $duplicates),
+            ]);
+        }
     }
 
     /**

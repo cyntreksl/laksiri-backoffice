@@ -226,6 +226,8 @@ const packageItem = reactive({
     height: 0,
     quantity: 1,
     volume: 0,
+    volumetricWeight: 0,
+    chargeableWeight: 0,
     totalWeight: 0,
     remarks: "",
     packageRule: 0,
@@ -294,7 +296,7 @@ const addPackageData = () => {
     packageItem.volume = packageItemVolume.value;
 
     if (form.cargo_type === 'Air Cargo') {
-        if (packageItem.totalWeight <= 0) {
+        if (packageItem.totalWeight <= 0 && packageItem.volumetricWeight <= 0) {
             push.error("Please fill the total weight");
             return;
         }
@@ -304,6 +306,9 @@ const addPackageData = () => {
         push.error("Please fill all required data");
         return;
     }
+
+    // Calculate chargeableWeight before adding to the list
+    packageItem.chargeableWeight = Math.max(packageItem.volumetricWeight, packageItem.totalWeight);
 
     if (editMode.value) {
         packageList.value.splice(editIndex.value, 1, {...packageItem});
@@ -340,8 +345,9 @@ watch(
         () => packageItem.height,
         () => packageItem.quantity,
         () => packageItem.measure_type,
+        () => form.cargo_type,
     ],
-    ([newLength, newWidth, newHeight, newQuantity, newMeasureType]) => {
+    ([newLength, newWidth, newHeight, newQuantity, newMeasureType, newCargoType]) => {
         // Convert dimensions from cm to meters
         const lengthMeters = newLength / 100; // 1 cm = 0.01 meters
         const widthMeters = newWidth / 100;
@@ -350,6 +356,16 @@ watch(
         // Calculate volume in cubic meters (m³)
         const volumeCubicMeters =
             lengthMeters * widthMeters * heightMeters * newQuantity;
+
+        // Calculate volumetric weight (L × W × H in cm) / 6000 for air cargo only
+        if (newCargoType === 'Air Cargo') {
+            const lengthCM = convertMeasurementstocm(newMeasureType, newLength);
+            const widthCM = convertMeasurementstocm(newMeasureType, newWidth);
+            const heightCM = convertMeasurementstocm(newMeasureType, newHeight);
+            packageItem.volumetricWeight = (lengthCM * widthCM * heightCM * newQuantity) / 6000;
+        } else {
+            packageItem.volumetricWeight = 0;
+        }
 
         // Assuming weight is directly proportional to volume
         // Convert weight from grams to kilograms
@@ -477,6 +493,13 @@ const calculatePayment = async () => {
                 break;
             } else form.is_active_package = false;
         }
+
+        const chargeableWeights = packageList.value.map(pkg => {
+            return Math.max(pkg.volumetricWeight, pkg.totalWeight);
+        });
+
+        const totalChargeableWeight = chargeableWeights.reduce((acc, curr) => acc + curr, 0);
+
         const response = await fetch(`/hbls/calculate-payment`, {
             method: "POST",
             headers: {
@@ -488,7 +511,7 @@ const calculatePayment = async () => {
                 hbl_type: form.hbl_type,
                 warehouse: form.warehouse,
                 grand_total_volume: grandTotalVolume.value,
-                grand_total_weight: grandTotalWeight.value,
+                grand_total_weight: totalChargeableWeight,
                 package_list_length: packageList.value.length,
                 package_list: packageList.value,
                 is_active_package: form.is_active_package,
@@ -552,6 +575,7 @@ const restModalFields = () => {
     packageItem.height = 0;
     packageItem.quantity = 1;
     packageItem.volume = 0;
+    packageItem.volumetricWeight = 0;
     packageItem.totalWeight = 0;
     packageItem.remarks = "";
     packageItem.packageRule = 0;
@@ -858,6 +882,13 @@ const onDialogShow = () => {
 const onDialogHide = () => {
     document.body.classList.remove('p-overflow-hidden');
 };
+
+const totalChargeableWeight = computed(() => {
+    return packageList.value.reduce((acc, pkg) => {
+        const chargeableWeight = Math.max(pkg.volumetricWeight, pkg.totalWeight);
+        return acc + chargeableWeight;
+    }, 0);
+});
 </script>
 
 <template>
@@ -1134,9 +1165,14 @@ const onDialogHide = () => {
                                     </template>
                                 </Column>
                                 <Column field="quantity" header="Quantity"></Column>
-                                <Column field="totalWeight" header="Weight">
+                                <Column field="totalWeight" header="Actual Weight">
                                     <template #body="slotProps">
                                         {{ slotProps.data.totalWeight.toFixed(3) }}
+                                    </template>
+                                </Column>
+                                <Column v-if="form.cargo_type === 'Air Cargo'" field="volumetricWeight" header="Volumetric Weight">
+                                    <template #body="slotProps">
+                                        {{ slotProps.data.volumetricWeight.toFixed(3) }} kg
                                     </template>
                                 </Column>
                                 <Column field="volume" header="Volume (M.CU)"></Column>
@@ -1297,6 +1333,19 @@ const onDialogHide = () => {
                                                             Weight
                                                         </h3>
                                                         <p class="ml-4">{{ grandTotalWeight.toFixed(2) }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li v-if="form.cargo_type === 'Air Cargo'" class="flex py-3">
+                                            <div class="flex flex-1 flex-col">
+                                                <div>
+                                                    <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                                        <h3>
+                                                            Chargeable Weight
+                                                        </h3>
+                                                        <p class="ml-4">{{ totalChargeableWeight.toFixed(2) }}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1506,6 +1555,7 @@ const onDialogHide = () => {
                 <div class="col-span-2">
                     <InputLabel value="Total Weight" />
                     <InputNumber v-model="packageItem.totalWeight" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" min="0" placeholder="1" step="1"/>
+                    <Message v-if="form.cargo_type === 'Air Cargo'" severity="secondary" size="small" variant="simple">Volumetric Weight {{packageItem.volumetricWeight.toFixed(3)}} kg</Message>
                 </div>
 
                 <div class="col-span-4">

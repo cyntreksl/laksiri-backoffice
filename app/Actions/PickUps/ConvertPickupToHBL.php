@@ -70,16 +70,16 @@ class ConvertPickupToHBL
                 $packagesData = $data['packages'];
 
                 CreateHBLPackages::run($hbl, $packagesData);
-            }
 
-            $hbl->addStatus('HBL Preparation by driver');
+                $hbl->addStatus('HBL Preparation by driver');
+
+                $pickup->addStatus('Cargo collected by driver');
+            }
 
             $pickup->update([
                 'status' => PickupStatus::PROCESSING->value,
                 'hbl_id' => $hbl->id,
             ]);
-
-            $pickup->addStatus('Cargo collected by driver');
 
             DB::commit();
 

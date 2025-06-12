@@ -14,6 +14,7 @@ use App\Actions\Container\Unloading\UnloadHBL;
 use App\Actions\Container\Unloading\UnloadHBLPackages;
 use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
+use App\Actions\Container\UpdateContainerSystemStatus;
 use App\Actions\ContainerDocument\DeleteDocument;
 use App\Actions\ContainerDocument\DownloadDocument;
 use App\Actions\ContainerDocument\UploadDocument;
@@ -44,6 +45,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Facades\Excel;
@@ -372,6 +374,68 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             return GetContainerByReference::run($reference, $vesselScheduleId);
         } catch (\Exception $exception) {
             throw new \Exception('Failed to getting container: '.$exception->getMessage());
+        }
+    }
+
+    public function getAfterDispatchShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
+    {
+        $query = Container::query()->whereIn('status', [
+            ContainerStatus::IN_TRANSIT->value,
+            ContainerStatus::REACHED_DESTINATION->value,
+            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
+        ])->withoutGlobalScope(BranchScope::class);
+
+        if (! empty($search)) {
+            $query->where(function ($query) use ($search) {
+                $query->where('reference', 'like', '%'.$search.'%')
+                    ->orWhere('container_number', 'like', '%'.$search.'%')
+                    ->orWhere('bl_number', 'like', '%'.$search.'%')
+                    ->orWhere('awb_number', 'like', '%'.$search.'%');
+            });
+        }
+
+        FilterFactory::apply($query, $filters);
+
+        $containers = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
+
+        return response()->json([
+            'data' => ContainerResource::collection($containers),
+            'meta' => [
+                'total' => $containers->total(),
+                'current_page' => $containers->currentPage(),
+                'perPage' => $containers->perPage(),
+                'lastPage' => $containers->lastPage(),
+            ],
+        ]);
+    }
+
+    public function updateInboundShipmentStatus(Container $container)
+    {
+        try {
+            $hbls = $container
+                ->hbl_packages
+                ->pluck('hbl')
+                ->unique();
+
+            foreach ($hbls as $hbl) {
+                $hbl->is_arrived_to_primary_warehouse = true;
+                $hbl->save();
+
+                $hbl->addStatus('HBL Arrived to Primary Warehouse');
+            }
+
+            UpdateContainer::run($container, [
+                'arrived_at_primary_warehouse' => now(),
+                'arrived_primary_warehouse_by' => auth()->id(),
+            ]);
+
+            UpdateContainerStatus::run($container, ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value);
+
+            UpdateContainerSystemStatus::run($container, Container::SYSTEM_STATUS_CONTAINER_PRIMARY_WAREHOUSE_ARRIVAL);
+
+            $container->addStatus('Container Arrived to Primary Warehouse', 'Container has been arrived to primary warehouse');
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to mark as arrived to warehouse: '.$e->getMessage());
         }
     }
 }

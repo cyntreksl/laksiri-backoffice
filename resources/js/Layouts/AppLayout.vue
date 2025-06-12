@@ -51,6 +51,7 @@
                             >
                                 <i class="ti ti-truck text-2xl"></i>
                             </a>
+
                             <!-- HBL -->
                             <a
                                 v-if="$page.props.user.permissions.includes('delivers.show deliver order') || $page.props.user.permissions.includes('hbls.show draft hbls') || $page.props.user.permissions.includes('hbls.show cancelled hbls') || $page.props.user.permissions.includes('mhbls.index') || $page.props.user.permissions.includes('hbls.index') || $page.props.user.permissions.includes('hbls.create')"
@@ -66,6 +67,7 @@
                             >
                                 <i class="ti ti-app-window text-2xl"></i>
                             </a>
+
                             <!-- Back Office -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('cash'))"
@@ -211,6 +213,7 @@
                             >
                                 <i class="ti ti-truck-loading text-2xl"></i>
                             </a>
+
                             <!-- Departure Branch Arrivals -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('arrival')) && $page.props.currentBranch.type === 'Departure'"
@@ -226,6 +229,7 @@
                             >
                                 <i class="ti ti-inbox text-2xl"></i>
                             </a>
+
                             <!-- Courier Management -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('Courier')) || $page.props.user.permissions.includes('third-party-agents.index') || $page.props.user.permissions.includes('couriers.index') || $page.props.user.permissions.includes('couriers.create') || $page.props.user.permissions.includes('courier-agents.create')"
@@ -241,6 +245,7 @@
                             >
                                 <i class="ti ti-truck-delivery text-2xl"></i>
                             </a>
+
                             <!-- Vessel Schedules -->
                             <Link
                                 v-if="$page.props.user.permissions.includes('vessel.schedule.index')"
@@ -269,6 +274,23 @@
                             >
                                 <i class="ti ti-container text-2xl"></i>
                             </a>
+
+                            <!-- Gate Controller  -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('mark-'))"
+                                :class="[
+                                    activeMenu === 'gate-controller' ? 'bg-primary/10 text-primary' : '',
+                                  ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Gate Controller'"
+                                @click="
+                                    setMenu('gate-controller');
+                                    openSideBar();
+                                  "
+                            >
+                                <i class="ti ti-spy text-2xl"></i>
+                            </a>
+
                             <!-- User Management -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('users')) || $page.props.user.permissions.includes('roles.list')"
@@ -284,6 +306,7 @@
                             >
                                 <i class="ti ti-users text-2xl"></i>
                             </a>
+
                             <!-- Branches -->
                             <Link
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('branches')) || $page.props.user.permissions.includes('branches.list')"
@@ -995,6 +1018,49 @@ export default {
                     );
                     changeSidePanelTitle("Container Payments");
                     break;
+                case "gate-controller":
+                    let gateControllerMenu = [];
+
+                    if (usePage().props.user.permissions.includes("mark-shipment-arrived-to-warehouse")) {
+                        gateControllerMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Inbound Shipments",
+                                route: "gate-control.inbound-shipments.index",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("mark-shipment-depart-from-warehouse")) {
+                        gateControllerMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Outbound Containers",
+                                route: "container-payment.showContainerPaymentRefund",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("mark-gate-pass")) {
+                        gateControllerMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Gate Pass Management",
+                                route: "container-payment.request",
+                            }
+                        );
+                    }
+
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...gateControllerMenu
+                    );
+                    changeSidePanelTitle("Gate Control");
+                    break;
                 case "reception":
                     let receptionMenu = [];
 
@@ -1418,11 +1484,6 @@ export default {
                     let settingMenu = [];
 
                     const settingsPermissionMenuMap = [
-                        {
-                            permission: "manage_zones",
-                            title: "Zones",
-                            route: "setting.warehouse-zones.index"
-                        },
                         {
                             permission: "manage_driver_zones",
                             title: "Driver Zones",

@@ -30,6 +30,8 @@ class HBLPackage extends Model
         'height',
         'quantity',
         'weight',
+        'actual_weight',
+        'volumetric_weight',
         'volume',
         'remarks',
         'is_loaded',

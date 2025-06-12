@@ -61,25 +61,28 @@ const priceRuleItem = reactive({
 
 const handlePriceRuleCreate = () => {
     form.priceRules = ruleList.value;
+
     if (form.priceRules.length <= 0) {
         push.error('Please add at least one price rule.');
         return;
-    }else{
-        form.priceRules = ruleList.value;
-
-        form.post(route("setting.prices.store"), {
-            onSuccess: () => {
-                form.reset();
-                router.visit(route("setting.prices.index"));
-                push.success('Price rule created successfully!');
-            },
-            onError: () => {
-                push.error('Something went to wrong!');
-            },
-            preserveScroll: true,
-            preserveState: true,
-        });
     }
+
+    form.post(route("setting.prices.store"), {
+        onSuccess: () => {
+            form.reset();
+            router.visit(route("setting.prices.index"));
+            push.success('Price rule created successfully!');
+        },
+        onError: (errors) => {
+            if (errors.priceRules) {
+                push.error(errors.priceRules);
+            } else {
+                push.error('Something went wrong!');
+            }
+        },
+        preserveScroll: true,
+        preserveState: true,
+    });
 }
 
 watch([() => form.cargo_mode], ([newCargoMode]) => {
@@ -165,6 +168,12 @@ const addPriceRuleData = () => {
         showAddNewPriceRuleDialog.value = false;
         restModalFields()
     }else{
+        // Check for duplicate conditions in the current list
+        if (ruleList.value.some(rule => rule.condition === priceRuleItem.condition)) {
+            push.error("This condition already exists in the rule list");
+            return;
+        }
+
         const newItem = {...priceRuleItem};
         ruleList.value.push(newItem);
         showAddNewPriceRuleDialog.value = false;
@@ -292,7 +301,7 @@ const onDialogHide = () => {
                                 <DataTable v-if="ruleList.length > 0" :value="ruleList" tableStyle="min-width: 50rem">
                                     <Column header="Actions">
                                         <template #body="slotProps">
-                                            <Button v-if="slotProps.data.condition !== '>0'" icon="pi pi-times" rounded severity="danger" size="small" variant="text" @click.prevent="confirmRemovePriceRule(slotProps.index)" />
+                                            <Button icon="pi pi-times" rounded severity="danger" size="small" variant="text" @click.prevent="confirmRemovePriceRule(slotProps.index)" />
 
                                             <Button icon="pi pi-pencil" rounded size="small" variant="text" @click.prevent="openEditModal(slotProps.index)"  />
                                         </template>
@@ -355,7 +364,7 @@ const onDialogHide = () => {
                     Condition
                     <span class="text-red-500 text-sm">*</span>
                 </InputLabel>
-                <InputText v-model="priceRuleItem.condition" :disabled="ruleList.length <= 0" class="w-full" placeholder="Type Condition"/>
+                <InputText v-model="priceRuleItem.condition" class="w-full" placeholder="Type Condition"/>
             </div>
 
             <div class="col-span-2 md:col-span-1">
@@ -408,7 +417,7 @@ const onDialogHide = () => {
 
         <template #footer>
             <Button label="Cancel" severity="secondary" text @click="closeAddPriceRuleModal" />
-            <Button :label="editMode ? `Edi Price Rule` : `Add Price Rule`" severity="help" @click="addPriceRuleData" />
+            <Button :label="editMode ? `Edit Price Rule` : `Add Price Rule`" severity="help" @click="addPriceRuleData" />
         </template>
 
     </Dialog>

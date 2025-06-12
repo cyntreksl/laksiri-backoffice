@@ -30,7 +30,7 @@ class CourierRepository implements CourierRepositoryInterface, GridJsInterface
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = Courier::query();
+        $query = Courier::with('courierAgent');
 
         if (! empty($search)) {
             $query->where('courier_number', 'like', '%'.$search.'%');
@@ -58,12 +58,27 @@ class CourierRepository implements CourierRepositoryInterface, GridJsInterface
         DeleteCourier::run($courier);
     }
 
-    public function changeStatus(array $courierData, string $status): void
+    public function changeStatus(array $courierData, string $status): array
     {
-        foreach ($courierData as $var) {
-            $courier = GetCourier::run($var);
-            UpdateCourierStatus::run($courier, $status);
+        $updatedCouriers = [];
+
+        foreach ($courierData as $courierId) {
+            try {
+                $courier = GetCourier::run($courierId);
+                $updatedCourier = UpdateCourierStatus::run($courier, $status);
+                $updatedCouriers[] = $updatedCourier;
+            } catch (\Exception $e) {
+                // Log the error but continue with other couriers
+                \Log::error("Failed to update courier status for courier ID: {$courierId}", [
+                    'error' => $e->getMessage(),
+                    'user_id' => auth()->id(),
+                    'status' => $status
+                ]);
+                throw $e; // Re-throw to handle in controller
+            }
         }
+
+        return $updatedCouriers;
     }
 
     public function updateCourier(Courier $courier, $data)

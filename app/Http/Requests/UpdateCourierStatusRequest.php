@@ -24,7 +24,25 @@ class UpdateCourierStatusRequest extends FormRequest
     {
         return [
             'couriers' => ['required', 'array', 'min:1'],
-            'status' => ['required'],
+            'couriers.*' => ['required', 'integer', 'exists:couriers,id'],
+            'status' => ['required', 'string', 'in:pending,on courier,delivered'],
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'couriers.required' => 'Please select at least one courier.',
+            'couriers.array' => 'Invalid courier selection format.',
+            'couriers.min' => 'Please select at least one courier.',
+            'couriers.*.exists' => 'One or more selected couriers do not exist.',
+            'status.required' => 'Please select a status.',
+            'status.in' => 'Invalid status selected. Please choose from: pending, on courier, or delivered.',
         ];
     }
 }
