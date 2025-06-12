@@ -207,12 +207,6 @@ const resolveWarehouse = (warehouse) => {
                             </template>
                         </Column>
 
-                        <Column field="condition" header="Condition"></Column>
-
-                        <Column field="true_action" header="True Action"></Column>
-
-                        <Column field="false_action" header="False Action" hidden></Column>
-
                         <Column field="hbl_type" header="HBL Type" sortable>
                             <template #body="slotProps">
                                 <Tag :severity="resolveHBLType(slotProps.data.hbl_type)" :value="slotProps.data.hbl_type"></Tag>
@@ -221,6 +215,21 @@ const resolveWarehouse = (warehouse) => {
                                 <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
+
+                        <Column field="destination_branch_name" header="Destination" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveWarehouse(slotProps.data.destination_branch_name)" :value="slotProps.data.destination_branch_name.toUpperCase()"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="condition" header="Condition"></Column>
+
+                        <Column field="true_action" header="True Action"></Column>
+
+                        <Column field="false_action" header="False Action" hidden></Column>
 
                         <Column field="price_mode" header="Mode" sortable>
                             <template #body="slotProps">
@@ -256,15 +265,6 @@ const resolveWarehouse = (warehouse) => {
                                 <div class="flex items-center justify-end">
                                     <span>{{slotProps.data.bill_vat}} %</span>
                                 </div>
-                            </template>
-                        </Column>
-
-                        <Column field="destination_branch_name" header="Destination" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveWarehouse(slotProps.data.destination_branch_name)" :value="slotProps.data.destination_branch_name.toUpperCase()"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 
