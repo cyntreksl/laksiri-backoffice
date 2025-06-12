@@ -6,6 +6,7 @@ use App\Enum\CargoType;
 use App\Enum\ContainerStatus;
 use App\Enum\ContainerType;
 use App\Interfaces\ContainerRepositoryInterface;
+use App\Models\Container;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -27,6 +28,7 @@ class GateControlController extends Controller
         return Inertia::render('GateControl/InboundShipments', [
             'cargoTypes' => CargoType::cases(),
             'containerTypes' => ContainerType::cases(),
+            'containers' => $this->containerRepository->getLoadedContainers(),
             'containerStatus' => $containerStatuses,
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
@@ -46,5 +48,8 @@ class GateControlController extends Controller
         return $this->containerRepository->getAfterDispatchShipmentsList($limit, $page, $order, $dir, $search, $filters);
     }
 
-    public function updateInboundShipmentStatus() {}
+    public function updateInboundShipmentStatus(Container $container)
+    {
+        $this->containerRepository->updateInboundShipmentStatus($container);
+    }
 }

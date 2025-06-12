@@ -14,6 +14,7 @@ use App\Actions\Container\Unloading\UnloadHBL;
 use App\Actions\Container\Unloading\UnloadHBLPackages;
 use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
+use App\Actions\Container\UpdateContainerSystemStatus;
 use App\Actions\ContainerDocument\DeleteDocument;
 use App\Actions\ContainerDocument\DownloadDocument;
 use App\Actions\ContainerDocument\UploadDocument;
@@ -381,6 +382,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         $query = Container::query()->whereIn('status', [
             ContainerStatus::IN_TRANSIT->value,
             ContainerStatus::REACHED_DESTINATION->value,
+            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
         ])->withoutGlobalScope(BranchScope::class);
 
         if (! empty($search)) {
@@ -405,5 +407,35 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
                 'lastPage' => $containers->lastPage(),
             ],
         ]);
+    }
+
+    public function updateInboundShipmentStatus(Container $container)
+    {
+        try {
+            $hbls = $container
+                ->hbl_packages
+                ->pluck('hbl')
+                ->unique();
+
+            foreach ($hbls as $hbl) {
+                $hbl->is_arrived_to_primary_warehouse = true;
+                $hbl->save();
+
+                $hbl->addStatus('HBL Arrived to Primary Warehouse');
+            }
+
+            UpdateContainer::run($container, [
+                'arrived_at_primary_warehouse' => now(),
+                'arrived_primary_warehouse_by' => auth()->id(),
+            ]);
+
+            UpdateContainerStatus::run($container, ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value);
+
+            UpdateContainerSystemStatus::run($container, Container::SYSTEM_STATUS_CONTAINER_PRIMARY_WAREHOUSE_ARRIVAL);
+
+            $container->addStatus('Container Arrived to Primary Warehouse', 'Container has been arrived to primary warehouse');
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to mark as arrived to warehouse: '.$e->getMessage());
+        }
     }
 }

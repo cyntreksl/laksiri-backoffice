@@ -9,6 +9,6 @@ Route::prefix('gate-control')->name('gate-control.')->group(function () {
 
     Route::get('/get-after-dispatch-shipments-list', [GateControlController::class, 'getAfterDispatchShipmentsList']);
 
-    Route::post('/inbound-shipments/{container}', [GateControlController::class, 'updateInboundShipmentStatus'])
+    Route::put('/inbound-shipments/{container}', [GateControlController::class, 'updateInboundShipmentStatus'])
         ->name('inbound-shipments.update-status');
 });

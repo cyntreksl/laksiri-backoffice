@@ -32,10 +32,12 @@ class HBL extends Model
 
     protected $table = 'hbl';
 
+    // HBL Preparation
     public const SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER = 1.3;
 
     public const SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE = 2.1;
 
+    // Pre-HBL Processes
     public const SYSTEM_STATUS_CASH_RECEIVED = 2.2;
 
     public const SYSTEM_STATUS_MANIFEST_PREPARATION = 2.3;
@@ -44,16 +46,23 @@ class HBL extends Model
 
     public const SYSTEM_STATUS_PALLETIZE_CARGO = 2.5;
 
-    protected $SYSTEM_STATUS = [
-        3.0 => 'HBL created',
-        3.1 => 'HBL created - Job Converted to HBL',
-        4.0 => 'Cash Collected',
-        4.1 => 'Partial Loaded',
-        4.2 => 'Fully Loaded',
-        4.3 => 'Partial Unloaded',
-        4.4 => 'Fully Unloaded',
-        4.5 => 'Finance Approved',
-    ];
+    // HBL Creation
+    public const SYSTEM_STATUS_HBL_CREATED = 3.0;
+
+    public const SYSTEM_STATUS_HBL_CONVERTED_FROM_JOB = 3.1;
+
+    // Post-HBL Processes
+    public const SYSTEM_STATUS_CASH_COLLECTED = 4.0;
+
+    public const SYSTEM_STATUS_PARTIAL_LOADED = 4.1;
+
+    public const SYSTEM_STATUS_FULLY_LOADED = 4.2;
+
+    public const SYSTEM_STATUS_PARTIAL_UNLOADED = 4.3;
+
+    public const SYSTEM_STATUS_FULLY_UNLOADED = 4.4;
+
+    public const SYSTEM_STATUS_FINANCE_APPROVED = 4.5;
 
     protected $fillable = [
         'reference',
@@ -105,6 +114,7 @@ class HBL extends Model
         'is_finance_release_approved',
         'finance_release_approved_by',
         'finance_release_approved_date',
+        'is_arrived_to_primary_warehouse',
     ];
 
     protected $appends = [

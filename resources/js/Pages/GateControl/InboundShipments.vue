@@ -21,6 +21,8 @@ import DatePicker from "primevue/datepicker";
 import Column from "primevue/column";
 import IconField from "primevue/iconfield";
 import LoadedShipmentDetailDialog from "@/Pages/Common/Dialog/Container/Index.vue";
+import {push} from "notivue";
+import {useConfirm} from "primevue/useconfirm";
 
 const props = defineProps({
     cargoTypes: {
@@ -29,6 +31,11 @@ const props = defineProps({
         },
     },
     containerTypes: {
+        type: Object,
+        default: () => {
+        },
+    },
+    containers: {
         type: Object,
         default: () => {
         },
@@ -61,8 +68,9 @@ const fromDate = ref(moment(new Date()).subtract(6, "month").toISOString().split
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 const etdStartDate = ref('');
 const etdEndDate = ref('');
-const showConfirmLoadedShipmentModal = ref(false);
-const loadedShipment = ref(null);
+const showConfirmShipmentModal = ref(false);
+const inboundShipment = ref(null);
+const confirm = useConfirm();
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -73,16 +81,16 @@ const filters = ref({
 
 const menuModel = ref([
     {
-        label: 'Show',
-        icon: 'pi pi-fw pi-search',
-        command: () => confirmViewLoadedShipment(selectedContainer.value.id),
-        disabled: !usePage().props.user.permissions.includes('shipment.show'),
+        label: 'Mark as Arrived',
+        icon: 'pi pi-fw pi-directions',
+        command: () => confirmMarkAsArrived(selectedContainer),
+        disabled: () => !usePage().props.user.permissions.includes('mark-shipment-arrived-to-warehouse') || selectedContainer.value.status === 'ARRIVED PRIMARY WAREHOUSE',
     },
     {
-        label: 'Edit',
-        icon: 'pi pi-fw pi-pencil',
-        command: () => router.visit(route("loading.loading-containers.edit", selectedContainer.value.id)),
-        disabled: !usePage().props.user.permissions.includes('container.edit'),
+        label: 'Show',
+        icon: 'pi pi-fw pi-search',
+        command: () => confirmViewShipment(selectedContainer.value.id),
+        disabled: !usePage().props.user.permissions.includes('shipment.show'),
     },
     {
         label: 'Download Manifest',
@@ -92,7 +100,7 @@ const menuModel = ref([
     },
 ]);
 
-const fetchLoadedShipments = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+const fetchInboundShipments = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
     loading.value = true;
     try {
         const response = await axios.get(baseUrl.value, {
@@ -115,62 +123,62 @@ const fetchLoadedShipments = async (page = 1, search = "", sortField = 'created_
         totalRecords.value = response.data.meta.total;
         currentPage.value = response.data.meta.current_page;
     } catch (error) {
-        console.error("Error fetching Pickups:", error);
+        console.error("Error fetching Inbound Shipments:", error);
     } finally {
         loading.value = false;
     }
 };
 
-const debouncedFetchPickups = debounce((searchValue) => {
-    fetchLoadedShipments(1, searchValue);
+const debouncedFetchInboundShipments = debounce((searchValue) => {
+    fetchInboundShipments(1, searchValue);
 }, 1000);
 
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
-        debouncedFetchPickups(newValue);
+        debouncedFetchInboundShipments(newValue);
     }
 });
 
 watch(() => filters.value.cargo_type.value, (newValue) => {
-    fetchLoadedShipments(1, filters.value.global.value);
+    fetchInboundShipments(1, filters.value.global.value);
 });
 
 watch(() => fromDate.value, (newValue) => {
-    fetchLoadedShipments(1, filters.value.global.value);
+    fetchInboundShipments(1, filters.value.global.value);
 });
 
 watch(() => filters.value.container_type.value, (newValue) => {
-    fetchLoadedShipments(1, filters.value.global.value);
+    fetchInboundShipments(1, filters.value.global.value);
 });
 
 watch(() => filters.value.status.value, (newValue) => {
-    fetchLoadedShipments(1, filters.value.global.value);
+    fetchInboundShipments(1, filters.value.global.value);
 });
 
 watch(() => toDate.value, (newValue) => {
-    fetchLoadedShipments(1, filters.value.global.value);
+    fetchInboundShipments(1, filters.value.global.value);
 });
 
 watch(() => etdStartDate.value, (newValue) => {
-    fetchLoadedShipments(1, filters.value.global.value);
+    fetchInboundShipments(1, filters.value.global.value);
 });
 
 watch(() => etdEndDate.value, (newValue) => {
-    fetchLoadedShipments(1, filters.value.global.value);
+    fetchInboundShipments(1, filters.value.global.value);
 });
 
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchLoadedShipments(currentPage.value);
+    fetchInboundShipments(currentPage.value);
 };
 
 const onSort = (event) => {
-    fetchLoadedShipments(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+    fetchInboundShipments(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
 
 onMounted(() => {
-    fetchLoadedShipments();
+    fetchInboundShipments();
 });
 
 const onRowContextMenu = (event) => {
@@ -188,7 +196,7 @@ const clearFilter = () => {
     toDate.value = moment(new Date()).toISOString().split("T")[0];
     etdStartDate.value = '';
     etdEndDate.value = '';
-    fetchLoadedShipments(currentPage.value);
+    fetchInboundShipments(currentPage.value);
 };
 
 const resolveCargoType = (container) => {
@@ -227,29 +235,19 @@ const resolveContainerType = (container) => {
 
 const resolveContainerStatus = (container) => {
     switch (container.status) {
-        case 'LOADED':
-            return {
-                icon: "ti ti-package",
-                color: "info",
-            };
-        case 'CONTAINER ORDERED':
-            return {
-                icon: "ti ti-clock-play",
-                color: "secondary",
-            };
         case 'IN TRANSIT':
             return {
                 icon: "ti ti-tir",
                 color: "help",
             };
-        case 'UNLOADED':
-            return {
-                icon: "ti ti-package-off",
-                color: "warn",
-            };
         case 'REACHED DESTINATION':
             return {
                 icon: "ti ti-checks",
+                color: "success",
+            };
+        case 'ARRIVED PRIMARY WAREHOUSE':
+            return {
+                icon: "pi pi-directions",
                 color: "success",
             };
         default:
@@ -260,16 +258,52 @@ const resolveContainerStatus = (container) => {
     }
 };
 
-const confirmViewLoadedShipment = (id) => {
-    loadedShipment.value = props.containers.find(
+const confirmViewShipment = (id) => {
+    inboundShipment.value = props.containers.find(
         (container) => container.id === id
     );
-    showConfirmLoadedShipmentModal.value = true;
+    showConfirmShipmentModal.value = true;
+};
+
+const confirmMarkAsArrived = (container) => {
+    confirm.require({
+        message: `Would you like to mark shipment ${container.value?.reference} as arrived at the warehouse?`,
+        header: `Mark as Arrived?`,
+        icon: 'pi pi-directions',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Mark as Arrived',
+            severity: 'success'
+        },
+        accept: () => {
+            router.put(
+                route("gate-control.inbound-shipments.update-status", container.value?.id),
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success(`Operation Successfully!`);
+                        fetchInboundShipments(currentPage.value);
+                    },
+                    onError: () => {
+                        push.error("Something went to wrong!");
+                    },
+                }
+            );
+        },
+        reject: () => {
+        }
+    });
 };
 
 const closeModal = () => {
-    showConfirmLoadedShipmentModal.value = false;
-    loadedShipment.value = null;
+    showConfirmShipmentModal.value = false;
+    inboundShipment.value = null;
 };
 
 const exportCSV = () => {
@@ -375,9 +409,9 @@ const exportCSV = () => {
                             </div>
                         </template>
 
-                        <template #empty>No loaded shipments found.</template>
+                        <template #empty>No inbound shipments found.</template>
 
-                        <template #loading>Loading loaded shipments data. Please wait.</template>
+                        <template #loading>Loading inbound shipments data. Please wait.</template>
 
                         <Column field="container_type" header="Container Type" sortable>
                             <template #body="slotProps">
@@ -425,23 +459,23 @@ const exportCSV = () => {
                             </template>
 
                             <template #filter="{ filterModel }">
-                                <Select v-model="filterModel.value" :options="['LOADED', 'REACHED DESTINATION', 'UNLOADED', 'IN TRANSIT', 'CONTAINER ORDERED']" :showClear="true"
+                                <Select v-model="filterModel.value" :options="['REACHED DESTINATION', 'IN TRANSIT', 'ARRIVED PRIMARY WAREHOUSE']" :showClear="true"
                                         placeholder="Select One" style="min-width: 12rem"/>
                             </template>
                         </Column>
 
                         <Column field="note" header="Note" hidden></Column>
 
-                        <template #footer> In total there are {{ containers ? totalRecords : 0 }} loaded shipments. </template>
+                        <template #footer> In total there are {{ containers ? totalRecords : 0 }} inbound shipments. </template>
                     </DataTable>
                 </template>
             </Card>
         </div>
     </AppLayout>
 
-    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="loadedShipment" :container-status="containerStatus" :sea-container-options="seaContainerOptions" :show="showConfirmLoadedShipmentModal"
+    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="inboundShipment" :container-status="containerStatus" :sea-container-options="seaContainerOptions" :show="showConfirmShipmentModal"
            @close="closeModal"
-           @update:show="showConfirmLoadedShipmentModal = $event" />
+           @update:show="showConfirmShipmentModal = $event" />
 </template>
 
 <style>

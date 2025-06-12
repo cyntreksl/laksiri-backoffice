@@ -44,6 +44,7 @@ class UpdateHBL
             'pickup_id' => $data['pickup_id'] ?? null,
             'is_departure_charges_paid' => $data['is_departure_charges_paid'],
             'is_destination_charges_paid' => $data['is_destination_charges_paid'],
+            'is_arrived_to_primary_warehouse' => $data['is_arrived_to_primary_warehouse'] ?? false,
         ]);
 
         if (! empty($data['paid_amount'])) {
