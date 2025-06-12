@@ -61,8 +61,8 @@ definitions:
           - application.zip
 
     - step: &deploy
-        name: Deploy to $DEPLOYMENT_ENVIRONMENT
-        deployment: $DEPLOYMENT_ENVIRONMENT
+        name: Deploy to Environment
+        deployment: $DEPLOYMENT_ENV
         script:
           - mkdir -p ~/.ssh
           - echo $EC2_SSH_KEY_BASE64 | base64 -d > ~/.ssh/id_rsa
