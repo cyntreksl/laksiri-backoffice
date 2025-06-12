@@ -21,6 +21,14 @@ Route::prefix('couriers')->name('couriers.')->group(function () {
         ->name('change-status')
         ->middleware('can:courier.edit');
 
+    Route::get('/{courier}/download', [CourierController::class, 'download'])
+        ->name('download')
+        ->middleware('can:courier.download pdf');
+
+    Route::get('/{courier}/download/invoice', [CourierController::class, 'downloadInvoice'])
+        ->name('download.invoice')
+        ->middleware('can:courier.download invoice');
+
     Route::prefix('third-party-agents')->name('agents.')->group(function () {
         Route::resource('/', ThirdPartyAgentController::class)
             ->parameters(['' => 'third_party_agent'])

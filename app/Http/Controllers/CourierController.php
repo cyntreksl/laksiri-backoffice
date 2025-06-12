@@ -172,4 +172,46 @@ class CourierController extends Controller
 
         $this->CourierRepository->deleteCourier($courier);
     }
+
+    /**
+     * Download Courier PDF
+     *
+     * Generates and downloads a PDF document for the specified courier.
+     *
+     * @group Courier Management
+     *
+     * @urlParam courier integer required The ID of the courier. Example: 1
+     *
+     * @response 200 scenario="Success" Returns PDF file for download
+     * @response 404 scenario="Not Found" {
+     *   "message": "Courier not found"
+     * }
+     */
+    public function download(Courier $courier)
+    {
+        $this->authorize('courier.download pdf');
+
+        return $this->CourierRepository->downloadCourier($courier);
+    }
+
+    /**
+     * Download Courier Invoice PDF
+     *
+     * Generates and downloads an invoice PDF for the specified courier.
+     *
+     * @group Courier Management
+     *
+     * @urlParam courier integer required The ID of the courier. Example: 1
+     *
+     * @response 200 scenario="Success" Returns invoice PDF file for download
+     * @response 404 scenario="Not Found" {
+     *   "message": "Courier not found"
+     * }
+     */
+    public function downloadInvoice(Courier $courier)
+    {
+        $this->authorize('courier.download invoice');
+
+        return $this->CourierRepository->downloadCourierInvoice($courier);
+    }
 }

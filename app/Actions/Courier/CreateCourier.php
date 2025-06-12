@@ -65,7 +65,7 @@ class CreateCourier
 
     private function calculateValue(float $amount, ?string $method, $value): float
     {
-        if (empty($value) || empty($method) || !is_numeric($value) || $value <= 0) {
+        if (empty($value) || empty($method) || ! is_numeric($value) || $value <= 0) {
             return 0.00;
         }
 
@@ -79,7 +79,6 @@ class CreateCourier
 
         return 0.00;
     }
-
 
     private function calculateGrandTotal($amount, $taxAmount, $discountAmount)
     {

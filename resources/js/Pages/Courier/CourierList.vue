@@ -77,6 +77,18 @@ const menuModel = ref([
         disabled: !usePage().props.user.permissions.includes("courier.edit"),
     },
     {
+        label: "Download",
+        icon: "pi pi-fw pi-download",
+        url: () => route("couriers.download", selectedCourier.value.id),
+        disabled: !usePage().props.user.permissions.includes("courier.download pdf"),
+    },
+    {
+        label: "Invoice",
+        icon: "pi pi-fw pi-receipt",
+        url: () => route("couriers.download.invoice", selectedCourier.value.id),
+        disabled: !usePage().props.user.permissions.includes("courier.download invoice"),
+    },
+    {
         separator: true
     },
     {

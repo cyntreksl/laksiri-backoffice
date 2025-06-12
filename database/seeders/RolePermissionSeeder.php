@@ -609,6 +609,8 @@ class RolePermissionSeeder extends Seeder
                     'courier.create',
                     'courier.edit',
                     'courier.delete',
+                    'courier.download pdf',
+                    'courier.download invoice',
                 ],
             ],
 

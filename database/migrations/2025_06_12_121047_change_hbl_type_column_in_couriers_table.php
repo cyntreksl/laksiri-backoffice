@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('couriers', function (Blueprint $table) {
-            DB::statement("ALTER TABLE couriers MODIFY hbl_type VARCHAR(50) NULL");
+            DB::statement('ALTER TABLE couriers MODIFY hbl_type VARCHAR(50) NULL');
         });
     }
 
