@@ -1485,11 +1485,6 @@ export default {
 
                     const settingsPermissionMenuMap = [
                         {
-                            permission: "manage_zones",
-                            title: "Zones",
-                            route: "setting.warehouse-zones.index"
-                        },
-                        {
                             permission: "manage_driver_zones",
                             title: "Driver Zones",
                             route: "setting.driver-zones.index"

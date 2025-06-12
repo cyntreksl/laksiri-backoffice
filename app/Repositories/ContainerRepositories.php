@@ -44,6 +44,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Facades\Excel;
@@ -373,5 +374,36 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         } catch (\Exception $exception) {
             throw new \Exception('Failed to getting container: '.$exception->getMessage());
         }
+    }
+
+    public function getAfterDispatchShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
+    {
+        $query = Container::query()->whereIn('status', [
+            ContainerStatus::IN_TRANSIT->value,
+            ContainerStatus::REACHED_DESTINATION->value,
+        ])->withoutGlobalScope(BranchScope::class);
+
+        if (! empty($search)) {
+            $query->where(function ($query) use ($search) {
+                $query->where('reference', 'like', '%'.$search.'%')
+                    ->orWhere('container_number', 'like', '%'.$search.'%')
+                    ->orWhere('bl_number', 'like', '%'.$search.'%')
+                    ->orWhere('awb_number', 'like', '%'.$search.'%');
+            });
+        }
+
+        FilterFactory::apply($query, $filters);
+
+        $containers = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
+
+        return response()->json([
+            'data' => ContainerResource::collection($containers),
+            'meta' => [
+                'total' => $containers->total(),
+                'current_page' => $containers->currentPage(),
+                'perPage' => $containers->perPage(),
+                'lastPage' => $containers->lastPage(),
+            ],
+        ]);
     }
 }

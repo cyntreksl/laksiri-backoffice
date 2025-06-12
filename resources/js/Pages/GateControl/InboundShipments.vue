@@ -33,11 +33,6 @@ const props = defineProps({
         default: () => {
         },
     },
-    containers: {
-        type: Object,
-        default: () => {
-        },
-    },
     containerStatus: {
         type: Array,
         default: () => [],
@@ -52,7 +47,7 @@ const props = defineProps({
     },
 });
 
-const baseUrl = ref("/loaded-container-list");
+const baseUrl = ref("/gate-control/get-after-dispatch-shipments-list");
 const loading = ref(true);
 const containers = ref([]);
 const totalRecords = ref(0);
@@ -282,8 +277,8 @@ const exportCSV = () => {
 };
 </script>
 <template>
-    <AppLayout v-if="$page.props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Loaded Shipments">
-        <template #header>Loaded Shipments</template>
+    <AppLayout title="Inbound Shipments">
+        <template #header>Inbound Shipments</template>
 
         <Breadcrumb/>
 
@@ -340,169 +335,7 @@ const exportCSV = () => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Loaded Shipments
-                                </div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row justify-between gap-4">
-                                <!-- Button Group -->
-                                <div class="flex flex-col sm:flex-row gap-2">
-                                    <Button
-                                        icon="pi pi-filter-slash"
-                                        label="Clear Filters"
-                                        outlined
-                                        severity="contrast"
-                                        size="small"
-                                        type="button"
-                                        @click="clearFilter()"
-                                    />
-
-                                    <Button
-                                        icon="pi pi-external-link"
-                                        label="Export"
-                                        severity="contrast"
-                                        size="small"
-                                        @click="exportCSV($event)"
-                                    />
-                                </div>
-
-                                <!-- Search Field -->
-                                <IconField class="w-full sm:w-auto">
-                                    <InputIcon>
-                                        <i class="pi pi-search" />
-                                    </InputIcon>
-                                    <InputText
-                                        v-model="filters.global.value"
-                                        class="w-full"
-                                        placeholder="Keyword Search"
-                                        size="small"
-                                    />
-                                </IconField>
-                            </div>
-                        </template>
-
-                        <template #empty>No loaded shipments found.</template>
-
-                        <template #loading>Loading loaded shipments data. Please wait.</template>
-
-                        <Column field="container_type" header="Container Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveContainerType(slotProps.data)"
-                                     :value="slotProps.data.container_type" class="text-sm"></Tag>
-                            </template>
-                            <template #filter="{ filterModel }">
-                                <Select v-model="filterModel.value" :options="containerTypes" :showClear="true"
-                                        placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
-
-                        <Column field="reference" header="Reference" sortable></Column>
-
-                        <Column field="bl_number" header="BL Number" sortable></Column>
-
-                        <Column field="awb_number" header="AWB Number" hidden sortable></Column>
-
-                        <Column field="container_number" header="Container Number" sortable></Column>
-
-                        <Column field="seal_number" header="Seal Number" sortable></Column>
-
-                        <Column field="cargo_type" header="Cargo Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :icon="resolveCargoType(slotProps.data).icon"
-                                     :severity="resolveCargoType(slotProps.data).color"
-                                     :value="slotProps.data.cargo_type" class="text-sm"></Tag>
-                            </template>
-
-                            <template #filter="{ filterModel }">
-                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true"
-                                        placeholder="Select One" style="min-width: 12rem"/>
-                            </template>
-                        </Column>
-
-                        <Column field="estimated_time_of_arrival" header="ETA"></Column>
-
-                        <Column field="estimated_time_of_departure" header="ETD"></Column>
-
-                        <Column field="status" header="Status">
-                            <template #body="slotProps">
-                                <Tag :icon="resolveContainerStatus(slotProps.data).icon"
-                                     :severity="resolveContainerStatus(slotProps.data).color"
-                                     :value="slotProps.data.status" class="text-sm uppercase"></Tag>
-                            </template>
-
-                            <template #filter="{ filterModel }">
-                                <Select v-model="filterModel.value" :options="['LOADED', 'REACHED DESTINATION', 'UNLOADED', 'IN TRANSIT', 'CONTAINER ORDERED']" :showClear="true"
-                                        placeholder="Select One" style="min-width: 12rem"/>
-                            </template>
-                        </Column>
-
-                        <Column field="note" header="Note" hidden></Column>
-
-                        <template #footer> In total there are {{ containers ? totalRecords : 0 }} loaded shipments. </template>
-                    </DataTable>
-                </template>
-            </Card>
-        </div>
-    </AppLayout>
-
-    <AppLayout v-else title="Loaded Shipments">
-        <template #header>Loaded Shipments</template>
-
-        <Breadcrumb/>
-
-        <div>
-            <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    <FloatLabel class="w-full" variant="in">
-                        <DatePicker v-model="fromDate" class="w-full" date-format="yy-mm-dd" input-id="from-date"/>
-                        <label for="from-date">From Date</label>
-                    </FloatLabel>
-
-                    <FloatLabel class="w-full" variant="in">
-                        <DatePicker v-model="toDate" class="w-full" date-format="yy-mm-dd" input-id="to-date"/>
-                        <label for="to-date">To Date</label>
-                    </FloatLabel>
-
-                    <FloatLabel class="w-full" variant="in">
-                        <DatePicker v-model="etdStartDate" class="w-full" date-format="yy-mm-dd" input-id="etd-start-date"/>
-                        <label for="etd-start-date">ETD Start Date</label>
-                    </FloatLabel>
-
-                    <FloatLabel class="w-full" variant="in">
-                        <DatePicker v-model="etdEndDate" class="w-full" date-format="yy-mm-dd" input-id="etd-end-date"/>
-                        <label for="etd-end-date">ETD End Date</label>
-                    </FloatLabel>
-                </div>
-            </Panel>
-
-            <Card class="my-5">
-                <template #content>
-                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedContainer.length < 1"/>
-                    <DataTable
-                        ref="dt"
-                        v-model:contextMenuSelection="selectedContainer"
-                        v-model:filters="filters"
-                        :globalFilterFields="['reference', 'bl_number', 'awb_number', 'container_number', 'seal_number', 'vessel_name', 'voyage_number', 'shipping_line']"
-                        :loading="loading"
-                        :rows="perPage"
-                        :rowsPerPageOptions="[5, 10, 20, 50, 100]"
-                        :totalRecords="totalRecords"
-                        :value="containers"
-                        context-menu
-                        data-key="id"
-                        filter-display="menu"
-                        lazy
-                        paginator
-                        removable-sort
-                        row-hover
-                        tableStyle="min-width: 50rem"
-                        @page="onPageChange"
-                        @rowContextmenu="onRowContextMenu"
-                        @sort="onSort">
-
-                        <template #header>
-                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
-                                <div class="text-lg font-medium">
-                                    Loaded Shipments
+                                    Inbound Shipments
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
