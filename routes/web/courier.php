@@ -29,7 +29,7 @@ Route::prefix('couriers')->name('couriers.')->group(function () {
         ->name('download.invoice')
         ->middleware('can:courier.download invoice');
 
-    Route::prefix('third-party-agents')->name('agents.')->group(function () {
+    Route::prefix('management/third-party-agents')->name('agents.')->group(function () {
         Route::resource('/', ThirdPartyAgentController::class)
             ->parameters(['' => 'third_party_agent'])
             ->except('show');
@@ -38,7 +38,7 @@ Route::prefix('couriers')->name('couriers.')->group(function () {
             ->name('list');
     });
 
-    Route::prefix('courier-agents')->name('courier-agents.')->group(function () {
+    Route::prefix('management/courier-agents')->name('courier-agents.')->group(function () {
         Route::resource('/', CourierAgentController::class)
             ->parameters(['' => 'courier_agent'])
             ->except('show');

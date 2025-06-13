@@ -65,6 +65,7 @@ class RolePermissionSeeder extends Seeder
             'Container',
             'Loaded Shipment',
             'Unloading Issues',
+            'Third Party Agent',
             'Courier',
             'Courier Agents',
             'Settings',
@@ -103,8 +104,6 @@ class RolePermissionSeeder extends Seeder
             'charges.air line do charges list',
             'charges.air line do charges edit',
             'charges.air line do charges delete',
-            'hbls.hbl finance approval list',
-            'hbls.finance approved hbl list',
         ];
 
         for ($i = 0; $i < count(self::defaultPermissions()); $i++) {
