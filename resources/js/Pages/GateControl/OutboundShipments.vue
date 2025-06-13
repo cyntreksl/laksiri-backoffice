@@ -56,7 +56,7 @@ const props = defineProps({
     },
 });
 
-const baseUrl = ref("/gate-control/get-after-dispatch-shipments-list");
+const baseUrl = ref("/gate-control/get-after-inbound-shipments-list");
 const loading = ref(true);
 const containers = ref([]);
 const totalRecords = ref(0);
@@ -71,7 +71,7 @@ const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 const etdStartDate = ref('');
 const etdEndDate = ref('');
 const showConfirmShipmentModal = ref(false);
-const inboundShipment = ref(null);
+const outboundShipment = ref(null);
 const confirm = useConfirm();
 
 const filters = ref({
@@ -83,10 +83,10 @@ const filters = ref({
 
 const menuModel = ref([
     {
-        label: 'Mark as Arrived',
-        icon: 'pi pi-fw pi-directions',
-        command: () => confirmMarkAsArrived(selectedContainer),
-        disabled: () => !usePage().props.user.permissions.includes('mark-shipment-arrived-to-warehouse') || selectedContainer.value.status === 'ARRIVED PRIMARY WAREHOUSE',
+        label: 'Mark as Departed',
+        icon: 'pi pi-fw pi-directions-alt',
+        command: () => confirmMarkAsDeparted(selectedContainer),
+        disabled: () => !usePage().props.user.permissions.includes('mark-shipment-depart-from-warehouse') || selectedContainer.value.status === 'DEPARTED PRIMARY WAREHOUSE',
     },
     // {
     //     label: 'Show',
@@ -102,7 +102,7 @@ const menuModel = ref([
     // },
 ]);
 
-const fetchInboundShipments = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+const fetchOutboundShipments = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
     loading.value = true;
     try {
         const response = await axios.get(baseUrl.value, {
@@ -125,62 +125,62 @@ const fetchInboundShipments = async (page = 1, search = "", sortField = 'created
         totalRecords.value = response.data.meta.total;
         currentPage.value = response.data.meta.current_page;
     } catch (error) {
-        console.error("Error fetching Inbound Shipments:", error);
+        console.error("Error fetching Outbound Shipments:", error);
     } finally {
         loading.value = false;
     }
 };
 
-const debouncedFetchInboundShipments = debounce((searchValue) => {
-    fetchInboundShipments(1, searchValue);
+const debouncedFetchOutboundShipments = debounce((searchValue) => {
+    fetchOutboundShipments(1, searchValue);
 }, 1000);
 
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
-        debouncedFetchInboundShipments(newValue);
+        debouncedFetchOutboundShipments(newValue);
     }
 });
 
 watch(() => filters.value.cargo_type.value, (newValue) => {
-    fetchInboundShipments(1, filters.value.global.value);
+    fetchOutboundShipments(1, filters.value.global.value);
 });
 
 watch(() => fromDate.value, (newValue) => {
-    fetchInboundShipments(1, filters.value.global.value);
+    fetchOutboundShipments(1, filters.value.global.value);
 });
 
 watch(() => filters.value.container_type.value, (newValue) => {
-    fetchInboundShipments(1, filters.value.global.value);
+    fetchOutboundShipments(1, filters.value.global.value);
 });
 
 watch(() => filters.value.status.value, (newValue) => {
-    fetchInboundShipments(1, filters.value.global.value);
+    fetchOutboundShipments(1, filters.value.global.value);
 });
 
 watch(() => toDate.value, (newValue) => {
-    fetchInboundShipments(1, filters.value.global.value);
+    fetchOutboundShipments(1, filters.value.global.value);
 });
 
 watch(() => etdStartDate.value, (newValue) => {
-    fetchInboundShipments(1, filters.value.global.value);
+    fetchOutboundShipments(1, filters.value.global.value);
 });
 
 watch(() => etdEndDate.value, (newValue) => {
-    fetchInboundShipments(1, filters.value.global.value);
+    fetchOutboundShipments(1, filters.value.global.value);
 });
 
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchInboundShipments(currentPage.value);
+    fetchOutboundShipments(currentPage.value);
 };
 
 const onSort = (event) => {
-    fetchInboundShipments(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+    fetchOutboundShipments(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
 };
 
 onMounted(() => {
-    fetchInboundShipments();
+    fetchOutboundShipments();
 });
 
 const onRowContextMenu = (event) => {
@@ -198,7 +198,7 @@ const clearFilter = () => {
     toDate.value = moment(new Date()).toISOString().split("T")[0];
     etdStartDate.value = '';
     etdEndDate.value = '';
-    fetchInboundShipments(currentPage.value);
+    fetchOutboundShipments(currentPage.value);
 };
 
 const resolveCargoType = (container) => {
@@ -252,6 +252,11 @@ const resolveContainerStatus = (container) => {
                 icon: "pi pi-directions",
                 color: "success",
             };
+        case 'DEPARTED PRIMARY WAREHOUSE':
+            return {
+                icon: "pi pi-directions-alt",
+                color: "danger",
+            };
         default:
             return {
                 icon: "ti ti-question-mark",
@@ -261,17 +266,17 @@ const resolveContainerStatus = (container) => {
 };
 
 const confirmViewShipment = (id) => {
-    inboundShipment.value = props.containers.find(
+    outboundShipment.value = props.containers.find(
         (container) => container.id === id
     );
     showConfirmShipmentModal.value = true;
 };
 
-const confirmMarkAsArrived = (container) => {
+const confirmMarkAsDeparted = (container) => {
     confirm.require({
-        message: `Would you like to mark shipment ${container.value?.reference} as arrived at the warehouse?`,
-        header: `Mark as Arrived?`,
-        icon: 'pi pi-directions',
+        message: `Would you like to mark container ${container.value?.reference} as departed from the warehouse?`,
+        header: `Mark as Departed?`,
+        icon: 'pi pi-directions-alt',
         rejectLabel: 'Cancel',
         rejectProps: {
             label: 'Cancel',
@@ -279,18 +284,18 @@ const confirmMarkAsArrived = (container) => {
             outlined: true
         },
         acceptProps: {
-            label: 'Mark as Arrived',
+            label: 'Mark as Departed',
             severity: 'success'
         },
         accept: () => {
             router.put(
-                route("gate-control.inbound-shipments.update-status", container.value?.id),
+                route("gate-control.outbound-shipments.update-status", container.value?.id),
                 {},
                 {
                     preserveScroll: true,
                     onSuccess: () => {
                         push.success(`Operation Successfully!`);
-                        fetchInboundShipments(currentPage.value);
+                        fetchOutboundShipments(currentPage.value);
                     },
                     onError: () => {
                         push.error("Something went to wrong!");
@@ -305,7 +310,7 @@ const confirmMarkAsArrived = (container) => {
 
 const closeModal = () => {
     showConfirmShipmentModal.value = false;
-    inboundShipment.value = null;
+    outboundShipment.value = null;
 };
 
 const exportCSV = () => {
@@ -313,8 +318,8 @@ const exportCSV = () => {
 };
 </script>
 <template>
-    <AppLayout title="Inbound Shipments">
-        <template #header>Inbound Shipments</template>
+    <AppLayout title="Outbound Containers">
+        <template #header>Outbound Containers</template>
 
         <Breadcrumb/>
 
@@ -371,7 +376,7 @@ const exportCSV = () => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Inbound Shipments
+                                    Outbound Containers
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -411,15 +416,14 @@ const exportCSV = () => {
                             </div>
                         </template>
 
-                        <template #empty>No inbound shipments found.</template>
+                        <template #empty>No outbound containers found.</template>
 
-                        <template #loading>Loading inbound shipments data. Please wait.</template>
+                        <template #loading>Loading outbound containers data. Please wait.</template>
 
-                        <Column field="container_type" header="Container Type" sortable>
+                        <Column field="container_type" header="Container Type" sortable style="width: 15rem">
                             <template #body="slotProps">
                                 <Tag :severity="resolveContainerType(slotProps.data)"
-                                     :value="slotProps.data.container_type" class="text-sm"></Tag>
-
+                                     :value="slotProps.data.container_type" class="text-sm mb-5"></Tag>
                                 <img v-if="slotProps.data?.cargo_type === 'Sea Cargo'" :src="LongVehicle" alt="image"
                                      class="w-2/4 block xl:block rounded"/>
 
@@ -471,25 +475,25 @@ const exportCSV = () => {
                                          :severity="resolveContainerStatus(slotProps.data).color"
                                          :value="slotProps.data.status" class="text-sm uppercase"></Tag>
                                     <div class="mt-1 italic text-neutral-500 text-right">
-                                        {{slotProps.data?.arrived_at_primary_warehouse}}
+                                        {{slotProps.data?.departed_at_primary_warehouse}}
                                     </div>
                                 </div>
                             </template>
 
                             <template #filter="{ filterModel }">
-                                <Select v-model="filterModel.value" :options="['REACHED DESTINATION', 'IN TRANSIT', 'ARRIVED PRIMARY WAREHOUSE']" :showClear="true"
+                                <Select v-model="filterModel.value" :options="['ARRIVED PRIMARY WAREHOUSE', 'DEPARTED PRIMARY WAREHOUSE']" :showClear="true"
                                         placeholder="Select One" style="min-width: 12rem"/>
                             </template>
                         </Column>
 
-                        <template #footer> In total there are {{ containers ? totalRecords : 0 }} inbound shipments. </template>
+                        <template #footer> In total there are {{ containers ? totalRecords : 0 }} outbound containers. </template>
                     </DataTable>
                 </template>
             </Card>
         </div>
     </AppLayout>
 
-    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="inboundShipment" :container-status="containerStatus" :sea-container-options="seaContainerOptions" :show="showConfirmShipmentModal"
+    <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="outboundShipment" :container-status="containerStatus" :sea-container-options="seaContainerOptions" :show="showConfirmShipmentModal"
            @close="closeModal"
            @update:show="showConfirmShipmentModal = $event" />
 </template>

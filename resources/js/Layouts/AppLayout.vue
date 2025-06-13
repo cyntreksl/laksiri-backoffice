@@ -1038,7 +1038,7 @@ export default {
                             0,
                             {
                                 title: "Outbound Containers",
-                                route: "container-payment.showContainerPaymentRefund",
+                                route: "gate-control.outbound-shipments.index",
                             }
                         );
                     }

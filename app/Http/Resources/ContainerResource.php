@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 
 class ContainerResource extends JsonResource
 {
@@ -53,6 +54,8 @@ class ContainerResource extends JsonResource
             'unloading_ended_by' => $this->unloading_ended_by,
             'note' => $this->note,
             'is_reached' => $this->is_reached ? 'REACHED' : 'PENDING',
+            'arrived_at_primary_warehouse' => $this->arrived_at_primary_warehouse ? Carbon::parse($this->arrived_at_primary_warehouse)->toDateTimeString() : null,
+            'departed_at_primary_warehouse' => $this->departed_at_primary_warehouse ? Carbon::parse($this->arrived_at_primary_warehouse)->toDateTimeString() : null,
         ];
     }
 }
