@@ -72,7 +72,8 @@ definitions:
           - chmod 600 ~/.ssh/id_rsa
           - ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
           - scp application.zip $EC2_USER@$HOST:/tmp/app.zip
-          - ssh $EC2_USER@$HOST << EOF
+          - |
+            ssh $EC2_USER@$HOST bash -s << 'EOF'
             unzip -o /tmp/app.zip -d $DEPLOY_PATH
             cd $DEPLOY_PATH
             php artisan migrate --force
@@ -80,6 +81,7 @@ definitions:
             php artisan cache:clear
             php artisan sidecar:deploy --activate
             EOF
+
 
 pipelines:
   pull-requests:
