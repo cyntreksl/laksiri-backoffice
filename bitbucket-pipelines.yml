@@ -55,7 +55,6 @@ definitions:
         script:
           - docker-php-ext-install pdo_mysql
           - vendor/bin/pint --test
-          - php artisan test
 
     - step: &package-application
         name: Package Application
@@ -87,7 +86,7 @@ pipelines:
     '**':
       - step: *install-dependencies
       - step: *build-frontend
-#      - step: *run-tests
+      - step: *run-tests
 
   custom:
     deploy-to-staging:
