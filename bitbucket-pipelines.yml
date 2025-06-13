@@ -74,8 +74,8 @@ definitions:
           - scp application.zip $EC2_USER@$HOST:/tmp/app.zip
           - |
             ssh $EC2_USER@$HOST bash -s << 'EOF'
-            unzip -o /tmp/app.zip -d $DEPLOY_PATH
-            cd $DEPLOY_PATH
+            unzip -o /tmp/app.zip -d /var/www/laksiri-backoffice
+            cd /var/www/laksiri-backoffice
             php artisan migrate --force
             php artisan config:clear
             php artisan cache:clear
