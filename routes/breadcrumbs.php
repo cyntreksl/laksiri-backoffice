@@ -536,6 +536,12 @@ Breadcrumbs::for('gate-control.inbound-shipments.index', function (BreadcrumbTra
     $trail->push('Inbound Shipments', route('gate-control.inbound-shipments.index'));
 });
 
+Breadcrumbs::for('gate-control.outbound-shipments.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Gate Control');
+    $trail->push('Outbound Containers', route('gate-control.outbound-shipments.index'));
+});
+
 require_once __DIR__.'/call-center-breadcrumbs.php';
 require_once __DIR__.'/finance-breadcrumbs.php';
 require_once __DIR__.'/clearance-breadcrumbs.php';

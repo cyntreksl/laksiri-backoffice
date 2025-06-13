@@ -58,4 +58,8 @@ interface ContainerRepositoryInterface
     public function getAfterDispatchShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse;
 
     public function updateInboundShipmentStatus(Container $container);
+
+    public function getAfterInboundShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse;
+
+    public function updateOutboundShipmentStatus(Container $container);
 }

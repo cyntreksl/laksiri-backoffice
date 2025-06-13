@@ -438,4 +438,53 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             throw new \Exception('Failed to mark as arrived to warehouse: '.$e->getMessage());
         }
     }
+
+    public function getAfterInboundShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
+    {
+        $query = Container::query()->whereIn('status', [
+            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
+            ContainerStatus::DEPARTED_PRIMARY_WAREHOUSE->value,
+        ])->withoutGlobalScope(BranchScope::class);
+
+        if (! empty($search)) {
+            $query->where(function ($query) use ($search) {
+                $query->where('reference', 'like', '%'.$search.'%')
+                    ->orWhere('container_number', 'like', '%'.$search.'%')
+                    ->orWhere('bl_number', 'like', '%'.$search.'%')
+                    ->orWhere('awb_number', 'like', '%'.$search.'%');
+            });
+        }
+
+        FilterFactory::apply($query, $filters);
+
+        $containers = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
+
+        return response()->json([
+            'data' => ContainerResource::collection($containers),
+            'meta' => [
+                'total' => $containers->total(),
+                'current_page' => $containers->currentPage(),
+                'perPage' => $containers->perPage(),
+                'lastPage' => $containers->lastPage(),
+            ],
+        ]);
+    }
+
+    public function updateOutboundShipmentStatus(Container $container)
+    {
+        try {
+            UpdateContainer::run($container, [
+                'departed_at_primary_warehouse' => now(),
+                'departed_primary_warehouse_by' => auth()->id(),
+            ]);
+
+            UpdateContainerStatus::run($container, ContainerStatus::DEPARTED_PRIMARY_WAREHOUSE->value);
+
+            UpdateContainerSystemStatus::run($container, Container::SYSTEM_STATUS_CONTAINER_PRIMARY_WAREHOUSE_DEPART);
+
+            $container->addStatus('Container Departed from Primary Warehouse', 'Container has been departed from primary warehouse');
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to mark as departed from warehouse: '.$e->getMessage());
+        }
+    }
 }
