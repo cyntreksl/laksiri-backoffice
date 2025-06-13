@@ -54,8 +54,37 @@ class ContainerResource extends JsonResource
             'unloading_ended_by' => $this->unloading_ended_by,
             'note' => $this->note,
             'is_reached' => $this->is_reached ? 'REACHED' : 'PENDING',
-            'arrived_at_primary_warehouse' => $this->arrived_at_primary_warehouse ? Carbon::parse($this->arrived_at_primary_warehouse)->toDateTimeString() : null,
-            'departed_at_primary_warehouse' => $this->departed_at_primary_warehouse ? Carbon::parse($this->arrived_at_primary_warehouse)->toDateTimeString() : null,
+            'arrived_at_primary_warehouse' => $this->arrived_at_primary_warehouse
+                ? Carbon::parse($this->arrived_at_primary_warehouse)->toDateTimeString()
+                : null,
+
+            'departed_at_primary_warehouse' => $this->departed_at_primary_warehouse
+                ? Carbon::parse($this->departed_at_primary_warehouse)->toDateTimeString()
+                : null,
+
+            'warehouse_dwell_time' => ($this->arrived_at_primary_warehouse && $this->departed_at_primary_warehouse)
+                ? $this->formatDwellTime($this->arrived_at_primary_warehouse, $this->departed_at_primary_warehouse)
+                : null,
         ];
+    }
+
+    private function formatDwellTime($start, $end): string
+    {
+        $start = Carbon::parse($start);
+        $end = Carbon::parse($end);
+        $diff = $start->diff($end);
+
+        $parts = [];
+        if ($diff->d > 0) {
+            $parts[] = $diff->d.' day'.($diff->d > 1 ? 's' : '');
+        }
+        if ($diff->h > 0) {
+            $parts[] = $diff->h.' hour'.($diff->h > 1 ? 's' : '');
+        }
+        if ($diff->i > 0) {
+            $parts[] = $diff->i.' min'.($diff->i > 1 ? 's' : '');
+        }
+
+        return implode(' ', $parts) ?: '0 mins';
     }
 }

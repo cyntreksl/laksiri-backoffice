@@ -477,6 +477,10 @@ const exportCSV = () => {
                                     <div class="mt-1 italic text-neutral-500 text-right">
                                         {{slotProps.data?.departed_at_primary_warehouse}}
                                     </div>
+                                    <div v-if="slotProps.data.departed_at_primary_warehouse" class="italic text-yellow-600 text-right text-xs">
+                                        Spend In Warehouse
+                                        <b>{{slotProps.data.warehouse_dwell_time}}</b>
+                                    </div>
                                 </div>
                             </template>
 
