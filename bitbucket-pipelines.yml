@@ -74,7 +74,6 @@ definitions:
           - ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
           - scp application.zip $EC2_USER@$HOST:/tmp/app.zip
           - ssh $EC2_USER@$HOST << EOF
-            set -e
             unzip -o /tmp/app.zip -d $DEPLOY_PATH
             cd $DEPLOY_PATH
             php artisan migrate --force
