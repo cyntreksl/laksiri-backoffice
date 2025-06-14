@@ -10,7 +10,7 @@
 <div class="mx-auto max-w-5xl overflow-hidden text-blue-900">
     <!-- Header -->
     <div class="p-6">
-        <p class="text-right text-xs font-semibold text-neutral-400">CASHIER'S COPY</p>
+        <p class="text-right text-xs font-semibold text-neutral-400">CASHIER'S COPY-(#{{$data['hbl']['id']}})</p>
 
         <div class="flex items-center justify-between">
             <div class="flex items-start">
@@ -66,7 +66,7 @@
     <!-- Invoice Details -->
     <div class="p-6">
         <!-- Customer & Cargo Information -->
-        <div class="mb-3 grid grid-cols-2 gap-8">
+        <div class="mb-3 grid grid-cols-2 gap-8 text-sm">
             <div class="space-y-2">
                 <div class="flex">
                     <span class="w-40 font-semibold">Name of Consignee:</span>
@@ -111,7 +111,7 @@
             <div class="overflow-hidden rounded-lg border border-gray-200">
                 <table class="w-full">
                     <thead>
-                    <tr class="bg-blue-900">
+                    <tr class="bg-blue-900 text-white">
                         <th class="px-6 py-2 text-left text-lg font-bold">DESCRIPTION</th>
                         <th class="px-6 py-2 text-right text-lg font-bold">RATE</th>
                         <th class="px-6 py-2 text-right text-lg font-bold">AMOUNT</th>
@@ -177,7 +177,7 @@
 
         <!-- Payment Summary -->
         <div class="mb-3 grid grid-cols-2 gap-8">
-            <div class="rounded-lg bg-gray-50 px-4">
+            <div class="rounded-lg bg-gray-50 px-4 py-2">
                 <p class="mb-2 text-sm">VAT 18% included in the charges</p>
                 <p class="text-sm font-bold text-neutral-500">{{ $data['total_in_word'] }}</p>
             </div>
@@ -229,7 +229,6 @@
                 NOTE: WE DO NOT TAKE ANY RESPONSIBILITY FOR ANY LOSS OR DAMAGE<br />
                 TO THE GOODS, AFTER CLEARING THE CARGO.
             </p>
-            <p class="text-xs text-gray-400">#{{$data['hbl']['id']}}</p>
         </div>
     </div>
 </div>
