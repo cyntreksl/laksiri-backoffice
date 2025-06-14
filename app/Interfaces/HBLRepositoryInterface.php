@@ -82,4 +82,6 @@ interface HBLRepositoryInterface
     public function getHBLsPackages(array $data);
 
     public function getHBLDestinationTotalSummary(HBL $hbl);
+
+    public function downloadGatePass($hbl);
 }

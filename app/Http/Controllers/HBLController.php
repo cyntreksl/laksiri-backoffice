@@ -407,4 +407,9 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->getHBLDestinationTotalSummary($hbl);
     }
+
+    public function downloadGatePass($hbl)
+    {
+        return $this->HBLRepository->downloadGatePass($hbl);
+    }
 }
