@@ -6,11 +6,11 @@ use App\Actions\Container\GetContainerWithoutGlobalScopesById;
 use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Actions\SLInvoice\CreateSLInvoice;
 use App\Actions\User\GetUserById;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Lorisleiva\Actions\Concerns\AsAction;
 use NumberFormatter;
+use Wnx\SidecarBrowsershot\BrowsershotLambda;
 
-class DownloadGatePassPDF
+class DownloadCashierInvoicePDF
 {
     use AsAction;
 
@@ -59,10 +59,20 @@ class DownloadGatePassPDF
             'by' => GetUserById::run($sl_Invoice['created_by'])->name,
         ];
 
-        $pdf = Pdf::loadView('pdf.cashier.gatePass', ['data' => $data, 'hbl' => $hbl])->setPaper('a4');
+        $template = view('pdf.cashier.invoice', [
+            'logoPath' => asset('images/app-logo.png') ?? null,
+            'data' => $data,
+            'hbl' => $hbl,
+        ])->render();
 
         $filename = 'RECEIPT'.$hbl['reference'].'.pdf';
 
-        return $pdf->download($filename);
+        $filePath = storage_path("app/public/{$filename}");
+
+        BrowsershotLambda::html($template)
+            ->format('A4')
+            ->save($filePath);
+
+        return response()->download($filePath)->deleteFileAfterSend(true);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Repositories\CallCenter;
 
-use App\Actions\Cashier\DownloadGatePassPDF;
+use App\Actions\Cashier\DownloadCashierInvoicePDF;
 use App\Actions\Cashier\UpdateCashierHBLPayments;
 use App\Actions\HBL\CashSettlement\UpdateHBLDOCharge;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
@@ -144,8 +144,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         ]);
     }
 
-    public function downloadGatePass($hbl)
+    public function downloadCashierInvoice($hbl)
     {
-        return DownloadGatePassPDF::run($hbl);
+        return DownloadCashierInvoicePDF::run($hbl);
     }
 }

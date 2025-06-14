@@ -359,7 +359,7 @@ class HBLController extends Controller
 
     public function getCashierReceipt($hbl)
     {
-        return $this->HBLRepository->downloadGatePass($hbl);
+        return $this->HBLRepository->downloadCashierInvoice($hbl);
     }
 
     public function showDoorToDoorList()
