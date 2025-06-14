@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\Cashier;
+namespace App\Actions\Examination;
 
 use App\Actions\Container\GetContainerWithoutGlobalScopesById;
 use App\Actions\HBL\GetHBLByIdWithPackages;
@@ -10,7 +10,7 @@ use Lorisleiva\Actions\Concerns\AsAction;
 use NumberFormatter;
 use Wnx\SidecarBrowsershot\BrowsershotLambda;
 
-class DownloadCashierInvoicePDF
+class DownloadGatePassPDF
 {
     use AsAction;
 
@@ -59,13 +59,13 @@ class DownloadCashierInvoicePDF
             'by' => GetUserById::run($sl_Invoice['created_by'])->name,
         ];
 
-        $template = view('pdf.cashier.invoice', [
+        $template = view('pdf.examination.gate-pass', [
             'logoPath' => asset('images/app-logo.png') ?? null,
             'data' => $data,
             'hbl' => $hbl,
         ])->render();
 
-        $filename = 'RECEIPT'.$hbl['reference'].'.pdf';
+        $filename = 'GATE-PASS-'.$hbl['reference'].'.pdf';
 
         $filePath = storage_path("app/public/{$filename}");
 

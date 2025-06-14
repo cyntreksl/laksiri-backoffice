@@ -10,7 +10,7 @@
 <div class="mx-auto max-w-5xl overflow-hidden text-blue-900">
     <!-- Header -->
     <div class="p-6">
-        <p class="text-right font-semibold text-neutral-400">CASHIER'S COPY</p>
+        <p class="text-right text-xs font-semibold text-neutral-400">CASHIER'S COPY</p>
 
         <div class="flex items-center justify-between">
             <div class="flex items-start">
@@ -60,7 +60,7 @@
 
     <!-- Invoice Title -->
     <div class="py-2 text-center">
-        <h2 class="text-xl font-bold tracking-wide underline">U.P.B. WAREHOUSE INVOICE FOR SEA CARGO</h2>
+        <h2 class="text-lg font-bold tracking-wide underline">U.P.B. WAREHOUSE INVOICE FOR SEA CARGO</h2>
     </div>
 
     <!-- Invoice Details -->

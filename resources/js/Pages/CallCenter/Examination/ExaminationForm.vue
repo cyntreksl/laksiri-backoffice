@@ -138,6 +138,8 @@ const handleUpdateReleaseHBLPackages = () => {
             router.visit(route("call-center.examination.queue.list"));
             form.reset();
             push.success('HBL Packages Released Successfully!');
+            // Trigger the download of the PDF
+            window.location.href = route("hbls.download.gate-pass", {hbl: props.hblId});
         },
         onError: () => {
             push.error('Something went to wrong!');

@@ -95,3 +95,6 @@ Route::get('hbls/get-total-summary/{hbl}', [HBLController::class, 'getHBLTotalSu
 Route::get('hbls/get-destination-total-summary/{hbl}', [HBLController::class, 'getHBLDestinationTotalSummary'])->name('hbls.get-destination hbl-total-summary');
 
 Route::post('hbls/packages', [HBLController::class, 'getHBLsPackages'])->name('hbls.get-hbls-packages');
+
+Route::get('hbls/download/gate-pass/{hbl}', [HBLController::class, 'downloadGatePass'])
+    ->name('hbls.download.gate-pass');
