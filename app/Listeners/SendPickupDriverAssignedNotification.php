@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use App\Actions\Notification\SendPickupAssignedNotificationToDriver;
 use App\Events\PickupDriverAssigned;
-use App\Models\User;
 use App\Notifications\PickupDriverAssignmentNotification;
 use Illuminate\Support\Facades\Notification;
 

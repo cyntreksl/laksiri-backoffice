@@ -3,7 +3,6 @@
 namespace App\Listeners;
 
 use App\Events\PickupCreated;
-use App\Models\User;
 use App\Notifications\ConfirmPickupNotification;
 use Illuminate\Support\Facades\Notification;
 
@@ -24,7 +23,6 @@ class SendPickupCreatedNotification
     {
         $pickUp = $event->pickUp;
         $whatsapp_number = $pickUp->whatsapp_number;
-
 
         Notification::send($whatsapp_number, new ConfirmPickupNotification($pickUp));
     }
