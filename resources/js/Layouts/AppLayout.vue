@@ -969,27 +969,6 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("payment-container.refund list")) {
-                        containerPaymentMenu.splice(
-                            2,
-                            0,
-                            {
-                                title: "Refunds",
-                                route: "container-payment.showContainerPaymentRefund",
-                            }
-                        );
-                    }
-                    if (usePage().props.user.permissions.includes("payment-container.show container payment requests")) {
-                        containerPaymentMenu.splice(
-                            2,
-                            0,
-                            {
-                                title: "Payment Requests",
-                                route: "container-payment.request",
-                            }
-                        );
-                    }
-
                     if (usePage().props.user.permissions.includes("payment-container.approved list")) {
                         containerPaymentMenu.splice(
                             2,
@@ -1011,6 +990,18 @@ export default {
                             }
                         );
                     }
+
+                    if (usePage().props.user.permissions.includes("payment-container.refund list")) {
+                        containerPaymentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Refunds",
+                                route: "container-payment.showContainerPaymentRefund",
+                            }
+                        );
+                    }
+
                     childMenuList.splice(
                         0,
                         childMenuList.length,
