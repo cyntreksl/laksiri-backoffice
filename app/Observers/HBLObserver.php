@@ -120,8 +120,8 @@ class HBLObserver
             }
         }
         if ($hbl->wasChanged('is_released')) {
-            $driver_delivery = $hbl->assignedDriver->get();
-            if (count($driver_delivery) > 0 && Auth::user()->hasRole('driver')) {
+            $driver_delivery = $hbl->assignedDriver;
+            if ($driver_delivery !== null && Auth::user()->hasRole('driver')) {
                 // Send notification email
                 $this->notificationMailRepository->sendHBLReleasedNotification($hbl);
             }

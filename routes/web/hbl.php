@@ -96,5 +96,5 @@ Route::get('hbls/get-destination-total-summary/{hbl}', [HBLController::class, 'g
 
 Route::post('hbls/packages', [HBLController::class, 'getHBLsPackages'])->name('hbls.get-hbls-packages');
 
-Route::get('hbls/download/gate-pass/{hbl}', [HBLController::class, 'downloadGatePass'])
+Route::get('hbls/download/gate-pass/{hbl}/queue/{customer_queue}', [HBLController::class, 'downloadGatePass'])
     ->name('hbls.download.gate-pass');

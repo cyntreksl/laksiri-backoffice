@@ -3,6 +3,7 @@
 namespace App\Interfaces;
 
 use App\Models\Container;
+use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\HBLDocument;
 use Illuminate\Http\JsonResponse;
@@ -83,5 +84,5 @@ interface HBLRepositoryInterface
 
     public function getHBLDestinationTotalSummary(HBL $hbl);
 
-    public function downloadGatePass($hbl);
+    public function downloadGatePass($hbl, CustomerQueue $customerQueue);
 }
