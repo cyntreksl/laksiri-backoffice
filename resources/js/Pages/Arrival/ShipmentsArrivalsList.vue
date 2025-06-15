@@ -473,8 +473,6 @@ const closeModal = () => {
 
                         <Column field="bl_number" header="BL Number" sortable></Column>
 
-                        <Column field="awb_number" header="AWB Number" sortable></Column>
-
                         <Column field="container_number" header="Container Number" sortable></Column>
 
                         <Column field="seal_number" header="Seal Number" sortable></Column>
@@ -508,6 +506,8 @@ const closeModal = () => {
                         </Column>
 
                         <Column field="note" header="Note"></Column>
+
+                        <Column field="estimated_time_of_arrival" header="ETA" sortable></Column>
 
                         <Column field="is_reached" header="Is Reached">
                             <template #body="{data}">
