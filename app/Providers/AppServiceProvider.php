@@ -41,9 +41,9 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        $hasEmailTest = config('mail.test.address', false);
-        if ($hasEmailTest) {
-            Mail::alwaysTo($hasEmailTest);
+        $emailTest = config('mail.test.address', true);
+        if ($emailTest) {
+            Mail::alwaysTo($emailTest);
         }
 
         Passport::enablePasswordGrant();

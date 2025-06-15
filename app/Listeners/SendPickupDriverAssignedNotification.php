@@ -24,10 +24,8 @@ class SendPickupDriverAssignedNotification
     public function handle(PickupDriverAssigned $event): void
     {
         $pickUp = $event->pickUp;
-        $contact_number = $pickUp->contact_number;
-
-        $user = User::where('contact', $contact_number)->first();
-        //        Notification::send($user, new PickupDriverAssignmentNotification($pickUp));
+        $whatsapp_number = $pickUp->whatsapp_number;
+        Notification::send($whatsapp_number, new PickupDriverAssignmentNotification($pickUp));
 
         SendPickupAssignedNotificationToDriver::run($pickUp);
 

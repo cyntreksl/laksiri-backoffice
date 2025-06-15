@@ -25,19 +25,19 @@ class PickupDriverAssignmentNotification extends Notification
      *
      * @return array<int, string>
      */
-    public function via(object $notifiable): array
+    public function via(string $notifiable): array
     {
         return [WhatsAppChannel::class];
     }
 
-    public function toWhatsapp(object $notifiable)
+    public function toWhatsapp(string $notifiable)
     {
         $driver = $this->pickUp->driver;
         $template = new DriverAssignmentForCargoCollectWhatsAppTemplate($this->pickUp->name, $driver->name, $driver->contact);
 
         return [
             'messaging_product' => 'whatsapp',
-            'to' => $notifiable->contact, // TODO: it should be whatsapp number
+            'to' => $notifiable,
             'type' => 'template',
             'template' => $template->getTemplate(),
         ];

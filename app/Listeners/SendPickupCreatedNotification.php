@@ -23,10 +23,9 @@ class SendPickupCreatedNotification
     public function handle(PickupCreated $event): void
     {
         $pickUp = $event->pickUp;
-        $contact_number = $pickUp->contact_number;
+        $whatsapp_number = $pickUp->whatsapp_number;
 
-        $user = User::where('contact', $contact_number)->first();
 
-        //        Notification::send($user, new ConfirmPickupNotification($pickUp));
+        Notification::send($whatsapp_number, new ConfirmPickupNotification($pickUp));
     }
 }

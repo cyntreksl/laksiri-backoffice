@@ -22,8 +22,8 @@ class SendShipmentDeparturedNotification
     public function handle(ShipmentDepartured $event): void
     {
         $hbl = $event->HBL;
-        $shipper = $hbl->shipper;
+        $whatsapp_number = $hbl->whatsapp_number;
 
-        //        Notification::send($shipper, new ShipmentDepartureNotification($hbl));
+        Notification::send($whatsapp_number, new ShipmentDepartureNotification($hbl));
     }
 }

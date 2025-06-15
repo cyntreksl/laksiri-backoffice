@@ -101,7 +101,7 @@ return [
     ],
 
     'test' => [
-        'address' => env('MAIL_TEST_ADDRESS', 'cyntreksl+laksiri@gmail.com'),
+        'address' => env('MAIL_TEST_RECEIVERS', 'cyntreksl+laksiri@gmail.com'),
     ],
 
 ];
