@@ -41,7 +41,10 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        Mail::alwaysTo('ashad@ufsqa.com');
+        $hasEmailTest = config('mail.test.address', false);
+        if ($hasEmailTest) {
+            Mail::alwaysTo($hasEmailTest);
+        }
 
         Passport::enablePasswordGrant();
         Event::listen(

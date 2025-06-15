@@ -26,6 +26,7 @@ class GenerateFakeHBLData extends Command
     protected $description = 'Generate fake HBL data using API endpoints';
 
     private $apiToken = 'driXAHHO5DSmcChwjg0fhQpPb6cuS1zOGn1TRnRyb421d730';
+
     private $baseUrl;
 
     /**
@@ -39,20 +40,23 @@ class GenerateFakeHBLData extends Command
 
         if ($count <= 0) {
             $this->error('Count must be a positive integer');
+
             return 1;
         }
 
         // Get user by ID if provided, otherwise use first user
         if ($userId) {
             $user = User::find($userId);
-            if (!$user) {
+            if (! $user) {
                 $this->error("User with ID {$userId} not found.");
+
                 return 1;
             }
         } else {
             $user = User::first();
-            if (!$user) {
+            if (! $user) {
                 $this->error('No users found. Please create a user first.');
+
                 return 1;
             }
         }
@@ -63,7 +67,7 @@ class GenerateFakeHBLData extends Command
         $this->baseUrl = config('app.api_url', 'http://localhost:8000');
 
         if ($debug) {
-            $this->info("Debug mode: Showing payload structure for API calls...");
+            $this->info('Debug mode: Showing payload structure for API calls...');
         } else {
             $this->info("Generating {$count} fake HBL records via API...");
         }
@@ -105,7 +109,7 @@ class GenerateFakeHBLData extends Command
                         'weight' => $weight,
                         'remarks' => $faker->optional()->words(3, true),
                         'measure_type' => 'cm',
-                        'rule_id' => null
+                        'rule_id' => null,
                     ];
 
                     $grandVolume += $volume;
@@ -131,27 +135,28 @@ class GenerateFakeHBLData extends Command
                             'quantity' => (string) $pkg['quantity'],
                             'volume' => (string) $pkg['volume'],
                             'weight' => (string) $pkg['weight'],
-                            'remarks' => $pkg['remarks'] ?? ''
+                            'remarks' => $pkg['remarks'] ?? '',
                         ];
-                    }, $packages)
+                    }, $packages),
                 ];
 
                 if ($debug) {
                     $this->newLine();
-                    $this->info("=== Payment Calculation API Payload ===");
+                    $this->info('=== Payment Calculation API Payload ===');
                     $this->line(json_encode($paymentData, JSON_PRETTY_PRINT));
                     $this->newLine();
                 }
 
-                if (!$debug) {
+                if (! $debug) {
                     $paymentResponse = Http::withHeaders([
-                        'Authorization' => 'Bearer ' . $this->apiToken,
+                        'Authorization' => 'Bearer '.$this->apiToken,
                         'Accept' => 'application/json',
-                        'Content-Type' => 'application/json'
-                    ])->post($this->baseUrl . '/v1/hbls/calculate/payment', $paymentData);
+                        'Content-Type' => 'application/json',
+                    ])->post($this->baseUrl.'/v1/hbls/calculate/payment', $paymentData);
 
-                    if (!$paymentResponse->successful()) {
-                        $this->error("\nError calculating payment for HBL #" . ($i + 1) . ": " . $paymentResponse->body());
+                    if (! $paymentResponse->successful()) {
+                        $this->error("\nError calculating payment for HBL #".($i + 1).': '.$paymentResponse->body());
+
                         continue;
                     }
 
@@ -185,9 +190,9 @@ class GenerateFakeHBLData extends Command
                 $shipperEmail = $faker->safeEmail;
 
                 // Generate phone numbers in international format for phone:INTERNATIONAL validation
-                $contactNumber = '+94 ' . $faker->numerify('77 ### ####');
-                $shipperContact = '+94 ' . $faker->numerify('77 ### ####');
-                $consigneeContact = '+94 ' . $faker->numerify('77 ### ####');
+                $contactNumber = '+94 '.$faker->numerify('77 ### ####');
+                $shipperContact = '+94 '.$faker->numerify('77 ### ####');
+                $consigneeContact = '+94 '.$faker->numerify('77 ### ####');
 
                 // Prepare HBL creation data to match exact API structure
                 $hblData = [
@@ -198,7 +203,7 @@ class GenerateFakeHBLData extends Command
                     'hbl_name' => $faker->name,
                     'email' => $faker->unique()->safeEmail,
                     'contact_number' => $contactNumber,
-                    'additional_mobile_number' => '+94 ' . $faker->numerify('77 ### ####'),
+                    'additional_mobile_number' => '+94 '.$faker->numerify('77 ### ####'),
                     'whatsapp_number' => $contactNumber, // Use same as contact_number
                     'nic' => $faker->numerify('##########V'),
                     'iq_number' => $faker->optional()->numerify('IQ######'),
@@ -213,7 +218,7 @@ class GenerateFakeHBLData extends Command
                     'consignee_name' => $faker->name,
                     'consignee_nic' => $faker->numerify('##########V'),
                     'consignee_contact' => $consigneeContact,
-                    'consignee_additional_mobile_number' => '+94 ' . $faker->numerify('77 ### ####'),
+                    'consignee_additional_mobile_number' => '+94 '.$faker->numerify('77 ### ####'),
                     'consignee_whatsapp_number' => $consigneeContact, // Use same as consignee_contact
                     'consignee_address' => $faker->address,
                     'consignee_note' => $faker->optional()->sentence,
@@ -234,34 +239,35 @@ class GenerateFakeHBLData extends Command
                     'is_destination_charges_paid' => $faker->boolean ? 1 : 0,
 
                     'grand_volume' => $grandVolume,
-                    'grand_weight' => $grandWeight
+                    'grand_weight' => $grandWeight,
                 ];
 
                 if ($debug) {
-                    $this->info("=== HBL Creation API Payload ===");
+                    $this->info('=== HBL Creation API Payload ===');
                     $this->line(json_encode($hblData, JSON_PRETTY_PRINT));
                     $this->newLine();
 
                     // Mock successful creation for debug mode
                     $createdHBLs[] = [
                         'hbl_id' => $faker->numberBetween(1, 1000),
-                        'reference' => 'QT-REF' . str_pad($faker->numberBetween(1, 999999), 6, '0', STR_PAD_LEFT),
+                        'reference' => 'QT-REF'.str_pad($faker->numberBetween(1, 999999), 6, '0', STR_PAD_LEFT),
                         'hbl_name' => $hblData['hbl_name'],
                         'cargo_type' => $hblData['cargo_type'],
                         'hbl_type' => $hblData['hbl_type'],
                         'warehouse' => $hblData['warehouse'],
-                        'grand_total' => $hblData['grand_total']
+                        'grand_total' => $hblData['grand_total'],
                     ];
                 } else {
                     // Create HBL via API
                     $hblResponse = Http::withHeaders([
-                        'Authorization' => 'Bearer ' . $this->apiToken,
+                        'Authorization' => 'Bearer '.$this->apiToken,
                         'Accept' => 'application/json',
-                        'Content-Type' => 'application/json'
-                    ])->post($this->baseUrl . '/v1/hbls', $hblData);
+                        'Content-Type' => 'application/json',
+                    ])->post($this->baseUrl.'/v1/hbls', $hblData);
 
-                    if (!$hblResponse->successful()) {
-                        $this->error("\nError creating HBL #" . ($i + 1) . ": " . $hblResponse->body());
+                    if (! $hblResponse->successful()) {
+                        $this->error("\nError creating HBL #".($i + 1).': '.$hblResponse->body());
+
                         continue;
                     }
 
@@ -271,7 +277,8 @@ class GenerateFakeHBLData extends Command
 
                 $progressBar->advance();
             } catch (\Exception $e) {
-                $this->error("\nError creating HBL #" . ($i + 1) . ": " . $e->getMessage());
+                $this->error("\nError creating HBL #".($i + 1).': '.$e->getMessage());
+
                 continue;
             }
         }
@@ -280,12 +287,12 @@ class GenerateFakeHBLData extends Command
 
         $this->newLine(2);
         if ($debug) {
-            $this->info("Debug mode completed! Showed payload structure for " . count($createdHBLs) . " fake HBL records.");
+            $this->info('Debug mode completed! Showed payload structure for '.count($createdHBLs).' fake HBL records.');
         } else {
-            $this->info("Successfully created " . count($createdHBLs) . " fake HBL records via API!");
+            $this->info('Successfully created '.count($createdHBLs).' fake HBL records via API!');
         }
 
-        if (!empty($createdHBLs)) {
+        if (! empty($createdHBLs)) {
             $tableData = collect($createdHBLs)->take(5)->map(function ($hbl) {
                 return [
                     $hbl['hbl_id'] ?? $hbl['id'] ?? 'N/A',
@@ -304,7 +311,7 @@ class GenerateFakeHBLData extends Command
             );
 
             if (count($createdHBLs) > 5) {
-                $this->info("... and " . (count($createdHBLs) - 5) . " more records.");
+                $this->info('... and '.(count($createdHBLs) - 5).' more records.');
             }
         }
 
