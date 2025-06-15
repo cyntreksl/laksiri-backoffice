@@ -10,7 +10,7 @@
 <div class="mx-auto max-w-5xl overflow-hidden text-blue-900">
     <!-- Header -->
     <div class="p-6">
-        <p class="text-right text-xs font-semibold text-neutral-400">CASHIER'S COPY-(#{{$data['hbl']['id']}})</p>
+        <p class="text-right text-xs font-semibold text-neutral-400">CASHIER'S COPY - (#{{$data['hbl']['id']}})</p>
 
         <div class="flex items-center justify-between">
             <div class="flex items-start">
@@ -213,12 +213,13 @@
         <!-- Signature Section -->
         <div class="mb-3 grid grid-cols-2 gap-8 px-4">
             <div>
-                <p class="text-primary mb-6">Cashier - Amount Received</p>
+                <p class="mb-6">Cashier - Amount Received</p>
                 <div class="mb-3 border-b-2 border-gray-300 pb-4"></div>
                 <p class="text-neutral text-sm font-medium">Signature</p>
             </div>
             <div>
-                <div class="mb-3 border-b-2 border-gray-300 pb-4 mt-3"></div>
+                <p class="mb-6">&nbsp</p>
+                <div class="mb-3 border-b-2 border-gray-300 pb-4"></div>
                 <p class="text-neutral text-right text-sm font-medium">Signature</p>
             </div>
         </div>

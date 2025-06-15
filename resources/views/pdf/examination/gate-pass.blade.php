@@ -70,7 +70,7 @@
             <div class="rounded-lg bg-gray-50 p-4">
                 <div class="flex items-center justify-between">
                     <span class="font-semibold">Gate Pass:</span>
-                    <span class="font-bold text-neutral-500">003</span>
+                    <span class="font-bold text-neutral-500">{{$data['token']}}</span>
                 </div>
             </div>
             <div class="rounded-lg bg-gray-50 p-4">
@@ -92,7 +92,7 @@
             <div class="rounded-lg bg-gray-50 p-4">
                 <div class="mb-2 flex items-center justify-between">
                     <span class="font-semibold">Time:</span>
-                    <span class="font-bold text-neutral-500">17:41:04</span>
+                    <span class="font-bold text-neutral-500">{{ $data['time'] }}</span>
                 </div>
             </div>
         </div>
@@ -163,13 +163,13 @@
                 <div>
                     <div class="flex">
                         <span class="text-neutral w-20 font-semibold">Date:</span>
-                        <span class="font-bold text-neutral-500">{{ $data['date'] }}</span>
+                        <span class="font-bold text-neutral-500">{{ \Carbon\Carbon::now()->toDateString() }}</span>
                     </div>
                 </div>
                 <div>
                     <div class="flex">
                         <span class="text-neutral w-20 font-semibold">Time:</span>
-                        <span class="font-bold text-neutral-500">{{ $data['clearing_time'] }}</span>
+                        <span class="font-bold text-neutral-500">{{ \Carbon\Carbon::now()->toTimeString() }}</span>
                     </div>
                 </div>
             </div>
@@ -180,15 +180,15 @@
             <div class="grid grid-cols-3 gap-4">
                 <div class="rounded-lg p-3">
                     <p class="mb-1 font-semibold">Reference No:</p>
-                    <p class="font-bold text-neutral-500">MF00020577</p>
+                    <p class="font-bold text-neutral-500">{{$data['hbl']['reference']}}</p>
                 </div>
                 <div class="rounded-lg p-3">
                     <p class="mb-1 font-semibold">Serial No:</p>
-                    <p class="font-bold text-neutral-500">23</p>
+                    <p class="font-bold text-neutral-500">{{$data['serial']}}</p>
                 </div>
                 <div class="rounded-lg p-3">
                     <p class="mb-1 font-semibold">User ID:</p>
-                    <p class="font-bold text-neutral-500">RAHMAN</p>
+                    <p class="font-bold text-neutral-500">{{$data['userId']}}</p>
                 </div>
             </div>
         </div>
