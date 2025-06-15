@@ -77,6 +77,7 @@ definitions:
             unzip -o /tmp/app.zip -d /var/www/laksiri-backoffice
             cd /var/www/laksiri-backoffice
             php artisan migrate --force
+            php artisan db:seed --force
             php artisan config:clear
             php artisan cache:clear
             php artisan sidecar:deploy --activate
