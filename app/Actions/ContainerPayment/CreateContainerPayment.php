@@ -16,7 +16,7 @@ class CreateContainerPayment
     public function handle(array $data): ContainerPayment
     {
         try {
-            $data['total'] = $data['do_charge'] + $data['demurrage_charge'] + $data['assessment_charge'] + $data['refund_charge'] + $data['clearance_charge'];
+            $data['total'] = $data['do_charge'] + $data['demurrage_charge'] + $data['assessment_charge'] + $data['refund_charge'] + $data['slpa_charge'] + $data['clearance_charge'];
 
             $existing = ContainerPayment::where('container_id', $data['container_id'])->first();
 
