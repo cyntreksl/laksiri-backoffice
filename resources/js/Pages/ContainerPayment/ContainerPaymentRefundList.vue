@@ -17,6 +17,7 @@ import {debounce} from "lodash";
 import {push} from "notivue";
 import DatePicker from "primevue/datepicker";
 import moment from "moment";
+import {align} from "quill/ui/icons.js";
 
 const confirm = useConfirm();
 const baseUrl = ref("container-payment-refund-list");
@@ -202,53 +203,9 @@ const clearFilter = () => {
                     <template #loading> Loading Container Refunds data. Please wait.</template>
                     <Column v-if="usePage().props.user.permissions.includes('payment-container.collect refund')" headerStyle="width: 3rem" selectionMode="multiple"></Column>
                     <Column field="containerReference" header="Container Reference" sortable></Column>
-                    <Column field="do_charge" header="DO Charge" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.do_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="demurrage_charge" header="Demurrage Charge" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.demurrage_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="assessment_charge" header="Assessment Charge" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.assessment_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="slpa_charge" header="SLPA Charge" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.slpa_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
                     <Column field="refund_charge" header="Refund Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.refund_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="clearance_charge" header="Clearance Charge" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.clearance_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="total" header="Total" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.total.toFixed(2) }}
-                            </div>
+                            {{ slotProps.data.refund_charge.toFixed(2) }}
                         </template>
                     </Column>
                     <Column field="created_at" header="Created At" sortable>
@@ -256,9 +213,9 @@ const clearFilter = () => {
                             <DatePicker v-model="filterModel.value" class="w-full" date-format="yy-mm-dd" placeholder="Set Date"/>
                         </template>
                     </Column>
-                    <Column field="is_finance_approved" header="Finance Approval" >
+                    <Column field="is_finance_approved" header="Finance Approval">
                         <template #body="{ data }">
-                            <div class="flex items-center justify-center">
+                            <div class="flex items-center">
                                 <div v-if="data.is_finance_approved" class="text-green-500">
                                     <i class="pi pi-check-circle"></i>
                                     Approved

@@ -991,16 +991,16 @@ export default {
                         );
                     }
 
-                    // if (usePage().props.user.permissions.includes("payment-container.refund list")) {
-                    //     containerPaymentMenu.splice(
-                    //         2,
-                    //         0,
-                    //         {
-                    //             title: "Refunds",
-                    //             route: "container-payment.showContainerPaymentRefund",
-                    //         }
-                    //     );
-                    // }
+                    if (usePage().props.user.permissions.includes("payment-container.refund list")) {
+                        containerPaymentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Refunds",
+                                route: "container-payment.showContainerPaymentRefund",
+                            }
+                        );
+                    }
 
                     childMenuList.splice(
                         0,
