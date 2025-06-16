@@ -6,7 +6,6 @@ use App\Actions\Branch\GetBranchByName;
 use App\Actions\User\CreateUser;
 use App\Actions\User\DeleteUser;
 use App\Actions\User\GetCurrentBranchUsers;
-use App\Actions\User\GetUsers;
 use App\Actions\User\SwitchUserBranch;
 use App\Actions\User\UpdateUser;
 use App\Actions\User\UpdateUserBranch;
