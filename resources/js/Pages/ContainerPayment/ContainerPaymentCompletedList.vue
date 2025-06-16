@@ -14,6 +14,7 @@ import axios from "axios";
 import {debounce} from "lodash";
 import DatePicker from "primevue/datepicker";
 import moment from "moment";
+import Dialog from "primevue/dialog";
 
 const baseUrl = ref("/container-payment-completed-list");
 const loading = ref(true);
@@ -21,6 +22,8 @@ const containerPayments = ref([]);
 const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
+const visible = ref(false);
+const selectedContainerPayment = ref();
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -87,6 +90,11 @@ const clearFilter = () => {
     };
     fetchContainerPayments(currentPage.value);
 };
+
+const displayInfo = (paymentRequest) => {
+    visible.value = true;
+    selectedContainerPayment.value = paymentRequest;
+}
 </script>
 <template>
     <AppLayout title="Completed Container Payments">
@@ -216,9 +224,51 @@ const clearFilter = () => {
                             </div>
                         </template>
                     </Column>
+                    <Column header="">
+                        <template #body="slotProps">
+                            <Button aria-label="Info" icon="pi pi-eye" rounded severity="info" size="small" type="button" @click="displayInfo(slotProps.data)" />
+                        </template>
+                    </Column>
                     <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} Completed Container Payments.</template>
                 </DataTable>
             </template>
         </Card>
     </AppLayout>
+
+    <Dialog v-model:visible="visible" :style="{ width: '35rem' }" header="Summery" modal>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm text-gray-500">Request Time</label>
+                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.created_at }}</div>
+            </div>
+
+            <div>
+                <label class="block text-sm text-gray-500">Request Updated Time</label>
+                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.updated_at }}</div>
+            </div>
+
+            <div v-if="selectedContainerPayment?.is_finance_approved">
+                <label class="block text-sm text-gray-500">Approved Time</label>
+                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.finance_approved_date }}</div>
+            </div>
+
+            <div v-if="selectedContainerPayment?.is_finance_approved">
+                <label class="block text-sm text-gray-500">Approved By</label>
+                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.finance_approved_by }}</div>
+            </div>
+
+            <div v-if="selectedContainerPayment?.is_refund_collected">
+                <label class="block text-sm text-gray-500">Collected Time</label>
+                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.refund_collected_date }}</div>
+            </div>
+
+            <div>
+                <label class="block text-sm text-gray-500">Requested By</label>
+                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.created_by }}</div>
+            </div>
+        </div>
+        <div class="flex justify-end gap-2">
+            <Button label="Close" severity="secondary" type="button" @click="visible = false"></Button>
+        </div>
+    </Dialog>
 </template>
