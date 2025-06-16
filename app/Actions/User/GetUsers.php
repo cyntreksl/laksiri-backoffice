@@ -12,7 +12,9 @@ class GetUsers
 
     public function handle(array $withoutRoles = []): Collection|array
     {
-        $query = User::query()->withoutRole('driver');
+        $query = User::query()
+            ->where('primary_branch_id', GetUserCurrentBranchID::run())
+            ->withoutRole('driver');
 
         if ($withoutRoles) {
             $query->withoutRole($withoutRoles);
