@@ -20,6 +20,7 @@ return new class extends Migration
                 $table->float('bond_charge')->default(0)->nullable();
                 $table->float('sub_total')->default(0)->nullable()->comment('without tax & discount');
                 $table->float('destination_total')->default(0)->nullable();
+                $table->json('tax_rates')->nullable();
                 $table->float('tax')->nullable();
             });
         });
@@ -31,7 +32,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('hbl_payments', function (Blueprint $table) {
-            $table->dropColumn(['package_charge', 'handling_charge', 'slpa_charge', 'demurrage_charge', 'bond_charge', 'sub_total', 'tax', 'destination_total']);
+            $table->dropColumn(['package_charge', 'handling_charge', 'slpa_charge', 'demurrage_charge', 'bond_charge', 'sub_total', 'tax', 'destination_total', 'tax_rates']);
         });
     }
 };

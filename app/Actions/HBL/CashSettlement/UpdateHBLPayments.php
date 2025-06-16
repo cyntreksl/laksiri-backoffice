@@ -5,6 +5,7 @@ namespace App\Actions\HBL\CashSettlement;
 use App\Actions\Branch\GetBranchById;
 use App\Actions\HBL\GetHBLDestinationTotalSummary;
 use App\Actions\HBL\GetHBLTotalSummary;
+use App\Actions\Tax\GetTaxesByWarehouse;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -75,6 +76,7 @@ class UpdateHBLPayments
             'demurrage_charge' => $destinationPayments['demurrageCharge'] ?? 0,
             'destination_total' => $destinationPayments['totalAmount'] ?? 0,
             'tax' => $departurePayments['vat'] ?? 0,
+            'tax_rates' => GetTaxesByWarehouse::run($hbl->warehouse_id),
 
             'is_departure_charges_paid' => $data['is_departure_charges_paid'] ?? $existingPayment->is_departure_charges_paid ?? false,
             'is_destination_charges_paid' => $data['is_destination_charges_paid'] ?? $existingPayment->is_destination_charges_paid ?? false,
