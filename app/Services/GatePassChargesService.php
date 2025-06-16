@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Actions\AirLine\GetAirLineByName;
 use App\Actions\Branch\GetBranchById;
 use App\Actions\SpecialDOCharge\GetSpecialDOChargeByAgent;
-use App\Actions\Tax\GetTaxByWarehouse;
+use App\Actions\Tax\GetSumOfTaxRatesByWarehouse;
 use App\Models\HBL;
 use Illuminate\Support\Facades\Auth;
 
@@ -285,10 +285,10 @@ class GatePassChargesService
      */
     public function vatCharge(HBL $hbl): array
     {
-        $tax = GetTaxByWarehouse::run($hbl->warehouse_id);
+        $sumOfRate = GetSumOfTaxRatesByWarehouse::run($hbl->warehouse_id);
 
         return [
-            'rate' => $tax ? $tax->rate : 0,
+            'rate' => $sumOfRate ?: 0,
         ];
     }
 

@@ -5,6 +5,7 @@ namespace App\Repositories\Api;
 use App\Actions\Branch\GetBranchByName;
 use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
 use App\Actions\HBL\CalculatePayment;
+use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\GetHBLDestinationTotalSummary;
@@ -48,6 +49,10 @@ class HBLRepository implements HBLRepositoryInterface
                 $hbl = CreateHBL::run($data);
                 $packagesData = $data['packages'];
                 CreateHBLPackages::run($hbl, $packagesData);
+
+                if (isset($data['paid_amount'])) {
+                    UpdateHBLPayments::run($data, $hbl);
+                }
             });
 
             $hbl->addStatus('HBL Preparation by driver');

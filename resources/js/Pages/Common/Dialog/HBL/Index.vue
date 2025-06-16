@@ -84,7 +84,6 @@ const getHBLTotalSummary = async () => {
 };
 
 const getHBLDestinationTotalSummary = async () => {
-    console.log(props.hblId);
     try {
         const response = await fetch(`/hbls/get-destination-total-summary/${props.hblId}`, {
             method: "GET",
