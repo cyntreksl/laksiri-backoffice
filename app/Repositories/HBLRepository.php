@@ -4,7 +4,8 @@ namespace App\Repositories;
 
 use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
 use App\Actions\CallFlag\CreateCallFlag;
-use App\Actions\Cashier\DownloadGatePassPDF;
+use App\Actions\Cashier\DownloadCashierInvoicePDF;
+use App\Actions\Examination\DownloadGatePassPDF;
 use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
@@ -44,6 +45,7 @@ use App\Interfaces\GridJsInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Models\Branch;
 use App\Models\Container;
+use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\HBLDocument;
 use App\Models\HBLPackage;
@@ -396,9 +398,13 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         }
     }
 
-    public function downloadGatePass($hbl)
+    public function downloadCashierInvoice($hbl)
     {
-        return DownloadGatePassPDF::run($hbl);
+        try {
+            return DownloadCashierInvoicePDF::run($hbl);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to download cashier invoice'.$e->getMessage());
+        }
     }
 
     public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
@@ -483,5 +489,14 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     public function getHBLDestinationTotalSummary(HBL $hbl)
     {
         return GetHBLDestinationTotalSummary::run($hbl);
+    }
+
+    public function downloadGatePass($hbl, CustomerQueue $customerQueue)
+    {
+        try {
+            return DownloadGatePassPDF::run($hbl, $customerQueue);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to download gate pass '.$e->getMessage());
+        }
     }
 }

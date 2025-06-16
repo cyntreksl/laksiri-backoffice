@@ -108,7 +108,7 @@ watch(() => containerData.value, () => {
                     label="Add MHBL To Shipment" size="small" @click.prevent="confirmAddMHBLModal" />
 
             <a v-if="filteredHBLSPackagesCount > 0" :href="route('loading.loaded-containers.doorToDoor.export', container.id)">
-                <Button icon="pi pi-print" label="Print Manifest" severity="info" size="small" @click.prevent="router.visit()"/>
+                <Button icon="pi pi-print" label="Print Manifest" severity="info" size="small" />
             </a>
         </div>
     </div>

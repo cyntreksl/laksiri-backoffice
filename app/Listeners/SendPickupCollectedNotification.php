@@ -22,8 +22,7 @@ class SendPickupCollectedNotification
     public function handle(PickupCollected $event): void
     {
         $hbl = $event->HBL;
-        $shipper = $hbl->shipper;
 
-        //        Notification::send($shipper, new CargoCollectedNotification($hbl));
+        Notification::send($hbl->whatsapp_number, new CargoCollectedNotification($hbl));
     }
 }

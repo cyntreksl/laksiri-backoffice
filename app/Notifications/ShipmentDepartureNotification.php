@@ -25,12 +25,12 @@ class ShipmentDepartureNotification extends Notification
      *
      * @return array<int, string>
      */
-    public function via(object $notifiable): array
+    public function via(string $notifiable): array
     {
         return [WhatsAppChannel::class];
     }
 
-    public function toWhatsapp(object $notifiable)
+    public function toWhatsapp(string $notifiable)
     {
         $branch = $this->HBL->branch;
         $country = $branch->country ?? 'Qatar';
@@ -39,7 +39,7 @@ class ShipmentDepartureNotification extends Notification
 
         return [
             'messaging_product' => 'whatsapp',
-            'to' => $notifiable->contact, // TODO: it should be whatsapp number
+            'to' => $notifiable,
             'type' => 'template',
             'template' => $template->getTemplate(),
         ];

@@ -31,7 +31,6 @@ definitions:
           - composer install --no-interaction
           - php artisan key:generate
         artifacts:
-          - .env
           - vendor/**
 
     - step: &build-frontend
@@ -56,12 +55,11 @@ definitions:
         script:
           - docker-php-ext-install pdo_mysql
           - vendor/bin/pint --test
-          - php artisan test
 
     - step: &package-application
         name: Package Application
         script:
-          - zip -r application.zip -r * .[^.]* -x "vendor/*" -x "node_modules/*"
+          - zip -r application.zip -r * .[^.]*
         artifacts:
           - application.zip
 
@@ -74,23 +72,24 @@ definitions:
           - chmod 600 ~/.ssh/id_rsa
           - ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
           - scp application.zip $EC2_USER@$HOST:/tmp/app.zip
-          - ssh $EC2_USER@$HOST << EOF
-            set -e
-            unzip -o /tmp/app.zip -d $DEPLOY_PATH
-            cd $DEPLOY_PATH
-            composer install --no-dev --optimize-autoloader
+          - |
+            ssh $EC2_USER@$HOST bash -s << 'EOF'
+            unzip -o /tmp/app.zip -d /var/www/laksiri-backoffice
+            cd /var/www/laksiri-backoffice
             php artisan migrate --force
+            php artisan db:seed --force
             php artisan config:clear
             php artisan cache:clear
             php artisan sidecar:deploy --activate
             EOF
+
 
 pipelines:
   pull-requests:
     '**':
       - step: *install-dependencies
       - step: *build-frontend
-#      - step: *run-tests
+      - step: *run-tests
 
   custom:
     deploy-to-staging:

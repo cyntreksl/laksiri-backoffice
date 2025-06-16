@@ -25,18 +25,18 @@ class CargoCollectedNotification extends Notification
      *
      * @return array<int, string>
      */
-    public function via(object $notifiable): array
+    public function via(string $notifiable): array
     {
         return [WhatsAppChannel::class];
     }
 
-    public function toWhatsapp(object $notifiable)
+    public function toWhatsapp(string $notifiable)
     {
         $template = new CargoCollectedWhatsAppTemplate($this->HBL->hbl_name, $this->HBL->hbl_number);
 
         return [
             'messaging_product' => 'whatsapp',
-            'to' => $notifiable->contact, // TODO: it should be whatsapp number
+            'to' => $notifiable,
             'type' => 'template',
             'template' => $template->getTemplate(),
         ];

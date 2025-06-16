@@ -1,7 +1,7 @@
 <script setup>
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import {ref, watchEffect} from "vue";
+import {computed, ref, watchEffect} from "vue";
 import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
 import Button from "primevue/button";
@@ -13,6 +13,7 @@ import Checkbox from 'primevue/checkbox';
 import Divider from 'primevue/divider';
 import moment from "moment";
 import {useConfirm} from "primevue/useconfirm";
+import { useDwellTime } from '@/composable/useDwellTime';
 
 const props = defineProps({
     container: {
@@ -37,6 +38,9 @@ const props = defineProps({
 const emit = defineEmits(['close']);
 
 const confirm = useConfirm();
+
+const arrivedDwellTimeNow = useDwellTime(() => props.container.arrived_at_primary_warehouse);
+const departedDwellTimeNow = useDwellTime(() => props.container.departed_at_primary_warehouse);
 
 const handleDeleteLoadedShipment = () => {
     confirm.require({
@@ -169,6 +173,14 @@ watchEffect(() => {
             <h3 class="text-2xl font-semibold text-slate-700 dark:text-navy-100">
                 {{ container.reference }}
             </h3>
+            <div v-if="container.arrived_at_primary_warehouse" class="text-yellow-500 italic text-sm">
+                Warehouse Arrived At {{container.arrived_at_primary_warehouse}}
+                ({{ arrivedDwellTimeNow }})
+            </div>
+            <div v-if="container.departed_at_primary_warehouse" class="text-red-500 italic text-sm">
+                Warehouse Arrived At {{container.departed_at_primary_warehouse}}
+                ({{ departedDwellTimeNow }})
+            </div>
         </div>
         <div class="flex items-center space-x-2">
             <Button :disabled="container.status === 'IN TRANSIT' || container.status === 'REACHED DESTINATION'" icon="pi pi-trash" label="Delete Shipment"

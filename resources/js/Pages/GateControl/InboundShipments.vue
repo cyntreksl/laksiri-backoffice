@@ -23,6 +23,8 @@ import IconField from "primevue/iconfield";
 import LoadedShipmentDetailDialog from "@/Pages/Common/Dialog/Container/Index.vue";
 import {push} from "notivue";
 import {useConfirm} from "primevue/useconfirm";
+import LongVehicle from '@/../images/illustrations/long-vehicle.png';
+import CargoPlane from '@/../images/illustrations/cargo-plane.png';
 
 const props = defineProps({
     cargoTypes: {
@@ -86,18 +88,18 @@ const menuModel = ref([
         command: () => confirmMarkAsArrived(selectedContainer),
         disabled: () => !usePage().props.user.permissions.includes('mark-shipment-arrived-to-warehouse') || selectedContainer.value.status === 'ARRIVED PRIMARY WAREHOUSE',
     },
-    {
-        label: 'Show',
-        icon: 'pi pi-fw pi-search',
-        command: () => confirmViewShipment(selectedContainer.value.id),
-        disabled: !usePage().props.user.permissions.includes('shipment.show'),
-    },
-    {
-        label: 'Download Manifest',
-        icon: 'pi pi-fw pi-download',
-        url: () => route("loading.loaded-containers.manifest.export", selectedContainer.value.id),
-        disabled: !usePage().props.user.permissions.includes('shipment.download manifest'),
-    },
+    // {
+    //     label: 'Show',
+    //     icon: 'pi pi-fw pi-search',
+    //     command: () => confirmViewShipment(selectedContainer.value.id),
+    //     disabled: !usePage().props.user.permissions.includes('shipment.show'),
+    // },
+    // {
+    //     label: 'Download Manifest',
+    //     icon: 'pi pi-fw pi-download',
+    //     url: () => route("loading.loaded-containers.manifest.export", selectedContainer.value.id),
+    //     disabled: !usePage().props.user.permissions.includes('shipment.download manifest'),
+    // },
 ]);
 
 const fetchInboundShipments = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
@@ -417,6 +419,12 @@ const exportCSV = () => {
                             <template #body="slotProps">
                                 <Tag :severity="resolveContainerType(slotProps.data)"
                                      :value="slotProps.data.container_type" class="text-sm"></Tag>
+
+                                <img v-if="slotProps.data?.cargo_type === 'Sea Cargo'" :src="LongVehicle" alt="image"
+                                     class="w-2/4 block xl:block rounded"/>
+
+                                <img v-if="slotProps.data?.cargo_type === 'Air Cargo'" :src="CargoPlane" alt="image"
+                                     class="w-2/4 block xl:block rounded"/>
                             </template>
                             <template #filter="{ filterModel }">
                                 <Select v-model="filterModel.value" :options="containerTypes" :showClear="true"
@@ -424,13 +432,18 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column field="reference" header="Reference" sortable></Column>
+                        <Column field="reference" header="Reference" sortable>
+                            <template #body="slotProps">
+                                <div class="font-medium">
+                                    {{slotProps.data.reference}}
+                                </div>
+                                <span class="text-neutral-500">{{slotProps.data.container_number}}</span>
+                            </template>
+                        </Column>
 
                         <Column field="bl_number" header="BL Number" sortable></Column>
 
                         <Column field="awb_number" header="AWB Number" hidden sortable></Column>
-
-                        <Column field="container_number" header="Container Number" sortable></Column>
 
                         <Column field="seal_number" header="Seal Number" sortable></Column>
 
@@ -453,9 +466,14 @@ const exportCSV = () => {
 
                         <Column field="status" header="Status">
                             <template #body="slotProps">
-                                <Tag :icon="resolveContainerStatus(slotProps.data).icon"
-                                     :severity="resolveContainerStatus(slotProps.data).color"
-                                     :value="slotProps.data.status" class="text-sm uppercase"></Tag>
+                                <div class="float-right">
+                                    <Tag :icon="resolveContainerStatus(slotProps.data).icon"
+                                         :severity="resolveContainerStatus(slotProps.data).color"
+                                         :value="slotProps.data.status" class="text-sm uppercase"></Tag>
+                                    <div class="mt-1 italic text-neutral-500 text-right">
+                                        {{slotProps.data?.arrived_at_primary_warehouse}}
+                                    </div>
+                                </div>
                             </template>
 
                             <template #filter="{ filterModel }">
@@ -463,8 +481,6 @@ const exportCSV = () => {
                                         placeholder="Select One" style="min-width: 12rem"/>
                             </template>
                         </Column>
-
-                        <Column field="note" header="Note" hidden></Column>
 
                         <template #footer> In total there are {{ containers ? totalRecords : 0 }} inbound shipments. </template>
                     </DataTable>

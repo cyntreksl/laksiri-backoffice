@@ -12,6 +12,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import InputText from "primevue/inputtext";
 import DatePicker from "primevue/datepicker";
 import Select from "primevue/select";
+import moment from "moment";
 
 const props = defineProps({
     cargoTypes: {
@@ -75,6 +76,31 @@ watchEffect(() => {
 });
 
 const handleCreate = () => {
+    const isValidDate = (date) => {
+        return date && date instanceof Date && !isNaN(date);
+    };
+
+    // Process departure date
+    if (form.estimated_time_of_departure) {
+        const departureDate = new Date(form.estimated_time_of_departure);
+        form.estimated_time_of_departure = isValidDate(departureDate)
+            ? moment(departureDate).format("YYYY-MM-DD")
+            : null;
+    } else {
+        form.estimated_time_of_departure = null;
+    }
+
+    // Process arrival date
+    if (form.estimated_time_of_arrival) {
+        const arrivalDate = new Date(form.estimated_time_of_arrival);
+        form.estimated_time_of_arrival = isValidDate(arrivalDate)
+            ? moment(arrivalDate).format("YYYY-MM-DD")
+            : null;
+    } else {
+        form.estimated_time_of_arrival = null;
+    }
+
+
     const selectedAirline = props.airLines.find(airline => airline.name === form.airline_name);
     if (selectedAirline) {
         form.air_line_id = selectedAirline.id;
@@ -177,14 +203,14 @@ const handleCreate = () => {
                                 </div>
                                 <div class="col-span-2">
                                     <InputLabel value="Estimated Departure Date"/>
-                                    <DatePicker v-model="form.estimated_time_of_departure" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set Estimated Departure Date" show-icon/>
+                                    <DatePicker v-model="form.estimated_time_of_departure" :manual-input="false" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set Estimated Departure Date" show-icon/>
                                     <InputError
                                         :message="form.errors.estimated_time_of_departure"
                                     />
                                 </div>
                                 <div class="col-span-2">
                                     <InputLabel value="Estimated Arrival Date to Destination"/>
-                                    <DatePicker v-model="form.estimated_time_of_arrival" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set Estimated Arrival Date" show-icon/>
+                                    <DatePicker v-model="form.estimated_time_of_arrival" :manual-input="false" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set Estimated Arrival Date" show-icon/>
                                     <InputError :message="form.errors.estimated_time_of_arrival" />
                                 </div>
 

@@ -18,6 +18,7 @@ use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Interfaces\PriceRepositoryInterface;
 use App\Interfaces\SettingRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
+use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\HBLDocument;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -359,7 +360,7 @@ class HBLController extends Controller
 
     public function getCashierReceipt($hbl)
     {
-        return $this->HBLRepository->downloadGatePass($hbl);
+        return $this->HBLRepository->downloadCashierInvoice($hbl);
     }
 
     public function showDoorToDoorList()
@@ -406,5 +407,10 @@ class HBLController extends Controller
     public function getHBLDestinationTotalSummary(HBL $hbl)
     {
         return $this->HBLRepository->getHBLDestinationTotalSummary($hbl);
+    }
+
+    public function downloadGatePass($hbl, CustomerQueue $customerQueue)
+    {
+        return $this->HBLRepository->downloadGatePass($hbl, $customerQueue);
     }
 }

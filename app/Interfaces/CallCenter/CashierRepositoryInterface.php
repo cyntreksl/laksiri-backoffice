@@ -6,5 +6,5 @@ interface CashierRepositoryInterface
 {
     public function updatePayment(array $data): void;
 
-    public function downloadGatePass($hbl);
+    public function downloadCashierInvoice($hbl);
 }

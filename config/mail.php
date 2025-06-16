@@ -100,4 +100,8 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'test' => [
+        'address' => env('MAIL_TEST_RECEIVERS', 'cyntreksl+laksiri@gmail.com'),
+    ],
+
 ];

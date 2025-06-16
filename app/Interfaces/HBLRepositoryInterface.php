@@ -3,6 +3,7 @@
 namespace App\Interfaces;
 
 use App\Models\Container;
+use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\HBLDocument;
 use Illuminate\Http\JsonResponse;
@@ -69,7 +70,7 @@ interface HBLRepositoryInterface
 
     public function getHBLRules(array $data);
 
-    public function downloadGatePass($hbl);
+    public function downloadCashierInvoice($hbl);
 
     public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []);
 
@@ -82,4 +83,6 @@ interface HBLRepositoryInterface
     public function getHBLsPackages(array $data);
 
     public function getHBLDestinationTotalSummary(HBL $hbl);
+
+    public function downloadGatePass($hbl, CustomerQueue $customerQueue);
 }

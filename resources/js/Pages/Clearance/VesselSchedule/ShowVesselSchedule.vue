@@ -394,7 +394,7 @@ const isPaymentInputDisabled = computed(() => {
                 </template>
                 <template #subtitle>{{ vesselSchedule?.clearance_containers.length }} Shipment(s)</template>
                 <template #content>
-                    <VirtualScroller :item-size="170" :items="groupedShipments" style="height: 400px">
+                    <VirtualScroller :item-size="170" :items="groupedShipments" style="height: 1000px;">
                         <template v-slot:item="{ item: dayGroup }">
                             <div class="mb-4">
                                 <h2 class="text-base font-semibold mb-2">
@@ -662,7 +662,7 @@ const isPaymentInputDisabled = computed(() => {
 
                                 <RequestsList :container-id="selectedContainer.id"/>
 
-                                <RefundList :container-id="selectedContainer.id"/>
+<!--                                <RefundList :container-id="selectedContainer.id"/>-->
                             </TabPanel>
 
                             <!-- Shipment Details Tab -->

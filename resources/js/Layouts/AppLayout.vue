@@ -825,7 +825,7 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("hbls.hbl finance approval list")) {
+                    if (usePage().props.user.permissions.includes("hbls.hbl finance approval list") && usePage().props.currentBranch.type === 'Destination') {
                         hblMenu.splice(
                             2,
                             0,
@@ -836,7 +836,7 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("hbls.finance approved hbl list")) {
+                    if (usePage().props.user.permissions.includes("hbls.finance approved hbl list") && usePage().props.currentBranch.type === 'Destination') {
                         hblMenu.splice(
                             2,
                             0,
@@ -969,27 +969,6 @@ export default {
                         );
                     }
 
-                    if (usePage().props.user.permissions.includes("payment-container.refund list")) {
-                        containerPaymentMenu.splice(
-                            2,
-                            0,
-                            {
-                                title: "Refunds",
-                                route: "container-payment.showContainerPaymentRefund",
-                            }
-                        );
-                    }
-                    if (usePage().props.user.permissions.includes("payment-container.show container payment requests")) {
-                        containerPaymentMenu.splice(
-                            2,
-                            0,
-                            {
-                                title: "Payment Requests",
-                                route: "container-payment.request",
-                            }
-                        );
-                    }
-
                     if (usePage().props.user.permissions.includes("payment-container.approved list")) {
                         containerPaymentMenu.splice(
                             2,
@@ -1011,6 +990,18 @@ export default {
                             }
                         );
                     }
+
+                    if (usePage().props.user.permissions.includes("payment-container.refund list")) {
+                        containerPaymentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Refunds",
+                                route: "container-payment.showContainerPaymentRefund",
+                            }
+                        );
+                    }
+
                     childMenuList.splice(
                         0,
                         childMenuList.length,
@@ -1038,7 +1029,7 @@ export default {
                             0,
                             {
                                 title: "Outbound Containers",
-                                route: "container-payment.showContainerPaymentRefund",
+                                route: "gate-control.outbound-shipments.index",
                             }
                         );
                     }
@@ -1405,7 +1396,7 @@ export default {
                     break;
                 case "courier":
                     let courierMenu = [];
-                    if (usePage().props.user.permissions.includes("third-party-agents.index")){
+                    if (usePage().props.user.permissions.includes("third-party-agents.index") && usePage().props.currentBranch.type === 'Destination'){
 
                         courierMenu.splice(
                             2,
@@ -1452,7 +1443,7 @@ export default {
                         childMenuList.length,
                         ...courierMenu
                     );
-                    changeSidePanelTitle("courier");
+                    changeSidePanelTitle("Courier");
                     break;
                 case "delivery":
                     childMenuList.splice(

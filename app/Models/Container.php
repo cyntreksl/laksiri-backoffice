@@ -42,7 +42,7 @@ class Container extends Model
 
     public const SYSTEM_STATUS_CONTAINER_CLEARED = 3.7;
 
-    public const SYSTEM_STATUS_CONTAINER_WAREHOUSE_DEPART = 3.8;
+    public const SYSTEM_STATUS_CONTAINER_PRIMARY_WAREHOUSE_DEPART = 3.8;
 
     public const SYSTEM_STATUS_CONTAINER_TRANSPORTED = 4.3;
 
@@ -51,7 +51,7 @@ class Container extends Model
     public const SYSTEM_STATUS_CONTAINER_RETURNED = 5.1;
 
     protected $fillable = [
-        'branch_id', 'target_warehouse', 'cargo_type', 'air_line_id', 'container_type', 'reference', 'bl_number', 'awb_number', 'container_number', 'seal_number', 'maximum_volume', 'minimum_volume', 'maximum_weight', 'minimum_weight', 'maximum_volumetric_weight', 'minimum_volumetric_weight', 'estimated_time_of_departure', 'estimated_time_of_arrival', 'vessel_name', 'voyage_number', 'shipping_line', 'port_of_loading', 'port_of_discharge', 'flight_number', 'airline_name', 'airport_of_departure', 'airport_of_arrival', 'cargo_class', 'status', 'system_status', 'loading_started_at', 'loading_ended_at', 'unloading_started_at', 'unloading_ended_at', 'loading_started_by', 'loading_ended_by', 'unloading_started_by', 'unloading_ended_by', 'created_by', 'note', 'is_reached', 'reached_date', 'return_date', 'is_returned', 'shipment_weight', 'arrived_at_primary_warehouse', 'arrived_primary_warehouse_by',
+        'branch_id', 'target_warehouse', 'cargo_type', 'air_line_id', 'container_type', 'reference', 'bl_number', 'awb_number', 'container_number', 'seal_number', 'maximum_volume', 'minimum_volume', 'maximum_weight', 'minimum_weight', 'maximum_volumetric_weight', 'minimum_volumetric_weight', 'estimated_time_of_departure', 'estimated_time_of_arrival', 'vessel_name', 'voyage_number', 'shipping_line', 'port_of_loading', 'port_of_discharge', 'flight_number', 'airline_name', 'airport_of_departure', 'airport_of_arrival', 'cargo_class', 'status', 'system_status', 'loading_started_at', 'loading_ended_at', 'unloading_started_at', 'unloading_ended_at', 'loading_started_by', 'loading_ended_by', 'unloading_started_by', 'unloading_ended_by', 'created_by', 'note', 'is_reached', 'reached_date', 'return_date', 'is_returned', 'shipment_weight', 'arrived_at_primary_warehouse', 'arrived_primary_warehouse_by', 'departed_at_primary_warehouse', 'departed_primary_warehouse_by',
     ];
 
     public function getActivitylogOptions(): LogOptions
