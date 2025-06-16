@@ -41,7 +41,7 @@ class UserController extends Controller
             'roles' => $this->roleRepository->getRoles(),
             'branches' => $this->branchRepository->getUserBranches(),
             'userRole' => Auth()->user()->getRoleNames()[0],
-            'userBranch' => GetUserCurrentBranchID::run(),
+            'currentBranch' => GetUserCurrentBranchID::run(),
             'isSuperAdmin' => Auth::user()->name === 'Super Administrator' && Auth::user()->hasRole('admin'),
         ]);
     }
