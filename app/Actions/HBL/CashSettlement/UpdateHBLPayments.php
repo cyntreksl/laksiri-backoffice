@@ -43,15 +43,14 @@ class UpdateHBLPayments
         $chargesTotal =
             ($departurePayments['freight_charge'] ?? $existingPayment->freight_charge ?? 0) +
             ($departurePayments['bill_charge'] ?? $existingPayment->bill_charge ?? 0) +
-            ($departurePayments['other_charge'] ?? $existingPayment->other_charge ?? 0) +
+            ($departurePayments['package_charges'] ?? $existingPayment->other_charge ?? 0) +
             ($departurePayments['destination_charges'] ?? $existingPayment->destination_charge ?? 0) +
             ($data['additional_charge'] ?? $existingPayment->additional_charge ?? 0);
 
         // Calculate grand total
         $grandTotal = $chargesTotal
             + ($departurePayments['vat'] ?? 0)
-            - ($departurePayments['discount'] ?? $existingPayment->discount ?? 0)
-            - ($this->calculatePaidAmount($data, $hbl));
+            - ($departurePayments['discount'] ?? $existingPayment->discount ?? 0);
 
         return [
             'branch_id' => GetUserCurrentBranchID::run(),
@@ -65,6 +64,7 @@ class UpdateHBLPayments
             'destination_charge' => $departurePayments['destination_charges'] ?? $existingPayment->destination_charge ?? 0,
             'additional_charge' => $data['additional_charge'] ?? $existingPayment->additional_charge ?? 0,
             'package_charge' => $departurePayments['package_charges'] ?? 0,
+            'sub_total' => $chargesTotal ?? 0,
 
             'discount' => $departurePayments['discount'] ?? $existingPayment->discount ?? 0,
 
@@ -73,7 +73,7 @@ class UpdateHBLPayments
             'slpa_charge' => $destinationPayments['slpaCharge'] ?? 0,
             'bond_charge' => $destinationPayments['bondCharge'] ?? 0,
             'demurrage_charge' => $destinationPayments['demurrageCharge'] ?? 0,
-            'sub_total' => $destinationPayments['totalAmount'] ?? 0,
+            'destination_total' => $destinationPayments['totalAmount'] ?? 0,
             'tax' => $departurePayments['vat'] ?? 0,
 
             'is_departure_charges_paid' => $data['is_departure_charges_paid'] ?? $existingPayment->is_departure_charges_paid ?? false,

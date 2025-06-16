@@ -44,6 +44,7 @@ class HBLPayment extends Model
         'bond_charge',
         'demurrage_charge',
         'sub_total',
+        'destination_total',
         'tax',
     ];
 
