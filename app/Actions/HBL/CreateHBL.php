@@ -2,7 +2,6 @@
 
 namespace App\Actions\HBL;
 
-use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -53,10 +52,6 @@ class CreateHBL
             'is_departure_charges_paid' => $data['is_departure_charges_paid'],
             'is_destination_charges_paid' => $data['is_destination_charges_paid'],
         ]);
-
-        if (isset($data['paid_amount'])) {
-            UpdateHBLPayments::run($data, $hbl);
-        }
 
         return $hbl;
     }

@@ -38,6 +38,13 @@ class HBLPayment extends Model
         'destination_charge',
         'is_departure_charges_paid',
         'is_destination_charges_paid',
+        'package_charge',
+        'handling_charge',
+        'slpa_charge',
+        'bond_charge',
+        'demurrage_charge',
+        'sub_total',
+        'tax',
     ];
 
     public function getActivitylogOptions(): LogOptions

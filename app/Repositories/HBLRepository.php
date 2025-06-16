@@ -7,6 +7,7 @@ use App\Actions\CallFlag\CreateCallFlag;
 use App\Actions\Cashier\DownloadCashierInvoicePDF;
 use App\Actions\Examination\DownloadGatePassPDF;
 use App\Actions\HBL\CalculatePayment;
+use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\CreateHBL;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\DeleteHBL;
@@ -68,6 +69,12 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         CreateHBLPackages::run($hbl, $packagesData);
 
         $hbl->addStatus('HBL Preparation by warehouse');
+
+        $hbl->refresh();
+
+        if (isset($data['paid_amount'])) {
+            UpdateHBLPayments::run($data, $hbl);
+        }
 
         return $hbl;
     }
