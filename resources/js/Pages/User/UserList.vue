@@ -34,7 +34,7 @@ const props = defineProps({
         type: String,
         required: false
     },
-    userBranch: {
+    currentBranch: {
         type: Number,
         required: false
     },
@@ -365,7 +365,7 @@ const confirmUserDelete = (user) => {
         </div>
     </AppLayout>
 
-    <CreateUserForm :branches="branches" :is-super-admin="isSuperAdmin" :roles="roles" :user-branch="userBranch"
+    <CreateUserForm :branches="branches" :is-super-admin="isSuperAdmin" :roles="roles" :user-branch="currentBranch"
                     :user-role="userRole" :visible="showUserCreateDialog"
                     @close="showUserCreateDialog = false"
                     @update:visible="showUserCreateDialog = $event"/>
