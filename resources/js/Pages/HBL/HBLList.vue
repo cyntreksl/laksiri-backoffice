@@ -372,6 +372,11 @@ const closeCallFlagModal = () => {
 const exportCSV = () => {
     dt.value.exportCSV();
 };
+
+const exportCSVFilename = computed(() => {
+    const timestamp = moment().format('YYYY_MM_DD_HH_mm_ss');
+    return `all-hbl-${timestamp}`;
+})
 </script>
 
 <template>
@@ -428,6 +433,7 @@ const exportCSV = () => {
                         tableStyle="min-width: 50rem"
                         @page="onPageChange"
                         @rowContextmenu="onRowContextMenu"
+                        :export-filename="exportCSVFilename"
                         @sort="onSort">
 
                         <template #header>
@@ -544,8 +550,6 @@ const exportCSV = () => {
                                 <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
-
-                        <Column field="status" header="Status" hidden></Column>
 
                         <Column field="is_hold" header="Hold">
                             <template #body="{ data }">
