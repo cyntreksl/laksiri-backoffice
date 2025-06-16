@@ -175,6 +175,12 @@ const resetConsigneeWhatsappNumber = () => {
 };
 
 const handleHBLCreate = () => {
+    // Check if there are any packages
+    if (packageList.value.length === 0 && Object.values(copiedPackages.value).length === 0) {
+        push.error("Please add at least one package before creating an HBL");
+        return;
+    }
+
     form.additional_mobile_number = additionalMobileCountryCode.value + additionalMobileNumber.value;
     form.whatsapp_number = whatsappNumberCountryCode.value + whatsappNumber.value;
     form.consignee_additional_mobile_number = consigneeAdditionalMobileCountryCode.value + consigneeAdditionalMobileNumber.value;
