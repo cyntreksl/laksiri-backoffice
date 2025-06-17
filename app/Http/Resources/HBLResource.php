@@ -47,10 +47,12 @@ class HBLResource extends JsonResource
             'is_hold' => $this->is_hold,
             'packages' => $this->packages ? HBLPackageResource::collection($this->packages) : '-',
             'created_by' => $this->user?->name,
-            'tokens' => isset($this->tokens[0]) && $this->tokens[0]->created_at->isToday()
+            'tokens' => $this->tokens()->orderBy('created_at', 'desc')->first()
                 ? [
-                    'token_number' => $this->tokens[0]->id,
-                    'queue_type' => ucwords(strtolower(str_replace('_', ' ', $this->tokens[0]->customerQueue->type))),
+                    'token_number' => $this->tokens()->orderBy('created_at', 'desc')->first()->token,
+                    'queue_type' => ucwords(strtolower(str_replace('_', ' ', $this->tokens()->orderBy('created_at', 'desc')->first()->customerQueue()->orderBy('created_at', 'desc')->first()->type))),
+                    'created_at' => $this->tokens()->orderBy('created_at', 'desc')->first()->created_at->format('Y-m-d H:i:s'),
+                    'is_today' => $this->tokens()->orderBy('created_at', 'desc')->first()->created_at->isToday(),
                 ]
                 : null,
             'hbl_number' => $this->hbl_number,

@@ -15,22 +15,22 @@ class RolePermissionSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create roles
-//        Role::updateOrCreate(['name' => 'super-admin']);
-//        Role::updateOrCreate(['name' => 'admin']);
-//        Role::updateOrCreate(['name' => 'empty']);
-//        Role::updateOrCreate(['name' => 'viewer']);
-//        Role::updateOrCreate(['name' => 'driver']);
-//        Role::updateOrCreate(['name' => 'customer']);
-//        Role::updateOrCreate(['name' => 'call center']);
-//        Role::updateOrCreate(['name' => 'boned area']);
-//        Role::updateOrCreate(['name' => 'finance Team']);
-//        Role::updateOrCreate(['name' => 'front office staff']);
-//        Role::updateOrCreate(['name' => 'clearance team']);
-//        Role::updateOrCreate(['name' => 'gate-security']);
-//
-//        $this->command->info('Default Roles added.');
-//
-//        $this->assignPermissions();
+        //        Role::updateOrCreate(['name' => 'super-admin']);
+        //        Role::updateOrCreate(['name' => 'admin']);
+        //        Role::updateOrCreate(['name' => 'empty']);
+        //        Role::updateOrCreate(['name' => 'viewer']);
+        //        Role::updateOrCreate(['name' => 'driver']);
+        //        Role::updateOrCreate(['name' => 'customer']);
+        //        Role::updateOrCreate(['name' => 'call center']);
+        //        Role::updateOrCreate(['name' => 'boned area']);
+        //        Role::updateOrCreate(['name' => 'finance Team']);
+        //        Role::updateOrCreate(['name' => 'front office staff']);
+        //        Role::updateOrCreate(['name' => 'clearance team']);
+        //        Role::updateOrCreate(['name' => 'gate-security']);
+        //
+        //        $this->command->info('Default Roles added.');
+        //
+        //        $this->assignPermissions();
 
         $this->createPermissionIfNotExsists();
 
@@ -118,7 +118,7 @@ class RolePermissionSeeder extends Seeder
                     'guard_name' => 'web',
                 ]);
                 if (in_array($permissionGroup, $allowedAdminPermissionGroups)) {
-                    if (!in_array($permission->name, $excludedAdminPermissions)) {
+                    if (! in_array($permission->name, $excludedAdminPermissions)) {
                         $adminRole->givePermissionTo($permission);
                     }
                 }
@@ -478,6 +478,7 @@ class RolePermissionSeeder extends Seeder
                     'hbls.hbl finance approval list',
                     'hbls.finance approved hbl list',
                     'hbls.create finance approval',
+                    'hbls.call flag',
                 ],
             ],
 

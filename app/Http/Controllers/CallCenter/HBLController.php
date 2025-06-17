@@ -63,6 +63,40 @@ class HBLController extends Controller
         return $this->HBLRepository->createAndIssueToken($hbl);
     }
 
+    public function createTokenWithVerification(Request $request, $hbl)
+    {
+        $request->validate([
+            'is_checked' => 'nullable|array',
+            'note' => 'nullable|string|max:1000',
+        ]);
+
+        $hbl = GetHBLByIdWithPackages::run($hbl);
+
+        $result = $this->HBLRepository->createAndIssueTokenWithVerification($hbl, $request->only(['is_checked', 'note']));
+
+        // If it's an Inertia request, return the token data without redirect
+        if ($request->header('X-Inertia')) {
+            $resultData = $result->getData();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Token issued successfully!',
+                'token' => $resultData->token ?? null,
+                'download_url' => route('call-center.hbls.download-token', $resultData->token->id ?? ''),
+                'print_url' => route('call-center.hbls.print-token', $resultData->token->id ?? ''),
+                'hbl' => [
+                    'hbl_number' => $hbl->hbl_number,
+                    'hbl_name' => $hbl->hbl_name,
+                    'reference' => $hbl->reference,
+                    'consignee_name' => $hbl->consignee_name,
+                ],
+            ]);
+        }
+
+        // For non-Inertia requests, return original JSON
+        return $result;
+    }
+
     public function showDoorToDoorList()
     {
         $this->authorize('hbls.index');
@@ -85,5 +119,15 @@ class HBLController extends Controller
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'warehouse']);
 
         return $this->HBLRepository->getDoorToDoorHBL($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function downloadToken($tokenId)
+    {
+        return $this->HBLRepository->generateTokenPDF($tokenId, 'download');
+    }
+
+    public function printToken($tokenId)
+    {
+        return $this->HBLRepository->generateTokenPDF($tokenId, 'print');
     }
 }

@@ -13,11 +13,12 @@ class ReceptionVerification extends Model
     use HasQueueLogs;
 
     protected $fillable = [
-        'is_checked', 'verified_by', 'customer_queue_id', 'token_id', 'note',
+        'is_checked', 'verified_by', 'customer_queue_id', 'token_id', 'note', 'all_documents_verified',
     ];
 
     protected $casts = [
         'is_checked' => 'array',
+        'all_documents_verified' => 'boolean',
     ];
 
     public static function reception_verification_documents(): array

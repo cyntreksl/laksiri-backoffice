@@ -28,9 +28,7 @@ const props = defineProps({
 const layout = ref('list');
 const options = ref(['list', 'grid']);
 
-const filteredReceptionQueue = computed(() => {
-    return props.receptionQueue.filter(q => q.is_reception_verified === false);
-})
+const filteredReceptionQueue = props.receptionQueue
 </script>
 
 <template>
