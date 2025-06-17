@@ -30,8 +30,14 @@ const closeModal = () => {
 };
 
 const downloadToken = () => {
-    if (props.tokenData?.pdf_url) {
-        window.open(props.tokenData.pdf_url, '_blank');
+    if (props.tokenData?.download_url) {
+        window.location.href = props.tokenData.download_url;
+    }
+};
+
+const printToken = () => {
+    if (props.tokenData?.print_url) {
+        window.open(props.tokenData.print_url, '_blank');
     }
 };
 </script>
@@ -135,21 +141,32 @@ const downloadToken = () => {
         </div>
 
         <template #footer>
-            <div class="flex justify-end gap-3">
-                <Button
-                    label="Download Token"
-                    icon="pi pi-download"
-                    severity="success"
-                    @click="downloadToken"
-                    :disabled="!tokenData?.pdf_url"
-                />
-                <Button
+            <div class="flex justify-between">
+                <div class="flex gap-3">
+                    <Button
+                        label="Print Token"
+                        icon="pi pi-print"
+                        severity="info"
+                        @click="printToken"
+                        :disabled="!tokenData?.print_url"
+                    />
+                    <Button
+                        label="Download Token"
+                        icon="pi pi-download"
+                        severity="success"
+                        @click="downloadToken"
+                        :disabled="!tokenData?.download_url"
+                    />
+
+                    <Button
                     label="Close"
                     icon="pi pi-times"
                     severity="secondary"
                     outlined
                     @click="closeModal"
                 />
+                </div>
+
             </div>
         </template>
     </Dialog>

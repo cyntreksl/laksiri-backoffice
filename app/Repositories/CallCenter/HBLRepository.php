@@ -167,15 +167,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             $filename = $hbl->hbl_number.'.pdf';
             $pdfPath = storage_path('app/public/tokens/'.$filename);
 
-            // Ensure directory exists
-            if (!file_exists(dirname($pdfPath))) {
-                mkdir(dirname($pdfPath), 0755, true);
-            }
-
-            // Save PDF to storage
-            $pdf->save($pdfPath);
-
-            // Return JSON response with token data and PDF URL
+            // Return JSON response with token data
             return response()->json([
                 'success' => true,
                 'message' => 'Token issued successfully',
@@ -184,11 +176,34 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                     'token_number' => $token->token,
                     'reference' => $token->reference,
                 ],
-                'pdf_url' => asset('storage/tokens/'.$filename),
             ]);
         }
 
         return response()->json(['success' => false, 'message' => 'HBL has no consignee'], 400);
+    }
+
+    public function generateTokenPDF($tokenId, $type = 'download')
+    {
+        $token = Token::with(['hbl' => function ($query) {
+            $query->withoutGlobalScope(BranchScope::class);
+        }])->findOrFail($tokenId);
+
+        // 4 inch width = 288 points (72 points per inch)
+        // Initial height of 400 points (will expand as needed)
+        $customPaper = [0, 0, 288, 400]; // 4 inches wide, expandable height
+
+        $pdf = Pdf::loadView('pdf.customer.token', [
+            'token' => $token,
+        ])->setPaper($customPaper);
+
+        $filename = $token->hbl->hbl_number . '_token.pdf';
+
+        if ($type === 'download') {
+            return $pdf->download($filename);
+        } else {
+            // For print, we'll return inline for browser printing
+            return $pdf->stream($filename);
+        }
     }
 
     public function getHBLsWithPackages()

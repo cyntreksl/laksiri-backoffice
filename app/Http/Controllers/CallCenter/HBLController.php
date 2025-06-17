@@ -81,7 +81,8 @@ class HBLController extends Controller
                 'success' => true,
                 'message' => 'Token issued successfully!',
                 'token' => $resultData->token ?? null,
-                'pdf_url' => $resultData->pdf_url ?? null,
+                'download_url' => route('call-center.hbls.download-token', $resultData->token->id ?? ''),
+                'print_url' => route('call-center.hbls.print-token', $resultData->token->id ?? ''),
                 'hbl' => [
                     'hbl_number' => $hbl->hbl_number,
                     'hbl_name' => $hbl->hbl_name,
@@ -117,5 +118,15 @@ class HBLController extends Controller
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'drivers', 'officers', 'paymentStatus', 'warehouse']);
 
         return $this->HBLRepository->getDoorToDoorHBL($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function downloadToken($tokenId)
+    {
+        return $this->HBLRepository->generateTokenPDF($tokenId, 'download');
+    }
+
+    public function printToken($tokenId)
+    {
+        return $this->HBLRepository->generateTokenPDF($tokenId, 'print');
     }
 }

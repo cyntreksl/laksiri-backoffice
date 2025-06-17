@@ -13,6 +13,12 @@ Route::get('/create-token/{hbl}', [HBLController::class, 'createToken'])
 Route::post('/create-token/{hbl}', [HBLController::class, 'createTokenWithVerification'])
     ->name('hbls.create-token-with-verification');
 
+Route::get('/download-token/{token}', [HBLController::class, 'downloadToken'])
+    ->name('hbls.download-token');
+
+Route::get('/print-token/{token}', [HBLController::class, 'printToken'])
+    ->name('hbls.print-token');
+
 Route::get('hbls/show/door-to-door', [HBLController::class, 'showDoorToDoorList'])
     ->name('hbls.door-to-door-list');
 
