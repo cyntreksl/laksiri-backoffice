@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HBLController;
+use App\Http\Controllers\ThirdPartyShipmentController;
 use App\Http\Controllers\WhatsappController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,7 @@ Route::middleware([
         require_once __DIR__.'/web/call-center/examination.php';
         require_once __DIR__.'/web/call-center/boned-area.php';
         require_once __DIR__.'/web/call-center/reception.php';
+        require_once __DIR__.'/web/call-center/tokens.php';
     });
 
     // finance routes
@@ -64,6 +66,22 @@ Route::middleware([
     Route::name('clearance.')->prefix('clearance')->group(function () {
         require_once __DIR__.'/web/clearance/vessel-schedule.php';
     });
+
+    // Third Party Shipment CSV Import Routes (must come before resource routes)
+    Route::post('third-party-shipments/import-csv', [ThirdPartyShipmentController::class, 'importCsv'])
+        ->name('third-party-shipments.import-csv');
+
+    Route::get('third-party-shipments/get-tmp-hbls', [ThirdPartyShipmentController::class, 'getTmpHbls'])
+        ->name('third-party-shipments.get-tmp-hbls');
+
+    Route::post('third-party-shipments/save-shipment', [ThirdPartyShipmentController::class, 'saveShipment'])
+        ->name('third-party-shipments.save-shipment');
+
+    Route::get('third-party-shipments/download-sample', [ThirdPartyShipmentController::class, 'downloadSample'])
+        ->name('third-party-shipments.download-sample');
+
+    Route::resource('third-party-shipments', ThirdPartyShipmentController::class);
+
 });
 
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);
