@@ -47,7 +47,13 @@ const props = defineProps({
     },
 });
 
-const baseUrl = ref("/call-center/hbl-list");
+const baseUrl = computed(() => {
+    if (route().current() === "call-center.hbls.index") {
+        return '/call-center/hbl-list';
+    }
+
+    return '/finance/approved-hbl-list';
+});
 const loading = ref(true);
 const hbls = ref([]);
 const totalRecords = ref(0);
@@ -450,7 +456,7 @@ const exportCSV = () => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    All HBLs
+                                    {{route().current() === "call-center.hbls.index" ? 'All HBLs' : 'Issue Tokens For HBLs'}}
                                 </div>
                                 <Button v-if="$page.props.user.permissions.includes('hbls.create')" icon="pi pi-arrow-right"
                                         icon-pos="right"
