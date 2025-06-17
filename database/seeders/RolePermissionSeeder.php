@@ -189,6 +189,7 @@ class RolePermissionSeeder extends Seeder
             'customer-queue.show examination calling queue',
             'customer-queue.show gate ist',
             'customer-queue.show examination calling screen',
+            'manage_tokens',
         ];
 
         $callCenterRole = Role::where('name', 'call center')->first();
@@ -652,6 +653,13 @@ class RolePermissionSeeder extends Seeder
                     'mark-shipment-arrived-to-warehouse',
                     'mark-shipment-depart-from-warehouse',
                     'mark-gate-pass',
+                ],
+            ],
+
+            [
+                'group_name' => 'Token',
+                'permissions' => [
+                    'manage_tokens',
                 ],
             ],
         ];

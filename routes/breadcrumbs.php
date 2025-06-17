@@ -548,6 +548,11 @@ Breadcrumbs::for('gate-control.outbound-gate-passes.index', function (Breadcrumb
     $trail->push('Outbound Gate Pass', route('gate-control.outbound-gate-passes.index'));
 });
 
+Breadcrumbs::for('call-center.tokens.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Tokens', route('call-center.tokens.index'));
+});
+
 require_once __DIR__.'/call-center-breadcrumbs.php';
 require_once __DIR__.'/finance-breadcrumbs.php';
 require_once __DIR__.'/clearance-breadcrumbs.php';
