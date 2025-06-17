@@ -478,6 +478,7 @@ class RolePermissionSeeder extends Seeder
                     'hbls.hbl finance approval list',
                     'hbls.finance approved hbl list',
                     'hbls.create finance approval',
+                    'hbls.call flag',
                 ],
             ],
 

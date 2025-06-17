@@ -131,7 +131,7 @@ const form = useForm({
 });
 
 const handleUpdatePayment = () => {
-    if (form.paid_amount < (paymentRecord.value.grand_total - hbl.value.paid_amount).toFixed(2)) {
+    if (form.paid_amount < (paymentRecord.value.grand_total - hbl.value.paid_amount)) {
         push.error('Please pay full amount');
     } else {
         form.post(route("call-center.cashier.store"), {

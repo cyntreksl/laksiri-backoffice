@@ -192,11 +192,11 @@ const confirmRoleDelete = (id) => {
                             </template>
                         </Column>
 
-                        <Column field="permissions" header="Permissions">
-                            <template #body="slotProps">
-                                <Chip v-for="permission in slotProps.data.permissions" :label="formatPermissionName(permission.name)"  class="mr-1 mb-1 border border-sky-500 !bg-sky-100"/>
-                            </template>
-                        </Column>
+<!--                        <Column field="permissions" header="Permissions">-->
+<!--                            <template #body="slotProps">-->
+<!--                                <Chip v-for="permission in slotProps.data.permissions" :label="formatPermissionName(permission.name)"  class="mr-1 mb-1 border border-sky-500 !bg-sky-100"/>-->
+<!--                            </template>-->
+<!--                        </Column>-->
 
                         <Column field="" header="Actions" style="width: 10%">
                             <template #body="{ data }">

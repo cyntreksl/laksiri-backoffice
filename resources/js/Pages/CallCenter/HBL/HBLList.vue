@@ -89,7 +89,7 @@ const menuModel = ref([
         label: "View",
         icon: "pi pi-fw pi-search",
         command: () => confirmViewHBL(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.show"),
+        visible: usePage().props.user.permissions.includes("hbls.show"),
     },
     {
         label: "Issue Token",
@@ -105,49 +105,49 @@ const menuModel = ref([
         label: "Call Flag",
         icon: "pi pi-fw pi-flag",
         command: () => confirmViewCallFlagModal(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
+        visible: usePage().props.user.permissions.includes("hbls.call flag"),
     },
     {
         label: "Edit",
         icon: "pi pi-fw pi-pencil",
         command: () => router.visit(route("hbls.edit", selectedHBL.value.id)),
-        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
+        visible: usePage().props.user.permissions.includes("hbls.edit"),
     },
     {
         label: computed(() => (selectedHBL.value?.is_hold ? 'Release' : 'Hold')),
         icon: computed(() => (selectedHBL.value?.is_hold ? 'pi pi-fw pi-play-circle' : 'pi pi-fw pi-pause-circle')) ,
         command: () => confirmHBLHold(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.hold and release"),
+        visible: usePage().props.user.permissions.includes("hbls.hold and release"),
     },
     {
         label: "Download",
         icon: "pi pi-fw pi-download",
         url: () => route("hbls.download", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download pdf"),
+        visible: usePage().props.user.permissions.includes("hbls.download pdf"),
     },
     {
         label: "Invoice",
         icon: "pi pi-fw pi-receipt",
         url: () => route("hbls.download.invoice", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download invoice"),
+        visible: usePage().props.user.permissions.includes("hbls.download invoice"),
     },
     {
         label: "Download Baggage PDF",
         icon: "pi pi-fw pi-shopping-bag",
         url: () => route("hbls.download.baggage", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download pdf"),
+        visible: usePage().props.user.permissions.includes("hbls.download pdf"),
     },
     {
         label: "Barcode",
         icon: "pi pi-fw pi-barcode",
         url: () => route("hbls.download.barcode", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download barcode"),
+        visible: usePage().props.user.permissions.includes("hbls.download barcode"),
     },
     {
         label: "Delete",
         icon: "pi pi-fw pi-times",
         command: () => confirmHBLDelete(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.delete"),
+        visible: usePage().props.user.permissions.includes("hbls.delete"),
     },
 ]);
 
@@ -522,6 +522,15 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
+                        <Column field="hbl_type" header="HBL Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
                         <Column field="hbl_name" header="HBL Name">
                             <template #body="slotProps">
                                 <a :href="`hbls/get-hbls-by-user/${slotProps.data.hbl_name}`"
@@ -538,17 +547,6 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column field="address" header="Address"></Column>
-
-                        <Column field="warehouse" header="Warehouse" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveWarehouse(slotProps.data)" :value="slotProps.data.warehouse.toUpperCase()"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
-
                         <Column field="consignee_name" header="Consignee">
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.consignee_name }}</div>
@@ -558,27 +556,6 @@ const exportCSV = () => {
                         </Column>
 
                         <Column field="consignee_address" header="Consignee Address"></Column>
-
-                        <Column field="hbl_type" header="HBL Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
-
-                        <Column field="is_hold" header="Hold">
-                            <template #body="{ data }">
-                                <i :class="{ 'pi-pause-circle text-yellow-500': data.is_hold, 'pi-play-circle text-green-400': !data.is_hold }" class="pi"></i>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <div class="flex items-center gap-2">
-                                    <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary inputId="is-hold"/>
-                                    <label for="is-hold"> Is Hold </label>
-                                </div>
-                            </template>
-                        </Column>
 
                         <template #expansion="{data}">
                             <div class="grid grid-cols-3 p-4">
