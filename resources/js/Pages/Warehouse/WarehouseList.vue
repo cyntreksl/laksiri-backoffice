@@ -686,8 +686,10 @@ const exportURL = computed(() => {
 
                         <Column field="zone" header="Zone">
                             <template #body="slotProps">
-                                <Button v-if="slotProps.data.zone === null" aria-label="zone" icon="ti ti-home-plus" rounded severity="help" size="small" @click.prevent="confirmAssignZone(slotProps.data.id)" />
-                                <span v-else>{{ slotProps.data.zone }}</span>
+                               <div class="flex items-center space-x-1">
+                                   <span v-if="slotProps.data.zone">{{ slotProps.data.zone }}</span>
+                                   <Button aria-label="zone" icon="ti ti-home-plus" rounded severity="help" size="small" variant="text" @click.prevent="confirmAssignZone(slotProps.data.id)" />
+                               </div>
                             </template>
                         </Column>
 

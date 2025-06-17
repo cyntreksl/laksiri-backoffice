@@ -100,7 +100,7 @@ class ExaminationRepository implements ExaminationRepositoryInterface
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            throw new \Exception('Failed to create examination record when releasing hbl packages: '.$e->getMessage());
+            throw new \Exception('Failed to mark as depart: '.$e->getMessage());
         }
     }
 }
