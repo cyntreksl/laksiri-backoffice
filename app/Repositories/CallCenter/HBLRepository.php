@@ -16,7 +16,6 @@ use App\Models\Scopes\BranchScope;
 use App\Models\Token;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 {
@@ -133,22 +132,43 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 'token' => $tokenValue,
             ]);
 
-            // set customer queue
+            // Determine the required documents based on HBL type
+            $requiredDocs = [];
+            if ($hbl->hbl_type === 'UPB') {
+                $requiredDocs = ['Passport', 'HBL Receipt'];
+            } else {
+                $requiredDocs = ['NIC', 'HBL Receipt'];
+            }
+
+            // Check if all required documents are verified
+            $checkedDocs = $verificationData['is_checked'] ?? [];
+            $allDocumentsVerified = count($requiredDocs) > 0 &&
+                                  count($checkedDocs) > 0 &&
+                                  collect($requiredDocs)->every(function ($doc) use ($checkedDocs) {
+                                      return isset($checkedDocs[$doc]) && $checkedDocs[$doc] === true;
+                                  });
+
+            // Determine next queue based on verification status
+            $queueType = $allDocumentsVerified
+                ? CustomerQueue::DOCUMENT_VERIFICATION_QUEUE
+                : CustomerQueue::RECEPTION_VERIFICATION_QUEUE;
+
             $customerQueue = $token->customerQueue()->create([
-                'type' => CustomerQueue::CASHIER_QUEUE,
+                'type' => $queueType,
             ]);
 
             // Store the reception verification data
             $customerQueue->reception_verification()->create([
-                'is_checked' => $verificationData['is_checked'],
+                'is_checked' => $verificationData['is_checked'] ?? [],
                 'note' => $verificationData['note'] ?? null,
                 'verified_by' => auth()->id(),
                 'token_id' => $token->id,
+                'all_documents_verified' => $allDocumentsVerified,
             ]);
 
-            // set queue status log
+            // set queue status log based on verification status
             $hbl->addQueueStatus(
-                CustomerQueue::TOKEN_ISSUED,
+                $queueType,
                 $hbl->consignee_id,
                 $token->id,
                 date('Y-m-d H:i:s', (time() - 60)),
@@ -175,6 +195,8 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                     'id' => $token->id,
                     'token_number' => $token->token,
                     'reference' => $token->reference,
+                    'queue_type' => $queueType,
+                    'all_documents_verified' => $allDocumentsVerified,
                 ],
             ]);
         }
@@ -196,7 +218,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             'token' => $token,
         ])->setPaper($customPaper);
 
-        $filename = $token->hbl->hbl_number . '_token.pdf';
+        $filename = $token->hbl->hbl_number.'_token.pdf';
 
         if ($type === 'download') {
             return $pdf->download($filename);

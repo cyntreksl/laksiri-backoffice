@@ -66,8 +66,15 @@ const paymentStatus = computed(() => {
     return 'Unpaid';
 });
 
-// Check if any documents are verified
-const isReceptionVerified = computed(() => {
+// Check if ALL required documents are verified
+const areAllDocumentsVerified = computed(() => {
+    if (verificationDocuments.value.length === 0) return false;
+
+    return verificationDocuments.value.every(doc => form.is_checked[doc] === true);
+});
+
+// Check if any documents are verified (but not necessarily all)
+const isAnyDocumentVerified = computed(() => {
     return Object.keys(form.is_checked).length > 0 && Object.values(form.is_checked).some(checked => checked);
 });
 
@@ -77,14 +84,14 @@ const tokenTimeline = computed(() => [
         label: 'Reception Queue',
         icon: 'pi pi-users',
         description: 'Customer arrival and document verification',
-        status: isReceptionVerified.value ? 'completed' : 'current'
+        status: areAllDocumentsVerified.value ? 'completed' : 'next'
     },
     {
         id: 2,
         label: 'Document Verification Queue',
         icon: 'pi pi-file-check',
         description: 'Document verification and approval',
-        status: isReceptionVerified.value ? 'current' : 'pending'
+        status: areAllDocumentsVerified.value ? 'next' : 'pending'
     },
     {
         id: 3,
@@ -123,8 +130,12 @@ const updateChecked = (doc, isChecked) => {
 // Simplified approach - use the HBL data from props and HBL total summary if available
 
 const handleIssueToken = () => {
+    const message = areAllDocumentsVerified.value
+        ? 'Are you sure you want to issue token for this HBL? All required documents have been verified.'
+        : 'Are you sure you want to issue token for this HBL?';
+
     confirm.require({
-        message: 'Are you sure you want to issue token for this HBL?',
+        message: message,
         header: 'Issue Token',
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
@@ -137,20 +148,23 @@ const handleIssueToken = () => {
             label: 'Issue Token',
             severity: 'success'
         },
-                                        accept: () => {
+        accept: () => {
             isProcessing.value = true;
-
-            // Ensure at least one document is checked for validation
-            if (Object.keys(form.is_checked).length === 0) {
-                form.is_checked = { 'Reception': true };
-            }
 
             // Set default note if empty
             if (!form.note) {
-                form.note = 'Token issued via dialog';
+                form.note = areAllDocumentsVerified.value
+                    ? 'Reception verification completed - All documents verified'
+                    : 'Token issued - Reception verification pending';
             }
 
-                                    // Use fetch for direct JSON response handling
+                                    // Ensure is_checked is always an object, even if empty
+            const requestData = {
+                is_checked: Object.keys(form.is_checked).length > 0 ? form.is_checked : {},
+                note: form.note || ''
+            };
+
+            // Use fetch for direct JSON response handling
             fetch(route('call-center.hbls.create-token-with-verification', props.hbl.id), {
                 method: 'POST',
                 headers: {
@@ -159,16 +173,20 @@ const handleIssueToken = () => {
                     'X-Inertia': 'true',
                     'Accept': 'application/json',
                 },
-                body: JSON.stringify({
-                    is_checked: form.is_checked,
-                    note: form.note
-                })
+                body: JSON.stringify(requestData)
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     // Store token data for success modal
                     tokenData.value = data;
+
+                    // Show appropriate success message based on queue placement
+                    const queueMessage = data.token.all_documents_verified
+                        ? 'Token issued and placed in Document Verification Queue - All documents verified!'
+                        : 'Token issued and placed in Reception Queue - Please complete document verification.';
+
+                    push.success(queueMessage);
 
                     // Reset the form and timeline
                     resetForm();
@@ -313,6 +331,7 @@ watch(() => props.visible, (newVal) => {
                                 :class="{
                                     'border-green-200 bg-green-50': step.status === 'completed',
                                     'border-blue-200 bg-blue-50': step.status === 'current',
+                                    'border-orange-200 bg-orange-50': step.status === 'next',
                                     'border-gray-200 bg-gray-50': step.status === 'pending'
                                 }"
                             >
@@ -322,6 +341,7 @@ watch(() => props.visible, (newVal) => {
                                         :class="{
                                             'bg-green-500 text-white': step.status === 'completed',
                                             'bg-blue-500 text-white': step.status === 'current',
+                                            'bg-orange-500 text-white': step.status === 'next',
                                             'bg-gray-200 text-gray-600': step.status === 'pending'
                                         }"
                                     >
@@ -338,6 +358,7 @@ watch(() => props.visible, (newVal) => {
                                             :class="{
                                                 'text-green-800': step.status === 'completed',
                                                 'text-blue-800': step.status === 'current',
+                                                'text-orange-800': step.status === 'next',
                                                 'text-gray-600': step.status === 'pending'
                                             }"
                                         >
@@ -349,10 +370,11 @@ watch(() => props.visible, (newVal) => {
                                                 :class="{
                                                     'bg-green-100 text-green-700': step.status === 'completed',
                                                     'bg-blue-100 text-blue-700': step.status === 'current',
+                                                    'bg-orange-100 text-orange-700': step.status === 'next',
                                                     'bg-gray-100 text-gray-600': step.status === 'pending'
                                                 }"
                                             >
-                                                {{ step.status === 'completed' ? 'Completed' : step.status === 'current' ? 'Current' : 'Pending' }}
+                                                {{ step.status === 'completed' ? 'Completed' : step.status === 'current' ? 'Current' : step.status === 'next' ? 'Next' : 'Pending' }}
                                             </span>
                                             <span class="text-sm font-medium text-gray-500">Step {{ step.id }}</span>
                                         </div>
@@ -362,6 +384,7 @@ watch(() => props.visible, (newVal) => {
                                         :class="{
                                             'text-green-700': step.status === 'completed',
                                             'text-blue-700': step.status === 'current',
+                                            'text-orange-700': step.status === 'next',
                                             'text-gray-600': step.status === 'pending'
                                         }"
                                     >
@@ -427,29 +450,67 @@ watch(() => props.visible, (newVal) => {
                 <!-- Reception Verification -->
                 <Card>
                     <template #title>
-                        <div class="flex items-center gap-3">
-                            <Avatar icon="pi pi-check-square" class="bg-orange-100 text-orange-600" size="large" />
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900">Reception Verification</h3>
-                                <p class="text-sm text-gray-600">Check required documents</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <Avatar
+                                    icon="pi pi-check-square"
+                                    :class="areAllDocumentsVerified ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'"
+                                    size="large"
+                                />
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">Reception Verification</h3>
+                                    <p class="text-sm text-gray-600">Verify customer brought required documents</p>
+                                </div>
+                            </div>
+                            <div v-if="areAllDocumentsVerified" class="flex items-center gap-2">
+                                <i class="pi pi-check-circle text-green-600"></i>
+                                <span class="text-sm font-medium text-green-600">All Verified</span>
+                            </div>
+                            <div v-else-if="isAnyDocumentVerified" class="flex items-center gap-2">
+                                <i class="pi pi-clock text-orange-600"></i>
+                                <span class="text-sm font-medium text-orange-600">Partial</span>
+                            </div>
+                            <div v-else class="flex items-center gap-2">
+                                <i class="pi pi-times-circle text-red-600"></i>
+                                <span class="text-sm font-medium text-red-600">Pending</span>
                             </div>
                         </div>
                     </template>
                     <template #content>
                         <div class="space-y-4">
+                            <!-- Verification Progress -->
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-gray-600">Verification Progress</span>
+                                    <span class="text-sm font-medium"
+                                          :class="areAllDocumentsVerified ? 'text-green-600' : 'text-orange-600'">
+                                        {{ Object.values(form.is_checked).filter(Boolean).length }} / {{ verificationDocuments.length }}
+                                    </span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="h-2 rounded-full transition-all duration-300"
+                                         :class="areAllDocumentsVerified ? 'bg-green-500' : 'bg-orange-500'"
+                                         :style="{ width: `${(Object.values(form.is_checked).filter(Boolean).length / verificationDocuments.length) * 100}%` }">
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Document Checklist -->
                             <div class="space-y-3">
                                 <div v-for="(doc, index) in verificationDocuments" :key="index"
-                                     class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
+                                     class="flex items-center gap-3 p-3 border rounded-lg transition-all duration-200"
+                                     :class="form.is_checked[doc] ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'">
                                     <Checkbox
                                         :checked="form.is_checked[doc] || false"
                                         :input-id="`${doc}-${index}`"
                                         :value="doc"
                                         @change="(event) => updateChecked(doc, event.target.checked)"
                                     />
-                                    <label :for="`${doc}-${index}`" class="cursor-pointer font-medium text-gray-700">
+                                    <label :for="`${doc}-${index}`" class="cursor-pointer font-medium flex-grow"
+                                           :class="form.is_checked[doc] ? 'text-green-700' : 'text-gray-700'">
                                         {{ doc }}
                                     </label>
+                                    <i v-if="form.is_checked[doc]" class="pi pi-check text-green-600"></i>
                                 </div>
                             </div>
 
@@ -476,21 +537,33 @@ watch(() => props.visible, (newVal) => {
             </div>
         </div>
 
-        <template #footer>
-            <div class="flex justify-end gap-3">
-                <Button
-                    label="Cancel"
-                    severity="secondary"
-                    outlined
-                    @click="closeDialog"
-                    :disabled="isProcessing"
-                />
-                <Button
-                    label="Issue Token"
-                    icon="pi pi-tag"
-                    :loading="isProcessing"
-                    @click="handleIssueToken"
-                />
+                <template #footer>
+            <div class="flex justify-between items-center">
+                <div v-if="!areAllDocumentsVerified" class="flex items-center gap-2 text-blue-600 mr-2">
+                    <i class="pi pi-info-circle"></i>
+                    <span class="text-sm">Document verification checklist helps track customer requirements</span>
+                </div>
+                <div v-else class="flex items-center gap-2 text-green-600 mr-2">
+                    <i class="pi pi-check-circle"></i>
+                    <span class="text-sm">All documents Checked - Customer is ready for next queue</span>
+                </div>
+
+                <div class="flex gap-3">
+                    <Button
+                        label="Cancel"
+                        severity="secondary"
+                        outlined
+                        @click="closeDialog"
+                        :disabled="isProcessing"
+                    />
+                    <Button
+                        label="Issue Token"
+                        icon="pi pi-tag"
+                        :loading="isProcessing"
+                        :disabled="isProcessing"
+                        @click="handleIssueToken"
+                    />
+                </div>
             </div>
         </template>
     </Dialog>

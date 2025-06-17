@@ -66,8 +66,8 @@ class HBLController extends Controller
     public function createTokenWithVerification(Request $request, $hbl)
     {
         $request->validate([
-            'is_checked' => 'required|array|min:1',
-            'note' => 'nullable|string|max:1000'
+            'is_checked' => 'nullable|array',
+            'note' => 'nullable|string|max:1000',
         ]);
 
         $hbl = GetHBLByIdWithPackages::run($hbl);
@@ -77,6 +77,7 @@ class HBLController extends Controller
         // If it's an Inertia request, return the token data without redirect
         if ($request->header('X-Inertia')) {
             $resultData = $result->getData();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Token issued successfully!',
@@ -88,7 +89,7 @@ class HBLController extends Controller
                     'hbl_name' => $hbl->hbl_name,
                     'reference' => $hbl->reference,
                     'consignee_name' => $hbl->consignee_name,
-                ]
+                ],
             ]);
         }
 

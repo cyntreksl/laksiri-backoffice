@@ -64,15 +64,15 @@ class HBL extends Model
 
     public const SYSTEM_STATUS_FINANCE_APPROVED = 4.5;
 
-    //system status for token and queue can be start from 6.0
-    //6.0 is for token issued
-    //6.1 is for reception queue
-    //6.2 is for document verification queue
-    //6.3 is for cashier queue
-    //6.4 is for waiting for package receive from bon area queue
-    //6.6 is for examination queue
-    //6.7 is for gate pass issued
-    //6.8 is for gate pass mark as released
+    // system status for token and queue can be start from 6.0
+    // 6.0 is for token issued
+    // 6.1 is for reception queue
+    // 6.2 is for document verification queue
+    // 6.3 is for cashier queue
+    // 6.4 is for waiting for package receive from bon area queue
+    // 6.6 is for examination queue
+    // 6.7 is for gate pass issued
+    // 6.8 is for gate pass mark as released
 
     protected $fillable = [
         'reference',
