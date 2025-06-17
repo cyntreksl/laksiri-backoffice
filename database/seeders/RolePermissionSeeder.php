@@ -654,6 +654,17 @@ class RolePermissionSeeder extends Seeder
                     'mark-gate-pass',
                 ],
             ],
+
+            // reception permissions
+            [
+                'group_name' => 'Reception',
+                'permissions' => [
+                    'reception.show reception calling queue',
+                    'reception.show reception verified list',
+                    'reception.show reception calling screen',
+                    'reception.issue token',
+                ],
+            ],
         ];
     }
 }

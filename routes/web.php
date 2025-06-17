@@ -66,6 +66,19 @@ Route::middleware([
         require_once __DIR__.'/web/clearance/vessel-schedule.php';
     });
 
+    // Third Party Shipment CSV Import Routes (must come before resource routes)
+    Route::post('third-party-shipments/import-csv', [ThirdPartyShipmentController::class, 'importCsv'])
+        ->name('third-party-shipments.import-csv');
+
+    Route::get('third-party-shipments/get-tmp-hbls', [ThirdPartyShipmentController::class, 'getTmpHbls'])
+        ->name('third-party-shipments.get-tmp-hbls');
+
+    Route::post('third-party-shipments/save-shipment', [ThirdPartyShipmentController::class, 'saveShipment'])
+        ->name('third-party-shipments.save-shipment');
+
+    Route::get('third-party-shipments/download-sample', [ThirdPartyShipmentController::class, 'downloadSample'])
+        ->name('third-party-shipments.download-sample');
+
     Route::resource('third-party-shipments', ThirdPartyShipmentController::class);
 
 });
