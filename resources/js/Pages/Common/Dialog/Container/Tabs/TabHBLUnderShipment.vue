@@ -3,7 +3,7 @@ import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue"
 import {ref, watch} from "vue";
 import HBLPackages from "@/Pages/Common/Dialog/Container/Tables/HBLPackages.vue";
 import AddHBLModal from "@/Pages/Common/Dialog/Container/Dialog/AddHBLModal.vue";
-import {router, usePage} from "@inertiajs/vue3";
+import {usePage} from "@inertiajs/vue3";
 import Button from "primevue/button";
 import Divider from "primevue/divider";
 
@@ -56,7 +56,6 @@ fetchLoadedContainer();
 const hbls = () => {
     const hbls = containerData.value.hbls;
     filteredHBLS.value = Object.values(hbls).filter(hbl => hbl.mhbl === null);
-    // hblsCount.value = filteredHBLS.value.length;
 
     const filteredHblIds = filteredHBLS.value.map(hbl => hbl.id);
 
@@ -67,11 +66,11 @@ const hbls = () => {
     filteredHBLSPackagesCount.value = filteredHblPackages.length;
 
     filteredHBLSPackagesWeight.value = filteredHblPackages.reduce((sum, pkg) => {
-        return sum + (pkg.weight || 0);  // Ensure pkg.weight exists
+        return sum + (pkg.weight || 0);
     }, 0);
 
     filteredHBLSPackagesVolume.value = filteredHblPackages.reduce((sum, pkg) => {
-        return sum + (pkg.volume || 0);  // Ensure pkg.weight exists
+        return sum + (pkg.volume || 0);
     }, 0);
 }
 
@@ -86,9 +85,6 @@ const filteredMHBLsLHBL = ref([]);
 const mhbls = () => {
     const hbls = Object.values(containerData.value.hbls);
     filteredMHBLsLHBL.value = Object.values(hbls).filter(hbl => hbl.mhbl !== null);
-
-    //Get hbls count
-    // hblsCount.value = hblsCount.value + filteredMHBLsLHBL.value.length;
 
     const filteredMHblsHBLIds = filteredMHBLsLHBL.value.map(hbl => hbl.id);
     const filteredMHblsHBLPackages = props.container.hbl_packages.filter(pkg =>
@@ -161,8 +157,10 @@ watch(
             </h3>
         </div>
         <div class="flex items-center space-x-2">
-            <Button v-if="usePage().props.user?.roles[0] === 'admin'" icon="pi pi-plus"
-                    label="Add HBL To Shipment" size="small" @click.prevent="confirmAddHBLModal"/>
+            <template v-if="container.status !== 'IN TRANSIT'">
+                <Button v-if="usePage().props.user?.roles[0] === 'admin'" icon="pi pi-plus"
+                        label="Add HBL To Shipment" size="small" @click.prevent="confirmAddHBLModal"/>
+            </template>
 
             <a v-if="container.status === 'LOADED'" :href="route('loading.hbls.batch-downloads', container.id)">
                 <Button icon="pi pi-print" label="Print All HBL" severity="info" size="small"/>
