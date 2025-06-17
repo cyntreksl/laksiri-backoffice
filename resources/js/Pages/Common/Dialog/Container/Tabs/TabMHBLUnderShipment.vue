@@ -1,11 +1,10 @@
 <script setup>
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import {ref, watch} from "vue";
-import {router, usePage} from "@inertiajs/vue3";
+import {usePage} from "@inertiajs/vue3";
 import Button from "primevue/button";
 import MHBLPackages from "@/Pages/Common/Dialog/Container/Tables/MHBLPackages.vue";
 import AddMHBLModal from "@/Pages/Common/Dialog/Container/Dialog/AddMHBLModal.vue";
-import AddHBLModal from "@/Pages/Common/Dialog/Container/Dialog/AddHBLModal.vue";
 import Divider from "primevue/divider";
 
 const props = defineProps({
@@ -65,11 +64,11 @@ const hbls = () => {
     filteredHBLSPackagesCount.value = filteredHblPackages.length;
 
     filteredHBLSPackagesWeight.value = filteredHblPackages.reduce((sum, pkg) => {
-        return sum + (pkg.weight || 0);  // Ensure pkg.weight exists
+        return sum + (pkg.weight || 0);
     }, 0);
 
     filteredHBLSPackagesVolume.value = filteredHblPackages.reduce((sum, pkg) => {
-        return sum + (pkg.volume || 0);  // Ensure pkg.weight exists
+        return sum + (pkg.volume || 0);
     }, 0);
     //counting mhbls
     const mhblSet = new Set(filteredHBLS.value.map(hbl => hbl.mhbl));
@@ -79,7 +78,6 @@ const hbls = () => {
 watch(() => containerData.value, () => {
     hbls();
 });
-// hbls();
 </script>
 
 <template>
@@ -104,8 +102,10 @@ watch(() => containerData.value, () => {
             </h3>
         </div>
         <div class="flex items-center space-x-2">
-            <Button v-if="usePage().props.user?.roles[0] === 'admin'" icon="pi pi-plus"
+            <template v-if="container.status !== 'IN TRANSIT'">
+                <Button v-if="usePage().props.user?.roles[0] === 'admin'" icon="pi pi-plus"
                     label="Add MHBL To Shipment" size="small" @click.prevent="confirmAddMHBLModal" />
+            </template>
 
             <a v-if="filteredHBLSPackagesCount > 0" :href="route('loading.loaded-containers.doorToDoor.export', container.id)">
                 <Button icon="pi pi-print" label="Print Manifest" severity="info" size="small" />
