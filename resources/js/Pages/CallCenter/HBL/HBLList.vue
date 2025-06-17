@@ -26,6 +26,7 @@ import {debounce} from "lodash";
 import {push} from "notivue";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
+import IssueTokenDialog from "./Components/IssueTokenDialog.vue";
 
 const props = defineProps({
     users: {
@@ -62,7 +63,9 @@ const currentPage = ref(1);
 const showConfirmViewHBLModal = ref(false);
 const cm = ref();
 const selectedHBL = ref(null);
+const selectedHBLData = ref(null);
 const selectedHBLID = ref(null);
+const selectedHblSummary = ref({});
 const confirm = useConfirm();
 const dt = ref();
 const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
@@ -71,6 +74,7 @@ const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
 const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const showConfirmViewCallFlagModal = ref(false);
+const showIssueTokenDialog = ref(false);
 const hblName = ref("");
 
 const filters = ref({
@@ -93,11 +97,7 @@ const menuModel = ref([
     {
         label: "Issue Token",
         icon: "pi pi-fw pi-tag",
-        url: () => route(
-            "call-center.hbls.create-token",
-            selectedHBL.value.id
-        ),
-        target: "_blank",
+        command: () => confirmIssueToken(selectedHBL),
         visible: () => selectedHBL.value?.system_status > 4.2 && usePage().props.user.permissions.includes("hbls.issue token"),
     },
     {
@@ -390,6 +390,26 @@ const closeCallFlagModal = () => {
     hblName.value = "";
 };
 
+const confirmIssueToken = (hbl) => {
+    console.log('hbl',hbl.value)
+    selectedHBLData.value = hbl.value;
+    showIssueTokenDialog.value = true;
+};
+
+const closeIssueTokenDialog = () => {
+    showIssueTokenDialog.value = false;
+    selectedHBLData.value = null;
+};
+
+const onTokenIssued = (result) => {
+    // Refresh the HBL list to show updated token information
+    fetchHBLs(currentPage.value, filters.value.global.value);
+
+    // Reset selected HBL
+    selectedHBL.value = null;
+    selectedHblSummary.value = {};
+};
+
 const exportCSV = () => {
     dt.value.exportCSV();
 };
@@ -599,4 +619,10 @@ const exportCSV = () => {
         :visible="showConfirmViewCallFlagModal"
         @close="closeCallFlagModal"
         @update:visible="showConfirmViewCallFlagModal = $event"/>
+
+    <IssueTokenDialog
+        :visible="showIssueTokenDialog"
+        :hbl="selectedHBLData"
+        @update:visible="closeIssueTokenDialog"
+        @token-issued="onTokenIssued"/>
 </template>

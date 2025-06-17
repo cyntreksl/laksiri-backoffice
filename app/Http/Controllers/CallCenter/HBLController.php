@@ -63,6 +63,38 @@ class HBLController extends Controller
         return $this->HBLRepository->createAndIssueToken($hbl);
     }
 
+    public function createTokenWithVerification(Request $request, $hbl)
+    {
+        $request->validate([
+            'is_checked' => 'required|array|min:1',
+            'note' => 'nullable|string|max:1000'
+        ]);
+
+        $hbl = GetHBLByIdWithPackages::run($hbl);
+
+        $result = $this->HBLRepository->createAndIssueTokenWithVerification($hbl, $request->only(['is_checked', 'note']));
+
+        // If it's an Inertia request, return the token data without redirect
+        if ($request->header('X-Inertia')) {
+            $resultData = $result->getData();
+            return response()->json([
+                'success' => true,
+                'message' => 'Token issued successfully!',
+                'token' => $resultData->token ?? null,
+                'pdf_url' => $resultData->pdf_url ?? null,
+                'hbl' => [
+                    'hbl_number' => $hbl->hbl_number,
+                    'hbl_name' => $hbl->hbl_name,
+                    'reference' => $hbl->reference,
+                    'consignee_name' => $hbl->consignee_name,
+                ]
+            ]);
+        }
+
+        // For non-Inertia requests, return original JSON
+        return $result;
+    }
+
     public function showDoorToDoorList()
     {
         $this->authorize('hbls.index');

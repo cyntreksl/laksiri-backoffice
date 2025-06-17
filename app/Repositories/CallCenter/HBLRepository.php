@@ -67,16 +67,6 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             // Get the current date
             $today = Carbon::today();
 
-            // Check if any tokens exist for today
-            $tokensExistToday = Token::whereDate('created_at', $today)->exists();
-
-            if (! $tokensExistToday) {
-                DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-                DB::table('tokens')->delete();
-                DB::table('customer_queues')->delete();
-                DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-            }
-
             // Get the last token created today
             $lastToken = Token::whereDate('created_at', $today)->orderBy('id', 'desc')->first();
 
@@ -94,7 +84,66 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
             // set customer queue
             $token->customerQueue()->create([
-                'type' => CustomerQueue::RECEPTION_VERIFICATION_QUEUE,
+                'type' => CustomerQueue::DOCUMENT_VERIFICATION_QUEUE,
+            ]);
+
+            // set queue status log
+            $hbl->addQueueStatus(
+                CustomerQueue::DOCUMENT_VERIFICATION_QUEUE,
+                $hbl->consignee_id,
+                $token->id,
+                date('Y-m-d H:i:s', (time() - 60)),
+                now(),
+            );
+
+            // print token pdf
+            $customPaper = [0, 0, 283.80, 567.00];
+
+            $pdf = Pdf::loadView('pdf.customer.token', [
+                'token' => $token->load(['hbl' => function ($query) {
+                    $query->withoutGlobalScope(BranchScope::class);
+                }]),
+            ])->setPaper($customPaper);
+
+            $filename = $hbl->hbl_number.'.pdf';
+
+            return $pdf->download($filename);
+        }
+    }
+
+    public function createAndIssueTokenWithVerification(HBL $hbl, array $verificationData)
+    {
+        // create token
+        if ($hbl->consignee_id) {
+            // Get the current date
+            $today = Carbon::today();
+
+            // Get the last token created today
+            $lastToken = Token::whereDate('created_at', $today)->orderBy('id', 'desc')->first();
+
+            // Determine the token value
+            $tokenValue = $lastToken ? $lastToken->token + 1 : 1;
+
+            $token = Token::create([
+                'hbl_id' => $hbl->id,
+                'customer_id' => $hbl->consignee_id,
+                'receptionist_id' => auth()->id(),
+                'reference' => $hbl->reference,
+                'package_count' => $hbl->packages->count(),
+                'token' => $tokenValue,
+            ]);
+
+            // set customer queue
+            $customerQueue = $token->customerQueue()->create([
+                'type' => CustomerQueue::CASHIER_QUEUE,
+            ]);
+
+            // Store the reception verification data
+            $customerQueue->reception_verification()->create([
+                'is_checked' => $verificationData['is_checked'],
+                'note' => $verificationData['note'] ?? null,
+                'verified_by' => auth()->id(),
+                'token_id' => $token->id,
             ]);
 
             // set queue status log
@@ -116,9 +165,30 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ])->setPaper($customPaper);
 
             $filename = $hbl->hbl_number.'.pdf';
+            $pdfPath = storage_path('app/public/tokens/'.$filename);
 
-            return $pdf->download($filename);
+            // Ensure directory exists
+            if (!file_exists(dirname($pdfPath))) {
+                mkdir(dirname($pdfPath), 0755, true);
+            }
+
+            // Save PDF to storage
+            $pdf->save($pdfPath);
+
+            // Return JSON response with token data and PDF URL
+            return response()->json([
+                'success' => true,
+                'message' => 'Token issued successfully',
+                'token' => [
+                    'id' => $token->id,
+                    'token_number' => $token->token,
+                    'reference' => $token->reference,
+                ],
+                'pdf_url' => asset('storage/tokens/'.$filename),
+            ]);
         }
+
+        return response()->json(['success' => false, 'message' => 'HBL has no consignee'], 400);
     }
 
     public function getHBLsWithPackages()
