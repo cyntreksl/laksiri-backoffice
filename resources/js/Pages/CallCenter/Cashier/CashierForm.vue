@@ -36,6 +36,14 @@ const props = defineProps({
     doCharge: {
         type: Number,
         default: null
+    },
+    branch: {
+        type: Object,
+        default: null
+    },
+    currencyRate : {
+        type: Number,
+        default: 1.0
     }
 })
 
@@ -132,7 +140,8 @@ const form = useForm({
 });
 
 const handleUpdatePayment = () => {
-    if (form.paid_amount < (paymentRecord.value.grand_total - hbl.value.paid_amount)) {
+    const outstandingAmount = parseFloat((paymentRecord.value.grand_total - hbl.value.paid_amount) * props.currencyRate);
+    if (form.paid_amount < outstandingAmount) {
         push.error('Please pay full amount');
     } else {
         form.post(route("call-center.cashier.store"), {
@@ -247,11 +256,11 @@ const handleUpdatePayment = () => {
                                         </div>
                                         <div>
                                             <p class="text-sm font-medium text-gray-600">Total Amount</p>
-                                            <p class="text-xs text-gray-500">Full invoice total</p>
+                                            <p class="text-xs text-gray-500">{{ parseFloat(paymentRecord.grand_total).toFixed(2) }} x {{ props.currencyRate }}</p>
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-xl font-bold text-gray-900">{{ currencyCode }} {{ parseFloat(paymentRecord.grand_total).toFixed(2) }}</p>
+                                        <p class="text-xl font-bold text-gray-900">{{ currencyCode }} {{ parseFloat(paymentRecord.grand_total * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
                                     </div>
                                 </div>
 
@@ -263,11 +272,11 @@ const handleUpdatePayment = () => {
                                         </div>
                                         <div>
                                             <p class="text-sm font-medium text-gray-600">Paid Amount</p>
-                                            <p class="text-xs text-gray-500">Amount received</p>
+                                            <p class="text-xs text-gray-500">{{ parseFloat(hbl.paid_amount).toFixed(2) }} x {{ props.currencyRate }}</p>
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-xl font-bold text-green-700">{{ currencyCode }} {{ parseFloat(hbl.paid_amount).toFixed(2) }}</p>
+                                        <p class="text-xl font-bold text-green-700">{{ currencyCode }} {{ parseFloat(hbl.paid_amount * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
                                     </div>
                                 </div>
 
@@ -282,13 +291,13 @@ const handleUpdatePayment = () => {
                                         </div>
                                         <div>
                                             <p class="text-sm font-medium text-gray-600">Outstanding</p>
-                                            <p class="text-xs text-gray-500">Remaining balance</p>
+                                            <p class="text-xs text-gray-500">{{ (paymentRecord.grand_total - hbl.paid_amount).toFixed(2) }} x {{ props.currencyRate }}</p>
                                         </div>
                                     </div>
                                     <div class="text-right">
                                         <p class="text-xl font-bold"
                                            :class="(paymentRecord.grand_total - hbl.paid_amount) > 0 ? 'text-orange-700' : 'text-green-700'">
-                                            {{ currencyCode }} {{ (paymentRecord.grand_total - hbl.paid_amount).toFixed(2) }}
+                                            {{ currencyCode }} {{ parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                                         </p>
                                     </div>
                                 </div>
@@ -363,12 +372,13 @@ const handleUpdatePayment = () => {
                         <div class="grid grid-cols-1 gap-5 mt-3">
                             <div v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0">
                                 <IftaLabel>
-                                    <InputNumber v-model="form.paid_amount" :max="(paymentRecord.grand_total - hbl.paid_amount)"
-                                                 :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="do-charge"
+                                    <InputNumber v-model="form.paid_amount" :max="parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate)"
+                                                 :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="paid-amount"
                                                  min="0" step="any"
                                                  variant="filled"/>
-                                    <label for="do-charge">Amount</label>
+                                    <label for="paid-amount">Amount ({{ currencyCode }})</label>
                                 </IftaLabel>
+                                <div class="text-xs text-gray-500 mt-1">Outstanding: {{ currencyCode }} {{ parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
                                 <InputError :message="form.errors.paid_amount"/>
                             </div>
 

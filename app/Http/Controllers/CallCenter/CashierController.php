@@ -6,6 +6,7 @@ use App\Actions\Branch\GetBranchById;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CallCenter\CashierRepositoryInterface;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
+use App\Models\Currency;
 use App\Models\CustomerQueue;
 use App\Models\HBL;
 use Illuminate\Http\Request;
@@ -46,12 +47,15 @@ class CashierController extends Controller
         $hbl = HBL::withoutGlobalScopes()->where('reference', $customerQueue->token->reference)->first();
 
         $branch = GetBranchById::run($hbl->branch_id);
+        $currencyRate = Currency::where('currency_symbol', $branch->currency_symbol)->first()?->sl_rate ?? 1;
 
         return Inertia::render('CallCenter/Cashier/CashierForm', [
             'customerQueue' => $customerQueue,
             'hblId' => $hbl->id,
             'hbl' => $hbl,
             'doCharge' => $branch->do_charge,
+            'branch' => $branch,
+            'currencyRate' => $currencyRate,
         ]);
     }
 
