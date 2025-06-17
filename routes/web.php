@@ -55,6 +55,7 @@ Route::middleware([
         require_once __DIR__.'/web/call-center/examination.php';
         require_once __DIR__.'/web/call-center/boned-area.php';
         require_once __DIR__.'/web/call-center/reception.php';
+        require_once __DIR__.'/web/call-center/tokens.php';
     });
 
     // finance routes
