@@ -15,22 +15,25 @@ class RolePermissionSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create roles
-        Role::updateOrCreate(['name' => 'super-admin']);
-        Role::updateOrCreate(['name' => 'admin']);
-        Role::updateOrCreate(['name' => 'empty']);
-        Role::updateOrCreate(['name' => 'viewer']);
-        Role::updateOrCreate(['name' => 'driver']);
-        Role::updateOrCreate(['name' => 'customer']);
-        Role::updateOrCreate(['name' => 'call center']);
-        Role::updateOrCreate(['name' => 'boned area']);
-        Role::updateOrCreate(['name' => 'finance Team']);
-        Role::updateOrCreate(['name' => 'front office staff']);
-        Role::updateOrCreate(['name' => 'clearance team']);
-        Role::updateOrCreate(['name' => 'gate-security']);
+//        Role::updateOrCreate(['name' => 'super-admin']);
+//        Role::updateOrCreate(['name' => 'admin']);
+//        Role::updateOrCreate(['name' => 'empty']);
+//        Role::updateOrCreate(['name' => 'viewer']);
+//        Role::updateOrCreate(['name' => 'driver']);
+//        Role::updateOrCreate(['name' => 'customer']);
+//        Role::updateOrCreate(['name' => 'call center']);
+//        Role::updateOrCreate(['name' => 'boned area']);
+//        Role::updateOrCreate(['name' => 'finance Team']);
+//        Role::updateOrCreate(['name' => 'front office staff']);
+//        Role::updateOrCreate(['name' => 'clearance team']);
+//        Role::updateOrCreate(['name' => 'gate-security']);
+//
+//        $this->command->info('Default Roles added.');
+//
+//        $this->assignPermissions();
 
-        $this->command->info('Default Roles added.');
+        $this->createPermissionIfNotExsists();
 
-        $this->assignPermissions();
     }
 
     protected function assignPermissions(): void
@@ -115,7 +118,7 @@ class RolePermissionSeeder extends Seeder
                     'guard_name' => 'web',
                 ]);
                 if (in_array($permissionGroup, $allowedAdminPermissionGroups)) {
-                    if (! in_array($permission->name, $excludedAdminPermissions)) {
+                    if (!in_array($permission->name, $excludedAdminPermissions)) {
                         $adminRole->givePermissionTo($permission);
                     }
                 }
@@ -674,5 +677,20 @@ class RolePermissionSeeder extends Seeder
                 ],
             ],
         ];
+    }
+
+    public function createPermissionIfNotExsists()
+    {
+        foreach (self::defaultPermissions() as $permissionGroup) {
+            foreach ($permissionGroup['permissions'] as $permName) {
+                $permission = Permission::updateOrCreate([
+                    'name' => $permName,
+                    'group_name' => $permissionGroup['group_name'],
+                    'guard_name' => 'web',
+                ]);
+            }
+
+            $this->command->info("Permission group '{$permissionGroup['group_name']}' with permissions created or updated.");
+        }
     }
 }
