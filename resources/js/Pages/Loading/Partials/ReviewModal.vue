@@ -89,10 +89,7 @@ const handleCreateLoadedContainer = (printTallySheet) => {
             if(printTallySheet){
                 window.location.href = route("loading.containers.tally-sheet-downloads", form.container_id);
             }
-            router.visit(route("loading.loading-points.index", {
-                'container': route().params.container,
-                'cargoType': route().params.cargoType,
-            }));
+            router.visit(route("loading.loaded-containers.index"));
         },
         onError: () => {
             push.error('Something went to wrong!');
