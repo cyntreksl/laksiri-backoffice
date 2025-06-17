@@ -72,7 +72,6 @@ const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const showConfirmViewCallFlagModal = ref(false);
 const hblName = ref("");
-const expandedRows = ref({});
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -433,7 +432,6 @@ const exportCSV = () => {
                     <DataTable
                         ref="dt"
                         v-model:contextMenuSelection="selectedHBL"
-                        v-model:expandedRows="expandedRows"
                         v-model:filters="filters"
                         :globalFilterFields="['reference', 'hbl', 'hbl_name', 'email', 'address', 'contact_number', 'consignee_name', 'consignee_address', 'consignee_contact', 'cargo_type', 'hbl_type', 'warehouse', 'status', 'hbl_number']"
                         :loading="loading"
@@ -503,8 +501,6 @@ const exportCSV = () => {
 
                         <template #loading> Loading hbl data. Please wait.</template>
 
-                        <Column expander style="width: 5rem" />
-
                         <Column field="hbl_number" header="HBL" sortable>
                             <template #body="slotProps">
                                 <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
@@ -557,13 +553,31 @@ const exportCSV = () => {
 
                         <Column field="consignee_address" header="Consignee Address"></Column>
 
-                        <template #expansion="{data}">
-                            <div class="grid grid-cols-3 p-4">
-                                <InfoDisplay v-if="data.tokens" :value="data.tokens.token_number" label="Token" />
-                                <InfoDisplay v-if="data.tokens" :value="data.tokens.queue_type" label="Queue Type" />
-                                <InfoDisplay v-if="data.finance_status" :value="data.finance_status" label="Finance Status" />
-                            </div>
-                        </template>
+                        <Column field="tokens.queue_type" header="Queue Type">
+                            <template #body="slotProps">
+                                <Tag v-if="slotProps.data.tokens" :value="slotProps.data.tokens.queue_type" severity="info" class="text-sm whitespace-nowrap"></Tag>
+                                <span v-else class="text-gray-400">-</span>
+                            </template>
+                        </Column>
+
+                        <Column field="tokens.token_number" header="Token Number">
+                            <template #body="slotProps">
+                                <span v-if="slotProps.data.tokens"
+                                      class="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-white bg-blue-500 rounded-full">
+                                    {{ slotProps.data.tokens.token_number }}
+                                </span>
+                                <span v-else class="text-gray-400">-</span>
+                            </template>
+                        </Column>
+
+
+
+                        <Column field="finance_status" header="Finance Status">
+                            <template #body="slotProps">
+                                <Tag v-if="slotProps.data.finance_status" :value="slotProps.data.finance_status" severity="success" class="text-sm"></Tag>
+                                <span v-else class="text-gray-400">-</span>
+                            </template>
+                        </Column>
 
                         <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs. </template>
                     </DataTable>
