@@ -1040,7 +1040,7 @@ export default {
                             0,
                             {
                                 title: "Gate Pass Management",
-                                route: "container-payment.request",
+                                route: "gate-control.outbound-gate-passes.index",
                             }
                         );
                     }

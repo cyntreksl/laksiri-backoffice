@@ -9,6 +9,9 @@ import Button from "primevue/button";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
+import {router} from "@inertiajs/vue3";
+import {push} from "notivue";
+import {useConfirm} from "primevue/useconfirm";
 
 const baseUrl = ref("/call-center/examination/gate-pass/list");
 const loading = ref(true);
@@ -17,6 +20,7 @@ const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
 const dt = ref();
+const confirm = useConfirm();
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -34,15 +38,60 @@ const fetchTokens = async (page = 1, search = "", sortField = 'created_at', sort
                 sort_order: sortOrder === 1 ? "asc" : "desc",
             }
         });
-        tokens.value = response.data.data;
-        totalRecords.value = response.data.meta.total;
-        currentPage.value = response.data.meta.current_page;
+
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date().toISOString().split('T')[0];
+
+        // Filter tokens where `created_at` matches today's date
+        tokens.value = response.data.data.filter(token => {
+            const tokenDate = new Date(token.created_at).toISOString().split('T')[0];
+            return tokenDate === today;
+        });
+
+        totalRecords.value = tokens.value.length;
+        currentPage.value = 1;
     } catch (error) {
         console.error("Error fetching tokens:", error);
     } finally {
         loading.value = false;
     }
 };
+
+const markAsDeparted = async (id) => {
+    confirm.require({
+        message: `Would you like to mark the token as departed from the warehouse?`,
+        header: `Mark as Departed?`,
+        icon: 'pi pi-directions-alt',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Mark as Departed',
+            severity: 'success'
+        },
+        accept: () => {
+            router.put(
+                route("gate-control.outbound-gate-passes.mark-as-departed", id),
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        push.success(`Operation Successfully!`);
+                        fetchTokens(currentPage.value);
+                    },
+                    onError: () => {
+                        push.error("Something went to wrong!");
+                    },
+                }
+            );
+        },
+        reject: () => {
+        }
+    });
+}
 
 const debouncedFetchTokens = debounce((searchValue) => {
     fetchTokens(1, searchValue);
@@ -103,7 +152,7 @@ const exportCSV = () => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Gate Pass Tokens
+                                    Outbound Gate Pass Tokens
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -151,7 +200,9 @@ const exportCSV = () => {
 
                         <Column header="">
                             <template #body="slotProps">
-                                <div v-if="slotProps.data.departed_at" class="space-y-1">
+                                <Button v-if="slotProps.data.departed_at === null" aria-label="Info" icon="pi pi-eye" rounded severity="info" size="small" type="button" variant="text" @click="markAsDeparted(slotProps.data.id)" />
+
+                                <div v-else class="space-y-1">
                                     <!-- Status indicator with icon -->
                                     <div class="flex items-center gap-1.5 text-green-600">
                                         <i class="ti ti-check text-lg"></i>

@@ -86,4 +86,21 @@ class ExaminationRepository implements ExaminationRepositoryInterface
             ],
         ]);
     }
+
+    public function markAsDeparted(CustomerQueue $customerQueue)
+    {
+        try {
+            DB::beginTransaction();
+
+            $customerQueue->token->update([
+                'departed_at' => now(),
+                'departed_by' => auth()->id(),
+            ]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception('Failed to create examination record when releasing hbl packages: '.$e->getMessage());
+        }
+    }
 }

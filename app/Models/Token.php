@@ -17,7 +17,7 @@ class Token extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'hbl_id', 'customer_id', 'receptionist_id', 'reference', 'package_count', 'token',
+        'hbl_id', 'customer_id', 'receptionist_id', 'reference', 'package_count', 'token', 'departed_by', 'departed_at',
     ];
 
     public function getActivitylogOptions(): LogOptions
