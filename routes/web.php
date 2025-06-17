@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HBLController;
+use App\Http\Controllers\ThirdPartyShipmentController;
 use App\Http\Controllers\WhatsappController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,9 @@ Route::middleware([
     Route::name('clearance.')->prefix('clearance')->group(function () {
         require_once __DIR__.'/web/clearance/vessel-schedule.php';
     });
+
+    Route::resource('third-party-shipments', ThirdPartyShipmentController::class);
+
 });
 
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);

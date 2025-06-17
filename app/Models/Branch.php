@@ -39,6 +39,11 @@ class Branch extends Model
         'is_third_party_agent',
     ];
 
+    public function scopeThirdPartyAgents($query)
+    {
+        return $query->where('is_third_party_agent', true);
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->logOnlyDirty();
