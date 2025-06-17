@@ -40,7 +40,7 @@ watch(
                 <template #content>
                     <div class="flex items-center space-x-5">
                         <p class="text-3xl uppercase font-normal">
-                            {{ $page.props.currentBranch.name }}
+                            {{ hbl?.branch.name }}
                         </p>
                         <i class="pi pi-arrow-right"></i>
                         <p class="text-3xl uppercase font-normal">

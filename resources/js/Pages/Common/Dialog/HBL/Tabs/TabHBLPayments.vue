@@ -1,6 +1,6 @@
 <script setup>
 import {usePage} from "@inertiajs/vue3";
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import Card from "primevue/card";
 
 const props = defineProps({
@@ -19,13 +19,24 @@ const props = defineProps({
 });
 
 const page = usePage();
-const isPrepaid = ref(page.props.currentBranch.is_prepaid)
+const isPrepaid = ref(props.hbl?.branch?.is_prepaid)
 const currencyRate = ref(
     page.props.currentBranchCurrencyRate && page.props.currentBranchCurrencyRate.sl_rate
         ? page.props.currentBranchCurrencyRate.sl_rate
         : 1
 )
-const currencySymbol = ref(page.props.currentBranch.currency_symbol || '')
+const currencySymbol = ref(props.hbl?.branch?.currency_symbol || '')
+
+watch(
+    () => props.hbl.branch,
+    (newBranch) => {
+        if (newBranch) {
+            isPrepaid.value = newBranch.is_prepaid ?? false;
+            currencySymbol.value = newBranch.currency_symbol ?? '';
+        }
+    },
+    { immediate: true }
+);
 
 const formatCurrency = (amount) => {
     const symbol = isPrepaid.value ? 'LKR' : currencySymbol.value;
