@@ -590,8 +590,6 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-
-
                         <Column field="finance_status" header="Finance Status">
                             <template #body="slotProps">
                                 <Tag v-if="slotProps.data.finance_status" :value="slotProps.data.finance_status" severity="success" class="text-sm"></Tag>

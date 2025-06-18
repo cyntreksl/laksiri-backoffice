@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Interfaces\TokenRepositoryInterface;
+use App\Models\ReceptionVerification;
+use App\Models\Token;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -28,5 +30,29 @@ class TokenController extends Controller
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'deliveryType', 'status']);
 
         return $this->tokenRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function show(Token $token)
+    {
+        $hbl = $token->hbl;
+
+        $documents = ReceptionVerification::reception_verification_documents();
+
+        if ($hbl->hbl_type === 'UPB') {
+            $documents = array_filter($documents, fn ($doc) => $doc !== 'NIC');
+        } else {
+            $documents = array_filter($documents, fn ($doc) => $doc !== 'Passport');
+        }
+
+        // Get all queue logs for this token
+        $queueLogs = $token->queueLogs;
+
+        return Inertia::render('Token/ShowToken', [
+            'token' => $token,
+            'hblId' => $token->hbl_id,
+            'verificationDocuments' => $documents,
+            'customerQueue' => $token->customerQueue,
+            'queueLogs' => $queueLogs,
+        ]);
     }
 }

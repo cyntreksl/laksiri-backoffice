@@ -22,6 +22,7 @@ class TokenResource extends JsonResource
             'token' => $this->token,
             'reception' => $this->reception->name,
             'package_count' => $this->package_count,
+            'finance_status' => $this->hbl->is_finance_release_approved ? 'Approved' : 'Not Approved',
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
         ];
     }
