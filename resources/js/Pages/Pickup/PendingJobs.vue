@@ -446,7 +446,7 @@ const handleConfirmDriverRemove = (pickupId) => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Pending Jobs
+                                    Pending Jobs ({{ pickups ? pickups.length : 0}})
                                 </div>
                                 <Button v-if="$page.props.user.permissions.includes('pickups.create')" icon="pi pi-arrow-right"
                                         icon-pos="right"
