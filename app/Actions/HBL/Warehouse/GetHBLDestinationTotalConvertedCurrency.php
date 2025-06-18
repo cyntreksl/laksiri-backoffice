@@ -3,12 +3,10 @@
 namespace App\Actions\HBL\Warehouse;
 
 use App\Actions\Branch\GetBranchById;
-use App\Actions\User\GetUserCurrentBranch;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Models\Currency;
 use App\Models\Tax;
 use App\Services\GatePassChargesService;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -16,85 +14,85 @@ class GetHBLDestinationTotalConvertedCurrency
 {
     use AsAction;
 
-    public function handle($cargoType,int $packageCount,float $grandVolume ,float $grandWeight= 0.0)
+    public function handle($cargoType, int $packageCount, float $grandVolume, float $grandWeight = 0.0)
     {
-//        try {
-            $service = new GatePassChargesService($cargoType);
+        //        try {
+        $service = new GatePassChargesService($cargoType);
 
-            $handlingCharges = $this->calculateHandlingCharges($service, $packageCount);
-            $slpaCharge = $this->calculateSlpaCharge($service, $grandVolume);
-            $bondCharge = $this->calculateBondCharge($service, $grandVolume, $grandWeight);
+        $handlingCharges = $this->calculateHandlingCharges($service, $packageCount);
+        $slpaCharge = $this->calculateSlpaCharge($service, $grandVolume);
+        $bondCharge = $this->calculateBondCharge($service, $grandVolume, $grandWeight);
 
-            $totalAmount = $handlingCharges + $slpaCharge + $bondCharge;
+        $totalAmount = $handlingCharges + $slpaCharge + $bondCharge;
 
-            $taxes = Tax::whereIsActive(true)
-                ->get();
+        $taxes = Tax::whereIsActive(true)
+            ->get();
 
-            $totalTax = 0.0;
-            foreach ($taxes as $tax) {
-                $taxAmount = ($totalAmount * $tax->rate) / 100;
-                $totalTax += $taxAmount;
-            }
+        $totalTax = 0.0;
+        foreach ($taxes as $tax) {
+            $taxAmount = ($totalAmount * $tax->rate) / 100;
+            $totalTax += $taxAmount;
+        }
 
-            $totalWithTax = $totalAmount + $totalTax;
+        $totalWithTax = $totalAmount + $totalTax;
 
-            $branch = GetBranchById::run(GetUserCurrentBranchID::run());
-            $currencyRate = Currency::whereCurrencySymbol($branch->currency_symbol)
-                ->latest()
-                ->first();
+        $branch = GetBranchById::run(GetUserCurrentBranchID::run());
+        $currencyRate = Currency::whereCurrencySymbol($branch->currency_symbol)
+            ->latest()
+            ->first();
 
-            $slRate =  1;
-            $currencySymbol =$branch->currency_symbol;
+        $slRate = 1;
+        $currencySymbol = $branch->currency_symbol;
 
-            $convertedHandlingCharges = $handlingCharges;
-            $convertedSlpaCharge = $slpaCharge;
-            $convertedBondCharge =$bondCharge;
-            $convertedTotalAmount = $totalAmount;
-            $convertedTotalTax = $totalTax;
-            $convertedTotalAmountWithTax = $totalWithTax;
+        $convertedHandlingCharges = $handlingCharges;
+        $convertedSlpaCharge = $slpaCharge;
+        $convertedBondCharge = $bondCharge;
+        $convertedTotalAmount = $totalAmount;
+        $convertedTotalTax = $totalTax;
+        $convertedTotalAmountWithTax = $totalWithTax;
 
-            if ($currencyRate instanceof Currency) {
-                $rate = $currencyRate->sl_rate;
-                $slRate = 1 / $rate;
-                $currencySymbol =$currencyRate->currency_symbol;
+        if ($currencyRate instanceof Currency) {
+            $rate = $currencyRate->sl_rate;
+            $slRate = 1 / $rate;
+            $currencySymbol = $currencyRate->currency_symbol;
 
-                $convertedHandlingCharges = $handlingCharges * $slRate;
-                $convertedSlpaCharge = $slpaCharge *$slRate;
-                $convertedBondCharge = $bondCharge * $slRate;
-                $convertedTotalAmount = $totalAmount * $slRate;
-                $convertedTotalTax = $totalTax * $slRate;
-                $convertedTotalAmountWithTax = $totalWithTax * $slRate;
+            $convertedHandlingCharges = $handlingCharges * $slRate;
+            $convertedSlpaCharge = $slpaCharge * $slRate;
+            $convertedBondCharge = $bondCharge * $slRate;
+            $convertedTotalAmount = $totalAmount * $slRate;
+            $convertedTotalTax = $totalTax * $slRate;
+            $convertedTotalAmountWithTax = $totalWithTax * $slRate;
 
-            }
+        }
 
-            return [
-                'handlingCharges' => $handlingCharges,
-                'slpaCharge' => $slpaCharge,
-                'bondCharge' => $bondCharge,
-                'dOCharge' => 0,
-                'totalAmount' => $totalAmount,
-                'totalTax' => $totalTax,
-                'totalAmountWithTax' => $totalWithTax,
-                'slRate' => $slRate,
-                'currencySymbol' => $currencySymbol,
-                'convertedHandlingCharges' => $convertedHandlingCharges,
-                'convertedSlpaCharge' => $convertedSlpaCharge,
-                'convertedBondCharge' => $convertedBondCharge,
-                'convertedTotalAmount' => $convertedTotalAmount,
-                'convertedTotalTax' => $convertedTotalTax,
-                'convertedTotalAmountWithTax' => $convertedTotalAmountWithTax,
-            ];
+        return [
+            'handlingCharges' => $handlingCharges,
+            'slpaCharge' => $slpaCharge,
+            'bondCharge' => $bondCharge,
+            'dOCharge' => 0,
+            'totalAmount' => $totalAmount,
+            'totalTax' => $totalTax,
+            'totalAmountWithTax' => $totalWithTax,
+            'slRate' => $slRate,
+            'currencySymbol' => $currencySymbol,
+            'convertedHandlingCharges' => $convertedHandlingCharges,
+            'convertedSlpaCharge' => $convertedSlpaCharge,
+            'convertedBondCharge' => $convertedBondCharge,
+            'convertedTotalAmount' => $convertedTotalAmount,
+            'convertedTotalTax' => $convertedTotalTax,
+            'convertedTotalAmountWithTax' => $convertedTotalAmountWithTax,
+        ];
 
-//        } catch (\Exception $e) {
-//            Log::error('Error calculating HBL destination total summary: '.$e->getMessage(), [
-//                'exception' => $e,
-//            ]);
-//
-//            return $this->getDefaultResponse();
-//        }
+        //        } catch (\Exception $e) {
+        //            Log::error('Error calculating HBL destination total summary: '.$e->getMessage(), [
+        //                'exception' => $e,
+        //            ]);
+        //
+        //            return $this->getDefaultResponse();
+        //        }
     }
 
-    private function calculateHandlingCharges(GatePassChargesService $service,int $packageCount): float
+    private function calculateHandlingCharges(GatePassChargesService $service, int $packageCount): float
     {
         try {
 

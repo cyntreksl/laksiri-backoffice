@@ -325,8 +325,8 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 $data['package_list'],
             );
 
-            $destinationCharge  = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'],$data['package_list_length'],$data['grand_total_volume'],$data['grand_total_weight']);
-            $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'],2);
+            $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $data['grand_total_weight']);
+            $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
             $result['sl_rate'] = $destinationCharge['slRate'];
 
             return response()->json($result);

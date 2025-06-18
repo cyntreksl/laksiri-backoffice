@@ -105,7 +105,7 @@ class GatePassChargesService
 
         return [
             'rate' => round($quantity * $this->charges['bond_charge'], 2),
-            'amount' => round($quantity * $this->charges['bond_charge'] , 2),
+            'amount' => round($quantity * $this->charges['bond_charge'], 2),
         ];
     }
 

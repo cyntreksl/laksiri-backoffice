@@ -2,6 +2,7 @@
 
 namespace App\Actions\HBL;
 
+use App\Models\Tax;
 use App\Services\GatePassChargesService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -22,24 +23,35 @@ class GetHBLDestinationTotalSummary
 
             $container = $this->getContainer($hbl);
             $arrivalDatesCount = $this->calculateArrivalDatesCount($container);
-            $vat = $this->getVatCharge($service, $hbl);
 
-            $handlingCharges = $this->calculateHandlingCharges($service, $hbl, $vat);
-            $slpaCharge = $this->calculateSlpaCharge($service, $hbl, $vat);
-            $bondCharge = $this->calculateBondCharge($service, $hbl, $vat);
-            $demurrageCharge = $this->calculateDemurrageCharge($service, $hbl, $vat, $container, $arrivalDatesCount);
+            $handlingCharges = $this->calculateHandlingCharges($service, $hbl);
+            $slpaCharge = $this->calculateSlpaCharge($service, $hbl);
+            $bondCharge = $this->calculateBondCharge($service, $hbl);
+            $demurrageCharge = $this->calculateDemurrageCharge($service, $hbl, $container, $arrivalDatesCount);
             $dOCharge = $this->getDOCharge($service, $hbl);
 
-            $totalAmount = $handlingCharges + $slpaCharge + $bondCharge + $demurrageCharge + $dOCharge;
+            $totalAmount = $handlingCharges + $slpaCharge + $bondCharge; // + $demurrageCharge + $dOCharge;
+
+            $taxes = Tax::whereIsActive(true)
+                ->get();
+
+            $totalTax = 0.0;
+            foreach ($taxes as $tax) {
+                $taxAmount = ($totalAmount * $tax->rate) / 100;
+                $totalTax += $taxAmount;
+            }
+
+            $totalWithTax = $totalAmount + $totalTax;
 
             return [
                 'handlingCharges' => $handlingCharges,
                 'slpaCharge' => $slpaCharge,
                 'bondCharge' => $bondCharge,
-                'demurrageCharge' => $demurrageCharge,
-                'dOCharge' => $dOCharge,
-                'vatCharge' => $vat,
+                'demurrageCharge' => 0,
+                'dOCharge' => 0,
                 'totalAmount' => $totalAmount,
+                'totalTax' => $totalTax,
+                'totalAmountWithTax' => $totalWithTax,
             ];
 
         } catch (\Exception $e) {
@@ -99,13 +111,12 @@ class GetHBLDestinationTotalSummary
         }
     }
 
-    private function calculateHandlingCharges(GatePassChargesService $service, $hbl, float $vat): float
+    private function calculateHandlingCharges(GatePassChargesService $service, $hbl, float $vat = 0): float
     {
         try {
             $packageCount = $hbl->packages->count();
-            $baseCharge = $service->handlingCharge($packageCount)['amount'] ?? 0.0;
 
-            return $baseCharge * (1 + $vat / 100);
+            return $service->handlingCharge($packageCount)['amount'] ?? 0.0;
         } catch (\Exception $e) {
             Log::warning('Error calculating handling charges: '.$e->getMessage());
 
@@ -113,13 +124,12 @@ class GetHBLDestinationTotalSummary
         }
     }
 
-    private function calculateSlpaCharge(GatePassChargesService $service, $hbl, float $vat): float
+    private function calculateSlpaCharge(GatePassChargesService $service, $hbl): float
     {
         try {
             $totalVolume = $hbl->packages->sum('volume');
-            $baseCharge = $service->portCharge($totalVolume)['amount'] ?? 0.0;
 
-            return $baseCharge * (1 + $vat / 100);
+            return $service->portCharge($totalVolume)['amount'] ?? 0.0;
         } catch (\Exception $e) {
             Log::warning('Error calculating SLPA charge: '.$e->getMessage());
 
@@ -127,14 +137,13 @@ class GetHBLDestinationTotalSummary
         }
     }
 
-    private function calculateBondCharge(GatePassChargesService $service, $hbl, float $vat): float
+    private function calculateBondCharge(GatePassChargesService $service, $hbl): float
     {
         try {
             $totalVolume = $hbl->packages->sum('volume');
             $totalWeight = $hbl->packages->sum('weight');
-            $baseCharge = $service->bondCharge($totalVolume, $totalWeight)['amount'] ?? 0.0;
 
-            return $baseCharge * (1 + $vat / 100);
+            return $service->bondCharge($totalVolume, $totalWeight)['amount'] ?? 0.0;
         } catch (\Exception $e) {
             Log::warning('Error calculating bond charge: '.$e->getMessage());
 
@@ -145,7 +154,6 @@ class GetHBLDestinationTotalSummary
     private function calculateDemurrageCharge(
         GatePassChargesService $service,
         $hbl,
-        float $vat,
         $container,
         int $arrivalDatesCount
     ): float {
@@ -156,9 +164,8 @@ class GetHBLDestinationTotalSummary
         try {
             $totalVolume = $hbl->packages->sum('volume');
             $totalWeight = $hbl->packages->sum('weight');
-            $baseCharge = $service->demurrageCharge($arrivalDatesCount, $totalVolume, $totalWeight)['amount'] ?? 0.0;
 
-            return $baseCharge * (1 + $vat / 100);
+            return $service->demurrageCharge($arrivalDatesCount, $totalVolume, $totalWeight)['amount'] ?? 0.0;
         } catch (\Exception $e) {
             Log::warning('Error calculating demurrage charge: '.$e->getMessage());
 
