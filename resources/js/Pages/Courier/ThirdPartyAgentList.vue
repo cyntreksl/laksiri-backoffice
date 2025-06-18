@@ -29,7 +29,7 @@ defineProps({
     }
 });
 
-const baseUrl = ref("/couriers/third-party-agents/list");
+const baseUrl = ref("/couriers/management/third-party-agents/list");
 const loading = ref(true);
 const thirdPartyAgents = ref([]);
 const selectedThirdPartyAgent = ref(null);
