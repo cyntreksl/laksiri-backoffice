@@ -177,13 +177,6 @@ const clearFilter = () => {
                         </template>
                     </Column>
 
-                    <Column field="finance_status" header="Finance Status">
-                        <template #body="slotProps">
-                            <Tag v-if="slotProps.data.finance_status" :severity="slotProps.data.finance_status === 'Approved' ? 'success' : 'danger'" :value="slotProps.data.finance_status" class="text-sm"></Tag>
-                            <span v-else class="text-gray-400">-</span>
-                        </template>
-                    </Column>
-
                     <Column field="created_at" header="Created At"></Column>
 
                     <Column field="" style="width: 10%">
