@@ -19,7 +19,7 @@ class DownloadHBLPDF
             'logoPath' => GetSettings::run()['logo_url'] ?? null,
         ])->setPaper('a4');
 
-        $filename = $hbl->hbl.'.pdf';
+        $filename = $hbl->hbl_number.'.pdf';
 
         return $pdf->download($filename);
     }
