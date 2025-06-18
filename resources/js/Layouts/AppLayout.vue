@@ -214,6 +214,22 @@
                                 <i class="ti ti-truck-loading text-2xl"></i>
                             </a>
 
+                            <!-- Third Part Shipments -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('third_party_shipments')) && usePage().props.currentBranch.type === 'Destination'"
+                                :class="[
+                activeMenu === 'third-party-shipments' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Third Party Shipments'"
+                                @click="
+                setMenu('third-party-shipments');
+                openSideBar();
+              "
+                            >
+                                <i class="ti ti-tir text-2xl"></i>
+                            </a>
+
                             <!-- Departure Branch Arrivals -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('arrival')) && $page.props.currentBranch.type === 'Departure'"
@@ -332,6 +348,8 @@
                             >
                                 <i class="ti ti-tag text-2xl"></i>
                             </Link>
+
+
                         </template>
                     </div>
 
@@ -1312,6 +1330,25 @@ export default {
                         ...loadingMenu
                     );
                     changeSidePanelTitle("Loading");
+                    break;
+                case "third-party-shipments":
+                    let thirdPartyShipmentMenu = [];
+                    if (usePage().props.user.permissions.includes("third_party_shipments.create")) {
+                        thirdPartyShipmentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Create Third Party Shipment",
+                                route: "third-party-shipments.create",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...thirdPartyShipmentMenu
+                    );
+                    changeSidePanelTitle("Third Party Shipments");
                     break;
                 case "arrival":
                     let arrivalMenu = [];

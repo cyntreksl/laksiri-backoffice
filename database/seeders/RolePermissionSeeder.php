@@ -72,6 +72,7 @@ class RolePermissionSeeder extends Seeder
             'Courier',
             'Courier Agents',
             'Settings',
+            'Third Party Shipment',
         ];
 
         $excludedAdminPermissions = [
@@ -675,6 +676,17 @@ class RolePermissionSeeder extends Seeder
                 'group_name' => 'Token',
                 'permissions' => [
                     'manage_tokens',
+                ],
+            ],
+
+            [
+                'group_name' => 'Third Party Shipment',
+                'permissions' => [
+                    'third_party_shipments.index',
+                    'third_party_shipments.create',
+                    'third_party_shipments.edit',
+                    'third_party_shipments.delete',
+                    'third_party_shipments.show',
                 ],
             ],
         ];
