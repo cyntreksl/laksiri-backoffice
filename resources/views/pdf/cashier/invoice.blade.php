@@ -178,8 +178,19 @@
         <!-- Payment Summary -->
         <div class="mb-3 grid grid-cols-2 gap-8">
             <div class="rounded-lg bg-gray-50 px-4 py-2">
-                <p class="mb-2 text-sm">VAT 18% included in the charges</p>
-                <p class="text-sm font-bold text-neutral-500">{{ $data['total_in_word'] }}</p>
+                @if (!empty($data['taxes']))
+                    <p class="text-sm font-medium text-gray-800">
+                        Following taxes are included in your charges:
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-gray-700">
+                        @foreach ($data['taxes'] as $tax)
+                            <li>
+                                <span>{{ $tax['name'] }}</span> {{ $tax['rate'] }}%
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+                <p class="text-sm font-bold text-neutral-500 mt-2">{{ $data['total_in_word'] }}</p>
             </div>
 
             <div>

@@ -179,6 +179,7 @@ class GetHBLDestinationTotalSummary
             if ($hbl->containers()->count() === 0) {
                 return 0.0;
             }
+
             return $service->dOCharge($hbl)['amount'] ?? 0.0;
         } catch (\Exception $e) {
             Log::warning('Error getting DO charge: '.$e->getMessage());

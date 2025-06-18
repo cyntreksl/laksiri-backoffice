@@ -60,7 +60,6 @@ class ContainerController extends Controller
         return $this->containerRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 
-
     public function ArrivedList(Request $request)
     {
         $limit = $request->input('per_page', 10);

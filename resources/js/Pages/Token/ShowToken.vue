@@ -221,14 +221,23 @@ const closeModal = () => {
                 <!-- HBL Summary Card -->
                 <Card class="mb-5">
                     <template #title>
-                        <div class="flex items-center gap-3">
-                            <Avatar class="bg-blue-100 text-blue-600" icon="ti ti-app-window" size="large" />
-                            <div>
-                                <div class="flex items-center">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <Avatar class="bg-blue-100 text-blue-600" icon="ti ti-app-window" size="large" />
+                                <div>
                                     <h3 class="text-xl font-semibold text-gray-900">HBL Details</h3>
-                                    <Button icon="pi pi-eye" variant="link" @click.prevent="showConfirmViewHBLModal = !showConfirmViewHBLModal"></Button>
+                                    <p class="text-sm text-gray-600">{{ hbl?.reference || 'N/A' }}</p>
                                 </div>
-                                <p class="text-sm text-gray-600">{{ hbl?.reference || 'N/A' }}</p>
+                            </div>
+                            <div class="space-x-2">
+                                <Button
+                                    :href="`/hbls/download/receipt/${hbl?.id}`"
+                                    as="a"
+                                    icon="pi pi-download"
+                                    label="Download Invoice"
+                                    severity="info"
+                                />
+                                <Button icon="pi pi-eye" label="Show HBL Details" @click.prevent="showConfirmViewHBLModal = !showConfirmViewHBLModal"></Button>
                             </div>
                         </div>
                     </template>

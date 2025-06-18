@@ -19,9 +19,9 @@ class CreateHBL
         $currencyRate = 1;
 
         $branch = GetBranchById::run($currentBranch);
-        $currencySymbol  = Currency::whereCurrencySymbol($branch->currency_symbol)->latest()->first();
+        $currencySymbol = Currency::whereCurrencySymbol($branch->currency_symbol)->latest()->first();
 
-        if ($currencySymbol instanceof Currency){
+        if ($currencySymbol instanceof Currency) {
             $currencyRate = $currencySymbol->sl_rate;
         }
 

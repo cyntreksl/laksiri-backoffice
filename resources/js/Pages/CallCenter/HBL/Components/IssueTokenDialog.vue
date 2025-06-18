@@ -1,9 +1,8 @@
 <script setup>
 import {ref, computed, watch} from "vue";
-import {useForm, usePage, router} from "@inertiajs/vue3";
+import {useForm, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import {useConfirm} from "primevue/useconfirm";
-import moment from "moment";
 import Dialog from "primevue/dialog";
 import Card from "primevue/card";
 import Button from "primevue/button";
@@ -14,7 +13,6 @@ import InputError from "@/Components/InputError.vue";
 import Divider from "primevue/divider";
 import Avatar from "primevue/avatar";
 import Tag from "primevue/tag";
-import Skeleton from "primevue/skeleton";
 import TokenSuccessModal from "./TokenSuccessModal.vue";
 
 const props = defineProps({
@@ -27,8 +25,6 @@ const props = defineProps({
         default: () => ({})
     }
 });
-
-
 
 const emit = defineEmits(['update:visible', 'token-issued']);
 
@@ -538,7 +534,7 @@ watch(() => props.visible, (newVal) => {
         </div>
 
                 <template #footer>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center pt-5">
                 <div v-if="!areAllDocumentsVerified" class="flex items-center gap-2 text-blue-600 mr-2">
                     <i class="pi pi-info-circle"></i>
                     <span class="text-sm">Document verification checklist helps track customer requirements</span>
@@ -555,6 +551,13 @@ watch(() => props.visible, (newVal) => {
                         outlined
                         @click="closeDialog"
                         :disabled="isProcessing"
+                    />
+                    <Button
+                        :href="`/hbls/download/receipt/${hbl?.id}`"
+                        as="a"
+                        icon="pi pi-download"
+                        label="Download Invoice"
+                        severity="info"
                     />
                     <Button
                         label="Issue Token"
