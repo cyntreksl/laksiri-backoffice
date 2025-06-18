@@ -1,5 +1,4 @@
 <script setup>
-import {usePage} from "@inertiajs/vue3";
 import {ref, watch} from "vue";
 import Card from "primevue/card";
 
@@ -34,13 +33,18 @@ watch(
 );
 
 const formatCurrency = (amount) => {
-    const symbol = isPrepaid.value ? currencySymbol.value  : 'LKR';
-    const rate = isPrepaid.value ? 1/currencyRate.value : (currencyRate.value);
+    const symbol = isPrepaid.value ? (currencySymbol.value || 'LKR') : 'LKR';
+    const rateRaw = isPrepaid.value ? (currencyRate.value || 1) : (currencyRate.value || 1);
+    const rate = isPrepaid.value ? (1 / rateRaw) : rateRaw;
+
+    const converted = amount * rate;
+    if (isNaN(converted)) return `${symbol} 0.00`;
+
     return `${symbol} ${new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
-    }).format(amount * rate)}`;
-}
+    }).format(converted)}`;
+};
 </script>
 
 <template>
