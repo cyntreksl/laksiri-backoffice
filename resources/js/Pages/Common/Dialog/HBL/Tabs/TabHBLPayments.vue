@@ -144,7 +144,7 @@ const formatCurrency = (amount) => {
                 <div class="flex items-center space-x-2">
                     <i class="ti ti-cash text-xl"></i>
                     <p class="text-xl uppercase font-normal">
-                        Destination
+                        Destination - I
                     </p>
                 </div>
 
@@ -187,32 +187,6 @@ const formatCurrency = (amount) => {
                     </div>
                 </div>
 
-                <div v-if="hblDestinationTotalSummary.demurrageCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
-                    <div class="flex min-w-0 gap-x-4">
-                        <div class="min-w-0 flex-auto">
-                            <p class="text-sm/6 font-semibold text-gray-900">Demurrage Charges</p>
-                        </div>
-                    </div>
-                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">
-                            {{formatCurrency(hblDestinationTotalSummary.demurrageCharge)}}
-                        </p>
-                    </div>
-                </div>
-
-                <div v-if="hblDestinationTotalSummary.dOCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
-                    <div class="flex min-w-0 gap-x-4">
-                        <div class="min-w-0 flex-auto">
-                            <p class="text-sm/6 font-semibold text-gray-900">DO Charges</p>
-                        </div>
-                    </div>
-                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">
-                            {{formatCurrency(hblDestinationTotalSummary.dOCharge)}}
-                        </p>
-                    </div>
-                </div>
-
                 <div v-if="hblDestinationTotalSummary.totalAmount" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
                         <div class="min-w-0 flex-auto">
@@ -225,6 +199,45 @@ const formatCurrency = (amount) => {
                         </p>
                     </div>
                 </div>
+            </template>
+        </Card>
+        <Card
+            class="!bg-white !border !border-neutral-300 !shadow-md !rounded-md mt-5"
+        >
+            <template #content>
+                <div class="flex items-center space-x-2">
+                    <i class="ti ti-cash text-xl"></i>
+                    <p class="text-xl uppercase font-normal">
+                        Destination - II
+                    </p>
+                </div>
+
+                <div class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                    <div class="flex min-w-0 gap-x-4">
+                        <div class="min-w-0 flex-auto">
+                            <p class="text-sm/6 font-semibold text-gray-900">Demurrage Charges</p>
+                        </div>
+                    </div>
+                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                        <p class="text-sm/6 text-gray-900">
+                          LKR  {{ hblTotalSummary.demurrageCharge? parseFloat(hblTotalSummary.demurrageCharge).toFixed(2) : '0.00' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                    <div class="flex min-w-0 gap-x-4">
+                        <div class="min-w-0 flex-auto">
+                            <p class="text-sm/6 font-semibold text-gray-900">DO Charges</p>
+                        </div>
+                    </div>
+                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                        <p class="text-sm/6 text-gray-900">
+                            LKR  {{ hblTotalSummary.dOCharge ? parseFloat(hblTotalSummary.dOCharge).toFixed(2) : '0.00' }}
+                        </p>
+                    </div>
+                </div>
+
             </template>
         </Card>
 

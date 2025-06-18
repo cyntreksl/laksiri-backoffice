@@ -30,7 +30,7 @@ class GetHBLDestinationTotalSummary
             $demurrageCharge = $this->calculateDemurrageCharge($service, $hbl, $container, $arrivalDatesCount);
             $dOCharge = $this->getDOCharge($service, $hbl);
 
-            $totalAmount = $handlingCharges + $slpaCharge + $bondCharge; // + $demurrageCharge + $dOCharge;
+            $totalAmount = $handlingCharges + $slpaCharge + $bondCharge + $demurrageCharge + $dOCharge;
 
             $taxes = Tax::whereIsActive(true)
                 ->get();
@@ -47,8 +47,8 @@ class GetHBLDestinationTotalSummary
                 'handlingCharges' => $handlingCharges,
                 'slpaCharge' => $slpaCharge,
                 'bondCharge' => $bondCharge,
-                'demurrageCharge' => 0,
-                'dOCharge' => 0,
+                'demurrageCharge' => $demurrageCharge,
+                'dOCharge' => $dOCharge,
                 'totalAmount' => $totalAmount,
                 'totalTax' => $totalTax,
                 'totalAmountWithTax' => $totalWithTax,
@@ -176,6 +176,9 @@ class GetHBLDestinationTotalSummary
     private function getDOCharge(GatePassChargesService $service, $hbl): float
     {
         try {
+            if ($hbl->containers()->count() === 0) {
+                return 0.0;
+            }
             return $service->dOCharge($hbl)['amount'] ?? 0.0;
         } catch (\Exception $e) {
             Log::warning('Error getting DO charge: '.$e->getMessage());
