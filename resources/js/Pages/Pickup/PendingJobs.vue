@@ -584,6 +584,10 @@ const handleConfirmDriverRemove = (pickupId) => {
 
                          <Column field="packages" header="Packages">
                             <template #body="slotProps">
+                                <div class="font-medium pb-2">
+                                    {{slotProps.data.notes}}
+                                </div>
+
                                 <div class="flex flex-wrap mb-1 gap-2">
                                     <template v-if="slotProps.data.package_types">
                                         <Chip v-for="(type, index) in parsePackageTypes(slotProps.data.package_types)" :key="index" :label="type" icon="pi pi-box"
