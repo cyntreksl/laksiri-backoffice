@@ -553,6 +553,11 @@ Breadcrumbs::for('call-center.tokens.index', function (BreadcrumbTrail $trail) {
     $trail->push('Tokens', route('call-center.tokens.index'));
 });
 
+Breadcrumbs::for('call-center.tokens.show', function (BreadcrumbTrail $trail, \App\Models\Token $token) {
+    $trail->parent('call-center.tokens.index');
+    $trail->push('Token Details', route('call-center.tokens.show', $token->id));
+});
+
 require_once __DIR__.'/call-center-breadcrumbs.php';
 require_once __DIR__.'/finance-breadcrumbs.php';
 require_once __DIR__.'/clearance-breadcrumbs.php';

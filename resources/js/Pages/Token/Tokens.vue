@@ -17,6 +17,7 @@ import IconField from "primevue/iconfield";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
 import moment from "moment";
+import Tag from "primevue/tag";
 
 const baseUrl = ref("/call-center/token-list");
 const loading = ref(true);
@@ -175,15 +176,19 @@ const clearFilter = () => {
                             </div>
                         </template>
                     </Column>
+
                     <Column field="created_at" header="Created At"></Column>
+
                     <Column field="" style="width: 10%">
                         <template #body="{ data }">
                             <Button
                                 class="mr-2"
-                                icon="pi pi-check"
+                                icon="pi pi-eye"
                                 rounded
+                                severity="info"
+                                variant="text"
                                 size="small"
-                                @click.prevent="() => router.visit(route('call-center.reception.create', data.id))"
+                                @click.prevent="() => router.visit(route('call-center.tokens.show', data.id))"
                             />
                         </template>
                     </Column>
