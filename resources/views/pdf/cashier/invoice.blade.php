@@ -112,12 +112,12 @@
                 <table class="w-full">
                     <thead>
                     <tr class="bg-blue-900 text-white">
-                        <th class="px-6 py-2 text-left text-lg font-bold">DESCRIPTION</th>
-                        <th class="px-6 py-2 text-right text-lg font-bold">RATE</th>
-                        <th class="px-6 py-2 text-right text-lg font-bold">AMOUNT</th>
+                        <th class="px-6 py-2 text-left font-bold">DESCRIPTION</th>
+                        <th class="px-6 py-2 text-right font-bold">RATE</th>
+                        <th class="px-6 py-2 text-right font-bold">AMOUNT</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody class="divide-y divide-gray-200 text-sm">
                     <tr>
                         <td class="px-6 py-1 font-medium">Sri Lanka Port Charges - Sea Cargo</td>
                         <td class="px-6 py-1 text-right">
@@ -163,7 +163,7 @@
                                 <div class="text-neutral-500">10.00</div>
                             </div>
                         </td>
-                        <td class="px-6 py-1 text-right text-lg font-bold text-neutral-500">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
+                        <td class="px-6 py-1 text-right text-neutral-500">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
                         <td class="px-6 py-1 text-xl font-bold">TOTAL</td>
