@@ -455,7 +455,7 @@ const handleConfirmDriverRemove = (pickupId) => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    {{userData}}'s Pickups
+                                    {{userData}}'s Pickups ({{ pickups ? pickups.length : 0}})
                                 </div>
                                 <Link v-if="$page.props.user.permissions.includes('pickups.create')" :href="route('pickups.create')">
                                     <PrimaryButton class="w-full">Create New Pending Job</PrimaryButton>
@@ -581,6 +581,10 @@ const handleConfirmDriverRemove = (pickupId) => {
 
                         <Column field="packages" header="Packages">
                             <template #body="slotProps">
+                                <div class="font-medium pb-2">
+                                    {{slotProps.data.notes}}
+                                </div>
+
                                 <div v-if="Array.isArray(slotProps.data.packages)" class="flex flex-wrap mb-1 gap-2">
                                     <Chip v-for="(type, index) in slotProps.data.packages" :key="index" :label="type.package_type" icon="pi pi-box"/>
                                 </div>

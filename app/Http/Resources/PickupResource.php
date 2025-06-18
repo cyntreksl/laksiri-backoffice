@@ -46,6 +46,7 @@ class PickupResource extends JsonResource
             'created_by' => $this->createdBy->name ?? '-',
             'hbl_number' => $this->hbl_number,
             'cr_number' => $this->cr_number,
+            'notes' => $this->notes,
             'status' => $this->status,
             'package_types' => Str::title($this->package_types),
         ];
