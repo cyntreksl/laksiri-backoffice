@@ -60,7 +60,7 @@ class PickupObserver
 
         if ($pickup->isDirty('status') && $pickup->status === PickupStatus::PROCESSING->value) {
             // Send notification email
-            $this->notificationMailRepository->sendCollectedCargoNotification($pickup);
+            // $this->notificationMailRepository->sendCollectedCargoNotification($pickup);
         }
     }
 }
