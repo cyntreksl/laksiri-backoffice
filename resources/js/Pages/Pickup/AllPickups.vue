@@ -463,7 +463,7 @@ const handleConfirmDriverRemove = (pickupId) => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    All Pickups
+                                    All Pickups ({{ pickups ? pickups.length : 0}})
                                 </div>
                                 <Button v-if="$page.props.user.permissions.includes('pickups.create')" icon="pi pi-arrow-right"
                                         icon-pos="right"
@@ -591,6 +591,10 @@ const handleConfirmDriverRemove = (pickupId) => {
 
                         <Column field="packages" header="Packages">
                             <template #body="slotProps">
+                                <div class="font-medium pb-2">
+                                    {{slotProps.data.notes}}
+                                </div>
+
                                 <div v-if="parsePackageTypes(slotProps.data.packages).length" class="flex flex-wrap mb-1 gap-2">
                                     <Chip v-for="(type, index) in parsePackageTypes(slotProps.data.packages)" :key="index" :label="typeof type === 'object' && type.package_type ? type.package_type : type" icon="pi pi-box"
                                     />
