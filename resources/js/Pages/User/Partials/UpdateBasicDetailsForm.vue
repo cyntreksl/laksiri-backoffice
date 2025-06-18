@@ -8,7 +8,8 @@ import Button from 'primevue/button';
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
 import IconField from "primevue/iconfield";
-import RadioButton from "primevue/radiobutton";
+import Select from "primevue/select";
+import {computed} from "vue";
 
 const props = defineProps({
     user: {
@@ -49,70 +50,27 @@ const handleUpdateUser = () => {
     });
 };
 
-const resolveRoleIcon = (role) => {
-    switch (role.toLowerCase()) {
-        case 'admin':
-            return {
-                icon: 'ti ti-user-shield',
-                color: 'text-red-500',
-            }
-        case 'viewer':
-            return {
-                icon: 'ti ti-eye-search',
-                color: 'text-orange-500',
-            }
-        case 'driver':
-            return {
-                icon: 'ti ti-steering-wheel',
-                color: 'text-lime-500',
-            }
-        case 'call center':
-            return {
-                icon: 'ti ti-device-landline-phone',
-                color: 'text-sky-500',
-            }
-        case 'bond warehouse staff':
-            return {
-                icon: 'ti ti-building-warehouse',
-                color: 'text-indigo-500',
-            }
-        case 'customer':
-            return {
-                icon: 'ti ti-user-heart',
-                color: 'text-pink-500',
-            }
-        case 'boned area':
-            return {
-                icon: 'ti ti-building-community',
-                color: 'text-rose-500',
-            }
-        case 'front office staff':
-            return {
-                icon: 'ti ti-building-estate',
-                color: 'text-violet-500',
-            }
-        case 'empty':
-            return {
-                icon: 'ti ti-mood-empty',
-                color: 'text-cyan-500',
-            }
-        case 'finance team':
-            return {
-                icon: 'ti ti-device-desktop-dollar',
-                color: 'text-teal-500',
-            }
-        case 'clearance team':
-            return {
-                icon: 'ti ti-backpack-off',
-                color: 'text-rose-500',
-            }
-        default:
-            return {
-                icon: 'ti ti-user-question',
-                color: 'text-stone-500',
-            }
-    }
+const formatRoleName = (name) => {
+    return name
+        .replace(/_/g, ' ') // Replace underscores with spaces
+        .replace(/-/g, ' ') // Replace hyphens with spaces
+        .split(' ') // Split into words
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
+        .join(' '); // Join back with spaces
 };
+
+// Filter roles based on branch type and format names
+const filteredRoles = computed(() => {
+    return props.roles
+        .filter(role => {
+            return usePage().props?.auth.user.active_branch_type !== 'destination' ||
+                (role.name !== 'call center' && role.name !== 'boned area');
+        })
+        .map(role => ({
+            ...role,
+            formattedName: formatRoleName(role.name)
+        }));
+});
 </script>
 
 <template>
@@ -141,7 +99,7 @@ const resolveRoleIcon = (role) => {
                         <InputError :message="form.errors.username"/>
                     </div>
 
-                    <div class="col-span-1 sm:col-span-2">
+                    <div>
                         <InputLabel value="Email"/>
                         <IconField>
                             <InputIcon class="pi pi-envelope"/>
@@ -150,18 +108,17 @@ const resolveRoleIcon = (role) => {
                         <InputError :message="form.errors.email"/>
                     </div>
 
-                    <div class="col-span-1 sm:col-span-2">
+                    <div>
                         <InputLabel value="Role"/>
-                        <div class="flex flex-wrap gap-4 mt-1">
-                            <div v-for="(role, index) in roles" :key="index" class="flex items-center gap-4">
-                                <RadioButton v-model="form.role_id" :input-id="role.name" :name="role.name"
-                                             :value="role.id"/>
-                                <label :for="role.name" class="capitalize cursor-pointer">
-                                    <i :class="[resolveRoleIcon(role.name).icon, resolveRoleIcon(role.name).color, 'mr-1 text-lg']"></i>
-                                    {{ role.name }}
-                                </label>
-                            </div>
-                        </div>
+                        <Select
+                            v-model="form.role_id"
+                            :options="filteredRoles"
+                            class="w-full"
+                            option-label="formattedName"
+                            option-value="id"
+                            placeholder="Select a role"
+                        >
+                        </Select>
                         <InputError :message="form.errors.role_id"/>
                     </div>
                 </div>
