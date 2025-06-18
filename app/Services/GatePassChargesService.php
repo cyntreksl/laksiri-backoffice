@@ -76,7 +76,7 @@ class GatePassChargesService
     {
         return [
             'rate' => round($this->charges['port_charge'] * $volume, 2),
-            'amount' => round($this->charges['port_charge'] * $volume * (1 + $this->vat / 100), 2),
+            'amount' => round($this->charges['port_charge'] * $volume, 2),
         ];
     }
 
@@ -89,7 +89,7 @@ class GatePassChargesService
     {
         return [
             'rate' => round($this->charges['handling_charge'] * $package_count, 2),
-            'amount' => round($this->charges['handling_charge'] * $package_count * (1 + $this->vat / 100), 2),
+            'amount' => round($this->charges['handling_charge'] * $package_count, 2),
         ];
     }
 
@@ -105,7 +105,7 @@ class GatePassChargesService
 
         return [
             'rate' => round($quantity * $this->charges['bond_charge'], 2),
-            'amount' => round($quantity * $this->charges['bond_charge'] * (1 + $this->vat / 100), 2),
+            'amount' => round($quantity * $this->charges['bond_charge'], 2),
         ];
     }
 

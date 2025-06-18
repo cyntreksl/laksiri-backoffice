@@ -31,6 +31,7 @@ use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
 use App\Actions\HBL\UpdateHBLPackages;
+use App\Actions\HBL\Warehouse\GetHBLDestinationTotalConvertedCurrency;
 use App\Actions\HBLDocument\DeleteDocument;
 use App\Actions\HBLDocument\DownloadDocument;
 use App\Actions\HBLDocument\UploadDocument;
@@ -323,6 +324,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 $data['is_active_package'],
                 $data['package_list'],
             );
+
+            $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $data['grand_total_weight']);
+            $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
+            $result['sl_rate'] = $destinationCharge['slRate'];
 
             return response()->json($result);
         }
