@@ -27,6 +27,7 @@ import moment from "moment";
 import RequestsList from "@/Pages/Clearance/VesselSchedule/RequestsList.vue";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import TreeTable from 'primevue/treetable';
+import ShipmentCreateDialog from "@/Pages/Clearance/VesselSchedule/Partials/ShipmentCreateDialog.vue";
 
 const props = defineProps({
     vesselSchedule: {
@@ -45,6 +46,10 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    warehouses: {
+        type: Object,
+        default: () => {},
+    },
 });
 
 const showConfirmLoadedShipmentModal = ref(false);
@@ -61,6 +66,7 @@ const showConfirmAddVesselModal = ref(false);
 const loadingContainerData = ref(false);
 const loadingPaymentData = ref(false);
 const selectedKey = ref();
+const showCreateShipmentDialog = ref(false);
 
 const form = useForm({
     container_id: selectedContainer.value.id ?? '',
@@ -406,6 +412,7 @@ const onNodeSelect = (event) => {
                     icon="pi pi-plus"
                     label="Create New Shipment"
                     size="small"
+                    @click="showCreateShipmentDialog = !showCreateShipmentDialog"
                 />
             </div>
         </div>
@@ -851,6 +858,7 @@ const onNodeSelect = (event) => {
                 </template>
             </Card>
         </div>
+
     </AppLayout>
 
     <LoadedShipmentDetailDialog :air-container-options="airContainerOptions" :container="selectedContainer"
@@ -865,5 +873,13 @@ const onNodeSelect = (event) => {
         @close="closeAddVesselModal"
         @reloadPage="reloadPage"
         @update:visible="showConfirmAddVesselModal = $event"
+    />
+
+    <ShipmentCreateDialog :sea-container-options="seaContainerOptions"
+                          :vessel-schedule="vesselSchedule"
+                          :visible="showCreateShipmentDialog"
+                          :warehouses="warehouses"
+                          @close="showCreateShipmentDialog = false"
+                          @update:visible="showCreateShipmentDialog = $event"
     />
 </template>

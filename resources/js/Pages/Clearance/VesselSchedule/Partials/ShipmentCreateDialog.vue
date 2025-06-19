@@ -1,7 +1,6 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
 import InputError from "@/Components/InputError.vue";
-import {ref, watchEffect} from "vue";
 import Card from 'primevue/card';
 import Button from "primevue/button";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -9,19 +8,33 @@ import InputText from "primevue/inputtext";
 import DatePicker from "primevue/datepicker";
 import moment from "moment";
 import {push} from "notivue";
-import Select from "primevue/select";
+import Dialog from "primevue/dialog";
+import SelectButton from 'primevue/selectbutton';
 
 const props = defineProps({
+    visible: {
+        type: Boolean,
+        default: false,
+    },
     cargoType: {
         type: String,
         default: "Sea Cargo",
     },
-    warehouse: 2,
-    airLines: {
+    vesselSchedule: {
+        type: Object,
+        default: () => ({}),
+    },
+    seaContainerOptions: {
         type: Array,
-        default: () => [],
+        required: true,
+    },
+    warehouses: {
+        type: Object,
+        default: () => {},
     },
 })
+
+const emit = defineEmits(["update:visible", 'close']);
 
 const form = useForm({
     cargo_type: props.cargoType,
@@ -46,17 +59,8 @@ const form = useForm({
     departure_time: "",
     arrival_time: "",
     cargo_class: "",
-    target_warehouse: props.warehouse,
-});
-
-const containerTypes = ref(props.seaContainerOptions);
-
-watchEffect(() => {
-    if (form.cargo_type === "Sea Cargo") {
-        containerTypes.value = props.seaContainerOptions;
-    } else {
-        containerTypes.value = props.airContainerOptions;
-    }
+    vessel_schedule_id: props.vesselSchedule?.id,
+    target_warehouse: "",
 });
 
 const handleCreate = () => {
@@ -76,7 +80,7 @@ const handleCreate = () => {
         onSuccess: (shipment) => {
             push.success('Container Created Successfully!')
             form.reset();
-            emit('containerCreated',true);
+            emit('close');
         },
         onError: () => console.log("error"),
         onFinish: () => console.log("finish"),
@@ -84,16 +88,34 @@ const handleCreate = () => {
         preserveState: true,
     });
 };
-
-const emit = defineEmits(['containerCreated']);
 </script>
 
 <template>
-        <form @submit.prevent="handleCreate">
-            <input type="hidden" v-model="form.target_warehouse"/>
+    <Dialog :style="{ width: '50rem' }" :visible="visible" header="Create Shipment" modal @update:visible="(newValue) => $emit('update:visible', newValue)">
+            <input v-model="form.target_warehouse" type="hidden"/>
             <div class="my-4 gap-4">
                 <div class="sm:col-span-3 space-y-5">
-                    <Card>
+                    <Card class="border">
+                        <template #title>Container Specs</template>
+                        <template #content>
+                            <div class="my-3">
+                                <SelectButton v-model="form.container_type" :options="seaContainerOptions" name="container_type"/>
+                                <InputError :message="form.errors.container_type" />
+                            </div>
+                        </template>
+                    </Card>
+
+                    <Card class="border">
+                        <template #title>Target Warehouse</template>
+                        <template #content>
+                            <div class="my-3">
+                                <SelectButton v-model="form.target_warehouse" :options="warehouses" name="target_warehouse" option-label="name" option-value="id"/>
+                                <InputError :message="form.errors.target_warehouse" />
+                            </div>
+                        </template>
+                    </Card>
+
+                    <Card class="border">
                         <template #title>Container Details</template>
                         <template #content>
                             <div class="grid grid-cols-4 gap-5 mt-3">
@@ -144,7 +166,7 @@ const emit = defineEmits(['containerCreated']);
                         </template>
                     </Card>
 
-                    <Card v-if="form.cargo_type === 'Sea Cargo'">
+                    <Card class="border">
                         <template #title>Vessel Details</template>
                         <template #content>
                             <div class="grid grid-cols-4 gap-5 mt-3">
@@ -182,51 +204,11 @@ const emit = defineEmits(['containerCreated']);
                         </template>
                     </Card>
 
-                    <Card v-else>
-                        <template #title>Flight Details</template>
-                        <template #content>
-                            <div class="grid grid-cols-4 gap-5 mt-3">
-
-                                <div class="col-span-1">
-                                    <InputLabel value="Flight Number"/>
-                                    <InputText v-model="form.flight_number" class="w-full" placeholder="Enter Flight Number"/>
-                                    <InputError :message="form.errors.flight_number" />
-                                </div>
-
-                                <div class="col-span-3">
-                                    <InputLabel value="Airline Name"/>
-                                    <Select
-                                        v-model="form.airline_name"
-                                        :options="airLines"
-                                        class="w-full"
-                                        filter
-                                        option-label="name"
-                                        option-value="name"
-                                        placeholder="Select Air Line"
-                                    />
-                                    <InputError :message="form.errors.airline_name"/>
-                                </div>
-
-                                <div class="col-span-2">
-                                    <InputLabel value="Airport of Departure"/>
-                                    <InputText v-model="form.airport_of_departure" class="w-full" placeholder="Enter Airport of Departure"/>
-                                    <InputError :message="form.errors.airport_of_departure" />
-                                </div>
-
-                                <div class="col-span-2">
-                                    <InputLabel value="Airport of Arrival"/>
-                                    <InputText v-model="form.airport_of_arrival" class="w-full" placeholder="Enter Airport of Arrival"/>
-                                    <InputError :message="form.errors.airport_of_arrival" />
-                                </div>
-                            </div>
-                        </template>
-                    </Card>
-
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-5">
-                        <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Create Container" type="submit" />
+                        <Button :class="{ 'opacity-50': form.processing }" :disabled="form.processing" icon="pi pi-arrow-right" iconPos="right" label="Create Container" @click.prevent="handleCreate" />
                     </div>
                 </div>
             </div>
-        </form>
+    </Dialog>
 </template>
