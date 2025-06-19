@@ -433,7 +433,7 @@ const onNodeSelect = (event) => {
                                             <span>({{ node.data.itemsCount || 0 }})</span>
                                         </h2>
                                         <span v-if="node.data.date" class="ml-2 text-gray-500 text-xs">{{ node.data.date }}</span>
-                                        <span v-if="node.data.itemsCount === 0" class="ml-2 text-gray-500 text-xs italic">No Shipments</span>
+                                        <span v-if="node.data.itemsCount === 0" class="ml-2 text-info text-xs italic">No Shipments</span>
                                     </div>
 
                                     <div v-else>
@@ -443,7 +443,7 @@ const onNodeSelect = (event) => {
                                                 <i class="ti ti-plane-departure text-xl mx-2"></i>
                                                 {{node.data.branch?.name}}
                                             </div>
-                                            <div class="grid grid-cols-2 gap-3">
+                                            <div class="grid grid-cols-2 gap-3 bg-sky-100 border border-sky-300 p-5 rounded-xl">
                                                 <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.container_type " label="Type"/>
                                                 <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.estimated_time_of_arrival " label="ETA"/>
                                                 <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.cargo_type " label="Cargo Type"/>
