@@ -1637,6 +1637,17 @@ export default {
                         );
                     }
 
+                    if (usePage().props.user.permissions.includes("call-center.all-calls")) {
+                        callCenterMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All Calls",
+                                route: "call-center.all-calls",
+                            }
+                        );
+                    }
+
                     if (usePage().props.user.permissions.includes("call-center.followups")) {
                         callCenterMenu.splice(
                             2,

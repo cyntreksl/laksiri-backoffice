@@ -198,6 +198,7 @@ class RolePermissionSeeder extends Seeder
             'call-center.hbl-list',
             'call-center.followups',
             'call-center.appointments',
+            'call-center.all-calls',
         ];
 
         $callCenterRole = Role::where('name', 'call center')->first();
@@ -700,6 +701,7 @@ class RolePermissionSeeder extends Seeder
                     'call-center.hbl-list',
                     'call-center.followups',
                     'call-center.appointments',
+                    'call-center.all-calls',
                 ],
             ],
         ];
