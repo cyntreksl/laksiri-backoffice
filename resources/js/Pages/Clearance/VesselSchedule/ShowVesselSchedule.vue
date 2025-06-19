@@ -17,7 +17,6 @@ import IftaLabel from "primevue/iftalabel";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
-import VirtualScroller from 'primevue/virtualscroller';
 import LoadedShipmentDetailDialog from "@/Pages/Common/Dialog/Container/Index.vue";
 import {useConfirm} from "primevue/useconfirm";
 import {push} from "notivue";
@@ -27,6 +26,7 @@ import Skeleton from "primevue/skeleton";
 import moment from "moment";
 import RequestsList from "@/Pages/Clearance/VesselSchedule/RequestsList.vue";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
+import TreeTable from 'primevue/treetable';
 
 const props = defineProps({
     vesselSchedule: {
@@ -60,6 +60,7 @@ const containerId = ref('');
 const showConfirmAddVesselModal = ref(false);
 const loadingContainerData = ref(false);
 const loadingPaymentData = ref(false);
+const selectedKey = ref();
 
 const form = useForm({
     container_id: selectedContainer.value.id ?? '',
@@ -297,62 +298,74 @@ const handleUpdateContainer = () => {
     });
 }
 
-// Using Moment.js for grouped shipments
-const groupedShipments = computed(() => {
+const treeTableData = computed(() => {
     if (!props.vesselSchedule?.clearance_containers) {
+        selectedContainer.value = null;
         return [];
     }
 
-    // Create a map of all days in the week
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const weekGroups = {};
+    const weekGroups = [];
+    let firstShipmentSelected = false;
 
-    // Initialize all days with empty data
     daysOfWeek.forEach(day => {
-        weekGroups[day] = {
-            day: day,
-            date: '', // Will be set if there are items
-            momentObject: null, // Will be set if there are items
-            items: []
+        const dayNode = {
+            key: day,
+            data: {
+                day: day,
+                date: '',
+                itemsCount: 0,
+                type: 'day'
+            },
+            children: []
         };
-    });
 
-    // Process actual shipments
-    props.vesselSchedule.clearance_containers.forEach(item => {
-        if (!item.estimated_time_of_arrival || !moment(item.estimated_time_of_arrival).isValid()) {
-            return;
+        const dayItems = props.vesselSchedule.clearance_containers.filter(item => {
+            if (!item.estimated_time_of_arrival || !moment(item.estimated_time_of_arrival).isValid()) {
+                return false;
+            }
+            return moment(item.estimated_time_of_arrival).format('dddd') === day;
+        });
+
+        if (dayItems.length > 0) {
+            const m = moment(dayItems[0].estimated_time_of_arrival);
+            dayNode.data.date = m.format('MMM Do, YYYY');
+            dayNode.data.itemsCount = dayItems.length;
+
+            dayItems.forEach((item, index) => {
+                const shipmentNode = {
+                    key: item.id,
+                    data: {
+                        ...item,
+                        type: 'shipment'
+                    }
+                };
+                dayNode.children.push(shipmentNode);
+
+                // Select the first shipment in the first day with shipments
+                if (!firstShipmentSelected && index === 0) {
+                    selectedContainer.value = item;
+                    firstShipmentSelected = true;
+                }
+            });
         }
 
-        const m = moment(item.estimated_time_of_arrival);
-        const dayOfWeek = m.format('dddd'); // 'Monday', 'Tuesday', etc.
-        const fullDate = m.format('MMM Do, YYYY');
-
-        if (!weekGroups[dayOfWeek].momentObject) {
-            weekGroups[dayOfWeek].date = fullDate;
-            weekGroups[dayOfWeek].momentObject = m.startOf('day');
-        }
-
-        weekGroups[dayOfWeek].items.push(item);
+        weekGroups.push(dayNode);
     });
 
-    // Convert to array and sort by date (days with items) or maintain week order
-    return daysOfWeek.map(day => weekGroups[day]);
+    return weekGroups;
 });
-
-watch(
-    () => groupedShipments.value,
-    (newVal) => {
-        if (newVal.length > 0) {
-            selectedContainer.value = newVal[0]?.items[0] ?? null;
-        }
-    },
-    { immediate: true }
-);
 
 const isPaymentInputDisabled = computed(() => {
     return isFinanceApproved.value ||
         usePage().props.auth.user.roles[0]?.name === 'finance Team';
 });
+
+const onNodeSelect = (event) => {
+    if (event.data.type === 'shipment') {
+        selectedContainer.value = event.data;
+    }
+};
 </script>
 
 <template>
@@ -402,58 +415,54 @@ const isPaymentInputDisabled = computed(() => {
                 </template>
                 <template #subtitle>{{ vesselSchedule?.clearance_containers.length }} Shipment(s)</template>
                 <template #content>
-                    <VirtualScroller :item-size="170" :items="groupedShipments" style="height: 1000px;">
-                        <template v-slot:item="{ item: dayGroup }">
-                            <div class="mb-4">
-                                <h2 class="text-base font-semibold mb-2">
-                                    {{ dayGroup.day }}
-                                    <span v-if="dayGroup.items.length > 0">({{ dayGroup.items.length }})</span>
-                                </h2>
-                                <div v-if="dayGroup.items.length > 0" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                                    <div v-for="item in dayGroup.items" :key="item.id" :class="['flex flex-col space-y-3 rounded-xl p-4 bg-gradient-to-tr hover:cursor-pointer', selectedContainer?.id === item?.id ? 'from-purple-700 to-purple-500' : 'from-violet-700 to-violet-500']"
-                                         style="height: 170px"
-                                         @click="selectedContainer = item">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center space-x-1 rounded-lg bg-violet-500 px-2 py-1">
-                                                <div :class="['h-4 w-4 rounded-md ', selectedContainer?.id === item?.id ? 'animate-spin bg-green-300' : 'animate-none bg-orange-300']"></div>
-                                                <div class="text-white text-xs">{{ item?.container_type }}
-                                                </div>
+                    <TreeTable
+                        v-model:selectionKeys="selectedKey"
+                        :meta-key-selection="false"
+                        :value="treeTableData"
+                        scroll-height="1000px"
+                        scrollable
+                        selection-mode="single"
+                        @node-select="onNodeSelect"
+                    >
+                        <Column expander field="day">
+                            <template #body="{ node }">
+                                <div>
+                                    <div v-if="node.data.type === 'day'" class="flex items-center">
+                                        <h2 class="font-semibold">
+                                            {{ node.data.day }}
+                                            <span>({{ node.data.itemsCount || 0 }})</span>
+                                        </h2>
+                                        <span v-if="node.data.date" class="ml-2 text-gray-500 text-xs">{{ node.data.date }}</span>
+                                        <span v-if="node.data.itemsCount === 0" class="ml-2 text-gray-500 text-xs italic">No Shipments</span>
+                                    </div>
+
+                                    <div v-else>
+                                        <div class="grid grid-cols-2">
+                                            <div class="space-y-2">
+                                                <InfoDisplay :value="node.data.reference " label="Reference"/>
+                                                <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.container_type " label="Type"/>
                                             </div>
-                                            <div class="text-violet-300 text-xs">
-                                                {{ moment(item?.estimated_time_of_arrival).format('DD MMM YYYY') }}
-                                            </div>
-                                        </div>
-                                        <h2 class="text-lg font-medium text-white">{{ item?.reference }}</h2>
-                                        <div class="flex justify-between">
-                                            <i class="ti ti-ship text-2xl text-white"></i>
-                                            <div class="flex space-x-4 items-center">
-                                                <div class="flex items-center space-x-1 text-violet-300">
-                                                    <div class="text-xs">{{ item?.cargo_type }}</div>
-                                                </div>
-                                                <div class="flex items-center space-x-1 text-white">
-                                                    <div class="text-xs uppercase">{{ item?.warehouse.name }}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="flex justify-between items-center space-x-4">
-                                            <div class="h-2 rounded-full bg-violet-500 flex-1">
-                                                <div
-                                                    class="w-[100%] h-2 rounded-full from-green-300 to-green-400 bg-gradient-to-l"></div>
-                                            </div>
-                                            <div v-tooltip="'Remove From Vessel Schedule'"
-                                                 class="text-red-300 text-xs whitespace-nowrap cursor-pointer"
-                                                 @click.prevent="confirmRemoveContainer(item?.id)">Remove
+                                            <div class="space-y-2">
+                                                <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.estimated_time_of_arrival " label="ETA"/>
+                                                <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.cargo_type " label="Cargo Type"/>
+                                                <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.warehouse?.name " label="Warehouse"/>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            </template>
+                        </Column>
 
-                                <div v-else class="p-4 bg-gray-100 rounded-lg text-center text-gray-500">
-                                    No shipments for this day
+                        <Column>
+                            <template #body="{ node }">
+                                <div v-if="node.data.type === 'shipment'" class="flex items-center space-x-2">
+                                    <Button v-tooltip="'Remove From Vessel Schedule'" class="p-button-sm p-button-text p-button-danger"
+                                            icon="pi pi-trash"
+                                            @click="confirmRemoveContainer(node.key)" />
                                 </div>
-                            </div>
-                        </template>
-                    </VirtualScroller>
+                            </template>
+                        </Column>
+                    </TreeTable>
                 </template>
             </Card>
 
