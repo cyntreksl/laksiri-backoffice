@@ -172,6 +172,7 @@ class RolePermissionSeeder extends Seeder
             'hbls.download pdf',
             'hbls.show',
             'hbls.issue token',
+            'hbls.call flag',
             'bonded.index',
             'bonded.show',
             'bonded.mark as short loading',
@@ -194,6 +195,9 @@ class RolePermissionSeeder extends Seeder
             'customer-queue.show gate ist',
             'customer-queue.show examination calling screen',
             'manage_tokens',
+            'call-center.hbl-list',
+            'call-center.followups',
+            'call-center.appointments',
         ];
 
         $callCenterRole = Role::where('name', 'call center')->first();
@@ -687,6 +691,15 @@ class RolePermissionSeeder extends Seeder
                     'third_party_shipments.edit',
                     'third_party_shipments.delete',
                     'third_party_shipments.show',
+                ],
+            ],
+
+            [
+                'group_name' => 'Call Center',
+                'permissions' => [
+                    'call-center.hbl-list',
+                    'call-center.followups',
+                    'call-center.appointments',
                 ],
             ],
         ];
