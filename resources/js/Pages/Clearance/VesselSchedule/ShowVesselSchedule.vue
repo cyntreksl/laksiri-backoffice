@@ -392,14 +392,22 @@ const onNodeSelect = (event) => {
                 </div>
             </div>
 
-            <a :href="route('clearance.vessel-schedule.download', vesselSchedule?.id)">
+            <div class="space-x-2">
+                <a :href="route('clearance.vessel-schedule.download', vesselSchedule?.id)">
+                    <Button
+                        icon="pi pi-download"
+                        label="Download Vessel Schedule"
+                        severity="help"
+                        size="small"
+                    />
+                </a>
+
                 <Button
-                    icon="pi pi-download"
-                    label="Download Vessel Schedule"
+                    icon="pi pi-plus"
+                    label="Create New Shipment"
                     size="small"
-                    severity="help"
                 />
-            </a>
+            </div>
         </div>
 
         <div class="grid grid-cols-12 gap-4 my-5">
