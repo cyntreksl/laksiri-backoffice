@@ -8,6 +8,9 @@ Route::resource('hbls', HBLController::class);
 Route::get('hbl-list', [HBLController::class, 'list']);
 Route::get('call-center-hbl-list', [HBLController::class, 'receptionIndex'])->name('callcenter-list');
 
+Route::get('appointments', [HBLController::class, 'appointmentList'])->name('call-center.appointments');
+Route::get('followups', [HBLController::class, 'followupList'])->name('call-center.followups');
+
 Route::get('/create-token/{hbl}', [HBLController::class, 'createToken'])
     ->name('hbls.create-token');
 

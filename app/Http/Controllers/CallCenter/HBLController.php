@@ -53,6 +53,36 @@ class HBLController extends Controller
         ]);
     }
 
+    /**
+     * Display appointment list
+     */
+    public function appointmentList()
+    {
+        $this->authorize('hbls.index');
+
+        return Inertia::render('CallCenter/HBL/AppointmentList', [
+            'users' => $this->userRepository->getUsers(['customer']),
+            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
+            'paymentStatus' => HBLPaymentStatus::cases(),
+            'warehouses' => GetDestinationBranches::run(),
+        ]);
+    }
+
+    /**
+     * Display follow-up list
+     */
+    public function followupList()
+    {
+        $this->authorize('hbls.index');
+
+        return Inertia::render('CallCenter/HBL/FollowupList', [
+            'users' => $this->userRepository->getUsers(['customer']),
+            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
+            'paymentStatus' => HBLPaymentStatus::cases(),
+            'warehouses' => GetDestinationBranches::run(),
+        ]);
+    }
+
     public function list(Request $request)
     {
         $limit = $request->input('per_page', 10);

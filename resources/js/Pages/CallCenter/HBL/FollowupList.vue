@@ -1,6 +1,6 @@
 <script setup>
 import {computed, onMounted, ref, watch} from "vue";
-import {router, usePage} from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
@@ -26,24 +26,20 @@ import {debounce} from "lodash";
 import {push} from "notivue";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
-import IssueTokenDialog from "./Components/IssueTokenDialog.vue";
 import CallFlagListDialog from "./Components/CallFlagListDialog.vue";
 
 const props = defineProps({
     users: {
         type: Object,
-        default: () => {
-        },
+        default: () => {},
     },
     hbls: {
         type: Object,
-        default: () => {
-        },
+        default: () => {},
     },
     paymentStatus: {
         type: Object,
-        default: () => {
-        },
+        default: () => {},
     },
     warehouses: {
         type: Object,
@@ -52,13 +48,6 @@ const props = defineProps({
     },
 });
 
-const baseUrl = computed(() => {
-    if (route().current() === "call-center.callcenter-list") {
-        return '/call-center/hbl-list';
-    }
-
-    return '/finance/approved-hbl-list';
-});
 const loading = ref(true);
 const hbls = ref([]);
 const totalRecords = ref(0);
@@ -69,7 +58,6 @@ const cm = ref();
 const selectedHBL = ref(null);
 const selectedHBLData = ref(null);
 const selectedHBLID = ref(null);
-const selectedHblSummary = ref({});
 const confirm = useConfirm();
 const dt = ref();
 const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
@@ -78,16 +66,15 @@ const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
 const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const showConfirmViewCallFlagModal = ref(false);
-const showIssueTokenDialog = ref(false);
 const showCallFlagListDialog = ref(false);
 const hblName = ref("");
 
 const filters = ref({
-    global: {value: null, matchMode: FilterMatchMode.CONTAINS},
-    warehouse: {value: null, matchMode: FilterMatchMode.EQUALS},
-    hbl_type: {value: null, matchMode: FilterMatchMode.EQUALS},
-    cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
-    is_hold: {value: null, matchMode: FilterMatchMode.EQUALS},
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
+    hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+    cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+    is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
     user: {value: null, matchMode: FilterMatchMode.EQUALS},
     payments: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
@@ -116,7 +103,7 @@ const menuModel = ref([
 const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
     loading.value = true;
     try {
-        const response = await axios.get(baseUrl.value, {
+        const response = await axios.get('/call-center/hbl-list', {
             params: {
                 page,
                 per_page: perPage.value,
@@ -131,13 +118,20 @@ const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOr
                 paymentStatus: filters.value.payments.value || [],
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
+                filter_type: 'followups' // Filter for follow-ups only
             }
         });
-        hbls.value = response.data.data;
-        totalRecords.value = response.data.meta.total;
+
+        // Filter HBLs that have follow-ups due
+        const hblsWithFollowups = response.data.data.filter(hbl =>
+            hbl.has_follow_up_due || hbl.followup_date
+        );
+
+        hbls.value = hblsWithFollowups;
+        totalRecords.value = hblsWithFollowups.length;
         currentPage.value = response.data.meta.current_page;
     } catch (error) {
-        console.error("Error fetching HBLs:", error);
+        console.error("Error fetching follow-ups:", error);
     } finally {
         loading.value = false;
     }
@@ -240,6 +234,23 @@ const resolveWarehouse = (hbl) => {
     }
 };
 
+const getFollowupStatus = (followupDate) => {
+    if (!followupDate) return { label: 'No Date', severity: 'contrast' };
+
+    const followup = moment(followupDate);
+    const today = moment();
+
+    if (followup.isBefore(today, 'day')) {
+        return { label: 'Overdue', severity: 'danger' };
+    } else if (followup.isSame(today, 'day')) {
+        return { label: 'Due Today', severity: 'warn' };
+    } else if (followup.diff(today, 'days') <= 3) {
+        return { label: 'Due Soon', severity: 'warn' };
+    } else {
+        return { label: 'Scheduled', severity: 'info' };
+    }
+};
+
 const onRowContextMenu = (event) => {
     cm.value.show(event.originalEvent);
 };
@@ -256,89 +267,17 @@ const closeModal = () => {
 
 const clearFilter = () => {
     filters.value = {
-        global: {value: null, matchMode: FilterMatchMode.CONTAINS},
-        warehouse: {value: null, matchMode: FilterMatchMode.EQUALS},
-        hbl_type: {value: null, matchMode: FilterMatchMode.EQUALS},
-        cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
-        is_hold: {value: null, matchMode: FilterMatchMode.EQUALS},
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        warehouse: { value: null, matchMode: FilterMatchMode.EQUALS },
+        hbl_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+        cargo_type: { value: null, matchMode: FilterMatchMode.EQUALS },
+        is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
         user: {value: null, matchMode: FilterMatchMode.EQUALS},
         payments: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
     fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
     fetchHBLs(currentPage.value);
-};
-
-const confirmHBLDelete = (hbl) => {
-    selectedHBLID.value = hbl.value.id;
-    confirm.require({
-        message: 'Would you like to delete this hbl record?',
-        header: 'Delete HBL?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Delete',
-            severity: 'danger'
-        },
-        accept: () => {
-            router.delete(route("hbls.destroy", selectedHBLID.value), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    push.success("HBL record Deleted Successfully!");
-                    router.visit(route("hbls.index"), {only: ["hbls"]});
-                },
-                onError: () => {
-                    push.error("Something went to wrong!");
-                },
-            });
-            selectedHBLID.value = null;
-        },
-        reject: () => {
-        }
-    });
-};
-
-const confirmHBLHold = (hbl) => {
-    selectedHBLID.value = hbl.value.id;
-    confirm.require({
-        message: `Would you like to ${hbl.value.is_hold ? 'Release' : 'Hold'} this hbl?`,
-        header: `${hbl.value.is_hold ? 'Release' : 'Hold'} HBL?`,
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: `${hbl.value.is_hold ? 'Release' : 'Hold'}`,
-            severity: 'warn'
-        },
-        accept: () => {
-            router.put(
-                route("hbls.toggle-hold", selectedHBLID.value),
-                {},
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        push.success(`Operation Successfully!`);
-                        fetchHBLs(currentPage.value);
-                    },
-                    onError: () => {
-                        push.error("Something went to wrong!");
-                    },
-                }
-            );
-            selectedHBLID.value = null;
-        },
-        reject: () => {
-        }
-    });
 };
 
 const confirmViewCallFlagModal = (hbl) => {
@@ -356,22 +295,8 @@ const closeCallFlagModal = () => {
 };
 
 const onCallFlagCreated = () => {
-    // Refresh the HBL list to show updated call flag information
     fetchHBLs(currentPage.value, filters.value.global.value);
-
-    // Reset selected HBL
     selectedHBL.value = null;
-    selectedHBLData.value = null;
-};
-
-const confirmIssueToken = (hbl) => {
-    console.log('hbl', hbl.value)
-    selectedHBLData.value = hbl.value;
-    showIssueTokenDialog.value = true;
-};
-
-const closeIssueTokenDialog = () => {
-    showIssueTokenDialog.value = false;
     selectedHBLData.value = null;
 };
 
@@ -393,25 +318,38 @@ const openCallHistory = (hblData) => {
     showCallFlagListDialog.value = true;
 };
 
-const onTokenIssued = (result) => {
-    // Refresh the HBL list to show updated token information
-    fetchHBLs(currentPage.value, filters.value.global.value);
-
-    // Reset selected HBL
-    selectedHBL.value = null;
-    selectedHblSummary.value = {};
-};
-
 const exportCSV = () => {
     dt.value.exportCSV();
+};
+
+const formatDate = (date) => {
+    if (!date) return '-';
+    return moment(date).format('MMM DD, YYYY');
+};
+
+const formatDateTime = (datetime) => {
+    if (!datetime) return '-';
+    return moment(datetime).format('MMM DD, YYYY hh:mm A');
+};
+
+const getDaysOverdue = (followupDate) => {
+    if (!followupDate) return 0;
+    const followup = moment(followupDate);
+    const today = moment();
+    return Math.max(0, today.diff(followup, 'days'));
 };
 </script>
 
 <template>
-    <AppLayout title="HBL List">
-        <template #header>HBL List</template>
+    <AppLayout title="Follow-up List">
+        <template #header>
+            <div class="flex items-center gap-2">
+                <i class="ti ti-clock-hour-4 text-2xl text-orange-600"></i>
+                <span>Follow-up List</span>
+            </div>
+        </template>
 
-        <Breadcrumb/>
+        <Breadcrumb />
 
         <div>
             <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
@@ -427,14 +365,12 @@ const exportCSV = () => {
                     </FloatLabel>
 
                     <FloatLabel class="w-full" variant="in">
-                        <Select v-model="filters.payments.value" :options="paymentStatus" :showClear="true"
-                                class="w-full" input-id="payment-status"/>
+                        <Select v-model="filters.payments.value" :options="paymentStatus" :showClear="true" class="w-full" input-id="payment-status" />
                         <label for="payment-status">Payment Status</label>
                     </FloatLabel>
 
                     <FloatLabel class="w-full" variant="in">
-                        <Select v-model="filters.user.value" :options="users" :showClear="true" class="w-full"
-                                input-id="user" option-label="name" option-value="id"/>
+                        <Select v-model="filters.user.value" :options="users" :showClear="true" class="w-full" input-id="user" option-label="name" option-value="id" />
                         <label for="user">Created By</label>
                     </FloatLabel>
                 </div>
@@ -442,7 +378,7 @@ const exportCSV = () => {
 
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedHBL = null"/>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedHBL = null" />
                     <DataTable
                         ref="dt"
                         v-model:contextMenuSelection="selectedHBL"
@@ -467,14 +403,10 @@ const exportCSV = () => {
 
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
-                                <div class="text-lg font-medium">
-                                    Follow Up
+                                <div class="flex items-center gap-2 text-lg font-medium">
+                                    <i class="ti ti-clock-hour-4 text-orange-600"></i>
+                                    <span>Pending Follow-ups</span>
                                 </div>
-                                <Button v-if="$page.props.user.permissions.includes('hbls.create')"
-                                        icon="pi pi-arrow-right"
-                                        icon-pos="right"
-                                        label="Create New HBL" size="small"
-                                        @click="router.visit(route('hbls.create'))"/>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Button Group -->
@@ -501,122 +433,119 @@ const exportCSV = () => {
                                 <!-- Search Field -->
                                 <IconField class="w-full sm:w-auto">
                                     <InputIcon>
-                                        <i class="pi pi-search"/>
+                                        <i class="pi pi-search" />
                                     </InputIcon>
                                     <InputText
                                         v-model="filters.global.value"
                                         class="w-full"
-                                        placeholder="Keyword Search"
+                                        placeholder="Search follow-ups..."
                                         size="small"
                                     />
                                 </IconField>
                             </div>
                         </template>
 
-                        <template #empty> No hbls found.</template>
+                        <template #empty> No follow-ups found. </template>
+                        <template #loading> Loading follow-up data. Please wait.</template>
 
-                        <template #loading> Loading hbl data. Please wait.</template>
-
-                        <Column field="hbl_number" header="HBL" sortable>
+                        <Column field="hbl_number" header="HBL" sortable style="width: 120px">
                             <template #body="slotProps">
                                 <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
                                 <br v-if="slotProps.data.is_short_loaded">
-                                <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`"
-                                     icon="pi pi-exclamation-triangle" size="small"></Tag>
+                                <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`" icon="pi pi-exclamation-triangle" size="small"></Tag>
                             </template>
                         </Column>
 
-                        <Column field="cargo_type" header="Cargo Type" sortable>
+                        <Column field="cargo_type" header="Cargo Type" sortable style="width: 130px">
                             <template #body="slotProps">
-                                <Tag :icon="resolveCargoType(slotProps.data).icon"
-                                     :severity="resolveCargoType(slotProps.data).color"
-                                     :value="slotProps.data.cargo_type" class="text-sm"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true"
-                                        placeholder="Select One" style="min-width: 12rem"/>
+                                <Tag :icon="resolveCargoType(slotProps.data).icon" :severity="resolveCargoType(slotProps.data).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
                             </template>
                         </Column>
 
-                        <Column field="hbl_type" header="HBL Type" sortable>
+                        <Column field="hbl_name" header="Customer">
                             <template #body="slotProps">
-                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true"
-                                        placeholder="Select One" style="min-width: 12rem"/>
-                            </template>
-                        </Column>
-
-                        <Column field="hbl_name" header="HBL Name">
-                            <template #body="slotProps">
-                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.hbl_name}`"
-                                   class="hover:underline" target="_blank">
-                                    <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
-                                    {{ slotProps.data.hbl_name }}
-                                </a>
+                                <div class="font-medium">{{ slotProps.data.hbl_name }}</div>
                                 <div class="text-gray-500 text-sm">{{ slotProps.data.email }}</div>
-                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.contact_number}`"
-                                   class="text-gray-500 hover:underline text-sm" target="_blank">
-                                    <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
-                                    {{ slotProps.data.contact_number }}
-                                </a>
+                                <div class="text-gray-500 text-sm">{{ slotProps.data.contact_number }}</div>
                             </template>
                         </Column>
 
                         <Column field="consignee_name" header="Consignee">
                             <template #body="slotProps">
-                                <div>{{ slotProps.data.consignee_name }}</div>
-                                <div class="text-gray-500 text-sm">{{ slotProps.data.consignee_email }}</div>
+                                <div class="font-medium">{{ slotProps.data.consignee_name }}</div>
                                 <div class="text-gray-500 text-sm">{{ slotProps.data.consignee_contact }}</div>
                             </template>
                         </Column>
 
-                        <Column field="consignee_address" header="Consignee Address"></Column>
-
-                        <Column field="finance_status" header="Finance Status">
+                        <Column field="followup_date" header="Follow-up Due" sortable style="width: 180px">
                             <template #body="slotProps">
-                                <Tag v-if="slotProps.data.finance_status" :value="slotProps.data.finance_status"
-                                     severity="success" class="text-sm"></Tag>
-                                <span v-else class="text-gray-400">-</span>
+                                <div v-if="slotProps.data.followup_date" class="space-y-1">
+                                    <div class="font-medium">{{ formatDate(slotProps.data.followup_date) }}</div>
+                                    <Tag
+                                        :value="getFollowupStatus(slotProps.data.followup_date).label"
+                                        :severity="getFollowupStatus(slotProps.data.followup_date).severity"
+                                        size="small"
+                                        icon="ti ti-clock"
+                                    />
+                                    <div v-if="getDaysOverdue(slotProps.data.followup_date) > 0" class="text-xs text-red-600 font-medium">
+                                        {{ getDaysOverdue(slotProps.data.followup_date) }} day(s) overdue
+                                    </div>
+                                </div>
+                                <div v-else class="text-gray-400 text-sm">No follow-up date</div>
                             </template>
                         </Column>
 
-                        <Column field="call_flags" header="Call Status" style="min-width: 120px">
+                        <Column field="latest_call_flag" header="Last Contact" style="width: 150px">
                             <template #body="slotProps">
-                                <div class="space-y-1 cursor-pointer" @click="openCallHistory(slotProps.data)">
-                                    <div v-if="slotProps.data.call_flags_count > 0" class="flex items-center gap-2">
-                                        <Tag
-                                            :value="`${slotProps.data.call_flags_count} Call${slotProps.data.call_flags_count > 1 ? 's' : ''}`"
-                                            severity="info"
-                                            size="small"
-                                            icon="ti ti-phone"
-                                            class="hover:bg-blue-600 transition-colors"/>
+                                <div v-if="slotProps.data.latest_call_flag" class="space-y-1">
+                                    <div class="text-sm">{{ formatDate(slotProps.data.latest_call_flag.date) }}</div>
+                                    <div class="text-xs text-gray-500">{{ slotProps.data.latest_call_flag.causer?.name || 'Unknown' }}</div>
+                                    <div v-if="slotProps.data.latest_call_flag.call_outcome" class="text-xs">
+                                        <Tag :value="slotProps.data.latest_call_flag.call_outcome" size="small" severity="secondary" />
                                     </div>
-                                    <div v-if="slotProps.data.has_follow_up_due" class="flex items-center gap-1">
-                                        <Tag value="Follow-up Due"
-                                             severity="warn"
-                                             size="small"
-                                             icon="ti ti-clock-hour-4"
-                                             class="hover:bg-orange-600 transition-colors"/>
-                                    </div>
-                                    <div v-if="slotProps.data.has_upcoming_appointment" class="flex items-center gap-1">
-                                        <Tag value="Appointment"
-                                             severity="success"
-                                             size="small"
-                                             icon="ti ti-calendar-check"
-                                             class="hover:bg-green-600 transition-colors"/>
-                                    </div>
-                                    <div v-if="!slotProps.data.call_flags_count"
-                                         class="text-gray-400 text-sm hover:text-gray-600 transition-colors">
-                                        Not contacted
-                                        <i class="pi pi-external-link ml-1 text-xs"></i>
-                                    </div>
+                                </div>
+                                <div v-else class="text-gray-400 text-sm">No contact</div>
+                            </template>
+                        </Column>
+
+                        <Column header="Priority" style="width: 80px">
+                            <template #body="slotProps">
+                                <div v-if="getDaysOverdue(slotProps.data.followup_date) > 0" class="text-center">
+                                    <i class="ti ti-alert-triangle text-red-500 text-xl" v-tooltip="'Overdue follow-up'"></i>
+                                </div>
+                                <div v-else-if="getFollowupStatus(slotProps.data.followup_date).label === 'Due Today'" class="text-center">
+                                    <i class="ti ti-clock text-orange-500 text-xl" v-tooltip="'Due today'"></i>
+                                </div>
+                                <div v-else class="text-center">
+                                    <i class="ti ti-calendar text-gray-400 text-xl" v-tooltip="'Scheduled'"></i>
                                 </div>
                             </template>
                         </Column>
 
-                        <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs.</template>
+                        <Column header="Actions" style="width: 100px">
+                            <template #body="slotProps">
+                                <div class="flex gap-2">
+                                    <Button
+                                        icon="ti ti-history"
+                                        size="small"
+                                        severity="info"
+                                        outlined
+                                        @click="openCallHistory(slotProps.data)"
+                                        v-tooltip="'View Call History'"
+                                    />
+                                    <Button
+                                        icon="ti ti-flag"
+                                        size="small"
+                                        severity="warn"
+                                        outlined
+                                        @click="confirmViewCallFlagModal({value: slotProps.data})"
+                                        v-tooltip="'Add Call Flag'"
+                                    />
+                                </div>
+                            </template>
+                        </Column>
+
+                        <template #footer> In total there are {{ totalRecords }} follow-ups pending. </template>
                     </DataTable>
                 </template>
             </Card>
@@ -638,12 +567,6 @@ const exportCSV = () => {
         @close="closeCallFlagModal"
         @call-flag-created="onCallFlagCreated"
         @update:visible="showConfirmViewCallFlagModal = $event"/>
-
-    <IssueTokenDialog
-        :visible="showIssueTokenDialog"
-        :hbl="selectedHBLData"
-        @update:visible="closeIssueTokenDialog"
-        @token-issued="onTokenIssued"/>
 
     <CallFlagListDialog
         :visible="showCallFlagListDialog"
