@@ -79,6 +79,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             ]);
         }
 
+        GetUserCurrentBranch::run();
         if (Auth::user()->hasRole('boned area')) {
             $query->where('target_warehouse', session('current_branch_id'));
         }
