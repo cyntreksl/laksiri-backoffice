@@ -26,6 +26,7 @@ use App\Actions\UnloadingIssue\UploadUnloadingIssueImages;
 use App\Actions\UnloadingIssueImages\DeleteUnloadingIssueFile;
 use App\Actions\UnloadingIssueImages\DownloadSingleUnloadingIssueFile;
 use App\Actions\UnloadingIssueImages\GetUnloadingIssueImages;
+use App\Actions\VesselSchedule\GetVesselSchedule;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
 use App\Exports\LoadedShipmentsExport;
@@ -59,7 +60,17 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function store(array $data): Container
     {
         try {
-            return CreateContainer::run($data);
+            $container = CreateContainer::run($data);
+
+            if ($data['vessel_schedule_id']) {
+                $vesselSchedule = GetVesselSchedule::run($data['vessel_schedule_id']);
+
+                $vesselSchedule->scheduleContainers()->create([
+                    'container_id' => $container->id,
+                ]);
+            }
+
+            return $container;
         } catch (\Exception $e) {
             throw new \Exception('Failed to create container: '.$e->getMessage());
         }
