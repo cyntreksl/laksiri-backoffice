@@ -404,7 +404,7 @@ const onNodeSelect = (event) => {
 
         <div class="grid grid-cols-12 gap-4 my-5">
             <!-- Container List -->
-            <Card class="col-span-12 lg:col-span-3 border-2 border-gray-200 !shadow-none">
+            <Card class="col-span-12 sm:col-span-5 md:col-span-4 lg:col-span-3 border-2 border-gray-200 !shadow-none">
                 <template #title>
                     <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
                         <div class="text-base font-semibold">Available Shipments</div>
@@ -437,12 +437,14 @@ const onNodeSelect = (event) => {
                                     </div>
 
                                     <div v-else>
-                                        <div class="grid grid-cols-2">
-                                            <div class="space-y-2">
-                                                <InfoDisplay :value="node.data.reference " label="Reference"/>
-                                                <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.container_type " label="Type"/>
+                                        <div class="space-y-2">
+                                            <div class="font-medium text-base text-lg">
+                                                {{node.data.reference}}
+                                                <i class="ti ti-plane-departure text-xl mx-2"></i>
+                                                {{node.data.branch?.name}}
                                             </div>
-                                            <div class="space-y-2">
+                                            <div class="grid grid-cols-2 gap-3">
+                                                <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.container_type " label="Type"/>
                                                 <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.estimated_time_of_arrival " label="ETA"/>
                                                 <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.cargo_type " label="Cargo Type"/>
                                                 <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.warehouse?.name " label="Warehouse"/>
@@ -467,7 +469,7 @@ const onNodeSelect = (event) => {
             </Card>
 
             <!-- Tabs Panel -->
-            <Card class="col-span-12 lg:col-span-9 border-2 border-gray-200 !shadow-none">
+            <Card class="col-span-12 sm:col-span-7 md:col-span-8 lg:col-span-9 border-2 border-gray-200 !shadow-none">
                 <template #title>
                     <div v-if="loadingContainerData" class="flex flex-col space-y-3">
                         <div class="flex items-center space-x-4">
