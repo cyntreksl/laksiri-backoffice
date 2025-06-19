@@ -23,8 +23,8 @@ import {useConfirm} from "primevue/useconfirm";
 import {push} from "notivue";
 import AddVesselModal from "@/Pages/Clearance/VesselSchedule/Partials/AddVesselModal.vue";
 import Checkbox from "primevue/checkbox";
+import Skeleton from "primevue/skeleton";
 import moment from "moment";
-import RefundList from "@/Pages/Clearance/VesselSchedule/RefundList.vue";
 import RequestsList from "@/Pages/Clearance/VesselSchedule/RequestsList.vue";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 
@@ -59,6 +59,7 @@ const isFinanceApproved = ref(false);
 const containerId = ref('');
 const showConfirmAddVesselModal = ref(false);
 const loadingContainerData = ref(false);
+const loadingPaymentData = ref(false);
 
 const form = useForm({
     container_id: selectedContainer.value.id ?? '',
@@ -122,6 +123,7 @@ const closeModal = () => {
 };
 
 const fetchContainerPayment = async () => {
+    loadingPaymentData.value = true;
     try {
         const response = await fetch(`/container-payment/${selectedContainer.value.id}`, {
             method: "GET",
@@ -155,6 +157,8 @@ const fetchContainerPayment = async () => {
         }
     } catch (error) {
         console.error("Error:", error);
+    } finally {
+        loadingPaymentData.value = false;
     }
 };
 
@@ -447,7 +451,18 @@ const isPaymentInputDisabled = computed(() => {
             <!-- Tabs Panel -->
             <Card class="col-span-12 lg:col-span-9 border-2 border-gray-200 !shadow-none">
                 <template #title>
-                    <div class="flex flex-col md:flex-row md:justify-between gap-4">
+                    <div v-if="loadingContainerData" class="flex flex-col space-y-3">
+                        <div class="flex items-center space-x-4">
+                            <Skeleton height="1rem" width="8rem"></Skeleton>
+                            <Skeleton height="1rem" width="2rem"></Skeleton>
+                            <Skeleton height="1rem" width="8rem"></Skeleton>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <Skeleton height="2rem" width="12rem"></Skeleton>
+                            <Skeleton height="2.5rem" width="10rem"></Skeleton>
+                        </div>
+                    </div>
+                    <div v-else class="flex flex-col md:flex-row md:justify-between gap-4">
                         <div>
                             <div class="flex items-center space-x-2 text-xs text-gray-400">
                                 <div class="flex items-center">
@@ -484,7 +499,22 @@ const isPaymentInputDisabled = computed(() => {
                         <TabPanels>
                             <!-- HBLs Tab -->
                             <TabPanel value="0">
-                                <div class="overflow-x-auto">
+                                <div v-if="loadingContainerData" class="space-y-4">
+                                    <div v-for="i in 5" :key="i" class="flex items-center space-x-4 p-4 border rounded">
+                                        <Skeleton height="1rem" width="6rem"></Skeleton>
+                                        <Skeleton height="1rem" width="4rem"></Skeleton>
+                                        <div class="flex-1">
+                                            <Skeleton class="mb-2" height="1rem" width="8rem"></Skeleton>
+                                            <Skeleton height="0.8rem" width="6rem"></Skeleton>
+                                        </div>
+                                        <Skeleton height="1rem" width="5rem"></Skeleton>
+                                        <div class="flex-1">
+                                            <Skeleton class="mb-2" height="1rem" width="7rem"></Skeleton>
+                                            <Skeleton height="0.8rem" width="10rem"></Skeleton>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else class="overflow-x-auto">
                                     <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                                                :value="filteredHBLS"
                                                paginator row-hover
@@ -523,7 +553,23 @@ const isPaymentInputDisabled = computed(() => {
 
                             <!-- MHBLs Tab -->
                             <TabPanel value="1">
-                                <div class="overflow-x-auto">
+                                <div v-if="loadingContainerData" class="space-y-4">
+                                    <div v-for="i in 5" :key="i" class="flex items-center space-x-4 p-4 border rounded">
+                                        <Skeleton height="1rem" width="6rem"></Skeleton>
+                                        <Skeleton height="1rem" width="5rem"></Skeleton>
+                                        <Skeleton height="1rem" width="4rem"></Skeleton>
+                                        <div class="flex-1">
+                                            <Skeleton class="mb-2" height="1rem" width="8rem"></Skeleton>
+                                            <Skeleton height="0.8rem" width="6rem"></Skeleton>
+                                        </div>
+                                        <Skeleton height="1rem" width="5rem"></Skeleton>
+                                        <div class="flex-1">
+                                            <Skeleton class="mb-2" height="1rem" width="7rem"></Skeleton>
+                                            <Skeleton height="0.8rem" width="10rem"></Skeleton>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else class="overflow-x-auto">
                                     <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                                                :value="filteredMHBLS"
                                                paginator row-hover
@@ -575,99 +621,131 @@ const isPaymentInputDisabled = computed(() => {
 
                             <!-- Payments Tab -->
                             <TabPanel value="2">
-                                <form @submit.prevent="handleContainerPaymentCreate">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber
-                                                    v-model="form.do_charge"
-                                                    :disabled="isPaymentInputDisabled"
-                                                    :maxFractionDigits="2"
-                                                    :minFractionDigits="2" class="w-full"
-                                                    inputId="do-charge" min="0" step="any"
-                                                    variant="filled"
-                                                />
-                                                <label for="do-charge">DO Charge</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.do_charge"/>
+                                <div v-if="loadingPaymentData" class="space-y-4">
+                                    <div v-for="i in 5" :key="i" class="flex items-center space-x-4 p-4 border rounded">
+                                        <Skeleton height="1rem" width="6rem"></Skeleton>
+                                        <Skeleton height="1rem" width="5rem"></Skeleton>
+                                        <Skeleton height="1rem" width="4rem"></Skeleton>
+                                        <div class="flex-1">
+                                            <Skeleton class="mb-2" height="1rem" width="8rem"></Skeleton>
+                                            <Skeleton height="0.8rem" width="6rem"></Skeleton>
                                         </div>
-
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber v-model="form.demurrage_charge"
-                                                             :disabled="isPaymentInputDisabled"
-                                                             :maxFractionDigits="2" :minFractionDigits="2"
-                                                             class="w-full" inputId="demurrage-charge" min="0"
-                                                             step="any" variant="filled"/>
-                                                <label for="demurrage-charge">Demurrage Charge</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.demurrage_charge"/>
+                                        <Skeleton height="1rem" width="5rem"></Skeleton>
+                                        <div class="flex-1">
+                                            <Skeleton class="mb-2" height="1rem" width="7rem"></Skeleton>
+                                            <Skeleton height="0.8rem" width="10rem"></Skeleton>
                                         </div>
-
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber v-model="form.assessment_charge"
-                                                             :disabled="isPaymentInputDisabled"
-                                                             :maxFractionDigits="2" :minFractionDigits="2"
-                                                             class="w-full" inputId="assessment-charge" min="0"
-                                                             step="any" variant="filled"/>
-                                                <label for="assessment-charge">Assessment Charge</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.assessment_charge"/>
-                                        </div>
-
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber v-model="form.slpa_charge" :disabled="isPaymentInputDisabled"
-                                                             :maxFractionDigits="2" :minFractionDigits="2"
-                                                             class="w-full"
-                                                             inputId="slap-charge" min="0" step="any" variant="filled"/>
-                                                <label for="slap-charge">SLAP Charge</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.slpa_charge"/>
-                                        </div>
-
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber v-model="form.refund_charge" :disabled="isPaymentInputDisabled"
-                                                             :maxFractionDigits="2" :minFractionDigits="2"
-                                                             class="w-full"
-                                                             inputId="refund-charge" min="0" step="any"
-                                                             variant="filled"/>
-                                                <label for="refund-charge">Refund</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.refund_charge"/>
-                                        </div>
-
-                                        <div>
-                                            <IftaLabel>
-                                                <InputNumber v-model="form.clearance_charge"
-                                                             :disabled="isPaymentInputDisabled"
-                                                             :maxFractionDigits="2" :minFractionDigits="2"
-                                                             class="w-full" inputId="clearance-charge" min="0"
-                                                             step="any" variant="filled"/>
-                                                <label for="clearance-charge">Clearance Charge</label>
-                                            </IftaLabel>
-                                            <InputError :message="form.errors.clearance_charge"/>
-                                        </div>
-
-                                        <template v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team'">
-                                            <div v-if="!isFinanceApproved"  class="col-span-1 md:col-span-2 text-right">
-                                                <Button :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"
-                                                        icon="pi pi-save" size="small" type="submit"/>
-                                            </div>
-                                        </template>
                                     </div>
-                                </form>
+                                </div>
+                                <template v-else>
+                                    <form @submit.prevent="handleContainerPaymentCreate">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                            <div>
+                                                <IftaLabel>
+                                                    <InputNumber
+                                                        v-model="form.do_charge"
+                                                        :disabled="isPaymentInputDisabled"
+                                                        :maxFractionDigits="2"
+                                                        :minFractionDigits="2" class="w-full"
+                                                        inputId="do-charge" min="0" step="any"
+                                                        variant="filled"
+                                                    />
+                                                    <label for="do-charge">DO Charge</label>
+                                                </IftaLabel>
+                                                <InputError :message="form.errors.do_charge"/>
+                                            </div>
 
-                                <RequestsList :container-id="selectedContainer.id"/>
+                                            <div>
+                                                <IftaLabel>
+                                                    <InputNumber v-model="form.demurrage_charge"
+                                                                 :disabled="isPaymentInputDisabled"
+                                                                 :maxFractionDigits="2" :minFractionDigits="2"
+                                                                 class="w-full" inputId="demurrage-charge" min="0"
+                                                                 step="any" variant="filled"/>
+                                                    <label for="demurrage-charge">Demurrage Charge</label>
+                                                </IftaLabel>
+                                                <InputError :message="form.errors.demurrage_charge"/>
+                                            </div>
 
-<!--                                <RefundList :container-id="selectedContainer.id"/>-->
+                                            <div>
+                                                <IftaLabel>
+                                                    <InputNumber v-model="form.assessment_charge"
+                                                                 :disabled="isPaymentInputDisabled"
+                                                                 :maxFractionDigits="2" :minFractionDigits="2"
+                                                                 class="w-full" inputId="assessment-charge" min="0"
+                                                                 step="any" variant="filled"/>
+                                                    <label for="assessment-charge">Assessment Charge</label>
+                                                </IftaLabel>
+                                                <InputError :message="form.errors.assessment_charge"/>
+                                            </div>
+
+                                            <div>
+                                                <IftaLabel>
+                                                    <InputNumber v-model="form.slpa_charge" :disabled="isPaymentInputDisabled"
+                                                                 :maxFractionDigits="2" :minFractionDigits="2"
+                                                                 class="w-full"
+                                                                 inputId="slap-charge" min="0" step="any" variant="filled"/>
+                                                    <label for="slap-charge">SLAP Charge</label>
+                                                </IftaLabel>
+                                                <InputError :message="form.errors.slpa_charge"/>
+                                            </div>
+
+                                            <div>
+                                                <IftaLabel>
+                                                    <InputNumber v-model="form.refund_charge" :disabled="isPaymentInputDisabled"
+                                                                 :maxFractionDigits="2" :minFractionDigits="2"
+                                                                 class="w-full"
+                                                                 inputId="refund-charge" min="0" step="any"
+                                                                 variant="filled"/>
+                                                    <label for="refund-charge">Refund</label>
+                                                </IftaLabel>
+                                                <InputError :message="form.errors.refund_charge"/>
+                                            </div>
+
+                                            <div>
+                                                <IftaLabel>
+                                                    <InputNumber v-model="form.clearance_charge"
+                                                                 :disabled="isPaymentInputDisabled"
+                                                                 :maxFractionDigits="2" :minFractionDigits="2"
+                                                                 class="w-full" inputId="clearance-charge" min="0"
+                                                                 step="any" variant="filled"/>
+                                                    <label for="clearance-charge">Clearance Charge</label>
+                                                </IftaLabel>
+                                                <InputError :message="form.errors.clearance_charge"/>
+                                            </div>
+
+                                            <template v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team'">
+                                                <div v-if="!isFinanceApproved"  class="col-span-1 md:col-span-2 text-right">
+                                                    <Button :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"
+                                                            icon="pi pi-save" size="small" type="submit"/>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </form>
+
+                                    <RequestsList :container-id="selectedContainer.id"/>
+                                </template>
                             </TabPanel>
 
                             <!-- Shipment Details Tab -->
                             <TabPanel value="3">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-10">
+                                <div v-if="loadingContainerData" class="space-y-4">
+                                    <div v-for="i in 5" :key="i" class="flex items-center space-x-4 p-4 border rounded">
+                                        <Skeleton height="1rem" width="6rem"></Skeleton>
+                                        <Skeleton height="1rem" width="5rem"></Skeleton>
+                                        <Skeleton height="1rem" width="4rem"></Skeleton>
+                                        <div class="flex-1">
+                                            <Skeleton class="mb-2" height="1rem" width="8rem"></Skeleton>
+                                            <Skeleton height="0.8rem" width="6rem"></Skeleton>
+                                        </div>
+                                        <Skeleton height="1rem" width="5rem"></Skeleton>
+                                        <div class="flex-1">
+                                            <Skeleton class="mb-2" height="1rem" width="7rem"></Skeleton>
+                                            <Skeleton height="0.8rem" width="10rem"></Skeleton>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-10">
 
                                     <InfoDisplay :value="selectedContainer.cargo_type" label="Cargo Mode"/>
                                     <InfoDisplay :value="selectedContainer.container_type" label="Container Type"/>
