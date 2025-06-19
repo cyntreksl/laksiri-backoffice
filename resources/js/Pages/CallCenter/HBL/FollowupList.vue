@@ -25,6 +25,7 @@ import axios from "axios";
 import {debounce} from "lodash";
 import {push} from "notivue";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
+import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 import CallFlagListDialog from "./Components/CallFlagListDialog.vue";
 
@@ -77,6 +78,7 @@ const filters = ref({
     is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
     user: {value: null, matchMode: FilterMatchMode.EQUALS},
     payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+    agent: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const menuModel = ref([
@@ -100,10 +102,70 @@ const menuModel = ref([
     },
 ]);
 
-const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+// Summary statistics for followups - will be fetched separately
+const summaryStats = ref({
+    totalFollowups: 0,
+    overdueFollowups: 0,
+    dueTodayFollowups: 0,
+    dueSoonFollowups: 0,
+    scheduledFollowups: 0
+});
+
+const fetchSummaryStats = async () => {
+    try {
+        const response = await axios.get('/call-center/followups-data', {
+            params: {
+                page: 1,
+                per_page: 999999, // Get all records for summary
+                search: filters.value.global.value || "",
+                warehouse: filters.value.warehouse.value || "",
+                deliveryType: filters.value.hbl_type.value || "",
+                cargoMode: filters.value.cargo_type.value || "",
+                isHold: filters.value.is_hold.value || false,
+                createdBy: filters.value.user.value || "",
+                paymentStatus: filters.value.payments.value || [],
+                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+                toDate: moment(toDate.value).format("YYYY-MM-DD"),
+                agent: filters.value.agent.value || "",
+            }
+        });
+
+        const allFollowups = response.data.data || [];
+        const today = moment().format('YYYY-MM-DD');
+        const threeDaysFromNow = moment().add(3, 'days').format('YYYY-MM-DD');
+
+        const stats = {
+            totalFollowups: allFollowups.length,
+            overdueFollowups: 0,
+            dueTodayFollowups: 0,
+            dueSoonFollowups: 0,
+            scheduledFollowups: 0
+        };
+
+        allFollowups.forEach(followup => {
+            const followupDate = followup.followup_date;
+            if (followupDate < today) {
+                stats.overdueFollowups++;
+            } else if (followupDate === today) {
+                stats.dueTodayFollowups++;
+            } else if (followupDate > today && followupDate <= threeDaysFromNow) {
+                stats.dueSoonFollowups++;
+            } else if (followupDate > threeDaysFromNow) {
+                stats.scheduledFollowups++;
+            }
+        });
+
+        summaryStats.value = stats;
+        console.log("Follow-up Summary Stats:", stats);
+    } catch (error) {
+        console.error("Error fetching followup summary stats:", error);
+    }
+};
+
+const fetchHBLs = async (page = 1, search = "", sortField = 'followup_date', sortOrder = 0) => {
     loading.value = true;
     try {
-        const response = await axios.get('/call-center/hbl-list', {
+        const response = await axios.get('/call-center/followups-data', {
             params: {
                 page,
                 per_page: perPage.value,
@@ -118,20 +180,35 @@ const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOr
                 paymentStatus: filters.value.payments.value || [],
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
-                filter_type: 'followups' // Filter for follow-ups only
+                agent: filters.value.agent.value || "",
             }
         });
 
-        // Filter HBLs that have follow-ups due
-        const hblsWithFollowups = response.data.data.filter(hbl =>
-            hbl.has_follow_up_due || hbl.followup_date
-        );
+        // Map CallFlag data to HBL-like structure for display
+        const followupData = response.data.data.map(callFlag => ({
+            ...callFlag.hbl,
+            followup_date: callFlag.followup_date,
+            call_outcome: callFlag.call_outcome,
+            latest_call_flag: {
+                date: callFlag.date,
+                notes: callFlag.notes,
+                causer: callFlag.causer
+            },
+            call_flags: [callFlag] // Include the call flag for compatibility
+        }));
 
-        hbls.value = hblsWithFollowups;
-        totalRecords.value = hblsWithFollowups.length;
-        currentPage.value = response.data.meta.current_page;
+        hbls.value = followupData;
+        totalRecords.value = response.data.meta?.total || 0;
+        currentPage.value = response.data.meta?.current_page || 1;
+
+        // Fetch summary stats when filters change
+        if (page === 1) {
+            await fetchSummaryStats();
+        }
     } catch (error) {
         console.error("Error fetching follow-ups:", error);
+        hbls.value = [];
+        totalRecords.value = 0;
     } finally {
         loading.value = false;
     }
@@ -141,42 +218,60 @@ const debouncedFetchHBLs = debounce((searchValue) => {
     fetchHBLs(1, searchValue);
 }, 1000);
 
+const refreshSummaryStats = debounce(() => {
+    fetchSummaryStats();
+}, 500);
+
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
         debouncedFetchHBLs(newValue);
+        refreshSummaryStats();
     }
 });
 
 watch(() => filters.value.warehouse.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => filters.value.hbl_type.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => filters.value.cargo_type.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => filters.value.is_hold.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => filters.value.user.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => filters.value.payments.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => fromDate.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => toDate.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
+});
+
+watch(() => filters.value.agent.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 const onPageChange = (event) => {
@@ -274,10 +369,12 @@ const clearFilter = () => {
         is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
         user: {value: null, matchMode: FilterMatchMode.EQUALS},
         payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+        agent: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
     fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
     fetchHBLs(currentPage.value);
+    refreshSummaryStats();
 };
 
 const confirmViewCallFlagModal = (hbl) => {
@@ -296,6 +393,7 @@ const closeCallFlagModal = () => {
 
 const onCallFlagCreated = () => {
     fetchHBLs(currentPage.value, filters.value.global.value);
+    refreshSummaryStats();
     selectedHBL.value = null;
     selectedHBLData.value = null;
 };
@@ -350,6 +448,34 @@ const getDaysOverdue = (followupDate) => {
         </template>
 
         <Breadcrumb />
+
+        <!-- Summary Widgets for Follow-ups -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
+            <SimpleOverviewWidget
+                title="Total Follow-ups"
+                :count="summaryStats.totalFollowups"
+                icon="ti ti-clock"
+                color="warn"
+            />
+            <SimpleOverviewWidget
+                title="Overdue"
+                :count="summaryStats.overdueFollowups"
+                icon="ti ti-clock-exclamation"
+                color="danger"
+            />
+            <SimpleOverviewWidget
+                title="Due Today"
+                :count="summaryStats.dueTodayFollowups"
+                icon="ti ti-clock-hour-9"
+                color="warn"
+            />
+            <SimpleOverviewWidget
+                title="Due Soon"
+                :count="summaryStats.dueSoonFollowups"
+                icon="ti ti-clock-hour-3"
+                color="info"
+            />
+        </div>
 
         <div>
             <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>

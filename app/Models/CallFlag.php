@@ -46,7 +46,7 @@ class CallFlag extends Model
     {
         return $this->followup_date &&
                $this->followup_date <= now()->toDateString() &&
-               !$this->hasCompletedFollowUp();
+               ! $this->hasCompletedFollowUp();
     }
 
     public function hasCompletedFollowUp(): bool
@@ -58,7 +58,7 @@ class CallFlag extends Model
 
     public function hasAppointment(): bool
     {
-        return !is_null($this->appointment_date);
+        return ! is_null($this->appointment_date);
     }
 
     public function isAppointmentUpcoming(): bool

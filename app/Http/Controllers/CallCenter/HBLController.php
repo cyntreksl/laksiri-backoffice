@@ -106,26 +106,26 @@ class HBLController extends Controller
     {
         $this->authorize('hbls.index');
 
-        $query = CallFlag::with(['hbl','causer'])
+        $query = CallFlag::with(['hbl', 'causer'])
             ->orderBy('created_at', 'desc');
 
         // Apply filters
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('notes', 'LIKE', "%{$search}%")
-                  ->orWhere('caller', 'LIKE', "%{$search}%")
-                  ->orWhereHas('hbl', function($hblQuery) use ($search) {
-                      $hblQuery->where('hbl_number', 'LIKE', "%{$search}%")
-                               ->orWhere('hbl', 'LIKE', "%{$search}%")
-                               ->orWhere('hbl_name', 'LIKE', "%{$search}%")
-                               ->orWhere('email', 'LIKE', "%{$search}%")
-                               ->orWhere('contact_number', 'LIKE', "%{$search}%")
-                               ->orWhere('consignee_name', 'LIKE', "%{$search}%");
-                  })
-                  ->orWhereHas('causer', function($userQuery) use ($search) {
-                      $userQuery->where('name', 'LIKE', "%{$search}%");
-                  });
+                    ->orWhere('caller', 'LIKE', "%{$search}%")
+                    ->orWhereHas('hbl', function ($hblQuery) use ($search) {
+                        $hblQuery->where('hbl_number', 'LIKE', "%{$search}%")
+                            ->orWhere('hbl', 'LIKE', "%{$search}%")
+                            ->orWhere('hbl_name', 'LIKE', "%{$search}%")
+                            ->orWhere('email', 'LIKE', "%{$search}%")
+                            ->orWhere('contact_number', 'LIKE', "%{$search}%")
+                            ->orWhere('consignee_name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('causer', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'LIKE', "%{$search}%");
+                    });
             });
         }
 
@@ -139,14 +139,14 @@ class HBLController extends Controller
 
         if ($request->filled('fromDate') && $request->filled('toDate')) {
             $query->whereBetween('created_at', [
-                $request->fromDate . ' 00:00:00',
-                $request->toDate . ' 23:59:59'
+                $request->fromDate.' 00:00:00',
+                $request->toDate.' 23:59:59',
             ]);
         }
 
         // Apply HBL-related filters through relationship
         if ($request->filled('warehouse') || $request->filled('deliveryType') || $request->filled('cargoMode') || $request->filled('paymentStatus') || $request->filled('createdBy')) {
-            $query->whereHas('hbl', function($hblQuery) use ($request) {
+            $query->whereHas('hbl', function ($hblQuery) use ($request) {
                 if ($request->filled('warehouse')) {
                     $hblQuery->where('warehouse', $request->warehouse);
                 }
@@ -194,7 +194,192 @@ class HBLController extends Controller
                 'total' => $callFlags->total(),
                 'from' => $callFlags->firstItem(),
                 'to' => $callFlags->lastItem(),
-            ]
+            ],
+        ]);
+    }
+
+    /**
+     * Get appointments data for API
+     */
+    public function getAppointmentsData(Request $request)
+    {
+        $this->authorize('hbls.index');
+
+        $query = CallFlag::with(['hbl', 'causer'])
+            ->whereNotNull('appointment_date')
+            ->orderBy('appointment_date', 'asc');
+
+        // Apply filters
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('notes', 'LIKE', "%{$search}%")
+                    ->orWhere('caller', 'LIKE', "%{$search}%")
+                    ->orWhere('appointment_notes', 'LIKE', "%{$search}%")
+                    ->orWhereHas('hbl', function ($hblQuery) use ($search) {
+                        $hblQuery->where('hbl_number', 'LIKE', "%{$search}%")
+                            ->orWhere('hbl', 'LIKE', "%{$search}%")
+                            ->orWhere('hbl_name', 'LIKE', "%{$search}%")
+                            ->orWhere('email', 'LIKE', "%{$search}%")
+                            ->orWhere('contact_number', 'LIKE', "%{$search}%")
+                            ->orWhere('consignee_name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('causer', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($request->filled('agent')) {
+            $query->where('created_by', $request->agent);
+        }
+
+        if ($request->filled('fromDate') && $request->filled('toDate')) {
+            $query->whereBetween('appointment_date', [
+                $request->fromDate,
+                $request->toDate,
+            ]);
+        }
+
+        // Apply HBL-related filters through relationship
+        if ($request->filled('warehouse') || $request->filled('deliveryType') || $request->filled('cargoMode') || $request->filled('paymentStatus') || $request->filled('createdBy')) {
+            $query->whereHas('hbl', function ($hblQuery) use ($request) {
+                if ($request->filled('warehouse')) {
+                    $hblQuery->where('warehouse', $request->warehouse);
+                }
+                if ($request->filled('deliveryType')) {
+                    $hblQuery->where('hbl_type', $request->deliveryType);
+                }
+                if ($request->filled('cargoMode')) {
+                    $hblQuery->where('cargo_type', $request->cargoMode);
+                }
+                if ($request->filled('paymentStatus')) {
+                    $hblQuery->where('payment_status', $request->paymentStatus);
+                }
+                if ($request->filled('createdBy')) {
+                    $hblQuery->where('created_by', $request->createdBy);
+                }
+            });
+        }
+
+        // Sorting
+        if ($request->filled('sort_field') && $request->filled('sort_order')) {
+            $sortField = $request->sort_field;
+            $sortOrder = $request->sort_order === 'asc' ? 'asc' : 'desc';
+
+            if ($sortField === 'appointment_date') {
+                $query->orderBy('appointment_date', $sortOrder);
+            } elseif ($sortField === 'created_at') {
+                $query->orderBy('created_at', $sortOrder);
+            }
+        }
+
+        // Pagination
+        $perPage = $request->get('per_page', 10);
+        $callFlags = $query->paginate($perPage);
+
+        return response()->json([
+            'data' => $callFlags->items(),
+            'meta' => [
+                'current_page' => $callFlags->currentPage(),
+                'last_page' => $callFlags->lastPage(),
+                'per_page' => $callFlags->perPage(),
+                'total' => $callFlags->total(),
+                'from' => $callFlags->firstItem(),
+                'to' => $callFlags->lastItem(),
+            ],
+        ]);
+    }
+
+    /**
+     * Get followups data for API
+     */
+    public function getFollowupsData(Request $request)
+    {
+        $this->authorize('hbls.index');
+
+        $query = CallFlag::with(['hbl', 'causer'])
+            ->whereNotNull('followup_date')
+            ->orderBy('followup_date', 'asc');
+
+        // Apply filters
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('notes', 'LIKE', "%{$search}%")
+                    ->orWhere('caller', 'LIKE', "%{$search}%")
+                    ->orWhereHas('hbl', function ($hblQuery) use ($search) {
+                        $hblQuery->where('hbl_number', 'LIKE', "%{$search}%")
+                            ->orWhere('hbl', 'LIKE', "%{$search}%")
+                            ->orWhere('hbl_name', 'LIKE', "%{$search}%")
+                            ->orWhere('email', 'LIKE', "%{$search}%")
+                            ->orWhere('contact_number', 'LIKE', "%{$search}%")
+                            ->orWhere('consignee_name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('causer', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($request->filled('agent')) {
+            $query->where('created_by', $request->agent);
+        }
+
+        if ($request->filled('fromDate') && $request->filled('toDate')) {
+            $query->whereBetween('followup_date', [
+                $request->fromDate,
+                $request->toDate,
+            ]);
+        }
+
+        // Apply HBL-related filters through relationship
+        if ($request->filled('warehouse') || $request->filled('deliveryType') || $request->filled('cargoMode') || $request->filled('paymentStatus') || $request->filled('createdBy')) {
+            $query->whereHas('hbl', function ($hblQuery) use ($request) {
+                if ($request->filled('warehouse')) {
+                    $hblQuery->where('warehouse', $request->warehouse);
+                }
+                if ($request->filled('deliveryType')) {
+                    $hblQuery->where('hbl_type', $request->deliveryType);
+                }
+                if ($request->filled('cargoMode')) {
+                    $hblQuery->where('cargo_type', $request->cargoMode);
+                }
+                if ($request->filled('paymentStatus')) {
+                    $hblQuery->where('payment_status', $request->paymentStatus);
+                }
+                if ($request->filled('createdBy')) {
+                    $hblQuery->where('created_by', $request->createdBy);
+                }
+            });
+        }
+
+        // Sorting
+        if ($request->filled('sort_field') && $request->filled('sort_order')) {
+            $sortField = $request->sort_field;
+            $sortOrder = $request->sort_order === 'asc' ? 'asc' : 'desc';
+
+            if ($sortField === 'followup_date') {
+                $query->orderBy('followup_date', $sortOrder);
+            } elseif ($sortField === 'created_at') {
+                $query->orderBy('created_at', $sortOrder);
+            }
+        }
+
+        // Pagination
+        $perPage = $request->get('per_page', 10);
+        $callFlags = $query->paginate($perPage);
+
+        return response()->json([
+            'data' => $callFlags->items(),
+            'meta' => [
+                'current_page' => $callFlags->currentPage(),
+                'last_page' => $callFlags->lastPage(),
+                'per_page' => $callFlags->perPage(),
+                'total' => $callFlags->total(),
+                'from' => $callFlags->firstItem(),
+                'to' => $callFlags->lastItem(),
+            ],
         ]);
     }
 

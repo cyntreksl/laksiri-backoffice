@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\CallCenter;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -43,6 +42,7 @@ class HBLResource extends JsonResource
             'call_flags_count' => $this->call_flags_count ?? 0,
             'latest_call_flag' => $this->when($this->callFlags && $this->callFlags->isNotEmpty(), function () {
                 $latest = $this->callFlags->first();
+
                 return [
                     'caller' => $latest->caller,
                     'date' => $latest->date,
@@ -65,7 +65,7 @@ class HBLResource extends JsonResource
      */
     private function hasFollowUpDue(): bool
     {
-        if (!$this->callFlags || $this->callFlags->isEmpty()) {
+        if (! $this->callFlags || $this->callFlags->isEmpty()) {
             return false;
         }
 
@@ -74,7 +74,7 @@ class HBLResource extends JsonResource
             ->where('followup_date', '!=', null)
             ->filter(function ($callFlag) {
                 // Check if there's no newer call flag after this follow-up date
-                return !$this->callFlags
+                return ! $this->callFlags
                     ->where('date', '>', $callFlag->followup_date)
                     ->isNotEmpty();
             })
@@ -86,7 +86,7 @@ class HBLResource extends JsonResource
      */
     private function hasUpcomingAppointment(): bool
     {
-        if (!$this->callFlags || $this->callFlags->isEmpty()) {
+        if (! $this->callFlags || $this->callFlags->isEmpty()) {
             return false;
         }
 
@@ -101,7 +101,7 @@ class HBLResource extends JsonResource
      */
     private function getNextFollowUpDate(): ?string
     {
-        if (!$this->callFlags || $this->callFlags->isEmpty()) {
+        if (! $this->callFlags || $this->callFlags->isEmpty()) {
             return null;
         }
 
@@ -118,7 +118,7 @@ class HBLResource extends JsonResource
      */
     private function getNextAppointmentDate(): ?string
     {
-        if (!$this->callFlags || $this->callFlags->isEmpty()) {
+        if (! $this->callFlags || $this->callFlags->isEmpty()) {
             return null;
         }
 

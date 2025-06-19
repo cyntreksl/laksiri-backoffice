@@ -25,6 +25,7 @@ import axios from "axios";
 import {debounce} from "lodash";
 import {push} from "notivue";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
+import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 import CallFlagListDialog from "./Components/CallFlagListDialog.vue";
 
@@ -77,6 +78,7 @@ const filters = ref({
     is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
     user: {value: null, matchMode: FilterMatchMode.EQUALS},
     payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+    agent: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const menuModel = ref([
@@ -100,10 +102,69 @@ const menuModel = ref([
     },
 ]);
 
-const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+// Summary statistics for appointments - will be fetched separately
+const summaryStats = ref({
+    totalAppointments: 0,
+    pastAppointments: 0,
+    todayAppointments: 0,
+    thisWeekAppointments: 0,
+    upcomingAppointments: 0
+});
+
+const fetchSummaryStats = async () => {
+    try {
+        const response = await axios.get('/call-center/appointments-data', {
+            params: {
+                page: 1,
+                per_page: 999999, // Get all records for summary
+                search: filters.value.global.value || "",
+                warehouse: filters.value.warehouse.value || "",
+                deliveryType: filters.value.hbl_type.value || "",
+                cargoMode: filters.value.cargo_type.value || "",
+                isHold: filters.value.is_hold.value || false,
+                createdBy: filters.value.user.value || "",
+                paymentStatus: filters.value.payments.value || [],
+                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+                toDate: moment(toDate.value).format("YYYY-MM-DD"),
+                agent: filters.value.agent.value || "",
+            }
+        });
+
+        const allAppointments = response.data.data || [];
+        const today = moment().format('YYYY-MM-DD');
+        const thisWeekEnd = moment().endOf('week').format('YYYY-MM-DD');
+
+        const stats = {
+            totalAppointments: allAppointments.length,
+            pastAppointments: 0,
+            todayAppointments: 0,
+            thisWeekAppointments: 0,
+            upcomingAppointments: 0
+        };
+
+        allAppointments.forEach(appointment => {
+            const appointmentDate = appointment.appointment_date;
+            if (appointmentDate === today) {
+                stats.todayAppointments++;
+            } else if (appointmentDate > today && appointmentDate <= thisWeekEnd) {
+                stats.thisWeekAppointments++;
+            } else if (appointmentDate > thisWeekEnd) {
+                stats.upcomingAppointments++;
+            }
+            // Note: We don't count past appointments in the widgets
+        });
+
+        summaryStats.value = stats;
+        console.log("Appointment Summary Stats:", stats);
+    } catch (error) {
+        console.error("Error fetching appointment summary stats:", error);
+    }
+};
+
+const fetchHBLs = async (page = 1, search = "", sortField = 'appointment_date', sortOrder = 0) => {
     loading.value = true;
     try {
-        const response = await axios.get('/call-center/hbl-list', {
+        const response = await axios.get('/call-center/appointments-data', {
             params: {
                 page,
                 per_page: perPage.value,
@@ -118,20 +179,36 @@ const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOr
                 paymentStatus: filters.value.payments.value || [],
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
-                filter_type: 'appointments' // Filter for appointments only
+                agent: filters.value.agent.value || "",
             }
         });
 
-        // Filter HBLs that have appointments
-        const hblsWithAppointments = response.data.data.filter(hbl =>
-            hbl.has_upcoming_appointment || hbl.appointment_date
-        );
+        // Map CallFlag data to HBL-like structure for display
+        const appointmentData = response.data.data.map(callFlag => ({
+            ...callFlag.hbl,
+            appointment_date: callFlag.appointment_date,
+            appointment_notes: callFlag.appointment_notes,
+            call_outcome: callFlag.call_outcome,
+            latest_call_flag: {
+                date: callFlag.date,
+                notes: callFlag.notes,
+                causer: callFlag.causer
+            },
+            call_flags: [callFlag] // Include the call flag for compatibility
+        }));
 
-        hbls.value = hblsWithAppointments;
-        totalRecords.value = hblsWithAppointments.length;
-        currentPage.value = response.data.meta.current_page;
+        hbls.value = appointmentData;
+        totalRecords.value = response.data.meta?.total || 0;
+        currentPage.value = response.data.meta?.current_page || 1;
+
+        // Fetch summary stats when filters change
+        if (page === 1) {
+            await fetchSummaryStats();
+        }
     } catch (error) {
         console.error("Error fetching appointments:", error);
+        hbls.value = [];
+        totalRecords.value = 0;
     } finally {
         loading.value = false;
     }
@@ -141,42 +218,60 @@ const debouncedFetchHBLs = debounce((searchValue) => {
     fetchHBLs(1, searchValue);
 }, 1000);
 
+const refreshSummaryStats = debounce(() => {
+    fetchSummaryStats();
+}, 500);
+
 watch(() => filters.value.global.value, (newValue) => {
     if (newValue !== null) {
         debouncedFetchHBLs(newValue);
+        refreshSummaryStats();
     }
 });
 
 watch(() => filters.value.warehouse.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => filters.value.hbl_type.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => filters.value.cargo_type.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => filters.value.is_hold.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => filters.value.user.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => filters.value.payments.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => fromDate.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 watch(() => toDate.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
+});
+
+watch(() => filters.value.agent.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+    refreshSummaryStats();
 });
 
 const onPageChange = (event) => {
@@ -274,10 +369,12 @@ const clearFilter = () => {
         is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
         user: {value: null, matchMode: FilterMatchMode.EQUALS},
         payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+        agent: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
     fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
     fetchHBLs(currentPage.value);
+    refreshSummaryStats();
 };
 
 const confirmViewCallFlagModal = (hbl) => {
@@ -296,6 +393,7 @@ const closeCallFlagModal = () => {
 
 const onCallFlagCreated = () => {
     fetchHBLs(currentPage.value, filters.value.global.value);
+    refreshSummaryStats();
     selectedHBL.value = null;
     selectedHBLData.value = null;
 };
@@ -343,6 +441,34 @@ const formatDateTime = (datetime) => {
         </template>
 
         <Breadcrumb />
+
+        <!-- Summary Widgets for Appointments -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
+            <SimpleOverviewWidget
+                title="Total Appointments"
+                :count="summaryStats.totalAppointments"
+                icon="ti ti-calendar-check"
+                color="success"
+            />
+            <SimpleOverviewWidget
+                title="Today"
+                :count="summaryStats.todayAppointments"
+                icon="ti ti-calendar-today"
+                color="primary"
+            />
+            <SimpleOverviewWidget
+                title="This Week"
+                :count="summaryStats.thisWeekAppointments"
+                icon="ti ti-calendar-week"
+                color="warn"
+            />
+            <SimpleOverviewWidget
+                title="Upcoming"
+                :count="summaryStats.upcomingAppointments"
+                icon="ti ti-calendar-forward"
+                color="info"
+            />
+        </div>
 
         <div>
             <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
