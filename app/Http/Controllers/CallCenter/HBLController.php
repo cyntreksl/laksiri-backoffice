@@ -43,6 +43,16 @@ class HBLController extends Controller
         ]);
     }
 
+    public function receptionIndex()
+    {
+        return Inertia::render('CallCenter/HBL/CallCenterHBLList', [
+            'users' => $this->userRepository->getUsers(['customer']),
+            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
+            'paymentStatus' => HBLPaymentStatus::cases(),
+            'warehouses' => GetDestinationBranches::run(),
+        ]);
+    }
+
     public function list(Request $request)
     {
         $limit = $request->input('per_page', 10);
