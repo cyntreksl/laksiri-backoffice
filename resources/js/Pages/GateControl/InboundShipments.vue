@@ -420,11 +420,11 @@ const exportCSV = () => {
                                 <Tag :severity="resolveContainerType(slotProps.data)"
                                      :value="slotProps.data.container_type" class="text-sm"></Tag>
 
-                                <img v-if="slotProps.data?.cargo_type === 'Sea Cargo'" :src="LongVehicle" alt="image"
-                                     class="w-2/4 block xl:block rounded"/>
+<!--                                <img v-if="slotProps.data?.cargo_type === 'Sea Cargo'" :src="LongVehicle" alt="image"-->
+<!--                                     class="w-2/4 block xl:block rounded"/>-->
 
-                                <img v-if="slotProps.data?.cargo_type === 'Air Cargo'" :src="CargoPlane" alt="image"
-                                     class="w-2/4 block xl:block rounded"/>
+<!--                                <img v-if="slotProps.data?.cargo_type === 'Air Cargo'" :src="CargoPlane" alt="image"-->
+<!--                                     class="w-2/4 block xl:block rounded"/>-->
                             </template>
                             <template #filter="{ filterModel }">
                                 <Select v-model="filterModel.value" :options="containerTypes" :showClear="true"

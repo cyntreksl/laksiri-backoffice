@@ -5,10 +5,31 @@ use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
 // HBLs
-Breadcrumbs::for('call-center.hbls.index', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('call-center.callcenter-list', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('HBL');
-    $trail->push('HBLs', route('call-center.hbls.index'));
+    $trail->push('Call Center');
+    $trail->push('HBL List', route('call-center.callcenter-list'));
+});
+
+// All Calls
+Breadcrumbs::for('call-center.all-calls', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Call Center');
+    $trail->push('All Calls', route('call-center.all-calls'));
+});
+
+// Appointments
+Breadcrumbs::for('call-center.appointments', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Call Center');
+    $trail->push('Appointments', route('call-center.appointments'));
+});
+
+// Follow-ups
+Breadcrumbs::for('call-center.followups', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Call Center');
+    $trail->push('Follow-ups', route('call-center.followups'));
 });
 
 // Reception

@@ -26,6 +26,7 @@ use App\Actions\UnloadingIssue\UploadUnloadingIssueImages;
 use App\Actions\UnloadingIssueImages\DeleteUnloadingIssueFile;
 use App\Actions\UnloadingIssueImages\DownloadSingleUnloadingIssueFile;
 use App\Actions\UnloadingIssueImages\GetUnloadingIssueImages;
+use App\Actions\User\GetUserCurrentBranchID;
 use App\Actions\VesselSchedule\GetVesselSchedule;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
@@ -78,7 +79,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = Container::query()->where('status', '<>', ContainerStatus::LOADED->value);
+        $query = Container::query()->whereIn('status', [ContainerStatus::DRAFT->value, ContainerStatus::REQUESTED->value]);
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {
@@ -391,9 +392,8 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function getAfterDispatchShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
     {
         $query = Container::query()->whereIn('status', [
-            ContainerStatus::IN_TRANSIT->value,
             ContainerStatus::REACHED_DESTINATION->value,
-            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
+            //            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
         ])->withoutGlobalScope(BranchScope::class);
 
         if (! empty($search)) {
@@ -404,6 +404,8 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
                     ->orWhere('awb_number', 'like', '%'.$search.'%');
             });
         }
+
+        $query->where('target_warehouse', GetUserCurrentBranchID::run());
 
         FilterFactory::apply($query, $filters);
 
@@ -453,8 +455,9 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function getAfterInboundShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
     {
         $query = Container::query()->whereIn('status', [
-            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
-            ContainerStatus::DEPARTED_PRIMARY_WAREHOUSE->value,
+            //            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
+            ContainerStatus::UNLOADED->value,
+            //            ContainerStatus::DEPARTED_PRIMARY_WAREHOUSE->value,
         ])->withoutGlobalScope(BranchScope::class);
 
         if (! empty($search)) {
@@ -467,7 +470,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         }
 
         FilterFactory::apply($query, $filters);
-
+        $query->where('target_warehouse', GetUserCurrentBranchID::run());
         $containers = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([

@@ -336,6 +336,22 @@
                                 <i class="ti ti-git-branch text-2xl"></i>
                             </Link>
 
+                            <!-- Call Center -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('call-center.'))"
+                                :class="[
+                activeMenu === 'call-center' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Call Center'"
+                                @click="
+                setMenu('call-center');
+                openSideBar();
+              "
+                            >
+                                <i class="ti ti-headset text-2xl"></i>
+                            </a>
+
                             <!-- Tokens -->
                             <Link
                                 v-if="$page.props.user.permissions.includes('manage_tokens')"
@@ -1606,6 +1622,56 @@ export default {
                     childMenuList.splice(0, childMenuList.length, ...settingMenu);
 
                     changeSidePanelTitle("Settings");
+                    break;
+                case "call-center":
+                    let callCenterMenu = [];
+
+                    if (usePage().props.user.permissions.includes("call-center.hbl-list")) {
+                        callCenterMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "HBL List",
+                                route: "call-center.callcenter-list",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("call-center.all-calls")) {
+                        callCenterMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All Calls",
+                                route: "call-center.all-calls",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("call-center.followups")) {
+                        callCenterMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Follow-ups",
+                                route: "call-center.followups",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("call-center.appointments")) {
+                        callCenterMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Appointments",
+                                route: "call-center.appointments",
+                            }
+                        );
+                    }
+
+                    childMenuList.splice(0, childMenuList.length, ...callCenterMenu);
+                    changeSidePanelTitle("Call Center");
                     break;
                 case "settings":
                     childMenuList.splice(0, childMenuList.length, {
