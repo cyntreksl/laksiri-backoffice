@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Enum\CargoType;
 use App\Enum\ContainerStatus;
 use App\Enum\ContainerType;
+use App\Interfaces\CallCenter\ExaminationRepositoryInterface;
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Models\Container;
+use App\Models\CustomerQueue;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,6 +16,7 @@ class GateControlController extends Controller
 {
     public function __construct(
         private readonly ContainerRepositoryInterface $containerRepository,
+        private readonly ExaminationRepositoryInterface $examinationRepository,
     ) {}
 
     public function listInboundShipments()
@@ -88,5 +91,19 @@ class GateControlController extends Controller
     public function updateOutboundShipmentStatus(Container $container)
     {
         $this->containerRepository->updateOutboundShipmentStatus($container);
+    }
+
+    public function listOutboundGatePasses()
+    {
+        return Inertia::render('GateControl/OutboundTokens');
+    }
+
+    public function markAsDeparted(CustomerQueue $customerQueue)
+    {
+        try {
+            $this->examinationRepository->markAsDeparted($customerQueue);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to mark as depart: '.$e->getMessage());
+        }
     }
 }

@@ -24,6 +24,10 @@ class CustomerQueue extends Model
 
     const EXAMINATION_QUEUE = 'EXAMINATION_QUEUE';
 
+    const BOND_AREA_QUEUE = 'BOND_AREA_QUEUE';
+
+    const GATE_PASS_RELEASED = 'GATE_PASS_RELEASED';
+
     protected $fillable = [
         'token_id', 'type', 'arrived_at', 'left_at',
     ];

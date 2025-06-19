@@ -1,7 +1,7 @@
 <script setup>
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import {computed, ref, watchEffect} from "vue";
+import {ref, watchEffect} from "vue";
 import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
 import Button from "primevue/button";
@@ -371,11 +371,11 @@ watchEffect(() => {
 
         <div>
             <InputLabel value="Reached Date"/>
-            <DatePicker v-model="form.reached_date" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set Reached Date" show-icon/>
+            <DatePicker v-model="form.reached_date" :disabled="$page.props.currentBranch.type !== 'Destination'" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set Reached Date" show-icon/>
             <InputError :message="form.errors.reached_date"/>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div v-if="$page.props.currentBranch.type === 'Destination'" class="flex items-center gap-2">
             <Checkbox v-model="form.is_reached" binary inputId="is_reached" />
             <label class="font-medium text-sm" for="is_reached">Reached Destination?</label>
             <InputError :message="form.errors.is_reached"/>

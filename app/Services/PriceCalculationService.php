@@ -269,7 +269,7 @@ class PriceCalculationService
             ? $billingRule['per_package_charges'] * $measuredData['package_list_length']
             : $billingRule['per_package_charges'];
 
-        $otherCharge = $destinationCharges + $packageCharges;
+        $otherCharge = $packageCharges;
         $vat = $billingRule['bill_vat'] ? $billingRule['bill_vat'] / 100 : 0;
         $grandTotal = $calculationResult['freight_charge'] + $billingRule['bill_price'] + $otherCharge + $vat;
 
@@ -278,7 +278,7 @@ class PriceCalculationService
             'bill_charge' => $this->formatNumber($billingRule['bill_price']),
             'other_charge' => $this->formatNumber($otherCharge, 2),
             'package_charges' => $this->formatNumber($packageCharges, 2),
-            'destination_charges' => $this->formatNumber($destinationCharges, 2),
+            'destination_charges' => $this->formatNumber(0, 2),
             'is_editable' => boolval($billingRule['is_editable']),
             'vat' => $vat,
             'per_package_charge' => floatval($billingRule['per_package_charges']),

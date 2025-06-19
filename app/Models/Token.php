@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
@@ -17,7 +18,7 @@ class Token extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'hbl_id', 'customer_id', 'receptionist_id', 'reference', 'package_count', 'token',
+        'hbl_id', 'customer_id', 'receptionist_id', 'reference', 'package_count', 'token', 'departed_by', 'departed_at',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -90,5 +91,10 @@ class Token extends Model
     public function hbl(): BelongsTo
     {
         return $this->belongsTo(HBL::class, 'hbl_id', 'id');
+    }
+
+    public function queueLogs(): HasMany
+    {
+        return $this->hasMany(QueueLog::class, 'token_id');
     }
 }

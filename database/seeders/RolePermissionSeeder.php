@@ -15,22 +15,25 @@ class RolePermissionSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create roles
-        Role::updateOrCreate(['name' => 'super-admin']);
-        Role::updateOrCreate(['name' => 'admin']);
-        Role::updateOrCreate(['name' => 'empty']);
-        Role::updateOrCreate(['name' => 'viewer']);
-        Role::updateOrCreate(['name' => 'driver']);
-        Role::updateOrCreate(['name' => 'customer']);
-        Role::updateOrCreate(['name' => 'call center']);
-        Role::updateOrCreate(['name' => 'boned area']);
-        Role::updateOrCreate(['name' => 'finance Team']);
-        Role::updateOrCreate(['name' => 'front office staff']);
-        Role::updateOrCreate(['name' => 'clearance team']);
-        Role::updateOrCreate(['name' => 'gate-security']);
+        //        Role::updateOrCreate(['name' => 'super-admin']);
+        //        Role::updateOrCreate(['name' => 'admin']);
+        //        Role::updateOrCreate(['name' => 'empty']);
+        //        Role::updateOrCreate(['name' => 'viewer']);
+        //        Role::updateOrCreate(['name' => 'driver']);
+        //        Role::updateOrCreate(['name' => 'customer']);
+        //        Role::updateOrCreate(['name' => 'call center']);
+        //        Role::updateOrCreate(['name' => 'boned area']);
+        //        Role::updateOrCreate(['name' => 'finance Team']);
+        //        Role::updateOrCreate(['name' => 'front office staff']);
+        //        Role::updateOrCreate(['name' => 'clearance team']);
+        //        Role::updateOrCreate(['name' => 'gate-security']);
+        //
+        //        $this->command->info('Default Roles added.');
+        //
+        //        $this->assignPermissions();
 
-        $this->command->info('Default Roles added.');
+        $this->createPermissionIfNotExsists();
 
-        $this->assignPermissions();
     }
 
     protected function assignPermissions(): void
@@ -69,6 +72,7 @@ class RolePermissionSeeder extends Seeder
             'Courier',
             'Courier Agents',
             'Settings',
+            'Third Party Shipment',
         ];
 
         $excludedAdminPermissions = [
@@ -189,6 +193,7 @@ class RolePermissionSeeder extends Seeder
             'customer-queue.show examination calling queue',
             'customer-queue.show gate ist',
             'customer-queue.show examination calling screen',
+            'manage_tokens',
         ];
 
         $callCenterRole = Role::where('name', 'call center')->first();
@@ -474,6 +479,7 @@ class RolePermissionSeeder extends Seeder
                     'hbls.hbl finance approval list',
                     'hbls.finance approved hbl list',
                     'hbls.create finance approval',
+                    'hbls.call flag',
                 ],
             ],
 
@@ -654,6 +660,50 @@ class RolePermissionSeeder extends Seeder
                     'mark-gate-pass',
                 ],
             ],
+
+            // reception permissions
+            [
+                'group_name' => 'Reception',
+                'permissions' => [
+                    'reception.show reception calling queue',
+                    'reception.show reception verified list',
+                    'reception.show reception calling screen',
+                    'reception.issue token',
+                ],
+            ],
+
+            [
+                'group_name' => 'Token',
+                'permissions' => [
+                    'manage_tokens',
+                ],
+            ],
+
+            [
+                'group_name' => 'Third Party Shipment',
+                'permissions' => [
+                    'third_party_shipments.index',
+                    'third_party_shipments.create',
+                    'third_party_shipments.edit',
+                    'third_party_shipments.delete',
+                    'third_party_shipments.show',
+                ],
+            ],
         ];
+    }
+
+    public function createPermissionIfNotExsists()
+    {
+        foreach (self::defaultPermissions() as $permissionGroup) {
+            foreach ($permissionGroup['permissions'] as $permName) {
+                $permission = Permission::updateOrCreate([
+                    'name' => $permName,
+                    'group_name' => $permissionGroup['group_name'],
+                    'guard_name' => 'web',
+                ]);
+            }
+
+            $this->command->info("Permission group '{$permissionGroup['group_name']}' with permissions created or updated.");
+        }
     }
 }

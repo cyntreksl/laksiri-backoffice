@@ -22,7 +22,7 @@ import Button from "primevue/button";
 import Column from "primevue/column";
 import IconField from "primevue/iconfield";
 
-const baseUrl = ref("/couriers/courier-agents/list");
+const baseUrl = ref("/couriers/management/courier-agents/list");
 const loading = ref(true);
 const courierAgents = ref([]);
 const selectedCourierAgent = ref(null);

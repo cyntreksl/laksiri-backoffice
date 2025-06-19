@@ -5,6 +5,7 @@ namespace App\Actions\Cashier;
 use App\Actions\Container\GetContainerWithoutGlobalScopesById;
 use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Actions\SLInvoice\CreateSLInvoice;
+use App\Actions\Tax\GetTaxesByWarehouse;
 use App\Actions\User\GetUserById;
 use Lorisleiva\Actions\Concerns\AsAction;
 use NumberFormatter;
@@ -16,6 +17,7 @@ class DownloadCashierInvoicePDF
 
     public function handle($hbl)
     {
+
         $hbl = GetHBLByIdWithPackages::run($hbl);
         $sl_Invoice = $hbl->slInvoices;
         if (! $sl_Invoice) {
@@ -24,7 +26,6 @@ class DownloadCashierInvoicePDF
         $container = $sl_Invoice && ! is_null($sl_Invoice['container_id'])
             ? GetContainerWithoutGlobalScopesById::run($sl_Invoice['container_id'])
             : $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
-
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
         $total_in_word = strtoupper($formatter->format($sl_Invoice['total']));
 
@@ -57,6 +58,15 @@ class DownloadCashierInvoicePDF
             ],
             'total_in_word' => $total_in_word,
             'by' => GetUserById::run($sl_Invoice['created_by'])->name,
+            'taxes' => GetTaxesByWarehouse::run($hbl->warehouse_id)
+                ->map(function ($tax) {
+                    return [
+                        'name' => $tax->name,
+                        'rate' => $tax->rate,
+                    ];
+                })
+                ->values()
+                ->all(),
         ];
 
         $template = view('pdf.cashier.invoice', [

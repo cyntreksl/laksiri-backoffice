@@ -10,6 +10,8 @@ Route::name('arrival.')->group(function () {
     Route::get('shipments-arrivals', [ContainerController::class, 'showShipmentArrivals'])
         ->name('shipments-arrivals.index');
 
+    Route::get('shipments-arrivals-list', [ContainerController::class, 'ArrivedList']);
+
     Route::get('unloading-points/{container?}', [ContainerController::class, 'showUnloadingPoint'])
         ->name('unloading-points.index');
 

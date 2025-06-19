@@ -112,12 +112,12 @@
                 <table class="w-full">
                     <thead>
                     <tr class="bg-blue-900 text-white">
-                        <th class="px-6 py-2 text-left text-lg font-bold">DESCRIPTION</th>
-                        <th class="px-6 py-2 text-right text-lg font-bold">RATE</th>
-                        <th class="px-6 py-2 text-right text-lg font-bold">AMOUNT</th>
+                        <th class="px-6 py-2 text-left font-bold">DESCRIPTION</th>
+                        <th class="px-6 py-2 text-right font-bold">RATE</th>
+                        <th class="px-6 py-2 text-right font-bold">AMOUNT</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody class="divide-y divide-gray-200 text-sm">
                     <tr>
                         <td class="px-6 py-1 font-medium">Sri Lanka Port Charges - Sea Cargo</td>
                         <td class="px-6 py-1 text-right">
@@ -163,7 +163,7 @@
                                 <div class="text-neutral-500">10.00</div>
                             </div>
                         </td>
-                        <td class="px-6 py-1 text-right text-lg font-bold text-neutral-500">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
+                        <td class="px-6 py-1 text-right text-neutral-500">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
                         <td class="px-6 py-1 text-xl font-bold">TOTAL</td>
@@ -178,15 +178,26 @@
         <!-- Payment Summary -->
         <div class="mb-3 grid grid-cols-2 gap-8">
             <div class="rounded-lg bg-gray-50 px-4 py-2">
-                <p class="mb-2 text-sm">VAT 18% included in the charges</p>
-                <p class="text-sm font-bold text-neutral-500">{{ $data['total_in_word'] }}</p>
+                @if (!empty($data['taxes']))
+                    <p class="text-xs font-medium text-gray-800">
+                        Following taxes are included in your charges:
+                    </p>
+                    <ul class="list-disc list-inside text-xs text-gray-700">
+                        @foreach ($data['taxes'] as $tax)
+                            <li>
+                                <span>{{ $tax['name'] }}</span> {{ $tax['rate'] }}%
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+                <p class="text-sm font-bold text-neutral-500 mt-2">{{ $data['total_in_word'] }}</p>
             </div>
 
             <div>
                 <div class="space-y-1">
                     <div class="flex items-center justify-between">
                         <span class="font-medium">D/O Charges:</span>
-                        <span class="px-6 text-xl font-bold">{{ number_format($data['charges']['do_charge'],2) }}</span>
+                        <span class="px-6 font-bold">{{ number_format($data['charges']['do_charge'],2) }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="font-medium">Stamp Duty:</span>
@@ -213,7 +224,7 @@
         <!-- Signature Section -->
         <div class="mb-3 grid grid-cols-2 gap-8 px-4">
             <div>
-                <p class="mb-6">Cashier - Amount Received</p>
+                <p class="mb-6 text-sm">Cashier - Amount Received</p>
                 <div class="mb-3 border-b-2 border-gray-300 pb-4"></div>
                 <p class="text-neutral text-sm font-medium">Signature</p>
             </div>

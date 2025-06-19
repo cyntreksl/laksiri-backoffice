@@ -19,4 +19,10 @@ Route::prefix('gate-control')->name('gate-control.')->group(function () {
 
     Route::put('/outbound-shipments/{container}', [GateControlController::class, 'updateOutboundShipmentStatus'])
         ->name('outbound-shipments.update-status');
+
+    Route::get('/outbound-gate-passes', [GateControlController::class, 'listOutboundGatePasses'])
+        ->name('outbound-gate-passes.index');
+
+    Route::put('/outbound-gate-passes/{customer_queue}', [GateControlController::class, 'markAsDeparted'])
+        ->name('outbound-gate-passes.mark-as-departed');
 });

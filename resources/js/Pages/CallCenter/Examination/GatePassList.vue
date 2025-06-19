@@ -149,6 +149,32 @@ const exportCSV = () => {
 
                         <Column field="released_by" header="Released By"></Column>
 
+                        <Column header="">
+                            <template #body="slotProps">
+                                <div v-if="slotProps.data.departed_at" class="space-y-1">
+                                    <!-- Status indicator with icon -->
+                                    <div class="flex items-center gap-1.5 text-green-600">
+                                        <i class="ti ti-check text-lg"></i>
+                                        <span class="font-medium">Departed From Warehouse</span>
+                                    </div>
+
+                                    <!-- Departed timestamp -->
+                                    <div class="text-sm text-gray-500">
+                                        <span>Departed at: </span>
+                                        <span class="font-mono">{{ slotProps.data.departed_at }}</span>
+                                    </div>
+
+                                    <!-- Time in warehouse -->
+                                    <div class="text-sm text-gray-500 italic">
+                                        <span>Time in warehouse: </span>
+                                        <span class="font-medium text-gray-600 not-italic">
+                                            {{ slotProps.data.total_time }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                        </Column>
+
                         <template #footer> In total there are {{ tokens ? totalRecords : 0 }} tokens.</template>
                     </DataTable>
                 </template>

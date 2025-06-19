@@ -62,7 +62,7 @@
     <div class="feedback-mail">
         <!-- Logo goes here -->
         <img class="logo" style="width: 30%;"
-             src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/app-logo.png'))) }}"
+             src="{{ $message->embed(public_path('images/app-logo.png')) }}"
              alt="app_logo">
 
         <h1>{{ $customer ? 'Dear '.$customer : 'Hi'}},</h1>

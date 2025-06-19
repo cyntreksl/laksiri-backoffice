@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Actions\AirLine\GetAirLineByName;
 use App\Actions\Branch\GetBranchById;
 use App\Actions\SpecialDOCharge\GetSpecialDOChargeByAgent;
-use App\Actions\Tax\GetTaxByWarehouse;
+use App\Actions\Tax\GetSumOfTaxRatesByWarehouse;
 use App\Models\HBL;
 use Illuminate\Support\Facades\Auth;
 
@@ -76,7 +76,7 @@ class GatePassChargesService
     {
         return [
             'rate' => round($this->charges['port_charge'] * $volume, 2),
-            'amount' => round($this->charges['port_charge'] * $volume * (1 + $this->vat / 100), 2),
+            'amount' => round($this->charges['port_charge'] * $volume, 2),
         ];
     }
 
@@ -89,7 +89,7 @@ class GatePassChargesService
     {
         return [
             'rate' => round($this->charges['handling_charge'] * $package_count, 2),
-            'amount' => round($this->charges['handling_charge'] * $package_count * (1 + $this->vat / 100), 2),
+            'amount' => round($this->charges['handling_charge'] * $package_count, 2),
         ];
     }
 
@@ -105,7 +105,7 @@ class GatePassChargesService
 
         return [
             'rate' => round($quantity * $this->charges['bond_charge'], 2),
-            'amount' => round($quantity * $this->charges['bond_charge'] * (1 + $this->vat / 100), 2),
+            'amount' => round($quantity * $this->charges['bond_charge'], 2),
         ];
     }
 
@@ -285,10 +285,10 @@ class GatePassChargesService
      */
     public function vatCharge(HBL $hbl): array
     {
-        $tax = GetTaxByWarehouse::run($hbl->warehouse_id);
+        $sumOfRate = GetSumOfTaxRatesByWarehouse::run($hbl->warehouse_id);
 
         return [
-            'rate' => $tax ? $tax->rate : 0,
+            'rate' => $sumOfRate ?: 0,
         ];
     }
 

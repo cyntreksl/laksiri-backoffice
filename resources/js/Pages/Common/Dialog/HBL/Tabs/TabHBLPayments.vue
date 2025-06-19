@@ -1,6 +1,5 @@
 <script setup>
-import {usePage} from "@inertiajs/vue3";
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import Card from "primevue/card";
 
 const props = defineProps({
@@ -18,23 +17,34 @@ const props = defineProps({
     },
 });
 
-const page = usePage();
-const isPrepaid = ref(page.props.currentBranch.is_prepaid)
-const currencyRate = ref(
-    page.props.currentBranchCurrencyRate && page.props.currentBranchCurrencyRate.sl_rate
-        ? page.props.currentBranchCurrencyRate.sl_rate
-        : 1
-)
-const currencySymbol = ref(page.props.currentBranch.currency_symbol || '')
+const isPrepaid = ref(props.hbl?.branch?.is_prepaid)
+const currencyRate = ref(props.hbl?.currency_rate)
+const currencySymbol = ref(props.hbl?.branch?.currency_symbol || '')
+
+watch(
+    () => props.hbl.branch,
+    (newBranch) => {
+        if (newBranch) {
+            isPrepaid.value = newBranch.is_prepaid ?? false;
+            currencySymbol.value = newBranch.currency_symbol ?? '';
+        }
+    },
+    { immediate: true }
+);
 
 const formatCurrency = (amount) => {
-    const symbol = isPrepaid.value ? 'LKR' : currencySymbol.value;
-    const rate = isPrepaid.value ? 1 : (currencyRate.value);
+    const symbol = isPrepaid.value ? (currencySymbol.value || 'LKR') : 'LKR';
+    const rateRaw = isPrepaid.value ? (currencyRate.value || 1) : (currencyRate.value || 1);
+    const rate = isPrepaid.value ? (1 / rateRaw) : rateRaw;
+
+    const converted = amount * rate;
+    if (isNaN(converted)) return `${symbol} 0.00`;
+
     return `${symbol} ${new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
-    }).format(amount * rate)}`;
-}
+    }).format(converted)}`;
+};
 </script>
 
 <template>
@@ -67,28 +77,28 @@ const formatCurrency = (amount) => {
                     </div>
                 </div>
 
-                <div v-if="hblTotalSummary.destination_charges" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
-                    <div class="flex min-w-0 gap-x-4">
-                        <div class="min-w-0 flex-auto">
-                            <p class="text-sm/6 font-semibold text-gray-900">Destination Charges</p>
-                        </div>
-                    </div>
-                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.destination_charges).toFixed(2) }}</p>
-                        <div v-if="hbl.is_destination_charges_paid" class="mt-1 flex items-center gap-x-1.5">
-                            <div class="flex-none rounded-full bg-emerald-500/20 p-1">
-                                <div class="size-1.5 rounded-full bg-emerald-500" />
-                            </div>
-                            <p class="text-xs/5 text-gray-500">Paid</p>
-                        </div>
-                        <div v-else class="mt-1 flex items-center gap-x-1.5">
-                            <div class="flex-none rounded-full bg-red-500/20 p-1">
-                                <div class="size-1.5 rounded-full bg-red-500" />
-                            </div>
-                            <p class="text-xs/5 text-gray-500">Unpaid</p>
-                        </div>
-                    </div>
-                </div>
+<!--                <div v-if="hblTotalSummary.destination_charges" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">-->
+<!--                    <div class="flex min-w-0 gap-x-4">-->
+<!--                        <div class="min-w-0 flex-auto">-->
+<!--                            <p class="text-sm/6 font-semibold text-gray-900">Destination Charges</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">-->
+<!--                        <p class="text-sm/6 text-gray-900">{{ currencySymbol }} {{ parseFloat(hblTotalSummary.destination_charges).toFixed(2) }}</p>-->
+<!--                        <div v-if="hbl.is_destination_charges_paid" class="mt-1 flex items-center gap-x-1.5">-->
+<!--                            <div class="flex-none rounded-full bg-emerald-500/20 p-1">-->
+<!--                                <div class="size-1.5 rounded-full bg-emerald-500" />-->
+<!--                            </div>-->
+<!--                            <p class="text-xs/5 text-gray-500">Paid</p>-->
+<!--                        </div>-->
+<!--                        <div v-else class="mt-1 flex items-center gap-x-1.5">-->
+<!--                            <div class="flex-none rounded-full bg-red-500/20 p-1">-->
+<!--                                <div class="size-1.5 rounded-full bg-red-500" />-->
+<!--                            </div>-->
+<!--                            <p class="text-xs/5 text-gray-500">Unpaid</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
 
                 <div v-if="hblTotalSummary.package_charges" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
@@ -133,7 +143,7 @@ const formatCurrency = (amount) => {
                 <div class="flex items-center space-x-2">
                     <i class="ti ti-cash text-xl"></i>
                     <p class="text-xl uppercase font-normal">
-                        Destination
+                        Destination - I
                     </p>
                 </div>
 
@@ -176,32 +186,6 @@ const formatCurrency = (amount) => {
                     </div>
                 </div>
 
-                <div v-if="hblDestinationTotalSummary.demurrageCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
-                    <div class="flex min-w-0 gap-x-4">
-                        <div class="min-w-0 flex-auto">
-                            <p class="text-sm/6 font-semibold text-gray-900">Demurrage Charges</p>
-                        </div>
-                    </div>
-                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">
-                            {{formatCurrency(hblDestinationTotalSummary.demurrageCharge)}}
-                        </p>
-                    </div>
-                </div>
-
-                <div v-if="hblDestinationTotalSummary.dOCharge" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
-                    <div class="flex min-w-0 gap-x-4">
-                        <div class="min-w-0 flex-auto">
-                            <p class="text-sm/6 font-semibold text-gray-900">DO Charges</p>
-                        </div>
-                    </div>
-                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p class="text-sm/6 text-gray-900">
-                            {{formatCurrency(hblDestinationTotalSummary.dOCharge)}}
-                        </p>
-                    </div>
-                </div>
-
                 <div v-if="hblDestinationTotalSummary.totalAmount" class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
                     <div class="flex min-w-0 gap-x-4">
                         <div class="min-w-0 flex-auto">
@@ -214,6 +198,45 @@ const formatCurrency = (amount) => {
                         </p>
                     </div>
                 </div>
+            </template>
+        </Card>
+        <Card
+            class="!bg-white !border !border-neutral-300 !shadow-md !rounded-md mt-5"
+        >
+            <template #content>
+                <div class="flex items-center space-x-2">
+                    <i class="ti ti-cash text-xl"></i>
+                    <p class="text-xl uppercase font-normal">
+                        Destination - II
+                    </p>
+                </div>
+
+                <div class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                    <div class="flex min-w-0 gap-x-4">
+                        <div class="min-w-0 flex-auto">
+                            <p class="text-sm/6 font-semibold text-gray-900">Demurrage Charges</p>
+                        </div>
+                    </div>
+                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                        <p class="text-sm/6 text-gray-900">
+                          LKR  {{ hblTotalSummary.demurrageCharge? parseFloat(hblTotalSummary.demurrageCharge).toFixed(2) : '0.00' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between gap-x-6 p-2 hover:bg-gray-100 rounded">
+                    <div class="flex min-w-0 gap-x-4">
+                        <div class="min-w-0 flex-auto">
+                            <p class="text-sm/6 font-semibold text-gray-900">DO Charges</p>
+                        </div>
+                    </div>
+                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                        <p class="text-sm/6 text-gray-900">
+                            LKR  {{ hblTotalSummary.dOCharge ? parseFloat(hblTotalSummary.dOCharge).toFixed(2) : '0.00' }}
+                        </p>
+                    </div>
+                </div>
+
             </template>
         </Card>
 

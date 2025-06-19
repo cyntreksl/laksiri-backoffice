@@ -4,17 +4,18 @@ namespace App\Actions\Tax;
 
 use App\Models\Scopes\BranchScope;
 use App\Models\Tax;
+use Illuminate\Support\Collection;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class GetTaxByWarehouse
+class GetTaxesByWarehouse
 {
     use AsAction;
 
-    public function handle(int $warehouseID): ?Tax
+    public function handle(int $warehouseID): Collection
     {
         return Tax::withoutGlobalScope(BranchScope::class)
             ->where('branch_id', $warehouseID)
-            ->where('is_active', '=', true)
-            ->first();
+            ->where('is_active', true)
+            ->get();
     }
 }

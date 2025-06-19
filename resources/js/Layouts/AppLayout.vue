@@ -214,6 +214,22 @@
                                 <i class="ti ti-truck-loading text-2xl"></i>
                             </a>
 
+                            <!-- Third Part Shipments -->
+                            <a
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('third_party_shipments')) && usePage().props.currentBranch.type === 'Destination'"
+                                :class="[
+                activeMenu === 'third-party-shipments' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Third Party Shipments'"
+                                @click="
+                setMenu('third-party-shipments');
+                openSideBar();
+              "
+                            >
+                                <i class="ti ti-tir text-2xl"></i>
+                            </a>
+
                             <!-- Departure Branch Arrivals -->
                             <a
                                 v-if="$page.props.user.permissions.some(permission => permission.startsWith('arrival')) && $page.props.currentBranch.type === 'Departure'"
@@ -319,6 +335,21 @@
                             >
                                 <i class="ti ti-git-branch text-2xl"></i>
                             </Link>
+
+                            <!-- Tokens -->
+                            <Link
+                                v-if="$page.props.user.permissions.includes('manage_tokens')"
+                                :class="[
+                current === 'call-center.tokens.index' ? 'bg-primary/10 text-primary' : '',
+              ]"
+                                :href="route('call-center.tokens.index')"
+                                class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                x-tooltip.placement.right="'Tokens'"
+                            >
+                                <i class="ti ti-tag text-2xl"></i>
+                            </Link>
+
+
                         </template>
                     </div>
 
@@ -1040,7 +1071,7 @@ export default {
                             0,
                             {
                                 title: "Gate Pass Management",
-                                route: "container-payment.request",
+                                route: "gate-control.outbound-gate-passes.index",
                             }
                         );
                     }
@@ -1299,6 +1330,25 @@ export default {
                         ...loadingMenu
                     );
                     changeSidePanelTitle("Loading");
+                    break;
+                case "third-party-shipments":
+                    let thirdPartyShipmentMenu = [];
+                    if (usePage().props.user.permissions.includes("third_party_shipments.create")) {
+                        thirdPartyShipmentMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Create Third Party Shipment",
+                                route: "third-party-shipments.create",
+                            }
+                        );
+                    }
+                    childMenuList.splice(
+                        0,
+                        childMenuList.length,
+                        ...thirdPartyShipmentMenu
+                    );
+                    changeSidePanelTitle("Third Party Shipments");
                     break;
                 case "arrival":
                     let arrivalMenu = [];
@@ -1618,6 +1668,7 @@ export default {
             setMenu,
             childMenuList,
             activeMenu,
+            current,
             userBranches,
             setBranch,
             isSidebarExpanded,

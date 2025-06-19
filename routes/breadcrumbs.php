@@ -542,6 +542,22 @@ Breadcrumbs::for('gate-control.outbound-shipments.index', function (BreadcrumbTr
     $trail->push('Outbound Containers', route('gate-control.outbound-shipments.index'));
 });
 
+Breadcrumbs::for('gate-control.outbound-gate-passes.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Gate Control');
+    $trail->push('Outbound Gate Pass', route('gate-control.outbound-gate-passes.index'));
+});
+
+Breadcrumbs::for('call-center.tokens.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Tokens', route('call-center.tokens.index'));
+});
+
+Breadcrumbs::for('call-center.tokens.show', function (BreadcrumbTrail $trail, \App\Models\Token $token) {
+    $trail->parent('call-center.tokens.index');
+    $trail->push('Token Details', route('call-center.tokens.show', $token->id));
+});
+
 require_once __DIR__.'/call-center-breadcrumbs.php';
 require_once __DIR__.'/finance-breadcrumbs.php';
 require_once __DIR__.'/clearance-breadcrumbs.php';

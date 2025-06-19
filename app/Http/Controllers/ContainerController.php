@@ -60,6 +60,19 @@ class ContainerController extends Controller
         return $this->containerRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 
+    public function ArrivedList(Request $request)
+    {
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'id');
+        $dir = $request->input('sort_order', 'asc');
+        $search = $request->input('search', null);
+
+        $filters = $request->only(['fromDate', 'toDate', 'etdStartDate', 'etdEndDate', 'cargoType', 'containerType', 'status']);
+
+        return $this->containerRepository->getAfterDispatchShipmentsList($limit, $page, $order, $dir, $search, $filters);
+    }
+
     public function create()
     {
         $this->authorize('container.create');

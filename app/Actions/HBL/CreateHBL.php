@@ -2,8 +2,9 @@
 
 namespace App\Actions\HBL;
 
-use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
+use App\Actions\Branch\GetBranchById;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Models\Currency;
 use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -14,9 +15,19 @@ class CreateHBL
     public function handle(array $data): HBL
     {
         $reference = GenerateHBLReferenceNumber::run();
+        $currentBranch = GetUserCurrentBranchID::run();
+        $currencyRate = 1;
+
+        $branch = GetBranchById::run($currentBranch);
+        $currencySymbol = Currency::whereCurrencySymbol($branch->currency_symbol)->latest()->first();
+
+        if ($currencySymbol instanceof Currency) {
+            $currencyRate = $currencySymbol->sl_rate;
+        }
+
         $hbl = HBL::create([
             'reference' => $reference,
-            'branch_id' => GetUserCurrentBranchID::run(),
+            'branch_id' => $currentBranch,
             'cargo_type' => $data['cargo_type'],
             'hbl_type' => $data['hbl_type'],
             'hbl' => $reference,
@@ -52,11 +63,8 @@ class CreateHBL
             'system_status' => $data['system_status'] ?? HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE,
             'is_departure_charges_paid' => $data['is_departure_charges_paid'],
             'is_destination_charges_paid' => $data['is_destination_charges_paid'],
+            'currency_rate' => $currencyRate,
         ]);
-
-        if (isset($data['paid_amount'])) {
-            UpdateHBLPayments::run($data, $hbl);
-        }
 
         return $hbl;
     }

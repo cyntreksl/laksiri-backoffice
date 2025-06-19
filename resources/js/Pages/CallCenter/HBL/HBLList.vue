@@ -26,6 +26,7 @@ import {debounce} from "lodash";
 import {push} from "notivue";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
+import IssueTokenDialog from "./Components/IssueTokenDialog.vue";
 
 const props = defineProps({
     users: {
@@ -47,7 +48,13 @@ const props = defineProps({
     },
 });
 
-const baseUrl = ref("/call-center/hbl-list");
+const baseUrl = computed(() => {
+    if (route().current() === "call-center.hbls.index") {
+        return '/call-center/hbl-list';
+    }
+
+    return '/finance/approved-hbl-list';
+});
 const loading = ref(true);
 const hbls = ref([]);
 const totalRecords = ref(0);
@@ -56,7 +63,9 @@ const currentPage = ref(1);
 const showConfirmViewHBLModal = ref(false);
 const cm = ref();
 const selectedHBL = ref(null);
+const selectedHBLData = ref(null);
 const selectedHBLID = ref(null);
+const selectedHblSummary = ref({});
 const confirm = useConfirm();
 const dt = ref();
 const fromDate = ref(moment(new Date()).subtract(24, "months").toISOString().split("T")[0]);
@@ -65,8 +74,8 @@ const warehouses = ref(['COLOMBO', 'NINTAVUR',]);
 const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const showConfirmViewCallFlagModal = ref(false);
+const showIssueTokenDialog = ref(false);
 const hblName = ref("");
-const expandedRows = ref({});
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -83,65 +92,61 @@ const menuModel = ref([
         label: "View",
         icon: "pi pi-fw pi-search",
         command: () => confirmViewHBL(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.show"),
+        visible: usePage().props.user.permissions.includes("hbls.show"),
     },
     {
         label: "Issue Token",
         icon: "pi pi-fw pi-tag",
-        url: () => route(
-            "call-center.hbls.create-token",
-            selectedHBL.value.id
-        ),
-        target: "_blank",
+        command: () => confirmIssueToken(selectedHBL),
         visible: () => selectedHBL.value?.system_status > 4.2 && usePage().props.user.permissions.includes("hbls.issue token"),
     },
     {
         label: "Call Flag",
         icon: "pi pi-fw pi-flag",
         command: () => confirmViewCallFlagModal(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
+        visible: usePage().props.user.permissions.includes("hbls.call flag"),
     },
     {
         label: "Edit",
         icon: "pi pi-fw pi-pencil",
         command: () => router.visit(route("hbls.edit", selectedHBL.value.id)),
-        disabled: !usePage().props.user.permissions.includes("hbls.edit"),
+        visible: usePage().props.user.permissions.includes("hbls.edit"),
     },
     {
         label: computed(() => (selectedHBL.value?.is_hold ? 'Release' : 'Hold')),
         icon: computed(() => (selectedHBL.value?.is_hold ? 'pi pi-fw pi-play-circle' : 'pi pi-fw pi-pause-circle')) ,
         command: () => confirmHBLHold(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.hold and release"),
+        visible: usePage().props.user.permissions.includes("hbls.hold and release"),
     },
     {
         label: "Download",
         icon: "pi pi-fw pi-download",
         url: () => route("hbls.download", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download pdf"),
+        visible: usePage().props.user.permissions.includes("hbls.download pdf"),
     },
     {
         label: "Invoice",
         icon: "pi pi-fw pi-receipt",
         url: () => route("hbls.download.invoice", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download invoice"),
+        visible: usePage().props.user.permissions.includes("hbls.download invoice"),
     },
     {
         label: "Download Baggage PDF",
         icon: "pi pi-fw pi-shopping-bag",
         url: () => route("hbls.download.baggage", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download pdf"),
+        visible: usePage().props.user.permissions.includes("hbls.download pdf"),
     },
     {
         label: "Barcode",
         icon: "pi pi-fw pi-barcode",
         url: () => route("hbls.download.barcode", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download barcode"),
+        visible: usePage().props.user.permissions.includes("hbls.download barcode"),
     },
     {
         label: "Delete",
         icon: "pi pi-fw pi-times",
         command: () => confirmHBLDelete(selectedHBL),
-        disabled: !usePage().props.user.permissions.includes("hbls.delete"),
+        visible: usePage().props.user.permissions.includes("hbls.delete"),
     },
 ]);
 
@@ -385,6 +390,26 @@ const closeCallFlagModal = () => {
     hblName.value = "";
 };
 
+const confirmIssueToken = (hbl) => {
+    console.log('hbl',hbl.value)
+    selectedHBLData.value = hbl.value;
+    showIssueTokenDialog.value = true;
+};
+
+const closeIssueTokenDialog = () => {
+    showIssueTokenDialog.value = false;
+    selectedHBLData.value = null;
+};
+
+const onTokenIssued = (result) => {
+    // Refresh the HBL list to show updated token information
+    fetchHBLs(currentPage.value, filters.value.global.value);
+
+    // Reset selected HBL
+    selectedHBL.value = null;
+    selectedHblSummary.value = {};
+};
+
 const exportCSV = () => {
     dt.value.exportCSV();
 };
@@ -427,7 +452,6 @@ const exportCSV = () => {
                     <DataTable
                         ref="dt"
                         v-model:contextMenuSelection="selectedHBL"
-                        v-model:expandedRows="expandedRows"
                         v-model:filters="filters"
                         :globalFilterFields="['reference', 'hbl', 'hbl_name', 'email', 'address', 'contact_number', 'consignee_name', 'consignee_address', 'consignee_contact', 'cargo_type', 'hbl_type', 'warehouse', 'status', 'hbl_number']"
                         :loading="loading"
@@ -450,7 +474,7 @@ const exportCSV = () => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    All HBLs
+                                    {{route().current() === "call-center.hbls.index" ? 'All HBLs' : 'Issue Tokens For HBLs'}}
                                 </div>
                                 <Button v-if="$page.props.user.permissions.includes('hbls.create')" icon="pi pi-arrow-right"
                                         icon-pos="right"
@@ -497,8 +521,6 @@ const exportCSV = () => {
 
                         <template #loading> Loading hbl data. Please wait.</template>
 
-                        <Column expander style="width: 5rem" />
-
                         <Column field="hbl_number" header="HBL" sortable>
                             <template #body="slotProps">
                                 <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
@@ -513,6 +535,15 @@ const exportCSV = () => {
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
                                 <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="hbl_type" header="HBL Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 
@@ -532,17 +563,6 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column field="address" header="Address"></Column>
-
-                        <Column field="warehouse" header="Warehouse" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveWarehouse(slotProps.data)" :value="slotProps.data.warehouse.toUpperCase()"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
-
                         <Column field="consignee_name" header="Consignee">
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.consignee_name }}</div>
@@ -553,34 +573,29 @@ const exportCSV = () => {
 
                         <Column field="consignee_address" header="Consignee Address"></Column>
 
-                        <Column field="hbl_type" header="HBL Type" sortable>
+                        <Column field="tokens.queue_type" header="Queue Type">
                             <template #body="slotProps">
-                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                                <Tag v-if="slotProps.data.tokens" :value="slotProps.data.tokens.queue_type" severity="info" class="text-sm whitespace-nowrap"></Tag>
+                                <span v-else class="text-gray-400">-</span>
                             </template>
                         </Column>
 
-                        <Column field="is_hold" header="Hold">
-                            <template #body="{ data }">
-                                <i :class="{ 'pi-pause-circle text-yellow-500': data.is_hold, 'pi-play-circle text-green-400': !data.is_hold }" class="pi"></i>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <div class="flex items-center gap-2">
-                                    <Checkbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary inputId="is-hold"/>
-                                    <label for="is-hold"> Is Hold </label>
-                                </div>
+                        <Column field="tokens.token_number" header="Token Number">
+                            <template #body="slotProps">
+                                <span v-if="slotProps.data.tokens"
+                                      class="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-white bg-blue-500 rounded-full">
+                                    {{ slotProps.data.tokens.token_number }}
+                                </span>
+                                <span v-else class="text-gray-400">-</span>
                             </template>
                         </Column>
 
-                        <template #expansion="{data}">
-                            <div class="grid grid-cols-3 p-4">
-                                <InfoDisplay v-if="data.tokens" :value="data.tokens.token_number" label="Token" />
-                                <InfoDisplay v-if="data.tokens" :value="data.tokens.queue_type" label="Queue Type" />
-                                <InfoDisplay v-if="data.finance_status" :value="data.finance_status" label="Finance Status" />
-                            </div>
-                        </template>
+                        <Column field="finance_status" header="Finance Status">
+                            <template #body="slotProps">
+                                <Tag v-if="slotProps.data.finance_status" :value="slotProps.data.finance_status" severity="success" class="text-sm"></Tag>
+                                <span v-else class="text-gray-400">-</span>
+                            </template>
+                        </Column>
 
                         <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs. </template>
                     </DataTable>
@@ -602,4 +617,10 @@ const exportCSV = () => {
         :visible="showConfirmViewCallFlagModal"
         @close="closeCallFlagModal"
         @update:visible="showConfirmViewCallFlagModal = $event"/>
+
+    <IssueTokenDialog
+        :visible="showIssueTokenDialog"
+        :hbl="selectedHBLData"
+        @update:visible="closeIssueTokenDialog"
+        @token-issued="onTokenIssued"/>
 </template>

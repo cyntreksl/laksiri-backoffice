@@ -19,7 +19,9 @@ class HBLPackageObserver
         $hbl = GetHBLById::run($hBLPackage['hbl_id']);
         $rules = [];
         if (! $hBLPackage['package_rule'] && $hBLPackage['package_rule'] <= 0) {
-            $rules = GetPriceRulesByCargoModeAndHBLType::run($hbl['cargo_type'], $hbl['hbl_type'], $hbl['warehouse_id']);
+            // Use warehouse_id if available, otherwise fall back to current branch ID
+            $destinationBranchId = $hbl['warehouse_id'] ?? \App\Actions\User\GetUserCurrentBranchID::run();
+            $rules = GetPriceRulesByCargoModeAndHBLType::run($hbl['cargo_type'], $hbl['hbl_type'], $destinationBranchId);
         } else {
             $rules = PackagePrice::where('id', $hBLPackage['package_rule'])->get();
         }
