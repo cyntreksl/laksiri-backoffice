@@ -303,36 +303,40 @@ const groupedShipments = computed(() => {
         return [];
     }
 
-    const groups = {};
+    // Create a map of all days in the week
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const weekGroups = {};
 
+    // Initialize all days with empty data
+    daysOfWeek.forEach(day => {
+        weekGroups[day] = {
+            day: day,
+            date: '', // Will be set if there are items
+            momentObject: null, // Will be set if there are items
+            items: []
+        };
+    });
+
+    // Process actual shipments
     props.vesselSchedule.clearance_containers.forEach(item => {
-        // Ensure estimated_time_of_arrival is valid before processing
         if (!item.estimated_time_of_arrival || !moment(item.estimated_time_of_arrival).isValid()) {
             return;
         }
 
         const m = moment(item.estimated_time_of_arrival);
         const dayOfWeek = m.format('dddd'); // 'Monday', 'Tuesday', etc.
-        const fullDate = m.format('MMM Do, YYYY'); // 'Jun 2nd, 2025' or similar (adjust format as needed)
-        const groupingKey = m.format('YYYY-MM-DD'); // Use a date string for consistent grouping regardless of time
+        const fullDate = m.format('MMM Do, YYYY');
 
-        if (!groups[groupingKey]) {
-            groups[groupingKey] = {
-                day: dayOfWeek,
-                date: fullDate,
-                momentObject: m.startOf('day'), // Store moment object for sorting by date
-                items: []
-            };
+        if (!weekGroups[dayOfWeek].momentObject) {
+            weekGroups[dayOfWeek].date = fullDate;
+            weekGroups[dayOfWeek].momentObject = m.startOf('day');
         }
-        groups[groupingKey].items.push(item);
+
+        weekGroups[dayOfWeek].items.push(item);
     });
 
-    // Convert the object to an array and sort them by the date
-    const sortedGroups = Object.keys(groups)
-        .map(key => groups[key])
-        .sort((a, b) => a.momentObject.diff(b.momentObject)); // Sort using moment objects
-
-    return sortedGroups;
+    // Convert to array and sort by date (days with items) or maintain week order
+    return daysOfWeek.map(day => weekGroups[day]);
 });
 
 watch(
@@ -402,9 +406,10 @@ const isPaymentInputDisabled = computed(() => {
                         <template v-slot:item="{ item: dayGroup }">
                             <div class="mb-4">
                                 <h2 class="text-base font-semibold mb-2">
-                                    {{ dayGroup.day }} ({{ dayGroup.items.length }})
+                                    {{ dayGroup.day }}
+                                    <span v-if="dayGroup.items.length > 0">({{ dayGroup.items.length }})</span>
                                 </h2>
-                                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                                <div v-if="dayGroup.items.length > 0" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
                                     <div v-for="item in dayGroup.items" :key="item.id" :class="['flex flex-col space-y-3 rounded-xl p-4 bg-gradient-to-tr hover:cursor-pointer', selectedContainer?.id === item?.id ? 'from-purple-700 to-purple-500' : 'from-violet-700 to-violet-500']"
                                          style="height: 170px"
                                          @click="selectedContainer = item">
@@ -441,6 +446,10 @@ const isPaymentInputDisabled = computed(() => {
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div v-else class="p-4 bg-gray-100 rounded-lg text-center text-gray-500">
+                                    No shipments for this day
                                 </div>
                             </div>
                         </template>
