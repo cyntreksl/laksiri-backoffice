@@ -40,10 +40,9 @@ return new class extends Migration
             $table->float('destination_2_tax')->nullable();
             $table->float('destination_2_total_with_tax')->nullable();
 
-
-            //departure_total_charge
-            //if prepaid departure_1_total + destination_1_total_with_tax(base currency)
-            //if postpaid departure_1_total
+            // departure_total_charge
+            // if prepaid departure_1_total + destination_1_total_with_tax(base currency)
+            // if postpaid departure_1_total
             $table->float('departure_total_charge')->nullable();
             $table->float('departure_discount')->nullable();
             $table->float('departure_additional_charge')->nullable();
@@ -51,29 +50,28 @@ return new class extends Migration
             $table->float('departure_paid_amount')->nullable();
             $table->float('departure_due')->nullable();
 
-            //destination_total_charge
-            //if prepaid destination_2_total
-            //if postpaid destination_1_total + destination_2_total
+            // destination_total_charge
+            // if prepaid destination_2_total
+            // if postpaid destination_1_total + destination_2_total
             $table->float('destination_total_charge')->nullable();
             $table->float('destination_discount')->nullable();
             $table->float('destination_additional_charge')->nullable();
 
-            //destination_total_tax
-            //destination_total_charge + destination_additional_charge - destination_discount
+            // destination_total_tax
+            // destination_total_charge + destination_additional_charge - destination_discount
             $table->float('destination_total_tax')->nullable();
 
-            //destination_net_total
-            //destination_total_charge - destination_discount + destination_additional_charge + destination_total_tax
+            // destination_net_total
+            // destination_total_charge - destination_discount + destination_additional_charge + destination_total_tax
             $table->float('destination_net_total')->nullable();
             $table->float('destination_paid_amount')->nullable();
             $table->float('destination_due')->nullable();
 
-            //grand_total
-            //if departure_net_total  + destination_net_total
+            // grand_total
+            // if departure_net_total  + destination_net_total
             $table->float('grand_total')->nullable()->comment('Total charge for the HBL including all charges and discounts');
             $table->float('grand_total_paid')->nullable()->comment('Total amount paid for the HBL');
             $table->float('grand_total_due')->nullable()->comment('Total amount due for the HBL');
-
 
             $table->foreign('hbl_id')->references('id')->on('hbl')->onDelete('cascade')->comment('Foreign key constraint linking to the HBL table');
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade')->comment('Foreign key constraint linking to the branches table');
