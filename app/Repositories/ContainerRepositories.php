@@ -7,6 +7,8 @@ use App\Actions\Container\GetContainerByReference;
 use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Loading\GetLoadedContainers;
 use App\Actions\Container\MarkAsReached;
+use App\Actions\Container\MarkAsRTF;
+use App\Actions\Container\MarkAsUnRTF;
 use App\Actions\Container\Unloading\CreateDraftUnload;
 use App\Actions\Container\Unloading\CreateFullyUnload;
 use App\Actions\Container\Unloading\UndoUnloadContainer;
@@ -496,6 +498,24 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             $container->addStatus('Container Departed from Primary Warehouse', 'Container has been departed from primary warehouse');
         } catch (\Exception $e) {
             throw new \Exception('Failed to mark as departed from warehouse: '.$e->getMessage());
+        }
+    }
+
+    public function doRTF(Container $container): void
+    {
+        try {
+            MarkAsRTF::run($container);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to mark as rtf container: '.$e->getMessage());
+        }
+    }
+
+    public function undoRTF(Container $container): void
+    {
+        try {
+            MarkAsUnRTF::run($container);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to undo rtf container: '.$e->getMessage());
         }
     }
 }

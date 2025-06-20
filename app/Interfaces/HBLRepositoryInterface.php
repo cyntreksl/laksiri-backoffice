@@ -85,4 +85,8 @@ interface HBLRepositoryInterface
     public function getHBLDestinationTotalSummary(HBL $hbl);
 
     public function downloadGatePass($hbl, CustomerQueue $customerQueue);
+
+    public function doRTF(HBL $hbl);
+
+    public function undoRTF(HBL $hbl);
 }

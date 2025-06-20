@@ -62,4 +62,8 @@ interface ContainerRepositoryInterface
     public function getAfterInboundShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse;
 
     public function updateOutboundShipmentStatus(Container $container);
+
+    public function doRTF(Container $container);
+
+    public function undoRTF(Container $container);
 }

@@ -413,4 +413,14 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->downloadGatePass($hbl, $customerQueue);
     }
+
+    public function setRTF(HBL $hbl)
+    {
+        return $this->HBLRepository->doRTF($hbl);
+    }
+
+    public function unsetRTF(HBL $hbl)
+    {
+        return $this->HBLRepository->undoRTF($hbl);
+    }
 }

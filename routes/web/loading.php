@@ -93,6 +93,12 @@ Route::name('loading.')->group(function () {
     Route::get('containers/tally-sheet-downloads/{container}', [LoadedContainerController::class, 'tallySheetDownloadPDF'])
         ->name('containers.tally-sheet-downloads');
 
+    Route::post('containers/{container}/set/rtf', [ContainerController::class, 'setRTF'])
+        ->name('containers.set.rtf');
+
+    Route::post('containers/{container}/unset/rtf', [ContainerController::class, 'unsetRTF'])
+        ->name('containers.unset.rtf');
+
     // Manual Loadings
     Route::get('manual-loadings', function () {
         return Inertia::render('Loading/ManualLoading');

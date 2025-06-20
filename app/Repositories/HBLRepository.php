@@ -27,6 +27,8 @@ use App\Actions\HBL\GetHBLsWithPackages;
 use App\Actions\HBL\GetHBLsWithUnloadedPackagesByReference;
 use App\Actions\HBL\GetHBLTotalSummary;
 use App\Actions\HBL\HBLPackage\GetPackagesByReference;
+use App\Actions\HBL\MarkAsRTF;
+use App\Actions\HBL\MarkAsUnRTF;
 use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
@@ -509,6 +511,24 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             return DownloadGatePassPDF::run($hbl, $customerQueue);
         } catch (\Exception $e) {
             throw new \Exception('Failed to download gate pass '.$e->getMessage());
+        }
+    }
+
+    public function doRTF(HBL $hbl): void
+    {
+        try {
+            MarkAsRTF::run($hbl);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to mark as rtf HBL: '.$e->getMessage());
+        }
+    }
+
+    public function undoRTF(HBL $hbl): void
+    {
+        try {
+            MarkAsUnRTF::run($hbl);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to undo rtf HBL: '.$e->getMessage());
         }
     }
 }

@@ -98,3 +98,9 @@ Route::post('hbls/packages', [HBLController::class, 'getHBLsPackages'])->name('h
 
 Route::get('hbls/download/gate-pass/{hbl}/queue/{customer_queue}', [HBLController::class, 'downloadGatePass'])
     ->name('hbls.download.gate-pass');
+
+Route::post('hbls/{hbl}/set/rtf', [HBLController::class, 'setRTF'])
+    ->name('hbls.set.rtf');
+
+Route::post('hbls/{hbl}/unset/rtf', [HBLController::class, 'unsetRTF'])
+    ->name('hbls.unset.rtf');
