@@ -1355,7 +1355,7 @@ export default {
                             0,
                             {
                                 title: "Create Third Party Shipment",
-                                route: "third-party-shipments.create",
+                                route: "third-party-shipments.multi-options",
                             }
                         );
                     }

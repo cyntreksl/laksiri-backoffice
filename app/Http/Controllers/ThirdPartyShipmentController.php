@@ -39,6 +39,18 @@ class ThirdPartyShipmentController extends Controller
             compact('agents', 'cargoTypes', 'hblTypes', 'shipments', 'airLines'));
     }
 
+    public function createV2()
+    {
+        $agents = Branch::thirdpartyAgents()->get();
+        $cargoTypes = CargoType::cases();
+        $hblTypes = HBLType::cases();
+        $shipments = Container::whereStatus('CONTAINER ORDERED')->get();
+        $airLines = AirLine::pluck('name', 'id');
+
+        return Inertia::render('ThirdPartyShipments/ThirdPartyShipmentCreateV2',
+            compact('agents', 'cargoTypes', 'hblTypes', 'shipments', 'airLines'));
+    }
+
     /**
      * Store a newly created third party shipment.
      */
@@ -181,5 +193,10 @@ class ThirdPartyShipmentController extends Controller
         }
 
         return response()->download($filePath, 'third-party-hbl-import-sample.csv');
+    }
+
+    public function multiOptions()
+    {
+        return Inertia::render('ThirdPartyShipments/MultiOptionLayout');
     }
 }

@@ -82,6 +82,12 @@ Route::middleware([
 
     Route::resource('third-party-shipments', ThirdPartyShipmentController::class);
 
+    Route::get('third-party-shipments/multi/options', [ThirdPartyShipmentController::class, 'multiOptions'])
+        ->name('third-party-shipments.multi-options');
+
+    Route::get('third-party-shipments/create/v2', [ThirdPartyShipmentController::class, 'createV2'])
+        ->name('third-party-shipments.create.v2');
+
 });
 
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);
