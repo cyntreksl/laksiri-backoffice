@@ -518,6 +518,13 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         try {
             MarkAsRTF::run($hbl);
+
+            $packages = $hbl->packages;
+
+            foreach ($packages as $package) {
+                \App\Actions\HBL\HBLPackage\MarkAsRTF::run($package);
+            }
+
         } catch (\Exception $e) {
             throw new \Exception('Failed to mark as rtf HBL: '.$e->getMessage());
         }
@@ -527,6 +534,13 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         try {
             MarkAsUnRTF::run($hbl);
+
+            $packages = $hbl->packages;
+
+            foreach ($packages as $package) {
+                \App\Actions\HBL\HBLPackage\MarkAsUnRTF::run($package);
+            }
+
         } catch (\Exception $e) {
             throw new \Exception('Failed to undo rtf HBL: '.$e->getMessage());
         }

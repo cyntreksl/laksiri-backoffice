@@ -505,6 +505,24 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     {
         try {
             MarkAsRTF::run($container);
+
+            $hbls = $container
+                ->hbl_packages
+                ->pluck('hbl')
+                ->unique();
+
+            foreach ($hbls as $hbl) {
+                \App\Actions\HBL\MarkAsRTF::run($hbl);
+            }
+
+            $packages = $container
+                ->hbl_packages
+                ->unique();
+
+            foreach ($packages as $package) {
+                \App\Actions\HBL\HBLPackage\MarkAsRTF::run($package);
+            }
+
         } catch (\Exception $e) {
             throw new \Exception('Failed to mark as rtf container: '.$e->getMessage());
         }
@@ -514,6 +532,23 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     {
         try {
             MarkAsUnRTF::run($container);
+
+            $hbls = $container
+                ->hbl_packages
+                ->pluck('hbl')
+                ->unique();
+
+            foreach ($hbls as $hbl) {
+                \App\Actions\HBL\MarkAsUnRTF::run($hbl);
+            }
+
+            $packages = $container
+                ->hbl_packages
+                ->unique();
+
+            foreach ($packages as $package) {
+                \App\Actions\HBL\HBLPackage\MarkAsUnRTF::run($package);
+            }
         } catch (\Exception $e) {
             throw new \Exception('Failed to undo rtf container: '.$e->getMessage());
         }

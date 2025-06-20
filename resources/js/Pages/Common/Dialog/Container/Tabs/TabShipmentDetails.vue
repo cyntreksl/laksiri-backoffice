@@ -252,7 +252,7 @@ watchEffect(() => {
             <Button v-if="!container?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="RTF Shipment"
                     severity="warn" size="small" variant="outlined" @click.prevent="handleRTFContainer" />
 
-            <Button v-if="container?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Undo RTF Shipment"
+            <Button v-if="container?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift RTF Shipment"
                     severity="warn" size="small" variant="outlined" @click.prevent="handleUndoRTFContainer" />
 
             <Button :disabled="container.status === 'IN TRANSIT' || container.status === 'REACHED DESTINATION'" icon="pi pi-trash" label="Delete Shipment"
