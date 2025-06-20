@@ -558,6 +558,16 @@ Breadcrumbs::for('call-center.tokens.show', function (BreadcrumbTrail $trail, \A
     $trail->push('Token Details', route('call-center.tokens.show', $token->id));
 });
 
+Breadcrumbs::for('third-party-shipments.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Create Third Party Shipment', route('third-party-shipments.create'));
+});
+
+Breadcrumbs::for('third-party-shipments.create.v2', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Create Third Party Shipment', route('third-party-shipments.create.v2'));
+});
+
 require_once __DIR__.'/call-center-breadcrumbs.php';
 require_once __DIR__.'/finance-breadcrumbs.php';
 require_once __DIR__.'/clearance-breadcrumbs.php';
