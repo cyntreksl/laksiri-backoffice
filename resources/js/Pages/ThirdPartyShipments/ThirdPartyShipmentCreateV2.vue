@@ -22,10 +22,8 @@ import Fieldset from 'primevue/fieldset';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputNumber from 'primevue/inputnumber';
-import IftaLabel from 'primevue/iftalabel';
 import Dialog from 'primevue/dialog';
 import Message from 'primevue/message';
-import ToggleButton from 'primevue/togglebutton';
 
 const props = defineProps({
     hblTypes: {
@@ -34,11 +32,6 @@ const props = defineProps({
         },
     },
     cargoTypes: {
-        type: Object,
-        default: () => {
-        },
-    },
-    priceRules: {
         type: Object,
         default: () => {
         },
@@ -141,15 +134,15 @@ const form = useForm({
     consignee_note: "",
     cargo_type: "",
     hbl_type: "",
-    warehouse: 2,
-    warehouse_id: "",
+    warehouse: "COLOMBO",
+    warehouse_id: 2,
     freight_charge: 0,
     bill_charge: 0,
     other_charge: 0,
     destination_charge: 0,
     package_charges: 0,
     discount: 0,
-    paid_amount: '',
+    paid_amount: 0,
     additional_charge: 0,
     grand_total: 0,
     packages: {},
@@ -212,11 +205,11 @@ const handleHBLCreate = () => {
         form.consignee_whatsapp_number = "";
     }
 
-    form.post(route("hbls.store"), {
-        onSuccess: (page) => {
-            confirmViewHBL(page.props.hbl_id)
+    form.post(route("third-party-shipments.save-shipment.v2"), {
+        onSuccess: () => {
             form.reset();
             push.success("HBL Created Successfully!");
+            router.visit(route('third-party-shipments.create.v2'))
         },
         onError: () => console.log("error"),
         preserveScroll: true,
@@ -254,8 +247,6 @@ const packageItem = reactive({
 
 const grandTotalWeight = ref(0);
 const grandTotalVolume = ref(0);
-
-const isPackageRuleSelected = ref(false);
 
 const addPackageData = () => {
     if (
@@ -295,8 +286,6 @@ const addPackageData = () => {
             (accumulator, currentValue) => accumulator + parseFloat(currentValue.volume),
             0
         );
-
-        calculatePayment();
     } else {
         const newItem = {...packageItem}; // Create a copy of packageItem
         packageList.value.push(newItem); // Add the new item to packageList
@@ -305,7 +294,6 @@ const addPackageData = () => {
         const volume = parseFloat(newItem.volume) || 0;
         grandTotalWeight.value += parseFloat(newItem.totalWeight);
         grandTotalVolume.value += parseFloat(volume.toFixed(3));
-        calculatePayment();
     }
     closeAddPackageModal();
 };
@@ -395,27 +383,6 @@ watch(
     }
 );
 
-watch([() => form.cargo_type], ([newCargoType]) => {
-    calculatePayment();
-    if(form.cargo_type && form.hbl_type && form.warehouse){
-        hblRules();
-    }
-});
-
-watch([() => form.hbl_type], ([newHBLType]) => {
-    calculatePayment();
-    if(form.cargo_type && form.hbl_type && form.warehouse){
-        hblRules();
-    }
-});
-
-watch([() => form.warehouse], ([newHBLType]) => {
-    calculatePayment();
-    if(form.cargo_type && form.hbl_type && form.warehouse){
-        hblRules();
-    }
-});
-
 const selectedType = ref("");
 
 const isChecked = ref(false);
@@ -450,72 +417,6 @@ const updateTypeDescription = () => {
 };
 
 const hblTotal = ref(0);
-const isEditable = ref(false);
-const perPackageCharge = ref(0);
-const perVolumeCharge = ref(0);
-const perFreightCharge = ref(0);
-const freightOperator = ref('');
-const priceMode = ref('');
-
-const freight_charge_operations = ref([]);
-
-const calculatePayment = async () => {
-    try {
-        for (let pkg of packageList.value) {
-            if (pkg.packageRule > 0) {
-                form.is_active_package = true;
-                break;
-            } else form.is_active_package = false;
-        }
-
-        const chargeableWeights = packageList.value.map(pkg => {
-            return Math.max(pkg.volumetricWeight, pkg.totalWeight);
-        });
-
-        const totalChargeableWeight = chargeableWeights.reduce((acc, curr) => acc + curr, 0);
-
-        const response = await fetch(`/hbls/calculate-payment`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-            },
-            body: JSON.stringify({
-                cargo_type: form.cargo_type,
-                hbl_type: form.hbl_type,
-                warehouse: form.warehouse,
-                grand_total_volume: grandTotalVolume.value,
-                grand_total_weight: totalChargeableWeight,
-                package_list_length: packageList.value.length,
-                package_list: packageList.value,
-                is_active_package: form.is_active_package,
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok.');
-        } else {
-            const data = await response.json();
-
-            form.freight_charge = data.freight_charge;
-            form.bill_charge = data.bill_charge;
-            form.other_charge = data.other_charge;
-            form.package_charges = data.package_charges;
-            form.destination_charge = data.destination_charges;
-            isEditable.value = data.is_editable;
-            vat.value = data.vat;
-            perPackageCharge.value = data.per_package_charge;
-            perVolumeCharge.value = data.per_volume_charge;
-            perFreightCharge.value = data.per_freight_charge;
-            freightOperator.value = data.freight_operator;
-            priceMode.value = data.price_mode;
-            freight_charge_operations.value = data.freight_charge_operations;
-        }
-
-    } catch (error) {
-        console.log(error);
-    }
-}
 
 const closeViewModal = () => {
     showConfirmViewHBLModal.value = false;
@@ -528,7 +429,6 @@ const handleRemovePackage = (index) => {
         grandTotalVolume.value -= packageList.value[index].volume;
         grandTotalWeight.value -= packageList.value[index].totalWeight;
         packageList.value.splice(index, 1);
-        calculatePayment();
     }
 };
 
@@ -573,10 +473,6 @@ const copyFromHBLToShipperModalShow = ref(false);
 
 const reference = ref(null);
 
-const confirmShowingCopyFromHBLToShipperModal = () => {
-    copyFromHBLToShipperModalShow.value = true;
-}
-
 const closeCopyFromHBLToShipperModal = () => {
     reference.value = null;
     copyFromHBLToShipperModalShow.value = false;
@@ -618,26 +514,9 @@ const handleCopyFromHBLToShipper = async () => {
 
 const copyFromHBLToConsigneeModalShow = ref(false);
 
-const confirmShowingCopyFromHBLToConsigneeModal = () => {
-    copyFromHBLToConsigneeModalShow.value = true;
-}
-
 const closeCopyFromHBLToConsigneeModal = () => {
     reference.value = null;
     copyFromHBLToConsigneeModalShow.value = false;
-}
-
-const volumeMeasurements = {
-    cm: 'cm.cu',
-    m: 'm.cu',
-    in: 'in.cu',
-    ft: 'ft.cu',
-};
-
-function getPackageRuleTitle(title, length, width , height, measureType) {
-    const volumeMeasurement = volumeMeasurements[measureType] || 'cm.cu';
-
-    return title + ' (' + convertMeasurements(measureType,length).toFixed(2) + ' * ' + convertMeasurements(measureType,width).toFixed(2) + ' * ' + convertMeasurements(measureType,height).toFixed(2) + ')'+ volumeMeasurement;
 }
 
 const handleCopyFromHBLToConsignee = async () => {
@@ -677,10 +556,6 @@ const copiedPackages = ref({});
 
 const copyFromHBLToPackageModalShow = ref(false);
 
-const confirmShowingCopyFromHBLToPackageModal = () => {
-    copyFromHBLToPackageModalShow.value = true;
-}
-
 const closeCopyFromHBLToPackageModal = () => {
     reference.value = null;
     copyFromHBLToPackageModalShow.value = false;
@@ -711,21 +586,12 @@ const handleCopyFromHBLToPackage = async () => {
             grandTotalWeight.value += copiedTotalWeight;
             grandTotalVolume.value += copiedTotalVolume;
 
-            calculatePayment();
-
             push.success('Copied!');
         }
 
     } catch (error) {
         console.log(error);
     }
-}
-
-const handleRemoveCopiedPackages = () => {
-    copiedPackages.value = {};
-    grandTotalWeight.value = 0;
-    grandTotalVolume.value = 0;
-    calculatePayment();
 }
 
 const handleCopyShipper = () => {
@@ -743,11 +609,6 @@ const conversionFactors = {
     in: 2.54,
     ft: 30.48,
 };
-
-function convertMeasurements(measureType, value) {
-    const factor = conversionFactors[measureType] || 1;
-    return value / factor;
-}
 
 function convertMeasurementstocm(measureType, value) {
     const factor = conversionFactors[measureType] || 1;
@@ -797,11 +658,6 @@ const volumeUnit = computed(() => {
 const hblId = ref(null);
 const showConfirmViewHBLModal = ref(false);
 
-const confirmViewHBL = async (id) => {
-    hblId.value = id;
-    showConfirmViewHBLModal.value = true;
-};
-
 const confirmRemovePackage = (index) => {
     confirm.require({
         message: 'Would you like to remove this hbl package record?',
@@ -832,6 +688,19 @@ const onDialogShow = () => {
 const onDialogHide = () => {
     document.body.classList.remove('p-overflow-hidden');
 };
+
+const filteredShipments = computed(() => {
+    if (!form.cargo_type || !props.shipments) return [];
+
+    return Object.values(props.shipments).filter(shipment => {
+        return shipment.cargo_type === form.cargo_type;
+    });
+});
+
+watch(() => form.cargo_type, (newVal) => {
+    form.shipment = null;
+});
+
 </script>
 
 <template>
@@ -883,8 +752,8 @@ const onDialogHide = () => {
                                 <InputLabel class="mb-1" value="Select Container"/>
                                 <Select
                                     v-model="form.shipment"
-                                    :option-label="(option) => option.container_number"
-                                    :options="shipments"
+                                    :option-label="(option) => option.reference"
+                                    :options="filteredShipments"
                                     :required="true"
                                     class="w-full"
                                     filter
@@ -905,7 +774,6 @@ const onDialogHide = () => {
                         <template #title>
                             <div class="flex justify-between items-center">
                                 <span>Shipper Details</span>
-                                <Button aria-label="Copy from HBL" icon="pi pi-clipboard" rounded size="large" variant="text" x-tooltip.placement.bottom="'Copy from HBL'" @click.prevent="confirmShowingCopyFromHBLToShipperModal" />
                             </div>
                         </template>
                         <template #content>
@@ -1010,8 +878,6 @@ const onDialogHide = () => {
                                 <div class="flex space-x-1">
                                     <Button v-if="form.hbl_name" aria-label="Copy Shipper" icon="pi pi-clone" rounded size="large" variant="text"  x-tooltip.placement.bottom="'Copy Shipper'"
                                             @click.prevent="handleCopyShipper" />
-                                    <Button aria-label="Copy from HBL" icon="pi pi-clipboard" rounded size="large" variant="text"  x-tooltip.placement.bottom="'Copy from HBL'"
-                                            @click.prevent="confirmShowingCopyFromHBLToConsigneeModal" />
                                 </div>
                             </div>
                         </template>
@@ -1095,11 +961,6 @@ const onDialogHide = () => {
                             <div class="flex justify-between items-center">
                                 <div class="flex items-center space-x-2">
                                     <span>Package Details</span>
-                                    <Button v-if="Object.values(copiedPackages).length === 0" aria-label="Copy from HBL" icon="pi pi-clipboard" rounded size="large" variant="text"
-                                            x-tooltip.placement.bottom="'Copy from HBL'"
-                                            @click.prevent="confirmShowingCopyFromHBLToPackageModal" />
-                                    <Button v-if="Object.values(copiedPackages).length > 0" label="Remove Copied Packages" severity="danger" variant="text"
-                                            @click.prevent="handleRemoveCopiedPackages" />
                                 </div>
                                 <Button v-if="Object.values(copiedPackages).length === 0" icon="pi pi-plus" label="New Package" severity="help" type="button" variant="outlined"
                                         @click="showPackageDialog" />
