@@ -37,6 +37,8 @@ const props = defineProps({
 const searchQuery = ref('');
 const unloadedHBLs = ref([]);
 const hblPackagesArr = ref([]);
+const loadedMHBLs = ref([]);
+const loadedHBLsPackages = ref([]);
 
 const params = route().params;
 
@@ -215,6 +217,25 @@ const handleRemoveDraftLoadedContainer = (packages) => {
         });
 }
 
+const handleGetHBLsPackages = async(hbls) => {
+    const response = await fetch(`/hbls/packages`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": usePage().props.csrf,
+        },
+        body: JSON.stringify({
+            hbls_id: hbls,
+        })
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok.');
+    } else {
+        const data = await response.json();
+        loadedHBLsPackages.value = data.hblsPackages;
+    }
+}
+
 // Watch for changes in the container array
 watch(containerArr, (newValue, oldValue) => {
     const added = newValue.filter(item => !oldValue.includes(item));
@@ -238,10 +259,23 @@ watch(unloadedHBLs, (newVal) => {
 });
 
 const reviewContainer = () => {
-    console.log(containerArr.value);
-    reviewContainerArr.value = containerArr.value;
+    const copiedContainer = JSON.parse(JSON.stringify(containerArr.value));
+    reviewContainerArr.value = [...copiedContainer];
 
-    showReviewModal.value = true
+    // Add packages to reviewContainerArr.value
+    loadedMHBLs.value.forEach(mhbl => {
+        mhbl.hbls.forEach(hbl => {
+            hbl.packages.forEach(pkg => {
+                reviewContainerArr.value.push(pkg);
+            });
+        });
+    });
+    const hblsIdsArray = [...new Set(reviewContainerArr.value.map(pkg => pkg.hbl_id))];
+    handleGetHBLsPackages(hblsIdsArray);
+
+    if(loadedHBLsPackages.value){
+        showReviewModal.value = true
+    }
 }
 </script>
 
@@ -272,7 +306,7 @@ const reviewContainer = () => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <PrimaryButton :disabled="containerArr.length === 0" @click.prevent="showReviewModal = true">
+                    <PrimaryButton :disabled="containerArr.length === 0" @click.prevent="reviewContainer">
                         Proceed to Review
                     </PrimaryButton>
                 </div>
@@ -414,7 +448,7 @@ const reviewContainer = () => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ hbl.hbl_number ?? hbl.hbl }}</span>
+                                        <span>{{ hbl?.hbl_number ?? hbl?.hbl }}</span>
                                     </div>
                                     <ul v-show="hbl.expanded" class="pl-4">
                                         <draggable v-model="hbl.packages"
@@ -429,7 +463,7 @@ const reviewContainer = () => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }}
+                                                                        {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id)?.hbl }}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -589,7 +623,7 @@ const reviewContainer = () => {
                                                 <div>
                                                     <div class="flex justify-between">
                                                         <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
-                                                            {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }}
+                                                            {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id)?.hbl }}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -707,7 +741,11 @@ const reviewContainer = () => {
         <ReviewModal :container-array="containerArr"
                      :containerPackages="reviewContainerArr"
                      :find-hbl-by-package-id="findHblByPackageId"
-                     :show="showReviewModal"
-                     @close="showReviewModal = false" :is-destination-loading="true"/>
+                     :loadedHBLsPackages="loadedHBLsPackages"
+                     :loadedMHBLs="loadedMHBLs"
+                     :visible="showReviewModal"
+                     @close="showReviewModal = false"
+                     :is-destination-loading="true"
+                     @update:visible="showReviewModal = $event"/>
     </AppLayout>
 </template>
