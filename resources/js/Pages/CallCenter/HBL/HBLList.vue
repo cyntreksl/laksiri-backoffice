@@ -149,7 +149,7 @@ const menuModel = ref([
         visible: () => !selectedHBL.value?.is_rtf,
     },
     {
-        label: "Undo RTF",
+        label: "Lift RTF",
         icon: "pi pi-fw pi-unlock",
         command: () => handleUndoRTFHBL(selectedHBL),
         visible: () => selectedHBL.value?.is_rtf,

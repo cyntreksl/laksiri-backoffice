@@ -50,6 +50,7 @@ const handleRTFHBLPackage = (packageId) => {
                 preserveScroll: true,
                 onSuccess: () => {
                     push.success('Package going to RTF');
+                    window.location.reload();
                 },
                 onError: () => {
                     push.error('Something went to wrong!');
@@ -81,6 +82,7 @@ const handleUndoRTFHBLPackage = (packageId) => {
                 preserveScroll: true,
                 onSuccess: () => {
                     push.success('Undo RTF for this package successfully!');
+                    window.location.reload();
                 },
                 onError: () => {
                     push.error('Something went to wrong!');
@@ -179,14 +181,17 @@ watch(
                         </div>
 
                         <div class="flex items-center space-x-2">
-                            <i class="ti ti-package text-xl"></i>
-                            <p class="text-xl uppercase font-normal">
-                                {{ item.package_type ?? '-' }}
-                            </p>
-                            <i
-                                v-tooltip="item.is_loaded ? 'Loaded to Shipment' : 'Not Loaded to Shipment'"
-                                :class="item.is_loaded ? 'ti ti-circle-check-filled text-xl text-success' : 'ti ti-circle-x-filled text-xl text-error'"
-                            ></i>
+                            <div class="flex items-center space-x-2">
+                                <i v-if="item?.latest_rtf_record?.is_rtf" v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                <i class="ti ti-package text-xl"></i>
+                                <p class="text-xl uppercase font-normal">
+                                    {{ item.package_type ?? '-' }}
+                                </p>
+                                <i
+                                    v-tooltip="item.is_loaded ? 'Loaded to Shipment' : 'Not Loaded to Shipment'"
+                                    :class="item.is_loaded ? 'ti ti-circle-check-filled text-xl text-success' : 'ti ti-circle-x-filled text-xl text-error'"
+                                ></i>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-1 gap-2">
@@ -208,10 +213,10 @@ watch(
                         </div>
 
                         <div class="mt-3">
-                            <Button v-if="!item?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="RTF Package"
+                            <Button v-if="!item?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="Set RTF Package"
                                     severity="warn" size="small" variant="outlined" @click.prevent="handleRTFHBLPackage(item.id)" />
 
-                            <Button v-if="item?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Undo RTF Package"
+                            <Button v-if="item?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift RTF Package"
                                     severity="warn" size="small" variant="outlined" @click.prevent="handleUndoRTFHBLPackage(item.id)" />
                         </div>
                     </template>
