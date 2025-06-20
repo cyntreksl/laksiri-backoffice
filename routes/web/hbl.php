@@ -104,3 +104,9 @@ Route::post('hbls/{hbl}/set/rtf', [HBLController::class, 'setRTF'])
 
 Route::post('hbls/{hbl}/unset/rtf', [HBLController::class, 'unsetRTF'])
     ->name('hbls.unset.rtf');
+
+Route::post('hbl-packages/{hbl_package}/set/rtf', [HBLController::class, 'setPackageRTF'])
+    ->name('hbl-packages.set.rtf');
+
+Route::post('hbl-packages/{hbl_package}/unset/rtf', [HBLController::class, 'unsetPackageRTF'])
+    ->name('hbl-packages.unset.rtf');

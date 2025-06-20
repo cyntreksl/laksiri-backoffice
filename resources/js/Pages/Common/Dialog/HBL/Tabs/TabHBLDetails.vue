@@ -6,6 +6,10 @@ import {watch} from "vue";
 import Card from 'primevue/card';
 import Avatar from 'primevue/avatar';
 import InfoDisplayChip from "@/Pages/Common/Components/InfoDisplayChip.vue";
+import Button from "primevue/button";
+import {router} from "@inertiajs/vue3";
+import {push} from "notivue";
+import {useConfirm} from "primevue/useconfirm";
 
 const props = defineProps({
     hbl: {
@@ -21,6 +25,72 @@ const props = defineProps({
         required: true,
     },
 });
+
+console.log(props.hbl?.packages)
+
+const confirm = useConfirm();
+
+const handleRTFHBLPackage = (packageId) => {
+    confirm.require({
+        message: 'Would you like to RTF this package?',
+        header: 'RTF Package?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Sure, RTF',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(route("hbl-packages.set.rtf", packageId), {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success('Package going to RTF');
+                },
+                onError: () => {
+                    push.error('Something went to wrong!');
+                }
+            })
+        },
+        reject: () => {
+        }
+    })
+}
+
+const handleUndoRTFHBLPackage = (packageId) => {
+    confirm.require({
+        message: 'Would you like to Undo RTF for this package?',
+        header: 'Undo RTF Package?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Sure, Remove RTF',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(route("hbl-packages.unset.rtf", packageId), {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success('Undo RTF for this package successfully!');
+                },
+                onError: () => {
+                    push.error('Something went to wrong!');
+                }
+            })
+        },
+        reject: () => {
+        }
+    })
+}
 
 watch(
     () => props.pickup,
@@ -135,6 +205,14 @@ watch(
                             <div class="col-span-2">
                                 <InfoDisplay :value="item.remarks ?? '-'" label="Remarks"/>
                             </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <Button v-if="!item?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="RTF Package"
+                                    severity="warn" size="small" variant="outlined" @click.prevent="handleRTFHBLPackage(item.id)" />
+
+                            <Button v-if="item?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Undo RTF Package"
+                                    severity="warn" size="small" variant="outlined" @click.prevent="handleUndoRTFHBLPackage(item.id)" />
                         </div>
                     </template>
                 </Card>
