@@ -39,6 +39,9 @@ watch(
             <Card v-else class="!bg-emerald-50 !border !border-emerald-200 !shadow-none">
                 <template #content>
                     <div class="flex items-center space-x-5">
+                        <div v-if="hbl?.latest_rtf_record?.is_rtf" class="flex space-x-2">
+                            <i v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                        </div>
                         <p class="text-3xl uppercase font-normal">
                             {{ hbl?.branch.name }}
                         </p>

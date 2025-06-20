@@ -486,13 +486,16 @@ const exportCSVFilename = computed(() => {
 
                         <template #loading> Loading hbl data. Please wait.</template>
 
-                        <Column field="reference" header="Reference" hidden sortable></Column>
-
                         <Column field="hbl_number" header="HBL" sortable>
                             <template #body="slotProps">
-                                <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
-                                <br v-if="slotProps.data.is_short_loaded">
-                                <Tag icon="pi pi-exclamation-triangle" v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`" size="small"></Tag>
+                                <div class="flex items-center space-x-2">
+                                    <i v-if="slotProps.data.is_rtf" v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <div>
+                                        <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
+                                        <br v-if="slotProps.data.is_short_loaded">
+                                        <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`" icon="pi pi-exclamation-triangle" size="small"></Tag>
+                                    </div>
+                                </div>
                             </template>
                         </Column>
 
