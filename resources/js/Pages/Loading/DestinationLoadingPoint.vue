@@ -448,7 +448,7 @@ const reviewContainer = () => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ hbl.hbl_number ?? hbl.hbl }}</span>
+                                        <span>{{ hbl?.hbl_number ?? hbl?.hbl }}</span>
                                     </div>
                                     <ul v-show="hbl.expanded" class="pl-4">
                                         <draggable v-model="hbl.packages"
@@ -463,7 +463,7 @@ const reviewContainer = () => {
                                                             <div>
                                                                 <div class="flex justify-between">
                                                                     <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }}
+                                                                        {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id)?.hbl }}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -623,7 +623,7 @@ const reviewContainer = () => {
                                                 <div>
                                                     <div class="flex justify-between">
                                                         <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
-                                                            {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id).hbl }}
+                                                            {{ findHblByPackageId(element.id)?.hbl_number || findHblByPackageId(element.id)?.hbl }}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -741,11 +741,11 @@ const reviewContainer = () => {
         <ReviewModal :container-array="containerArr"
                      :containerPackages="reviewContainerArr"
                      :find-hbl-by-package-id="findHblByPackageId"
-                     :is-destination-loading="true"
                      :loadedHBLsPackages="loadedHBLsPackages"
                      :loadedMHBLs="loadedMHBLs"
                      :visible="showReviewModal"
                      @close="showReviewModal = false"
+                     :is-destination-loading="true"
                      @update:visible="showReviewModal = $event"/>
     </AppLayout>
 </template>
