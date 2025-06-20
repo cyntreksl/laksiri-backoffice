@@ -12,10 +12,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -280,10 +283,20 @@ class HBL extends Model
         );
     }
 
-    public function containers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function containers(): BelongsToMany
     {
         return $this->belongsToMany(Container::class, 'container_hbl_package', 'hbl_package_id', 'container_id')
             ->withPivot('status', 'loaded_by')
             ->withTimestamps();
+    }
+
+    public function rtfRecords(): MorphMany
+    {
+        return $this->morphMany(RtfRecord::class, 'rtfable');
+    }
+
+    public function latestRtfRecord(): MorphOne
+    {
+        return $this->morphOne(RtfRecord::class, 'rtfable')->latestOfMany();
     }
 }

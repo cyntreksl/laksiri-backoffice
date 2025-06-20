@@ -20,7 +20,7 @@ class GetHBLByIdWithPackages
             }])
             ->with(['packages' => function ($query) {
                 $query->withoutGlobalScope(BranchScope::class);
-            }])
+            }, 'latestRtfRecord'])
             ->withSum(['packages' => function ($query) {
                 $query->withoutGlobalScope(BranchScope::class);
             }], 'weight')

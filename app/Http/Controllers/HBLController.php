@@ -21,6 +21,7 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\HBLDocument;
+use App\Models\HBLPackage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -412,5 +413,25 @@ class HBLController extends Controller
     public function downloadGatePass($hbl, CustomerQueue $customerQueue)
     {
         return $this->HBLRepository->downloadGatePass($hbl, $customerQueue);
+    }
+
+    public function setRTF(HBL $hbl)
+    {
+        return $this->HBLRepository->doRTF($hbl);
+    }
+
+    public function unsetRTF(HBL $hbl)
+    {
+        return $this->HBLRepository->undoRTF($hbl);
+    }
+
+    public function setPackageRTF(HBLPackage $hbl_package)
+    {
+        return $this->HBLRepository->doPackageRTF($hbl_package);
+    }
+
+    public function unsetPackageRTF(HBLPackage $hbl_package)
+    {
+        return $this->HBLRepository->undoPackageRTF($hbl_package);
     }
 }

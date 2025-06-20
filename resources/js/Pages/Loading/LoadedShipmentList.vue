@@ -386,8 +386,11 @@ const exportCSV = () => {
 
                         <Column field="container_type" header="Container Type" sortable>
                             <template #body="slotProps">
-                                <Tag :severity="resolveContainerType(slotProps.data)"
-                                     :value="slotProps.data.container_type" class="text-sm"></Tag>
+                                <div class="flex space-x-2">
+                                    <i v-if="slotProps.data.is_rtf" v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <Tag :severity="resolveContainerType(slotProps.data)"
+                                         :value="slotProps.data.container_type" class="text-sm"></Tag>
+                                </div>
                             </template>
                             <template #filter="{ filterModel }">
                                 <Select v-model="filterModel.value" :options="containerTypes" :showClear="true"
