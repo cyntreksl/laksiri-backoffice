@@ -14,76 +14,50 @@ class RolePermissionSeeder extends Seeder
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $this->createRoles();
+        // Create roles
+        //        Role::updateOrCreate(['name' => 'super-admin']);
+        //        Role::updateOrCreate(['name' => 'admin']);
+        //        Role::updateOrCreate(['name' => 'empty']);
+        //        Role::updateOrCreate(['name' => 'viewer']);
+        //        Role::updateOrCreate(['name' => 'driver']);
+        //        Role::updateOrCreate(['name' => 'customer']);
+        //        Role::updateOrCreate(['name' => 'call center']);
+        //        Role::updateOrCreate(['name' => 'boned area']);
+        //        Role::updateOrCreate(['name' => 'finance Team']);
+        //        Role::updateOrCreate(['name' => 'front office staff']);
+        //        Role::updateOrCreate(['name' => 'clearance team']);
+        //        Role::updateOrCreate(['name' => 'gate-security']);
+        //
+        //        $this->command->info('Default Roles added.');
+        //
+        //        $this->assignPermissions();
 
-        $this->createPermissions();
+        $this->createPermissionIfNotExsists();
 
-        $this->assignRolePermissions();
     }
 
-    protected function createRoles(): void
+    protected function assignPermissions(): void
     {
-        $roles = [
-            'super-admin',
-            'admin',
-            'empty',
-            'viewer',
-            'driver',
-            'customer',
-            'call center',
-            'boned area',
-            'finance Team',
-            'front office staff',
-            'clearance team',
-            'gate-security',
-        ];
+        // Clear all existing permissions first
+        Permission::query()->delete();
 
-        foreach ($roles as $role) {
-            Role::firstOrCreate(['name' => $role]);
-        }
+        $superAdminRole = Role::where('name', 'super-admin')->first();
 
-        $this->command->info('Default roles created.');
-    }
-
-    protected function createPermissions(): void
-    {
-        foreach ($this->permissionGroups() as $group) {
-            foreach ($group['permissions'] as $permission) {
-                Permission::firstOrCreate([
-                    'name' => $permission,
-                    'group_name' => $group['group_name'],
+        // Create all permissions and assign to super admin
+        foreach (self::defaultPermissions() as $permissionGroup) {
+            foreach ($permissionGroup['permissions'] as $permName) {
+                $permission = Permission::updateOrCreate([
+                    'name' => $permName,
+                    'group_name' => $permissionGroup['group_name'],
                     'guard_name' => 'web',
                 ]);
+                $superAdminRole->givePermissionTo($permission);
             }
         }
 
-        $this->command->info('Permissions created.');
-    }
+        $adminRole = Role::where('name', 'admin')->first();
 
-    protected function assignRolePermissions(): void
-    {
-        $this->assignSuperAdminPermissions();
-        $this->assignAdminPermissions();
-        $this->assignBonedAreaPermissions();
-        $this->assignCallCenterPermissions();
-        $this->assignFinanceTeamPermissions();
-        $this->assignClearanceTeamPermissions();
-        $this->assignSecurityPermissions();
-
-        $this->command->info('Permissions assigned to roles.');
-    }
-
-    protected function assignSuperAdminPermissions(): void
-    {
-        $superAdmin = Role::where('name', 'super-admin')->first();
-        $superAdmin->givePermissionTo(Permission::all());
-    }
-
-    protected function assignAdminPermissions(): void
-    {
-        $admin = Role::where('name', 'admin')->first();
-
-        $allowedPermissionGroups = [
+        $allowedAdminPermissionGroups = [
             'User',
             'Role',
             'Pickup',
@@ -101,7 +75,7 @@ class RolePermissionSeeder extends Seeder
             'Third Party Shipment',
         ];
 
-        $excludedPermissions = [
+        $excludedAdminPermissions = [
             'air-line.index',
             'air-line.create',
             'air-line.list',
@@ -136,18 +110,25 @@ class RolePermissionSeeder extends Seeder
             'charges.air line do charges delete',
         ];
 
-        $permissions = Permission::whereIn('group_name', $allowedPermissionGroups)
-            ->whereNotIn('name', $excludedPermissions)
-            ->get();
+        for ($i = 0; $i < count(self::defaultPermissions()); $i++) {
+            $permissionGroup = self::defaultPermissions()[$i]['group_name'];
+            for ($j = 0; $j < count(self::defaultPermissions()[$i]['permissions']); $j++) {
+                $permission = Permission::updateOrCreate([
+                    'name' => self::defaultPermissions()[$i]['permissions'][$j],
+                    'group_name' => $permissionGroup,
+                    'guard_name' => 'web',
+                ]);
+                if (in_array($permissionGroup, $allowedAdminPermissionGroups)) {
+                    if (! in_array($permission->name, $excludedAdminPermissions)) {
+                        $adminRole->givePermissionTo($permission);
+                    }
+                }
+            }
+        }
 
-        $admin->givePermissionTo($permissions);
-    }
+        $bonedAreaRole = Role::where('name', 'boned area')->first();
 
-    protected function assignBonedAreaPermissions(): void
-    {
-        $role = Role::where('name', 'boned area')->first();
-
-        $permissions = [
+        $bonedAreaPermissions = [
             'hbls.index',
             'hbls.download pdf',
             'hbls.show',
@@ -177,14 +158,16 @@ class RolePermissionSeeder extends Seeder
             'customer-queue.show package calling screen',
         ];
 
-        $this->assignPermissionsToRole($role, $permissions);
-    }
+        foreach ($bonedAreaPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $bonedAreaRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
+        }
 
-    protected function assignCallCenterPermissions(): void
-    {
-        $role = Role::where('name', 'call center')->first();
-
-        $permissions = [
+        $callCenterPermissions = [
             'hbls.index',
             'hbls.download pdf',
             'hbls.show',
@@ -218,14 +201,20 @@ class RolePermissionSeeder extends Seeder
             'call-center.all-calls',
         ];
 
-        $this->assignPermissionsToRole($role, $permissions);
-    }
+        $callCenterRole = Role::where('name', 'call center')->first();
 
-    protected function assignFinanceTeamPermissions(): void
-    {
-        $role = Role::where('name', 'finance Team')->first();
+        foreach ($callCenterPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $callCenterRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
+        }
 
-        $permissions = [
+        $financeTeamRole = Role::where('name', 'finance Team')->first();
+
+        $financeTeamPermissions = [
             'air-line.index',
             'air-line.create',
             'air-line.list',
@@ -290,14 +279,18 @@ class RolePermissionSeeder extends Seeder
             'payment-container.completed payment requests',
         ];
 
-        $this->assignPermissionsToRole($role, $permissions);
-    }
+        foreach ($financeTeamPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $financeTeamRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
+        }
 
-    protected function assignClearanceTeamPermissions(): void
-    {
-        $role = Role::where('name', 'clearance team')->first();
+        $clearanceTeamRole = Role::where('name', 'clearance team')->first();
 
-        $permissions = [
+        $clearanceTeamPermissions = [
             'hbls.index',
             'hbls.show',
             'hbls.hold and release',
@@ -321,38 +314,36 @@ class RolePermissionSeeder extends Seeder
             'payment-container.completed payment requests',
         ];
 
-        $this->assignPermissionsToRole($role, $permissions);
-    }
+        foreach ($clearanceTeamPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $clearanceTeamRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
+        }
 
-    protected function assignSecurityPermissions(): void
-    {
-        $role = Role::where('name', 'gate-security')->first();
+        $securityRole = Role::where('name', 'gate-security')->first();
 
-        $permissions = [
+        $securityPermissions = [
             'mark-shipment-arrived-to-warehouse',
             'mark-shipment-depart-from-warehouse',
             'mark-gate-pass',
         ];
 
-        $this->assignPermissionsToRole($role, $permissions);
-    }
-
-    protected function assignPermissionsToRole(Role $role, array $permissionNames): void
-    {
-        $permissions = Permission::whereIn('name', $permissionNames)->get();
-
-        foreach ($permissions as $permission) {
-            $role->givePermissionTo($permission);
+        foreach ($securityPermissions as $permName) {
+            $permission = Permission::where('name', $permName)->first();
+            if ($permission) {
+                $securityRole->givePermissionTo($permission);
+            } else {
+                $this->command->warn("Permission '{$permName}' not found.");
+            }
         }
 
-        $notFound = array_diff($permissionNames, $permissions->pluck('name')->toArray());
-
-        if (! empty($notFound)) {
-            $this->command->warn('Permissions not found: '.implode(', ', $notFound));
-        }
+        $this->command->info('Permissions assigned to admin and boned area roles.');
     }
 
-    public static function permissionGroups(): array
+    public static function defaultPermissions(): array
     {
         return [
             [
@@ -714,5 +705,20 @@ class RolePermissionSeeder extends Seeder
                 ],
             ],
         ];
+    }
+
+    public function createPermissionIfNotExsists()
+    {
+        foreach (self::defaultPermissions() as $permissionGroup) {
+            foreach ($permissionGroup['permissions'] as $permName) {
+                $permission = Permission::updateOrCreate([
+                    'name' => $permName,
+                    'group_name' => $permissionGroup['group_name'],
+                    'guard_name' => 'web',
+                ]);
+            }
+
+            $this->command->info("Permission group '{$permissionGroup['group_name']}' with permissions created or updated.");
+        }
     }
 }
