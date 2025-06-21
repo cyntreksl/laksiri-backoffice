@@ -248,7 +248,7 @@
 
                             <!-- Courier Management -->
                             <a
-                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('Courier')) || $page.props.user.permissions.includes('third-party-agents.index') || $page.props.user.permissions.includes('couriers.index') || $page.props.user.permissions.includes('couriers.create') || $page.props.user.permissions.includes('courier-agents.create')"
+                                v-if="$page.props.user.permissions.some(permission => permission.startsWith('courier')) || $page.props.user.permissions.some(permission => permission.startsWith('third-party-agents')) || $page.props.user.permissions.some(permission => permission.startsWith('courier-agents'))"
                                 :class="[
                 activeMenu === 'courier' ? 'bg-primary/10 text-primary' : '',
               ]"
