@@ -1183,7 +1183,7 @@ const handleCopyFromHBLToConsignee = async () => {
 
                             <div class="col-span-2">
                                 <IftaLabel>
-                                    <InputNumber v-model="form.bill_charge" :disabled="!isEditable" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                    <InputNumber v-model="form.bill_charge" :minFractionDigits="2" class="w-full" disabled inputId="bill-charge" min="0" step="any" variant="filled" />
                                     <label for="bill-charge">Bill Charge</label>
                                 </IftaLabel>
                                 <InputError :message="form.errors.bill_charge"/>
@@ -1191,7 +1191,7 @@ const handleCopyFromHBLToConsignee = async () => {
 
                             <div class="col-span-2">
                                 <IftaLabel>
-                                    <InputNumber v-model="form.destination_charge" :disabled="!isEditable" :minFractionDigits="2"  class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                    <InputNumber v-model="form.destination_charge" :minFractionDigits="2" class="w-full"  disabled inputId="bill-charge" min="0" step="any" variant="filled" />
                                     <label for="bill-charge">Destination Charges</label>
                                 </IftaLabel>
                                 <InputError :message="form.errors.destination_charge"/>
@@ -1199,7 +1199,7 @@ const handleCopyFromHBLToConsignee = async () => {
 
                             <div class="col-span-2">
                                 <IftaLabel>
-                                    <InputNumber v-model="form.package_charges" :disabled="!isEditable" :minFractionDigits="2"  class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                    <InputNumber v-model="form.package_charges" :minFractionDigits="2" class="w-full"  disabled inputId="bill-charge" min="0" step="any" variant="filled" />
                                     <label for="bill-charge">Package Charges</label>
                                 </IftaLabel>
                                 <InputError :message="form.errors.package_charges"/>
