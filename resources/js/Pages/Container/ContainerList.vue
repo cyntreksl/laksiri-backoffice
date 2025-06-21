@@ -449,7 +449,7 @@ const exportCSV = () => {
 
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedContainer.length < 1"/>
+                    <ContextMenu ref="cm" :hidden="selectedContainer.length < 1 || selectedContainer.status === 'IN TRANSIT'" :model="menuModel"/>
                     <DataTable
                         ref="dt"
                         v-model:contextMenuSelection="selectedContainer"
