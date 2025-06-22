@@ -45,6 +45,10 @@ class PriceCalculationService
         array $measuredData,
         Collection $dataRules
     ): array {
+        if (empty($priceRuleData) && $hbl->packages->isEmpty()) {
+            return $this->calculateTotalWithPriceRule($dataRules, $measuredData);
+        }
+
         if ($priceRuleData && ! $priceRuleData['is_package_rule']) {
             $appliedRules = collect(json_decode($priceRuleData['rules'] ?? '[]', true));
 
@@ -217,18 +221,22 @@ class PriceCalculationService
         $value = floatval($matches[2] ?? 0);
 
         switch ($operator) {
-            case '*': $result['freight_charge'] += $quantity * $value;
+            case '*':
+                $result['freight_charge'] += $quantity * $value;
                 break;
-            case '+': $result['freight_charge'] += $quantity + $value;
+            case '+':
+                $result['freight_charge'] += $quantity + $value;
                 break;
-            case '-': $result['freight_charge'] += $quantity - $value;
+            case '-':
+                $result['freight_charge'] += $quantity - $value;
                 break;
             case '/':
                 if ($value != 0) {
                     $result['freight_charge'] += $quantity / $value;
                 }
                 break;
-            case '': $result['freight_charge'] += $value;
+            case '':
+                $result['freight_charge'] += $value;
                 break;
         }
     }
