@@ -11,6 +11,7 @@ use App\Actions\Role\Permission\GetPermissionGroup;
 use App\Actions\Role\Permission\GetPermissionsByGroupName;
 use App\Actions\Role\UpdateRole;
 use App\Interfaces\RoleRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 
 class RoleRepository implements RoleRepositoryInterface
@@ -22,7 +23,7 @@ class RoleRepository implements RoleRepositoryInterface
 
     public function getPermissionGroups()
     {
-        return GetPermissionGroup::run();
+        return GetPermissionGroup::run(Auth::user());
     }
 
     public function getPermissionsByGroupName(string $group_name)
@@ -48,7 +49,8 @@ class RoleRepository implements RoleRepositoryInterface
 
     public function getPermissions()
     {
-        return GetAllPermissions::run();
+        // Pass the authenticated user to GetAllPermissions
+        return GetAllPermissions::run(Auth::user());
     }
 
     public function storeRole(array $data)
