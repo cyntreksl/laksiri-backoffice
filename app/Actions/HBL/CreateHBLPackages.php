@@ -52,13 +52,13 @@ class CreateHBLPackages
                     // Logic ONLY for mobile (v1/*)
 
                     if ($hbl->cargo_type === CargoType::AIR_CARGO->value) {
-                        $package->weight = number_format($chargeableWeight, 3);
+                        $package->weight = round($chargeableWeight, 3);
                     } else {
-                        $package->weight = number_format($actualWeight, 3);
+                        $package->weight = round($actualWeight, 3);
                     }
 
                     $package->actual_weight = $actualWeight;
-                    $package->volumetric_weight = number_format($volumetricWeight, 3);
+                    $package->volumetric_weight = round($volumetricWeight, 3);
                 } else {
                     // Default logic (web or other APIs)
 
