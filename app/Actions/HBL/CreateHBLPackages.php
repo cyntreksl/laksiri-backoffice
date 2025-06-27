@@ -34,15 +34,44 @@ class CreateHBLPackages
                 $package->height = $packageData['height'];
                 $package->quantity = $packageData['quantity'];
                 $package->volume = $packageData['volume'];
-                if ($hbl->cargo_type === CargoType::AIR_CARGO->value) {
-                    $package->weight = number_format($packageData['chargeableWeight'] ?? 0, 3);
-                } else {
-                    $package->weight = number_format($packageData['totalWeight'] ?? $packageData['weight'] ?? 0, 3);
-                }
-                $package->actual_weight = $packageData['totalWeight'] ?? $packageData['weight'] ?? 0;
-                $package->volumetric_weight = number_format($packageData['volumetricWeight'] ?? 0, 3);
                 $package->remarks = $packageData['remarks'];
                 $package->measure_type = $packageData['measure_type'] ?? 'cm';
+
+                // Calculate actual_weight
+                $totalWeight = $packageData['totalWeight'] ?? null;
+                $weight = $packageData['weight'] ?? 0;
+                $actualWeight = $totalWeight ?? $weight;
+
+                // Calculate volumetric weight: (L * W * H * Q) / 6000
+                $volumetricWeight = ($packageData['length'] * $packageData['width'] * $packageData['height'] * $packageData['quantity']) / 6000;
+
+                // Calculate chargeableWeight
+                $chargeableWeight = max($actualWeight, $volumetricWeight);
+
+                if (request()->is('v1/*')) {
+                    // Logic ONLY for mobile (v1/*)
+
+                    if ($hbl->cargo_type === CargoType::AIR_CARGO->value) {
+                        $package->weight = number_format($chargeableWeight, 3);
+                    } else {
+                        $package->weight = number_format($actualWeight, 3);
+                    }
+
+                    $package->actual_weight = $actualWeight;
+                    $package->volumetric_weight = number_format($volumetricWeight, 3);
+                } else {
+                    // Default logic (web or other APIs)
+
+                    if ($hbl->cargo_type === CargoType::AIR_CARGO->value) {
+                        $package->weight = number_format($packageData['chargeableWeight'] ?? 0, 3);
+                    } else {
+                        $package->weight = number_format($packageData['totalWeight'] ?? $packageData['weight'] ?? 0, 3);
+                    }
+
+                    $package->actual_weight = $packageData['totalWeight'] ?? $packageData['weight'] ?? 0;
+                    $package->volumetric_weight = number_format($packageData['volumetricWeight'] ?? 0, 3);
+                }
+
                 $package->save();
             }
 
