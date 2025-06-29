@@ -67,6 +67,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function storeHBL(array $data)
     {
+        dd($data);
         $hbl = CreateHBL::run($data);
         $packagesData = $data['packages'];
         CreateHBLPackages::run($hbl, $packagesData);
@@ -78,6 +79,9 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         if (isset($data['paid_amount'])) {
             UpdateHBLPayments::run($data, $hbl);
         }
+
+        
+
 
         return $hbl;
     }
