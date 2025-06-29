@@ -32,6 +32,7 @@ use App\Actions\HBL\MarkAsUnRTF;
 use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
+use App\Actions\HBL\UpdateHBLCharges;
 use App\Actions\HBL\UpdateHBLPackages;
 use App\Actions\HBL\Warehouse\GetHBLDestinationTotalConvertedCurrency;
 use App\Actions\HBLDocument\DeleteDocument;
@@ -80,9 +81,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             UpdateHBLPayments::run($data, $hbl);
         }
 
-        
-
-
+        UpdateHBLCharges::run($hbl);
         return $hbl;
     }
 
