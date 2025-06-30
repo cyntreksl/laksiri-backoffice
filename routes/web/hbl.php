@@ -110,3 +110,6 @@ Route::post('hbl-packages/{hbl_package}/set/rtf', [HBLController::class, 'setPac
 
 Route::post('hbl-packages/{hbl_package}/unset/rtf', [HBLController::class, 'unsetPackageRTF'])
     ->name('hbl-packages.unset.rtf');
+
+Route::get('hbl-charge/{id}', [HBLController::class, 'hblChargeDetails'])
+    ->name('hbl-charge.details');

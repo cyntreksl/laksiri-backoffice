@@ -13,6 +13,7 @@ import TabStatus from "@/Pages/Common/Dialog/HBL/Tabs/TabStatus.vue";
 import TabShipment from "@/Pages/Common/Dialog/HBL/Tabs/TabShipment.vue";
 import TabHBLPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLPayments.vue";
 import TabHBLDetails from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLDetails.vue";
+import TabHBLCharge from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLCharge.vue";
 
 const props = defineProps({
     show: {
@@ -63,48 +64,54 @@ const fetchHBL = async () => {
     }
 }
 
-const getHBLTotalSummary = async () => {
-    try {
-        const response = await fetch(`/hbls/get-total-summary/${props.hblId}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Network response was not ok.");
-        }else{
-            hblTotalSummary.value = await response.json();
-        }
-    } catch (error) {
-        console.error("Error:", error);
-    }
-};
-
-const getHBLDestinationTotalSummary = async () => {
-    try {
-        const response = await fetch(`/hbls/get-destination-total-summary/${props.hblId}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": usePage().props.csrf,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Network response was not ok.");
-        }else{
-            hblDestinationTotalSummary.value = await response.json();
-        }
-    } catch (error) {
-        console.error("Error:", error);
-    }
-};
+// const getHBLTotalSummary = async () => {
+//     try {
+//         const response = await fetch(`/hbls/get-total-summary/${props.hblId}`, {
+//             method: "GET",
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 "X-CSRF-TOKEN": usePage().props.csrf,
+//             },
+//         });
+//
+//         if (!response.ok) {
+//             throw new Error("Network response was not ok.");
+//         }else{
+//             hblTotalSummary.value = await response.json();
+//         }
+//     } catch (error) {
+//         console.error("Error:", error);
+//     }
+// };
+//
+// const getHBLDestinationTotalSummary = async () => {
+//     try {
+//         const response = await fetch(`/hbls/get-destination-total-summary/${props.hblId}`, {
+//             method: "GET",
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 "X-CSRF-TOKEN": usePage().props.csrf,
+//             },
+//         });
+//
+//         if (!response.ok) {
+//             throw new Error("Network response was not ok.");
+//         }else{
+//             hblDestinationTotalSummary.value = await response.json();
+//         }
+//     } catch (error) {
+//         console.error("Error:", error);
+//     }
+// };
 
 const fetchPickup = async () => {
     isLoading.value = true;
+
+    if (props.pickupId === null || props.pickupId === undefined) {
+        pickup.value = {};
+        isLoading.value = false;
+        return;
+    }
 
     try {
         const response = await fetch(`/pickups/${props.pickupId}`, {
@@ -132,8 +139,6 @@ const fetchPickup = async () => {
 watch(() => props.hblId, (newVal) => {
     if (newVal !== undefined) {
         fetchHBL();
-        getHBLTotalSummary();
-        getHBLDestinationTotalSummary();
     }
 });
 
@@ -206,7 +211,8 @@ onMounted(() => {
                     <TabHBLDetails :hbl="hbl" :is-loading="isLoading" :pickup="pickup" />
                 </TabPanel>
                 <TabPanel value="1">
-                    <TabHBLPayments :hbl="hbl" :hbl-destination-total-summary="hblDestinationTotalSummary" :hbl-total-summary="hblTotalSummary"/>
+                    <TabHBLCharge :hbl="hbl"></TabHBLCharge>
+<!--                    <TabHBLPayments :hbl="hbl" :hbl-destination-total-summary="hblDestinationTotalSummary" :hbl-total-summary="hblTotalSummary"/>-->
                 </TabPanel>
                 <TabPanel value="2">
                     <TabShipment v-if="hbl" :hbl="hbl" :pickup="pickup" />

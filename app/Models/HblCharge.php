@@ -50,14 +50,13 @@ class HblCharge extends Model
         'destination_total_charge',
         'destination_discount',
         'destination_additional_charge',
-
         // destination_total_tax
         'destination_total_tax',
         'destination_net_total',
         'destination_paid_amount',
         'destination_due',
 
-        'destination_due',
+        'grand_total',
         'grand_total_paid',
         'grand_total_due',
 

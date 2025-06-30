@@ -299,4 +299,14 @@ class HBL extends Model
     {
         return $this->morphOne(RtfRecord::class, 'rtfable')->latestOfMany();
     }
+
+    public function departureCharge(): HasOne
+    {
+        return $this->hasOne(HBLDepartureCharge::class, 'hbl_id', 'id');
+    }
+
+    public function destinationCharge(): HasOne
+    {
+        return $this->hasOne(HBLDestinationCharge::class, 'hbl_id', 'id');
+    }
 }
