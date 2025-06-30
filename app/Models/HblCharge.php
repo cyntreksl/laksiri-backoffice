@@ -61,6 +61,4 @@ class HblCharge extends Model
         'grand_total_due',
 
     ];
-
-
 }

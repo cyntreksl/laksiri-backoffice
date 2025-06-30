@@ -445,7 +445,7 @@ class HBLController extends Controller
             'destinationCharge',
         ]);
 
-        $chargeDetails =[
+        $chargeDetails = [
             'base_currency_code' => $hbl->departureCharge->base_currency_code ?? null,
             'base_currency_rate_in_lkr' => $hbl->departureCharge->base_currency_rate_in_lkr ?? null,
             'is_branch_prepaid' => $hbl->departureCharge->is_branch_prepaid ?? null,
@@ -474,7 +474,6 @@ class HBLController extends Controller
         ];
 
         return response()->json($chargeDetails);
-
 
     }
 }

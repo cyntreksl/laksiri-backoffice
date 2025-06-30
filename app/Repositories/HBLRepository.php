@@ -35,7 +35,6 @@ use App\Actions\HBL\MarkAsUnRTF;
 use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
-use App\Actions\HBL\UpdateHBLCharges;
 use App\Actions\HBL\UpdateHBLPackages;
 use App\Actions\HBL\Warehouse\GetHBLDestinationTotalConvertedCurrency;
 use App\Actions\HBLDocument\DeleteDocument;
@@ -98,8 +97,9 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             'is_destination_charges_paid' => $data['is_destination_charges_paid'],
         ];
 
-        UpdateHBLDepartureCharges::run($hbl,$paymentData);
-        UpdateHBLDestinationCharges::run($hbl,$paymentData);
+        UpdateHBLDepartureCharges::run($hbl, $paymentData);
+        UpdateHBLDestinationCharges::run($hbl, $paymentData);
+
         return $hbl;
     }
 
@@ -349,14 +349,13 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             );
 
             $currentBranch = GetBranchById::run(GetUserCurrentBranchID::run());
-            if ($currentBranch->is_prepaid){
+            if ($currentBranch->is_prepaid) {
                 $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $data['grand_total_weight']);
                 $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
                 $result['sl_rate'] = $destinationCharge['slRate'];
-            }else{
+            } else {
                 $result['destination_charges'] = 0;
             }
-
 
             return response()->json($result);
         }

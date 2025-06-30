@@ -31,7 +31,7 @@ class HBLDestinationCharge extends Model
         'destination_2_tax',
         'destination_2_total_with_tax',
 
-        'stop_demurrage_at'
+        'stop_demurrage_at',
     ];
 
     protected $casts = [

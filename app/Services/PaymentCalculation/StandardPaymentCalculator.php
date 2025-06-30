@@ -3,8 +3,6 @@
 namespace App\Services\PaymentCalculation;
 
 use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
-use App\Services\PaymentCalculation\FreightChargeCalculator;
-use App\Services\PaymentCalculation\PriceRuleProcessor;
 use Illuminate\Database\Eloquent\Collection;
 
 class StandardPaymentCalculator implements PaymentCalculatorInterface
@@ -78,6 +76,7 @@ class StandardPaymentCalculator implements PaymentCalculatorInterface
     {
         return array_values(array_filter($operations, function ($operation) use ($grandTotalQuantity) {
             $number = floatval(substr($operation, 1));
+
             return $number < $grandTotalQuantity;
         }));
     }
@@ -102,6 +101,7 @@ class StandardPaymentCalculator implements PaymentCalculatorInterface
     private function calculateGrandTotal(float $freightCharge, object $billingRule, array $charges): float
     {
         $vat = $billingRule->bill_vat ? $billingRule->bill_vat / 100 : 0;
+
         return $freightCharge + $billingRule->bill_price + $charges['other_charge'] + $vat;
     }
 }

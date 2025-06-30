@@ -102,5 +102,4 @@ class CalculateDoCharge
     {
         return $hbl->packages[0]->containers()->withoutGlobalScopes()->first() ?? $hbl->packages[0]->duplicate_containers()->withoutGlobalScopes()->first();
     }
-
 }

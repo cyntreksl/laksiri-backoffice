@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
-use App\Providers\PaymentCalculationServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {

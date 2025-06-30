@@ -2,11 +2,11 @@
 
 namespace App\Actions\HBL;
 
-use App\Services\PaymentCalculation\PackagePaymentCalculator;
-use App\Services\PaymentCalculation\StandardPaymentCalculator;
-use App\Services\PaymentCalculation\PaymentCalculationRequest;
 use App\Services\PaymentCalculation\FreightChargeCalculator;
+use App\Services\PaymentCalculation\PackagePaymentCalculator;
+use App\Services\PaymentCalculation\PaymentCalculationRequest;
 use App\Services\PaymentCalculation\PriceRuleProcessor;
+use App\Services\PaymentCalculation\StandardPaymentCalculator;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CalculatePayment
@@ -48,9 +48,9 @@ class CalculatePayment
 
     public static function make(): self
     {
-        $freightCalculator = new FreightChargeCalculator();
-        $priceRuleProcessor = new PriceRuleProcessor();
-        $packageCalculator = new PackagePaymentCalculator();
+        $freightCalculator = new FreightChargeCalculator;
+        $priceRuleProcessor = new PriceRuleProcessor;
+        $packageCalculator = new PackagePaymentCalculator;
         $standardCalculator = new StandardPaymentCalculator($freightCalculator, $priceRuleProcessor);
 
         return new self($packageCalculator, $standardCalculator);

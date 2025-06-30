@@ -129,7 +129,7 @@ class HBL extends Model
         'finance_release_approved_date',
         'is_arrived_to_primary_warehouse',
         'currency_rate',
-        'package_charges'
+        'package_charges',
     ];
 
     protected $appends = [

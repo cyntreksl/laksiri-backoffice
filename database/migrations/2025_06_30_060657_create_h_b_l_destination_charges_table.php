@@ -37,7 +37,6 @@ return new class extends Migration
 
             $table->timestamp('stop_demurrage_at')->nullable();
 
-
             $table->timestamps();
         });
     }

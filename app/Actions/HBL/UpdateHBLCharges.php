@@ -26,7 +26,8 @@ class UpdateHBLCharges
      * 'paid_amount' => 0,
      * ];
      */
-    public function handle(HBL $HBL, $paymentData = []) {
+    public function handle(HBL $HBL, $paymentData = [])
+    {
         $branchId = $HBL->branch_id;
         $currencyCode = $HBL->branch->currency_symbol;
         $currencyRateInLKR = $HBL->currency_rate;
@@ -43,14 +44,14 @@ class UpdateHBLCharges
         $packageListLength = $HBL->packages->count();
         $grandTotalVolume = $HBL->grand_total_volume;
         $grandTotalWeight = $HBL->grand_total_weight;
-        $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($cargoType, $packageListLength, $grandTotalVolume,$grandTotalWeight);
+        $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($cargoType, $packageListLength, $grandTotalVolume, $grandTotalWeight);
 
         $destinationHandlingCharge = $destinationCharge['handlingCharges'];
         $destinationSLPACharge = $destinationCharge['slpaCharge'];
         $destinationBondCharge = $destinationCharge['bondCharge'];
-        $destination1Total = $destinationCharge['totalAmount'];;
-        $destination1Tax =  $destinationCharge['totalTax'];;
-        $destination1TotalWithTax =  $destinationCharge['totalAmountWithTax'];;
+        $destination1Total = $destinationCharge['totalAmount'];
+        $destination1Tax = $destinationCharge['totalTax'];
+        $destination1TotalWithTax = $destinationCharge['totalAmountWithTax'];
 
         $destinationDOCharge = null;
         $destinationDemurrageCharge = null;
@@ -60,7 +61,7 @@ class UpdateHBLCharges
         $destination2Tax = null;
         $destination2TotalWithTax = null;
 
-        $departureTotalCharge = $isBranchPrepaid ?  $departure1Total + $destination1TotalWithTax : $departure1Total;
+        $departureTotalCharge = $isBranchPrepaid ? $departure1Total + $destination1TotalWithTax : $departure1Total;
         $departureDiscount = $paymentData['discount'] ?? 0;
         $departureAdditionalCharge = $paymentData['additional_charge'] ?? 0;
         $departureNetTotal = $departureTotalCharge - $departureDiscount + $departureAdditionalCharge;
@@ -68,7 +69,7 @@ class UpdateHBLCharges
         $departureDue = $departureNetTotal - $departurePaidAmount;
 
         $destinationTotalCharge = $isBranchPrepaid ? $destination2TotalWithTax : $destination1TotalWithTax + $destination2TotalWithTax;
-        $destinationDiscount =  null;
+        $destinationDiscount = null;
         $destinationAdditionalCharge = null;
 
         $destinationTotalTax = null;

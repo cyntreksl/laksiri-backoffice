@@ -8,7 +8,7 @@ class PackagePaymentCalculator implements PaymentCalculatorInterface
 {
     public function calculate(PaymentCalculationRequest $request): array
     {
-        if (!$request->hasPackages()) {
+        if (! $request->hasPackages()) {
             return PaymentCalculationResult::createError('Please add at least one package')->toArray();
         }
 
@@ -52,6 +52,7 @@ class PackagePaymentCalculator implements PaymentCalculatorInterface
     private function getFirstPackagePriceRule(array $packageList): object
     {
         $firstPackage = $packageList[0];
+
         return GetPackagePriceRule::run(
             $firstPackage['packageRule'] ?? $firstPackage['package_rule']
         );

@@ -32,9 +32,9 @@ class FreightChargeCalculator
             }
 
             $freightCharge += $result['value'];
-            $freightChargeOperations[] = "{$quantityAfterOperation} " .
-                ($calculation['operator'] !== '' ? $calculation['operator'] : '=>') .
-                ' ' . number_format((float) $calculation['value'], 2);
+            $freightChargeOperations[] = "{$quantityAfterOperation} ".
+                ($calculation['operator'] !== '' ? $calculation['operator'] : '=>').
+                ' '.number_format((float) $calculation['value'], 2);
 
             $currentQuantity = $operationQuantity;
             $lastOperator = $calculation['operator'];
@@ -55,7 +55,7 @@ class FreightChargeCalculator
 
         return [
             'operator' => $matches[1] ?? '',
-            'value' => floatval($matches[2] ?? 0)
+            'value' => floatval($matches[2] ?? 0),
         ];
     }
 
@@ -72,6 +72,7 @@ class FreightChargeCalculator
                 if ($value == 0) {
                     return ['error' => 'Division by zero error'];
                 }
+
                 return ['value' => $quantity / $value];
             case '':
                 return ['value' => $value];

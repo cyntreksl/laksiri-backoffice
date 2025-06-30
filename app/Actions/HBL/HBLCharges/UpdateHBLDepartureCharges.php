@@ -2,9 +2,7 @@
 
 namespace App\Actions\HBL\HBLCharges;
 
-use App\Actions\HBL\Warehouse\GetHBLDestinationTotalConvertedCurrency;
 use App\Models\HBL;
-use App\Models\Tax;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class UpdateHBLDepartureCharges
@@ -26,7 +24,8 @@ class UpdateHBLDepartureCharges
      * 'paid_amount' => 0,
      * ];
      */
-    public function handle(HBL $HBL, $paymentData = []) {
+    public function handle(HBL $HBL, $paymentData = [])
+    {
         $branchId = $HBL->branch_id;
         $currencyCode = $HBL->branch->currency_symbol;
         $currencyRateInLKR = $HBL->currency_rate;

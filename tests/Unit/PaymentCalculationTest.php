@@ -2,12 +2,10 @@
 
 namespace Tests\Unit;
 
+use App\Services\PaymentCalculation\FreightChargeCalculator;
 use App\Services\PaymentCalculation\PaymentCalculationRequest;
 use App\Services\PaymentCalculation\PaymentCalculationResult;
-use App\Services\PaymentCalculation\PackagePaymentCalculator;
-use App\Services\PaymentCalculation\FreightChargeCalculator;
 use App\Services\PaymentCalculation\PriceRuleProcessor;
-use App\Services\PaymentCalculation\StandardPaymentCalculator;
 use Tests\TestCase;
 
 class PaymentCalculationTest extends TestCase
@@ -76,7 +74,7 @@ class PaymentCalculationTest extends TestCase
 
     public function test_freight_charge_calculator_parses_operations_correctly()
     {
-        $calculator = new FreightChargeCalculator();
+        $calculator = new FreightChargeCalculator;
 
         $reflection = new \ReflectionClass($calculator);
         $method = $reflection->getMethod('parseTrueAction');
@@ -90,11 +88,11 @@ class PaymentCalculationTest extends TestCase
 
     public function test_price_rule_processor_sorts_operations_correctly()
     {
-        $processor = new PriceRuleProcessor();
+        $processor = new PriceRuleProcessor;
 
         $mockCollection = \Mockery::mock(\Illuminate\Database\Eloquent\Collection::class);
         $mockCollection->shouldReceive('toArray')
-            ->andReturn(['>10' => (object)['condition' => '>10'], '>5' => (object)['condition' => '>5']]);
+            ->andReturn(['>10' => (object) ['condition' => '>10'], '>5' => (object) ['condition' => '>5']]);
 
         $operations = $processor->getSortedOperations($mockCollection);
 

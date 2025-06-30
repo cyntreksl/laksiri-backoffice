@@ -2,8 +2,6 @@
 
 namespace App\Actions\HBL\HBLCharges;
 
-use App\Actions\AirLine\GetAirLineByName;
-use App\Actions\SpecialDOCharge\GetSpecialDOChargeByAgent;
 use App\Models\HBL;
 use Carbon\Carbon;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -44,14 +42,14 @@ class CalculateDemurrageCharge
         $grand_volume = $HBL->grand_total_volume;
         $grand_weight = $HBL->grand_total_weight;
 
-        if (!empty($containerArrivalDate)) {
+        if (! empty($containerArrivalDate)) {
             $arrivedAt = Carbon::parse($containerArrivalDate);
             $currentDate = Carbon::now();
             $containerArrivalDatesCount = $arrivedAt->diffInDays($currentDate);
 
             if ($containerArrivalDatesCount > 1) {
-                return $this->demurrageCharge($containerArrivalDatesCount, $grand_volume,$grand_weight);
-            }else{
+                return $this->demurrageCharge($containerArrivalDatesCount, $grand_volume, $grand_weight);
+            } else {
                 return [
                     'rate' => 0.00,
                 ];
@@ -92,5 +90,4 @@ class CalculateDemurrageCharge
             'rate' => round($rate, 2),
         ];
     }
-
 }

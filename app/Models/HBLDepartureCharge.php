@@ -22,7 +22,6 @@ class HBLDepartureCharge extends Model
         'departure_grand_total',
     ];
 
-
     public function hbl()
     {
         return $this->belongsTo(HBL::class, 'hbl_id');
