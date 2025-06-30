@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Actions\Branch\GetBranchById;
 use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
 use App\Actions\CallFlag\CreateCallFlag;
 use App\Actions\Cashier\DownloadCashierInvoicePDF;
@@ -41,6 +42,7 @@ use App\Actions\HBLDocument\DeleteDocument;
 use App\Actions\HBLDocument\DownloadDocument;
 use App\Actions\HBLDocument\UploadDocument;
 use App\Actions\MHBL\DeleteMHBLsHBL;
+use App\Actions\User\GetUserCurrentBranchID;
 use App\Enum\HBLType;
 use App\Exports\CancelledHBLExport;
 use App\Exports\HBLExport;
@@ -346,9 +348,15 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 $data['package_list'],
             );
 
-            $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $data['grand_total_weight']);
-            $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
-            $result['sl_rate'] = $destinationCharge['slRate'];
+            $currentBranch = GetBranchById::run(GetUserCurrentBranchID::run());
+            if ($currentBranch->is_prepaid){
+                $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $data['grand_total_weight']);
+                $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
+                $result['sl_rate'] = $destinationCharge['slRate'];
+            }else{
+                $result['destination_charges'] = 0;
+            }
+
 
             return response()->json($result);
         }

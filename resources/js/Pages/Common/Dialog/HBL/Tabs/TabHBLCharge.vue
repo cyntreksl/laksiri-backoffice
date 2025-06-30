@@ -27,7 +27,7 @@ watch(hblCharges, (newVal) => {
     currencyRate.value = newVal.base_currency_rate_in_lkr;
 });
 
-const formatCurrency = (amount, isBaseCurrency = false) => {
+const formatCurrency = (amount, isBaseCurrency = false, primaryCurrency = true) => {
     const symbol = isPrepaid.value ? (currencySymbol.value || 'LKR') : 'LKR';
     if (amount === null || amount === undefined) {
         return `${symbol} 0.00`;
@@ -35,11 +35,12 @@ const formatCurrency = (amount, isBaseCurrency = false) => {
 
     const total = convertCurrency(amount,isBaseCurrency)
 
-    return `${symbol} ${new Intl.NumberFormat('en-US', {
+    const formatted = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
-    }).format(total)}`;
+    }).format(total);
 
+    return primaryCurrency ? `${symbol} ${formatted}` : formatted;
 };
 
 const convertCurrency = (amount, isBaseCurrency = false) => {
@@ -152,23 +153,23 @@ const getHBLChargeDetails = async (hbl) => {
                         <div class="space-y-2 ml-4">
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Freight Charge</span>
-                                <span class="font-medium">{{ formatCurrency(hblCharges.freight_charge || 0, true) }}</span>
+                                <span class="font-medium">{{currencySymbol}} {{ formatCurrency(hblCharges.freight_charge || 0, true,false) }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Package Charge</span>
-                                <span class="font-medium">{{ formatCurrency(hblCharges.package_charge || 0, true) }}</span>
+                                <span class="font-medium">{{currencySymbol}} {{ formatCurrency(hblCharges.package_charge || 0, true,false) }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Bill Charge</span>
-                                <span class="font-medium">{{ formatCurrency(hblCharges.bill_charge || 0, true) }}</span>
+                                <span class="font-medium">{{currencySymbol}} {{ formatCurrency(hblCharges.bill_charge || 0, true,false) }}</span>
                             </div>
                             <div v-if="hblCharges.additional_charges > 0" class="flex justify-between text-sm">
                                 <span class="text-gray-600">Additional Charges</span>
-                                <span class="font-medium text-green-600">{{ formatCurrency(hblCharges.additional_charges || 0, true) }}</span>
+                                <span class="font-medium text-green-600">{{currencySymbol}} {{ formatCurrency(hblCharges.additional_charges || 0, true,false) }}</span>
                             </div>
                             <div v-if="hblCharges.discount > 0" class="flex justify-between text-sm">
                                 <span class="text-gray-600">Discount</span>
-                                <span class="font-medium text-red-600">-{{ formatCurrency(hblCharges.discount || 0, true) }}</span>
+                                <span class="font-medium text-red-600">-{{currencySymbol}}  {{ formatCurrency(hblCharges.discount || 0, true,false) }}</span>
                             </div>
                         </div>
                     </div>
@@ -203,7 +204,7 @@ const getHBLChargeDetails = async (hbl) => {
                     <div class="border-t pt-3 mt-4">
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-semibold text-gray-900">Agent Total</span>
-                            <span class="text-lg font-bold text-blue-600">{{ formatCurrency(agentTotal,true) }}</span>
+                            <span class="text-lg font-bold text-blue-600">{{currencySymbol}}  {{ formatCurrency(agentTotal,true,false) }}</span>
                         </div>
                     </div>
                 </template>
@@ -279,30 +280,30 @@ const getHBLChargeDetails = async (hbl) => {
         </div>
 
         <!-- Grand Total Section -->
-        <Card class="!bg-white !border !border-neutral-300 !shadow-md !rounded-md mt-6">
-            <template #content>
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center space-x-2">
-                        <i class="ti ti-calculator text-xl text-purple-600"></i>
-                        <span class="text-xl font-semibold text-gray-900">Grand Total</span>
-                    </div>
-                    <span class="text-2xl font-bold text-purple-600">{{ formatCurrency(grandTotal,true) }}</span>
-                </div>
+<!--        <Card class="!bg-white !border !border-neutral-300 !shadow-md !rounded-md mt-6">-->
+<!--            <template #content>-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <div class="flex items-center space-x-2">-->
+<!--                        <i class="ti ti-calculator text-xl text-purple-600"></i>-->
+<!--                        <span class="text-xl font-semibold text-gray-900">Grand Total</span>-->
+<!--                    </div>-->
+<!--                    <span class="text-2xl font-bold text-purple-600">{{ formatCurrency(grandTotal,true) }}</span>-->
+<!--                </div>-->
 
-                <!-- Breakdown Summary -->
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Agent Total:</span>
-                            <span class="font-medium">{{ formatCurrency(agentTotal,true) }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">SL Portal Total:</span>
-                            <span class="font-medium">LKR {{ slPortalCharge }}</span>
-                        </div>
-                    </div>
-                </div>
-            </template>
-        </Card>
+<!--                &lt;!&ndash; Breakdown Summary &ndash;&gt;-->
+<!--                <div class="mt-4 pt-4 border-t border-gray-200">-->
+<!--                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">-->
+<!--                        <div class="flex justify-between">-->
+<!--                            <span class="text-gray-600">Agent Total:</span>-->
+<!--                            <span class="font-medium">{{currencySymbol}}  {{ formatCurrency(agentTotal,true,false) }}</span>-->
+<!--                        </div>-->
+<!--                        <div class="flex justify-between">-->
+<!--                            <span class="text-gray-600">SL Portal Total:</span>-->
+<!--                            <span class="font-medium">LKR {{ slPortalCharge }}</span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </template>-->
+<!--        </Card>-->
     </div>
 </template>

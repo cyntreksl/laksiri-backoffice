@@ -181,7 +181,7 @@ onMounted(() => {
                         <span>Details</span>
                     </a>
                 </Tab>
-                <Tab v-if="Object.keys(hbl).length !== 0" value="1">
+                <Tab value="1">
                     <a class="flex items-center gap-2 text-inherit">
                         <i class="pi pi-dollar" />
                         <span>Payments</span>
