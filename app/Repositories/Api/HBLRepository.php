@@ -27,6 +27,7 @@ use App\Models\HBL;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Lcobucci\JWT\Exception;
 
 class HBLRepository implements HBLRepositoryInterface
@@ -48,7 +49,7 @@ class HBLRepository implements HBLRepositoryInterface
     {
         $warehouse = GetBranchByName::run($data['warehouse']);
         $data['warehouse_id'] = $warehouse->id;
-        try {
+//        try {
             $hbl = null;
             DB::transaction(function () use ($data, &$hbl) {
                 $hbl = CreateHBL::run($data);
@@ -82,9 +83,13 @@ class HBLRepository implements HBLRepositoryInterface
 
             return $this->success('HBL created successfully!', $hbl->load('packages'));
 
-        } catch (\Exception $e) {
-            return $this->error($e->getMessage(), $e->getCode());
-        }
+//        } catch (\Exception $e) {
+//            Log::error('Failed to create HBL Repository API: '.$e->getMessage(), [
+//                'data' => $data,
+//                'user_id' => auth()->id(),
+//            ]);
+//            return $this->error($e->getMessage(), $e->getCode());
+//        }
     }
 
     public function calculatePayment(array $data): JsonResponse
