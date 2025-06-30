@@ -91,13 +91,10 @@ const slPortalCharge = computed(() => {
         return ((hblCharges.value.destination_2_total || 0) +
                 (hblCharges.value.destination_2_tax || 0)) * rate;
     } else {
-        // Non-prepaid: destination1 + destination2 + destination1_tax + destination2_tax (convert to LKR)
-        const rateRaw = currencyRate.value || 1;
-        const rate = rateRaw;
         return ((hblCharges.value.destination_1_total || 0) +
                 (hblCharges.value.destination_2_total || 0) +
                 (hblCharges.value.destination_1_tax || 0) +
-                (hblCharges.value.destination_2_tax || 0)) * rate;
+                (hblCharges.value.destination_2_tax || 0)) ;
     }
 });
 
