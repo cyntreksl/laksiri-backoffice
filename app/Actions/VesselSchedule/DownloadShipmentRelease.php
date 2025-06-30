@@ -13,9 +13,15 @@ class DownloadShipmentRelease
 
     public function handle(Container $container)
     {
+        // Get all containers with the same BL number, including the count of their HBL packages
+        $containers = Container::where('bl_number', $container->bl_number)
+            ->withCount('hbl_packages')
+            ->get();
+
         $template = view('pdf.shipment.release', [
             'container' => $container->load('branch', 'hbl_packages'),
             'logoPath' => GetSettings::run()['logo_url'] ?? null,
+            'containers' => $containers,
         ])->render();
 
         $filename = 'shipment_release_'.$container->reference.'.pdf';

@@ -6,6 +6,7 @@ use App\Models\Container;
 use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\HBLDocument;
+use App\Models\HBLPackage;
 use Illuminate\Http\JsonResponse;
 
 interface HBLRepositoryInterface
@@ -85,4 +86,12 @@ interface HBLRepositoryInterface
     public function getHBLDestinationTotalSummary(HBL $hbl);
 
     public function downloadGatePass($hbl, CustomerQueue $customerQueue);
+
+    public function doRTF(HBL $hbl);
+
+    public function undoRTF(HBL $hbl);
+
+    public function doPackageRTF(HBLPackage $hbl_package);
+
+    public function undoPackageRTF(HBLPackage $hbl_package);
 }

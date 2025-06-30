@@ -7,7 +7,7 @@ use App\Actions\HBL\GetHBLsWithPackages;
 use App\Enum\HBLType;
 use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\CallCenter\HBLDeliverResource;
-use App\Http\Resources\HBLResource;
+use App\Http\Resources\CallCenter\HBLResource;
 use App\Interfaces\CallCenter\HBLRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\CustomerQueue;
@@ -26,7 +26,13 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = HBL::query()->withoutGlobalScope(BranchScope::class)->with('tokens.customerQueue');
+        $query = HBL::query()
+            ->withoutGlobalScope(BranchScope::class)
+            ->with('tokens.customerQueue')
+            ->withCount('callFlags')
+            ->with(['callFlags' => function ($query) {
+                $query->orderBy('date', 'desc');
+            }]);
 
         if (! empty($search)) {
             $query->whereAny([

@@ -1239,7 +1239,7 @@ const totalChargeableWeight = computed(() => {
 
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.bill_charge" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <InputNumber v-model="form.bill_charge" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" disabled inputId="bill-charge" min="0" step="any" variant="filled" />
                                         <label for="bill-charge">Bill Charge</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.bill_charge"/>
@@ -1247,7 +1247,7 @@ const totalChargeableWeight = computed(() => {
 
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.destination_charge" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled" />
+                                        <InputNumber v-model="form.destination_charge" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" disabled inputId="bill-charge" min="0" step="any" variant="filled" />
                                         <label for="bill-charge">Destination Charges</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.destination_charge"/>
@@ -1255,7 +1255,7 @@ const totalChargeableWeight = computed(() => {
 
                                 <div class="col-span-2">
                                     <IftaLabel>
-                                        <InputNumber v-model="form.package_charges" :disabled="!isEditable" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" inputId="bill-charge" min="0" step="any" variant="filled"/>
+                                        <InputNumber v-model="form.package_charges" :maxFractionDigits="5" :minFractionDigits="2" class="w-full" disabled inputId="bill-charge" min="0" step="any" variant="filled"/>
                                         <label for="bill-charge">Package Charges</label>
                                     </IftaLabel>
                                     <InputError :message="form.errors.package_charges"/>

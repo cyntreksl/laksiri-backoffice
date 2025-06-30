@@ -143,6 +143,18 @@ const menuModel = ref([
         visible: usePage().props.user.permissions.includes("hbls.download barcode"),
     },
     {
+        label: "Set As RTF",
+        icon: "pi pi-fw pi-lock",
+        command: () => handleRTFHBL(selectedHBL),
+        visible: () => !selectedHBL.value?.is_rtf,
+    },
+    {
+        label: "Lift RTF",
+        icon: "pi pi-fw pi-unlock",
+        command: () => handleUndoRTFHBL(selectedHBL),
+        visible: () => selectedHBL.value?.is_rtf,
+    },
+    {
         label: "Delete",
         icon: "pi pi-fw pi-times",
         command: () => confirmHBLDelete(selectedHBL),
@@ -327,7 +339,7 @@ const confirmHBLDelete = (hbl) => {
                 preserveScroll: true,
                 onSuccess: () => {
                     push.success("HBL record Deleted Successfully!");
-                    router.visit(route("hbls.index"), {only: ["hbls"]});
+                    fetchHBLs(currentPage.value);
                 },
                 onError: () => {
                     push.error("Something went to wrong!");
@@ -377,6 +389,76 @@ const confirmHBLHold = (hbl) => {
         }
     });
 };
+
+const handleRTFHBL = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    confirm.require({
+        message: 'Would you like to RTF this HBL?',
+        header: 'RTF HBL?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Sure, RTF',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(route("hbls.set.rtf", selectedHBLID.value), {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success('HBL going to RTF');
+                    fetchHBLs(currentPage.value);
+                },
+                onError: () => {
+                    push.error('Something went to wrong!');
+                }
+            })
+            selectedHBLID.value = null;
+        },
+        reject: () => {
+            selectedHBLID.value = null;
+        }
+    })
+}
+
+const handleUndoRTFHBL = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    confirm.require({
+        message: 'Would you like to Undo RTF for this HBL?',
+        header: 'Undo RTF HBL?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Sure, Remove RTF',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(route("hbls.unset.rtf", selectedHBLID.value), {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success('Undo RTF for this HBL successfully!');
+                    fetchHBLs(currentPage.value);
+                },
+                onError: () => {
+                    push.error('Something went to wrong!');
+                }
+            })
+            selectedHBLID.value = null;
+        },
+        reject: () => {
+            selectedHBLID.value = null;
+        }
+    })
+}
 
 const confirmViewCallFlagModal = (hbl) => {
     selectedHBLID.value = hbl.value.id;
@@ -523,9 +605,14 @@ const exportCSV = () => {
 
                         <Column field="hbl_number" header="HBL" sortable>
                             <template #body="slotProps">
-                                <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
-                                <br v-if="slotProps.data.is_short_loaded">
-                                <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`" icon="pi pi-exclamation-triangle" size="small"></Tag>
+                                <div class="flex items-center space-x-2">
+                                    <i v-if="slotProps.data.is_rtf" v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <div>
+                                        <div class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</div>
+                                        <br v-if="slotProps.data.is_short_loaded">
+                                        <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`" icon="pi pi-exclamation-triangle" size="small"></Tag>
+                                    </div>
+                                </div>
                             </template>
                         </Column>
 

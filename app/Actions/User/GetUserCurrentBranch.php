@@ -17,6 +17,7 @@ class GetUserCurrentBranch
         $branchType = session('current_branch_type');
         $branchCode = session('current_branch_code');
         $timezone = session('current_branch_timezone');
+        $isPrimaryWarehouse = session('is_primary_warehouse');
 
         //      For API
         if (empty($branchId) || is_null($branchId)) {
@@ -26,6 +27,7 @@ class GetUserCurrentBranch
             $branchType = $primaryBranch->type;
             $branchCode = $primaryBranch->branch_code;
             $timezone = $primaryBranch->timezone;
+            $isPrimaryWarehouse = $primaryBranch->is_primary_warehouse;
         }
 
         return [
@@ -34,6 +36,7 @@ class GetUserCurrentBranch
             'branchType' => $branchType,
             'branchCode' => $branchCode,
             'timezone' => $timezone,
+            'isPrimaryWarehouse' => $isPrimaryWarehouse,
         ];
     }
 }

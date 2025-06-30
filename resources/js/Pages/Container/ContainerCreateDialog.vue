@@ -1,5 +1,5 @@
 <script setup>
-import { useForm, router } from "@inertiajs/vue3";
+import { useForm } from "@inertiajs/vue3";
 import InputError from "@/Components/InputError.vue";
 import {ref, watchEffect} from "vue";
 import Card from 'primevue/card';
@@ -12,7 +12,10 @@ import {push} from "notivue";
 import Select from "primevue/select";
 
 const props = defineProps({
-    cargoType:"Sea Cargo" ,
+    cargoType: {
+        type: String,
+        default: "Sea Cargo",
+    },
     warehouse: 2,
     airLines: {
         type: Array,
@@ -71,9 +74,7 @@ const handleCreate = () => {
 
     form.post(route("loading.loading-containers.store"), {
         onSuccess: (shipment) => {
-            console.log(shipment)
             push.success('Container Created Successfully!')
-            // router.visit(route("loading.loading-containers.index"));
             form.reset();
             emit('containerCreated',true);
         },

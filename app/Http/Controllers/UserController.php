@@ -102,6 +102,13 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
+        if ($user->hasRole('admin') || $user->hasRole('super-admin')) {
+            // Prevent non-super-admins from editing admin/super-admin users
+            if (auth()->user() && ! auth()->user()->hasRole('super-admin')) {
+                abort(403, 'You are not authorized to modify this user.');
+            }
+        }
+
         $this->userRepository->updateUser($request->all(), $user);
     }
 
@@ -110,6 +117,13 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        if ($user->hasRole('admin') || $user->hasRole('super-admin')) {
+            // Prevent non-super-admins from deleting admin/super-admin users
+            if (auth()->user() && ! auth()->user()->hasRole('super-admin')) {
+                abort(403, 'You are not authorized to delete this user.');
+            }
+        }
+
         $this->authorize('users.delete');
 
         $this->userRepository->deleteUser($user);

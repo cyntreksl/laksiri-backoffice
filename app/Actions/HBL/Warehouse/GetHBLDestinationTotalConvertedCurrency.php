@@ -25,8 +25,7 @@ class GetHBLDestinationTotalConvertedCurrency
 
         $totalAmount = $handlingCharges + $slpaCharge + $bondCharge;
 
-        $taxes = Tax::whereIsActive(true)
-            ->get();
+        $taxes = Tax::whereIsActive(true)->get();
 
         $totalTax = 0.0;
         foreach ($taxes as $tax) {

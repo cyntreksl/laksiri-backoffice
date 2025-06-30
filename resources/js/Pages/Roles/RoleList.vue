@@ -9,7 +9,6 @@ import Card from "primevue/card";
 import Button from "primevue/button";
 import Column from "primevue/column";
 import DataTable from "primevue/datatable";
-import Chip from 'primevue/chip';
 
 const props = defineProps({
     roles: {

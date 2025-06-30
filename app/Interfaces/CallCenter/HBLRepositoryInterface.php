@@ -8,6 +8,8 @@ interface HBLRepositoryInterface
 {
     public function getHBLs();
 
+    public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []);
+
     public function createAndIssueToken(HBL $hbl);
 
     public function createAndIssueTokenWithVerification(HBL $hbl, array $verificationData);
@@ -15,4 +17,6 @@ interface HBLRepositoryInterface
     public function generateTokenPDF($tokenId, $type = 'download');
 
     public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []);
+
+    public function getHBLsWithPackages();
 }

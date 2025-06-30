@@ -21,6 +21,9 @@ class CallFlag extends Model
         'date',
         'notes',
         'followup_date',
+        'call_outcome',
+        'appointment_date',
+        'appointment_notes',
         'created_by',
     ];
 
@@ -37,5 +40,30 @@ class CallFlag extends Model
     public function causer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function isFollowUpDue(): bool
+    {
+        return $this->followup_date &&
+               $this->followup_date <= now()->toDateString() &&
+               ! $this->hasCompletedFollowUp();
+    }
+
+    public function hasCompletedFollowUp(): bool
+    {
+        return $this->hbl->callFlags()
+            ->where('date', '>', $this->followup_date)
+            ->exists();
+    }
+
+    public function hasAppointment(): bool
+    {
+        return ! is_null($this->appointment_date);
+    }
+
+    public function isAppointmentUpcoming(): bool
+    {
+        return $this->hasAppointment() &&
+               $this->appointment_date >= now()->toDateString();
     }
 }

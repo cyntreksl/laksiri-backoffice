@@ -42,8 +42,13 @@ const isLoadingPickupStatus = ref(false);
 const fetchPickupStatus = async () => {
     isLoadingPickupStatus.value = true;
 
+
+
     try {
         const id = props.hbl.pickup_id ? props.hbl.pickup_id : props.pickup?.id;
+        if (id === null || id === undefined) {
+            return;
+        }
         const response = await fetch(`get-pickup-status/${id}`, {
             method: "GET",
             headers: {
@@ -96,7 +101,9 @@ const fetchHBLStatus = async () => {
 
 const fetchHBLStatusByPickup = async () => {
     isLoadingHBLStatus.value = true;
-
+    if (props.pickup?.id === null || props.pickup?.id === undefined) {
+        return;
+    }
     try {
         const response = await fetch(`/get-hbl-status-by-pickup/${props.pickup?.id}`, {
             method: "GET",
@@ -169,7 +176,9 @@ const isLoadingPickup = ref(false);
 
 const fetchPickup = async () => {
     isLoadingPickup.value = true;
-
+    if (props.hbl.pickup_id === null || props.hbl.pickup_id === undefined) {
+        return;
+    }
     try {
         const response = await fetch(`/pickups/${props.hbl.pickup_id}`, {
             method: "GET",

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Clearance;
 
+use App\Actions\Branch\GetDestinationBranches;
 use App\Enum\ContainerStatus;
 use App\Enum\ContainerType;
 use App\Http\Controllers\Controller;
@@ -41,6 +42,7 @@ class VesselScheduleController extends Controller
         return Inertia::render('Clearance/VesselSchedule/ShowVesselSchedule', [
             'vesselSchedule' => $vesselSchedule,
             'containerStatus' => $containerStatuses,
+            'warehouses' => GetDestinationBranches::run()->reject(fn ($warehouse) => $warehouse->name === 'Other'),
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
         ]);

@@ -5,8 +5,13 @@ namespace App\Http\Controllers;
 use App\Actions\ThirdPartyShipment\GetTmpHblsBySession;
 use App\Actions\ThirdPartyShipment\ImportHblFromCsv;
 use App\Actions\ThirdPartyShipment\SaveThirdPartyShipment;
+use App\Actions\ThirdPartyShipment\SaveThirdPartyShipmentV2;
 use App\Enum\CargoType;
 use App\Enum\HBLType;
+use App\Http\Requests\StoreHBLRequest;
+use App\Interfaces\CountryRepositoryInterface;
+use App\Interfaces\HBLRepositoryInterface;
+use App\Interfaces\PackageTypeRepositoryInterface;
 use App\Models\AirLine;
 use App\Models\Branch;
 use App\Models\Container;
@@ -16,6 +21,12 @@ use Inertia\Inertia;
 
 class ThirdPartyShipmentController extends Controller
 {
+    public function __construct(
+        private readonly CountryRepositoryInterface $countryRepository,
+        private readonly PackageTypeRepositoryInterface $packageTypeRepository,
+        private readonly HBLRepositoryInterface $HBLRepository,
+    ) {}
+
     /**
      * Display a listing of third party shipments.
      */
@@ -34,9 +45,23 @@ class ThirdPartyShipmentController extends Controller
         $hblTypes = HBLType::cases();
         $shipments = Container::whereStatus('CONTAINER ORDERED')->get();
         $airLines = AirLine::pluck('name', 'id');
+        $packageTypes = $this->packageTypeRepository->getPackageTypes();
 
         return Inertia::render('ThirdPartyShipments/ThirdPartyShipmentCreate',
-            compact('agents', 'cargoTypes', 'hblTypes', 'shipments', 'airLines'));
+            compact('agents', 'cargoTypes', 'hblTypes', 'shipments', 'airLines', 'packageTypes'));
+    }
+
+    public function createV2()
+    {
+        $agents = Branch::thirdpartyAgents()->get();
+        $cargoTypes = CargoType::cases();
+        $hblTypes = HBLType::cases();
+        $shipments = Container::whereStatus('CONTAINER ORDERED')->get();
+        $airLines = AirLine::pluck('name', 'id');
+        $countryCodes = $this->countryRepository->getAllPhoneCodes();
+
+        return Inertia::render('ThirdPartyShipments/ThirdPartyShipmentCreateV2',
+            compact('agents', 'cargoTypes', 'hblTypes', 'shipments', 'airLines', 'countryCodes'));
     }
 
     /**
@@ -181,5 +206,15 @@ class ThirdPartyShipmentController extends Controller
         }
 
         return response()->download($filePath, 'third-party-hbl-import-sample.csv');
+    }
+
+    public function multiOptions()
+    {
+        return Inertia::render('ThirdPartyShipments/MultiOptionLayout');
+    }
+
+    public function saveShipmentV2(StoreHBLRequest $request)
+    {
+        SaveThirdPartyShipmentV2::run($request->all());
     }
 }

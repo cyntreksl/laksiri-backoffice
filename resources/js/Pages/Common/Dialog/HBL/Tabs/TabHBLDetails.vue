@@ -6,6 +6,10 @@ import {watch} from "vue";
 import Card from 'primevue/card';
 import Avatar from 'primevue/avatar';
 import InfoDisplayChip from "@/Pages/Common/Components/InfoDisplayChip.vue";
+import Button from "primevue/button";
+import {router} from "@inertiajs/vue3";
+import {push} from "notivue";
+import {useConfirm} from "primevue/useconfirm";
 
 const props = defineProps({
     hbl: {
@@ -21,6 +25,74 @@ const props = defineProps({
         required: true,
     },
 });
+
+console.log(props.hbl?.packages)
+
+const confirm = useConfirm();
+
+const handleRTFHBLPackage = (packageId) => {
+    confirm.require({
+        message: 'Would you like to RTF this package?',
+        header: 'RTF Package?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Sure, RTF',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(route("hbl-packages.set.rtf", packageId), {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success('Package going to RTF');
+                    window.location.reload();
+                },
+                onError: () => {
+                    push.error('Something went to wrong!');
+                }
+            })
+        },
+        reject: () => {
+        }
+    })
+}
+
+const handleUndoRTFHBLPackage = (packageId) => {
+    confirm.require({
+        message: 'Would you like to Undo RTF for this package?',
+        header: 'Undo RTF Package?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Sure, Remove RTF',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(route("hbl-packages.unset.rtf", packageId), {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success('Undo RTF for this package successfully!');
+                    window.location.reload();
+                },
+                onError: () => {
+                    push.error('Something went to wrong!');
+                }
+            })
+        },
+        reject: () => {
+        }
+    })
+}
 
 watch(
     () => props.pickup,
@@ -39,6 +111,9 @@ watch(
             <Card v-else class="!bg-emerald-50 !border !border-emerald-200 !shadow-none">
                 <template #content>
                     <div class="flex items-center space-x-5">
+                        <div v-if="hbl?.latest_rtf_record?.is_rtf" class="flex space-x-2">
+                            <i v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                        </div>
                         <p class="text-3xl uppercase font-normal">
                             {{ hbl?.branch.name }}
                         </p>
@@ -106,14 +181,17 @@ watch(
                         </div>
 
                         <div class="flex items-center space-x-2">
-                            <i class="ti ti-package text-xl"></i>
-                            <p class="text-xl uppercase font-normal">
-                                {{ item.package_type ?? '-' }}
-                            </p>
-                            <i
-                                v-tooltip="item.is_loaded ? 'Loaded to Shipment' : 'Not Loaded to Shipment'"
-                                :class="item.is_loaded ? 'ti ti-circle-check-filled text-xl text-success' : 'ti ti-circle-x-filled text-xl text-error'"
-                            ></i>
+                            <div class="flex items-center space-x-2">
+                                <i v-if="item?.latest_rtf_record?.is_rtf" v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                <i class="ti ti-package text-xl"></i>
+                                <p class="text-xl uppercase font-normal">
+                                    {{ item.package_type ?? '-' }}
+                                </p>
+                                <i
+                                    v-tooltip="item.is_loaded ? 'Loaded to Shipment' : 'Not Loaded to Shipment'"
+                                    :class="item.is_loaded ? 'ti ti-circle-check-filled text-xl text-success' : 'ti ti-circle-x-filled text-xl text-error'"
+                                ></i>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-1 gap-2">
@@ -132,6 +210,14 @@ watch(
                             <div class="col-span-2">
                                 <InfoDisplay :value="item.remarks ?? '-'" label="Remarks"/>
                             </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <Button v-if="!item?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="Set RTF Package"
+                                    severity="warn" size="small" variant="outlined" @click.prevent="handleRTFHBLPackage(item.id)" />
+
+                            <Button v-if="item?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift RTF Package"
+                                    severity="warn" size="small" variant="outlined" @click.prevent="handleUndoRTFHBLPackage(item.id)" />
                         </div>
                     </template>
                 </Card>

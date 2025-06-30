@@ -6,7 +6,7 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import Message from 'primevue/message';
 import {push} from "notivue";
-import moment from "moment/moment.js";
+import moment from "moment";
 
 const props = defineProps({
     visible: {

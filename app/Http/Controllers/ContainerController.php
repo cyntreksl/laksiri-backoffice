@@ -308,4 +308,14 @@ class ContainerController extends Controller
     {
         return $this->containerRepository->getContainerByReference($reference, $request->vesselScheduleId);
     }
+
+    public function setRTF(Container $container)
+    {
+        return $this->containerRepository->doRTF($container);
+    }
+
+    public function unsetRTF(Container $container)
+    {
+        return $this->containerRepository->undoRTF($container);
+    }
 }

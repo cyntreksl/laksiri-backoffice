@@ -13,6 +13,7 @@ use App\Actions\HBL\GetHBLPackageRules;
 use App\Actions\HBL\GetHBLTotalSummary;
 use App\Actions\HBL\UpdateHBLApi;
 use App\Actions\HBL\UpdateHBLPackagesApi;
+use App\Actions\HBL\Warehouse\GetHBLDestinationTotalConvertedCurrency;
 use App\Http\Resources\HBLPackageResource;
 use App\Http\Resources\HBLResource;
 use App\Http\Resources\PickupResource;
@@ -77,6 +78,10 @@ class HBLRepository implements HBLRepositoryInterface
             $data['is_active_package'],
             $data['package_list'],
         );
+
+        $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $data['grand_total_weight']);
+        $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
+        $result['sl_rate'] = $destinationCharge['slRate'];
 
         return response()->json($result);
     }

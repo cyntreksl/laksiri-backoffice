@@ -17,6 +17,7 @@ class SwitchUserBranch
         session(['current_branch_type' => $branch->type]);
         session(['current_branch_code' => $branch->branch_code]);
         session(['current_branch_timezone' => $branch->timezone]);
+        session(['is_primary_warehouse' => $branch->is_primary_warehouse]);
 
         $user = Auth::user();
         if ($user->last_logged_branch_id !== $branch->id) {
@@ -26,6 +27,7 @@ class SwitchUserBranch
         return [
             'branchName' => $branch->name,
             'branchId' => $branch->id,
+            'isPrimaryWarehouse' => $branch->is_primary_warehouse,
         ];
     }
 }

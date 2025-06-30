@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Actions\Branch\GetBranchById;
 use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
 use App\Actions\CallFlag\CreateCallFlag;
 use App\Actions\Cashier\DownloadCashierInvoicePDF;
@@ -26,7 +27,11 @@ use App\Actions\HBL\GetHBLStatusByReference;
 use App\Actions\HBL\GetHBLsWithPackages;
 use App\Actions\HBL\GetHBLsWithUnloadedPackagesByReference;
 use App\Actions\HBL\GetHBLTotalSummary;
+use App\Actions\HBL\HBLCharges\UpdateHBLDepartureCharges;
+use App\Actions\HBL\HBLCharges\UpdateHBLDestinationCharges;
 use App\Actions\HBL\HBLPackage\GetPackagesByReference;
+use App\Actions\HBL\MarkAsRTF;
+use App\Actions\HBL\MarkAsUnRTF;
 use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
@@ -36,6 +41,7 @@ use App\Actions\HBLDocument\DeleteDocument;
 use App\Actions\HBLDocument\DownloadDocument;
 use App\Actions\HBLDocument\UploadDocument;
 use App\Actions\MHBL\DeleteMHBLsHBL;
+use App\Actions\User\GetUserCurrentBranchID;
 use App\Enum\HBLType;
 use App\Exports\CancelledHBLExport;
 use App\Exports\HBLExport;
@@ -76,6 +82,23 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         if (isset($data['paid_amount'])) {
             UpdateHBLPayments::run($data, $hbl);
         }
+
+        $paymentData = [
+            'freight_charge' => $data['freight_charge'],
+            'bill_charge' => $data['bill_charge'],
+            'other_charge' => $data['other_charge'],
+            'destination_charge' => $data['destination_charge'],
+            'package_charges' => $data['package_charges'],
+            'discount' => $data['discount'],
+            'additional_charge' => $data['additional_charge'],
+            'grand_total' => $data['grand_total'],
+            'paid_amount' => $data['paid_amount'],
+            'is_departure_charges_paid' => $data['is_departure_charges_paid'],
+            'is_destination_charges_paid' => $data['is_destination_charges_paid'],
+        ];
+
+        UpdateHBLDepartureCharges::run($hbl, $paymentData);
+        UpdateHBLDestinationCharges::run($hbl, $paymentData);
 
         return $hbl;
     }
@@ -325,9 +348,14 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 $data['package_list'],
             );
 
-            $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $data['grand_total_weight']);
-            $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
-            $result['sl_rate'] = $destinationCharge['slRate'];
+            $currentBranch = GetBranchById::run(GetUserCurrentBranchID::run());
+            if ($currentBranch->is_prepaid) {
+                $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $data['grand_total_weight']);
+                $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
+                $result['sl_rate'] = $destinationCharge['slRate'];
+            } else {
+                $result['destination_charges'] = 0;
+            }
 
             return response()->json($result);
         }
@@ -509,6 +537,56 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             return DownloadGatePassPDF::run($hbl, $customerQueue);
         } catch (\Exception $e) {
             throw new \Exception('Failed to download gate pass '.$e->getMessage());
+        }
+    }
+
+    public function doRTF(HBL $hbl): void
+    {
+        try {
+            MarkAsRTF::run($hbl);
+
+            $packages = $hbl->packages;
+
+            foreach ($packages as $package) {
+                \App\Actions\HBL\HBLPackage\MarkAsRTF::run($package);
+            }
+
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to mark as rtf HBL: '.$e->getMessage());
+        }
+    }
+
+    public function undoRTF(HBL $hbl): void
+    {
+        try {
+            MarkAsUnRTF::run($hbl);
+
+            $packages = $hbl->packages;
+
+            foreach ($packages as $package) {
+                \App\Actions\HBL\HBLPackage\MarkAsUnRTF::run($package);
+            }
+
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to undo rtf HBL: '.$e->getMessage());
+        }
+    }
+
+    public function doPackageRTF(HBLPackage $hbl_package): void
+    {
+        try {
+            \App\Actions\HBL\HBLPackage\MarkAsRTF::run($hbl_package);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to mark as rtf HBL Package: '.$e->getMessage());
+        }
+    }
+
+    public function undoPackageRTF(HBLPackage $hbl_package): void
+    {
+        try {
+            \App\Actions\HBL\HBLPackage\MarkAsUnRTF::run($hbl_package);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to undo rtf HBL Package: '.$e->getMessage());
         }
     }
 }

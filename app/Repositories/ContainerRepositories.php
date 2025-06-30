@@ -7,6 +7,8 @@ use App\Actions\Container\GetContainerByReference;
 use App\Actions\Container\Loading\GetLoadedContainerById;
 use App\Actions\Container\Loading\GetLoadedContainers;
 use App\Actions\Container\MarkAsReached;
+use App\Actions\Container\MarkAsRTF;
+use App\Actions\Container\MarkAsUnRTF;
 use App\Actions\Container\Unloading\CreateDraftUnload;
 use App\Actions\Container\Unloading\CreateFullyUnload;
 use App\Actions\Container\Unloading\UndoUnloadContainer;
@@ -26,6 +28,8 @@ use App\Actions\UnloadingIssue\UploadUnloadingIssueImages;
 use App\Actions\UnloadingIssueImages\DeleteUnloadingIssueFile;
 use App\Actions\UnloadingIssueImages\DownloadSingleUnloadingIssueFile;
 use App\Actions\UnloadingIssueImages\GetUnloadingIssueImages;
+use App\Actions\User\GetUserCurrentBranchID;
+use App\Actions\VesselSchedule\GetVesselSchedule;
 use App\Enum\ContainerStatus;
 use App\Exports\ContainersExport;
 use App\Exports\LoadedShipmentsExport;
@@ -59,7 +63,17 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function store(array $data): Container
     {
         try {
-            return CreateContainer::run($data);
+            $container = CreateContainer::run($data);
+
+            if ($data['vessel_schedule_id']) {
+                $vesselSchedule = GetVesselSchedule::run($data['vessel_schedule_id']);
+
+                $vesselSchedule->scheduleContainers()->create([
+                    'container_id' => $container->id,
+                ]);
+            }
+
+            return $container;
         } catch (\Exception $e) {
             throw new \Exception('Failed to create container: '.$e->getMessage());
         }
@@ -67,7 +81,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = Container::query()->where('status', '<>', ContainerStatus::LOADED->value);
+        $query = Container::query()->whereIn('status', [ContainerStatus::DRAFT->value, ContainerStatus::REQUESTED->value]);
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {
@@ -380,9 +394,8 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function getAfterDispatchShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
     {
         $query = Container::query()->whereIn('status', [
-            ContainerStatus::IN_TRANSIT->value,
             ContainerStatus::REACHED_DESTINATION->value,
-            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
+            //            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
         ])->withoutGlobalScope(BranchScope::class);
 
         if (! empty($search)) {
@@ -393,6 +406,8 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
                     ->orWhere('awb_number', 'like', '%'.$search.'%');
             });
         }
+
+        $query->where('target_warehouse', GetUserCurrentBranchID::run());
 
         FilterFactory::apply($query, $filters);
 
@@ -442,8 +457,9 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
     public function getAfterInboundShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
     {
         $query = Container::query()->whereIn('status', [
-            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
-            ContainerStatus::DEPARTED_PRIMARY_WAREHOUSE->value,
+            //            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
+            ContainerStatus::UNLOADED->value,
+            //            ContainerStatus::DEPARTED_PRIMARY_WAREHOUSE->value,
         ])->withoutGlobalScope(BranchScope::class);
 
         if (! empty($search)) {
@@ -456,7 +472,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         }
 
         FilterFactory::apply($query, $filters);
-
+        $query->where('target_warehouse', GetUserCurrentBranchID::run());
         $containers = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
@@ -485,6 +501,59 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             $container->addStatus('Container Departed from Primary Warehouse', 'Container has been departed from primary warehouse');
         } catch (\Exception $e) {
             throw new \Exception('Failed to mark as departed from warehouse: '.$e->getMessage());
+        }
+    }
+
+    public function doRTF(Container $container): void
+    {
+        try {
+            MarkAsRTF::run($container);
+
+            $hbls = $container
+                ->hbl_packages
+                ->pluck('hbl')
+                ->unique();
+
+            foreach ($hbls as $hbl) {
+                \App\Actions\HBL\MarkAsRTF::run($hbl);
+            }
+
+            $packages = $container
+                ->hbl_packages
+                ->unique();
+
+            foreach ($packages as $package) {
+                \App\Actions\HBL\HBLPackage\MarkAsRTF::run($package);
+            }
+
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to mark as rtf container: '.$e->getMessage());
+        }
+    }
+
+    public function undoRTF(Container $container): void
+    {
+        try {
+            MarkAsUnRTF::run($container);
+
+            $hbls = $container
+                ->hbl_packages
+                ->pluck('hbl')
+                ->unique();
+
+            foreach ($hbls as $hbl) {
+                \App\Actions\HBL\MarkAsUnRTF::run($hbl);
+            }
+
+            $packages = $container
+                ->hbl_packages
+                ->unique();
+
+            foreach ($packages as $package) {
+                \App\Actions\HBL\HBLPackage\MarkAsUnRTF::run($package);
+            }
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to undo rtf container: '.$e->getMessage());
         }
     }
 }

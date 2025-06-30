@@ -110,40 +110,40 @@ const menuModel = ref([
                 container: selectedShipment.value.id,
             })
         ),
-        disabled: !usePage().props.user.permissions.includes('arrivals.unload'),
+        visible: usePage().props.user.permissions.includes('arrivals.unload') //&& selectedShipment.value.status === 'ARRIVED PRIMARY WAREHOUSE',
     },
-    {
-        label: "Mark As Reached",
-        icon: "ti ti-navigation-check text-lg",
-        command: () => {
-            confirm.require({
-                message: 'Would you like to mark this shipment as reached?',
-                header: 'Mark As REACHED?',
-                icon: 'pi pi-info-circle',
-                rejectLabel: 'Cancel',
-                rejectProps: {
-                    label: 'Cancel',
-                    severity: 'secondary',
-                    outlined: true
-                },
-                acceptProps: {
-                    label: 'Mark as Reached',
-                    severity: 'warn'
-                },
-                accept: () => {
-                    router.visit(
-                        route("arrival.shipments-arrivals.containers.markAsReachedContainer", selectedShipment.value.id), {
-                            onSuccess: () => push.success('Mark As Reached')
-                        })
-                },
-                reject: () => {
-                }
-            });
-        },
-        disabled: () =>
-            !usePage().props.user.permissions.includes('arrivals.mark as reached') ||
-            ["REACHED"].includes(selectedShipment.value.is_reached),
-    },
+    // {
+    //     label: "Mark As Reached",
+    //     icon: "ti ti-navigation-check text-lg",
+    //     command: () => {
+    //         confirm.require({
+    //             message: 'Would you like to mark this shipment as reached?',
+    //             header: 'Mark As REACHED?',
+    //             icon: 'pi pi-info-circle',
+    //             rejectLabel: 'Cancel',
+    //             rejectProps: {
+    //                 label: 'Cancel',
+    //                 severity: 'secondary',
+    //                 outlined: true
+    //             },
+    //             acceptProps: {
+    //                 label: 'Mark as Reached',
+    //                 severity: 'warn'
+    //             },
+    //             accept: () => {
+    //                 router.visit(
+    //                     route("arrival.shipments-arrivals.containers.markAsReachedContainer", selectedShipment.value.id), {
+    //                         onSuccess: () => push.success('Mark As Reached')
+    //                     })
+    //             },
+    //             reject: () => {
+    //             }
+    //         });
+    //     },
+    //     disabled: () =>
+    //         !usePage().props.user.permissions.includes('arrivals.mark as reached') ||
+    //         ["REACHED"].includes(selectedShipment.value.is_reached),
+    // },
 ]);
 
 const fetchShipmentArrivals = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {

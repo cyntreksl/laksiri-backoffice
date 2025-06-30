@@ -23,7 +23,6 @@ use App\Models\ContainerDocument;
 use App\Models\Scopes\BranchScope;
 use App\Services\ContainerWeightService;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Auth;
 
 class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepositoryInterface
 {
@@ -69,7 +68,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             $query = Container::query()->whereIn('status', [
                 ContainerStatus::IN_TRANSIT->value,
                 ContainerStatus::REACHED_DESTINATION->value,
-                ContainerStatus::LOADED->value,
+                ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
             ])->withoutGlobalScope(BranchScope::class);
         } else {
             $query = Container::query()->whereIn('status', [
@@ -79,9 +78,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             ]);
         }
 
-        if (Auth::user()->hasRole('boned area')) {
-            $query->where('target_warehouse', session('current_branch_id'));
-        }
+        $query->where('target_warehouse', session('current_branch_id'));
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {

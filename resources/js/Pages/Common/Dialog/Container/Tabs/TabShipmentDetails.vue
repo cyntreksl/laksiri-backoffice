@@ -142,6 +142,72 @@ const handleUpdateContainer = () => {
     });
 }
 
+const handleRTFContainer = () => {
+    confirm.require({
+        message: 'Would you like to RTF this shipment?',
+        header: 'RTF Shipment?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Sure, RTF',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(route("loading.containers.set.rtf", props.container.id), {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    emit('close')
+                    router.visit(route('loading.loaded-containers.index'))
+                    push.success('Shipment going to RTF');
+                },
+                onError: () => {
+                    push.error('Something went to wrong!');
+                }
+            })
+        },
+        reject: () => {
+        }
+    })
+}
+
+const handleUndoRTFContainer = () => {
+    confirm.require({
+        message: 'Would you like to Undo RTF for this shipment?',
+        header: 'Undo RTF Shipment?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Sure, Remove RTF',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(route("loading.containers.unset.rtf", props.container.id), {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    emit('close')
+                    router.visit(route('loading.loaded-containers.index'))
+                    push.success('Undo RTF for this shipment successfully!');
+                },
+                onError: () => {
+                    push.error('Something went to wrong!');
+                }
+            })
+        },
+        reject: () => {
+        }
+    })
+}
+
 const containerTypes = ref(props.seaContainerOptions);
 
 watchEffect(() => {
@@ -183,6 +249,12 @@ watchEffect(() => {
             </div>
         </div>
         <div class="flex items-center space-x-2">
+            <Button v-if="!container?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="RTF Shipment"
+                    severity="warn" size="small" variant="outlined" @click.prevent="handleRTFContainer" />
+
+            <Button v-if="container?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift RTF Shipment"
+                    severity="warn" size="small" variant="outlined" @click.prevent="handleUndoRTFContainer" />
+
             <Button :disabled="container.status === 'IN TRANSIT' || container.status === 'REACHED DESTINATION'" icon="pi pi-trash" label="Delete Shipment"
                     severity="danger" size="small" @click.prevent="handleDeleteLoadedShipment" />
 
