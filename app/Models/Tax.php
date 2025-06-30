@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-#[ScopedBy(BranchScope::class)]
 class Tax extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;

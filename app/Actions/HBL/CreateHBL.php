@@ -64,6 +64,7 @@ class CreateHBL
             'is_departure_charges_paid' => $data['is_departure_charges_paid'],
             'is_destination_charges_paid' => $data['is_destination_charges_paid'],
             'currency_rate' => $currencyRate,
+            'package_charges' => $data['package_charges'],
         ]);
 
         return $hbl;

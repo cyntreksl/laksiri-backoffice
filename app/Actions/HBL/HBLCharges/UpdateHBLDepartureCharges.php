@@ -34,7 +34,7 @@ class UpdateHBLDepartureCharges
 
         $freightCharge = $HBL->freight_charge;
         $billCharge = $HBL->bill_charge;
-        $packageCharge = 0;
+        $packageCharge = $HBL->package_charges;
         $discount = $paymentData['discount'] ?? 0;
         $additionalCharges = $paymentData['additional_charge'] ?? 0;
         $departureGrandTotal = $paymentData['grand_total'] ?? 0;
