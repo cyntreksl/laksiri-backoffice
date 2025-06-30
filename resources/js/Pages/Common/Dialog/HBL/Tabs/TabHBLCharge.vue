@@ -20,6 +20,7 @@ const hblCharges = ref({});
 const currencySymbol = ref('LKR');
 const isPrepaid = ref(false);
 const currencyRate = ref(1);
+const isLoading = ref(false);
 
 watch(hblCharges, (newVal) => {
     currencySymbol.value = newVal.base_currency_code;
@@ -110,6 +111,8 @@ const getHBLChargeDetails = async (hbl) => {
         console.error("Invalid HBL object or ID.");
         return;
     }
+
+    isLoading.value = true;
     try {
         const response = await fetch(`/hbl-charge/${hbl.id}`, {
             method: "GET",
@@ -126,13 +129,161 @@ const getHBLChargeDetails = async (hbl) => {
         }
     } catch (error) {
         console.error("Error:", error);
+    } finally {
+        isLoading.value = false;
     }
 };
 
 </script>
 
 <template>
-    <div v-if="hblCharges">
+    <!-- Skeleton Loading -->
+    <div v-if="isLoading" class="space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Agent Total Skeleton -->
+            <Card class="!bg-white !border !border-neutral-300 !shadow-md !rounded-md">
+                <template #content>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                        <div class="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
+                    </div>
+
+                    <!-- Departure Charges Skeleton -->
+                    <div class="mb-4">
+                        <div class="flex items-center mb-2">
+                            <div class="w-4 h-4 bg-gray-200 rounded mr-2 animate-pulse"></div>
+                            <div class="h-4 bg-gray-200 rounded w-40 animate-pulse"></div>
+                        </div>
+                        <div class="space-y-2 ml-4">
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-28 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Destination I Charges Skeleton -->
+                    <div class="mb-4">
+                        <div class="flex items-center mb-2">
+                            <div class="w-4 h-4 bg-gray-200 rounded mr-2 animate-pulse"></div>
+                            <div class="h-4 bg-gray-200 rounded w-36 animate-pulse"></div>
+                        </div>
+                        <div class="space-y-2 ml-4">
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-28 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Agent Total Summary Skeleton -->
+                    <div class="border-t pt-3 mt-4">
+                        <div class="flex justify-between items-center">
+                            <div class="h-6 bg-gray-200 rounded w-24 animate-pulse"></div>
+                            <div class="h-6 bg-gray-200 rounded w-20 animate-pulse"></div>
+                        </div>
+                    </div>
+                </template>
+            </Card>
+
+            <!-- SL Portal Charges Skeleton -->
+            <Card class="!bg-white !border !border-neutral-300 !shadow-md !rounded-md">
+                <template #content>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                        <div class="h-6 bg-gray-200 rounded w-36 animate-pulse"></div>
+                    </div>
+
+                    <!-- Destination I Charges Skeleton -->
+                    <div class="mb-4">
+                        <div class="flex items-center mb-2">
+                            <div class="w-4 h-4 bg-gray-200 rounded mr-2 animate-pulse"></div>
+                            <div class="h-4 bg-gray-200 rounded w-36 animate-pulse"></div>
+                        </div>
+                        <div class="space-y-2 ml-4">
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-28 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Destination II Charges Skeleton -->
+                    <div class="mb-4">
+                        <div class="flex items-center mb-2">
+                            <div class="w-4 h-4 bg-gray-200 rounded mr-2 animate-pulse"></div>
+                            <div class="h-4 bg-gray-200 rounded w-36 animate-pulse"></div>
+                        </div>
+                        <div class="space-y-2 ml-4">
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-28 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SL Portal Total Summary Skeleton -->
+                    <div class="border-t pt-3 mt-4">
+                        <div class="flex justify-between items-center">
+                            <div class="h-6 bg-gray-200 rounded w-28 animate-pulse"></div>
+                            <div class="h-6 bg-gray-200 rounded w-20 animate-pulse"></div>
+                        </div>
+                    </div>
+                </template>
+            </Card>
+        </div>
+    </div>
+
+    <!-- Actual Content -->
+    <div v-else-if="hblCharges">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Agent Total Section -->
             <Card class="!bg-white !border !border-neutral-300 !shadow-md !rounded-md">
@@ -229,19 +380,19 @@ const getHBLChargeDetails = async (hbl) => {
                         <div class="space-y-2 ml-4">
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Handling Charge</span>
-                                <span class="font-medium">{{ formatCurrency(hblCharges.destination_handling_charge || 0, false) }}</span>
+                                <span class="font-medium">{{ formatCurrency(hblCharges.destination_handling_charge || 0, !isPrepaid) }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">SLPA Charge</span>
-                                <span class="font-medium">{{ formatCurrency(hblCharges.destination_slpa_charge || 0, false) }}</span>
+                                <span class="font-medium">{{ formatCurrency(hblCharges.destination_slpa_charge || 0, !isPrepaid) }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Bond Charge</span>
-                                <span class="font-medium">{{ formatCurrency(hblCharges.destination_bond_charge || 0, false) }}</span>
+                                <span class="font-medium">{{ formatCurrency(hblCharges.destination_bond_charge || 0, !isPrepaid) }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Tax I</span>
-                                <span class="font-medium">{{ formatCurrency(hblCharges.destination_1_tax || 0, false) }}</span>
+                                <span class="font-medium">{{ formatCurrency(hblCharges.destination_1_tax || 0, !isPrepaid) }}</span>
                             </div>
                         </div>
                     </div>
@@ -279,31 +430,38 @@ const getHBLChargeDetails = async (hbl) => {
             </Card>
         </div>
 
-        <!-- Grand Total Section -->
-<!--        <Card class="!bg-white !border !border-neutral-300 !shadow-md !rounded-md mt-6">-->
-<!--            <template #content>-->
-<!--                <div class="flex justify-between items-center">-->
-<!--                    <div class="flex items-center space-x-2">-->
-<!--                        <i class="ti ti-calculator text-xl text-purple-600"></i>-->
-<!--                        <span class="text-xl font-semibold text-gray-900">Grand Total</span>-->
-<!--                    </div>-->
-<!--                    <span class="text-2xl font-bold text-purple-600">{{ formatCurrency(grandTotal,true) }}</span>-->
-<!--                </div>-->
+        <!--        <Card class="!bg-white !border !border-neutral-300 !shadow-md !rounded-md mt-6">-->
+        <!--            <template #content>-->
+        <!--                <div class="flex justify-between items-center">-->
+        <!--                    <div class="flex items-center space-x-2">-->
+        <!--                        <i class="ti ti-calculator text-xl text-purple-600"></i>-->
+        <!--                        <span class="text-xl font-semibold text-gray-900">Grand Total</span>-->
+        <!--                    </div>-->
+        <!--                    <span class="text-2xl font-bold text-purple-600">{{ formatCurrency(grandTotal,true) }}</span>-->
+        <!--                </div>-->
 
-<!--                &lt;!&ndash; Breakdown Summary &ndash;&gt;-->
-<!--                <div class="mt-4 pt-4 border-t border-gray-200">-->
-<!--                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">-->
-<!--                        <div class="flex justify-between">-->
-<!--                            <span class="text-gray-600">Agent Total:</span>-->
-<!--                            <span class="font-medium">{{currencySymbol}}  {{ formatCurrency(agentTotal,true,false) }}</span>-->
-<!--                        </div>-->
-<!--                        <div class="flex justify-between">-->
-<!--                            <span class="text-gray-600">SL Portal Total:</span>-->
-<!--                            <span class="font-medium">LKR {{ slPortalCharge }}</span>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </template>-->
-<!--        </Card>-->
+        <!--                &lt;!&ndash; Breakdown Summary &ndash;&gt;-->
+        <!--                <div class="mt-4 pt-4 border-t border-gray-200">-->
+        <!--                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">-->
+        <!--                        <div class="flex justify-between">-->
+        <!--                            <span class="text-gray-600">Agent Total:</span>-->
+        <!--                            <span class="font-medium">{{currencySymbol}}  {{ formatCurrency(agentTotal,true,false) }}</span>-->
+        <!--                        </div>-->
+        <!--                        <div class="flex justify-between">-->
+        <!--                            <span class="text-gray-600">SL Portal Total:</span>-->
+        <!--                            <span class="font-medium">LKR {{ slPortalCharge }}</span>-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </template>-->
+        <!--        </Card>-->
+    </div>
+
+    <!-- No Data State -->
+    <div v-else class="flex items-center justify-center py-12">
+        <div class="text-center">
+            <i class="ti ti-file-off text-4xl text-gray-400 mb-4"></i>
+            <p class="text-gray-500">No charge details available</p>
+        </div>
     </div>
 </template>
