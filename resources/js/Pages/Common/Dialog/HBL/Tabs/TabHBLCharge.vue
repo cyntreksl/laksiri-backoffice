@@ -28,29 +28,28 @@ watch(hblCharges, (newVal) => {
 });
 
 const formatCurrency = (amount, isBaseCurrency = false) => {
-    if (isBaseCurrency) {
-        // For freight, package, bill charges - always use base currency without conversion
-        const symbol = currencySymbol.value || 'LKR';
-        const converted = amount;
-        if (isNaN(converted)) return `${symbol} 0.00`;
+    const symbol = isPrepaid.value ? (currencySymbol.value || 'LKR') : 'LKR';
+    if (amount === null || amount === undefined) {
+        return `${symbol} 0.00`;
+    }
 
-        return `${symbol} ${new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(converted)}`;
+    const total = convertCurrency(amount,isBaseCurrency)
+
+    return `${symbol} ${new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(total)}`;
+
+};
+
+const convertCurrency = (amount, isBaseCurrency = false) => {
+    if (isBaseCurrency) {
+        return amount;
     } else {
-        // For destination charges - apply conversion based on prepaid status
-        const symbol = isPrepaid.value ? (currencySymbol.value || 'LKR') : 'LKR';
+        // For destination charges, apply conversion based on prepaid status
         const rateRaw = isPrepaid.value ? (currencyRate.value || 1) : (currencyRate.value || 1);
         const rate = isPrepaid.value ? (1 / rateRaw) : rateRaw;
-
-        const converted = amount * rate;
-        if (isNaN(converted)) return `${symbol} 0.00`;
-
-        return `${symbol} ${new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(converted)}`;
+        return amount * rate;
     }
 };
 
@@ -68,12 +67,12 @@ const agentTotal = computed(() => {
     const discount = hblCharges.value.discount || 0;
 
     if (isPrepaid.value) {
-        // Prepaid: base charges + additional charges - discount + destination1 + destination1_tax (with conversion)
-        const rateRaw = currencyRate.value || 1;
-        const rate = 1 / rateRaw;
-        const destinationCharges = ((hblCharges.value.destination_1_total || 0) +
-                                   (hblCharges.value.destination_1_tax || 0)) * rate;
-        return baseCharges + additionalCharges - discount + destinationCharges;
+        // Prepaid: base charges + additional charges - discount + destination1 + destination1_tax
+        // Since all charges are in base currency, no conversion needed
+        const destinationCharges = (hblCharges.value.destination_1_total || 0) +
+                                  (hblCharges.value.destination_1_tax || 0);
+
+        return baseCharges + additionalCharges - discount + convertCurrency(destinationCharges);
     } else {
         // Non-prepaid: base charges + additional charges - discount
         return baseCharges + additionalCharges - discount;
@@ -83,15 +82,16 @@ const agentTotal = computed(() => {
 const slPortalCharge = computed(() => {
     if (!hblCharges.value) return 0;
 
-    const rateRaw = currencyRate.value || 1;
-    const rate = isPrepaid.value ? (1 / rateRaw) : rateRaw;
-
     if (isPrepaid.value) {
-        // Prepaid: destination2 + destination2_tax (with conversion)
+        // Prepaid: destination2 + destination2_tax (convert to base currency)
+        const rateRaw = currencyRate.value || 1;
+        const rate = 1 / rateRaw;
         return ((hblCharges.value.destination_2_total || 0) +
                 (hblCharges.value.destination_2_tax || 0)) * rate;
     } else {
-        // Non-prepaid: destination1 + destination2 + destination1_tax + destination2_tax (with conversion)
+        // Non-prepaid: destination1 + destination2 + destination1_tax + destination2_tax (convert to LKR)
+        const rateRaw = currencyRate.value || 1;
+        const rate = rateRaw;
         return ((hblCharges.value.destination_1_total || 0) +
                 (hblCharges.value.destination_2_total || 0) +
                 (hblCharges.value.destination_1_tax || 0) +
@@ -203,7 +203,7 @@ const getHBLChargeDetails = async (hbl) => {
                     <div class="border-t pt-3 mt-4">
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-semibold text-gray-900">Agent Total</span>
-                            <span class="text-lg font-bold text-blue-600">{{ formatCurrency(agentTotal) }}</span>
+                            <span class="text-lg font-bold text-blue-600">{{ formatCurrency(agentTotal,true) }}</span>
                         </div>
                     </div>
                 </template>
@@ -254,15 +254,15 @@ const getHBLChargeDetails = async (hbl) => {
                         <div class="space-y-2 ml-4">
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Demurrage Charge</span>
-                                <span class="font-medium">{{ formatCurrency(hblCharges.destination_demurrage_charge || 0, false) }}</span>
+                                <span class="font-medium">LKR {{ hblCharges.destination_demurrage_charge  }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">DO Charge</span>
-                                <span class="font-medium">{{ formatCurrency(hblCharges.destination_do_charge || 0, false) }}</span>
+                                <span class="font-medium">LKR {{ hblCharges.destination_do_charge  }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Tax II</span>
-                                <span class="font-medium">{{ formatCurrency(hblCharges.destination_2_tax || 0, false) }}</span>
+                                <span class="font-medium">LKR {{ hblCharges.destination_2_tax  }}</span>
                             </div>
                         </div>
                     </div>
@@ -271,7 +271,7 @@ const getHBLChargeDetails = async (hbl) => {
                     <div class="border-t pt-3 mt-4">
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-semibold text-gray-900">SL Portal Total</span>
-                            <span class="text-lg font-bold text-green-600">{{ formatCurrency(slPortalCharge) }}</span>
+                            <span class="text-lg font-bold text-green-600">LKR {{ slPortalCharge }}</span>
                         </div>
                     </div>
                 </template>
@@ -286,7 +286,7 @@ const getHBLChargeDetails = async (hbl) => {
                         <i class="ti ti-calculator text-xl text-purple-600"></i>
                         <span class="text-xl font-semibold text-gray-900">Grand Total</span>
                     </div>
-                    <span class="text-2xl font-bold text-purple-600">{{ formatCurrency(grandTotal) }}</span>
+                    <span class="text-2xl font-bold text-purple-600">{{ formatCurrency(grandTotal,true) }}</span>
                 </div>
 
                 <!-- Breakdown Summary -->
@@ -294,11 +294,11 @@ const getHBLChargeDetails = async (hbl) => {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div class="flex justify-between">
                             <span class="text-gray-600">Agent Total:</span>
-                            <span class="font-medium">{{ formatCurrency(agentTotal) }}</span>
+                            <span class="font-medium">{{ formatCurrency(agentTotal,true) }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">SL Portal Total:</span>
-                            <span class="font-medium">{{ formatCurrency(slPortalCharge) }}</span>
+                            <span class="font-medium">LKR {{ slPortalCharge }}</span>
                         </div>
                     </div>
                 </div>
