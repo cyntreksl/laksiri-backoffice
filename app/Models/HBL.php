@@ -129,6 +129,7 @@ class HBL extends Model
         'finance_release_approved_date',
         'is_arrived_to_primary_warehouse',
         'currency_rate',
+        'package_charges'
     ];
 
     protected $appends = [
@@ -298,5 +299,15 @@ class HBL extends Model
     public function latestRtfRecord(): MorphOne
     {
         return $this->morphOne(RtfRecord::class, 'rtfable')->latestOfMany();
+    }
+
+    public function departureCharge(): HasOne
+    {
+        return $this->hasOne(HBLDepartureCharge::class, 'hbl_id', 'id');
+    }
+
+    public function destinationCharge(): HasOne
+    {
+        return $this->hasOne(HBLDestinationCharge::class, 'hbl_id', 'id');
     }
 }
