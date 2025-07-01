@@ -27,6 +27,7 @@ class UpdateHBLDestinationCharges
      */
     public function handle(HBL $HBL, $paymentData = [])
     {
+        $HBL->load(['packages', 'branch']);
         $branchId = $HBL->branch_id;
         $currencyCode = $HBL->branch->currency_symbol;
         $currencyRateInLKR = $HBL->currency_rate;
