@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Actions\AirLine\GetAirLineByName;
 use App\Actions\Branch\GetBranchById;
+use App\Actions\HBL\HBLCharges\CalculateTax;
 use App\Actions\SpecialDOCharge\GetSpecialDOChargeByAgent;
 use App\Actions\Tax\GetSumOfTaxRatesByWarehouse;
 use App\Models\HBL;
@@ -11,8 +12,6 @@ use Illuminate\Support\Facades\Auth;
 
 class GatePassChargesService
 {
-    private float $vat;
-
     private string $cargo_mode;
 
     private array $charges;
@@ -28,6 +27,7 @@ class GatePassChargesService
             'demurrage_charge_second' => 9.50,
             'demurrage_charge_third' => 10.00,
             'slpa_charge' => 600.00,
+            'reimbursement_logic' => null,
         ],
         'Air Cargo' => [
             'port_charge' => 0.00,
@@ -39,20 +39,33 @@ class GatePassChargesService
             'demurrage_charge_third' => 6.00,
             'demurrage_charge_fourth' => 24.00,
             'slpa_charge' => 0.00,
+            'reimbursement_logic' => 'kg > 79 ? ((kg * 27) + 2000) : 0',
         ],
     ];
-
-    private int $branch_demurrage_charge_discount;
 
     /**
      * Create a new instance with VAT and cargo mode.
      */
-    public function __construct(string $cargo_mode = 'Sea Cargo', float $vat = 18)
+    public function __construct(string $cargo_mode = 'Sea Cargo',$destinationBranchId= null)
     {
-        $this->vat = $vat;
         $this->cargo_mode = $cargo_mode;
+        if(!empty($destinationBranchId)){
+            $destinationBranch = GetBranchById::run($destinationBranchId);
+            $branchDestinationPrice = $destinationBranch->branchDestinationPrices;
+            if ($branchDestinationPrice) {
+                $this->chargeModes['Sea Cargo']['port_charge'] = $branchDestinationPrice->sea_cargo_port_charge ?? $this->chargeModes['Sea Cargo']['port_charge'];
+                $this->chargeModes['Sea Cargo']['handling_charge'] = $branchDestinationPrice->sea_cargo_handling_charge ?? $this->chargeModes['Sea Cargo']['handling_charge'];
+                $this->chargeModes['Sea Cargo']['bond_charge'] = $branchDestinationPrice->sea_cargo_bond_charge ?? $this->chargeModes['Sea Cargo']['bond_charge'];
+                $this->chargeModes['Sea Cargo']['slpa_charge'] = $branchDestinationPrice->sea_cargo_slpa_charge ?? $this->chargeModes['Sea Cargo']['slpa_charge'];
+                $this->chargeModes['Air Cargo']['port_charge'] = $branchDestinationPrice->air_cargo_port_charge ?? $this->chargeModes['Air Cargo']['port_charge'];
+                $this->chargeModes['Air Cargo']['handling_charge'] = $branchDestinationPrice->air_cargo_handling_charge ?? $this->chargeModes['Air Cargo']['handling_charge'];
+                $this->chargeModes['Air Cargo']['bond_charge'] = $branchDestinationPrice->air_cargo_bond_charge ?? $this->chargeModes['Air Cargo']['bond_charge'];
+                $this->chargeModes['Air Cargo']['slpa_charge'] = $branchDestinationPrice->air_cargo_slpa_charge ?? $this->chargeModes['Air Cargo']['slpa_charge'];
+                $this->chargeModes['Air Cargo']['reimbursement_logic'] = $branchDestinationPrice->air_cargo_reimbursement_logic ?? $this->chargeModes['Air Cargo']['reimbursement_logic'];
+            }
+        }
+
         $this->setCharges($cargo_mode);
-        $this->branch_demurrage_charge_discount = GetBranchById::run(Auth::user()->primary_branch_id)['maximum_demurrage_discount'];
     }
 
     /**
@@ -102,7 +115,6 @@ class GatePassChargesService
     public function bondCharge(float $grand_volume, float $grand_weight): array
     {
         $quantity = $this->cargo_mode === 'Sea Cargo' ? $grand_volume : $grand_weight;
-
         return [
             'rate' => round($quantity * $this->charges['bond_charge'], 2),
             'amount' => round($quantity * $this->charges['bond_charge'], 2),
@@ -141,11 +153,11 @@ class GatePassChargesService
             $containerArrivalDatesCount -= $applicableDays;
         }
 
-        $amount = $rate * (1 + $this->vat / 100);
-        $discounted_rate = $rate * (100 - $this->branch_demurrage_charge_discount) / 100;
+        $tax = CalculateTax::run($rate);
+        $amount = $tax['amount_with_tax'];
 
         return [
-            'rate' => round($discounted_rate, 2),
+            'rate' => round($amount, 2),
             'amount' => round($amount, 2),
         ];
     }
@@ -175,11 +187,11 @@ class GatePassChargesService
             $containerArrivalDatesCount -= $applicableDays;
         }
 
-        $amount = $rate * (1 + $this->vat / 100);
-        $discounted_rate = $rate * (100 - $this->branch_demurrage_charge_discount) / 100;
+        $tax = CalculateTax::run($rate);
+        $amount = $tax['amount_with_tax'];
 
         return [
-            'rate' => round($discounted_rate, 2),
+            'rate' => round($amount, 2),
             'amount' => round($amount, 2),
         ];
     }
@@ -280,20 +292,26 @@ class GatePassChargesService
         }
     }
 
-    /**
-     * Get VAT charge details.
-     */
-    public function vatCharge(HBL $hbl): array
-    {
-        $sumOfRate = GetSumOfTaxRatesByWarehouse::run($hbl->warehouse_id);
-
-        return [
-            'rate' => $sumOfRate ?: 0,
-        ];
-    }
-
     private function getContainer($hbl)
     {
         return $hbl->packages[0]->containers()->withoutGlobalScopes()->first() ?? $hbl->packages[0]->duplicate_containers()->withoutGlobalScopes()->first();
+    }
+
+    public function calculateReimbursement(float $kg): float
+    {
+        $logic = $this->chargeModes[$this->cargo_mode]['reimbursement_logic'];
+
+        if (!$logic) {
+            return 0.0;
+        }
+
+        $executor = new MathExecutor();
+
+        try {
+            return $executor->execute($logic, ['kg' => $kg]);
+        } catch (\Throwable $e) {
+            // fallback or log error
+            return 0.0;
+        }
     }
 }

@@ -294,9 +294,17 @@ const getHBLChargeDetails = async (hbl) => {
 
                     <!-- Departure Charges -->
                     <div class="mb-4">
-                        <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                            <i class="ti ti-plane-departure text-sm mr-2"></i>
-                            Departure Charges
+                        <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="ti ti-plane-departure text-sm mr-2"></i>
+                                Departure Charges
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <i :class="hbl?.is_departure_charges_paid ? 'fa fa-check-circle text-green-500' : 'fa fa-times-circle text-red-500'" class="text-xs"></i>
+                                <span class="text-xs" :class="hbl?.is_departure_charges_paid ? 'text-green-600' : 'text-red-600'">
+                                    {{ hbl?.is_departure_charges_paid ? 'Paid' : 'Unpaid' }}
+                                </span>
+                            </div>
                         </h4>
                         <div class="space-y-2 ml-4">
                             <div class="flex justify-between text-sm">
@@ -324,9 +332,17 @@ const getHBLChargeDetails = async (hbl) => {
 
                     <!-- Destination I Charges (only for prepaid) -->
                     <div v-if="isPrepaid" class="mb-4">
-                        <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                            <i class="ti ti-anchor text-sm mr-2"></i>
-                            Destination I Charges
+                        <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="ti ti-anchor text-sm mr-2"></i>
+                                Destination I Charges
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <i :class="hbl?.is_destination_charges_paid ? 'fa fa-check-circle text-green-500' : 'fa fa-times-circle text-red-500'" class="text-xs"></i>
+                                <span class="text-xs" :class="hbl?.is_destination_charges_paid ? 'text-green-600' : 'text-red-600'">
+                                    {{ hbl?.is_destination_charges_paid ? 'Paid' : 'Unpaid' }}
+                                </span>
+                            </div>
                         </h4>
                         <div class="space-y-2 ml-4">
                             <div class="flex justify-between text-sm">
@@ -354,6 +370,30 @@ const getHBLChargeDetails = async (hbl) => {
                             <span class="text-lg font-semibold text-gray-900">Agent Total</span>
                             <span class="text-lg font-bold text-blue-600">{{currencySymbol}}  {{ formatCurrency(agentTotal,true,false) }}</span>
                         </div>
+
+                        <!-- Payment Information -->
+                        <div class="mt-3 pt-3 border-t border-gray-100">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Paid Amount</span>
+                                <span class="font-medium text-green-600">{{currencySymbol}} {{ formatCurrency(hbl?.paid_amount || 0, true, false) }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Due Amount</span>
+                                <span class="font-medium text-red-600">{{currencySymbol}} {{ formatCurrency(agentTotal - (hbl?.paid_amount || 0), true, false) }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Status -->
+                        <div class="mt-2 flex items-center space-x-4">
+                            <div class="flex items-center space-x-1">
+                                <i :class="hbl?.is_departure_charges_paid ? 'fa fa-check-circle text-green-500' : 'fa fa-times-circle text-red-500'" class="text-sm"></i>
+                                <span class="text-xs text-gray-500">Departure</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <i :class="hbl?.is_destination_charges_paid ? 'fa fa-check-circle text-green-500' : 'fa fa-times-circle text-red-500'" class="text-sm"></i>
+                                <span class="text-xs text-gray-500">Destination</span>
+                            </div>
+                        </div>
                     </div>
                 </template>
             </Card>
@@ -370,9 +410,17 @@ const getHBLChargeDetails = async (hbl) => {
 
                     <!-- Destination I Charges (only for non-prepaid) -->
                     <div v-if="!isPrepaid" class="mb-4">
-                        <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                            <i class="ti ti-anchor text-sm mr-2"></i>
-                            Destination I Charges
+                        <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="ti ti-anchor text-sm mr-2"></i>
+                                Destination I Charges
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <i :class="hbl?.is_destination_charges_paid ? 'fa fa-check-circle text-green-500' : 'fa fa-times-circle text-red-500'" class="text-xs"></i>
+                                <span class="text-xs" :class="hbl?.is_destination_charges_paid ? 'text-green-600' : 'text-red-600'">
+                                    {{ hbl?.is_destination_charges_paid ? 'Paid' : 'Unpaid' }}
+                                </span>
+                            </div>
                         </h4>
                         <div class="space-y-2 ml-4">
                             <div class="flex justify-between text-sm">

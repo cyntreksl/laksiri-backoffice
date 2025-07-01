@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -72,5 +73,10 @@ class Branch extends Model
     public static function timezones(): array
     {
         return timezone_identifiers_list();
+    }
+
+    public function branchDestinationPrices(): HasOne
+    {
+        return $this->hasOne(BranchDestinationPrice::class);
     }
 }

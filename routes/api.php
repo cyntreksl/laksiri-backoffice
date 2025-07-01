@@ -66,6 +66,9 @@ Route::domain(app()->environment('local') ? null : 'api.'.parse_url(config('app.
         Route::get('/hbls/get-total-summary/{hbl}', [HBLController::class, 'getHBLTotalSummary'])->name('api.hbls.get-hbl-total-summary');
         Route::get('/hbls/get-destination-total-summary/{hbl}', [HBLController::class, 'getHBLDestinationTotalSummary'])->name('api.hbls.get-destination hbl-total-summary');
 
+        Route::get('hbl-charge/{id}', [HBLController::class, 'hblChargeDetails'])
+            ->name('hbl-charge.details');
+
     });
 
 Route::domain('api.'.config('app.url'))->prefix('/v1/')->post('/login', [LoginController::class, 'login']);

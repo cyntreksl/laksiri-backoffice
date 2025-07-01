@@ -46,7 +46,7 @@ class CalculateDoCharge
                 $operations = array_keys($groupedDORules->toArray());
 
                 usort($operations, function ($a, $b) {
-                    return ((int) filter_var($b, FILTER_SANITIZE_NUMBER_INT)) <=> ((int) filter_var($a, FILTER_SANITIZE_NUMBER_INT));
+                    return ((int)filter_var($b, FILTER_SANITIZE_NUMBER_INT)) <=> ((int)filter_var($a, FILTER_SANITIZE_NUMBER_INT));
                 });
                 $operations = array_values(array_filter($operations, function ($operation) use ($package_quantity) {
                     $number = floatval(substr($operation, 1));
@@ -55,8 +55,8 @@ class CalculateDoCharge
                 }));
                 $packageDOCharge = 0;
                 foreach ($operations as $operation) {
-                    $operation_quantity = (float) filter_var($operation, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-                    $rule = (object) $groupedDORules[$operation][0];
+                    $operation_quantity = (float)filter_var($operation, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+                    $rule = (object)$groupedDORules[$operation][0];
                     $quantity_after_operation = $package_quantity - $operation_quantity;
                     $packageDOCharge += ($quantity_after_operation * $rule['charge']);
                     $package_quantity = $operation_quantity;
@@ -76,7 +76,7 @@ class CalculateDoCharge
     {
         $container = $this->getContainer($hbl);
 
-        if (! $container || ! $container->airline_name) {
+        if (empty($container) || !$container || !$container->airline_name) {
             return [
                 'rate' => 0.00,
                 'amount' => 0.00,
@@ -100,6 +100,9 @@ class CalculateDoCharge
 
     private function getContainer($hbl)
     {
+        if ($hbl->packages->isEmpty()) {
+            return null;
+        }
         return $hbl->packages[0]->containers()->withoutGlobalScopes()->first() ?? $hbl->packages[0]->duplicate_containers()->withoutGlobalScopes()->first();
     }
 }

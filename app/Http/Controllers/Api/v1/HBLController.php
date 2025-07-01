@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Actions\HBL\GetHBLById;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreHBLRequest;
 use App\Interfaces\Api\HBLRepositoryInterface;
@@ -87,5 +88,47 @@ class HBLController extends Controller
     public function getHBLDestinationTotalSummary(HBL $hbl)
     {
         return $this->HBLRepository->getHBLDestinationTotalSummary($hbl);
+    }
+
+    public function hblChargeDetails(Request $request)
+    {
+        $id = $request->id;
+        $hbl = GetHBLById::run($id);
+
+        $hbl->load([
+            'departureCharge',
+            'destinationCharge',
+        ]);
+
+        $chargeDetails = [
+            'base_currency_code' => $hbl->departureCharge->base_currency_code ?? null,
+            'base_currency_rate_in_lkr' => $hbl->departureCharge->base_currency_rate_in_lkr ?? null,
+            'is_branch_prepaid' => $hbl->departureCharge->is_branch_prepaid ?? null,
+            'freight_charge' => $hbl->departureCharge->freight_charge ?? null,
+            'bill_charge' => $hbl->departureCharge->bill_charge ?? null,
+            'package_charge' => $hbl->departureCharge->package_charge ?? null,
+            'discount' => $hbl->departureCharge->discount ?? null,
+            'additional_charges' => $hbl->departureCharge->additional_charges ?? null,
+            'departure_grand_total' => $hbl->departureCharge->departure_grand_total ?? null,
+
+            'destination_handling_charge' => $hbl->destinationCharge->destination_handling_charge ?? null,
+            'destination_slpa_charge' => $hbl->destinationCharge->destination_slpa_charge ?? null,
+            'destination_bond_charge' => $hbl->destinationCharge->destination_bond_charge ?? null,
+            'destination_1_total' => $hbl->destinationCharge->destination_1_total ?? null,
+            'destination_1_tax' => $hbl->destinationCharge->destination_1_tax ?? null,
+            'destination_1_total_with_tax' => $hbl->destinationCharge->destination_1_total_with_tax ?? null,
+
+            'destination_do_charge' => $hbl->destinationCharge->destination_do_charge ?? null,
+            'destination_demurrage_charge' => $hbl->destinationCharge->destination_demurrage_charge ?? null,
+            'destination_stamp_charge' => $hbl->destinationCharge->destination_stamp_charge ?? null,
+            'destination_other_charge' => $hbl->destinationCharge->destination_other_charge ?? null,
+            'destination_2_total' => $hbl->destinationCharge->destination_2_total ?? null,
+            'destination_2_tax' => $hbl->destinationCharge->destination_2_tax ?? null,
+            'destination_2_total_with_tax' => $hbl->destinationCharge->destination_2_total_with_tax ?? null,
+            'stop_demurrage_at' => $hbl->destinationCharge->stop_demurrage_at ?? null,
+        ];
+
+        return $this->success('HBL Charge Details',$chargeDetails);
+
     }
 }
