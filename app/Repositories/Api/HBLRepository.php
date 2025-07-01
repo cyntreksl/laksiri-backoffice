@@ -95,11 +95,20 @@ class HBLRepository implements HBLRepositoryInterface
     public function calculatePayment(array $data): JsonResponse
     {
         $destination_branch = Branch::where('name', '=', $data['warehouse'])->get();
+
+        $chargeableWeight = $data['grand_total_weight'];
+        if ($data['cargo_type'] == 'Air Cargo') {
+            //volumetric weight calculation for Air Cargo
+            $volumetricWeight = ($data['grand_total_volume'] * 1000000 / 6000);
+            //get higher one as chargeable weight
+            $chargeableWeight = max($chargeableWeight, $volumetricWeight);
+        }
+
         $result = CalculatePayment::run(
             $data['cargo_type'],
             $data['hbl_type'],
             $data['grand_total_volume'],
-            $data['grand_total_weight'],
+            $chargeableWeight,
             $data['package_list_length'],
             $destination_branch[0]['id'],
             $data['is_active_package'],
@@ -108,9 +117,10 @@ class HBLRepository implements HBLRepositoryInterface
 
         $currentBranch = GetBranchById::run(GetUserCurrentBranchID::run());
         if ($currentBranch->is_prepaid) {
-            $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $data['grand_total_weight'],$destination_branch[0]['id']);
+            $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $chargeableWeight,$destination_branch[0]['id']);
             $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
             $result['sl_rate'] = $destinationCharge['slRate'];
+            $result['grand_total_without_discount'] =  $result['grand_total_without_discount'] +  $result['destination_charges'];
         } else {
             $result['destination_charges'] = 0;
         }
