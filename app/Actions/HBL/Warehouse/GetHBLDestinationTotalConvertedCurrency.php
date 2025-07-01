@@ -14,10 +14,10 @@ class GetHBLDestinationTotalConvertedCurrency
 {
     use AsAction;
 
-    public function handle($cargoType, int $packageCount, float $grandVolume, float $grandWeight = 0.0)
+    public function handle($cargoType, int $packageCount, float $grandVolume, float $grandWeight = 0.0, int $destinationBranchId = 0)
     {
         //        try {
-        $service = new GatePassChargesService($cargoType);
+        $service = new GatePassChargesService($cargoType,$destinationBranchId);
 
         $handlingCharges = $this->calculateHandlingCharges($service, $packageCount);
         $slpaCharge = $this->calculateSlpaCharge($service, $grandVolume);

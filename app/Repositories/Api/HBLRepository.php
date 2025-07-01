@@ -108,7 +108,7 @@ class HBLRepository implements HBLRepositoryInterface
 
         $currentBranch = GetBranchById::run(GetUserCurrentBranchID::run());
         if ($currentBranch->is_prepaid) {
-            $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $data['grand_total_weight']);
+            $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $data['grand_total_weight'],$destination_branch[0]['id']);
             $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
             $result['sl_rate'] = $destinationCharge['slRate'];
         } else {
