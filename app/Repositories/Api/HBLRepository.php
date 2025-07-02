@@ -120,7 +120,7 @@ class HBLRepository implements HBLRepositoryInterface
             $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $chargeableWeight, $destination_branch[0]['id']);
             $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
             $result['sl_rate'] = $destinationCharge['slRate'];
-            $result['grand_total_without_discount'] = $result['grand_total_without_discount'] + $result['destination_charges'];
+            $result['grand_total_without_discount'] = round(($result['grand_total_without_discount'] + $result['destination_charges']),2);
         } else {
             $result['destination_charges'] = 0;
         }
@@ -137,7 +137,7 @@ class HBLRepository implements HBLRepositoryInterface
 
             return response()->json(['package_rules' => $packagesRules, 'price_rules' => $priceRules]);
         } catch (\Exception $e) {
-            throw new \Exception('Failed to get package rules '.$e->getMessage());
+            throw new \Exception('Failed to get package rules ' . $e->getMessage());
         }
     }
 
@@ -237,6 +237,8 @@ class HBLRepository implements HBLRepositoryInterface
             ];
         }
 
+        $response['is_destination_charges_paid'] = $hbl->is_destination_charges_paid ?? 0;
+        $response['is_departure_charges_paid'] = $hbl->is_departure_charges_paid ?? 0;
         return $this->success('Completed HBL received successfully!', $response);
 
     }
