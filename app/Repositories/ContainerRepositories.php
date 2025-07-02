@@ -556,4 +556,32 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             throw new \Exception('Failed to undo rtf container: '.$e->getMessage());
         }
     }
+
+    public function getAllShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
+    {
+        $query = Container::query();
+
+        if (! empty($search)) {
+            $query->where(function ($query) use ($search) {
+                $query->where('reference', 'like', '%'.$search.'%')
+                    ->orWhere('container_number', 'like', '%'.$search.'%')
+                    ->orWhere('bl_number', 'like', '%'.$search.'%')
+                    ->orWhere('awb_number', 'like', '%'.$search.'%');
+            });
+        }
+
+        FilterFactory::apply($query, $filters);
+
+        $containers = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
+
+        return response()->json([
+            'data' => ContainerResource::collection($containers),
+            'meta' => [
+                'total' => $containers->total(),
+                'current_page' => $containers->currentPage(),
+                'perPage' => $containers->perPage(),
+                'lastPage' => $containers->lastPage(),
+            ],
+        ]);
+    }
 }

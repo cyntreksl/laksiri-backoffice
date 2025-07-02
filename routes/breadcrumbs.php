@@ -247,6 +247,12 @@ Breadcrumbs::for('setting.driver-zones.index', function (BreadcrumbTrail $trail)
     $trail->push('Driver Zones', route('setting.driver-zones.index'));
 });
 
+Breadcrumbs::for('loading.all-shipments', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Loading');
+    $trail->push('All Shipments', route('loading.all-shipments'));
+});
+
 // Loading > Shipments Index
 Breadcrumbs::for('loading.loading-containers.index', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

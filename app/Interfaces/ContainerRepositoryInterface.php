@@ -66,4 +66,6 @@ interface ContainerRepositoryInterface
     public function doRTF(Container $container);
 
     public function undoRTF(Container $container);
+
+    public function getAllShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse;
 }
