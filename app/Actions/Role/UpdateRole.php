@@ -12,7 +12,7 @@ class UpdateRole
 
     public function handle(string $role_name, Role $role): Role
     {
-        if (in_array($role->name, ['admin', 'super-admin']) && auth()->user() && ! auth()->user()->hasRole('super-admin')) {
+        if (in_array($role->name, ['admin', 'super-admin']) && auth()->user() && ! auth()->user()->hasRole(['super-admin', 'admin'])) {
             throw ValidationException::withMessages([
                 'role' => 'You are not authorized to modify this role.',
             ])->status(403);

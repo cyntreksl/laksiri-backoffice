@@ -94,7 +94,7 @@ class StandardPaymentCalculator implements PaymentCalculatorInterface
         return [
             'destination_charges' => $destinationCharges,
             'package_charges' => $packageCharges,
-            'other_charge' => $destinationCharges + $packageCharges,
+            'other_charge' => 0,
         ];
     }
 
@@ -102,6 +102,6 @@ class StandardPaymentCalculator implements PaymentCalculatorInterface
     {
         $vat = $billingRule->bill_vat ? $billingRule->bill_vat / 100 : 0;
 
-        return $freightCharge + $billingRule->bill_price + $charges['other_charge'] + $vat;
+        return $freightCharge + $billingRule->bill_price + $vat;
     }
 }

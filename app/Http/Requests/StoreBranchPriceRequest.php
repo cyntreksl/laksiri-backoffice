@@ -33,7 +33,7 @@ class StoreBranchPriceRequest extends FormRequest
             'priceRules.*.bill_price' => ['required', 'numeric', 'min:0'],
             'priceRules.*.bill_vat' => ['required', 'numeric', 'min:0'],
             'priceRules.*.volume_charges' => ['required', 'numeric', 'min:0'],
-            'priceRules.*.per_package_charges' => ['required', 'numeric', 'min:0'],
+            'priceRules.*.per_package_charges' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 

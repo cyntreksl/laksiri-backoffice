@@ -37,7 +37,7 @@ class UpdateHBLDestinationCharges
         $packageListLength = $HBL->packages->count();
         $grandTotalVolume = $HBL->packages()->sum('volume');
         $grandTotalWeight = $HBL->packages()->sum('weight');
-        $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($cargoType, $packageListLength, $grandTotalVolume, $grandTotalWeight,$HBL->warehouse_id);
+        $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($cargoType, $packageListLength, $grandTotalVolume, $grandTotalWeight, $HBL->warehouse_id);
 
         $destinationHandlingCharge = $destinationCharge['handlingCharges'];
         $destinationSLPACharge = $destinationCharge['slpaCharge'];

@@ -1320,6 +1320,16 @@ export default {
                     break;
                 case "loading":
                     let loadingMenu = [];
+                    if (usePage().props.user.permissions.includes("all.shipments.index")) {
+                        loadingMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "All Shipments",
+                                route: "loading.all-shipments",
+                            }
+                        );
+                    }
                     if (usePage().props.user.permissions.includes("container.index")) {
                         loadingMenu.splice(
                             2,

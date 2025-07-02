@@ -128,7 +128,7 @@ class HBLController extends Controller
             'stop_demurrage_at' => $hbl->destinationCharge->stop_demurrage_at ?? null,
         ];
 
-        return $this->success('HBL Charge Details',$chargeDetails);
+        return $this->success('HBL Charge Details', $chargeDetails);
 
     }
 }
