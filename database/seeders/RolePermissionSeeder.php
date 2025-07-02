@@ -538,6 +538,9 @@ class RolePermissionSeeder extends Seeder
                     'container.delete documents',
                     'container.edit',
                     'container.download documents',
+                    'all.shipments.index',
+                    'all.shipments.show',
+                    'all.shipments.download manifest',
                 ],
             ],
 

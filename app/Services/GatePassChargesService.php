@@ -6,9 +6,7 @@ use App\Actions\AirLine\GetAirLineByName;
 use App\Actions\Branch\GetBranchById;
 use App\Actions\HBL\HBLCharges\CalculateTax;
 use App\Actions\SpecialDOCharge\GetSpecialDOChargeByAgent;
-use App\Actions\Tax\GetSumOfTaxRatesByWarehouse;
 use App\Models\HBL;
-use Illuminate\Support\Facades\Auth;
 
 class GatePassChargesService
 {
@@ -46,10 +44,10 @@ class GatePassChargesService
     /**
      * Create a new instance with VAT and cargo mode.
      */
-    public function __construct(string $cargo_mode = 'Sea Cargo',$destinationBranchId= null)
+    public function __construct(string $cargo_mode = 'Sea Cargo', $destinationBranchId = null)
     {
         $this->cargo_mode = $cargo_mode;
-        if(!empty($destinationBranchId)){
+        if (! empty($destinationBranchId)) {
             $destinationBranch = GetBranchById::run($destinationBranchId);
             $branchDestinationPrice = $destinationBranch->branchDestinationPrices;
             if ($branchDestinationPrice) {
@@ -115,6 +113,7 @@ class GatePassChargesService
     public function bondCharge(float $grand_volume, float $grand_weight): array
     {
         $quantity = $this->cargo_mode === 'Sea Cargo' ? $grand_volume : $grand_weight;
+
         return [
             'rate' => round($quantity * $this->charges['bond_charge'], 2),
             'amount' => round($quantity * $this->charges['bond_charge'], 2),
@@ -301,11 +300,11 @@ class GatePassChargesService
     {
         $logic = $this->chargeModes[$this->cargo_mode]['reimbursement_logic'];
 
-        if (!$logic) {
+        if (! $logic) {
             return 0.0;
         }
 
-        $executor = new MathExecutor();
+        $executor = new MathExecutor;
 
         try {
             return $executor->execute($logic, ['kg' => $kg]);

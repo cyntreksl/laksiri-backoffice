@@ -99,6 +99,11 @@ Route::name('loading.')->group(function () {
     Route::post('containers/{container}/unset/rtf', [ContainerController::class, 'unsetRTF'])
         ->name('containers.unset.rtf');
 
+    Route::get('all-shipments', [ContainerController::class, 'allShipments'])
+        ->name('all-shipments');
+
+    Route::get('all-shipments-list', [ContainerController::class, 'allShipmentsList']);
+
     // Manual Loadings
     Route::get('manual-loadings', function () {
         return Inertia::render('Loading/ManualLoading');

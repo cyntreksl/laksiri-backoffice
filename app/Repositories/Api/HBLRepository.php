@@ -49,47 +49,47 @@ class HBLRepository implements HBLRepositoryInterface
     {
         $warehouse = GetBranchByName::run($data['warehouse']);
         $data['warehouse_id'] = $warehouse->id;
-//        try {
-            $hbl = null;
-            DB::transaction(function () use ($data, &$hbl) {
-                $hbl = CreateHBL::run($data);
-                $packagesData = $data['packages'];
-                CreateHBLPackages::run($hbl, $packagesData);
+        //        try {
+        $hbl = null;
+        DB::transaction(function () use ($data, &$hbl) {
+            $hbl = CreateHBL::run($data);
+            $packagesData = $data['packages'];
+            CreateHBLPackages::run($hbl, $packagesData);
 
-                if (isset($data['paid_amount'])) {
-                    UpdateHBLPayments::run($data, $hbl);
-                }
+            if (isset($data['paid_amount'])) {
+                UpdateHBLPayments::run($data, $hbl);
+            }
 
-                $paymentData = [
-                    'freight_charge' => $data['freight_charge'],
-                    'bill_charge' => $data['bill_charge'],
-                    'other_charge' => $data['other_charge'],
-                    'destination_charge' => $data['destination_charge'],
-                    'package_charges' => $data['package_charges'],
-                    'discount' => $data['discount'],
-                    'additional_charge' => $data['additional_charge'],
-                    'grand_total' => $data['grand_total'],
-                    'paid_amount' => $data['paid_amount'],
-                    'is_departure_charges_paid' => $data['is_departure_charges_paid'],
-                    'is_destination_charges_paid' => $data['is_destination_charges_paid'],
-                ];
+            $paymentData = [
+                'freight_charge' => $data['freight_charge'],
+                'bill_charge' => $data['bill_charge'],
+                'other_charge' => $data['other_charge'],
+                'destination_charge' => $data['destination_charge'],
+                'package_charges' => $data['package_charges'],
+                'discount' => $data['discount'],
+                'additional_charge' => $data['additional_charge'],
+                'grand_total' => $data['grand_total'],
+                'paid_amount' => $data['paid_amount'],
+                'is_departure_charges_paid' => $data['is_departure_charges_paid'],
+                'is_destination_charges_paid' => $data['is_destination_charges_paid'],
+            ];
 
-                UpdateHBLDepartureCharges::run($hbl, $paymentData);
-                UpdateHBLDestinationCharges::run($hbl, $paymentData);
+            UpdateHBLDepartureCharges::run($hbl, $paymentData);
+            UpdateHBLDestinationCharges::run($hbl, $paymentData);
 
-            });
+        });
 
-            $hbl->addStatus('HBL Preparation by driver');
+        $hbl->addStatus('HBL Preparation by driver');
 
-            return $this->success('HBL created successfully!', $hbl->load('packages'));
+        return $this->success('HBL created successfully!', $hbl->load('packages'));
 
-//        } catch (\Exception $e) {
-//            Log::error('Failed to create HBL Repository API: '.$e->getMessage(), [
-//                'data' => $data,
-//                'user_id' => auth()->id(),
-//            ]);
-//            return $this->error($e->getMessage(), $e->getCode());
-//        }
+        //        } catch (\Exception $e) {
+        //            Log::error('Failed to create HBL Repository API: '.$e->getMessage(), [
+        //                'data' => $data,
+        //                'user_id' => auth()->id(),
+        //            ]);
+        //            return $this->error($e->getMessage(), $e->getCode());
+        //        }
     }
 
     public function calculatePayment(array $data): JsonResponse
@@ -98,9 +98,9 @@ class HBLRepository implements HBLRepositoryInterface
 
         $chargeableWeight = $data['grand_total_weight'];
         if ($data['cargo_type'] == 'Air Cargo') {
-            //volumetric weight calculation for Air Cargo
+            // volumetric weight calculation for Air Cargo
             $volumetricWeight = ($data['grand_total_volume'] * 1000000 / 6000);
-            //get higher one as chargeable weight
+            // get higher one as chargeable weight
             $chargeableWeight = max($chargeableWeight, $volumetricWeight);
         }
 
@@ -117,10 +117,10 @@ class HBLRepository implements HBLRepositoryInterface
 
         $currentBranch = GetBranchById::run(GetUserCurrentBranchID::run());
         if ($currentBranch->is_prepaid) {
-            $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $chargeableWeight,$destination_branch[0]['id']);
+            $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($data['cargo_type'], $data['package_list_length'], $data['grand_total_volume'], $chargeableWeight, $destination_branch[0]['id']);
             $result['destination_charges'] = round($destinationCharge['convertedTotalAmountWithTax'], 2);
             $result['sl_rate'] = $destinationCharge['slRate'];
-            $result['grand_total_without_discount'] =  $result['grand_total_without_discount'] +  $result['destination_charges'];
+            $result['grand_total_without_discount'] = $result['grand_total_without_discount'] + $result['destination_charges'];
         } else {
             $result['destination_charges'] = 0;
         }
