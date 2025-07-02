@@ -69,6 +69,8 @@ class HBLResource extends JsonResource
             'finance_status' => $this->is_finance_release_approved ? 'Approved' : 'Not Approved',
             'currency_rate' => $this->currency_rate ?? 1.0,
             'is_rtf' => $this->latestRtfRecord?->is_rtf ?? false,
+            'is_destination_charges_paid' => $this->is_destination_charges_paid,
+            'is_departure_charges_paid' => $this->is_departure_charges_paid,
         ];
     }
 }
