@@ -540,7 +540,7 @@ const calculatePayment = async () => {
         } else {
             const data = await response.json();
 
-            form.freight_charge = data.freight_charge;
+            // form.freight_charge = data.freight_charge;
             form.bill_charge = data.bill_charge;
             form.other_charge = data.other_charge;
             form.package_charges = data.package_charges;
