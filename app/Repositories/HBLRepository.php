@@ -32,6 +32,7 @@ use App\Actions\HBL\HBLCharges\UpdateHBLDestinationCharges;
 use App\Actions\HBL\HBLPackage\GetPackagesByReference;
 use App\Actions\HBL\MarkAsRTF;
 use App\Actions\HBL\MarkAsUnRTF;
+use App\Actions\HBL\Payments\CreateHBLPayment;
 use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
@@ -82,6 +83,18 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         if (isset($data['paid_amount'])) {
             UpdateHBLPayments::run($data, $hbl);
         }
+
+        // Payment creation
+        $newPaymentData = [
+            'hbl_id'         => $hbl->id,
+            'paid_amount'    => $data['paid_amount'],
+            'total_amount'   => $data['grand_total'],
+            'due_amount'     => $data['grand_total'] - $data['paid_amount'],
+            'payment_method' => $data['payment_method'] ?? null,
+            'paid_by'        => auth()->id(),
+            'notes'          => $data['payment_notes'] ?? null,
+        ];
+        CreateHBLPayment::run($newPaymentData);
 
         $paymentData = [
             'freight_charge' => $data['freight_charge'],

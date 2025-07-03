@@ -14,6 +14,7 @@ use App\Actions\HBL\GetHBLPackageRules;
 use App\Actions\HBL\GetHBLTotalSummary;
 use App\Actions\HBL\HBLCharges\UpdateHBLDepartureCharges;
 use App\Actions\HBL\HBLCharges\UpdateHBLDestinationCharges;
+use App\Actions\HBL\Payments\CreateHBLPayment;
 use App\Actions\HBL\UpdateHBLApi;
 use App\Actions\HBL\UpdateHBLPackagesApi;
 use App\Actions\HBL\Warehouse\GetHBLDestinationTotalConvertedCurrency;
@@ -59,6 +60,18 @@ class HBLRepository implements HBLRepositoryInterface
             if (isset($data['paid_amount'])) {
                 UpdateHBLPayments::run($data, $hbl);
             }
+
+            // Payment creation
+            $newPaymentData = [
+                'hbl_id'         => $hbl->id,
+                'paid_amount'    => $data['paid_amount'],
+                'total_amount'   => $data['grand_total'],
+                'due_amount'     => $data['grand_total'] - $data['paid_amount'],
+                'payment_method' => $data['payment_method'] ?? null,
+                'paid_by'        => auth()->id(),
+                'notes'          => $data['payment_notes'] ?? null,
+            ];
+            CreateHBLPayment::run($newPaymentData);
 
             $paymentData = [
                 'freight_charge' => $data['freight_charge'],
