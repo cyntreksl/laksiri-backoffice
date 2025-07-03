@@ -63,13 +63,13 @@ class HBLRepository implements HBLRepositoryInterface
 
             // Payment creation
             $newPaymentData = [
-                'hbl_id'         => $hbl->id,
-                'paid_amount'    => $data['paid_amount'],
-                'total_amount'   => $data['grand_total'],
-                'due_amount'     => $data['grand_total'] - $data['paid_amount'],
+                'hbl_id' => $hbl->id,
+                'paid_amount' => $data['paid_amount'],
+                'total_amount' => $data['grand_total'],
+                'due_amount' => $data['grand_total'] - $data['paid_amount'],
                 'payment_method' => $data['payment_method'] ?? null,
-                'paid_by'        => auth()->id(),
-                'notes'          => $data['payment_notes'] ?? null,
+                'paid_by' => auth()->id(),
+                'notes' => $data['payment_notes'] ?? null,
             ];
             CreateHBLPayment::run($newPaymentData);
 
@@ -262,10 +262,36 @@ class HBLRepository implements HBLRepositoryInterface
         try {
             DB::beginTransaction();
 
+            // Capture old payment info before update
+            $oldPaidAmount = $hbl->paid_amount ?? 0;
+            $oldTotalAmount = $hbl->grand_total ?? 0;
+
             $hbl = UpdateHBLApi::run($hbl, $data);
 
             $packagesData = $data['packages'] ?? [];
             UpdateHBLPackagesApi::run($hbl, $packagesData);
+
+            // New payment values from the request
+            $newPaidAmount = (float) ($data['paid_amount'] ?? 0);
+            $newTotalAmount = (float) ($data['grand_total'] ?? 0);
+
+            // Determine if payment record should be added
+            $hasPaidAmountChanged = $newPaidAmount != $oldPaidAmount;
+            $hasTotalAmountChanged = $newTotalAmount != $oldTotalAmount;
+
+            if ($hasPaidAmountChanged || $hasTotalAmountChanged) {
+                $paymentData = [
+                    'hbl_id' => $hbl->id,
+                    'paid_amount' => $newPaidAmount,
+                    'total_amount' => $newTotalAmount,
+                    'due_amount' => $newTotalAmount - $newPaidAmount,
+                    'payment_method' => $data['payment_method'] ?? 'cash',
+                    'paid_by' => auth()->id(),
+                    'notes' => $data['payment_notes'] ?? null,
+                ];
+
+                CreateHBLPayment::run($paymentData);
+            }
 
             DB::commit();
 
