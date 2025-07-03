@@ -268,7 +268,7 @@ const resolvePaymentStatus = (hbl) => {
     switch (hbl.status) {
         case 'Partial Paid':
             return {
-                icon: "pi pi-question",
+                icon: "pi pi-chart-pie",
                 color: "warn",
             };
         case 'Not Paid':

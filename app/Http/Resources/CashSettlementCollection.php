@@ -35,6 +35,8 @@ class CashSettlementCollection extends JsonResource
             'status' => $this->hblPayment()->latest()->first()->status ?? 'Not Updated',
             'zone' => $this->warehouseZone?->name,
             'packages_counts' => $this->packages->count() ?? 0,
+            'is_departure_charges_paid' => $this->is_departure_charges_paid,
+            'is_destination_charges_paid' => $this->is_destination_charges_paid,
             'actions' => '-',
         ];
     }
