@@ -286,7 +286,7 @@ const resolvePaymentStatus = (hbl) => {
     switch (hbl.status) {
         case 'Partial Paid':
             return {
-                icon: "pi pi-question",
+                icon: "pi pi-chart-pie",
                 color: "warn",
             };
         case 'Not Paid':
@@ -656,9 +656,20 @@ const exportURL = computed(() => {
 
                         <Column field="paid_amount" header="Paid">
                             <template #body="slotProps">
-                                <div class="flex items-center justify-end">
+                                <div class="flex items-center">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
                                     {{ slotProps.data.paid_amount.toFixed(2) }}
+                                </div>
+
+                                <div class="mt-1">
+                                    <div class="flex items-center space-x-1">
+                                        <i :class="slotProps.data?.is_departure_charges_paid ? 'fa fa-check-circle text-green-500' : 'fa fa-times-circle text-red-500'" class="text-sm"></i>
+                                        <span class="text-xs text-gray-500">Departure</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <i :class="slotProps.data?.is_destination_charges_paid ? 'fa fa-check-circle text-green-500' : 'fa fa-times-circle text-red-500'" class="text-sm"></i>
+                                        <span class="text-xs text-gray-500">Destination</span>
+                                    </div>
                                 </div>
                             </template>
                         </Column>

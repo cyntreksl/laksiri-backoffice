@@ -86,7 +86,7 @@ class UpdateHBLPayments
             'grand_total' => $grandTotal,
 
             'status' => GetHBLPaymentStatus::run(
-                $data['paid_amount'] ?? $existingPayment->paid_amount ?? 0,
+                $this->calculatePaidAmount($data, $hbl) ?? 0,
                 $grandTotal
             ),
 

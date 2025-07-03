@@ -378,7 +378,7 @@ const resolvePaymentStatus = (paymentStatus) => {
     switch (paymentStatus) {
         case 'Partial Paid':
             return {
-                icon: "pi pi-question",
+                icon: "pi pi-chart-pie",
                 color: "warn",
             };
         case 'Not Paid':
