@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Actions\HBL\CashSettlement\GetHBLPaymentStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -32,7 +33,7 @@ class CashSettlementCollection extends JsonResource
             'officer' => $this->created_by ?? '-',
             'warehouse' => $this->warehouse,
             'is_hold' => $this->is_hold ?? '-',
-            'status' => $this->hblPayment()->latest()->first()->status ?? 'Not Updated',
+            'status' => GetHBLPaymentStatus::run($this->paid_amount, $this->grand_total) ?? 'Not Updated',
             'zone' => $this->warehouseZone?->name,
             'packages_counts' => $this->packages->count() ?? 0,
             'is_departure_charges_paid' => $this->is_departure_charges_paid,
