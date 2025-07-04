@@ -150,7 +150,13 @@ const form = useForm({
 
 const handleUpdatePayment = () => {
     const outstandingAmount = parseFloat(computedOutstanding.value);
-    if (form.paid_amount < outstandingAmount) {
+    const paidAmount = parseFloat(form.paid_amount);
+
+    // Round to 2 decimal places for comparison
+    const roundedOutstanding = Math.round(outstandingAmount * 100) / 100;
+    const roundedPaid = Math.round(paidAmount * 100) / 100;
+
+    if (roundedPaid < roundedOutstanding) {
         push.error('Please pay full amount');
     } else {
         form.post(route("call-center.cashier.store"), {
