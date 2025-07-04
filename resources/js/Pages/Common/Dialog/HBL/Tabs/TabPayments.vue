@@ -196,7 +196,7 @@ const confirmCancelPayment = async () => {
                                     <span v-if="item.notes" class="italic text-gray-400"><i class="pi pi-info-circle mr-1"></i>Note: {{ item.notes }}</span>
                                 </div>
                                 <div v-if="!item.is_cancelled" class="mt-4 flex justify-end">
-                                    <Button icon="pi pi-times" label="Cancel Payment" outlined severity="danger" size="small" @click="openCancelDialog(item)" />
+                                    <Button v-if="item.branch_id === $page.props.currentBranch.id" icon="pi pi-times" label="Cancel Payment" outlined severity="danger" size="small" @click="openCancelDialog(item)" />
                                 </div>
                             </div>
                         </li>

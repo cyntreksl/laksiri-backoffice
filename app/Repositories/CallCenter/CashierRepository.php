@@ -62,7 +62,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         UpdateHBLPayments::run($paymentData, $hbl);
 
         // Create a payment record
-        $this->createPaymentRecord($hbl, $paymentData);
+        $this->createPaymentRecord($hbl, $paymentData, $currencyRate);
 
         // Update cashier payments
         UpdateCashierHBLPayments::run($data, $hbl, $paymentData['new_paid_amount']);
@@ -91,13 +91,19 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         }
     }
 
-    private function createPaymentRecord(HBL $hbl, $paymentData): void
+    private function createPaymentRecord(HBL $hbl, array $paymentData, float $currencyRate): void
     {
+        $discountInCurrency = 0;
+
+        if (! empty($paymentData['discount'])) {
+            $discountInCurrency = round((float) $paymentData['discount'] / $currencyRate, 2);
+        }
+
         CreateHBLPayment::run([
             'hbl_id' => $hbl->id,
             'base_currency_rate_in_lkr' => $hbl->currency_rate,
             'paid_amount' => $paymentData['new_paid_amount'],
-            'total_amount' => $hbl->grand_total - ($hbl->paid_amount ?? 0),
+            'total_amount' => ($hbl->grand_total - ($hbl->paid_amount ?? 0)) - $discountInCurrency,
             'due_amount' => $paymentData['due_amount'],
             'payment_method' => $paymentData['payment_method'] ?? 'cash',
             'paid_by' => auth()->id(),

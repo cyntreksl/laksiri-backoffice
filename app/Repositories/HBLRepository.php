@@ -85,18 +85,20 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             UpdateHBLPayments::run($data, $hbl);
         }
 
-        // Payment creation
-        $newPaymentData = [
-            'hbl_id' => $hbl->id,
-            'base_currency_rate_in_lkr' => $hbl->currency_rate,
-            'paid_amount' => $data['paid_amount'],
-            'total_amount' => $data['grand_total'],
-            'due_amount' => $data['grand_total'] - $data['paid_amount'],
-            'payment_method' => $data['payment_method'] ?? 'cash',
-            'paid_by' => auth()->id(),
-            'notes' => $data['payment_notes'] ?? 'Initial payment',
-        ];
-        CreateHBLPayment::run($newPaymentData);
+        // Only create a payment record if paid_amount exists and is greater than 0
+        if (! empty($data['paid_amount']) && $data['paid_amount'] > 0) {
+            $newPaymentData = [
+                'hbl_id' => $hbl->id,
+                'base_currency_rate_in_lkr' => $hbl->currency_rate,
+                'paid_amount' => $data['paid_amount'],
+                'total_amount' => $data['grand_total'],
+                'due_amount' => $data['grand_total'] - $data['paid_amount'],
+                'payment_method' => $data['payment_method'] ?? 'cash',
+                'paid_by' => auth()->id(),
+                'notes' => $data['payment_notes'] ?? 'Initial payment',
+            ];
+            CreateHBLPayment::run($newPaymentData);
+        }
 
         $paymentData = [
             'freight_charge' => $data['freight_charge'],
