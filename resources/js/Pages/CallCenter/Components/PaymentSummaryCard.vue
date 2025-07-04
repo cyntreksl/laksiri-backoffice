@@ -16,6 +16,8 @@ const isPrepaid = computed(() => hblCharges.value?.is_branch_prepaid ?? false);
 const baseCurrency = computed(() => hblCharges.value?.base_currency_code || 'LKR');
 const baseRate = computed(() => hblCharges.value?.base_currency_rate_in_lkr || 1);
 
+const emit = defineEmits(['update:total-due']);
+
 function formatCurrency(amount, symbol = 'LKR') {
     if (amount === null || amount === undefined || isNaN(amount)) return `${symbol} 0.00`;
     return `${symbol} ${parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -79,6 +81,7 @@ onMounted(() => {
         fetchHBL();
         fetchHBLCharges();
     }
+    emit('update:total-due', totalDue.value);
 });
 
 watch(() => props.hblId, (newVal) => {
@@ -155,6 +158,10 @@ const slPortalTotal = computed(() => {
 });
 
 const totalDue = computed(() => agentDueLKR.value + slPortalTotal.value);
+
+watch(totalDue, (val) => {
+    emit('update:total-due', val);
+});
 </script>
 
 <template>

@@ -1,6 +1,6 @@
 <script setup>
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {ref} from "vue";
+import {ref, watch, computed} from "vue";
 import InputError from "@/Components/InputError.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
@@ -35,10 +35,6 @@ const props = defineProps({
         type: Number,
         default: null
     },
-    doCharge: {
-        type: Number,
-        default: null
-    },
     branch: {
         type: Object,
         default: null
@@ -56,7 +52,15 @@ const paymentRecord = ref([]);
 const isLoading = ref(false);
 const currencyCode = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 const showPaymentDialog = ref(false);
-const isChargesLoading = ref(false);
+const summaryTotalDue = ref(0);
+
+const computedOutstanding = computed(() => {
+    return (
+        parseFloat(summaryTotalDue.value || 0) +
+        parseFloat(form.additional_charges || 0) -
+        parseFloat(form.discount || 0)
+    );
+});
 
 const fetchHBL = async () => {
     isLoadingHbl.value = true;
@@ -140,11 +144,12 @@ const form = useForm({
     paid_amount: 0,
     customer_queue: props.customerQueue,
     note: '',
-    do_charge: props.doCharge,
+    discount: 0,
+    additional_charges: 0,
 });
 
 const handleUpdatePayment = () => {
-    const outstandingAmount = parseFloat((paymentRecord.value.grand_total - hbl.value.paid_amount) * props.currencyRate);
+    const outstandingAmount = parseFloat(computedOutstanding.value);
     if (form.paid_amount < outstandingAmount) {
         push.error('Please pay full amount');
     } else {
@@ -161,9 +166,26 @@ const handleUpdatePayment = () => {
             },
             preserveScroll: true,
             preserveState: true,
+            data: {
+                ...form,
+                additional_charges: form.additional_charges,
+                discount: form.discount,
+            }
         });
     }
 }
+
+// Watch for the dialog open to set the default amount
+watch(showPaymentDialog, (val) => {
+    if (val) {
+        form.paid_amount = parseFloat(computedOutstanding.value.toFixed(2));
+    }
+});
+
+// Always sync amount with outstanding
+watch(computedOutstanding, (val) => {
+    form.paid_amount = parseFloat(val.toFixed(2));
+});
 </script>
 
 <template>
@@ -254,32 +276,53 @@ const handleUpdatePayment = () => {
 
                 <Skeleton v-if="isLoading" height="350px" width="100%"></Skeleton>
 
-                <PaymentSummaryCard v-if="props.hblId" :hbl-id="props.hblId" />
+                <PaymentSummaryCard v-if="props.hblId" :hbl-id="props.hblId" @update:total-due="summaryTotalDue = $event" />
             </div>
         </div>
 
-        <Dialog v-model:visible="showPaymentDialog" :style="{ width: '500px' }" header="Update Payment" modal>
+        <Dialog v-model:visible="showPaymentDialog" :style="{ width: '500px' }" header="Pay Now" modal>
             <div class="grid grid-cols-1 gap-5 mt-3">
-                <div v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0">
+                <!-- Outstanding Amount Widget (now inside dialog) -->
+                <div v-if="computedOutstanding" class="mb-2 p-4 rounded-xl shadow bg-gradient-to-r from-red-100 to-orange-100 border border-red-200 flex flex-col items-center">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="pi pi-exclamation-circle text-red-600 text-2xl"></i>
+                        <span class="font-semibold text-lg text-red-800">Outstanding</span>
+                    </div>
+                    <div class="text-3xl font-bold text-red-700">
+                        {{ currencyCode }} {{ parseFloat(computedOutstanding).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                    </div>
+                </div>
+                <div v-show="computedOutstanding !== 0">
                     <IftaLabel>
-                        <InputNumber v-model="form.paid_amount" :max="parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate)"
+                        <InputNumber v-model="form.paid_amount" :max="computedOutstanding"
                                      :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="paid-amount"
                                      min="0" step="any"
                                      variant="filled"/>
                         <label for="paid-amount">Amount ({{ currencyCode }})</label>
                     </IftaLabel>
-                    <div class="text-xs text-gray-500 mt-1">Outstanding: {{ currencyCode }} {{ parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
                     <InputError :message="form.errors.paid_amount"/>
                 </div>
 
+                <!-- Additional Charges Field -->
                 <div>
                     <IftaLabel>
-                        <InputNumber v-model="form.do_charge" :maxFractionDigits="2" :minFractionDigits="2"
-                                     class="w-full" inputId="do-charge" min="0" step="any"
+                        <InputNumber v-model="form.additional_charges" :maxFractionDigits="2" :minFractionDigits="2"
+                                     class="w-full" inputId="additional-charges" min="0" step="any"
                                      variant="filled"/>
-                        <label for="do-charge">DO Charges</label>
+                        <label for="additional-charges">Additional Charges</label>
                     </IftaLabel>
-                    <InputError :message="form.errors.do_charge"/>
+                    <InputError :message="form.errors.additional_charges"/>
+                </div>
+
+                <!-- Discount Field -->
+                <div>
+                    <IftaLabel>
+                        <InputNumber v-model="form.discount" :maxFractionDigits="2" :minFractionDigits="2"
+                                     class="w-full" inputId="discount" min="0" step="any"
+                                     variant="filled"/>
+                        <label for="discount">Discount</label>
+                    </IftaLabel>
+                    <InputError :message="form.errors.discount"/>
                 </div>
 
                 <div>
@@ -297,8 +340,9 @@ const handleUpdatePayment = () => {
                 <Button
                   :class="{ 'opacity-25': form.processing }"
                   :disabled="form.processing"
-                  icon="pi pi-check"
-                  label="Update Payment"
+                  icon="pi pi-wallet"
+                  icon-class="animate-pulse"
+                  label="Pay Now"
                   @click="handleUpdatePayment"
                 />
             </template>
