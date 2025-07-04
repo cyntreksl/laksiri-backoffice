@@ -173,11 +173,11 @@ const confirmCancelPayment = async () => {
                 </div>
 
                 <!-- Timeline -->
-                <div v-else-if="payments.length" class="relative max-w-2xl mx-auto">
-                    <ol class="space-y-8">
+                <div v-else-if="payments.length">
+                    <ol class="space-y-4">
                         <li v-for="(item, idx) in payments" :key="item.id || idx" class="relative flex items-start group animate-fade-in-up">
                             <div :class="[
-                                'ml-6 flex-1 rounded-xl shadow transition-all duration-200 border p-4',
+                                'flex-1 rounded-xl shadow transition-all duration-200 border-2 p-4',
                                 item.is_cancelled ? 'bg-red-50 border-red-200' : item.due_amount === 0 ? 'bg-green-50 border-green-200' : item.paid_amount > 0 ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-50 border-gray-200',
                                 'hover:shadow-lg focus-within:shadow-lg',
                                 'relative'
@@ -185,11 +185,10 @@ const confirmCancelPayment = async () => {
                                 <div v-if="item.is_cancelled" class="absolute -top-3 -right-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full shadow">Cancelled</div>
                                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-2xl font-bold text-gray-900">{{ formatAmount(item.paid_amount, item.base_currency_code || 'LKR') }}</span>
-                                        <span class="px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">{{ item.payment_method }}</span>
+                                        <span class="text-xs text-gray-500">{{ formatDate(item.paid_at) }}</span>
                                         <span :class="['ml-2 px-2 py-0.5 rounded text-xs font-semibold', statusBadge(item).color]">{{ statusBadge(item).text }}</span>
                                     </div>
-                                    <span class="text-xs text-gray-500">{{ formatDate(item.paid_at) }}</span>
+                                    <span class="text-2xl font-bold text-gray-900">{{ formatAmount(item.paid_amount, item.base_currency_code || 'LKR') }}</span>
                                 </div>
                                 <div class="flex flex-wrap gap-3 mt-2 text-sm text-gray-600">
                                     <span><i class="pi pi-calculator mr-1 text-gray-400"></i>Total: <b>{{ formatAmount(item.total_amount, item.base_currency_code || 'LKR') }}</b></span>
