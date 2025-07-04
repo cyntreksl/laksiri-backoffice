@@ -7,6 +7,7 @@ use App\Actions\Cashier\UpdateCashierHBLPayments;
 use App\Actions\HBL\CashSettlement\UpdateHBLDOCharge;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\HBLPayment\GetPaymentByReference;
+use App\Actions\HBL\Payments\CreateHBLPayment;
 use App\Http\Resources\CallCenter\PaidCollection;
 use App\Interfaces\CallCenter\CashierRepositoryInterface;
 use App\Interfaces\GridJsInterface;
@@ -24,18 +25,34 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
 
             $hbl = HBL::where('reference', $data['customer_queue']['token']['reference'])->withoutGlobalScopes()->firstOrFail();
 
-            $new_paid_amount = $data['paid_amount'];
-            $old_paid_amount = $hbl->paid_amount;
-            $total_paid_amount = $old_paid_amount + $new_paid_amount;
+            $newPaidAmount = (float) ($data['paid_amount'] ?? 0);
+            $previousPaidAmount = (float) ($hbl->paid_amount ?? 0);
+            $grandTotal = (float) ($hbl->grand_total ?? 0);
 
-            $paymentData = array_merge($data, [
-                'paid_amount' => $total_paid_amount,
+            $updatedPaidAmount = $previousPaidAmount + $newPaidAmount;
+            $dueAmount = max(0, $grandTotal - $updatedPaidAmount);
+
+            $hblUpdateData = array_merge($data, [
+                'paid_amount' => $updatedPaidAmount,
             ]);
 
-            UpdateHBLPayments::run($paymentData, $hbl);
+            UpdateHBLPayments::run($hblUpdateData, $hbl);
+
+            // Payment creation
+            CreateHBLPayment::run([
+                'hbl_id' => $hbl->id,
+                'base_currency_rate_in_lkr' => $hbl->currency_rate,
+                'paid_amount' => $newPaidAmount,
+                'total_amount' => $grandTotal - $previousPaidAmount,
+                'due_amount' => $dueAmount,
+                'payment_method' => $data['payment_method'] ?? 'cash',
+                'paid_by' => auth()->id(),
+                'notes' => $data['payment_notes'] ?? 'Payment was updated from cashier',
+            ]);
+
             UpdateHBLDOCharge::run($hbl, $data['do_charge']);
 
-            UpdateCashierHBLPayments::run($data, $hbl, $new_paid_amount);
+            UpdateCashierHBLPayments::run($data, $hbl, $newPaidAmount);
 
             $customerQueue = CustomerQueue::find($data['customer_queue']['id']);
 
@@ -85,7 +102,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
                             null,
                         );
                     } else {
-                        // send to cashier queue
+                        // send it to the cashier queue
                         $customerQueue->create([
                             'type' => CustomerQueue::CASHIER_QUEUE,
                             'token_id' => $customerQueue->token_id,
@@ -101,7 +118,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
                         );
                     }
                 } else {
-                    // send to cashier queue
+                    // send it to the cashier queue
                     $customerQueue->create([
                         'type' => CustomerQueue::CASHIER_QUEUE,
                         'token_id' => $customerQueue->token_id,

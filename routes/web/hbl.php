@@ -113,3 +113,7 @@ Route::post('hbl-packages/{hbl_package}/unset/rtf', [HBLController::class, 'unse
 
 Route::get('hbl-charge/{id}', [HBLController::class, 'hblChargeDetails'])
     ->name('hbl-charge.details');
+
+Route::get('hbls/{hbl}/payments', [HBLController::class, 'getHBLPayments']);
+
+Route::post('hbls/payments/{payment}/cancel', [HBLController::class, 'cancelPayment']);

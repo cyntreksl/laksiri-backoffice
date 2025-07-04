@@ -25,6 +25,10 @@ return new class extends Migration
                 ->constrained('hbl')
                 ->cascadeOnDelete();
 
+            $table->char('base_currency_code', 3);
+            $table->float('base_currency_rate_in_lkr')
+                ->default(1.0);
+
             $table->decimal('paid_amount', 15, 2)
                 ->default(0);
             $table->decimal('total_amount', 15, 2)

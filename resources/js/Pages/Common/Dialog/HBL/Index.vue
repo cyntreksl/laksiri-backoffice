@@ -14,6 +14,7 @@ import TabShipment from "@/Pages/Common/Dialog/HBL/Tabs/TabShipment.vue";
 import TabHBLPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLPayments.vue";
 import TabHBLDetails from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLDetails.vue";
 import TabHBLCharge from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLCharge.vue";
+import TabPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabPayments.vue";
 
 const props = defineProps({
     show: {
@@ -184,22 +185,28 @@ onMounted(() => {
                 <Tab value="1">
                     <a class="flex items-center gap-2 text-inherit">
                         <i class="pi pi-dollar" />
-                        <span>Payments</span>
+                        <span>Charges</span>
                     </a>
                 </Tab>
                 <Tab value="2">
+                    <a class="flex items-center gap-2 text-inherit">
+                        <i class="pi pi-wallet" />
+                        <span>Payments</span>
+                    </a>
+                </Tab>
+                <Tab value="3">
                     <a class="flex items-center gap-2 text-inherit">
                         <i class="pi pi-truck" />
                         <span>Shipment</span>
                     </a>
                 </Tab>
-                <Tab value="3">
+                <Tab value="4">
                     <a class="flex items-center gap-2 text-inherit">
                         <i class="pi pi-chart-bar" />
                         <span>Status & Audit</span>
                     </a>
                 </Tab>
-                <Tab value="4">
+                <Tab value="5">
                     <a class="flex items-center gap-2 text-inherit">
                         <i class="pi pi-file" />
                         <span>Documents</span>
@@ -215,12 +222,15 @@ onMounted(() => {
 <!--                    <TabHBLPayments :hbl="hbl" :hbl-destination-total-summary="hblDestinationTotalSummary" :hbl-total-summary="hblTotalSummary"/>-->
                 </TabPanel>
                 <TabPanel value="2">
-                    <TabShipment v-if="hbl" :hbl="hbl" :pickup="pickup" />
+                    <TabPayments :hbl="hbl"></TabPayments>
                 </TabPanel>
                 <TabPanel value="3">
-                    <TabStatus v-if="hbl" :hbl="hbl" :pickup="pickup" />
+                    <TabShipment v-if="hbl" :hbl="hbl" :pickup="pickup" />
                 </TabPanel>
                 <TabPanel value="4">
+                    <TabStatus v-if="hbl" :hbl="hbl" :pickup="pickup" />
+                </TabPanel>
+                <TabPanel value="5">
                     <TabDocuments v-if="hbl" :hbl-id="hbl.id"/>
                 </TabPanel>
             </TabPanels>

@@ -707,6 +707,14 @@ class RolePermissionSeeder extends Seeder
                     'call-center.all-calls',
                 ],
             ],
+
+            [
+                'group_name' => 'RTF',
+                'permissions' => [
+                    'set_rtf',
+                    'lift_rtf',
+                ],
+            ],
         ];
     }
 

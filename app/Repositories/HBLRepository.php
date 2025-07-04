@@ -88,12 +88,13 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         // Payment creation
         $newPaymentData = [
             'hbl_id' => $hbl->id,
+            'base_currency_rate_in_lkr' => $hbl->currency_rate,
             'paid_amount' => $data['paid_amount'],
             'total_amount' => $data['grand_total'],
             'due_amount' => $data['grand_total'] - $data['paid_amount'],
-            'payment_method' => $data['payment_method'] ?? null,
+            'payment_method' => $data['payment_method'] ?? 'cash',
             'paid_by' => auth()->id(),
-            'notes' => $data['payment_notes'] ?? null,
+            'notes' => $data['payment_notes'] ?? 'Initial payment',
         ];
         CreateHBLPayment::run($newPaymentData);
 
@@ -138,6 +139,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             if ($hasPaidAmountChanged || $hasTotalAmountChanged) {
                 $newPaymentData = [
                     'hbl_id' => $hbl->id,
+                    'base_currency_rate_in_lkr' => $hbl->currency_rate,
                     'paid_amount' => $newPaidAmount,
                     'total_amount' => $newTotalAmount,
                     'due_amount' => $newTotalAmount - $newPaidAmount,
