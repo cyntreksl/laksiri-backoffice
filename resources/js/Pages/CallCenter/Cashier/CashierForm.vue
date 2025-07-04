@@ -1,7 +1,6 @@
 <script setup>
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import {ref} from "vue";
-import moment from "moment";
 import InputError from "@/Components/InputError.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
@@ -24,6 +23,7 @@ import InputNumber from "primevue/inputnumber";
 import TabHBLCharge from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLCharge.vue";
 import TabPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabPayments.vue";
 import Dialog from "primevue/dialog";
+import PaymentSummaryCard from "@/Pages/CallCenter/Components/PaymentSummaryCard.vue";
 
 const props = defineProps({
     customerQueue: {
@@ -56,6 +56,7 @@ const paymentRecord = ref([]);
 const isLoading = ref(false);
 const currencyCode = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 const showPaymentDialog = ref(false);
+const isChargesLoading = ref(false);
 
 const fetchHBL = async () => {
     isLoadingHbl.value = true;
@@ -172,7 +173,7 @@ const handleUpdatePayment = () => {
         <Breadcrumb/>
 
         <div class="grid grid-cols-12 gap-5 mt-5">
-            <div class="col-span-9">
+            <div class="col-span-8">
                 <Card>
                     <template #content>
                         <Tabs value="1">
@@ -239,7 +240,7 @@ const handleUpdatePayment = () => {
                 </Card>
             </div>
 
-            <div class="col-span-3">
+            <div class="col-span-4">
                 <div class="flex mb-4">
                     <Button v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0"
                             class="p-button-lg p-button-primary w-full"
@@ -253,139 +254,7 @@ const handleUpdatePayment = () => {
 
                 <Skeleton v-if="isLoading" height="350px" width="100%"></Skeleton>
 
-                <Card v-else class="shadow-lg border-0 overflow-hidden">
-                    <template #content>
-                        <div v-if="Object.keys(paymentRecord).length > 0" class="space-y-6">
-                            <!-- Header -->
-                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 -m-6 mb-6 p-6 border-b border-blue-100">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-blue-100 rounded-lg">
-                                        <i class="pi pi-wallet text-blue-600 text-lg"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-900">Payment Summary</h3>
-                                        <p class="text-sm text-gray-600">Transaction overview</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Amount Details -->
-                            <div class="space-y-4">
-                                <!-- Total Amount -->
-                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-2 bg-blue-100 rounded-lg">
-                                            <i class="pi pi-calculator text-blue-600"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-600">Total Amount</p>
-                                            <p class="text-xs text-gray-500">{{ parseFloat(paymentRecord.grand_total).toFixed(2) }} x {{ props.currencyRate }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-xl font-bold text-gray-900">{{ currencyCode }} {{ parseFloat(paymentRecord.grand_total * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
-                                    </div>
-                                </div>
-
-                                <!-- Paid Amount -->
-                                <div class="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-100">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-2 bg-green-100 rounded-lg">
-                                            <i class="pi pi-check-circle text-green-600"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-600">Paid Amount</p>
-                                            <p class="text-xs text-gray-500">{{ parseFloat(hbl.paid_amount).toFixed(2) }} x {{ props.currencyRate }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-xl font-bold text-green-700">{{ currencyCode }} {{ parseFloat(hbl.paid_amount * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
-                                    </div>
-                                </div>
-
-                                <!-- Outstanding -->
-                                <div class="flex items-center justify-between p-4 rounded-xl border"
-                                     :class="(paymentRecord.grand_total - hbl.paid_amount) > 0 ? 'bg-orange-50 border-orange-100' : 'bg-green-50 border-green-100'">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-2 rounded-lg"
-                                             :class="(paymentRecord.grand_total - hbl.paid_amount) > 0 ? 'bg-orange-100' : 'bg-green-100'">
-                                            <i class="text-lg"
-                                               :class="(paymentRecord.grand_total - hbl.paid_amount) > 0 ? 'pi pi-exclamation-triangle text-orange-600' : 'pi pi-check text-green-600'"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-600">Outstanding</p>
-                                            <p class="text-xs text-gray-500">{{ (paymentRecord.grand_total - hbl.paid_amount).toFixed(2) }} x {{ props.currencyRate }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-xl font-bold"
-                                           :class="(paymentRecord.grand_total - hbl.paid_amount) > 0 ? 'text-orange-700' : 'text-green-700'">
-                                            {{ currencyCode }} {{ parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Status and Date -->
-                            <div class="border-t border-gray-100 pt-4 space-y-4">
-                                <!-- Status -->
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-1.5 bg-blue-100 rounded-lg">
-                                            <i class="pi pi-info-circle text-blue-600 text-sm"></i>
-                                        </div>
-                                        <span class="text-sm font-medium text-gray-600">Payment Status</span>
-                                    </div>
-                                    <div>
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                                              :class="{
-                                                  'bg-green-100 text-green-800': paymentRecord.status === 'Paid' || paymentRecord.status === 'Completed',
-                                                  'bg-orange-100 text-orange-800': paymentRecord.status === 'Partial' || paymentRecord.status === 'Pending',
-                                                  'bg-red-100 text-red-800': paymentRecord.status === 'Unpaid' || paymentRecord.status === 'Failed',
-                                                  'bg-gray-100 text-gray-800': !['Paid', 'Completed', 'Partial', 'Pending', 'Unpaid', 'Failed'].includes(paymentRecord.status)
-                                              }">
-                                            <i class="pi pi-circle-fill text-xs mr-1.5"
-                                               :class="{
-                                                   'text-green-500': paymentRecord.status === 'Paid' || paymentRecord.status === 'Completed',
-                                                   'text-orange-500': paymentRecord.status === 'Partial' || paymentRecord.status === 'Pending',
-                                                   'text-red-500': paymentRecord.status === 'Unpaid' || paymentRecord.status === 'Failed',
-                                                   'text-gray-500': !['Paid', 'Completed', 'Partial', 'Pending', 'Unpaid', 'Failed'].includes(paymentRecord.status)
-                                               }"></i>
-                                            {{ paymentRecord.status }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Last Updated -->
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-1.5 bg-gray-100 rounded-lg">
-                                            <i class="pi pi-clock text-gray-600 text-sm"></i>
-                                        </div>
-                                        <span class="text-sm font-medium text-gray-600">Last Updated</span>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-sm font-semibold text-gray-800">{{ moment(paymentRecord.updated_at).format('MMM DD, YYYY') }}</p>
-                                        <p class="text-xs text-gray-500">{{ moment(paymentRecord.updated_at).format('h:mm A') }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Empty State -->
-                        <div v-else class="text-center py-12">
-                            <div class="flex flex-col items-center gap-4">
-                                <div class="p-4 bg-gray-100 rounded-full">
-                                    <i class="pi pi-wallet text-gray-400 text-3xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-700 mb-2">No Payment Records</h3>
-                                    <p class="text-sm text-gray-500">Payment information will appear here once available.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                </Card>
+                <PaymentSummaryCard v-if="props.hblId" :hbl-id="props.hblId" />
             </div>
         </div>
 
