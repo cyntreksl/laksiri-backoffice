@@ -4,9 +4,9 @@ namespace App\Repositories\CallCenter;
 
 use App\Actions\Cashier\DownloadCashierInvoicePDF;
 use App\Actions\Cashier\UpdateCashierHBLPayments;
-use App\Actions\HBL\CashSettlement\UpdateHBLDOCharge;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\HBLPayment\GetPaymentByReference;
+use App\Actions\HBL\Payments\CreateHBLPayment;
 use App\Http\Resources\CallCenter\PaidCollection;
 use App\Interfaces\CallCenter\CashierRepositoryInterface;
 use App\Interfaces\GridJsInterface;
@@ -19,110 +19,191 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
 {
     public function updatePayment(array $data): void
     {
+        DB::beginTransaction();
+
         try {
-            DB::beginTransaction();
+            // 1. Retrieve HBL record
+            $hbl = $this->getHBL($data['customer_queue']['token']['reference']);
 
-            $hbl = HBL::where('reference', $data['customer_queue']['token']['reference'])->withoutGlobalScopes()->firstOrFail();
+            // 2. Process payment updates
+            $this->processPaymentUpdates($hbl, $data);
 
-            $new_paid_amount = $data['paid_amount'];
-            $old_paid_amount = $hbl->paid_amount;
-            $total_paid_amount = $old_paid_amount + $new_paid_amount;
-
-            $paymentData = array_merge($data, [
-                'paid_amount' => $total_paid_amount,
-            ]);
-
-            UpdateHBLPayments::run($paymentData, $hbl);
-            UpdateHBLDOCharge::run($hbl, $data['do_charge']);
-
-            UpdateCashierHBLPayments::run($data, $hbl, $new_paid_amount);
-
-            $customerQueue = CustomerQueue::find($data['customer_queue']['id']);
-
-            if ($customerQueue) {
-                $customerQueue->update([
-                    'left_at' => now(),
-                ]);
-
-                // set queue status log
-                $customerQueue->addQueueStatus(
-                    CustomerQueue::CASHIER_QUEUE,
-                    $customerQueue->token->customer_id,
-                    $customerQueue->token_id,
-                    null,
-                    now(),
-                );
-
-                // check payment status
-                $payment = GetPaymentByReference::run($customerQueue->token->reference);
-
-                // If $data is an object, convert it to an array
-                $paymentArray = (array) $payment->getData();
-
-                if (! empty($paymentArray)) {
-                    if ($data['paid_amount'] >= $payment->getData()->grand_total - $payment->getData()->paid_amount) {
-                        // send examination queue
-                        $customerQueue->create([
-                            'type' => CustomerQueue::EXAMINATION_QUEUE,
-                            'token_id' => $customerQueue->token_id,
-                        ]);
-
-                        // create package queue
-                        PackageQueue::create([
-                            'token_id' => $customerQueue->token_id,
-                            'hbl_id' => $hbl->id,
-                            'auth_id' => auth()->id(),
-                            'reference' => $data['customer_queue']['token']['reference'],
-                            'package_count' => $data['customer_queue']['token']['package_count'],
-                        ]);
-
-                        // set queue status log
-                        $customerQueue->addQueueStatus(
-                            CustomerQueue::EXAMINATION_QUEUE,
-                            $customerQueue->token->customer_id,
-                            $customerQueue->token_id,
-                            now(),
-                            null,
-                        );
-                    } else {
-                        // send to cashier queue
-                        $customerQueue->create([
-                            'type' => CustomerQueue::CASHIER_QUEUE,
-                            'token_id' => $customerQueue->token_id,
-                        ]);
-
-                        // set queue status log
-                        $customerQueue->addQueueStatus(
-                            CustomerQueue::CASHIER_QUEUE,
-                            $customerQueue->token->customer_id,
-                            $customerQueue->token_id,
-                            now(),
-                            null,
-                        );
-                    }
-                } else {
-                    // send to cashier queue
-                    $customerQueue->create([
-                        'type' => CustomerQueue::CASHIER_QUEUE,
-                        'token_id' => $customerQueue->token_id,
-                    ]);
-
-                    // set queue status log
-                    $customerQueue->addQueueStatus(
-                        CustomerQueue::CASHIER_QUEUE,
-                        $customerQueue->token->customer_id,
-                        $customerQueue->token_id,
-                        now(),
-                        null,
-                    );
-                }
-            }
+            // 3. Handle queue updates
+            $this->updateCustomerQueue($hbl, $data);
 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
             throw new \Exception('Failed to update payments: '.$e->getMessage());
         }
+    }
+
+    protected function getHBL(string $reference): HBL
+    {
+        return HBL::where('reference', $reference)
+            ->withoutGlobalScopes()
+            ->firstOrFail();
+    }
+
+    private function processPaymentUpdates(HBL $hbl, array $data): void
+    {
+        $currencyRate = (float) ($hbl->currency_rate ?: 1);
+
+        // Process additional charges if any
+        $this->processAdditionalCharges($hbl, $data, $currencyRate);
+
+        // Process discount if any
+        $this->processDiscount($hbl, $data, $currencyRate);
+
+        // Calculate payment amounts
+        $paymentData = $this->calculatePaymentAmounts($hbl, $data, $currencyRate);
+
+        // Update HBL payments
+        UpdateHBLPayments::run($paymentData, $hbl);
+
+        // Create a payment record
+        $this->createPaymentRecord($hbl, $paymentData, $currencyRate);
+
+        // Update cashier payments
+        UpdateCashierHBLPayments::run($data, $hbl, $paymentData['new_paid_amount']);
+    }
+
+    private function processAdditionalCharges(HBL $hbl, array $data, float $currencyRate): void
+    {
+        if (! empty($data['additional_charges'])) {
+            $additionalChargesInCurrency = round((float) $data['additional_charges'] / $currencyRate, 2);
+
+            if ($destinationCharges = $hbl->destinationCharge) {
+                $destinationCharges->destination_other_charge += $additionalChargesInCurrency;
+                $destinationCharges->save();
+            }
+        }
+    }
+
+    private function processDiscount(HBL $hbl, array $data, float $currencyRate): void
+    {
+        if (! empty($data['discount'])) {
+            $discountInCurrency = round((float) $data['discount'] / $currencyRate, 2);
+
+            // Apply discount to HBL or appropriate model
+            $hbl->discount += $discountInCurrency;
+            $hbl->save();
+        }
+    }
+
+    private function createPaymentRecord(HBL $hbl, array $paymentData, float $currencyRate): void
+    {
+        $discountInCurrency = 0;
+
+        if (! empty($paymentData['discount'])) {
+            $discountInCurrency = round((float) $paymentData['discount'] / $currencyRate, 2);
+        }
+
+        CreateHBLPayment::run([
+            'hbl_id' => $hbl->id,
+            'base_currency_rate_in_lkr' => $hbl->currency_rate,
+            'paid_amount' => $paymentData['new_paid_amount'],
+            'total_amount' => ($hbl->grand_total - ($hbl->paid_amount ?? 0)) - $discountInCurrency,
+            'due_amount' => $paymentData['due_amount'],
+            'payment_method' => $paymentData['payment_method'] ?? 'cash',
+            'paid_by' => auth()->id(),
+            'notes' => $paymentData['payment_notes'] ?? 'Payment was updated from cashier',
+        ]);
+    }
+
+    private function calculatePaymentAmounts(HBL $hbl, array $data, float $currencyRate): array
+    {
+        $newPaidAmountLKR = (float) ($data['paid_amount'] ?? 0);
+        $newPaidAmount = round($newPaidAmountLKR / $currencyRate, 2);
+        $previousPaidAmount = (float) ($hbl->paid_amount ?? 0);
+        $grandTotal = (float) ($hbl->grand_total ?? 0);
+
+        $updatedPaidAmount = $previousPaidAmount + $newPaidAmount;
+        $dueAmount = max(0, $grandTotal - $updatedPaidAmount);
+
+        return array_merge($data, [
+            'paid_amount' => $updatedPaidAmount,
+            'new_paid_amount' => $newPaidAmount,
+            'due_amount' => $dueAmount,
+        ]);
+    }
+
+    private function updateCustomerQueue(HBL $hbl, array $data): void
+    {
+        $customerQueue = CustomerQueue::find($data['customer_queue']['id']);
+
+        if (! $customerQueue) {
+            return;
+        }
+
+        // Mark current queue as completed
+        $customerQueue->update(['left_at' => now()]);
+        $customerQueue->addQueueStatus(
+            CustomerQueue::CASHIER_QUEUE,
+            $customerQueue->token->customer_id,
+            $customerQueue->token_id,
+            null,
+            now()
+        );
+
+        // Determine next queue based on payment status
+        $payment = GetPaymentByReference::run($customerQueue->token->reference);
+        $paymentData = (array) $payment->getData();
+
+        if (empty($paymentData)) {
+            $this->sendToCashierQueue($customerQueue);
+
+            return;
+        }
+
+        if ($data['paid_amount'] >= ($payment->getData()->grand_total - $payment->getData()->paid_amount)) {
+            $this->sendToExaminationQueue($customerQueue, $hbl, $data);
+        } else {
+            $this->sendToCashierQueue($customerQueue);
+        }
+    }
+
+    private function sendToCashierQueue(CustomerQueue $customerQueue): void
+    {
+        $customerQueue->create([
+            'type' => CustomerQueue::CASHIER_QUEUE,
+            'token_id' => $customerQueue->token_id,
+        ]);
+
+        $customerQueue->addQueueStatus(
+            CustomerQueue::CASHIER_QUEUE,
+            $customerQueue->token->customer_id,
+            $customerQueue->token_id,
+            now(),
+            null
+        );
+    }
+
+    private function sendToExaminationQueue(CustomerQueue $customerQueue, HBL $hbl, array $data): void
+    {
+        // Create examination queue
+        $customerQueue->create([
+            'type' => CustomerQueue::EXAMINATION_QUEUE,
+            'token_id' => $customerQueue->token_id,
+        ]);
+
+        // Create package queue
+        PackageQueue::create([
+            'token_id' => $customerQueue->token_id,
+            'hbl_id' => $hbl->id,
+            'auth_id' => auth()->id(),
+            'reference' => $data['customer_queue']['token']['reference'],
+            'package_count' => $data['customer_queue']['token']['package_count'],
+        ]);
+
+        // Set queue status
+        $customerQueue->addQueueStatus(
+            CustomerQueue::EXAMINATION_QUEUE,
+            $customerQueue->token->customer_id,
+            $customerQueue->token_id,
+            now(),
+            null
+        );
     }
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])

@@ -14,6 +14,7 @@ use App\Actions\HBL\GetHBLPackageRules;
 use App\Actions\HBL\GetHBLTotalSummary;
 use App\Actions\HBL\HBLCharges\UpdateHBLDepartureCharges;
 use App\Actions\HBL\HBLCharges\UpdateHBLDestinationCharges;
+use App\Actions\HBL\Payments\CreateHBLPayment;
 use App\Actions\HBL\UpdateHBLApi;
 use App\Actions\HBL\UpdateHBLPackagesApi;
 use App\Actions\HBL\Warehouse\GetHBLDestinationTotalConvertedCurrency;
@@ -58,6 +59,21 @@ class HBLRepository implements HBLRepositoryInterface
 
             if (isset($data['paid_amount'])) {
                 UpdateHBLPayments::run($data, $hbl);
+            }
+
+            // Only create a payment record if paid_amount exists and is greater than 0
+            if (! empty($data['paid_amount']) && $data['paid_amount'] > 0) {
+                $newPaymentData = [
+                    'hbl_id' => $hbl->id,
+                    'base_currency_rate_in_lkr' => $hbl->currency_rate,
+                    'paid_amount' => $data['paid_amount'],
+                    'total_amount' => $data['grand_total'],
+                    'due_amount' => $data['grand_total'] - $data['paid_amount'],
+                    'payment_method' => $data['payment_method'] ?? 'cash',
+                    'paid_by' => auth()->id(),
+                    'notes' => $data['payment_notes'] ?? 'Initial payment',
+                ];
+                CreateHBLPayment::run($newPaymentData);
             }
 
             $paymentData = [
@@ -249,10 +265,37 @@ class HBLRepository implements HBLRepositoryInterface
         try {
             DB::beginTransaction();
 
+            // Capture old payment info before update
+            $oldPaidAmount = $hbl->paid_amount ?? 0;
+            $oldTotalAmount = $hbl->grand_total ?? 0;
+
             $hbl = UpdateHBLApi::run($hbl, $data);
 
             $packagesData = $data['packages'] ?? [];
             UpdateHBLPackagesApi::run($hbl, $packagesData);
+
+            // New payment values from the request
+            $newPaidAmount = (float) ($data['paid_amount'] ?? 0);
+            $newTotalAmount = (float) ($data['grand_total'] ?? 0);
+
+            // Determine if payment record should be added
+            $hasPaidAmountChanged = $newPaidAmount != $oldPaidAmount;
+            $hasTotalAmountChanged = $newTotalAmount != $oldTotalAmount;
+
+            if ($hasPaidAmountChanged || $hasTotalAmountChanged) {
+                $paymentData = [
+                    'hbl_id' => $hbl->id,
+                    'base_currency_rate_in_lkr' => $hbl->currency_rate,
+                    'paid_amount' => $newPaidAmount,
+                    'total_amount' => $newTotalAmount,
+                    'due_amount' => $newTotalAmount - $newPaidAmount,
+                    'payment_method' => $data['payment_method'] ?? 'cash',
+                    'paid_by' => auth()->id(),
+                    'notes' => $data['payment_notes'] ?? 'Payment was updated because HBL was updated',
+                ];
+
+                CreateHBLPayment::run($paymentData);
+            }
 
             DB::commit();
 

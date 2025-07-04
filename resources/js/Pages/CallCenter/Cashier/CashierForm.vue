@@ -1,7 +1,6 @@
 <script setup>
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {ref} from "vue";
-import moment from "moment";
+import {ref, watch, computed} from "vue";
 import InputError from "@/Components/InputError.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
@@ -12,7 +11,6 @@ import TabShipment from "@/Pages/Common/Dialog/HBL/Tabs/TabShipment.vue";
 import Card from "primevue/card";
 import TabHBLDetails from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLDetails.vue";
 import IftaLabel from "primevue/iftalabel";
-import TabHBLPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLPayments.vue";
 import Skeleton from "primevue/skeleton";
 import TabStatus from "@/Pages/Common/Dialog/HBL/Tabs/TabStatus.vue";
 import Textarea from "primevue/textarea";
@@ -22,6 +20,10 @@ import Tabs from "primevue/tabs";
 import TabPanels from "primevue/tabpanels";
 import Button from "primevue/button";
 import InputNumber from "primevue/inputnumber";
+import TabHBLCharge from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLCharge.vue";
+import TabPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabPayments.vue";
+import Dialog from "primevue/dialog";
+import PaymentSummaryCard from "@/Pages/CallCenter/Components/PaymentSummaryCard.vue";
 
 const props = defineProps({
     customerQueue: {
@@ -30,10 +32,6 @@ const props = defineProps({
         }
     },
     hblId: {
-        type: Number,
-        default: null
-    },
-    doCharge: {
         type: Number,
         default: null
     },
@@ -53,6 +51,16 @@ const isLoadingHbl = ref(false);
 const paymentRecord = ref([]);
 const isLoading = ref(false);
 const currencyCode = ref(usePage().props.currentBranch.currency_symbol || "SAR");
+const showPaymentDialog = ref(false);
+const summaryTotalDue = ref(0);
+
+const computedOutstanding = computed(() => {
+    return (
+        parseFloat(summaryTotalDue.value || 0) +
+        parseFloat(form.additional_charges || 0) -
+        parseFloat(form.discount || 0)
+    );
+});
 
 const fetchHBL = async () => {
     isLoadingHbl.value = true;
@@ -136,12 +144,19 @@ const form = useForm({
     paid_amount: 0,
     customer_queue: props.customerQueue,
     note: '',
-    do_charge: props.doCharge,
+    discount: 0,
+    additional_charges: 0,
 });
 
 const handleUpdatePayment = () => {
-    const outstandingAmount = parseFloat((paymentRecord.value.grand_total - hbl.value.paid_amount) * props.currencyRate);
-    if (form.paid_amount < outstandingAmount) {
+    const outstandingAmount = parseFloat(computedOutstanding.value);
+    const paidAmount = parseFloat(form.paid_amount);
+
+    // Round to 2 decimal places for comparison
+    const roundedOutstanding = Math.round(outstandingAmount * 100) / 100;
+    const roundedPaid = Math.round(paidAmount * 100) / 100;
+
+    if (roundedPaid < roundedOutstanding) {
         push.error('Please pay full amount');
     } else {
         form.post(route("call-center.cashier.store"), {
@@ -157,9 +172,26 @@ const handleUpdatePayment = () => {
             },
             preserveScroll: true,
             preserveState: true,
+            data: {
+                ...form,
+                additional_charges: form.additional_charges,
+                discount: form.discount,
+            }
         });
     }
 }
+
+// Watch for the dialog open to set the default amount
+watch(showPaymentDialog, (val) => {
+    if (val) {
+        form.paid_amount = parseFloat(computedOutstanding.value.toFixed(2));
+    }
+});
+
+// Always sync amount with outstanding
+watch(computedOutstanding, (val) => {
+    form.paid_amount = parseFloat(val.toFixed(2));
+});
 </script>
 
 <template>
@@ -169,10 +201,10 @@ const handleUpdatePayment = () => {
         <Breadcrumb/>
 
         <div class="grid grid-cols-12 gap-5 mt-5">
-            <div class="col-span-9">
+            <div class="col-span-8">
                 <Card>
                     <template #content>
-                        <Tabs value="0">
+                        <Tabs value="1">
                             <TabList>
                                 <Tab value="0">
                                     <a class="flex items-center gap-2 text-inherit">
@@ -183,22 +215,28 @@ const handleUpdatePayment = () => {
                                 <Tab v-if="Object.keys(hbl).length !== 0" value="1">
                                     <a class="flex items-center gap-2 text-inherit">
                                         <i class="pi pi-dollar"/>
+                                        <span>Charges</span>
+                                    </a>
+                                </Tab>
+                                <Tab value="2">
+                                    <a class="flex items-center gap-2 text-inherit">
+                                        <i class="pi pi-wallet" />
                                         <span>Payments</span>
                                     </a>
                                 </Tab>
-                                <Tab v-if="Object.keys(hbl).length !== 0" value="2">
+                                <Tab v-if="Object.keys(hbl).length !== 0" value="3">
                                     <a class="flex items-center gap-2 text-inherit">
                                         <i class="pi pi-truck"/>
                                         <span>Shipment</span>
                                     </a>
                                 </Tab>
-                                <Tab value="3">
+                                <Tab value="4">
                                     <a class="flex items-center gap-2 text-inherit">
                                         <i class="pi pi-chart-bar"/>
                                         <span>Status & Audit</span>
                                     </a>
                                 </Tab>
-                                <Tab value="4">
+                                <Tab value="5">
                                     <a class="flex items-center gap-2 text-inherit">
                                         <i class="pi pi-file"/>
                                         <span>Documents</span>
@@ -210,15 +248,18 @@ const handleUpdatePayment = () => {
                                     <TabHBLDetails :hbl="hbl" :is-loading="isLoading"/>
                                 </TabPanel>
                                 <TabPanel value="1">
-                                    <TabHBLPayments :hbl="hbl" :hbl-total-summary="hblTotalSummary"/>
+                                    <TabHBLCharge :hbl="hbl"></TabHBLCharge>
                                 </TabPanel>
                                 <TabPanel value="2">
-                                    <TabShipment v-if="hbl" :hbl="hbl"/>
+                                    <TabPayments :hbl="hbl"></TabPayments>
                                 </TabPanel>
                                 <TabPanel value="3">
-                                    <TabStatus v-if="hbl" :hbl="hbl"/>
+                                    <TabShipment v-if="hbl" :hbl="hbl"/>
                                 </TabPanel>
                                 <TabPanel value="4">
+                                    <TabStatus v-if="hbl" :hbl="hbl"/>
+                                </TabPanel>
+                                <TabPanel value="5">
                                     <TabDocuments v-if="hbl" :hbl-id="hbl.id"/>
                                 </TabPanel>
                             </TabPanels>
@@ -227,191 +268,90 @@ const handleUpdatePayment = () => {
                 </Card>
             </div>
 
-            <div class="col-span-3">
+            <div class="col-span-4">
+                <div class="flex mb-4">
+                    <Button v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0"
+                            class="p-button-lg p-button-primary w-full"
+                            icon="pi pi-credit-card"
+                            label="Pay Now"
+                            raised
+                            size="large"
+                            style="min-width: 180px; font-size: 1.25rem;"
+                            @click="showPaymentDialog = true"/>
+                </div>
+
                 <Skeleton v-if="isLoading" height="350px" width="100%"></Skeleton>
 
-                <Card v-else class="shadow-lg border-0 overflow-hidden">
-                    <template #content>
-                        <div v-if="Object.keys(paymentRecord).length > 0" class="space-y-6">
-                            <!-- Header -->
-                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 -m-6 mb-6 p-6 border-b border-blue-100">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-blue-100 rounded-lg">
-                                        <i class="pi pi-wallet text-blue-600 text-lg"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-900">Payment Summary</h3>
-                                        <p class="text-sm text-gray-600">Transaction overview</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Amount Details -->
-                            <div class="space-y-4">
-                                <!-- Total Amount -->
-                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-2 bg-blue-100 rounded-lg">
-                                            <i class="pi pi-calculator text-blue-600"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-600">Total Amount</p>
-                                            <p class="text-xs text-gray-500">{{ parseFloat(paymentRecord.grand_total).toFixed(2) }} x {{ props.currencyRate }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-xl font-bold text-gray-900">{{ currencyCode }} {{ parseFloat(paymentRecord.grand_total * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
-                                    </div>
-                                </div>
-
-                                <!-- Paid Amount -->
-                                <div class="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-100">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-2 bg-green-100 rounded-lg">
-                                            <i class="pi pi-check-circle text-green-600"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-600">Paid Amount</p>
-                                            <p class="text-xs text-gray-500">{{ parseFloat(hbl.paid_amount).toFixed(2) }} x {{ props.currencyRate }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-xl font-bold text-green-700">{{ currencyCode }} {{ parseFloat(hbl.paid_amount * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
-                                    </div>
-                                </div>
-
-                                <!-- Outstanding -->
-                                <div class="flex items-center justify-between p-4 rounded-xl border"
-                                     :class="(paymentRecord.grand_total - hbl.paid_amount) > 0 ? 'bg-orange-50 border-orange-100' : 'bg-green-50 border-green-100'">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-2 rounded-lg"
-                                             :class="(paymentRecord.grand_total - hbl.paid_amount) > 0 ? 'bg-orange-100' : 'bg-green-100'">
-                                            <i class="text-lg"
-                                               :class="(paymentRecord.grand_total - hbl.paid_amount) > 0 ? 'pi pi-exclamation-triangle text-orange-600' : 'pi pi-check text-green-600'"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-600">Outstanding</p>
-                                            <p class="text-xs text-gray-500">{{ (paymentRecord.grand_total - hbl.paid_amount).toFixed(2) }} x {{ props.currencyRate }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-xl font-bold"
-                                           :class="(paymentRecord.grand_total - hbl.paid_amount) > 0 ? 'text-orange-700' : 'text-green-700'">
-                                            {{ currencyCode }} {{ parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Status and Date -->
-                            <div class="border-t border-gray-100 pt-4 space-y-4">
-                                <!-- Status -->
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-1.5 bg-blue-100 rounded-lg">
-                                            <i class="pi pi-info-circle text-blue-600 text-sm"></i>
-                                        </div>
-                                        <span class="text-sm font-medium text-gray-600">Payment Status</span>
-                                    </div>
-                                    <div>
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                                              :class="{
-                                                  'bg-green-100 text-green-800': paymentRecord.status === 'Paid' || paymentRecord.status === 'Completed',
-                                                  'bg-orange-100 text-orange-800': paymentRecord.status === 'Partial' || paymentRecord.status === 'Pending',
-                                                  'bg-red-100 text-red-800': paymentRecord.status === 'Unpaid' || paymentRecord.status === 'Failed',
-                                                  'bg-gray-100 text-gray-800': !['Paid', 'Completed', 'Partial', 'Pending', 'Unpaid', 'Failed'].includes(paymentRecord.status)
-                                              }">
-                                            <i class="pi pi-circle-fill text-xs mr-1.5"
-                                               :class="{
-                                                   'text-green-500': paymentRecord.status === 'Paid' || paymentRecord.status === 'Completed',
-                                                   'text-orange-500': paymentRecord.status === 'Partial' || paymentRecord.status === 'Pending',
-                                                   'text-red-500': paymentRecord.status === 'Unpaid' || paymentRecord.status === 'Failed',
-                                                   'text-gray-500': !['Paid', 'Completed', 'Partial', 'Pending', 'Unpaid', 'Failed'].includes(paymentRecord.status)
-                                               }"></i>
-                                            {{ paymentRecord.status }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Last Updated -->
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-1.5 bg-gray-100 rounded-lg">
-                                            <i class="pi pi-clock text-gray-600 text-sm"></i>
-                                        </div>
-                                        <span class="text-sm font-medium text-gray-600">Last Updated</span>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-sm font-semibold text-gray-800">{{ moment(paymentRecord.updated_at).format('MMM DD, YYYY') }}</p>
-                                        <p class="text-xs text-gray-500">{{ moment(paymentRecord.updated_at).format('h:mm A') }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Empty State -->
-                        <div v-else class="text-center py-12">
-                            <div class="flex flex-col items-center gap-4">
-                                <div class="p-4 bg-gray-100 rounded-full">
-                                    <i class="pi pi-wallet text-gray-400 text-3xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-700 mb-2">No Payment Records</h3>
-                                    <p class="text-sm text-gray-500">Payment information will appear here once available.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                </Card>
-
-                <Card class="my-5">
-                    <template #title>
-                        Update Payment
-                    </template>
-                    <template #content>
-                        <div class="grid grid-cols-1 gap-5 mt-3">
-                            <div v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0">
-                                <IftaLabel>
-                                    <InputNumber v-model="form.paid_amount" :max="parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate)"
-                                                 :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="paid-amount"
-                                                 min="0" step="any"
-                                                 variant="filled"/>
-                                    <label for="paid-amount">Amount ({{ currencyCode }})</label>
-                                </IftaLabel>
-                                <div class="text-xs text-gray-500 mt-1">Outstanding: {{ currencyCode }} {{ parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
-                                <InputError :message="form.errors.paid_amount"/>
-                            </div>
-
-                            <div>
-                                <IftaLabel>
-                                    <InputNumber v-model="form.do_charge" :maxFractionDigits="2" :minFractionDigits="2"
-                                                 class="w-full" inputId="do-charge" min="0" step="any"
-                                                 variant="filled"/>
-                                    <label for="do-charge">DO Charges</label>
-                                </IftaLabel>
-                                <InputError :message="form.errors.do_charge"/>
-                            </div>
-
-                            <div>
-                                <IftaLabel>
-                                    <Textarea id="description" v-model="form.note" class="w-full" cols="30"
-                                              placeholder="Type note here..." rows="5" style="resize: none"
-                                              variant="filled"/>
-                                    <label for="description">Note</label>
-                                </IftaLabel>
-                                <InputError :message="form.errors.note"/>
-                            </div>
-                        </div>
-
-                        <div class="text-right mt-3">
-                            <Button v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0"
-                                    :class="{ 'opacity-25': form.processing }"
-                                    :disabled="form.processing" icon="pi pi-check"
-                                    label="Update Payment" size="small" @click="handleUpdatePayment"/>
-                        </div>
-                    </template>
-                </Card>
+                <PaymentSummaryCard v-if="props.hblId" :hbl-id="props.hblId" @update:total-due="summaryTotalDue = $event" />
             </div>
         </div>
+
+        <Dialog v-model:visible="showPaymentDialog" :style="{ width: '500px' }" header="Pay Now" modal>
+            <div class="grid grid-cols-1 gap-5 mt-3">
+                <!-- Outstanding Amount Widget (now inside dialog) -->
+                <div v-if="computedOutstanding" class="mb-2 p-4 rounded-xl shadow bg-gradient-to-r from-red-100 to-orange-100 border border-red-200 flex flex-col items-center">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="pi pi-exclamation-circle text-red-600 text-2xl"></i>
+                        <span class="font-semibold text-lg text-red-800">Outstanding</span>
+                    </div>
+                    <div class="text-3xl font-bold text-red-700">
+                        {{ currencyCode }} {{ parseFloat(computedOutstanding).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                    </div>
+                </div>
+                <div v-show="computedOutstanding !== 0">
+                    <IftaLabel>
+                        <InputNumber v-model="form.paid_amount" :max="computedOutstanding"
+                                     :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="paid-amount"
+                                     min="0" step="any"
+                                     variant="filled"/>
+                        <label for="paid-amount">Amount ({{ currencyCode }})</label>
+                    </IftaLabel>
+                    <InputError :message="form.errors.paid_amount"/>
+                </div>
+
+                <!-- Additional Charges Field -->
+                <div>
+                    <IftaLabel>
+                        <InputNumber v-model="form.additional_charges" :maxFractionDigits="2" :minFractionDigits="2"
+                                     class="w-full" inputId="additional-charges" min="0" step="any"
+                                     variant="filled"/>
+                        <label for="additional-charges">Additional Charges</label>
+                    </IftaLabel>
+                    <InputError :message="form.errors.additional_charges"/>
+                </div>
+
+                <!-- Discount Field -->
+                <div>
+                    <IftaLabel>
+                        <InputNumber v-model="form.discount" :maxFractionDigits="2" :minFractionDigits="2"
+                                     class="w-full" inputId="discount" min="0" step="any"
+                                     variant="filled"/>
+                        <label for="discount">Discount</label>
+                    </IftaLabel>
+                    <InputError :message="form.errors.discount"/>
+                </div>
+
+                <div>
+                    <IftaLabel>
+                        <Textarea id="description" v-model="form.note" class="w-full" cols="30"
+                                  placeholder="Type note here..." rows="5" style="resize: none"
+                                  variant="filled"/>
+                        <label for="description">Note</label>
+                    </IftaLabel>
+                    <InputError :message="form.errors.note"/>
+                </div>
+            </div>
+            <template #footer>
+                <Button class="p-button-text" icon="pi pi-times" label="Cancel" @click="showPaymentDialog = false" />
+                <Button
+                  :class="{ 'opacity-25': form.processing }"
+                  :disabled="form.processing"
+                  icon="pi pi-wallet"
+                  icon-class="animate-pulse"
+                  label="Pay Now"
+                  @click="handleUpdatePayment"
+                />
+            </template>
+        </Dialog>
     </AppLayout>
 </template>

@@ -476,4 +476,40 @@ class HBLController extends Controller
         return response()->json($chargeDetails);
 
     }
+
+    /**
+     * Get all payments for a given HBL
+     */
+    public function getHBLPayments($hbl_id)
+    {
+        $payments = \App\Models\Payment::where('hbl_id', $hbl_id)
+            ->orderByDesc('paid_at')
+            ->get();
+
+        return response()->json($payments);
+    }
+
+    /**
+     * Cancel a payment by ID with optional reason
+     */
+    public function cancelPayment($paymentId, Request $request)
+    {
+        $payment = \App\Models\Payment::findOrFail($paymentId);
+        $payment->is_cancelled = true;
+        $payment->cancelled_at = now();
+        $payment->cancellation_reason = $request->input('reason');
+        $payment->save();
+
+        // Update HBL's paid_amount to exclude cancelled payments
+        $hbl = \App\Models\HBL::find($payment->hbl_id);
+        if ($hbl) {
+            $totalPaid = \App\Models\Payment::where('hbl_id', $hbl->id)
+                ->where('is_cancelled', false)
+                ->sum('paid_amount');
+            $hbl->paid_amount = $totalPaid;
+            $hbl->save();
+        }
+
+        return response()->json(['success' => true]);
+    }
 }
