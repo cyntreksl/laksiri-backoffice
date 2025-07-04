@@ -78,7 +78,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             ]);
         }
 
-        $query->where('target_warehouse', session('current_branch_id'));
+//        $query->where('target_warehouse', session('current_branch_id'));
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {
