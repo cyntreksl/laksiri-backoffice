@@ -175,7 +175,7 @@ const handleUpdatePayment = () => {
             <div class="col-span-9">
                 <Card>
                     <template #content>
-                        <Tabs value="0">
+                        <Tabs value="1">
                             <TabList>
                                 <Tab value="0">
                                     <a class="flex items-center gap-2 text-inherit">
