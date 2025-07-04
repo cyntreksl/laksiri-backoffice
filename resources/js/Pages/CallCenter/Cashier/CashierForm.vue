@@ -23,6 +23,7 @@ import Button from "primevue/button";
 import InputNumber from "primevue/inputnumber";
 import TabHBLCharge from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLCharge.vue";
 import TabPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabPayments.vue";
+import Dialog from "primevue/dialog";
 
 const props = defineProps({
     customerQueue: {
@@ -54,6 +55,7 @@ const isLoadingHbl = ref(false);
 const paymentRecord = ref([]);
 const isLoading = ref(false);
 const currencyCode = ref(usePage().props.currentBranch.currency_symbol || "SAR");
+const showPaymentDialog = ref(false);
 
 const fetchHBL = async () => {
     isLoadingHbl.value = true;
@@ -238,6 +240,17 @@ const handleUpdatePayment = () => {
             </div>
 
             <div class="col-span-3">
+                <div class="flex mb-4">
+                    <Button v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0"
+                            class="p-button-lg p-button-primary w-full"
+                            icon="pi pi-credit-card"
+                            label="Pay Now"
+                            raised
+                            size="large"
+                            style="min-width: 180px; font-size: 1.25rem;"
+                            @click="showPaymentDialog = true"/>
+                </div>
+
                 <Skeleton v-if="isLoading" height="350px" width="100%"></Skeleton>
 
                 <Card v-else class="shadow-lg border-0 overflow-hidden">
@@ -373,55 +386,53 @@ const handleUpdatePayment = () => {
                         </div>
                     </template>
                 </Card>
-
-                <Card class="my-5">
-                    <template #title>
-                        Update Payment
-                    </template>
-                    <template #content>
-                        <div class="grid grid-cols-1 gap-5 mt-3">
-                            <div v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0">
-                                <IftaLabel>
-                                    <InputNumber v-model="form.paid_amount" :max="parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate)"
-                                                 :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="paid-amount"
-                                                 min="0" step="any"
-                                                 variant="filled"/>
-                                    <label for="paid-amount">Amount ({{ currencyCode }})</label>
-                                </IftaLabel>
-                                <div class="text-xs text-gray-500 mt-1">Outstanding: {{ currencyCode }} {{ parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
-                                <InputError :message="form.errors.paid_amount"/>
-                            </div>
-
-                            <div>
-                                <IftaLabel>
-                                    <InputNumber v-model="form.do_charge" :maxFractionDigits="2" :minFractionDigits="2"
-                                                 class="w-full" inputId="do-charge" min="0" step="any"
-                                                 variant="filled"/>
-                                    <label for="do-charge">DO Charges</label>
-                                </IftaLabel>
-                                <InputError :message="form.errors.do_charge"/>
-                            </div>
-
-                            <div>
-                                <IftaLabel>
-                                    <Textarea id="description" v-model="form.note" class="w-full" cols="30"
-                                              placeholder="Type note here..." rows="5" style="resize: none"
-                                              variant="filled"/>
-                                    <label for="description">Note</label>
-                                </IftaLabel>
-                                <InputError :message="form.errors.note"/>
-                            </div>
-                        </div>
-
-                        <div class="text-right mt-3">
-                            <Button v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0"
-                                    :class="{ 'opacity-25': form.processing }"
-                                    :disabled="form.processing" icon="pi pi-check"
-                                    label="Update Payment" size="small" @click="handleUpdatePayment"/>
-                        </div>
-                    </template>
-                </Card>
             </div>
         </div>
+
+        <Dialog v-model:visible="showPaymentDialog" :style="{ width: '500px' }" header="Update Payment" modal>
+            <div class="grid grid-cols-1 gap-5 mt-3">
+                <div v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0">
+                    <IftaLabel>
+                        <InputNumber v-model="form.paid_amount" :max="parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate)"
+                                     :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="paid-amount"
+                                     min="0" step="any"
+                                     variant="filled"/>
+                        <label for="paid-amount">Amount ({{ currencyCode }})</label>
+                    </IftaLabel>
+                    <div class="text-xs text-gray-500 mt-1">Outstanding: {{ currencyCode }} {{ parseFloat((paymentRecord.grand_total - hbl.paid_amount) * props.currencyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
+                    <InputError :message="form.errors.paid_amount"/>
+                </div>
+
+                <div>
+                    <IftaLabel>
+                        <InputNumber v-model="form.do_charge" :maxFractionDigits="2" :minFractionDigits="2"
+                                     class="w-full" inputId="do-charge" min="0" step="any"
+                                     variant="filled"/>
+                        <label for="do-charge">DO Charges</label>
+                    </IftaLabel>
+                    <InputError :message="form.errors.do_charge"/>
+                </div>
+
+                <div>
+                    <IftaLabel>
+                        <Textarea id="description" v-model="form.note" class="w-full" cols="30"
+                                  placeholder="Type note here..." rows="5" style="resize: none"
+                                  variant="filled"/>
+                        <label for="description">Note</label>
+                    </IftaLabel>
+                    <InputError :message="form.errors.note"/>
+                </div>
+            </div>
+            <template #footer>
+                <Button class="p-button-text" icon="pi pi-times" label="Cancel" @click="showPaymentDialog = false" />
+                <Button
+                  :class="{ 'opacity-25': form.processing }"
+                  :disabled="form.processing"
+                  icon="pi pi-check"
+                  label="Update Payment"
+                  @click="handleUpdatePayment"
+                />
+            </template>
+        </Dialog>
     </AppLayout>
 </template>
