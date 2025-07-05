@@ -7,7 +7,7 @@ import Card from 'primevue/card';
 import Avatar from 'primevue/avatar';
 import InfoDisplayChip from "@/Pages/Common/Components/InfoDisplayChip.vue";
 import Button from "primevue/button";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import {useConfirm} from "primevue/useconfirm";
 
@@ -213,11 +213,15 @@ watch(
                         </div>
 
                         <div class="mt-3">
-                            <Button v-if="!item?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="Set RTF Package"
-                                    severity="warn" size="small" variant="outlined" @click.prevent="handleRTFHBLPackage(item.id)" />
+                            <template v-if="$page.props.user.permissions.includes('set_rtf')">
+                                <Button v-if="!item?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="Set RTF Package"
+                                        severity="warn" size="small" variant="outlined" @click.prevent="handleRTFHBLPackage(item.id)" />
+                            </template>
 
-                            <Button v-if="item?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift RTF Package"
-                                    severity="warn" size="small" variant="outlined" @click.prevent="handleUndoRTFHBLPackage(item.id)" />
+                            <template v-if="$page.props.user.permissions.includes('lift_rtf')">
+                                <Button v-if="item?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift RTF Package"
+                                        severity="warn" size="small" variant="outlined" @click.prevent="handleUndoRTFHBLPackage(item.id)" />
+                            </template>
                         </div>
                     </template>
                 </Card>

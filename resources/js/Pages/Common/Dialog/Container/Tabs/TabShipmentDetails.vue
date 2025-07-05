@@ -249,11 +249,15 @@ watchEffect(() => {
             </div>
         </div>
         <div class="flex items-center space-x-2">
-            <Button v-if="!container?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="RTF Shipment"
+            <template v-if="$page.props.user.permissions.includes('set_rtf')">
+              <Button v-if="!container?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="RTF Shipment"
                     severity="warn" size="small" variant="outlined" @click.prevent="handleRTFContainer" />
+            </template>
 
-            <Button v-if="container?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift RTF Shipment"
+            <template v-if="$page.props.user.permissions.includes('lift_rtf')">
+              <Button v-if="container?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift RTF Shipment"
                     severity="warn" size="small" variant="outlined" @click.prevent="handleUndoRTFContainer" />
+            </template>
 
             <Button :disabled="container.status === 'IN TRANSIT' || container.status === 'REACHED DESTINATION'" icon="pi pi-trash" label="Delete Shipment"
                     severity="danger" size="small" @click.prevent="handleDeleteLoadedShipment" />

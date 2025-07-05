@@ -13,7 +13,6 @@ import Checkbox from "primevue/checkbox";
 import Card from "primevue/card";
 import TabHBLDetails from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLDetails.vue";
 import IftaLabel from "primevue/iftalabel";
-import TabHBLPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLPayments.vue";
 import Skeleton from "primevue/skeleton";
 import TabStatus from "@/Pages/Common/Dialog/HBL/Tabs/TabStatus.vue";
 import Textarea from "primevue/textarea";
@@ -23,6 +22,8 @@ import Tabs from "primevue/tabs";
 import TabPanels from "primevue/tabpanels";
 import Button from "primevue/button";
 import {useConfirm} from "primevue/useconfirm";
+import TabPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabPayments.vue";
+import TabHBLCharge from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLCharge.vue";
 
 const props = defineProps({
     verificationDocuments: {
@@ -188,49 +189,58 @@ getHBLPayments();
                             <TabList>
                                 <Tab value="0">
                                     <a class="flex items-center gap-2 text-inherit">
-                                        <i class="pi pi-info-circle" />
+                                        <i class="pi pi-info-circle"/>
                                         <span>Details</span>
                                     </a>
                                 </Tab>
                                 <Tab v-if="Object.keys(hbl).length !== 0" value="1">
                                     <a class="flex items-center gap-2 text-inherit">
-                                        <i class="pi pi-dollar" />
+                                        <i class="pi pi-dollar"/>
+                                        <span>Charges</span>
+                                    </a>
+                                </Tab>
+                                <Tab value="2">
+                                    <a class="flex items-center gap-2 text-inherit">
+                                        <i class="pi pi-wallet" />
                                         <span>Payments</span>
                                     </a>
                                 </Tab>
-                                <Tab v-if="Object.keys(hbl).length !== 0" value="2">
+                                <Tab v-if="Object.keys(hbl).length !== 0" value="3">
                                     <a class="flex items-center gap-2 text-inherit">
-                                        <i class="pi pi-truck" />
+                                        <i class="pi pi-truck"/>
                                         <span>Shipment</span>
-                                    </a>
-                                </Tab>
-                                <Tab value="3">
-                                    <a class="flex items-center gap-2 text-inherit">
-                                        <i class="pi pi-chart-bar" />
-                                        <span>Status & Audit</span>
                                     </a>
                                 </Tab>
                                 <Tab value="4">
                                     <a class="flex items-center gap-2 text-inherit">
-                                        <i class="pi pi-file" />
+                                        <i class="pi pi-chart-bar"/>
+                                        <span>Status & Audit</span>
+                                    </a>
+                                </Tab>
+                                <Tab value="5">
+                                    <a class="flex items-center gap-2 text-inherit">
+                                        <i class="pi pi-file"/>
                                         <span>Documents</span>
                                     </a>
                                 </Tab>
                             </TabList>
                             <TabPanels>
                                 <TabPanel value="0">
-                                    <TabHBLDetails :hbl="hbl" :is-loading="isLoading" />
+                                    <TabHBLDetails :hbl="hbl" :is-loading="isLoading"/>
                                 </TabPanel>
                                 <TabPanel value="1">
-                                    <TabHBLPayments :hbl="hbl" :hbl-total-summary="hblTotalSummary"/>
+                                    <TabHBLCharge :hbl="hbl"></TabHBLCharge>
                                 </TabPanel>
                                 <TabPanel value="2">
-                                    <TabShipment v-if="hbl" :hbl="hbl" />
+                                    <TabPayments :hbl="hbl"></TabPayments>
                                 </TabPanel>
                                 <TabPanel value="3">
-                                    <TabStatus v-if="hbl" :hbl="hbl" />
+                                    <TabShipment v-if="hbl" :hbl="hbl"/>
                                 </TabPanel>
                                 <TabPanel value="4">
+                                    <TabStatus v-if="hbl" :hbl="hbl"/>
+                                </TabPanel>
+                                <TabPanel value="5">
                                     <TabDocuments v-if="hbl" :hbl-id="hbl.id"/>
                                 </TabPanel>
                             </TabPanels>

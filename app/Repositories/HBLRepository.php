@@ -32,6 +32,7 @@ use App\Actions\HBL\HBLCharges\UpdateHBLDestinationCharges;
 use App\Actions\HBL\HBLPackage\GetPackagesByReference;
 use App\Actions\HBL\MarkAsRTF;
 use App\Actions\HBL\MarkAsUnRTF;
+use App\Actions\HBL\Payments\CreateHBLPayment;
 use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
@@ -60,6 +61,7 @@ use App\Models\HBLPackage;
 use App\Models\PickUp;
 use App\Models\Scopes\BranchScope;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class HBLRepository implements GridJsInterface, HBLRepositoryInterface
@@ -81,6 +83,21 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
         if (isset($data['paid_amount'])) {
             UpdateHBLPayments::run($data, $hbl);
+        }
+
+        // Only create a payment record if paid_amount exists and is greater than 0
+        if (! empty($data['paid_amount']) && $data['paid_amount'] > 0) {
+            $newPaymentData = [
+                'hbl_id' => $hbl->id,
+                'base_currency_rate_in_lkr' => $hbl->currency_rate,
+                'paid_amount' => $data['paid_amount'],
+                'total_amount' => $data['grand_total'],
+                'due_amount' => $data['grand_total'] - $data['paid_amount'],
+                'payment_method' => $data['payment_method'] ?? 'cash',
+                'paid_by' => auth()->id(),
+                'notes' => $data['payment_notes'] ?? 'Initial payment',
+            ];
+            CreateHBLPayment::run($newPaymentData);
         }
 
         $paymentData = [
@@ -105,9 +122,39 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function updateHBL(array $data, HBL $hbl)
     {
-        $hbl = UpdateHBL::run($hbl, $data);
-        $packagesData = $data['packages'];
-        UpdateHBLPackages::run($hbl, $packagesData);
+        DB::transaction(function () use (&$hbl, $data) {
+            // Capture previous amounts before update
+            $oldPaidAmount = $hbl->paid_amount ?? 0;
+            $oldTotalAmount = $hbl->grand_total ?? 0;
+
+            $hbl = UpdateHBL::run($hbl, $data);
+            $packagesData = $data['packages'];
+            UpdateHBLPackages::run($hbl, $packagesData);
+
+            // Use updated values from the request
+            $newPaidAmount = (float) ($data['paid_amount'] ?? 0);
+            $newTotalAmount = (float) ($data['grand_total'] ?? 0);
+
+            $hasPaidAmountChanged = $newPaidAmount != $oldPaidAmount;
+            $hasTotalAmountChanged = $newTotalAmount != $oldTotalAmount;
+
+            if ($hasPaidAmountChanged || $hasTotalAmountChanged) {
+                $newPaymentData = [
+                    'hbl_id' => $hbl->id,
+                    'base_currency_rate_in_lkr' => $hbl->currency_rate,
+                    'paid_amount' => $newPaidAmount,
+                    'total_amount' => $newTotalAmount,
+                    'due_amount' => $newTotalAmount - $newPaidAmount,
+                    'payment_method' => $data['payment_method'] ?? 'cash',
+                    'paid_by' => auth()->id(),
+                    'notes' => $data['payment_notes'] ?? null,
+                ];
+
+                CreateHBLPayment::run($newPaymentData);
+            }
+
+            $hbl->refresh();
+        });
 
         return $hbl;
     }

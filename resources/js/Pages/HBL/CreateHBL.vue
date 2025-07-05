@@ -1487,6 +1487,7 @@ const totalChargeableWeight = computed(() => {
                         :required="!!form.is_active_package"
                         class="w-full"
                         filter
+                        show-clear
                         option-value="id"
                         placeholder="Choose Package"
                         @change="getSelectedPackage"
