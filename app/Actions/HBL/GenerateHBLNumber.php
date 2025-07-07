@@ -17,6 +17,11 @@ class GenerateHBLNumber
         $branchCode = $this->getBranchCode($currentBranchId);
         $nextNumber = $this->getNextAvailableNumber($currentBranchId);
 
+        // If the next number is empty, 0, or 1, get the starting number from config
+        if (empty($nextNumber) || $nextNumber <= 1) {
+            $nextNumber = (int) config('hbl.starting_number', 128500);
+        }
+
         do {
             $hblNumber = strtoupper(str_pad($branchCode, 3, '0', STR_PAD_LEFT)).
                 str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
