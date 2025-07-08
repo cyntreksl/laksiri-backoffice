@@ -60,8 +60,8 @@ class PickupController extends Controller
         $search = $request->input('search', null);
 
         $filters = $request->input('pickupDate')
-            ? $request->only(['userData', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate'])
-            : $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy']);
+            ? $request->only(['userData', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate', 'trashed'])
+            : $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'trashed']);
 
         return $this->pickupRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
@@ -216,5 +216,10 @@ class PickupController extends Controller
         $this->authorize('pickups.unassign driver');
 
         $this->pickupRepository->unassignDriverFromPickup($pickup);
+    }
+
+    public function restore($pickUp)
+    {
+        return $this->pickupRepository->restorePickup($pickUp);
     }
 }

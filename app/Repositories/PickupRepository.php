@@ -69,6 +69,10 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
                 ])->whereDoesntHave('pickupException');
         }
 
+        if ($filters['trashed']) {
+            $query->onlyTrashed();
+        }
+
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {
                 $query->where('reference', 'like', '%'.$search.'%')
@@ -193,5 +197,12 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     public function unassignDriverFromPickup(PickUp $pickup): void
     {
         UnassignDriver::run($pickup);
+    }
+
+    public function restorePickup($pickUp)
+    {
+        $pickUp = PickUp::withTrashed()->find($pickUp);
+
+        $pickUp->restore();
     }
 }

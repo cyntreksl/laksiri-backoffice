@@ -52,3 +52,6 @@ Route::get('get-hbl-status-by-pickup/{pickup}', [PickupController::class, 'getHB
 
 Route::put('pickups/{pickup}/driver/unassign', [PickupController::class, 'unassignDriver'])
     ->name('pickups.driver.unassign');
+
+Route::post('pickups/{pickup}/restore', [PickupController::class, 'restore'])
+    ->name('pickups.restore');

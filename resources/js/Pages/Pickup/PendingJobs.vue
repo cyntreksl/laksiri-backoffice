@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import FloatLabel from 'primevue/floatlabel';
 import {useConfirm} from "primevue/useconfirm";
@@ -58,6 +58,8 @@ const selectedPickupID = ref(null);
 const confirm = useConfirm();
 const showAssignDriverDialog = ref(false);
 const dt = ref();
+const params = route().params;
+const isTrashedView = computed(() => params.view === 'trashed');
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -86,6 +88,14 @@ const menuModel = ref([
         icon: 'pi pi-fw pi-times',
         command: () => confirmPickupDelete(selectedPickup),
         disabled: !usePage().props.user.permissions.includes('pickups.delete'),
+        visible: !isTrashedView.value,
+    },
+    {
+        label: 'Restore',
+        icon: 'pi pi-fw pi-undo',
+        command: () => confirmPickupRestore(selectedPickup),
+        disabled: !usePage().props.user.permissions.includes('pickups.delete'),
+        visible: isTrashedView.value,
     },
 ]);
 
@@ -110,6 +120,7 @@ const fetchPickups = async (page = 1, search = "", sortField = 'id', sortOrder =
                 pickupDate: filters.value.pickup_date.value || "",
                 zoneBy: filters.value.zone.value || "",
                 driverBy: filters.value.driver.value || [],
+                trashed: isTrashedView.value,
             }
         });
         pickups.value = response.data.data;
@@ -268,6 +279,41 @@ const confirmPickupDelete = (pickup) => {
                 onSuccess: () => {
                     push.success("Pickup record Deleted Successfully!");
                     router.visit(route("pickups.index"), {only: ["pickups"]});
+                },
+                onError: () => {
+                    push.error("Something went to wrong!");
+                },
+            });
+            selectedPickupID.value = null;
+        },
+        reject: () => {
+            selectedPickupID.value = null;
+        }
+    });
+};
+
+const confirmPickupRestore = (pickup) => {
+    selectedPickupID.value = pickup.value.id;
+    confirm.require({
+        message: 'Would you like to restore into pending jobs this pickup record?',
+        header: 'Restore Pickup?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Restore',
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(route("pickups.restore", selectedPickupID.value), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    fetchPickups(currentPage.value, filters.value.global.value);
+                    push.success("Pickup record restored Successfully!");
                 },
                 onError: () => {
                     push.error("Something went to wrong!");
@@ -446,36 +492,50 @@ const handleConfirmDriverRemove = (pickupId) => {
                         <template #header>
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
                                 <div class="text-lg font-medium">
-                                    Pending Jobs ({{ pickups ? pickups.length : 0}})
+                                    {{isTrashedView ? 'Trashed ' : 'Pending ' }}  Jobs ({{ pickups ? pickups.length : 0}})
                                 </div>
-                                <Button v-if="$page.props.user.permissions.includes('pickups.create')" icon="pi pi-arrow-right"
-                                        icon-pos="right"
-                                        label="Create New Pending Job" size="small" @click="router.visit(route('pickups.create'))"/>
+                                <div class="space-x-2">
+                                    <Button v-if="$page.props.user.permissions.includes('pickups.create')" icon="pi pi-arrow-right"
+                                            icon-pos="right"
+                                            label="Create New Pending Job" size="small" @click="router.visit(route('pickups.create'))"/>
+
+                                    <Button v-if="!isTrashedView" icon="pi pi-trash"
+                                            label="Trashed Jobs"
+                                            severity="contrast"
+                                            size="small" variant="outlined" @click="router.visit(route('pickups.index', {view: 'trashed'}))"/>
+
+                                    <Button v-else icon="pi pi-arrow-left"
+                                            label="Back to Pending Jobs"
+                                            severity="contrast"
+                                            size="small" variant="outlined" @click="router.visit(route('pickups.index'))"/>
+                                </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Button Group -->
                                 <div class="flex flex-col sm:flex-row gap-2">
-                                    <Button
-                                        v-if="$page.props.user.permissions.includes('pickups.assign driver')"
-                                        :disabled="selectedPickups.length === 0"
-                                        icon="ti ti-steering-wheel"
-                                        label="Assign Driver"
-                                        severity="primary"
-                                        size="small"
-                                        type="button"
-                                        @click="showAssignDriverDialog = !showAssignDriverDialog"
-                                    />
+                                    <template v-if="!isTrashedView">
+                                        <Button
+                                            v-if="$page.props.user.permissions.includes('pickups.assign driver')"
+                                            :disabled="selectedPickups.length === 0"
+                                            icon="ti ti-steering-wheel"
+                                            label="Assign Driver"
+                                            severity="primary"
+                                            size="small"
+                                            type="button"
+                                            @click="showAssignDriverDialog = !showAssignDriverDialog"
+                                        />
 
-                                    <Button
-                                        v-if="$page.props.user.permissions.includes('pickups.delete')"
-                                        :disabled="selectedPickups.length === 0"
-                                        icon="pi pi-trash"
-                                        label="Delete"
-                                        severity="danger"
-                                        size="small"
-                                        type="button"
-                                        @click="confirmPickupsDelete()"
-                                    />
+                                        <Button
+                                            v-if="$page.props.user.permissions.includes('pickups.delete')"
+                                            :disabled="selectedPickups.length === 0"
+                                            icon="pi pi-trash"
+                                            label="Delete"
+                                            severity="danger"
+                                            size="small"
+                                            type="button"
+                                            @click="confirmPickupsDelete()"
+                                        />
+                                    </template>
 
                                     <Button
                                         icon="pi pi-filter-slash"
@@ -515,7 +575,7 @@ const handleConfirmDriverRemove = (pickupId) => {
 
                         <template #loading> Loading pickups data. Please wait.</template>
 
-                        <Column headerStyle="width: 3rem" selectionMode="multiple"></Column>
+                        <Column v-if="!isTrashedView" headerStyle="width: 3rem" selectionMode="multiple"></Column>
 
                         <Column field="reference" header="Reference" headerStyle="width: 12rem" sortable>
                             <template #body="slotProps">
@@ -569,7 +629,7 @@ const handleConfirmDriverRemove = (pickupId) => {
                                     :label="slotProps.data.driver"
                                     class="!bg-blue-100"
                                     icon="ti ti-steering-wheel"
-                                    removable
+                                    :removable="!isTrashedView"
                                     @remove="handleConfirmDriverRemove(slotProps.data.id)"
                                 />
                             </template>
@@ -600,7 +660,7 @@ const handleConfirmDriverRemove = (pickupId) => {
                             </template>
                         </Column>
 
-                        <template #footer> In total there are {{ pickups ? pickups.length : 0 }} pickups. </template>
+                        <template #footer> In total there are {{ pickups ? pickups.length : 0 }} {{ isTrashedView ? 'trashed ' : ''}} pickups. </template>
                     </DataTable>
                 </template>
             </Card>
