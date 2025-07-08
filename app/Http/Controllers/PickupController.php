@@ -9,6 +9,7 @@ use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\UpdatePickupRequest;
 use App\Http\Resources\PickupResource;
+use App\Interfaces\Api\ExceptionNameRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
@@ -38,6 +39,7 @@ class PickupController extends Controller
         private readonly SettingRepositoryInterface $settingRepository,
         private readonly NotificationMailRepositoryInterface $notificationMailRepository,
         private readonly HBLRepositoryInterface $HBLRepository,
+        private readonly ExceptionNameRepositoryInterface $exceptionNameRepository,
     ) {}
 
     public function index()
@@ -48,6 +50,7 @@ class PickupController extends Controller
             'drivers' => $this->driverRepository->getAllDrivers(),
             'users' => $this->userRepository->getUsers(['customer']),
             'zones' => $this->zoneRepository->getZones(),
+            'exceptions' => $this->exceptionNameRepository->getExceptionNames()->getData(),
         ]);
     }
 
@@ -115,11 +118,13 @@ class PickupController extends Controller
         return $this->pickupRepository->updatePickup($request->all(), $pickup);
     }
 
-    public function destroy(PickUp $pickup)
+    public function destroy(Request $request, PickUp $pickup)
     {
         $this->authorize('pickups.delete');
 
-        $this->pickupRepository->deletePickup($pickup);
+        $deleteRemarks = $request->input('remarks');
+        $deleteMainReason = $request->input('main_reason');
+        $this->pickupRepository->deletePickup($pickup, $deleteRemarks, $deleteMainReason);
     }
 
     public function assignDriver(AssignDriverRequest $request)
@@ -165,6 +170,7 @@ class PickupController extends Controller
             'users' => $this->userRepository->getUsers(),
             'zones' => $this->zoneRepository->getZones(),
             'userData' => $user,
+            'exceptions' => $this->exceptionNameRepository->getExceptionNames()->getData(),
         ]);
     }
 
@@ -179,6 +185,7 @@ class PickupController extends Controller
             'users' => $this->userRepository->getUsers(['customer']),
             'zones' => $this->zoneRepository->getZones(),
             'pickups' => $pickups,
+            'exceptions' => $this->exceptionNameRepository->getExceptionNames()->getData(),
         ]);
     }
 
@@ -199,7 +206,9 @@ class PickupController extends Controller
     {
         $this->authorize('pickups.delete');
 
-        $this->pickupRepository->deletePickups($request->pickupIds);
+        $deleteRemarks = $request->input('remarks');
+        $deleteMainReason = $request->input('main_reason');
+        $this->pickupRepository->deletePickups($request->pickupIds, $deleteRemarks, $deleteMainReason);
     }
 
     public function getHBLStatusByPickup(PickUp $pickup)
