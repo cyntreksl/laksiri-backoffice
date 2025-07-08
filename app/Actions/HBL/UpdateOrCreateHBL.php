@@ -2,9 +2,11 @@
 
 namespace App\Actions\HBL;
 
+use App\Actions\Branch\GetBranchById;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Enum\PickupStatus;
+use App\Models\Currency;
 use App\Models\HBL;
 use App\Models\PickUp;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -32,6 +34,16 @@ class UpdateOrCreateHBL
                     ]);
                 }
             }
+        }
+
+        $currentBranch = GetUserCurrentBranchID::run();
+        $currencyRate = 1;
+
+        $branch = GetBranchById::run($currentBranch);
+        $currencySymbol = Currency::whereCurrencySymbol($branch->currency_symbol)->latest()->first();
+
+        if ($currencySymbol instanceof Currency) {
+            $currencyRate = $currencySymbol->sl_rate;
         }
 
         $hbl = HBL::updateOrCreate([
@@ -74,6 +86,7 @@ class UpdateOrCreateHBL
             'status' => $status,
             'is_departure_charges_paid' => $data['is_departure_charges_paid'],
             'is_destination_charges_paid' => $data['is_destination_charges_paid'],
+            'currency_rate' => $currencyRate,
         ]);
 
         if (isset($data['paid_amount']) && isset($data['is_completed'])) {
