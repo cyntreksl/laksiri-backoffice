@@ -6,6 +6,9 @@ use App\Actions\Branch\GetDestinationBranches;
 use App\Actions\HBL\GetHBLById;
 use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Actions\HBL\GetHBLWithTrashedById;
+use App\Actions\HBL\HBLCharges\UpdateHBLDepartureCharges;
+use App\Actions\HBL\HBLCharges\UpdateHBLDestinationCharges;
+use App\Actions\HBL\Payments\CreateHBLPayment;
 use App\Enum\CargoType;
 use App\Enum\HBLPaymentStatus;
 use App\Enum\HBLType;
@@ -25,6 +28,8 @@ use App\Models\HBLPackage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class HBLController extends Controller
@@ -511,5 +516,106 @@ class HBLController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    public function calculatePaymentManual(string $hbl_number)
+    {
+        // Get HBL using HBL number
+        $hbl = HBL::with(['payments', 'departureCharge', 'destinationCharge'])
+            ->where('hbl_number', $hbl_number)
+            ->first();
+
+        if (! $hbl) {
+            return response()->json([
+                'success' => false,
+                'message' => 'HBL not found',
+                'errors' => ['hbl_number' => 'No HBL found with the provided number'],
+            ], 404);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $messages = [];
+            $warnings = [];
+
+            // Only create a payment record if paid_amount exists, is greater than 0,
+            // and no existing payment with the same amount exists
+            if ($hbl->paid_amount > 0) {
+                $existingPayment = $hbl->payments()
+                    ->first();
+
+                if (! $existingPayment) {
+                    $newPaymentData = [
+                        'hbl_id' => $hbl->id,
+                        'base_currency_rate_in_lkr' => $hbl->currency_rate,
+                        'paid_amount' => $hbl->paid_amount,
+                        'total_amount' => $hbl->grand_total,
+                        'due_amount' => $hbl->grand_total - $hbl->paid_amount,
+                        'payment_method' => 'cash',
+                        'paid_by' => $hbl->created_by,
+                        'notes' => 'Initial payment',
+                    ];
+                    CreateHBLPayment::run($newPaymentData);
+                    $messages[] = 'Payment record created successfully';
+                } else {
+                    $warnings[] = 'Payment already exists for this HBL';
+                }
+            }
+
+            // Prepare payment data
+            $paymentData = [
+                'freight_charge' => $hbl->freight_charge ?? 0,
+                'bill_charge' => $hbl->bill_charge ?? 0,
+                'other_charge' => $hbl->other_charge ?? 0,
+                'destination_charge' => $hbl->destination_charge ?? 0,
+                'package_charges' => $hbl->package_charges ?? 0,
+                'discount' => $hbl->discount ?? 0,
+                'additional_charge' => $hbl->additional_charge ?? 0,
+                'grand_total' => $hbl->grand_total ?? 0,
+                'paid_amount' => $hbl->paid_amount ?? 0,
+                'is_departure_charges_paid' => $hbl->is_departure_charges_paid ?? false,
+                'is_destination_charges_paid' => $hbl->is_destination_charges_paid ?? false,
+            ];
+
+            // Update or create departure charges if not exists
+            if (! $hbl->departureCharge) {
+                UpdateHBLDepartureCharges::run($hbl, $paymentData);
+                $messages[] = 'Departure charges created successfully';
+            } else {
+                $warnings[] = 'Departure charges already exist';
+                Log::info("Departure charge already exists for HBL {$hbl->hbl_number}");
+            }
+
+            // Update or create destination charges if not exists
+            if (! $hbl->destinationCharge) {
+                UpdateHBLDestinationCharges::run($hbl, $paymentData);
+                $messages[] = 'Destination charges created successfully';
+            } else {
+                $warnings[] = 'Destination charges already exist';
+                Log::info("Destination charge already exists for HBL {$hbl->hbl_number}");
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Operation completed successfully',
+                'data' => $hbl->fresh(['payments', 'departureCharge', 'destinationCharge']),
+                'messages' => $messages,
+                'warnings' => $warnings,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Payment calculation failed for HBL {$hbl_number}: ".$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process payment calculation',
+                'error' => $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTrace() : null,
+            ], 500);
+        }
     }
 }

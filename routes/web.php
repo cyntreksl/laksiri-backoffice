@@ -97,3 +97,5 @@ Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'ge
 
 Route::post('/whatsapp/webhook', [WhatsappController::class, 'handleWebhook']);
 Route::get('/whatsapp/webhook', [WhatsappController::class, 'verifyWebhook']);
+
+Route::get('/calculate-payments/manually/{hbl_number}', [HBLController::class, 'calculatePaymentManual']);
