@@ -26,4 +26,4 @@ return new class extends Migration
             $table->dropColumn(['delete_remarks', 'delete_main_reason']);
         });
     }
-}; 
+};
