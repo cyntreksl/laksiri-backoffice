@@ -345,6 +345,32 @@ watch(
                     </div>
                 </template>
             </Card>
+
+            <!-- Deletion Details Card -->
+            <Card v-if="pickup?.delete_main_reason || pickup?.delete_remarks" class="relative overflow-hidden !border !border-red-200 !bg-red-50 !shadow-sm">
+                <template #title>
+                    <div class="flex items-center gap-2 pl-2 border-l-4 border-red-500 py-1">
+                        <i class="ti ti-alert-circle-filled text-2xl text-red-500"></i>
+                        <span class="font-semibold text-base text-red-700">Deletion Details</span>
+                    </div>
+                </template>
+                <template #content>
+                    <div class="px-2 py-2">
+                        <div v-if="pickup?.delete_main_reason" class="mb-2">
+                            <div class="text-xs text-red-500 font-medium uppercase tracking-wide">Delete Reason</div>
+                            <div class="text-base font-semibold text-red-800">{{ pickup.delete_main_reason }}</div>
+                        </div>
+                        <div v-if="pickup?.delete_main_reason && pickup?.delete_remarks" class="my-2">
+                            <hr class="border-t border-dashed border-red-200" />
+                        </div>
+                        <div v-if="pickup?.delete_remarks">
+                            <div class="text-xs text-red-500 font-medium uppercase tracking-wide">Delete Remarks</div>
+                            <div class="text-base text-red-700">{{ pickup.delete_remarks }}</div>
+                        </div>
+                    </div>
+                </template>
+            </Card>
+            <!-- End Deletion Details Card -->
         </div>
 
         <div class="col-span-12 lg:col-span-8 md:col-span-6 sm:col-span-12 space-y-4">

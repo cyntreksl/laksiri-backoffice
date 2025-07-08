@@ -11,7 +11,6 @@ import TabPanel from 'primevue/tabpanel';
 import TabDocuments from "@/Pages/Common/Dialog/HBL/Tabs/TabDocuments.vue";
 import TabStatus from "@/Pages/Common/Dialog/HBL/Tabs/TabStatus.vue";
 import TabShipment from "@/Pages/Common/Dialog/HBL/Tabs/TabShipment.vue";
-import TabHBLPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLPayments.vue";
 import TabHBLDetails from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLDetails.vue";
 import TabHBLCharge from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLCharge.vue";
 import TabPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabPayments.vue";
@@ -35,8 +34,6 @@ const emit = defineEmits(['close']);
 
 const hbl = ref({});
 const pickup = ref({});
-const hblTotalSummary = ref({});
-const hblDestinationTotalSummary = ref({});
 const isLoading = ref(false);
 
 const fetchHBL = async () => {
@@ -64,46 +61,6 @@ const fetchHBL = async () => {
         isLoading.value = false;
     }
 }
-
-// const getHBLTotalSummary = async () => {
-//     try {
-//         const response = await fetch(`/hbls/get-total-summary/${props.hblId}`, {
-//             method: "GET",
-//             headers: {
-//                 "Content-Type": "application/json",
-//                 "X-CSRF-TOKEN": usePage().props.csrf,
-//             },
-//         });
-//
-//         if (!response.ok) {
-//             throw new Error("Network response was not ok.");
-//         }else{
-//             hblTotalSummary.value = await response.json();
-//         }
-//     } catch (error) {
-//         console.error("Error:", error);
-//     }
-// };
-//
-// const getHBLDestinationTotalSummary = async () => {
-//     try {
-//         const response = await fetch(`/hbls/get-destination-total-summary/${props.hblId}`, {
-//             method: "GET",
-//             headers: {
-//                 "Content-Type": "application/json",
-//                 "X-CSRF-TOKEN": usePage().props.csrf,
-//             },
-//         });
-//
-//         if (!response.ok) {
-//             throw new Error("Network response was not ok.");
-//         }else{
-//             hblDestinationTotalSummary.value = await response.json();
-//         }
-//     } catch (error) {
-//         console.error("Error:", error);
-//     }
-// };
 
 const fetchPickup = async () => {
     isLoading.value = true;
@@ -219,7 +176,6 @@ onMounted(() => {
                 </TabPanel>
                 <TabPanel value="1">
                     <TabHBLCharge :hbl="hbl"></TabHBLCharge>
-<!--                    <TabHBLPayments :hbl="hbl" :hbl-destination-total-summary="hblDestinationTotalSummary" :hbl-total-summary="hblTotalSummary"/>-->
                 </TabPanel>
                 <TabPanel value="2">
                     <TabPayments :hbl="hbl"></TabPayments>

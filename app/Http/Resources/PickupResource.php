@@ -49,6 +49,8 @@ class PickupResource extends JsonResource
             'notes' => $this->notes,
             'status' => $this->status,
             'package_types' => Str::title($this->package_types),
+            'delete_main_reason' => $this->delete_main_reason,
+            'delete_remarks' => $this->delete_remarks,
         ];
     }
 }

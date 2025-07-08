@@ -664,6 +664,14 @@ const handleConfirmDriverRemove = (pickupId) => {
                             </template>
                         </Column>
 
+                        <Column v-if="isTrashedView" field="delete_main_reason" header="Reason">
+                            <template #body="slotProps">
+                                <div class="font-medium text-error">
+                                    {{slotProps.data.delete_main_reason}}
+                                </div>
+                            </template>
+                        </Column>
+
                         <template #footer> In total there are {{ pickups ? pickups.length : 0 }} {{ isTrashedView ? 'trashed ' : ''}} pickups. </template>
                     </DataTable>
                 </template>

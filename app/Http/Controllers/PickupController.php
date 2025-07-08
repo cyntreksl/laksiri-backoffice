@@ -89,9 +89,11 @@ class PickupController extends Controller
         PickupCreated::dispatch($pickup);
     }
 
-    public function show(PickUp $pickup)
+    public function show($pickup)
     {
         $this->authorize('pickups.show');
+
+        $pickup = Pickup::withTrashed()->find($pickup);
 
         $pickupResource = new PickupResource($pickup);
 
@@ -211,8 +213,10 @@ class PickupController extends Controller
         $this->pickupRepository->deletePickups($request->pickupIds, $deleteRemarks, $deleteMainReason);
     }
 
-    public function getHBLStatusByPickup(PickUp $pickup)
+    public function getHBLStatusByPickup($pickup)
     {
+        $pickup = Pickup::withTrashed()->find($pickup);
+
         $hbl = $pickup->hbl()->latest()->first();
 
         if ($hbl) {
