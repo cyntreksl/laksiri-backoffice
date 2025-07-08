@@ -69,7 +69,7 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
                 ])->whereDoesntHave('pickupException');
         }
 
-        if ($filters['trashed']) {
+        if ($filters['view'] == 'trashed') {
             $query->onlyTrashed();
         }
 

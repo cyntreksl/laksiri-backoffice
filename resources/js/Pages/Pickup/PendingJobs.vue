@@ -120,7 +120,7 @@ const fetchPickups = async (page = 1, search = "", sortField = 'id', sortOrder =
                 pickupDate: filters.value.pickup_date.value || "",
                 zoneBy: filters.value.zone.value || "",
                 driverBy: filters.value.driver.value || [],
-                trashed: isTrashedView.value,
+                view: isTrashedView.value ? 'trashed' : 'pending',
             }
         });
         pickups.value = response.data.data;
@@ -309,11 +309,11 @@ const confirmPickupRestore = (pickup) => {
             severity: 'warn'
         },
         accept: () => {
-            router.post(route("pickups.restore", selectedPickupID.value), {
+            router.get(route("pickups.restore", selectedPickupID.value), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    fetchPickups(currentPage.value, filters.value.global.value);
                     push.success("Pickup record restored Successfully!");
+                    router.visit(route("pickups.index"));
                 },
                 onError: () => {
                     push.error("Something went to wrong!");
