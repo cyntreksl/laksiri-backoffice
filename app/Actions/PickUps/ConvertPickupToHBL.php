@@ -6,6 +6,9 @@ use App\Actions\Branch\GetBranchByName;
 use App\Actions\HBL\CreateHBLPackages;
 use App\Actions\HBL\GenerateCRNumber;
 use App\Actions\HBL\GenerateHBLNumber;
+use App\Actions\HBL\HBLCharges\UpdateHBLDepartureCharges;
+use App\Actions\HBL\HBLCharges\UpdateHBLDestinationCharges;
+use App\Actions\HBL\Payments\CreateHBLPayment;
 use App\Actions\HBL\UpdateOrCreateHBL;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Enum\PickupStatus;
@@ -70,6 +73,38 @@ class ConvertPickupToHBL
                 $packagesData = $data['packages'];
 
                 CreateHBLPackages::run($hbl, $packagesData);
+
+                // Only create a payment record if paid_amount exists and is greater than 0
+                if (! empty($request->paid_amount) && $request->paid_amount > 0) {
+                    $newPaymentData = [
+                        'hbl_id' => $hbl->id,
+                        'base_currency_rate_in_lkr' => $hbl->currency_rate,
+                        'paid_amount' => $request->paid_amount,
+                        'total_amount' => $request->grand_total,
+                        'due_amount' => $request->grand_total - $request->paid_amount,
+                        'payment_method' => $request->payment_method ?? 'cash',
+                        'paid_by' => auth()->id(),
+                        'notes' => $request->payment_notes ?? 'Initial payment',
+                    ];
+                    CreateHBLPayment::run($newPaymentData);
+                }
+
+                $paymentData = [
+                    'freight_charge' => $request->freight_charge,
+                    'bill_charge' => $request->bill_charge,
+                    'other_charge' => $request->other_charge,
+                    'destination_charge' => $request->destination_charge,
+                    'package_charges' => $request->package_charges ?? 0,
+                    'discount' => $request->discount,
+                    'additional_charge' => $request->additional_charge ?? 0,
+                    'grand_total' => $request->grand_total,
+                    'paid_amount' => $request->paid_amount,
+                    'is_departure_charges_paid' => $request->is_departure_charges_paid,
+                    'is_destination_charges_paid' => $request->is_destination_charges_paid,
+                ];
+
+                UpdateHBLDepartureCharges::run($hbl, $paymentData);
+                UpdateHBLDestinationCharges::run($hbl, $paymentData);
 
                 $hbl->addStatus('HBL Preparation by driver');
 
