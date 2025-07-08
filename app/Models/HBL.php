@@ -310,4 +310,9 @@ class HBL extends Model
     {
         return $this->hasOne(HBLDestinationCharge::class, 'hbl_id', 'id');
     }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'hbl_id');
+    }
 }
