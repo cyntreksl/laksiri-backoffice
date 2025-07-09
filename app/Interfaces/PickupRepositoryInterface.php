@@ -30,4 +30,6 @@ interface PickupRepositoryInterface
     public function exportDataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []);
 
     public function unassignDriverFromPickup(PickUp $pickup): void;
+
+    public function restorePickup($pickUp);
 }

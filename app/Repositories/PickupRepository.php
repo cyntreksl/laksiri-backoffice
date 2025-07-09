@@ -69,6 +69,10 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
                 ])->whereDoesntHave('pickupException');
         }
 
+        if ($filters['view'] == 'trashed') {
+            $query->onlyTrashed();
+        }
+
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {
                 $query->where('reference', 'like', '%'.$search.'%')
@@ -127,17 +131,17 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
         return UpdatePickUp::run($data, $pickup);
     }
 
-    public function deletePickup(PickUp $pickup)
+    public function deletePickup(PickUp $pickup, ?string $deleteRemarks = null, ?string $deleteMainReason = null)
     {
-        return DeletePickup::run($pickup);
+        return DeletePickup::run($pickup, $deleteRemarks, $deleteMainReason);
     }
 
-    public function deletePickups(array $pickupIds)
+    public function deletePickups(array $pickupIds, ?string $deleteRemarks = null, ?string $deleteMainReason = null)
     {
         $pickupList = GetPickupByIds::run($pickupIds);
 
         foreach ($pickupList as $pickup) {
-            DeletePickup::run($pickup);
+            DeletePickup::run($pickup, $deleteRemarks, $deleteMainReason);
         }
     }
 
@@ -193,5 +197,12 @@ class PickupRepository implements GridJsInterface, PickupRepositoryInterface
     public function unassignDriverFromPickup(PickUp $pickup): void
     {
         UnassignDriver::run($pickup);
+    }
+
+    public function restorePickup($pickUp)
+    {
+        $pickUp = PickUp::withTrashed()->find($pickUp);
+
+        $pickUp->restore();
     }
 }

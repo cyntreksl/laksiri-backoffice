@@ -26,6 +26,8 @@ import {useConfirm} from "primevue/useconfirm";
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
+import Dialog from 'primevue/dialog';
+import Textarea from 'primevue/textarea';
 
 const props = defineProps({
     drivers: {
@@ -47,6 +49,11 @@ const props = defineProps({
         type: String,
         default: ''
     },
+    exceptions: {
+        type: Object,
+        default: () => {
+        },
+    },
 });
 
 const baseUrl = ref("/pickup-list");
@@ -63,6 +70,10 @@ const selectedPickupID = ref(null);
 const confirm = useConfirm();
 const showAssignDriverDialog = ref(false);
 const dt = ref();
+const showDeleteDialog = ref(false);
+const deleteRemarks = ref('');
+const deleteMainReason = ref(null);
+const deleteTarget = ref(null);
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -120,6 +131,7 @@ const fetchPickups = async (page = 1, search = "", sortField = 'id', sortOrder =
                 zoneBy: filters.value.zone.value || "",
                 driverBy: filters.value.driver.value || [],
                 userData: props.userData,
+                view: 'pending',
             }
         });
         pickups.value = response.data.data;
@@ -239,83 +251,75 @@ const exportCSV = () => {
     dt.value.exportCSV();
 };
 
-const confirmPickupDelete = (pickup) => {
-    selectedPickupID.value = pickup.value.id;
-    confirm.require({
-        message: 'Would you like to delete this pickup record?',
-        header: 'Delete Pickup?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Delete',
-            severity: 'danger'
-        },
-        accept: () => {
-            router.delete(route("pickups.destroy", selectedPickupID.value), {
+const openDeleteDialog = (pickup) => {
+    deleteTarget.value = pickup.value;
+    showDeleteDialog.value = true;
+    deleteRemarks.value = '';
+    deleteMainReason.value = null;
+};
+
+const openBulkDeleteDialog = () => {
+    deleteTarget.value = selectedPickups.value.map(item => item.id);
+    showDeleteDialog.value = true;
+    deleteRemarks.value = '';
+    deleteMainReason.value = null;
+};
+
+const handleDeleteConfirm = () => {
+    if (!deleteMainReason.value) {
+        push.error("Please select a main reason for deletion.");
+        return;
+    }
+    if (Array.isArray(deleteTarget.value)) {
+        // Bulk delete
+        router.post(
+            route("pickups.delete"),
+            {
+                pickupIds: deleteTarget.value,
+                remarks: deleteRemarks.value,
+                main_reason: deleteMainReason.value,
+            },
+            {
                 preserveScroll: true,
                 onSuccess: () => {
-                    push.success("Pickup record Deleted Successfully!");
+                    push.success("Pickups Deleted Successfully!");
                     const currentRoute = route().current();
                     router.visit(route(currentRoute, route().params));
                 },
                 onError: () => {
-                    push.error("Something went to wrong!");
+                    push.error("Something went wrong!");
                 },
-            });
-            selectedPickupID.value = null;
-        },
-        reject: () => {
-            selectedPickupID.value = null;
-        }
-    });
+            }
+        );
+        selectedPickups.value = [];
+    } else {
+        // Single delete
+        router.delete(route("pickups.destroy", deleteTarget.value.id), {
+            data: {
+                remarks: deleteRemarks.value,
+                main_reason: deleteMainReason.value,
+            },
+            preserveScroll: true,
+            onSuccess: () => {
+                push.success("Pickup record Deleted Successfully!");
+                const currentRoute = route().current();
+                router.visit(route(currentRoute, route().params));
+            },
+            onError: () => {
+                push.error("Something went wrong!");
+            },
+        });
+    }
+    showDeleteDialog.value = false;
+    deleteTarget.value = null;
+};
+
+const confirmPickupDelete = (pickup) => {
+    openDeleteDialog(pickup);
 };
 
 const confirmPickupsDelete = () => {
-    const idList = selectedPickups.value.map((item) => item.id);
-
-    confirm.require({
-        message: 'Would you like to delete this pickup records?',
-        header: `${idList.length} Delete Pickups?`,
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Delete',
-            severity: 'danger'
-        },
-        accept: () => {
-            router.post(
-                route("pickups.delete"),
-                {
-                    pickupIds: idList,
-                },
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        push.success("Pickups Deleted Successfully!");
-                        const currentRoute = route().current();
-                        router.visit(route(currentRoute, route().params));
-                    },
-                    onError: () => {
-                        push.error("Something went to wrong!");
-                    },
-                }
-            );
-            selectedPickups.value = [];
-        },
-        reject: () => {
-            selectedPickups.value = [];
-        }
-    });
+    openBulkDeleteDialog();
 };
 
 const closeAssignDriverModal = () => {
@@ -618,4 +622,19 @@ const handleConfirmDriverRemove = (pickupId) => {
         @close="closeAssignDriverModal"
         @update:visible="showAssignDriverDialog = $event"
     />
+
+    <Dialog v-model:visible="showDeleteDialog" :closable="false" :modal="true" :style="{ width: '35rem' }" header="Delete Pickup">
+        <div class="mb-4">
+            <label class="block mb-2 font-medium">Main Reason <span class="text-red-500">*</span></label>
+            <Select v-model="deleteMainReason" :options="exceptions.results" class="w-full" option-label="name" option-value="name" placeholder="Select reason" />
+        </div>
+        <div class="mb-4">
+            <label class="block mb-2 font-medium">Remarks (optional)</label>
+            <Textarea v-model="deleteRemarks" class="w-full" placeholder="Enter remarks (optional)" />
+        </div>
+        <div class="flex justify-end gap-2">
+            <Button label="Cancel" severity="secondary" @click="showDeleteDialog = false" />
+            <Button label="Delete" severity="danger" @click="handleDeleteConfirm" />
+        </div>
+    </Dialog>
 </template>
