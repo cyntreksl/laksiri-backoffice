@@ -9,6 +9,7 @@ use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StorePickupRequest;
 use App\Http\Requests\UpdatePickupRequest;
 use App\Http\Resources\PickupResource;
+use App\Interfaces\Api\ExceptionNameRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\DriverRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
@@ -38,6 +39,7 @@ class PickupController extends Controller
         private readonly SettingRepositoryInterface $settingRepository,
         private readonly NotificationMailRepositoryInterface $notificationMailRepository,
         private readonly HBLRepositoryInterface $HBLRepository,
+        private readonly ExceptionNameRepositoryInterface $exceptionNameRepository,
     ) {}
 
     public function index()
@@ -48,6 +50,7 @@ class PickupController extends Controller
             'drivers' => $this->driverRepository->getAllDrivers(),
             'users' => $this->userRepository->getUsers(['customer']),
             'zones' => $this->zoneRepository->getZones(),
+            'exceptions' => $this->exceptionNameRepository->getExceptionNames()->getData(),
         ]);
     }
 
@@ -60,8 +63,8 @@ class PickupController extends Controller
         $search = $request->input('search', null);
 
         $filters = $request->input('pickupDate')
-            ? $request->only(['userData', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate'])
-            : $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy']);
+            ? $request->only(['userData', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'pickupDate', 'view'])
+            : $request->only(['userData', 'fromDate', 'toDate', 'cargoMode', 'isUrgent', 'isImportant', 'createdBy', 'driverBy', 'zoneBy', 'view']);
 
         return $this->pickupRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
@@ -86,9 +89,11 @@ class PickupController extends Controller
         PickupCreated::dispatch($pickup);
     }
 
-    public function show(PickUp $pickup)
+    public function show($pickup)
     {
         $this->authorize('pickups.show');
+
+        $pickup = Pickup::withTrashed()->find($pickup);
 
         $pickupResource = new PickupResource($pickup);
 
@@ -115,11 +120,13 @@ class PickupController extends Controller
         return $this->pickupRepository->updatePickup($request->all(), $pickup);
     }
 
-    public function destroy(PickUp $pickup)
+    public function destroy(Request $request, PickUp $pickup)
     {
         $this->authorize('pickups.delete');
 
-        $this->pickupRepository->deletePickup($pickup);
+        $deleteRemarks = $request->input('remarks');
+        $deleteMainReason = $request->input('main_reason');
+        $this->pickupRepository->deletePickup($pickup, $deleteRemarks, $deleteMainReason);
     }
 
     public function assignDriver(AssignDriverRequest $request)
@@ -165,6 +172,7 @@ class PickupController extends Controller
             'users' => $this->userRepository->getUsers(),
             'zones' => $this->zoneRepository->getZones(),
             'userData' => $user,
+            'exceptions' => $this->exceptionNameRepository->getExceptionNames()->getData(),
         ]);
     }
 
@@ -179,6 +187,7 @@ class PickupController extends Controller
             'users' => $this->userRepository->getUsers(['customer']),
             'zones' => $this->zoneRepository->getZones(),
             'pickups' => $pickups,
+            'exceptions' => $this->exceptionNameRepository->getExceptionNames()->getData(),
         ]);
     }
 
@@ -199,11 +208,15 @@ class PickupController extends Controller
     {
         $this->authorize('pickups.delete');
 
-        $this->pickupRepository->deletePickups($request->pickupIds);
+        $deleteRemarks = $request->input('remarks');
+        $deleteMainReason = $request->input('main_reason');
+        $this->pickupRepository->deletePickups($request->pickupIds, $deleteRemarks, $deleteMainReason);
     }
 
-    public function getHBLStatusByPickup(PickUp $pickup)
+    public function getHBLStatusByPickup($pickup)
     {
+        $pickup = Pickup::withTrashed()->find($pickup);
+
         $hbl = $pickup->hbl()->latest()->first();
 
         if ($hbl) {
@@ -216,5 +229,12 @@ class PickupController extends Controller
         $this->authorize('pickups.unassign driver');
 
         $this->pickupRepository->unassignDriverFromPickup($pickup);
+    }
+
+    public function restore($pickUp)
+    {
+        $this->pickupRepository->restorePickup($pickUp);
+
+        return redirect()->route('pickups.index');
     }
 }

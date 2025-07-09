@@ -478,12 +478,8 @@
                                                 <li v-for="item in childMenuList">
                                                     <template v-if="true">
                                                         <Link
-                                                            :class="
-                      route().current() === item.route
-                        ? 'font-medium text-primary dark:text-accent-light'
-                        : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50   dark:hover:bg-neutral-500'
-                    "
-                                                            :href="route(item.route)"
+                                                            :class="isActive(item) ? 'afont-medium text-primary dark:text-accent-light' : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50 dark:hover:bg-neutral-500'"
+                                                            :href="route(item.route, item.params || {})"
                                                             class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
                                                         >
                                                             <span class="ml-2"> {{ item.title }}</span>
@@ -747,6 +743,22 @@ export default {
             }
         };
 
+        const isActive = (item) => {
+            const current = route().current();
+            if (current !== item.route) return false;
+
+            const routeParams = route().params || {};
+            const routeQuery = route().query || {};
+            const routeView = routeParams.view || routeQuery.view;
+            const itemView = item.params?.view;
+
+            if (itemView !== undefined) {
+                return routeView === itemView;
+            } else {
+                return routeView === undefined;
+            }
+        }
+
         setSidebarState();
 
         const current = route().current();
@@ -810,6 +822,18 @@ export default {
                             {
                                 title: "All Pickups",
                                 route: "pickups.all",
+                            }
+                        );
+                    }
+
+                    if (usePage().props.user.permissions.includes("pickups.trash_pickups")) {
+                        pickupMenu.splice(
+                            2,
+                            0,
+                            {
+                                title: "Trashed Jobs",
+                                route: "pickups.index",
+                                params: { view: 'trashed' }
                             }
                         );
                     }
@@ -1754,6 +1778,7 @@ export default {
             changeSidePanelTitle,
             toggle,
             op,
+            isActive,
         };
     },
 };
