@@ -7,7 +7,7 @@ import Card from 'primevue/card';
 import Avatar from 'primevue/avatar';
 import InfoDisplayChip from "@/Pages/Common/Components/InfoDisplayChip.vue";
 import Button from "primevue/button";
-import {router, usePage} from "@inertiajs/vue3";
+import {router} from "@inertiajs/vue3";
 import {push} from "notivue";
 import {useConfirm} from "primevue/useconfirm";
 
@@ -155,7 +155,7 @@ watch(
                 <PostSkeleton v-if="isLoading"/>
 
                 <SimpleOverviewWidget v-else
-                                      :count="hbl?.packages_sum_weight != null ? hbl.packages_sum_weight.toFixed(2) : '0.00'"
+                                      :count="hbl?.packages_sum_actual_weight != null ? hbl.packages_sum_actual_weight.toFixed(2) : '0.00'"
                                       class="bg-slate-100" title="Weight">
                     <i class="ti ti-weight text-emerald-500 text-3xl"></i>
                 </SimpleOverviewWidget>

@@ -4,6 +4,7 @@ namespace App\Actions\HBL;
 
 use App\Actions\Branch\GetBranchById;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\HBLType;
 use App\Models\Currency;
 use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -29,7 +30,7 @@ class CreateHBL
             'reference' => $reference,
             'branch_id' => $currentBranch,
             'cargo_type' => $data['cargo_type'],
-            'hbl_type' => $data['hbl_type'],
+            'hbl_type' => $data['hbl_type'] == 'D2D' ? HBLType::DOOR_TO_DOOR->value : $data['hbl_type'],
             'hbl' => $reference,
             'hbl_name' => $data['hbl_name'],
             'email' => $data['email'],

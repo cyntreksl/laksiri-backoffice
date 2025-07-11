@@ -77,7 +77,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
 
         $query->cashSettlement()->whereHas('packages');
 
-        // Ensure 'isHold' key exists and set to boolean
+        // Ensure the 'isHold' key exists and set to boolean
         $filters['isHold'] = isset($filters['isHold']) ? (bool) $filters['isHold'] : false;
 
         // Apply filters

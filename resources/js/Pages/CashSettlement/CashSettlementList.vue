@@ -149,7 +149,7 @@ const getCashSettlementSummary = async () => {
                 deliveryType: filters.value.hbl_type.value,
                 cargoMode: filters.value.cargo_type.value,
                 isHold: filters.value.is_hold.value,
-                officers: filters.value.user.value,
+                createdBy: filters.value.user.value,
                 driverBy: filters.value.driver.value || [],
                 paymentStatus: filters.value.payments.value,
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
@@ -605,7 +605,7 @@ const exportURL = computed(() => {
                             <template #body="slotProps">
                                 <div class="flex items-center">
                                     <i class="ti ti-scale-outline mr-1 text-blue-500" style="font-size: 1rem"></i>
-                                    {{ slotProps.data.weight.toFixed(2) }}
+                                    {{ Number(slotProps.data.weight || 0).toFixed(2) }}
                                 </div>
                             </template>
                         </Column>
@@ -614,7 +614,7 @@ const exportURL = computed(() => {
                             <template #body="slotProps">
                                 <div class="flex items-center">
                                     <i class="ti ti-scale mr-1 text-blue-500" style="font-size: 1rem"></i>
-                                    {{ slotProps.data.volume.toFixed(3) }}
+                                    {{ Number(slotProps.data.volume || 0).toFixed(3) }}
                                 </div>
                             </template>
                         </Column>
@@ -650,7 +650,7 @@ const exportURL = computed(() => {
                             <template #body="slotProps">
                                 <div class="flex items-center justify-end">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
-                                    {{ slotProps.data.grand_total.toFixed(2) }}
+                                    {{ Number(slotProps.data.grand_total || 0).toFixed(2) }}
                                 </div>
                             </template>
                         </Column>
@@ -659,7 +659,7 @@ const exportURL = computed(() => {
                             <template #body="slotProps">
                                 <div class="flex items-center">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
-                                    {{ slotProps.data.paid_amount.toFixed(2) }}
+                                    {{ Number(slotProps.data.paid_amount || 0).toFixed(2) }}
                                 </div>
 
                                 <div class="mt-1">

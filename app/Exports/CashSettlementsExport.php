@@ -31,9 +31,13 @@ class CashSettlementsExport implements FromQuery, ShouldAutoSize, WithHeadings, 
             'Weight',
             'Volume',
             'No of Packages',
+            'Destination Charges',
+            'Agent Charges',
             'Amount',
             'Paid Amount',
             'Cargo Mode',
+            'Driver',
+            'Source',
         ];
     }
 
@@ -65,13 +69,17 @@ class CashSettlementsExport implements FromQuery, ShouldAutoSize, WithHeadings, 
             'Id' => $row->id,
             'HBL Number' => $row->hbl_number,
             'Name' => $row->hbl_name,
-            'Pickup Date' => $row->pickup ? $row->pickup['pickup_date'] : $row->created_at->format('Y-m-d'),
+            'Pickup Date' => $row->created_at->format('Y-m-d'),
             'Weight' => $row['packages_sum_weight'],
             'Volume' => $row['packages_sum_volume'],
             'No of Packages' => count($row->packages),
+            'Destination Charges' => number_format($row->destinationCharge->destination_2_total_with_tax ?? 0, 2),
+            'Agent Charges' => number_format($row->departureCharge->departure_grand_total ?? 0, 2),
             'Amount' => $row->grand_total,
             'Paid Amount' => $row->paid_amount,
             'Cargo Mode' => $row->cargo_type,
+            'Driver' => $row->pickup?->driver?->name,
+            'Source' => $row->user?->name,
         ];
 
         return $array;

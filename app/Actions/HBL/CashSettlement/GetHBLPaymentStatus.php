@@ -9,8 +9,12 @@ class GetHBLPaymentStatus
 {
     use AsAction;
 
-    public function handle(float $total_paid_amount, float $grand_total): string
+    public function handle(?float $total_paid_amount, ?float $grand_total): string
     {
+        // Handle null values by providing defaults
+        $total_paid_amount = $total_paid_amount ?? 0.0;
+        $grand_total = $grand_total ?? 0.0;
+
         $total_paid_amount = round($total_paid_amount, 2);
         $grand_total = round($grand_total, 2);
 

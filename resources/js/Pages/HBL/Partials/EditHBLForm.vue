@@ -140,16 +140,16 @@ const form = useForm({
         ? props.hbl.warehouse.charAt(0).toUpperCase() + props.hbl.warehouse.slice(1).toLowerCase()
         : '',
     warehouse_id: props.hbl.warehouse_id,
-    freight_charge: props.hbl.freight_charge.toFixed(2),
-    bill_charge: props.hbl.bill_charge.toFixed(2),
-    other_charge: props.hbl.other_charge.toFixed(2),
-    destination_charge: props.hbl.destination_charge.toFixed(2),
-    discount: props.hbl.discount.toFixed(2),
-    paid_amount: props.hbl.paid_amount.toFixed(2),
-    grand_total: props.hbl.grand_total.toFixed(2),
+    freight_charge: Number(props.hbl.freight_charge || 0).toFixed(2),
+    bill_charge: Number(props.hbl.bill_charge || 0).toFixed(2),
+    other_charge: Number(props.hbl.other_charge || 0).toFixed(2),
+    destination_charge: Number(props.hbl.destination_charge || 0).toFixed(2),
+    discount: Number(props.hbl.discount || 0).toFixed(2),
+    paid_amount: Number(props.hbl.paid_amount || 0).toFixed(2),
+    grand_total: Number(props.hbl.grand_total || 0).toFixed(2),
     packages: props.hbl.packages,
     is_active_package: !!props. hbl. packages?.[0]?.package_rule,
-    additional_charge: props.hbl.additional_charge.toFixed(2),
+    additional_charge: Number(props.hbl.additional_charge || 0).toFixed(2),
     vat: 0,
     is_departure_charges_paid: props.hbl.is_departure_charges_paid === 1,
     is_destination_charges_paid: props.hbl.is_destination_charges_paid === 1,
@@ -514,7 +514,7 @@ const calculatePayment = async () => {
 
             totalChargeableWeight = chargeableWeights.reduce((acc, curr) => acc + curr, 0);
         } else {
-            totalChargeableWeight = grandTotalWeight.value;
+            totalChargeableWeight = Number(grandTotalWeight.value || 0);
         }
 
         const response = await fetch(`/hbls/calculate-payment`, {
@@ -527,8 +527,8 @@ const calculatePayment = async () => {
                 cargo_type: form.cargo_type,
                 hbl_type: form.hbl_type,
                 warehouse: form.warehouse,
-                grand_total_volume: grandTotalVolume.value,
-                grand_total_weight: totalChargeableWeight,
+                grand_total_volume: Number(grandTotalVolume.value || 0),
+                grand_total_weight: Number(totalChargeableWeight || 0),
                 package_list_length: packageList.value.length,
                 package_list: packageList.value,
                 is_active_package: form.is_active_package,
@@ -1121,28 +1121,28 @@ const handleCopyFromHBLToConsignee = async () => {
                             </Column>
                             <Column field="length" header="Length (CM)">
                                 <template #body="slotProps">
-                                    {{ slotProps.data.length.toFixed(3) }}
+                                    {{ Number(slotProps.data.length || 0).toFixed(3) }}
                                 </template>
                             </Column>
                             <Column field="width" header="Width">
                                 <template #body="slotProps">
-                                    {{ slotProps.data.width.toFixed(3) }}
+                                    {{ Number(slotProps.data.width || 0).toFixed(3) }}
                                 </template>
                             </Column>
                             <Column field="height" header="Height">
                                 <template #body="slotProps">
-                                    {{ slotProps.data.height.toFixed(3) }}
+                                    {{ Number(slotProps.data.height || 0).toFixed(3) }}
                                 </template>
                             </Column>
                             <Column field="quantity" header="Quantity"></Column>
                             <Column field="weight" header="Actual Weight">
                                 <template #body="slotProps">
-                                    {{ form.cargo_type === 'Air Cargo' ? (slotProps.data.actual_weight || 0).toFixed(3) :  (slotProps.data.weight || 0).toFixed(3)}}
+                                    {{ form.cargo_type === 'Air Cargo' ? Number(slotProps.data.actual_weight || 0).toFixed(3) :  Number(slotProps.data.weight || 0).toFixed(3)}}
                                 </template>
                             </Column>
                             <Column v-if="form.cargo_type === 'Air Cargo'" field="volumetricWeight" header="Volumetric Weight">
                                 <template #body="slotProps">
-                                    {{ (slotProps.data.volumetricWeight || slotProps.data.volumetric_weight || 0).toFixed(3) }} kg
+                                    {{ Number(slotProps.data.volumetricWeight || slotProps.data.volumetric_weight || 0).toFixed(3) }} kg
                                 </template>
                             </Column>
                             <Column field="volume" header="Volume (M.CU)"></Column>
