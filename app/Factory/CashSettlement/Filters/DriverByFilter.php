@@ -12,9 +12,11 @@ class DriverByFilter implements FilterInterface
         if ($value) {
             $value = ! is_array($value) ? explode(',', $value) : $value;
 
-            return $query->whereHas('pickup', function (Builder $query) use ($value) {
-                $query->whereIn('driver_id', $value);
-            })->orWhereIn('created_by', $value);
+            return $query->where(function (Builder $query) use ($value) {
+                $query->whereHas('pickup', function (Builder $query) use ($value) {
+                    $query->whereIn('driver_id', $value);
+                })->orWhereIn('created_by', $value);
+            });
         }
     }
 }

@@ -24,7 +24,7 @@ class GetHBLByIdWithPackages
             }, 'latestRtfRecord'])
             ->withSum(['packages' => function ($query) {
                 $query->withoutGlobalScope(BranchScope::class);
-            }], 'weight')
+            }], 'actual_weight')
             ->withSum(['packages' => function ($query) {
                 $query->withoutGlobalScope(BranchScope::class);
             }], 'volume')
