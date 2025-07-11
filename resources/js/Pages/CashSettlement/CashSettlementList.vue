@@ -149,7 +149,7 @@ const getCashSettlementSummary = async () => {
                 deliveryType: filters.value.hbl_type.value,
                 cargoMode: filters.value.cargo_type.value,
                 isHold: filters.value.is_hold.value,
-                officers: filters.value.user.value,
+                createdBy: filters.value.user.value,
                 driverBy: filters.value.driver.value || [],
                 paymentStatus: filters.value.payments.value,
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
